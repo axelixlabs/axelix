@@ -17,7 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
+import java.util.List;
+
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
 
 /**
  * Provides insights discovered for the current service instance.
@@ -31,4 +34,11 @@ public interface InsightsInfoProvider {
      * @return the actual insight information.
      */
     Insights getInsight();
+
+    /**
+     * @return the aggregated information about the transactions inside the instance.
+     */
+    default List<TransactionAggregatedProfile> getTransactions() {
+        return getInsight().getPersistenceInsights().getTransactions();
+    }
 }

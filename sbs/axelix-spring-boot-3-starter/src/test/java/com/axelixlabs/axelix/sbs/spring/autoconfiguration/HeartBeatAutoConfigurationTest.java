@@ -32,9 +32,11 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.master.HealthDetectionFunction;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,6 +100,16 @@ class HeartBeatAutoConfigurationTest {
         @Bean
         public BasicRegistrationMetadataAssembler serviceMetadataAssembler() {
             return mock(BasicRegistrationMetadataAssembler.class);
+        }
+
+        @Bean
+        public HealthDetectionFunction healthDetectionFunction() {
+            return mock(HealthDetectionFunction.class);
+        }
+
+        @Bean
+        public InsightsInfoProvider insightsInfoProvider() {
+            return mock(InsightsInfoProvider.class);
         }
 
         @Bean

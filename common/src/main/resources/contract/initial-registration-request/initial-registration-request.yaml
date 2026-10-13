@@ -11,6 +11,7 @@ info:
     uses us, and apart from it, Axelix Master would become overwhelmed by the necessity to parse them.
     So we decided to separate heartbeat from the initial registration request, where initial registration
     request pushes all the data needed, and later heartbeats just send the data
+    that changes over time: the health status, the heap usage and the transactions.
   x-axelix-introduced-in: 1.3.0
   x-axelix-server: master
 paths:
@@ -128,7 +129,7 @@ components:
           $ref: '#/components/schemas/SoftwareVersions'
         healthStatus:
           description: >-
-            The health status of the given instance that is reported by started infrastructure.
+            The health status of the given instance that is reported by the starter infrastructure.
             Never absent.
           x-axelix-introduced-in: 1.3.0
           $ref: '#/components/schemas/HealthStatus'

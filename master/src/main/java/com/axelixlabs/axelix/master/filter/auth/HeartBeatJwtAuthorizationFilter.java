@@ -56,8 +56,11 @@ import com.axelixlabs.axelix.master.filter.FiltersOrder;
 @Order(FiltersOrder.HEART_BEAT_JWT_AUTHORIZATION_FILTER)
 public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private static final String HEART_BEAT_REQUEST_PATH =
+    private static final String REGISTRATION_REQUEST_PATH =
             WebAutoConfiguration.INTERNAL_API_PATH + ApiPaths.SelfRegistrationApi.SERVICE_REGISTER;
+
+    private static final String HEART_BEAT_REQUEST_PATH =
+            WebAutoConfiguration.INTERNAL_API_PATH + ApiPaths.SelfRegistrationApi.HEARTBEAT;
 
     private final SecurityContextExecutor securityContextExecutor;
     private final JwtDecoderService jwtDecoderService;
@@ -76,7 +79,7 @@ public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
-        return !path.equalsIgnoreCase(HEART_BEAT_REQUEST_PATH);
+        return !path.equalsIgnoreCase(REGISTRATION_REQUEST_PATH) && !path.equalsIgnoreCase(HEART_BEAT_REQUEST_PATH);
     }
 
     @Override

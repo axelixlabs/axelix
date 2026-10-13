@@ -118,10 +118,11 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                 .scheduledTaskExecutions(List.of());
     }
 
-    private PersistenceInsights assemblePersistenceInsights() {
+    @Override
+    public List<TransactionAggregatedProfile> getTransactions() {
         Map<MethodClassKey, TransactionStats> stats = transactionStatsCollector.getCopyOfStats();
 
-        List<TransactionAggregatedProfile> transactions = stats.entrySet().stream()
+        return stats.entrySet().stream()
                 .map(entry -> {
                     MethodClassKey key = entry.getKey();
                     TransactionStats transactionStats = entry.getValue();
@@ -145,9 +146,11 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                             .readOnly(attributes != null && attributes.isReadOnly());
                 })
                 .collect(Collectors.toList());
+    }
 
+    private PersistenceInsights assemblePersistenceInsights() {
         JpaEntities jpaEntities = entitiesMapProvider.getEntities();
-        return new PersistenceInsights().transactions(transactions).entitiesMap(jpaEntities);
+        return new PersistenceInsights().transactions(getTransactions()).entitiesMap(jpaEntities);
     }
 
     private static List<CountedLazyLoadingTarget> convertLazyLoadingTargets(

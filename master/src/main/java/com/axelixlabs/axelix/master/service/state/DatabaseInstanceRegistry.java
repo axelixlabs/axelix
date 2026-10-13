@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 
 /**
@@ -61,8 +63,8 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public void refresh(InstanceId instanceId, Instance.InstanceStatus status) {
-        instanceRepository.refreshInstanceStatus(instanceId.instanceId(), status);
+    public void refresh(InstanceId instanceId, Instance.InstanceStatus status, MemoryUsage memoryUsage) {
+        instanceRepository.refreshInstanceStatus(instanceId.instanceId(), status, memoryUsage.heap(), Instant.now());
     }
 
     @Override

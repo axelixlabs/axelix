@@ -30,9 +30,11 @@ import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProper
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultHeartBeatMetadataAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.master.HealthDetectionFunction;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
  * Auto-configuration for instance self-registration.
@@ -54,9 +56,14 @@ public class HeartBeatAutoConfiguration {
     @Bean
     public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
             BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
+            HealthDetectionFunction healthDetectionFunction,
+            InsightsInfoProvider insightsInfoProvider,
             HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
         return new DefaultHeartBeatMetadataAssembler(
-                basicRegistrationMetadataAssembler, heartBeatConfigurationProperties);
+                basicRegistrationMetadataAssembler,
+                healthDetectionFunction,
+                insightsInfoProvider,
+                heartBeatConfigurationProperties);
     }
 
     @Bean

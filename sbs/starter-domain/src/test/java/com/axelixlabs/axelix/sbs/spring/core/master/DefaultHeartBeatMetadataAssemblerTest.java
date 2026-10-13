@@ -40,7 +40,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HotSpotInsights;
@@ -80,6 +81,12 @@ class DefaultHeartBeatMetadataAssemblerTest {
     private BasicRegistrationMetadataAssembler service;
 
     @Autowired
+    private HealthDetectionFunction healthDetectionFunction;
+
+    @Autowired
+    private InsightsInfoProvider insightsInfoProvider;
+
+    @Autowired
     private HeartBeatConfigurationProperties properties;
 
     @TestConfiguration
@@ -94,9 +101,14 @@ class DefaultHeartBeatMetadataAssemblerTest {
         @Bean
         public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
                 BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
+                HealthDetectionFunction healthDetectionFunction,
+                InsightsInfoProvider insightsInfoProvider,
                 HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
             return new DefaultHeartBeatMetadataAssembler(
-                    basicRegistrationMetadataAssembler, heartBeatConfigurationProperties);
+                    basicRegistrationMetadataAssembler,
+                    healthDetectionFunction,
+                    insightsInfoProvider,
+                    heartBeatConfigurationProperties);
         }
 
         @Bean
@@ -154,7 +166,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
     @Test
     void shouldAssembleTheHeartBeatMetadataAboutGivenService() {
         // when.
-        HeartBeatMetadata metadata = subject.assemble();
+        InitialSelfRegistrationRequest metadata = subject.assembleRegistrationRequest();
         BasicRegistrationMetadata basicMetadata = metadata.getBasicRegistrationMetadata();
 
         // then.
@@ -173,11 +185,24 @@ class DefaultHeartBeatMetadataAssemblerTest {
         assertThat(basicMetadata.getSoftwareVersions().getSpringFramework()).isEqualTo(SpringVersion.getVersion());
     }
 
+    @Test
+    void shouldAssembleTheLightweightHeartBeatOfGivenService() {
+        // when.
+        HeartBeatMetadataV2 heartBeat = subject.assembleHeartBeat();
+
+        // then.
+        assertThat(heartBeat.getInstanceId())
+                .isEqualTo(subject.assembleRegistrationRequest().getInstanceId());
+        assertThat(heartBeat.getHealthStatus()).isEqualTo(HealthStatus.UP);
+        assertThat(heartBeat.getMemoryDetails().getHeap()).isPositive();
+        assertThat(heartBeat.getTransactions()).isEmpty();
+    }
+
     @Test // GH-1292
     void shouldReturnStableInstanceNameOnRepeatedCalls() {
         // when.
-        HeartBeatMetadata firstMetadata = subject.assemble();
-        HeartBeatMetadata secondMetadata = subject.assemble();
+        InitialSelfRegistrationRequest firstMetadata = subject.assembleRegistrationRequest();
+        InitialSelfRegistrationRequest secondMetadata = subject.assembleRegistrationRequest();
 
         // then.
         assertThat(firstMetadata.getInstanceName()).isEqualTo(secondMetadata.getInstanceName());
@@ -186,12 +211,14 @@ class DefaultHeartBeatMetadataAssemblerTest {
     @Test // GH-1292
     void shouldReturnDifferentInstanceNameForDifferentInstances() {
         // given.
-        DefaultHeartBeatMetadataAssembler assembler1 = new DefaultHeartBeatMetadataAssembler(service, properties);
-        DefaultHeartBeatMetadataAssembler assembler2 = new DefaultHeartBeatMetadataAssembler(service, properties);
+        DefaultHeartBeatMetadataAssembler assembler1 = new DefaultHeartBeatMetadataAssembler(
+                service, healthDetectionFunction, insightsInfoProvider, properties);
+        DefaultHeartBeatMetadataAssembler assembler2 = new DefaultHeartBeatMetadataAssembler(
+                service, healthDetectionFunction, insightsInfoProvider, properties);
 
         // when.
-        HeartBeatMetadata metadata1 = assembler1.assemble();
-        HeartBeatMetadata metadata2 = assembler2.assemble();
+        InitialSelfRegistrationRequest metadata1 = assembler1.assembleRegistrationRequest();
+        InitialSelfRegistrationRequest metadata2 = assembler2.assembleRegistrationRequest();
 
         // then.
         assertThat(metadata1.getInstanceName()).startsWith("testApp-");

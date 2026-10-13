@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.master.contract.heartbeat.HeartBeatMetadata;
+import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.Insights;
 import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskExecution;
@@ -42,7 +42,7 @@ class ScheduledTaskExecutionResultConverterTest {
     @Test
     void shouldSkipExecutionsWithUnparseableStartedAtTimestamp() {
         // given.
-        HeartBeatMetadata heartBeatMetadata = new HeartBeatMetadata()
+        InitialSelfRegistrationRequest request = new InitialSelfRegistrationRequest()
                 .instanceId("3c994958-924f-4a12-87d0-a8782e97af10")
                 .basicRegistrationMetadata(new BasicRegistrationMetadata()
                         .groupId("org.springframework.samples")
@@ -61,7 +61,7 @@ class ScheduledTaskExecutionResultConverterTest {
                                                 .success(true)))));
 
         // when.
-        Set<ScheduledTaskExecutionResult> results = subject.convert(heartBeatMetadata);
+        Set<ScheduledTaskExecutionResult> results = subject.convert(request);
 
         // then.
         assertThat(results)

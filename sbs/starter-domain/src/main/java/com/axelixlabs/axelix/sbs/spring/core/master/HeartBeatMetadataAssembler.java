@@ -17,10 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 
 /**
- * Abstractions responsible for assembling the wire {@link HeartBeatMetadata}.
+ * Abstractions responsible for assembling the wire {@link InitialSelfRegistrationRequest}
+ * and the wire {@link HeartBeatMetadataV2}.
  *
  * @since 04.02.2026
  * @author Nikita Kirillov
@@ -28,5 +30,13 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadat
  */
 public interface HeartBeatMetadataAssembler {
 
-    HeartBeatMetadata assemble();
+    /**
+     * @return the full metadata required for the instance to register itself in the master.
+     */
+    InitialSelfRegistrationRequest assembleRegistrationRequest();
+
+    /**
+     * @return the lightweight metadata sent to the master once the instance has been registered.
+     */
+    HeartBeatMetadataV2 assembleHeartBeat();
 }

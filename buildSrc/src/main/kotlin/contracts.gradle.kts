@@ -37,11 +37,16 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
             outputDir.set(outputRoot.absolutePath)
             modelPackage.set(contracts.modelBasePackage.map { basePackage -> "$basePackage.$featurePackage" })
 
-            // heartbeat.yaml textually duplicates metadata-feed.yaml's BasicRegistrationMetadata subtree
+            // These documents textually duplicate (parts of) metadata-feed.yaml's BasicRegistrationMetadata subtree
             // (GH-1666, see the yaml comments). Avoid duplicate classes: only generate the one model
-            // heartbeat.yaml actually adds (HeartBeatMetadata); map everything else to metadata-feed's classes.
-            if (featurePackage == "heartbeat") {
-                globalProperties.set(mapOf("models" to "HeartBeatMetadata", "modelDocs" to "false", "modelTests" to "false"))
+            // the document actually adds; map everything else to metadata-feed's classes.
+            val ownModel = mapOf(
+                "heartbeat" to "HeartBeatMetadata",
+                "heartbeatv2" to "HeartBeatMetadataV2",
+                "initialregistrationrequest" to "InitialSelfRegistrationRequest",
+            )[featurePackage]
+            if (ownModel != null) {
+                globalProperties.set(mapOf("models" to ownModel, "modelDocs" to "false", "modelTests" to "false"))
                 importMappings.set(contracts.modelBasePackage.map { basePackage ->
                     listOf(
                         "BasicRegistrationMetadata", "SoftwareVersions", "MemoryDetails", "HealthStatus", "GarbageCollector",

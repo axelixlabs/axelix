@@ -91,6 +91,7 @@ public class ExternalApiCookieAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/external/oauth2/callback")
                 || path.startsWith("/api/external/settings")
                 || path.equalsIgnoreCase("/api/internal/service/register")
+                || path.equalsIgnoreCase("/api/internal/service/heartbeat/v2")
                 || path.startsWith("/api/mcp")
                 || path.equalsIgnoreCase("/api/external/mcp-oauth2/.well-known/oauth-protected-resource");
     }

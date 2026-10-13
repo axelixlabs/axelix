@@ -190,6 +190,83 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
     }
 
     @Nested
+    class ReloadTransactions {
+
+        @Test
+        void shouldReplaceTransactionsOfCurrentSnapshot() {
+            // given.
+            LocalDate today = LocalDate.now(ZoneOffset.UTC);
+            jdbcAggregateTemplate.insert(persistenceSnapshot(
+                    "com.example", "service-a", today, insights(List.of(nPlusOne("pets", 2)), Map.of("owner", 4))));
+            PersistenceInsights reported = insights(List.of(nPlusOne("tags", 7)), Map.of());
+
+            // when.
+            subject.reloadTransactions(ApplicationId.of("com.example", "service-a"), reported.getTransactions());
+
+            // then.
+            HistoricalApplicationSnapshot updated = jdbcAggregateTemplate.findById(
+                    new SnapshotId("com.example", "service-a", today), HistoricalApplicationSnapshot.class);
+
+            assertThat(updated).isNotNull();
+            assertThat(updated.insights().persistenceInsights().getTransactions())
+                    .hasSize(1)
+                    .first()
+                    .satisfies(stored -> {
+                        assertThat(stored.getLazyLoadingTargets())
+                                .extracting(target -> target.getTarget().getAssociationPropertyName())
+                                .containsExactly("tags");
+                        assertThat(stored.getInMemoryPagination()).isEmpty();
+                    });
+            assertThat(jdbcAggregateTemplate.count(HistoricalApplicationSnapshot.class))
+                    .isEqualTo(1);
+        }
+
+        @Test
+        void shouldCarryLatestSnapshotOverToCurrentDay() {
+            // given a snapshot that was taken yesterday, i.e. the service has not registered itself today.
+            LocalDate today = LocalDate.now(ZoneOffset.UTC);
+            LocalDate yesterday = today.minusDays(1);
+            jdbcAggregateTemplate.insert(snapshot("com.example", "service-a", yesterday, GarbageCollector.ZGC));
+            PersistenceInsights reported = insights(List.of(nPlusOne("pets", 2)), Map.of("owner", 4));
+
+            // when.
+            subject.reloadTransactions(ApplicationId.of("com.example", "service-a"), reported.getTransactions());
+
+            // then the current day got its own snapshot with everything but transactions taken from yesterday.
+            HistoricalApplicationSnapshot current = jdbcAggregateTemplate.findById(
+                    new SnapshotId("com.example", "service-a", today), HistoricalApplicationSnapshot.class);
+            HistoricalApplicationSnapshot previous = jdbcAggregateTemplate.findById(
+                    new SnapshotId("com.example", "service-a", yesterday), HistoricalApplicationSnapshot.class);
+
+            assertThat(current).isNotNull();
+            assertThat(current.insights().persistenceInsights().getTransactions())
+                    .hasSize(1);
+            assertThat(current.insights().hotSpot())
+                    .isEqualTo(previous.insights().hotSpot());
+            assertThat(current.insights().springFramework())
+                    .isEqualTo(previous.insights().springFramework());
+            assertThat(current.versions()).isEqualTo(previous.versions());
+
+            // and yesterday's snapshot is left as it was.
+            assertThat(previous.insights().persistenceInsights().getTransactions())
+                    .isEmpty();
+        }
+
+        @Test
+        void shouldDoNothingWhenApplicationHasNoSnapshots() {
+            // given.
+            PersistenceInsights reported = insights(List.of(nPlusOne("pets", 2)), Map.of());
+
+            // when.
+            subject.reloadTransactions(ApplicationId.of("com.example", "missing-service"), reported.getTransactions());
+
+            // then.
+            assertThat(jdbcAggregateTemplate.count(HistoricalApplicationSnapshot.class))
+                    .isZero();
+        }
+    }
+
+    @Nested
     class GetCurrentRecord {
 
         @Test

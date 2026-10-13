@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.state;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,6 +40,7 @@ import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static com.axelixlabs.axelix.master.utils.TestInstanceFactory.withName;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 /**
  * Base class for integration tests of {@link DatabaseInstanceRegistry}
@@ -157,6 +159,45 @@ class DatabaseInstanceRegistryTest {
                 .usingRecursiveComparison()
                 .ignoringFieldsOfTypes(Instant.class)
                 .isEqualTo(updated);
+    }
+
+    @Test
+    void refresh_shouldUpdateStatusHeapAndHeartBeatOnly() {
+        // given.
+        Instant staleHeartBeat = Instant.now().minus(1, ChronoUnit.HOURS);
+        Instance instance = TestInstanceFactory.createInstanceWithHeartbeat("refresh-id-1", staleHeartBeat);
+        Instance untouched = TestInstanceFactory.createInstanceWithHeartbeat("refresh-id-2", staleHeartBeat);
+        instanceRegistry.register(instance);
+        instanceRegistry.register(untouched);
+
+        // when.
+        instanceRegistry.refresh(instance.id(), Instance.InstanceStatus.DOWN, new MemoryUsage(2048d));
+
+        // then.
+        Instance refreshed = instanceRegistry.get(instance.id()).orElseThrow();
+        assertThat(refreshed.status()).isEqualTo(Instance.InstanceStatus.DOWN);
+        assertThat(refreshed.memoryUsage()).isEqualTo(new MemoryUsage(2048d));
+        assertThat(refreshed.latestHeartBeat()).isCloseTo(Instant.now(), within(1, ChronoUnit.MINUTES));
+        assertThat(refreshed)
+                .usingRecursiveComparison()
+                .ignoringFields("status", "memoryUsage")
+                .ignoringFieldsOfTypes(Instant.class)
+                .isEqualTo(instance);
+
+        // and the other instance is left as it was.
+        Instance other = instanceRegistry.get(untouched.id()).orElseThrow();
+        assertThat(other.status()).isEqualTo(untouched.status());
+        assertThat(other.memoryUsage()).isEqualTo(untouched.memoryUsage());
+        assertThat(other.latestHeartBeat()).isCloseTo(staleHeartBeat, within(1, ChronoUnit.SECONDS));
+    }
+
+    @Test
+    void refresh_shouldNotCreateUnknownInstance() {
+        // when.
+        instanceRegistry.refresh(InstanceId.of("unknown-id"), Instance.InstanceStatus.UP, new MemoryUsage(2048d));
+
+        // then.
+        assertThat(instanceRegistry.getAll()).isEmpty();
     }
 
     @Test

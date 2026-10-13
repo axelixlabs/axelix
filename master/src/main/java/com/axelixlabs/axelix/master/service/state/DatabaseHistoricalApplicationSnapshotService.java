@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.state;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,8 +40,11 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceD
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
+import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.GarbageCollectorDistributionAggregate;
@@ -164,6 +168,29 @@ public class DatabaseHistoricalApplicationSnapshotService {
         HistoricalApplicationSnapshot applicationSnapshot = converter.currentSnapshot(metadata);
 
         jdbcAggregateTemplate.upsert(applicationSnapshot);
+    }
+
+    /**
+     * Replaces the transactions inside the current snapshot of the given application, keeping everything
+     * else as it was reported during the latest registration.
+     */
+    @Transactional
+    public void reloadTransactions(ApplicationId applicationId, List<TransactionAggregatedProfile> transactions) {
+        HistoricalApplicationSnapshot latest = getCurrentRecord(applicationId);
+
+        if (latest == null) {
+            return;
+        }
+
+        Insights insights = latest.insights();
+        PersistenceInsights persistenceInsights = new PersistenceInsights()
+                .transactions(transactions)
+                .entitiesMap(insights.persistenceInsights().getEntitiesMap());
+
+        jdbcAggregateTemplate.upsert(new HistoricalApplicationSnapshot(
+                new SnapshotId(applicationId.groupId(), applicationId.artifactId(), LocalDate.now(ZoneOffset.UTC)),
+                new Insights(insights.hotSpot(), insights.springFramework(), persistenceInsights),
+                latest.versions()));
     }
 
     /**

@@ -18,12 +18,9 @@
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.contract.heartbeatv2.HeartBeatMetadataV2;
-import com.axelixlabs.axelix.master.contract.initialregistrationrequest.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
-import com.axelixlabs.axelix.master.domain.InstanceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +33,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
+import com.axelixlabs.axelix.master.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
@@ -128,18 +130,45 @@ public class InstanceSelfRegistrationInternalApi {
     }
 
     @PostMapping(path = ApiPaths.SelfRegistrationApi.HEARTBEAT)
-    public ResponseEntity<Void> heartbeatV2(HeartBeatMetadataV2 heartBeatMetadataV2) {
+    public ResponseEntity<Void> heartbeatV2(@RequestBody HeartBeatMetadataV2 heartBeatMetadataV2) {
         log.debug("Received heartbeat for {}", heartBeatMetadataV2.getInstanceId());
 
-        instanceRegistry.refresh(
-            InstanceId.of(heartBeatMetadataV2.getInstanceId()),
-            switch (heartBeatMetadataV2.getHealthStatus()) {
-                case UP -> Instance.InstanceStatus.UP;
-                case DOWN -> Instance.InstanceStatus.DOWN;
-                case UNKNOWN -> Instance.InstanceStatus.UNKNOWN;
-            }
-        );
+        if (!hasRequiredFields(heartBeatMetadataV2)) {
+            log.warn("Rejecting heartbeat of '{}': required fields are missing", heartBeatMetadataV2.getInstanceId());
+            return ResponseEntity.badRequest().build();
+        }
 
-        return ResponseEntity.accepted().build();
+        InstanceId instanceId = InstanceId.of(heartBeatMetadataV2.getInstanceId());
+        Optional<Instance> instance = instanceRegistry.get(instanceId);
+
+        if (instance.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        Instance.InstanceStatus status =
+                switch (heartBeatMetadataV2.getHealthStatus()) {
+                    case UP -> Instance.InstanceStatus.UP;
+                    case DOWN -> Instance.InstanceStatus.DOWN;
+                    case UNKNOWN -> Instance.InstanceStatus.UNKNOWN;
+                };
+
+        transactionTemplate.executeWithoutResult(_ -> {
+            instanceRegistry.refresh(
+                    instanceId,
+                    status,
+                    new MemoryUsage(heartBeatMetadataV2.getMemoryDetails().getHeap()));
+            databaseHistoricalApplicationSnapshotService.reloadTransactions(
+                    instance.get().applicationId(), heartBeatMetadataV2.getTransactions());
+        });
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private static boolean hasRequiredFields(HeartBeatMetadataV2 heartBeat) {
+        return heartBeat.getInstanceId() != null
+                && heartBeat.getHealthStatus() != null
+                && heartBeat.getMemoryDetails() != null
+                && heartBeat.getMemoryDetails().getHeap() != null
+                && heartBeat.getTransactions() != null;
     }
 }

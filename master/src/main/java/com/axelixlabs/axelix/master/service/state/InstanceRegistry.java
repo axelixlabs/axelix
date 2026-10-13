@@ -26,8 +26,9 @@ import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.MemoryUsage;
 
-import static com.axelixlabs.axelix.master.domain.Instance.*;
+import static com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
 
 /**
  * Central registry of all the {@link Instance instances} that this Master deployment is aware about.
@@ -53,9 +54,9 @@ public interface InstanceRegistry {
     void register(Instance instance);
 
     /**
-     * Refreshes the status of the given {@link Instance}.
+     * Refreshes the status and the memory usage of the given {@link Instance}.
      */
-    void refresh(InstanceId instanceId, InstanceStatus status);
+    void refresh(InstanceId instanceId, InstanceStatus status, MemoryUsage memoryUsage);
 
     /**
      * Reloads the registry, by removing all previously auto-discovered Instances,

@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultBasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStateProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.HealthDetectionFunction;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
@@ -102,15 +103,20 @@ public class AxelixMetadataEndpointAutoConfiguration {
     }
 
     @Bean
+    public HealthDetectionFunction healthDetectionFunction(ObjectProvider<HealthEndpoint> healthEndpoint) {
+        return () -> getCurrentHealth(healthEndpoint.getIfAvailable());
+    }
+
+    @Bean
     public BasicRegistrationMetadataAssembler serviceMetadataAssembler(
-            ObjectProvider<HealthEndpoint> healthEndpoint,
+            HealthDetectionFunction healthDetectionFunction,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             AxelixInfoProperties axelixInfoProperties,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider) {
 
         return new DefaultBasicRegistrationMetadataAssembler(
-                () -> getCurrentHealth(healthEndpoint.getIfAvailable()),
+                healthDetectionFunction,
                 axelixVersionDiscoverer,
                 libraryInformationProvider,
                 insightsInfoProvider,

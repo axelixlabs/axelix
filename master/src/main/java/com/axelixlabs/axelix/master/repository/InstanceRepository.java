@@ -28,7 +28,7 @@ import org.springframework.data.repository.query.Param;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 
-import static com.axelixlabs.axelix.master.domain.Instance.*;
+import static com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
 
 /**
  * Repository for {@link Instance} aggregate.
@@ -53,10 +53,15 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
     @Query("""
         UPDATE instances
         SET
-            latest_heart_beat = NOW(),
-            status = :status
+            latest_heart_beat = :heartBeat,
+            status = :status,
+            heap = :heap
         WHERE
-            instance_id := instanceId
+            instance_id = :instanceId
         """)
-    void refreshInstanceStatus(@Param("instanceId") String instanceId, @Param("status") InstanceStatus status);
+    void refreshInstanceStatus(
+            @Param("instanceId") String instanceId,
+            @Param("status") InstanceStatus status,
+            @Param("heap") double heap,
+            @Param("heartBeat") Instant heartBeat);
 }

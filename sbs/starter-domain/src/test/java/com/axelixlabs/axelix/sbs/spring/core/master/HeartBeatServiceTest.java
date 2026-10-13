@@ -26,8 +26,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +50,8 @@ import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HotSpotInsights;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
@@ -73,6 +73,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @SpringBootTest(classes = HeartBeatServiceTest.TestApplication.class)
 @TestPropertySource(
         properties = {
+            "axelix.sbs.discovery.master-url=http://localhost/service/register",
             "axelix.sbs.discovery.instance-name=testApp",
             "axelix.sbs.discovery.instance-actuator-url=http://localhost:8089/actuator",
             "axelix.sbs.discovery.heartbeat-interval=PT1S"
@@ -80,12 +81,20 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @Import({HeartBeatServiceTest.HeartBeatServiceTestConfiguration.class})
 class HeartBeatServiceTest {
 
-    private static MockWebServer mockWebServer;
+    private MockWebServer mockWebServer;
 
     @SpringBootApplication
     static class TestApplication {}
 
     @Autowired
+    private HeartBeatConfigurationProperties properties;
+
+    @Autowired
+    private HeartBeatMetadataAssembler metadataAssembler;
+
+    @Autowired
+    private JwtEncoderService jwtEncoderService;
+
     private HeartBeatService heartBeatService;
 
     @Autowired
@@ -123,25 +132,17 @@ class HeartBeatServiceTest {
         }
 
         @Bean
-        public HeartBeatService heartBeatService(
-                HeartBeatConfigurationProperties properties,
-                HeartBeatMetadataAssembler metadataAssembler,
-                JwtEncoderService jwtEncoderService) {
-            return new HeartBeatService(
-                    new NoOpLogger(),
-                    HeartBeatServiceTest::serialize,
-                    properties,
-                    metadataAssembler,
-                    jwtEncoderService);
-        }
-
-        @Bean
         public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
                 BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
+                HealthDetectionFunction healthDetectionFunction,
+                InsightsInfoProvider insightsInfoProvider,
                 HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
 
             return new DefaultHeartBeatMetadataAssembler(
-                    basicRegistrationMetadataAssembler, heartBeatConfigurationProperties);
+                    basicRegistrationMetadataAssembler,
+                    healthDetectionFunction,
+                    insightsInfoProvider,
+                    heartBeatConfigurationProperties);
         }
 
         @Bean
@@ -197,31 +198,30 @@ class HeartBeatServiceTest {
         }
     }
 
-    @BeforeAll
-    static void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        String masterUrl =
-                "http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort() + "/service/register";
-        System.setProperty("axelix.sbs.discovery.master-url", masterUrl);
     }
 
-    @AfterAll
-    static void tearDown() throws IOException {
-        if (mockWebServer != null) {
-            mockWebServer.shutdown();
-        }
-        System.clearProperty("axelix.sbs.discovery.master-url");
+    @AfterEach
+    void tearDown() throws IOException {
+        heartBeatService.close();
+        mockWebServer.shutdown();
     }
 
-    @BeforeEach
-    void beforeEach() {
+    private void startHeartBeating(String masterUrlPath) {
+        properties.setMasterUrl(
+                "http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort() + masterUrlPath);
+        heartBeatService = new HeartBeatService(
+                new NoOpLogger(), HeartBeatServiceTest::serialize, properties, metadataAssembler, jwtEncoderService);
         heartBeatService.scheduleHeartBeat();
     }
 
     @Test
     void shouldHeartbeatOnApplicationEvent() throws Exception {
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        startHeartBeating("/service/register");
 
         RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
         assertThat(request).isNotNull();
@@ -245,6 +245,7 @@ class HeartBeatServiceTest {
     @Test
     void shouldHandleRejectedRegistration() throws Exception {
         mockWebServer.enqueue(new MockResponse().setResponseCode(400));
+        startHeartBeating("/service/register");
 
         RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
         assertThat(request).isNotNull();
@@ -254,6 +255,7 @@ class HeartBeatServiceTest {
     @Test
     void shouldHandleServerError() throws Exception {
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        startHeartBeating("/service/register");
 
         RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
         assertThat(request).isNotNull();
@@ -263,6 +265,7 @@ class HeartBeatServiceTest {
     @Test
     void shouldHandleTimeout() throws Exception {
         mockWebServer.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
+        startHeartBeating("/service/register");
 
         RecordedRequest request = mockWebServer.takeRequest(1, TimeUnit.SECONDS);
         assertThat(request).isNotNull();
@@ -273,6 +276,7 @@ class HeartBeatServiceTest {
     void shouldHandleUnauthorized() throws InterruptedException {
         mockWebServer.enqueue(new MockResponse().setResponseCode(401));
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        startHeartBeating("/service/register");
 
         RecordedRequest firstRequest = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
         assertThat(firstRequest).isNotNull();
@@ -283,8 +287,71 @@ class HeartBeatServiceTest {
         assertThat(secondRequest.getMethod()).isEqualTo("POST");
     }
 
+    @Test
+    void shouldSendLightweightHeartbeatOnceRegistered() throws InterruptedException {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        startHeartBeating("/service/register");
+
+        RecordedRequest registration = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
+        assertThat(registration).isNotNull();
+        assertThat(registration.getPath()).isEqualTo("/service/register");
+
+        RecordedRequest heartbeat = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        assertThat(heartbeat).isNotNull();
+        assertThat(heartbeat.getMethod()).isEqualTo("POST");
+        assertThat(heartbeat.getPath()).isEqualTo("/service/heartbeat/v2");
+        assertThat(heartbeat.getHeader("Content-Type")).isEqualTo("application/json");
+        assertThat(heartbeat.getHeader(HeartBeatService.AUTHORIZATION_HEADER))
+                .startsWith(AuthenticationSchemes.BEARER.prefix());
+        assertThat(heartbeat.getBody().readUtf8()).contains("instanceId").doesNotContain("testApp");
+    }
+
+    @Test
+    void shouldRegisterAgainWhenMasterDoesNotKnowTheInstance() throws InterruptedException {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(409));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        startHeartBeating("/service/register");
+
+        assertThat(mockWebServer.takeRequest(2, TimeUnit.SECONDS).getPath()).isEqualTo("/service/register");
+        assertThat(mockWebServer.takeRequest(3, TimeUnit.SECONDS).getPath()).isEqualTo("/service/heartbeat/v2");
+
+        RecordedRequest registration = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        assertThat(registration).isNotNull();
+        assertThat(registration.getPath()).isEqualTo("/service/register");
+        assertThat(registration.getBody().readUtf8()).contains("testApp");
+
+        assertThat(mockWebServer.takeRequest(3, TimeUnit.SECONDS).getPath()).isEqualTo("/service/heartbeat/v2");
+    }
+
+    @Test
+    void shouldKeepRegisteringUntilRegistrationSucceeds() throws InterruptedException {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        startHeartBeating("/service/register");
+
+        assertThat(mockWebServer.takeRequest(2, TimeUnit.SECONDS).getPath()).isEqualTo("/service/register");
+        assertThat(mockWebServer.takeRequest(3, TimeUnit.SECONDS).getPath()).isEqualTo("/service/register");
+    }
+
+    @Test
+    void shouldKeepRegisteringWhenHeartbeatUrlCannotBeDerivedFromMasterUrl() throws InterruptedException {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        startHeartBeating("/custom/path");
+
+        assertThat(mockWebServer.takeRequest(2, TimeUnit.SECONDS).getPath()).isEqualTo("/custom/path");
+        assertThat(mockWebServer.takeRequest(3, TimeUnit.SECONDS).getPath()).isEqualTo("/custom/path");
+    }
+
     private static String serialize(Object payload) {
-        HeartBeatMetadata metadata = (HeartBeatMetadata) payload;
+        if (payload instanceof HeartBeatMetadataV2) {
+            return "{\"instanceId\":\"" + ((HeartBeatMetadataV2) payload).getInstanceId() + "\"}";
+        }
+
+        InitialSelfRegistrationRequest metadata = (InitialSelfRegistrationRequest) payload;
         return "{\"instanceName\":\""
                 + metadata.getInstanceName()
                 + "\",\"instanceActuatorUrl\":\""

@@ -165,6 +165,34 @@ public class InstanceSelfRegistrationInternalApiTest {
      }
     """.formatted(TEST_INSTANCE_ID);
 
+    // language=json
+    private static final String JSON_HEARTBEAT = """
+        {
+           "instanceId" : "%s",
+           "healthStatus" : "DOWN",
+           "memoryDetails" : {
+             "heap" : 34000
+           },
+           "transactions" : [
+             {
+               "transactionOrigin" : "APPLICATION_DECLARATIVE",
+               "transactionalKey" : {
+                 "className" : "com.example.VetService",
+                 "methodName" : "findVets"
+               },
+               "transactionOverallStats" : {
+                 "minMs" : 2,
+                 "maxMs" : 40,
+                 "averageMs" : 12
+               },
+               "lazyLoadingTargets" : [ ],
+               "inMemoryPagination" : { },
+               "externalCalls" : [ ]
+             }
+           ]
+     }
+    """.formatted(TEST_INSTANCE_ID);
+
     @Autowired
     private TestRestTemplateBuilder restTemplate;
 
@@ -313,6 +341,103 @@ public class InstanceSelfRegistrationInternalApiTest {
         assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isEmpty();
     }
 
+    @Test
+    void shouldRefreshInstanceOnHeartbeat() {
+        // given.
+        restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        // and then.
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).get().satisfies(instance -> {
+            assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.DOWN);
+            assertThat(instance.memoryUsage().heap()).isEqualTo(34000.0);
+            assertThat(instance.latestHeartBeat()).isNotNull();
+            assertThat(instance.name()).isEqualTo("petclinic");
+        });
+
+        // and then.
+        var snapshotId = new SnapshotId("org.springframework.samples", "petclinic", LocalDate.now(ZoneOffset.UTC));
+        var snapshot = jdbcAggregateTemplate.findById(snapshotId, HistoricalApplicationSnapshot.class);
+
+        assertThat(snapshot.insights().hotSpot().projectLeyden().appCdsEnabled())
+                .isTrue();
+        assertThat(snapshot.insights().persistenceInsights().getTransactions())
+                .singleElement()
+                .satisfies(profile -> {
+                    assertThat(profile.getTransactionalKey().getClassName()).isEqualTo("com.example.VetService");
+                    assertThat(profile.getTransactionalKey().getMethodName()).isEqualTo("findVets");
+                    assertThat(profile.getTransactionOverallStats().getMinMs()).isEqualTo(2);
+                    assertThat(profile.getTransactionOverallStats().getMaxMs()).isEqualTo(40);
+                    assertThat(profile.getTransactionOverallStats().getAverageMs())
+                            .isEqualTo(12);
+                });
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("heartbeatsWithMissingRequiredFields")
+    void shouldReturnBadRequestOnHeartbeatWithMissingRequiredField(String missingField, String heartbeat) {
+        // given.
+        restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
+        Instant registeredHeartBeat = instanceRegistry
+                .get(InstanceId.of(TEST_INSTANCE_ID))
+                .orElseThrow()
+                .latestHeartBeat();
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(heartbeat), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // and then.
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).get().satisfies(instance -> {
+            assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
+            assertThat(instance.latestHeartBeat()).isEqualTo(registeredHeartBeat);
+        });
+    }
+
+    static Stream<Arguments> heartbeatsWithMissingRequiredFields() {
+        return Stream.of(
+                Arguments.of(
+                        "instanceId",
+                        JSON_HEARTBEAT.replace("\"instanceId\" : \"%s\",".formatted(TEST_INSTANCE_ID), "")),
+                Arguments.of("healthStatus", JSON_HEARTBEAT.replace("\"healthStatus\" : \"DOWN\",", "")),
+                Arguments.of("memoryDetails", JSON_HEARTBEAT.replaceAll("\"memoryDetails\" : \\{[^}]*},", "")),
+                Arguments.of("heap", JSON_HEARTBEAT.replace("\"heap\" : 34000", "")),
+                // absent transactions default to an empty list in the generated model, only an explicit null is
+                // missing.
+                Arguments.of(
+                        "transactions",
+                        JSON_HEARTBEAT.replaceAll("\"transactions\" : \\[[\\s\\S]*]", "\"transactions\" : null")));
+    }
+
+    @Test
+    void shouldReturnConflictOnHeartbeatOfUnknownInstance() {
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+
+        // and then.
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isEmpty();
+    }
+
     @ParameterizedTest(name = "{0}")
     @MethodSource("invalidTokens")
     void shouldReturnUnauthorized(String scenario, TestRestTemplate testRestTemplate) {
@@ -329,6 +454,17 @@ public class InstanceSelfRegistrationInternalApiTest {
         assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("invalidTokens")
+    void shouldReturnUnauthorizedOnHeartbeat(String scenario, TestRestTemplate testRestTemplate) {
+        // when.
+        ResponseEntity<Void> response = testRestTemplate.postForEntity(
+                "/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     private static Stream<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {

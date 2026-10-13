@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
@@ -40,7 +40,6 @@ import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**
@@ -53,6 +52,8 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 public class HeartBeatService implements Closeable {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String REGISTRATION_PATH = "/service/register";
+    private static final String HEARTBEAT_PATH = "/service/heartbeat/v2";
     private static final PasswordlessUser TECH_USER =
             new PasswordlessUser("AXELIX.STARTER", "AXELIX.STARTER", Set.of(DefaultRole.MANAGED_SERVICE));
 
@@ -64,8 +65,13 @@ public class HeartBeatService implements Closeable {
     private final Logger logger;
     private final JwtEncoderService jwtEncoderService;
 
+    @Nullable
+    private volatile String heartbeatUrl;
+
     @SuppressWarnings("NullAway.Init")
     private volatile String currentToken;
+
+    private volatile boolean registered;
 
     public HeartBeatService(
             Logger logger,
@@ -91,29 +97,61 @@ public class HeartBeatService implements Closeable {
 
     public void scheduleHeartBeat() {
         currentToken = jwtEncoderService.generateToken(TECH_USER);
+        heartbeatUrl = resolveHeartbeatUrl(properties.getMasterUrl());
         executor.scheduleAtFixedRate(
                 this::heartbeat, 0L, properties.getHeartbeatInterval().getSeconds(), TimeUnit.SECONDS);
     }
 
     private void heartbeat() {
-        HeartBeatMetadata heartBeatMetadata = heartBeatMetadataAssembler.assemble();
-
         try {
-            HttpResponse<Void> response = sendRequest(heartBeatMetadata, properties.getMasterUrl());
+            String heartbeatUrl = this.heartbeatUrl;
 
-            int statusCode = response.statusCode();
+            if (registered && heartbeatUrl != null) {
+                int statusCode = sendRequest(heartBeatMetadataAssembler.assembleHeartBeat(), heartbeatUrl)
+                        .statusCode();
 
-            if (is2xxSuccessful(statusCode)) {
-                logger.trace("Heartbeat successful. Master URL: {}", properties.getMasterUrl());
-            } else if (isUnauthorized(statusCode)) {
-                logger.debug("Master heartbeat failed. Token expired. Re-generating token");
-                currentToken = jwtEncoderService.generateToken(TECH_USER);
+                if (is2xxSuccessful(statusCode)) {
+                    logger.trace("Heartbeat successful. Master URL: {}", heartbeatUrl);
+                } else if (isUnauthorized(statusCode)) {
+                    logger.debug("Master heartbeat failed. Token expired. Re-generating token");
+                    currentToken = jwtEncoderService.generateToken(TECH_USER);
+                } else if (isConflict(statusCode)) {
+                    logger.info("Master does not know this instance. Registering again");
+                    registered = false;
+                    register();
+                } else {
+                    logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
+                }
             } else {
-                logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
+                register();
             }
         } catch (IOException | InterruptedException e) {
             logger.info("Error sending registration request or heartbeat to master: {}", e.getMessage());
         }
+    }
+
+    private void register() throws IOException, InterruptedException {
+        int statusCode = sendRequest(
+                        heartBeatMetadataAssembler.assembleRegistrationRequest(), properties.getMasterUrl())
+                .statusCode();
+
+        if (is2xxSuccessful(statusCode)) {
+            logger.trace("Registration successful. Master URL: {}", properties.getMasterUrl());
+            registered = true;
+        } else if (isUnauthorized(statusCode)) {
+            logger.debug("Master registration failed. Token expired. Re-generating token");
+            currentToken = jwtEncoderService.generateToken(TECH_USER);
+        } else {
+            logger.info("Master registration failed, HTTP status: {}\"", statusCode);
+        }
+    }
+
+    @Nullable
+    private static String resolveHeartbeatUrl(String masterUrl) {
+        if (!masterUrl.endsWith(REGISTRATION_PATH)) {
+            return null;
+        }
+        return masterUrl.substring(0, masterUrl.length() - REGISTRATION_PATH.length()) + HEARTBEAT_PATH;
     }
 
     private static boolean is2xxSuccessful(int statusCode) {
@@ -124,10 +162,17 @@ public class HeartBeatService implements Closeable {
         return statusCode == 401;
     }
 
-    private HttpResponse<Void> sendRequest(@NonNull HeartBeatMetadata heartBeatMetadata, String url)
-            throws IOException, InterruptedException {
-        HttpPayload payload = HttpPayload.json(
-                serializationFunction.serialize(heartBeatMetadata).getBytes(StandardCharsets.UTF_8));
+    /**
+     * The conflict means that the master does not know this instance (e.g. the master has been restarted),
+     * so the starter has to register itself again.
+     */
+    private static boolean isConflict(int statusCode) {
+        return statusCode == 409;
+    }
+
+    private HttpResponse<Void> sendRequest(Object body, String url) throws IOException, InterruptedException {
+        HttpPayload payload =
+                HttpPayload.json(serializationFunction.serialize(body).getBytes(StandardCharsets.UTF_8));
         HttpRequest request = buildHttpRequest(url, payload);
         return httpClient.send(request, HttpResponse.BodyHandlers.discarding());
     }

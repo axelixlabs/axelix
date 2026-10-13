@@ -17,12 +17,17 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.time.Instant;
 import java.util.Random;
 import java.util.UUID;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
  * Default implementation of {@link HeartBeatMetadataAssembler}.
@@ -35,12 +40,17 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
 
     private static final char[] NAME_POSTFIX_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
     private static final int NAME_POSTFIX_LENGTH = 8;
+    private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
     private final Random random = new Random();
 
     private final HeartBeatConfigurationProperties heartBeatConfigurationProperties;
 
     private final BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler;
+
+    private final HealthDetectionFunction healthDetectionFunction;
+
+    private final InsightsInfoProvider insightsInfoProvider;
 
     private final String instanceId;
 
@@ -50,23 +60,37 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
 
     public DefaultHeartBeatMetadataAssembler(
             BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
+            HealthDetectionFunction healthDetectionFunction,
+            InsightsInfoProvider insightsInfoProvider,
             HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
         this.heartBeatConfigurationProperties = heartBeatConfigurationProperties;
         this.basicRegistrationMetadataAssembler = basicRegistrationMetadataAssembler;
+        this.healthDetectionFunction = healthDetectionFunction;
+        this.insightsInfoProvider = insightsInfoProvider;
         this.instanceId = UUID.randomUUID().toString();
         this.instanceName = heartBeatConfigurationProperties.getInstanceName() + "-" + generateNamePostfix();
         this.deploymentAt = Instant.now().toString();
     }
 
     @Override
-    public HeartBeatMetadata assemble() {
+    public InitialSelfRegistrationRequest assembleRegistrationRequest() {
 
-        return new HeartBeatMetadata()
+        return new InitialSelfRegistrationRequest()
                 .basicRegistrationMetadata(basicRegistrationMetadataAssembler.assemble())
                 .instanceId(instanceId)
                 .instanceName(instanceName)
                 .instanceActuatorUrl(heartBeatConfigurationProperties.getInstanceActuatorUrl())
                 .deploymentAt(deploymentAt);
+    }
+
+    @Override
+    public HeartBeatMetadataV2 assembleHeartBeat() {
+        return new HeartBeatMetadataV2()
+                .instanceId(instanceId)
+                .healthStatus(healthDetectionFunction.get())
+                .memoryDetails(new MemoryDetails()
+                        .heap(memoryMXBean.getHeapMemoryUsage().getUsed()))
+                .transactions(insightsInfoProvider.getTransactions());
     }
 
     private String generateNamePostfix() {
