@@ -1,11 +1,13 @@
 .Trigger.Trigger {
-    padding: 0 11px;
+    height: auto;
+    padding: 4px 11px;
     gap: 8px;
     border-radius: 6px;
     border-color: #d8e2dc;
     background: var(--axelix-primary-white);
     color: #34473c;
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 1.5;
     font-weight: 500;
     box-shadow: 0 1px 2px rgb(21 45 29 / 3%);
     transition:
