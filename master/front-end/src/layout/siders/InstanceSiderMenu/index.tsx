@@ -26,6 +26,8 @@ import { EInstanceFeature, type IInstanceFeaturesResponse } from "@/models";
 import { getInstanceFeatures } from "@/services";
 import { getInstanceItems } from "@/utils";
 
+import { InstanceContext } from "./InstanceContext";
+
 export const InstanceSiderMenu = () => {
     const { t } = useTranslation();
 
@@ -53,11 +55,14 @@ export const InstanceSiderMenu = () => {
     const items = getInstanceItems(instanceId!, t, features);
 
     return (
-        <Menu
-            mode="inline"
-            items={items}
-            selectedKeys={[pathname]}
-            defaultOpenKeys={findOpenInstanceKeys(items, pathname)}
-        />
+        <>
+            {instanceId && <InstanceContext key={instanceId} />}
+            <Menu
+                mode="inline"
+                items={items}
+                selectedKeys={[pathname]}
+                defaultOpenKeys={findOpenInstanceKeys(items, pathname)}
+            />
+        </>
     );
 };

@@ -21,9 +21,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader, NoRequiredAuthorityTooltip, PageSearch } from "@/components";
+import { ActionInstancesSelector, EmptyHandler, Loader, NoRequiredAuthorityTooltip, PageSearch } from "@/components";
 import { extractErrorCode, fetchData, filterCacheManagers } from "@/helpers";
-import { useAuthority, useConfirmableAction } from "@/hooks";
+import { useActionInstanceSelection, useAuthority, useConfirmableAction } from "@/hooks";
 import {
     EAuthorities,
     type ICachesResponseBody,
@@ -41,6 +41,7 @@ const Caches = () => {
 
     const { t } = useTranslation();
     const { instanceId } = useParams();
+    const instanceSelection = useActionInstanceSelection(instanceId!);
     const { message } = App.useApp();
     const confirmAction = useConfirmableAction();
 
@@ -91,9 +92,9 @@ const Caches = () => {
 
     return (
         <>
-            <EmptyHandler isEmpty={effectiveCacheManagers.length === 0}>
-                <div className={styles.TopSection}>
-                    <PageSearch setSearch={setSearch} />
+            <div className={styles.TopSection}>
+                <PageSearch setSearch={setSearch} />
+                <div className={styles.Actions}>
                     <NoRequiredAuthorityTooltip disabled={!cachesClearAccess}>
                         <Button
                             type="primary"
@@ -104,8 +105,11 @@ const Caches = () => {
                             {t("Caches.clearAll")}
                         </Button>
                     </NoRequiredAuthorityTooltip>
+                    <ActionInstancesSelector key={instanceId} {...instanceSelection} />
                 </div>
+            </div>
 
+            <EmptyHandler isEmpty={effectiveCacheManagers.length === 0}>
                 {effectiveCacheManagers.map((cacheManager) => (
                     <CacheManagerSection key={cacheManager.name} cacheManager={cacheManager} />
                 ))}

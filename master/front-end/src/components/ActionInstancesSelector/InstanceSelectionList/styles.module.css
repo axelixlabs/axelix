@@ -1,0 +1,99 @@
+.MainWrapper {
+    width: max-content;
+    min-width: min(320px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+    padding: 6px;
+    border: 1px solid #dfe5e1;
+    border-radius: 9px;
+    background: var(--axelix-primary-white);
+    box-shadow:
+        0 10px 32px rgb(22 52 33 / 10%),
+        0 2px 6px rgb(22 52 33 / 3%);
+    overflow: hidden;
+    animation: selector-in 160ms ease-out;
+}
+
+.Current {
+    padding: 12px 10px 13px;
+    background: #e3f4eb;
+    border-radius: 5px;
+}
+
+.SelectAll {
+    margin: 5px 0 3px;
+}
+
+.AllCheckbox.AllCheckbox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #728177;
+    border-bottom: 1px solid #edf0ee;
+}
+
+.AllCheckbox:hover {
+    background: #fafcfb;
+    color: #344a3b;
+}
+
+.AllCheckbox :global(.ant-checkbox) {
+    order: 2;
+    flex-shrink: 0;
+}
+
+.AllCheckbox :global(.ant-checkbox-label) {
+    order: 1;
+    padding: 0;
+    flex: 1;
+    text-align: left;
+}
+
+.Options {
+    margin: 0;
+    padding: 2px 0;
+    max-height: 328px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #d2dcd5 transparent;
+    scrollbar-gutter: stable;
+}
+
+.Current,
+.SelectAll {
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    overflow-y: auto;
+}
+
+.Footer {
+    margin: 5px -6px -6px;
+    padding: 10px 16px;
+    background: #f8faf9;
+    color: #7e8e84;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+@keyframes selector-in {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .MainWrapper {
+        animation: none;
+    }
+}

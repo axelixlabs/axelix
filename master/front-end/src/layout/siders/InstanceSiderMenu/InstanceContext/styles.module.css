@@ -1,0 +1,112 @@
+.MainWrapper {
+    position: relative;
+    display: block;
+    width: calc(100% - 36px);
+    margin: 12px 12px 14px 24px;
+    padding: 12px;
+    font: inherit;
+    text-align: left;
+    background: var(--axelix-primary-white);
+    border: 1px solid #e0e7e2;
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: 0 1px 2px rgb(28 56 38 / 3%);
+    cursor: pointer;
+    transition:
+        border-color 180ms,
+        box-shadow 180ms,
+        background 180ms,
+        transform 120ms;
+}
+
+.MainWrapper:hover {
+    background: #fbfdfc;
+    border-color: #9ccdb1;
+    box-shadow: 0 3px 10px rgb(28 56 38 / 6%);
+}
+
+.MainWrapper:active {
+    background: #f3faf6;
+    transform: translateY(1px);
+}
+
+.MainWrapper:focus-visible {
+    outline: 3px solid #72d5a0;
+    outline-offset: -3px;
+}
+
+.MainWrapper.Pressed {
+    background: var(--axelix-primary-white);
+    border-color: var(--axelix-primary-green);
+    box-shadow: 0 0 0 3px rgb(0 173 86 / 5%);
+}
+
+.Name {
+    display: block;
+    padding-right: 17px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #344a3c;
+    overflow-wrap: anywhere;
+}
+
+.MainWrapper svg,
+.Time svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: #555;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.MainWrapper .Arrow {
+    position: absolute;
+    right: 12px;
+    top: 16px;
+    stroke: #86958b;
+    stroke-width: 1.4;
+    transform: rotate(180deg);
+    transition: transform 200ms;
+}
+
+.Pressed .Arrow {
+    transform: rotate(0deg);
+}
+
+.Meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-top: 1px solid #edf1ee;
+    padding-top: 9px;
+    margin-top: 10px;
+    color: #303030;
+    font-size: 11px;
+}
+
+.Time {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Popup {
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+        transition: none !important;
+    }
+
+    .MainWrapper,
+    .MainWrapper .Arrow {
+        transition: none;
+    }
+}

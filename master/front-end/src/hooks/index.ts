@@ -24,3 +24,6 @@ export const useAppSelector: TypedUseSelectorHook<TRootState> = useSelector;
 
 export { useConfirmableAction } from "./useConfirmableAction";
 export { useAuthority } from "./useAuthority";
+
+export { useInstancePreviewData } from "./useInstancePreviewData";
+export { useActionInstanceSelection } from "./useActionInstanceSelection";

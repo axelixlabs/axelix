@@ -1,4 +1,26 @@
 {
+    "ActionInstancesSelector": {
+        "all": "All",
+        "current": "Current",
+        "alwaysIncluded": "Current instance is always included",
+        "selectAllOthers": "Select all other instances",
+        "selectedCount": "Selected: {{count}} / {{total}}",
+        "included": "Instances: {{count}} included"
+    },
+    "InstanceContext": {
+        "instances": "Instances",
+        "instancesCount": "Instances · {{count}}",
+        "selectInstance": "Select instance: {{name}}",
+        "status": {
+            "UP": "Instance status: up",
+            "DOWN": "Instance status: down",
+            "UNKNOWN": "Instance status: unknown"
+        },
+        "currentInstance": "Current instance: {{name}}",
+        "commit": "Commit hash",
+        "uptime": "Uptime",
+        "uptimeValue": "Uptime: {{value}}"
+    },
     "search": "Search",
     "noData": "No data",
     "copied": "Copied",

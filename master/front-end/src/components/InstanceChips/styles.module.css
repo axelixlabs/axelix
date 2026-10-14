@@ -1,0 +1,88 @@
+.Commit.Commit,
+.Status.Status {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    margin: 0;
+    padding: 3px 6px;
+    border: 1px solid #dedede;
+    border-radius: 5px;
+    background: #ededed;
+    color: #303030;
+    font:
+        11px/14px ui-monospace,
+        SFMono-Regular,
+        Consolas,
+        monospace;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.Commit {
+    letter-spacing: 0.2px;
+    box-shadow: 0 1px 1px rgb(23 59 34 / 2%);
+}
+
+.Commit svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: #555;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.Status.Status {
+    border-color: #cfe7d8;
+    background: #e5f5eb;
+    color: #256b42;
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.Status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2a6;
+    transform: translateY(-1px);
+}
+
+.Status.Down {
+    background: #fbe9e9;
+    border-color: #f0d1d1;
+    color: #a63d3d;
+}
+
+.Down::before {
+    background: #dc6666;
+}
+
+.Status.Unknown {
+    background: #ededed;
+    border-color: #dedede;
+    color: #666;
+}
+
+.Unknown::before {
+    background: #a3ada7;
+}
+
+.CurrentTag.CurrentTag {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 3px 6px;
+    margin: 0;
+    border: 1px solid #dce2e9;
+    border-radius: 5px;
+    background: #edf0f5;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 14px;
+    color: #52617a;
+    white-space: nowrap;
+}

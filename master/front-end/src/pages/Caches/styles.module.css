@@ -6,5 +6,14 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    column-gap: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.Actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-left: auto;
+    flex-wrap: wrap;
 }

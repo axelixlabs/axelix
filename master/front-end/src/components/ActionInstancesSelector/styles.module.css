@@ -1,0 +1,96 @@
+.Trigger.Trigger {
+    padding: 0 11px;
+    gap: 8px;
+    border-radius: 6px;
+    border-color: #d8e2dc;
+    background: var(--axelix-primary-white);
+    color: #34473c;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgb(21 45 29 / 3%);
+    transition:
+        background 180ms,
+        border-color 180ms,
+        box-shadow 180ms,
+        transform 120ms;
+}
+
+.Trigger.Trigger:hover {
+    background: #f6fbf8;
+    border-color: #8bc9a6;
+    color: #34473c;
+    box-shadow: 0 2px 5px rgb(21 45 29 / 5%);
+}
+
+.Trigger.Trigger:active {
+    transform: translateY(1px);
+}
+
+.Trigger.Trigger.Open {
+    background: #f0faf4;
+    border-color: var(--axelix-primary-green);
+    box-shadow: 0 0 0 3px rgb(0 173 86 / 6%);
+}
+
+.Trigger.Trigger:focus-visible {
+    outline: 3px solid #72d5a0;
+    outline-offset: 2px;
+}
+
+.Trigger svg {
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.Stack {
+    width: 16px;
+    height: 16px;
+    color: #71867a;
+}
+
+.Open .Stack {
+    color: var(--axelix-primary-green);
+}
+
+.Count.Count {
+    height: 20px;
+    min-width: 20px;
+    margin: 0;
+    padding: 0 6px;
+    border: 0;
+    border-radius: 5px;
+    background: #eef5f0;
+    color: #44805b;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 20px;
+    text-align: center;
+}
+
+.Arrow {
+    width: 12px;
+    height: 12px;
+    color: #83948a;
+    transform: rotate(180deg);
+    transition: transform 200ms;
+}
+
+.Open .Arrow {
+    transform: rotate(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Trigger.Trigger,
+    .Arrow {
+        transition: none;
+    }
+
+    .Popup {
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+        transition: none !important;
+    }
+}

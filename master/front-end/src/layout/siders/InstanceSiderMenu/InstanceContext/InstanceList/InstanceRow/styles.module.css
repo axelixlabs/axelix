@@ -1,0 +1,72 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: start;
+    width: 100%;
+    min-height: 61px;
+    padding: 12px 10px;
+    border: 0;
+    border-radius: 5px;
+    background: var(--axelix-primary-white);
+    text-align: left;
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 150ms;
+}
+
+.MainWrapper.Selected {
+    background: #eef8f2;
+}
+
+.MainWrapper:hover,
+.MainWrapper:focus-visible {
+    background: #f0faf4;
+}
+
+.MainWrapper.Selected:hover,
+.MainWrapper.Selected:focus-visible {
+    background: #e5f4eb;
+}
+
+.MainWrapper:focus-visible {
+    outline: 2px solid #72d5a0;
+    outline-offset: -2px;
+}
+
+.Details {
+    min-width: 0;
+}
+
+.Name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 16px;
+    font-weight: 700;
+    color: #344054;
+}
+
+.Commit {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.Right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .MainWrapper {
+        transition: none;
+    }
+}

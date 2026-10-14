@@ -1,12 +1,13 @@
 .MainWrapper {
     min-height: 100vh;
+    background-color: var(--axelix-primary-white);
 }
 
 .Sider {
     position: fixed;
     top: var(--axelix-header-height);
     height: calc(100vh - var(--axelix-header-height));
-    background-color: var(--axelix-white);
+    background-color: var(--axelix-grey-50);
     z-index: 10;
 }
 
@@ -20,7 +21,6 @@
 
 .Content {
     padding: 24px;
-    border-radius: var(--axelix-border-radius-large);
     background-color: var(--axelix-white);
 }
 
@@ -41,7 +41,7 @@
 
 .ContentLayout {
     margin-top: var(--axelix-header-height);
-    padding: 24px;
+    background-color: var(--axelix-primary-white);
 }
 
 /* Targets the thread-dump page */
