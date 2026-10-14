@@ -80,9 +80,9 @@ const Loggers = () => {
         <>
             <div className={styles.FirstSection}>
                 <PageSearch addonAfter={addonAfter} setSearch={setSearch} key={activeTab} />
+                <ActionInstancesSelector key={instanceId} {...instanceSelection} />
                 <div className={styles.Actions}>
                     <Tabs activeKey={activeTab} onChange={handleTabChange} size="small" items={loggersTabs(t)} />
-                    <ActionInstancesSelector key={instanceId} {...instanceSelection} />
                 </div>
             </div>
 

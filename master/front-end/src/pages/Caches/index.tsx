@@ -94,6 +94,7 @@ const Caches = () => {
         <>
             <div className={styles.TopSection}>
                 <PageSearch setSearch={setSearch} />
+                <ActionInstancesSelector key={instanceId} {...instanceSelection} />
                 <div className={styles.Actions}>
                     <NoRequiredAuthorityTooltip disabled={!cachesClearAccess}>
                         <Button
@@ -105,7 +106,6 @@ const Caches = () => {
                             {t("Caches.clearAll")}
                         </Button>
                     </NoRequiredAuthorityTooltip>
-                    <ActionInstancesSelector key={instanceId} {...instanceSelection} />
                 </div>
             </div>
 
