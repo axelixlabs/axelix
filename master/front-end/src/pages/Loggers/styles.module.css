@@ -2,5 +2,14 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    column-gap: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.Actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-left: auto;
+    flex-wrap: wrap;
 }

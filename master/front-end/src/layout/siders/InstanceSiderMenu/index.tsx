@@ -26,6 +26,7 @@ import { EInstanceFeature, type IInstanceProfileResponse } from "@/models";
 import { getInstanceProfile } from "@/services";
 import { getInstanceItems } from "@/utils";
 
+import { InstanceContext } from "./InstanceContext";
 import styles from "./styles.module.css";
 
 export const InstanceSiderMenu = () => {
@@ -54,12 +55,15 @@ export const InstanceSiderMenu = () => {
     const items = getInstanceItems(instanceId!, t, features);
 
     return (
-        <Menu
-            className={styles.Menu}
-            mode="inline"
-            items={items}
-            selectedKeys={[pathname]}
-            defaultOpenKeys={findOpenInstanceKeys(items, pathname)}
-        />
+        <>
+            {instanceId && <InstanceContext key={instanceId} />}
+            <Menu
+                className={styles.Menu}
+                mode="inline"
+                items={items}
+                selectedKeys={[pathname]}
+                defaultOpenKeys={findOpenInstanceKeys(items, pathname)}
+            />
+        </>
     );
 };

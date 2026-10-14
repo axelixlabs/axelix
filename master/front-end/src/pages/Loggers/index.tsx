@@ -20,8 +20,9 @@ import { Activity, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader, PageSearch } from "@/components";
+import { ActionInstancesSelector, EmptyHandler, Loader, PageSearch } from "@/components";
 import { fetchData, filterLoggerGroups, filterLoggers } from "@/helpers";
+import { useActionInstanceSelection } from "@/hooks";
 import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest } from "@/models";
 import { getLoggersData } from "@/services";
 import { loggersTabs } from "@/utils";
@@ -33,6 +34,7 @@ import styles from "./styles.module.css";
 const Loggers = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
+    const instanceSelection = useActionInstanceSelection(instanceId!);
 
     const [activeTab, setActiveTab] = useState<ELoggersTabs>(ELoggersTabs.LOGGERS);
     const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggersResponseBody>());
@@ -78,7 +80,10 @@ const Loggers = () => {
         <>
             <div className={styles.FirstSection}>
                 <PageSearch addonAfter={addonAfter} setSearch={setSearch} key={activeTab} />
-                <Tabs activeKey={activeTab} onChange={handleTabChange} size="small" items={loggersTabs(t)} />
+                <div className={styles.Actions}>
+                    <Tabs activeKey={activeTab} onChange={handleTabChange} size="small" items={loggersTabs(t)} />
+                    <ActionInstancesSelector key={instanceId} {...instanceSelection} />
+                </div>
             </div>
 
             <Activity mode={isLoggersTab ? "visible" : "hidden"}>

@@ -1,4 +1,26 @@
 {
+    "ActionInstancesSelector": {
+        "all": "Все",
+        "current": "Текущий",
+        "alwaysIncluded": "Текущий инстанс всегда выбран",
+        "selectAllOthers": "Выбрать все остальные инстансы",
+        "selectedCount": "Выбрано: {{count}} / {{total}}",
+        "included": "Инстансы: выбрано {{count}}"
+    },
+    "InstanceContext": {
+        "instances": "Инстансы",
+        "instancesCount": "Инстансы · {{count}}",
+        "selectInstance": "Выбрать инстанс: {{name}}",
+        "status": {
+            "UP": "Статус инстанса: работает",
+            "DOWN": "Статус инстанса: недоступен",
+            "UNKNOWN": "Статус инстанса: неизвестен"
+        },
+        "currentInstance": "Текущий инстанс: {{name}}",
+        "commit": "Хеш коммита",
+        "uptime": "Время работы",
+        "uptimeValue": "Время работы: {{value}}"
+    },
     "search": "Поиск",
     "noData": "Нет данных",
     "copied": "Скопировано",

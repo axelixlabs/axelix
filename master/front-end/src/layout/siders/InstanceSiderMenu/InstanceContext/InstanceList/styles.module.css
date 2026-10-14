@@ -1,0 +1,43 @@
+.MainWrapper {
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    padding: 12px 10px 8px;
+    background: var(--axelix-primary-white);
+    border: 1px solid #e4ebe7;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgb(21 60 48 / 15%);
+    animation: menu-in 160ms ease-out;
+}
+
+.Heading {
+    padding: 1px 3px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #52617a;
+}
+
+.Options {
+    max-height: min(390px, 60vh);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #969d98 transparent;
+    padding-right: 4px;
+}
+
+@keyframes menu-in {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .MainWrapper {
+        animation: none;
+    }
+}

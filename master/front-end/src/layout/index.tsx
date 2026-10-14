@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Layout } from "antd";
+import { ConfigProvider, Layout } from "antd";
 import type { JSX } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useParams } from "react-router";
 
 import { AccessProvider } from "@/components";
+import { InstancePreviewProvider } from "@/components/InstancePreviewProvider";
 
 import { AdminHeader } from "./AdminHeader";
 // License key entry is moving to the Enterprise distro; banner temporarily disabled.
@@ -36,7 +37,9 @@ interface IProps {
 }
 
 export const MainLayout = ({ siderContent }: IProps) => {
-    return (
+    const { instanceId } = useParams();
+
+    const layout = (
         <>
             <AccessProvider />
             <Layout className={styles.MainWrapper}>
@@ -44,7 +47,19 @@ export const MainLayout = ({ siderContent }: IProps) => {
 
                 {siderContent && (
                     <Sider width={270} className={styles.Sider}>
-                        <div className={styles.SiderScrollContainer}>{siderContent}</div>
+                        <ConfigProvider
+                            theme={{
+                                components: {
+                                    Menu: {
+                                        itemBg: "transparent",
+                                        subMenuItemBg: "transparent",
+                                        activeBarBorderWidth: 0,
+                                    },
+                                },
+                            }}
+                        >
+                            <div className={styles.SiderScrollContainer}>{siderContent}</div>
+                        </ConfigProvider>
                     </Sider>
                 )}
 
@@ -57,5 +72,13 @@ export const MainLayout = ({ siderContent }: IProps) => {
                 </Layout>
             </Layout>
         </>
+    );
+
+    return instanceId ? (
+        <InstancePreviewProvider key={instanceId} instanceId={instanceId}>
+            {layout}
+        </InstancePreviewProvider>
+    ) : (
+        layout
     );
 };

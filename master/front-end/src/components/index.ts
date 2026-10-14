@@ -39,3 +39,5 @@ export { AppAlert } from "./AppAlert";
 export { default } from "./Loadable";
 export { Loader } from "./Loader";
 export { Copy } from "./Copy";
+
+export { ActionInstancesSelector } from "./ActionInstancesSelector";
