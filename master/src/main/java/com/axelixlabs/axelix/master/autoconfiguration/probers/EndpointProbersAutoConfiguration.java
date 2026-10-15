@@ -274,7 +274,7 @@ public class EndpointProbersAutoConfiguration {
                 instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, securityContextExecutor);
     }
 
-    // Dependencies (SBOM)
+    // Dependencies (SBOM). To be removed in 1.6 together with ActuatorEndpoints.GET_DEPENDENCIES_SBOM.
     @Bean
     public EndpointProber<byte[]> getDependenciesSbomProber() {
         return new CachingEndpointProber<>(new ProxyingEndpointProber(

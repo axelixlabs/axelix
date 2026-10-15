@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
 
 /**
  * Autoconfiguration for heart-beating of the Instance.
@@ -65,7 +66,9 @@ public class HeartBeatAutoConfiguration {
                 basicRegistrationMetadataAssembler,
                 healthDetectionFunction,
                 insightsInfoProvider,
-                heartBeatConfigurationProperties);
+                heartBeatConfigurationProperties,
+                new ClasspathDependencySbom(),
+                new SLF4JLogger(LoggerFactory.getLogger(DefaultHeartBeatMetadataAssembler.class)));
     }
 
     @Bean

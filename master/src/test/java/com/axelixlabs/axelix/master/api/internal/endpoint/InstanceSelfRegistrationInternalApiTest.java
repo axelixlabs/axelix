@@ -44,6 +44,8 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
+import com.axelixlabs.axelix.master.domain.ApplicationDependencies.ApplicationDependenciesId;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -53,6 +55,7 @@ import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.CapturingIamWebInterceptor;
+import com.axelixlabs.axelix.master.utils.CycloneDxDocuments;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -211,6 +214,7 @@ public class InstanceSelfRegistrationInternalApiTest {
         jdbcAggregateTemplate.deleteAll(Instance.class);
         jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
         jdbcAggregateTemplate.deleteAll(ScheduledTaskExecutionResult.class);
+        jdbcAggregateTemplate.deleteAll(ApplicationDependencies.class);
         capturingIamWebInterceptor.reset();
     }
 
@@ -339,6 +343,43 @@ public class InstanceSelfRegistrationInternalApiTest {
 
         // and then.
         assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isEmpty();
+    }
+
+    @Test
+    void shouldStoreTheDependencySbomReportedOnRegistration() {
+        // given.
+        String sbom = CycloneDxDocuments.of(
+                "org.springframework.samples:petclinic:3.5.0-SNAPSHOT", "org.slf4j:slf4j-api:2.0.9");
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity("/api/internal/service/register", defaultJsonEntity(requestWithSbom(sbom)), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(jdbcAggregateTemplate.findById(
+                        new ApplicationDependenciesId("org.springframework.samples", "petclinic"),
+                        ApplicationDependencies.class))
+                .isNotNull()
+                .extracting(ApplicationDependencies::sbom)
+                .isEqualTo(sbom);
+    }
+
+    @Test
+    void shouldRegisterWithoutTheSbomWhenItIsMalformed() {
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity(
+                        "/api/internal/service/register",
+                        defaultJsonEntity(requestWithSbom("{ \"bomFormat\": \"CycloneDX\"")),
+                        Void.class);
+
+        // then. the SBOM is optional, so a broken one never costs the instance its registration.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isPresent();
+        assertThat(jdbcAggregateTemplate.findAll(ApplicationDependencies.class)).isEmpty();
     }
 
     @Test
@@ -472,6 +513,14 @@ public class InstanceSelfRegistrationInternalApiTest {
                 Arguments.of("without token", builder.withoutToken()),
                 Arguments.of("expired token", builder.withExpiredTokenInAuthHeader()),
                 Arguments.of("malformed token", builder.withMalformedTokenInAuthHeader()));
+    }
+
+    /**
+     * @param sbom the SBOM, embedded into the request as a JSON string
+     */
+    private static String requestWithSbom(String sbom) {
+        String escaped = sbom.replace("\"", "\\\"").replace("\n", "\\n");
+        return JSON_REQUEST.replace("\"instanceId\" :", "\"sbom\" : \"%s\",\n   \"instanceId\" :".formatted(escaped));
     }
 
     private <T> HttpEntity<T> defaultJsonEntity(T request) {

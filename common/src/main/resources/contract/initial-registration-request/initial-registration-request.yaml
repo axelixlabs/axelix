@@ -66,6 +66,12 @@ components:
           type: string
           description: Timestamp when the service was created.
           x-axelix-introduced-in: 1.3.0
+        sbom:
+          type: string
+          description: >-
+            The CycloneDX SBOM of the runtime dependencies. Absent when the application was built
+            without an Axelix build plugin.
+          x-axelix-introduced-in: 1.3.0
     # BasicRegistrationMetadata and everything below it is duplicated verbatim in
     # metadata/metadata-feed.yaml (no cross-document schema reuse yet, see GH-1666). Keep both in sync.
     BasicRegistrationMetadata:

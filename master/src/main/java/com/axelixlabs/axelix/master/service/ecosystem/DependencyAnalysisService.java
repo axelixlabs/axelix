@@ -17,13 +17,15 @@
  */
 package com.axelixlabs.axelix.master.service.ecosystem;
 
+import com.axelixlabs.axelix.master.api.external.response.dashboard.DependenciesDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dependencies.DependencyAnalysisResponse;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.exception.SbomNotAvailableException;
 
 /**
- * Analyzes the runtime dependencies of a managed instance.
+ * Keeps and analyzes the runtime dependency SBOMs of the managed applications.
  *
  * @author Mikhail Polivakha
  */
@@ -39,4 +41,17 @@ public interface DependencyAnalysisService {
      *                                   Axelix build plugin
      */
     DependencyAnalysisResponse analyzeFor(InstanceId instanceId);
+
+    /**
+     * Replaces the dependency SBOM of the given application.
+     *
+     * @param applicationId the application that reported the SBOM
+     * @param sbom          the SBOM exactly as the Axelix build plugins generated it
+     */
+    void store(ApplicationId applicationId, String sbom);
+
+    /**
+     * @return the aggregated dependency health across every application that reported its SBOM
+     */
+    DependenciesDashboardResponse getDashboard();
 }

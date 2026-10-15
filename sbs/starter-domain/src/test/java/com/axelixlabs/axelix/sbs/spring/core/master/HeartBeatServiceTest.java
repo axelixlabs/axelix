@@ -53,6 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetad
 import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
 
@@ -139,7 +140,9 @@ class HeartBeatServiceTest {
                     basicRegistrationMetadataAssembler,
                     healthDetectionFunction,
                     insightsInfoProvider,
-                    heartBeatConfigurationProperties);
+                    heartBeatConfigurationProperties,
+                    new ClasspathDependencySbom(),
+                    new NoOpLogger());
         }
 
         @Bean

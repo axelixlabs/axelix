@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  *
  * @author Mikhail Polivakha
  */
+@Deprecated(forRemoval = true, since = "1.3")
 @RestControllerEndpoint(id = "axelix-dependencies")
 public class AxelixDependenciesEndpoint {
 

@@ -17,17 +17,23 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
+import java.io.UncheckedIOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Random;
 import java.util.UUID;
+
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
 import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
 
 /**
  * Default implementation of {@link HeartBeatMetadataAssembler}.
@@ -58,11 +64,15 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
 
     private final String deploymentAt;
 
+    private final @Nullable String sbom;
+
     public DefaultHeartBeatMetadataAssembler(
             BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
             HealthDetectionFunction healthDetectionFunction,
             InsightsInfoProvider insightsInfoProvider,
-            HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
+            HeartBeatConfigurationProperties heartBeatConfigurationProperties,
+            ClasspathDependencySbom classpathDependencySbom,
+            Logger logger) {
         this.heartBeatConfigurationProperties = heartBeatConfigurationProperties;
         this.basicRegistrationMetadataAssembler = basicRegistrationMetadataAssembler;
         this.healthDetectionFunction = healthDetectionFunction;
@@ -70,6 +80,7 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
         this.instanceId = UUID.randomUUID().toString();
         this.instanceName = heartBeatConfigurationProperties.getInstanceName() + "-" + generateNamePostfix();
         this.deploymentAt = Instant.now().toString();
+        this.sbom = readSbom(classpathDependencySbom, logger);
     }
 
     @Override
@@ -80,7 +91,8 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
                 .instanceId(instanceId)
                 .instanceName(instanceName)
                 .instanceActuatorUrl(heartBeatConfigurationProperties.getInstanceActuatorUrl())
-                .deploymentAt(deploymentAt);
+                .deploymentAt(deploymentAt)
+                .sbom(sbom);
     }
 
     @Override
@@ -91,6 +103,18 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
                 .memoryDetails(new MemoryDetails()
                         .heap(memoryMXBean.getHeapMemoryUsage().getUsed()))
                 .transactions(insightsInfoProvider.getTransactions());
+    }
+
+    private static @Nullable String readSbom(ClasspathDependencySbom classpathDependencySbom, Logger logger) {
+        try {
+            return classpathDependencySbom
+                    .read()
+                    .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
+                    .orElse(null);
+        } catch (UncheckedIOException e) {
+            logger.info("Failed to read the dependency SBOM, registering without it: {}", e.getMessage());
+            return null;
+        }
     }
 
     private String generateNamePostfix() {

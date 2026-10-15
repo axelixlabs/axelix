@@ -194,6 +194,8 @@ public final class MasterWebEndpoints {
             register("dashboard:read-spring-portfolio", HttpMethod.GET, ApiPaths.DashboardApi.SPRING_PORTFOLIO, null);
     public static final MasterWebEndpoint DASHBOARD_READ_LANGUAGES =
             register("dashboard:read-languages", HttpMethod.GET, ApiPaths.DashboardApi.LANGUAGES, null);
+    public static final MasterWebEndpoint DASHBOARD_READ_DEPENDENCIES =
+            register("dashboard:read-dependencies", HttpMethod.GET, ApiPaths.DashboardApi.DEPENDENCIES, null);
 
     // Dependencies
     public static final MasterWebEndpoint DEPENDENCIES_READ =

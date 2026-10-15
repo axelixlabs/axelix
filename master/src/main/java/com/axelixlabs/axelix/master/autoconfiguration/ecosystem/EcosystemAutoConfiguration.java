@@ -20,7 +20,9 @@ package com.axelixlabs.axelix.master.autoconfiguration.ecosystem;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
+import com.axelixlabs.axelix.master.repository.ApplicationDependenciesRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultDependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultLanguagesProfileService;
@@ -78,12 +80,20 @@ public class EcosystemAutoConfiguration {
     @Bean
     public DependencyAnalysisService dependencyAnalysisService(
             EndpointInvoker endpointInvoker,
+            ApplicationDependenciesRepository applicationDependenciesRepository,
+            JdbcAggregateTemplate jdbcAggregateTemplate,
             SbomParser sbomParser,
             SoftwareProjectsCatalog softwareProjectsCatalog,
             PlatformCatalog platformCatalog,
             InstanceRegistry instanceRegistry) {
         return new DefaultDependencyAnalysisService(
-                endpointInvoker, sbomParser, softwareProjectsCatalog, platformCatalog, instanceRegistry);
+                endpointInvoker,
+                applicationDependenciesRepository,
+                jdbcAggregateTemplate,
+                sbomParser,
+                softwareProjectsCatalog,
+                platformCatalog,
+                instanceRegistry);
     }
 
     @Bean

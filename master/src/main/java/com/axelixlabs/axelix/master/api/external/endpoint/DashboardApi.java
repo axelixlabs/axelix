@@ -21,10 +21,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.DependenciesDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.LanguagesProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse;
+import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.ecosystem.LanguagesProfileService;
 import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
@@ -41,14 +43,17 @@ public class DashboardApi {
     private final SpringPortfolioService springPortfolioService;
     private final LanguagesProfileService languagesProfileService;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
+    private final DependencyAnalysisService dependencyAnalysisService;
 
     public DashboardApi(
             SpringPortfolioService springPortfolioService,
             LanguagesProfileService languagesProfileService,
-            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService) {
+            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
+            DependencyAnalysisService dependencyAnalysisService) {
         this.springPortfolioService = springPortfolioService;
         this.languagesProfileService = languagesProfileService;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
+        this.dependencyAnalysisService = dependencyAnalysisService;
     }
 
     /**
@@ -65,6 +70,14 @@ public class DashboardApi {
     @GetMapping(path = ApiPaths.DashboardApi.PERSISTENCE)
     public PersistenceDashboardResponse getPersistenceDashboard() {
         return databaseHistoricalApplicationSnapshotService.getPersistenceDashboard();
+    }
+
+    /**
+     * Retrieve the aggregated dependency health across the ecosystem.
+     */
+    @GetMapping(path = ApiPaths.DashboardApi.DEPENDENCIES)
+    public DependenciesDashboardResponse getDependenciesDashboard() {
+        return dependencyAnalysisService.getDashboard();
     }
 
     /**

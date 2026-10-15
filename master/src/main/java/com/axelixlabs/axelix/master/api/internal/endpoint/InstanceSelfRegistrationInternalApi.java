@@ -43,6 +43,7 @@ import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
 import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
+import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.scheduled.ScheduledTaskExecutionHistoryService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -71,6 +72,7 @@ public class InstanceSelfRegistrationInternalApi {
     private final CompatibilityDetectionStrategy compatibilityDetectionStrategy;
     private final ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter;
     private final ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService;
+    private final DependencyAnalysisService dependencyAnalysisService;
 
     public InstanceSelfRegistrationInternalApi(
             InstanceRegistry instanceRegistry,
@@ -79,7 +81,8 @@ public class InstanceSelfRegistrationInternalApi {
             TransactionTemplate transactionTemplate,
             CompatibilityDetectionStrategy compatibilityDetectionStrategy,
             ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
-            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService) {
+            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService,
+            DependencyAnalysisService dependencyAnalysisService) {
         this.instanceRegistry = instanceRegistry;
         this.instanceFactory = instanceFactory;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
@@ -87,6 +90,7 @@ public class InstanceSelfRegistrationInternalApi {
         this.compatibilityDetectionStrategy = compatibilityDetectionStrategy;
         this.scheduledTaskExecutionResultConverter = scheduledTaskExecutionResultConverter;
         this.scheduledTaskExecutionHistoryService = scheduledTaskExecutionHistoryService;
+        this.dependencyAnalysisService = dependencyAnalysisService;
     }
 
     @PostMapping(path = ApiPaths.SelfRegistrationApi.SERVICE_REGISTER)
@@ -120,6 +124,9 @@ public class InstanceSelfRegistrationInternalApi {
                 instanceRegistry.register(instance);
                 databaseHistoricalApplicationSnapshotService.reloadCurrentState(metadata);
                 scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
+                if (request.getSbom() != null) {
+                    dependencyAnalysisService.store(instance.applicationId(), request.getSbom());
+                }
             });
 
             return ResponseEntity.noContent().build();

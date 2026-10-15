@@ -65,7 +65,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Conditions
     public static final ActuatorEndpoint GET_CONDITIONS = endpoint("/axelix-conditions", HttpMethod.GET);
 
-    // Dependencies (SBOM)
+    // Dependencies (SBOM). Since 1.3 the starters report the SBOM on self-registration or auto discovery,
+    // the endpoint is read only for the dependency analysis of a single instance, so it keeps working for 1.2 starters.
+    // To be removed in 1.6, once 1.2 starters fall out of the compatibility window.
+    @Deprecated(forRemoval = true, since = "1.3")
     public static final ActuatorEndpoint GET_DEPENDENCIES_SBOM = endpoint("/axelix-dependencies", HttpMethod.GET);
 
     // @ConfigurationProperties beans

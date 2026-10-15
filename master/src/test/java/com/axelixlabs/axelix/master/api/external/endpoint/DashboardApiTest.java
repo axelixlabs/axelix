@@ -44,6 +44,8 @@ import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
+import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -51,8 +53,10 @@ import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.CycloneDxDocuments;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
@@ -85,6 +89,9 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
 
     @Autowired
     private JdbcAggregateTemplate jdbcAggregateTemplate;
+
+    @Autowired
+    private DependencyAnalysisService dependencyAnalysisService;
 
     @BeforeEach
     void prepare() {
@@ -229,6 +236,65 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_LANGUAGES, viewer.getActor());
     }
 
+    @Test
+    void shouldReturnDependenciesDashboardAggregatedAcrossServices() {
+        // given.
+        dependencyAnalysisService.store(
+                ApplicationId.of("com.example", "service-a"),
+                CycloneDxDocuments.of(
+                        "com.example:service-a:1.0.0",
+                        "org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11",
+                        "org.hdrhistogram:HdrHistogram:2.2.2",
+                        "org.springframework:spring-core:6.1.5"));
+        dependencyAnalysisService.store(
+                ApplicationId.of("com.example", "service-b"),
+                CycloneDxDocuments.of(
+                        "com.example:service-b:1.0.0",
+                        "org.hdrhistogram:HdrHistogram:2.2.2",
+                        "io.prometheus:simpleclient:0.16.0",
+                        "io.prometheus:simpleclient_common:0.16.0"));
+        dependencyAnalysisService.store(
+                ApplicationId.of("com.example", "service-c"),
+                CycloneDxDocuments.of(
+                        "com.example:service-c:1.0.0",
+                        "ch.qos.logback:logback-classic:1.5.18",
+                        "org.springframework:spring-core:6.1.5"));
+
+        // when.
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/dependencies", String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).node("totalServices").isEqualTo(3);
+        // and then. the service with only an ACTIVE project is the one not at risk.
+        assertThatJson(response.getBody()).node("servicesWithRiskyDependencies").isEqualTo(2);
+        assertThatJson(response.getBody()).node("servicesByStatus").isEqualTo("""
+                { "SUNSET": 1, "DORMANT": 2, "MAINTENANCE": 1, "ACTIVE": 1 }
+                """);
+        assertThatJson(response.getBody())
+                .node("trackedProjects[0].softwareProject.id.value")
+                .isEqualTo("hdrhistogram");
+        assertThatJson(response.getBody())
+                .node("trackedProjects[0].serviceCount")
+                .isEqualTo(2);
+        assertThatJson(response.getBody())
+                .withTolerance(0.01)
+                .node("trackedProjects[0].share")
+                .isEqualTo(66.67);
+        assertThatJson(response.getBody())
+                .when(IGNORING_ARRAY_ORDER)
+                .inPath("trackedProjects[*].softwareProject.id.value")
+                .isEqualTo("[\"hdrhistogram\", \"spring-cloud-sleuth\", \"prometheus-simpleclient\", \"logback\"]");
+        assertThatJson(response.getBody())
+                .withTolerance(0.01)
+                .inPath("trackedProjects[1:].share")
+                .isEqualTo("[33.33, 33.33, 33.33]");
+        assertThatJson(response.getBody()).node("lastScannedAt").isPresent();
+        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_DEPENDENCIES, viewer.getActor());
+    }
+
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
         return Set.of(
@@ -238,6 +304,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     private void deRegisterAll() {
         jdbcAggregateTemplate.deleteAll(Instance.class);
         jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
+        jdbcAggregateTemplate.deleteAll(ApplicationDependencies.class);
     }
 
     private static BasicRegistrationMetadata metadata(
