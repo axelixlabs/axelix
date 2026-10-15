@@ -104,6 +104,15 @@ axelix:
           filters:
             namespaces: default
             # labels:
+      probe:
+        timeout: 5s
+        min-lease: 1m
+        transient-base: 1m
+        transient-cap: 30m
+        throttled-default: 5m
+        throttled-cap: 1h
+        permanent: 1h
+        max-transient-failures: 5
     auth:
       jwt:
         lifespan: 12h

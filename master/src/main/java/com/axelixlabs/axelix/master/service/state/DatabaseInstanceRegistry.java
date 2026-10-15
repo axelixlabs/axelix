@@ -17,8 +17,11 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 
 /**
@@ -38,6 +42,7 @@ import com.axelixlabs.axelix.master.repository.InstanceRepository;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Marsel Semenov
  */
 @Service
 @NullMarked
@@ -61,10 +66,33 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public void reload(Collection<Instance> instances) {
+    public void reconcile(Map<InstanceKey, Instance> fresh, Set<InstanceKey> retained) {
         // The assumption is that every Instance without the heartbeat has come from auto-discovery
-        instanceRepository.deleteAllWithoutHeartbeat();
-        jdbcAggregateTemplate.insertAll(instances);
+        List<InstanceId> toDelete = new ArrayList<>();
+        Set<InstanceId> kept = new HashSet<>();
+        List<Instance> instances = instanceRepository.findAllByLatestHeartBeatIsNull();
+        for (Instance instance : instances) {
+            if (isKept(instance, fresh, retained)) {
+                kept.add(instance.id());
+            } else {
+                toDelete.add(instance.id());
+            }
+        }
+
+        instanceRepository.deleteAllById(toDelete);
+
+        // The same pod may be visible under several services, i.e. under several keys
+        Map<InstanceId, Instance> toInsert = new LinkedHashMap<>();
+        fresh.values().stream()
+                .filter(instance -> !kept.contains(instance.id()))
+                .forEach(instance -> toInsert.putIfAbsent(instance.id(), instance));
+
+        jdbcAggregateTemplate.insertAll(toInsert.values());
+    }
+
+    private static boolean isKept(Instance instance, Map<InstanceKey, Instance> fresh, Set<InstanceKey> retained) {
+        InstanceKey key = instance.discoveryKey();
+        return key != null && !fresh.containsKey(key) && retained.contains(key);
     }
 
     @Override

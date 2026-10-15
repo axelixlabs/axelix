@@ -17,7 +17,9 @@
  */
 package com.axelixlabs.axelix.master.service.discovery;
 
-import java.util.Set;
+import java.util.Optional;
+
+import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 
@@ -39,18 +41,20 @@ public interface InstancesDiscoverer {
     /**
      * Perform actual discovery.
      */
-    Set<DiscoveredInstanceProfile> discover();
+    DiscoveryResult discover();
 
     /**
-     * Return the discovered {@link Set} of {@link Instance instance references}.
      * Safe variation of {@link #discover()}.
+     *
+     * @return the result of the discovery, or {@link Optional#empty()} if the discovery has failed, in which case
+     *         the registry must not be touched
      */
-    default Set<DiscoveredInstanceProfile> discoverSafely() {
+    default Optional<DiscoveryResult> discoverSafely() {
         try {
-            return discover();
+            return Optional.of(discover());
         } catch (Throwable t) {
-            t.printStackTrace();
-            return Set.of();
+            LoggerFactory.getLogger(getClass()).error("Auto-discovery run failed", t);
+            return Optional.empty();
         }
     }
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    The key under which the auto-discovery sees the instance. Null for self-registered instances.
+  -->
+  <changeSet id="1.2-004-1-postgres-add-discovery-key-to-instances" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="instances" columnName="service_id"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="instances">
+      <column name="service_id" type="TEXT"/>
+      <column name="host" type="TEXT"/>
+      <column name="port" type="INTEGER"/>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

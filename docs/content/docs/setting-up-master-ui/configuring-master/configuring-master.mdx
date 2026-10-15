@@ -495,7 +495,22 @@ without an explicit Axelix role are not silently granted access.
 Auto-discovery lets Master find Spring Boot Starter–equipped applications without each one having to call in. On the
 schedule set by `broadcast.schedule`, Master queries the Kubernetes API for Services in the configured namespaces,
 filters them by label, and probes `/actuator/axelix-metadata` on each match using a JWT it issues itself with
-`axelix.master.auth.jwt.signing-key`. A successful probe registers the instance; a probe failure drops it from the list.
+`axelix.master.auth.jwt.signing-key`. A successful probe registers the instance.
+
+A failed probe does not necessarily drop the instance. Master backs off per instance, depending on how the probe
+failed:
+
+- **No response, `408` or `5xx`** — the instance may recover on its own. It is probed again after `transient-base`,
+  doubling with each consecutive failure up to `transient-cap`, and stays registered until `max-transient-failures`
+  failures in a row.
+- **`429`** — the instance is alive, but asks to back off. Master honors `Retry-After` (up to `throttled-cap`, or
+  `throttled-default` without the header) and treats it like a recoverable failure.
+- **Other `3xx`/`4xx`, or a `2xx` the instance can't be managed with** (unreadable metadata, incompatible starter
+  version, missing `artifactId`) — most likely not an Axelix-enabled service. It is dropped right away and
+  probed again only after `permanent`.
+
+The probe state is stored in the database, so it survives restarts and is shared by all Master replicas: every
+instance is probed by exactly one replica per scan.
 
 To turn the feature on, set `axelix.master.discovery.auto.enabled=true` (default `false`, i.e. off). Kubernetes is
 currently the only supported discovery platform.
@@ -517,6 +532,14 @@ external API URL, a token file with the required RBAC, and the cluster CA path. 
 | `axelix.master.discovery.auto.kubernetes.ca-cert-path`       | `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`                | Path inside the Master pod where the kube-apiserver CA certificate is mounted.             |
 | `axelix.master.discovery.auto.kubernetes.filters.namespaces` | `default`                                                             | Comma-separated list of namespaces to scan.                                                |
 | `axelix.master.discovery.auto.kubernetes.filters.labels`     | empty                                                                 | Map of label key/value pairs a Kubernetes Service must match to be picked up by discovery. |
+| `axelix.master.discovery.probe.timeout`                      | `5s`                                                                  | Timeout of a single probe request.                                                         |
+| `axelix.master.discovery.probe.min-lease`                    | `1m`                                                                  | Minimum time an instance stays claimed by the Master replica probing it.                   |
+| `axelix.master.discovery.probe.transient-base`               | `1m`                                                                  | Delay after the first recoverable failure, doubled after each next one.                    |
+| `axelix.master.discovery.probe.transient-cap`                | `30m`                                                                 | Maximum delay after recoverable failures.                                                  |
+| `axelix.master.discovery.probe.throttled-default`            | `5m`                                                                  | Delay after a `429` response without a `Retry-After` header.                               |
+| `axelix.master.discovery.probe.throttled-cap`                | `1h`                                                                  | Maximum delay after a `429` response, even if `Retry-After` asks for more.                 |
+| `axelix.master.discovery.probe.permanent`                    | `1h`                                                                  | Delay after a failure that is unlikely to resolve without a redeployment.                  |
+| `axelix.master.discovery.probe.max-transient-failures`       | `5`                                                                   | Consecutive recoverable failures after which a registered instance is dropped.             |
 
 </div>
 

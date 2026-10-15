@@ -18,6 +18,10 @@
 package com.axelixlabs.axelix.master.service.discovery;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +37,7 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
 import com.axelixlabs.axelix.master.service.scheduled.ScheduledTaskExecutionHistoryService;
@@ -62,6 +67,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private final TransactionTemplate transactionTemplate;
     private final ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter;
     private final ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService;
+    private final DiscoveryLock discoveryLock;
 
     public ShortPollingInstanceDiscoveryScheduler(
             InstancesDiscoverer instancesDiscoverer,
@@ -71,8 +77,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate,
             ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
-            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService) {
-
+            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService,
+            DiscoveryLock discoveryLock) {
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
         this.jwtEncoderService = jwtEncoderService;
@@ -81,6 +87,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
         this.transactionTemplate = transactionTemplate;
         this.scheduledTaskExecutionResultConverter = scheduledTaskExecutionResultConverter;
         this.scheduledTaskExecutionHistoryService = scheduledTaskExecutionHistoryService;
+        this.discoveryLock = discoveryLock;
     }
 
     @Scheduled(cron = "${axelix.master.discovery.auto.broadcast.schedule}")
@@ -88,8 +95,14 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
         String token = jwtEncoderService.generateToken(TECH_USER, Duration.ofSeconds(300));
 
-        Set<DiscoveredInstanceProfile> discoveredInstances = securityContextExecutor.callWithinSecurityContext(
+        Optional<DiscoveryResult> result = securityContextExecutor.callWithinSecurityContext(
                 instancesDiscoverer::discoverSafely, new DefaultSecurityContext(TECH_USER, token));
+
+        if (result.isEmpty()) {
+            return;
+        }
+
+        DiscoveryResult discoveredInstances = result.get();
 
         if (discoveredInstances.isEmpty()) {
             logger.error("""
@@ -98,22 +111,24 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 """, this.getClass().getSimpleName());
         }
 
-        Set<BasicRegistrationMetadata> collectiveMetadata = discoveredInstances.stream()
-                .map(DiscoveredInstanceProfile::metadata)
-                .collect(Collectors.toSet());
+        Map<InstanceKey, Instance> freshInstances = new HashMap<>();
+        Set<BasicRegistrationMetadata> freshMetadata = new HashSet<>();
 
-        Set<Instance> instances = discoveredInstances.stream()
-                .map(DiscoveredInstanceProfile::instance)
-                .collect(Collectors.toSet());
+        discoveredInstances.fresh().forEach((key, profile) -> {
+            freshInstances.put(key, profile.instance());
+            freshMetadata.add(profile.metadata());
+        });
 
-        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = discoveredInstances.stream()
+        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = discoveredInstances.fresh().values().stream()
                 .map(scheduledTaskExecutionResultConverter::convert)
                 .flatMap(Set::stream)
                 .collect(Collectors.toSet());
 
         transactionTemplate.executeWithoutResult(_ -> {
-            instanceRegistry.reload(instances);
-            databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
+            // Serializes the reconciliation and the snapshots between Master replicas until the commit
+            discoveryLock.acquire();
+            instanceRegistry.reconcile(freshInstances, discoveredInstances.retained());
+            databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(freshMetadata);
             scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
         });
     }

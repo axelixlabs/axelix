@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -26,6 +26,7 @@ import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 
 /**
  * Central registry of all the {@link Instance instances} that this Master deployment is aware about.
@@ -51,13 +52,15 @@ public interface InstanceRegistry {
     void reload(Instance instance);
 
     /**
-     * Reloads the registry, by removing all previously auto-discovered Instances,
-     * and inserts the following discovered instances instead. The Instances that have
-     * self-registered are not removed by this call.
+     * Reconciles the auto-discovered Instances with the result of the latest discovery run. A previously
+     * auto-discovered Instance is replaced if it is present in {@code fresh}, kept as is if it is present in
+     * {@code retained}, and removed otherwise. The Instances that have self-registered are not affected by this call.
      *
-     * @param instances Instances to register as a replacement of previously auto-discovered instances.
+     * @param fresh    Instances probed successfully during the run, by their discovery key
+     * @param retained discovery keys of the Instances that must be kept as they are, since they were not probed
+     *                 successfully during the run, but are still considered alive
      */
-    void reload(Collection<Instance> instances);
+    void reconcile(Map<InstanceKey, Instance> fresh, Set<InstanceKey> retained);
 
     /**
      * Deregisters the {@link Instance} by the instanceId.
