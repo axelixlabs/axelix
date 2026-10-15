@@ -28,7 +28,7 @@ export const EnvironmentProfilesData = ({ profiles }: IProps) => {
 
     return (
         <>
-            <div className={styles.Dropdown}>
+            <div className={`TextUltraSmall ${styles.Dropdown}`}>
                 <div className={styles.DropdownHeader}>
                     <div className={styles.DropdownTitle}>{t("Environments.activeProfiles")}</div>
                     <div className={styles.DropdownHint}>{t("Environments.profilesPrecedenceHint")}</div>

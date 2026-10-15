@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    column-gap: 14px;
+    column-gap: 20px;
     width: 100%;
     min-width: 0;
 }
@@ -15,15 +15,12 @@
 }
 
 .Title {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--prop-text);
+    font-weight: 600;
     overflow-wrap: anywhere;
 }
 
 .TooltipName {
-    font-size: 11.5px;
-    color: var(--prop-text-dim);
+    color: var(--axelix-bold-grey);
     overflow-wrap: anywhere;
 }
 
@@ -31,12 +28,12 @@
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--prop-text-dim);
+    color: var(--axelix-bold-grey);
     cursor: help;
-    transition: color 0.15s;
+    transition: color 0.3s;
 
     &:hover {
-        color: var(--prop-text);
+        color: var(--axelix-primary-black);
     }
 }
 
@@ -48,19 +45,14 @@
 }
 
 .FlaggedCounter {
-    padding: 2px 7px;
-    font-size: 11.5px;
-    font-weight: 700;
-    white-space: nowrap;
-    color: var(--prop-danger);
-    background-color: var(--prop-danger-surface);
+    font-weight: 600;
+    color: var(--axelix-primary-red);
+    background-color: var(--axelix-primary-light-red);
     border: 1px solid var(--prop-danger-border);
-    border-radius: var(--axelix-border-radius-small);
 }
 
 .PropertiesCounter {
-    font-size: 11.5px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    color: var(--prop-text-faint);
+    color: var(--axelix-bold-grey);
 }

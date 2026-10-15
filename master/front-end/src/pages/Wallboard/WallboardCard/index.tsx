@@ -17,6 +17,7 @@
  */
 import { Badge, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { QuestionIcon } from "@/assets";
@@ -32,6 +33,8 @@ interface IProps {
 }
 
 export const WallboardCard = ({ data }: IProps) => {
+    const { t } = useTranslation();
+
     const textRef = useRef<HTMLDivElement>(null);
     const [isEllipsis, setIsEllipsis] = useState<boolean>(false);
 
@@ -89,7 +92,7 @@ export const WallboardCard = ({ data }: IProps) => {
                 </div>
                 <div className={`TextSmall ${styles.Body}`}>
                     <div className={styles.BodyChunk}>
-                        <div className={styles.Label}>Version</div>
+                        <div className={styles.Label}>{t("version")}</div>
                         <div className={styles.Value}>{data.serviceVersion}</div>
                     </div>
 

@@ -37,18 +37,20 @@ export const EnvironmentProfiles = ({ profiles }: IProps) => {
     const [open, setOpen] = useState<boolean>(false);
 
     return (
-        <Popover
-            trigger="click"
-            placement="bottomLeft"
-            onOpenChange={setOpen}
-            styles={{ container: { padding: 0 } }}
-            content={<EnvironmentProfilesData profiles={profiles} />}
-        >
-            <button type="button" className={`${styles.Trigger} ${open ? styles.TriggerOpen : ""}`}>
-                <ProfileIcon className={styles.TriggerIcon} />
-                {t("Environments.profilesCount", { value: profiles.length })}
-                <span className={styles.Caret}>{open ? "▴" : "▾"}</span>
-            </button>
-        </Popover>
+        <>
+            <Popover
+                trigger="click"
+                placement="bottomLeft"
+                onOpenChange={setOpen}
+                styles={{ container: { padding: 0 } }}
+                content={<EnvironmentProfilesData profiles={profiles} />}
+            >
+                <div className={`TextSmall ${styles.Trigger} ${open ? styles.TriggerOpen : ""}`}>
+                    <ProfileIcon className={styles.TriggerIcon} />
+                    {t("Environments.profilesCount", { value: profiles.length })}
+                    <span className={`${styles.Caret} ${open ? styles.CaretOpen : ""}`}>▾</span>
+                </div>
+            </Popover>
+        </>
     );
 };

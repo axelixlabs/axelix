@@ -5,14 +5,10 @@
     flex-shrink: 0;
     height: 32px;
     padding-inline: 12px;
-    font: inherit;
-    font-size: 13px;
     font-weight: 600;
-    color: var(--prop-text);
-    background-color: var(--prop-surface);
-    border: 1px solid var(--prop-border);
+    border: 1px solid var(--axelix-medium-grey);
     border-radius: var(--axelix-border-radius-large);
-    box-shadow: var(--prop-shadow-card);
+    box-shadow: var(--axelix-box-shadow-light);
     cursor: pointer;
     user-select: none;
     transition: border-color 0.2s;
@@ -20,7 +16,7 @@
 
 .Trigger:hover,
 .TriggerOpen {
-    border-color: var(--prop-text);
+    border-color: var(--axelix-primary-black);
 }
 
 .TriggerIcon {
@@ -30,7 +26,9 @@
 }
 
 .Caret {
-    font-size: 10px;
-    color: var(--prop-text-dim);
+    transition: transform 0.3s;
 }
 
+.CaretOpen {
+    transform: rotate(180deg);
+}

@@ -18,5 +18,5 @@
 .InjectionPointWrapper:not(:last-child) {
     margin-bottom: 8px;
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--prop-border-faint);
+    border-bottom: 1px solid var(--axelix-medium-grey);
 }

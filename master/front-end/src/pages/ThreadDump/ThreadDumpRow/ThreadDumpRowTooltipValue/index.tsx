@@ -36,7 +36,7 @@ interface IProps {
 const ThreadDumpTrackableValue = ({ value, parameterName }: IProps) => {
     const { t } = useTranslation();
 
-    if (value != -1) {
+    if (value !== -1) {
         return <>{value}</>;
     } else {
         return (

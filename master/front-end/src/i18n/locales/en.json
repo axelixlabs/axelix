@@ -18,6 +18,8 @@
     "password": "Password",
     "notEnoughAuthorities": "You don't have enough authorities",
     "license": "License",
+    "version": "Version",
+    "or": "or",
     "LicenseStatusAlert": {
         "licenseExpiringSoonAlertTitle_one": "Your Axelix Enterprise license expires in {{count}} day ({{date}}). Enterprise features stop after that date.",
         "licenseExpiringSoonAlertTitle_other": "Your Axelix Enterprise license expires in {{count}} days ({{date}}). Enterprise features stop after that date.",
@@ -339,7 +341,6 @@
     },
     "About": {
         "title": "About Axelix",
-        "version": "Version",
         "intro": "<0>Axelix</0> is a monitoring and runtime debugging solution for Java/Kotlin deployments that run on Spring Boot.",
         "licensing": "The core of the <0>Axelix</0> product is Open Source and is available under <1>LGPL 3.0</1>. The source code of the <0>Axelix</0> core is available over on <2>GitHub</2>.",
         "contact": "In case of any questions please consult the <0>Reference Guide</0>",
@@ -372,7 +373,6 @@
             "activate": "Activate",
             "replaceLicense": "Replace license",
             "availableInEnterprise": "Available in Enterprise",
-            "or": "or",
             "uploadFile": "upload a .lic file",
             "keyActivated": "License key activated",
             "keyUpdated": "License key updated",
@@ -590,7 +590,6 @@
         },
         "columns": {
             "dependency": "Dependency",
-            "version": "Version",
             "scope": "Scope"
         },
         "scope": {

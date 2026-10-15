@@ -37,10 +37,12 @@ interface IProps {
 export const EnvironmentPropertiesAccordionBody = ({ allProperties, precedenceIndex }: IProps) => {
     const { t } = useTranslation();
 
+    const isEmpty = allProperties.length === 0;
+
     return (
         <>
-            {allProperties.length === 0 ? (
-                <div className={styles.EmptySource}>{t("Environments.noPropertiesInSource")}</div>
+            {isEmpty ? (
+                <div className={`TextSmall ${styles.EmptySource}`}>{t("Environments.noPropertiesInSource")}</div>
             ) : (
                 allProperties.map(({ property, hasDropdown }) => {
                     if (hasDropdown) {

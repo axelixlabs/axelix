@@ -15,14 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useTranslation } from "react-i18next";
+
 import styles from "./styles.module.css";
 
 export const SeparatorLine = () => {
+    const { t } = useTranslation();
+
     return (
         <>
             <div className={styles.MainWrapper}>
                 <div className={styles.Line} />
-                <div className={`TextSmall ${styles.Or}`}>OR</div>
+                <div className={`TextSmall ${styles.Or}`}>{t("or")}</div>
                 <div className={styles.Line} />
             </div>
         </>

@@ -1,3 +1,4 @@
+/* TODO: Improve in the future */
 .Chip {
     display: inline-flex;
     align-items: center;
@@ -17,7 +18,7 @@
         background-color 0.12s;
 
     &:hover {
-        color: var(--prop-surface);
+        color: var(--axelix-primary-white);
         background-color: var(--risk-color);
     }
 }
@@ -33,7 +34,7 @@
 
 .Dangerous {
     --risk-color: var(--prop-danger);
-    --risk-surface: var(--prop-danger-surface);
+    --risk-surface: var(--axelix-primary-light-red);
     --risk-border: var(--prop-danger-border);
     --risk-on-dark: var(--prop-danger-on-dark);
 }
@@ -55,40 +56,30 @@
 .Tooltip {
     display: flex;
     flex-direction: column;
-    row-gap: 6px;
+    row-gap: 8px;
 }
 
 .TooltipLabel {
     display: flex;
     align-items: center;
     column-gap: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-weight: 600;
+    letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--risk-on-dark);
-}
-
-.TooltipHint {
-    display: flex;
-    flex-direction: column;
-    row-gap: 3px;
-    margin-top: 2px;
-    padding-top: 8px;
-    border-top: 1px solid rgb(255 255 255 / 12%);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
 }
 
 .TooltipHintLabel {
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-weight: 600;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    color: var(--prop-text-dim);
+    color: var(--axelix-bold-grey);
+    margin-bottom: 4px;
 }
 
 .TooltipHintValue {
-    font-size: 12px;
     font-weight: 600;
-    color: var(--prop-surface);
     overflow-wrap: anywhere;
 }

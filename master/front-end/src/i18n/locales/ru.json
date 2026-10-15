@@ -17,6 +17,8 @@
     "username": "Имя пользователя",
     "password": "Пароль",
     "license": "Лицензия",
+    "version": "Версия",
+    "or": "или",
     "LicenseStatusAlert": {
         "licenseExpiringSoonAlertTitle_one": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} день ({{date}}). После этой даты корпоративные функции перестанут работать.",
         "licenseExpiringSoonAlertTitle_few": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} дня ({{date}}). После этой даты корпоративные функции перестанут работать.",
@@ -341,7 +343,6 @@
     },
     "About": {
         "title": "Про Axelix",
-        "version": "Версия",
         "intro": "<0>Axelix</0> это решение для мониторинга и рантайм дебага Java/Kotlin приложений, работающих на Spring Boot.",
         "licensing": "Ядро продукта <0>Axelix</0> лежит в открытом досутпе и доступно в рамках Open Source лицензии <1>LGPL 3.0</1>. Исходный код ядра Axelix доступен на <2>GitHub</2>.",
         "contact": "Если у вас есть вопросы, пожалуйста, обратитесь к <0>Документации</0>",
@@ -375,7 +376,6 @@
             "activate": "Активировать",
             "replaceLicense": "Заменить лицензию",
             "availableInEnterprise": "Доступно в Enterprise",
-            "or": "или",
             "uploadFile": "загрузить файл .lic",
             "keyActivated": "Ключ лицензии активирован",
             "keyUpdated": "Ключ лицензии обновлён",
@@ -596,7 +596,6 @@
         },
         "columns": {
             "dependency": "Зависимость",
-            "version": "Версия",
             "scope": "Тип"
         },
         "scope": {

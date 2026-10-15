@@ -10,13 +10,12 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--prop-text-faint);
+    color: var(--axelix-bold-grey);
 }
 
 .DetailValue {
     min-width: 0;
     font-size: 13px;
     line-height: 1.55;
-    color: var(--prop-text-muted);
     text-wrap: pretty;
 }

@@ -5,22 +5,20 @@
     gap: 8px;
 }
 
+/* TODO: fix in the future */
 .Chip {
-    --chip-accent: var(--prop-text-faint);
-    --chip-surface: var(--prop-surface-sunken);
+    --chip-accent: var(--axelix-bold-grey);
+    --chip-surface: var(--axelix-extra-light-grey);
 
     display: inline-flex;
     align-items: center;
     column-gap: 8px;
     padding: 6px 12px;
-    font: inherit;
-    font-size: 12.5px;
     font-weight: 600;
     color: #475467;
-    background-color: var(--prop-surface);
-    border: 1px solid var(--prop-border);
+    border: 1px solid var(--axelix-medium-grey);
     border-radius: var(--axelix-border-radius-large);
-    box-shadow: var(--prop-shadow-card);
+    box-shadow: var(--axelix-box-shadow-light);
     cursor: pointer;
     user-select: none;
     transition:
@@ -41,7 +39,7 @@
 
 .Dangerous {
     --chip-accent: var(--prop-danger);
-    --chip-surface: var(--prop-danger-surface);
+    --chip-surface: var(--axelix-primary-light-red);
 }
 
 .DeprecatedError {
@@ -56,7 +54,7 @@
 
 .Suppressed {
     --chip-accent: #475467;
-    --chip-surface: var(--prop-surface-sunken);
+    --chip-surface: var(--axelix-extra-light-grey);
 }
 
 .Dot {
@@ -68,31 +66,26 @@
 }
 
 .Count {
-    padding: 1px 5px;
-    font-size: 11.5px;
-    font-weight: 700;
+    padding-inline: 4px;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
-    color: var(--prop-text-faint);
-    background-color: var(--prop-border-faint);
+    color: var(--axelix-bold-grey);
+    background-color: var(--axelix-medium-grey);
     border-radius: var(--axelix-border-radius-small);
 }
 
 .Selected .Count {
     color: var(--chip-accent);
-    background-color: var(--prop-surface);
+    background-color: var(--axelix-primary-white);
 }
 
 .Clear {
     padding: 6px 4px;
-    font: inherit;
-    font-size: 12.5px;
     font-weight: 600;
-    color: var(--prop-text-faint);
-    background: none;
-    border: none;
+    color: var(--axelix-bold-grey);
     cursor: pointer;
-}
 
-.Clear:hover {
-    color: var(--prop-text);
+    &:hover {
+        color: var(--axelix-primary-black);
+    }
 }

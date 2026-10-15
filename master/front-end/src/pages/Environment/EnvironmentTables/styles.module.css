@@ -1,7 +1,7 @@
-.ToolbarWrapper {
+.MainWrapper {
     padding-bottom: 16px;
     margin-bottom: 16px;
-    border-bottom: 1px solid #e9edec;
+    border-bottom: 1px solid var(--axelix-medium-grey);
 }
 
 .ToolbarRow {
@@ -20,10 +20,10 @@
 .NoResults {
     padding: 50px;
     text-align: center;
-    color: var(--prop-text-faint);
-    background-color: var(--prop-surface);
-    border: 1px solid var(--prop-panel-border);
-    border-radius: var(--prop-radius);
+    color: var(--axelix-bold-grey);
+    background-color: var(--axelix-extra-light-grey);
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
 }
 
 .ContentWrapper {

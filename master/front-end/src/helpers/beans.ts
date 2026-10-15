@@ -51,7 +51,7 @@ export const filterBeans = (beans: IBean[], selectedBeanName: string | null, sea
 
     return beans
         .filter(({ beanName }) => {
-            return selectedBeanName == null || selectedBeanName === beanName;
+            return selectedBeanName === null || selectedBeanName === beanName;
         })
         .filter(({ beanName, className, aliases }) => {
             const lowerBeanName = beanName.toLowerCase();

@@ -177,7 +177,7 @@ export const buildChartData = (lookupHistory: ICacheLookup[], slidingWindow: num
             data.push({ timestamp: lookup.timestamp, count: windowHits / (i + 1) });
         } else {
             // eslint-disable-next-line max-depth
-            if (lookup.outcome == ELookupOutcome.HIT) {
+            if (lookup.outcome === ELookupOutcome.HIT) {
                 windowHits++;
             }
 

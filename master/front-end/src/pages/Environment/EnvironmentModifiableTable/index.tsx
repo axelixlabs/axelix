@@ -52,21 +52,25 @@ export const EnvironmentModifiableTable = ({ propertySource, precedenceIndex }: 
     ];
 
     return (
-        <div className={styles.Panel}>
-            <Accordion
-                header={
-                    <EnvironmentPropertiesAccordionHeader
-                        properties={propertySource.properties}
-                        propertySource={propertySource}
+        <>
+            <div className={styles.MainWrapper}>
+                <Accordion
+                    header={
+                        <EnvironmentPropertiesAccordionHeader
+                            properties={propertySource.properties}
+                            propertySource={propertySource}
+                        />
+                    }
+                    headerStyles={styles.AccordionHeader}
+                    contentStyles={styles.AccordionBody}
+                    accordionExpanded
+                >
+                    <EnvironmentPropertiesAccordionBody
+                        allProperties={allProperties}
+                        precedenceIndex={precedenceIndex}
                     />
-                }
-                wrapperStyles={styles.PanelAccordion}
-                headerStyles={styles.PanelHeader}
-                contentStyles={styles.PanelBody}
-                accordionExpanded
-            >
-                <EnvironmentPropertiesAccordionBody allProperties={allProperties} precedenceIndex={precedenceIndex} />
-            </Accordion>
-        </div>
+                </Accordion>
+            </div>
+        </>
     );
 };

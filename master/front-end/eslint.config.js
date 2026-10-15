@@ -99,6 +99,7 @@ export default [
             complexity: ["error", 10],
             "max-nested-callbacks": ["error", 2],
             "max-depth": ["error", 2],
+            eqeqeq: ["error", "always"],
             "react/no-danger": "error",
             "react/jsx-no-target-blank": "error",
             "react/no-unknown-property": "error",

@@ -19,15 +19,9 @@ import { useTranslation } from "react-i18next";
 
 import { countTriageTag } from "@/helpers";
 import { EPropertyTriageTag, type IEnvironmentPropertySource } from "@/models";
+import { environmentTriageTags } from "@/utils";
 
 import styles from "./styles.module.css";
-
-const TRIAGE_TAGS = [
-    EPropertyTriageTag.DANGEROUS,
-    EPropertyTriageTag.DEPRECATED_ERROR,
-    EPropertyTriageTag.DEPRECATED_WARNING,
-    EPropertyTriageTag.SUPPRESSED,
-];
 
 const TAG_STYLES: Record<EPropertyTriageTag, string> = {
     [EPropertyTriageTag.DANGEROUS]: styles.Dangerous,
@@ -56,10 +50,14 @@ interface IProps {
 export const EnvironmentTriageFilters = ({ propertySources, selectedTags, onSelectedTagsChange }: IProps) => {
     const { t } = useTranslation();
 
-    const availableTags = TRIAGE_TAGS.map((triageTag) => ({
-        triageTag,
-        count: countTriageTag(propertySources, triageTag),
-    })).filter(({ count }) => count > 0);
+    const availableTags = environmentTriageTags
+        .map((triageTag) => {
+            return {
+                triageTag: triageTag,
+                count: countTriageTag(propertySources, triageTag),
+            };
+        })
+        .filter(({ count }) => count > 0);
 
     if (!availableTags.length) {
         return null;
@@ -75,13 +73,12 @@ export const EnvironmentTriageFilters = ({ propertySources, selectedTags, onSele
 
     return (
         <>
-            <div className={styles.MainWrapper}>
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
                 {availableTags.map(({ triageTag, count }) => {
                     const isSelected = selectedTags.includes(triageTag);
 
                     return (
-                        <button
-                            type="button"
+                        <div
                             className={`${styles.Chip} ${TAG_STYLES[triageTag]} ${isSelected ? styles.Selected : ""}`}
                             onClick={() => toggleTag(triageTag)}
                             key={triageTag}
@@ -89,14 +86,14 @@ export const EnvironmentTriageFilters = ({ propertySources, selectedTags, onSele
                             <span className={styles.Dot} />
                             {t(`Environments.triageTags.${triageTag}`)}
                             <span className={styles.Count}>{count}</span>
-                        </button>
+                        </div>
                     );
                 })}
 
                 {selectedTags.length > 0 && (
-                    <button type="button" className={styles.Clear} onClick={() => onSelectedTagsChange([])}>
+                    <div className={styles.Clear} onClick={() => onSelectedTagsChange([])}>
                         {t("Environments.clearFilters")}
-                    </button>
+                    </div>
                 )}
             </div>
         </>

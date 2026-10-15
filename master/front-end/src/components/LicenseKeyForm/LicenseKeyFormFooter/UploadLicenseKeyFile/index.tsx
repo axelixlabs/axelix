@@ -59,7 +59,7 @@ export const UploadLicenseKeyFile = ({ setLicenseKey }: IProps) => {
     return (
         <>
             <div>
-                <span className={styles.Or}>{t("LicenseModal.Form.or")}</span>
+                <span className={styles.Or}>{t("or")}</span>
 
                 <label className={styles.FileUploadLabel}>
                     {t("LicenseModal.Form.uploadFile")}

@@ -58,7 +58,7 @@ export const AboutModal = ({ open, setOpen }: IProps) => {
                 <div className={`TextSmall ${styles.HeaderWrapper}`}>
                     <p className="TextLarge">{t("About.title")}</p>
                     <p className={styles.Version}>
-                        {t("About.version")}: {version}
+                        {t("version")}: {version}
                     </p>
                 </div>
 

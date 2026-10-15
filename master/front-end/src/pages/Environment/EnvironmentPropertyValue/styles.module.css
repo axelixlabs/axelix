@@ -4,12 +4,11 @@
     font-size: 12.5px;
     font-weight: 600;
     text-align: right;
-    color: var(--prop-text);
     overflow-wrap: anywhere;
 }
 
 .SuppressedValue {
-    color: var(--prop-text-faint);
+    color: var(--axelix-bold-grey);
     text-decoration: line-through;
 }
 
@@ -34,15 +33,14 @@
 }
 
 .Active {
-    color: var(--prop-accent-strong);
-    background-color: var(--prop-accent-surface);
+    color: var(--axelix-primary-green);
+    background-color: var(--axelix-primary-light-green);
     border: 1px solid var(--prop-accent-border);
 }
 
 .Suppressed {
-    color: var(--prop-text-faint);
-    background-color: var(--prop-surface-sunken);
-    border: 1px solid var(--prop-border-soft);
+    color: var(--axelix-bold-grey);
+    border: 1px solid var(--axelix-medium-grey);
 }
 
 .TooltipLabel {

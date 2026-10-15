@@ -75,7 +75,7 @@ export const FixedTasksEditableValue = ({ task }: IProps) => {
     };
 
     const handleInputChange = (newVal: string): void => {
-        if (isNaN(Number(newVal)) || newVal.trim().length == 0) {
+        if (isNaN(Number(newVal)) || newVal.trim().length === 0) {
             setIsValidInterval(false);
         } else {
             setIsValidInterval(true);

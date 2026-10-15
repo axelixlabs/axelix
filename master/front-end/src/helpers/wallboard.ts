@@ -95,11 +95,11 @@ export const semVerMatch = (candidateSemVer: string, filter: IWallboardSingleOpe
     // eslint-disable-next-line prefer-const
     let [filterMajor, filterMinor, filterPatch] = parseVersion(filter.operand);
 
-    if (filter.operator == EWallboardFilterOperator.EQUAL) {
+    if (filter.operator === EWallboardFilterOperator.EQUAL) {
         return (
-            major == filterMajor &&
-            (filterMinor === undefined || filterMinor == minor) &&
-            (filterPatch === undefined || filterPatch == patch)
+            major === filterMajor &&
+            (filterMinor === undefined || filterMinor === minor) &&
+            (filterPatch === undefined || filterPatch === patch)
         );
     }
 

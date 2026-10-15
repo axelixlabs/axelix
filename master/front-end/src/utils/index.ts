@@ -20,6 +20,7 @@ export * from "./dashboard/dashboardLanguages";
 export * from "./dashboard/dashboardJava";
 export * from "./transactional";
 export * from "./dependencies";
+export * from "./environments";
 export * from "./entitiesMap";
 export * from "./threadDump";
 export * from "./siderMenu";

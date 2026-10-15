@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { InfoIcon } from "@/assets";
-import { HintTooltip } from "@/components";
+import { HintTooltip, StyledTag } from "@/components";
 import { isFlaggedProperty } from "@/helpers";
 import type { IEnvProperty, IEnvironmentPropertySource } from "@/models";
 
@@ -40,13 +40,13 @@ export const EnvironmentPropertiesAccordionHeader = ({ properties, propertySourc
         <>
             <div className={styles.MainWrapper}>
                 <span className={styles.TitleWrapper}>
-                    <span className={styles.Title}>{name}</span>
+                    <span className={`TextSmall ${styles.Title}`}>{name}</span>
                     {description && (
                         <HintTooltip
                             placement="bottomLeft"
                             content={
                                 <>
-                                    <span className={styles.TooltipName}>{name}</span>
+                                    <span className={`TextUltraSmall ${styles.TooltipName}`}>{name}</span>
                                     <span>{description}</span>
                                 </>
                             }
@@ -58,12 +58,13 @@ export const EnvironmentPropertiesAccordionHeader = ({ properties, propertySourc
                     )}
                 </span>
 
-                <span className={styles.Counters}>
+                <span className={`TextUltraSmall ${styles.Counters}`}>
                     {flaggedCount > 0 && (
-                        <span className={styles.FlaggedCounter}>
+                        <StyledTag className={`TextUltraSmall ${styles.FlaggedCounter}`}>
                             {t("Environments.flaggedCount", { value: flaggedCount })}
-                        </span>
+                        </StyledTag>
                     )}
+
                     <span className={styles.PropertiesCounter}>
                         {t("Environments.propertiesCount", { value: properties.length })}
                     </span>

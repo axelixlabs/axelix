@@ -1,21 +1,15 @@
 .MainWrapper {
     display: grid;
-    grid-template-columns: 26px minmax(0, 1fr) minmax(0, auto) 104px;
+    grid-template-columns: 25px minmax(0, 1fr) minmax(0, auto) 105px;
     align-items: center;
-    column-gap: 14px;
-    min-height: 44px;
-    padding: 7px 16px;
-    background-color: var(--prop-surface);
+    column-gap: 20px;
+    min-height: 45px;
+    padding: 8px 16px;
     border-left: 3px solid transparent;
-    transition: background-color 0.12s;
-
-    &:hover {
-        background-color: var(--prop-surface-soft);
-    }
 }
 
 .DangerousRow {
-    background-color: var(--prop-danger-surface);
+    background-color: var(--axelix-primary-light-red);
     border-left-color: var(--prop-danger);
 
     &:hover {
@@ -42,24 +36,18 @@
 }
 
 .SuppressedRow {
-    background-color: var(--prop-surface-soft);
-}
-
-.CaretCell {
-    display: block;
+    background-color: var(--axelix-extra-light-grey);
 }
 
 .KeyChunk {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 4px 9px;
+    gap: 5px 8px;
     min-width: 0;
 }
 
 .Key {
-    font-size: 12.5px;
     font-weight: 500;
-    color: var(--prop-text);
     overflow-wrap: anywhere;
 }

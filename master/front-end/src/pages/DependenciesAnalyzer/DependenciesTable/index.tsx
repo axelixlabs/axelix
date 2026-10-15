@@ -51,7 +51,7 @@ export const DependenciesTable = ({ dependencies, rootCoordinates }: IProps) => 
                 <div className={styles.Table}>
                     <div className={`TextUltraSmall ${styles.HeaderRow}`}>
                         <span>{t("DependenciesAnalyzer.columns.dependency")}</span>
-                        <span className={styles.AlignEnd}>{t("DependenciesAnalyzer.columns.version")}</span>
+                        <span className={styles.AlignEnd}>{t("version")}</span>
                         <span className={styles.AlignEnd}>{t("DependenciesAnalyzer.columns.scope")}</span>
                     </div>
 

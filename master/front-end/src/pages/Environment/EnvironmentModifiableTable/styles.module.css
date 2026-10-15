@@ -1,30 +1,25 @@
-.Panel {
-    background-color: var(--prop-surface);
-    border: 1px solid var(--prop-panel-border);
-    border-radius: var(--prop-radius);
-    box-shadow: var(--prop-shadow-card);
+.MainWrapper {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-light);
     overflow: hidden;
 }
 
-.PanelAccordion.PanelAccordion {
-    border-bottom: none;
-}
-
-.PanelHeader.PanelHeader {
+.AccordionHeader.AccordionHeader {
     display: flex;
     align-items: center;
-    min-height: 44px;
-    padding: 0 16px 0 34px;
-    background-color: var(--prop-surface-soft);
-    border-radius: 9px 9px 0 0;
+    min-height: 45px;
+    padding-inline: 35px 15px;
+    background-color: var(--axelix-extra-light-grey);
+    border-radius: var(--axelix-border-radius-large) var(--axelix-border-radius-large) 0 0;
+
+    &::before {
+        left: 14px;
+        width: 12px;
+        height: 12px;
+    }
 }
 
-.PanelHeader.PanelHeader::before {
-    left: 14px;
-    width: 12px;
-    height: 12px;
-}
-
-.PanelBody.PanelBody {
+.AccordionBody {
     padding: 0;
 }

@@ -35,10 +35,6 @@ interface IProps {
     dangerousValue?: IDangerousValue;
 }
 
-/**
- * The risk-related rows of the expanded property view: why a property is deprecated or dangerous and,
- * where the metadata gives one, the property to migrate to or a safer value to use.
- */
 export const EnvironmentPropertyRiskDetails = ({ deprecation, dangerousValue }: IProps) => {
     const { t } = useTranslation();
 
@@ -52,7 +48,7 @@ export const EnvironmentPropertyRiskDetails = ({ deprecation, dangerousValue }: 
 
             {deprecation?.replacedBy && (
                 <EnvironmentPropertyDetailRow label={t("Environments.replacedBy")}>
-                    <span className={styles.PropertyName}>{deprecation.replacedBy}</span>
+                    <span className={`TextUltraSmall ${styles.PropertyName}`}>{deprecation.replacedBy}</span>
                 </EnvironmentPropertyDetailRow>
             )}
 

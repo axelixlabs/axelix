@@ -36,41 +36,43 @@ const KIND_STYLES: Record<TPropertyRiskKind, string> = {
     [EPropertyTriageTag.DEPRECATED_WARNING]: styles.DeprecatedWarning,
 };
 
-/**
- * An inline pill next to a property key that names a risk and, on hover, explains why it is flagged
- * and what to do about it. The reasoning lives in the tooltip so it never lengthens the row.
- */
 export const RiskChip = ({ risk }: IProps) => {
     const { t } = useTranslation();
+    const { reason, hint, kind } = risk;
 
     const kindClass = KIND_STYLES[risk.kind];
-    const label = t(`Environments.triageTags.${risk.kind}`);
+    const label = t(`Environments.triageTags.${kind}`);
     const hintLabel =
-        risk.kind === EPropertyTriageTag.DANGEROUS ? t("Environments.recommended") : t("Environments.replacedBy");
+        kind === EPropertyTriageTag.DANGEROUS ? t("Environments.recommended") : t("Environments.replacedBy");
 
     return (
-        <HintTooltip
-            placement="right"
-            content={
-                <span className={`${styles.Tooltip} ${kindClass}`}>
-                    <span className={styles.TooltipLabel}>
-                        <span className={styles.TooltipDot} />
-                        {label}
-                    </span>
-                    <span>{risk.reason}</span>
-                    {risk.hint && (
-                        <span className={styles.TooltipHint}>
-                            <span className={styles.TooltipHintLabel}>{hintLabel}</span>
-                            <span className={styles.TooltipHintValue}>{risk.hint}</span>
-                        </span>
-                    )}
+        <>
+            <HintTooltip
+                placement="right"
+                content={
+                    <div className={`${styles.Tooltip} ${kindClass}`}>
+                        <div className={`TextUltraSmall ${styles.TooltipLabel}`}>
+                            <div className={styles.TooltipDot} />
+
+                            {label}
+                        </div>
+
+                        <div>{reason}</div>
+
+                        {hint && (
+                            <div className="TextUltraSmall">
+                                <div className={styles.TooltipHintLabel}>{hintLabel}</div>
+                                <div className={styles.TooltipHintValue}>{hint}</div>
+                            </div>
+                        )}
+                    </div>
+                }
+            >
+                <span className={`${styles.Chip} ${kindClass}`}>
+                    <span className={styles.ChipDot} />
+                    {label}
                 </span>
-            }
-        >
-            <span className={`${styles.Chip} ${kindClass}`}>
-                <span className={styles.ChipDot} />
-                {label}
-            </span>
-        </HintTooltip>
+            </HintTooltip>
+        </>
     );
 };

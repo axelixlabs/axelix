@@ -54,10 +54,10 @@ export const EnvironmentProperty = ({ property }: IProps) => {
     return (
         <>
             <div className={rowStyles}>
-                <span className={styles.CaretCell} />
+                <div />
 
                 <div className={styles.KeyChunk}>
-                    <span className={styles.Key}>{name}</span>
+                    <span className={`TextUltraSmall ${styles.Key}`}>{name}</span>
                     <Copy text={name} />
                     {risks.map((risk) => (
                         <RiskChip risk={risk} key={risk.kind} />

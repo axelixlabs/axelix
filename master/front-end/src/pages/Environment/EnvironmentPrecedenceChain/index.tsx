@@ -44,10 +44,10 @@ export const EnvironmentPrecedenceChain = ({ chain }: IProps) => {
                                 key={`${propertySourceName}-${index}`}
                             >
                                 <div className={styles.CellHeader}>
-                                    <span className={styles.SourceName}>{propertySourceName}</span>
+                                    <span className={`TextUltraSmall ${styles.SourceName}`}>{propertySourceName}</span>
                                     {isWinning && <span className={styles.WinsBadge}>{t("Environments.wins")}</span>}
                                 </div>
-                                <span className={styles.Value} title={value}>
+                                <span className={`TextSmall ${styles.Value}`} title={value}>
                                     {value}
                                 </span>
                             </div>
@@ -55,7 +55,7 @@ export const EnvironmentPrecedenceChain = ({ chain }: IProps) => {
                     })}
                 </div>
 
-                <div className={styles.Rail}>
+                <div className={`TextUltraSmall ${styles.Rail}`}>
                     <span>{t("Environments.highestPrecedence")}</span>
                     <span className={styles.RailLine} />
                     <span>{t("Environments.lowestPrecedence")}</span>
