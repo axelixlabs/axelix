@@ -136,9 +136,23 @@ jobs:
           JAVA_25_HOME: ${{ steps.setup-java-25.outputs.path }}
         run: make build-playground
 
+  helm-chart-checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check Helm chart
+        uses: ./.github/actions/check-helm-chart
+        with:
+          release: true
+
   release-artifacts:
     needs:
       [
+        helm-chart-checks,
         security-check,
         starter-compatibility-tests,
         master-e2e-tests,
@@ -237,7 +251,71 @@ jobs:
         if: always()
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
 
+      - name: Upload the Master jar
+        uses: actions/upload-artifact@v7
+        with:
+          name: master-jar
+          path: master-oss/build/libs/master.jar
+          retention-days: 3
+          if-no-files-found: error
+
+      # Generate complete README from README.md template
+      - name: Generate Helm chart README via helm-docs
+        uses: losisin/helm-docs-github-action@v1.7.1
+        with:
+          chart-search-root: charts
+          template-files: README.md
+          # Version of the helm-docs to be used
+          version: v1.14.2
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v5.0.1
+        with:
+          version: v3.14.0
+
+      # The schema has already been validated her
+      - name: Generate values.schema.json
+        uses: losisin/helm-values-schema-json-action@v2
+        with:
+          useHelmDocs: true
+          # Working around bug https://github.com/losisin/helm-values-schema-json-action/pull/408
+          # TODO: that will not work in case we would have multiple charts
+          values: charts/axelix/values.yaml
+
+      - name: Package the Helm chart
+        run: |
+          cp values.schema.json charts/axelix/
+          helm package charts/axelix --destination helm-chart-dist
+          # Make it obvious that the archive is a Helm chart. The chart name inside the archive is not affected.
+          mv "helm-chart-dist/axelix-${RELEASE_TAG}.tgz" "helm-chart-dist/axelix-helm-chart-${RELEASE_TAG}.tgz"
+
+      - name: Upload the Helm chart archive
+        uses: actions/upload-artifact@v7
+        with:
+          name: helm-chart
+          path: helm-chart-dist/*.tgz
+          retention-days: 3
+          if-no-files-found: error
+
       - name: Create and push the fleet release tag
         run: |
           git tag "v${RELEASE_TAG}"
           git push origin "v${RELEASE_TAG}"
+
+      - name: Add the Helm chart to the repository index in gh-pages
+        env:
+          CHART_URL: https://github.com/${{ github.repository }}/releases/download/v${{ env.RELEASE_TAG }}
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+          git fetch origin gh-pages
+          git worktree add -B gh-pages gh-pages-dir origin/gh-pages
+
+          helm repo index helm-chart-dist --url "${CHART_URL}" --merge gh-pages-dir/index.yaml
+          cp helm-chart-dist/index.yaml gh-pages-dir/index.yaml
+
+          cd gh-pages-dir
+          git add index.yaml
+          git commit -m "Add Helm chart ${RELEASE_TAG}"
+          git push origin gh-pages
