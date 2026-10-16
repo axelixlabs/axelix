@@ -34,7 +34,6 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.caches.CacheBulkClearRequest;
 import com.axelixlabs.axelix.master.api.external.request.caches.CachesBulkClearRequest;
-import com.axelixlabs.axelix.master.service.BulkRequestValidator;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 
@@ -55,10 +54,6 @@ public class CachesClearApi {
 
     @DeleteMapping(ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL)
     public ResponseEntity<?> clearAllCaches(@RequestBody CachesBulkClearRequest request) {
-        if (BulkRequestValidator.hasMissingRequiredFields(request.instanceIds())) {
-            return ResponseEntity.badRequest().build();
-        }
-
         try {
             endpointInvoker.invokeNoValueForInstances(
                     request.instanceIds(), ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
@@ -72,11 +67,6 @@ public class CachesClearApi {
 
     @DeleteMapping(ApiPaths.CachesApi.CACHE_BULK_CLEAR_CACHE)
     public ResponseEntity<?> clearSpecificCacheEntity(@RequestBody CacheBulkClearRequest request) {
-        if (BulkRequestValidator.hasMissingRequiredFields(
-                request.instanceIds(), request.cacheManagerName(), request.cacheName())) {
-            return ResponseEntity.badRequest().build();
-        }
-
         HttpPayload payload = new DefaultHttpPayload(
                 Map.of("cacheName", request.cacheName(), "cacheManagerName", request.cacheManagerName()));
 

@@ -39,7 +39,6 @@ import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerB
 import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.BulkRequestValidator;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
@@ -90,12 +89,6 @@ public class LoggersApi {
 
     @PostMapping(path = ApiPaths.LoggersApi.LOGGER_BULK_CHANGE)
     public ResponseEntity<?> setLoggingLevelByLoggerName(@RequestBody LogLevelLoggerBulkChangeRequest request) {
-
-        if (request == null
-                || BulkRequestValidator.hasMissingRequiredFields(
-                        request.instanceIds(), request.loggerName(), request.configuredLevel())) {
-            return ResponseEntity.badRequest().build();
-        }
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("name", request.loggerName()),

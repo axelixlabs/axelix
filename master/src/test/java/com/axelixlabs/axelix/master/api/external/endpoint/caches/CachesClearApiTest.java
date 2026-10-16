@@ -18,7 +18,9 @@
 package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -244,7 +246,8 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
         @NullAndEmptySource
         void shouldRejectMissingInstanceIds(List<String> instanceIds) {
             // given.
-            CachesBulkClearRequest requestBody = new CachesBulkClearRequest(instanceIds);
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", instanceIds);
 
             // when.
             ResponseEntity<String> response = restTemplate
@@ -375,7 +378,10 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
         @NullAndEmptySource
         void shouldRejectMissingInstanceIds(List<String> instanceIds) {
             // given.
-            CacheBulkClearRequest requestBody = new CacheBulkClearRequest(instanceIds, "manager", "orders");
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", instanceIds);
+            requestBody.put("cacheManagerName", "manager");
+            requestBody.put("cacheName", "orders");
 
             // when.
             ResponseEntity<String> response = restTemplate
@@ -396,7 +402,10 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
         @ValueSource(strings = " ")
         void shouldRejectMissingCacheManagerName(String value) {
             // given.
-            CacheBulkClearRequest requestBody = new CacheBulkClearRequest(List.of(activeInstanceId), value, "orders");
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", List.of(activeInstanceId));
+            requestBody.put("cacheManagerName", value);
+            requestBody.put("cacheName", "orders");
 
             // when.
             ResponseEntity<String> response = restTemplate
@@ -417,7 +426,10 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
         @ValueSource(strings = " ")
         void shouldRejectMissingCacheName(String value) {
             // given.
-            CacheBulkClearRequest requestBody = new CacheBulkClearRequest(List.of(activeInstanceId), "manager", value);
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", List.of(activeInstanceId));
+            requestBody.put("cacheManagerName", "manager");
+            requestBody.put("cacheName", value);
 
             // when.
             ResponseEntity<String> response = restTemplate

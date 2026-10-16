@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.master.api.external.request.caches;
 
 import java.util.List;
 
+import com.axelixlabs.axelix.master.service.BulkRequestValidator;
+
 /**
  * Request to clear all caches across several instances.
  *
@@ -26,4 +28,14 @@ import java.util.List;
  *
  * @author Sergey Cherkasov
  */
-public record CachesBulkClearRequest(List<String> instanceIds) {}
+public record CachesBulkClearRequest(List<String> instanceIds) {
+
+    /**
+     * Validates the required fields when creating the request.
+     *
+     * @throws IllegalArgumentException if the list is null or has no non-blank ID, or a required text value is blank
+     */
+    public CachesBulkClearRequest {
+        BulkRequestValidator.validate(instanceIds);
+    }
+}

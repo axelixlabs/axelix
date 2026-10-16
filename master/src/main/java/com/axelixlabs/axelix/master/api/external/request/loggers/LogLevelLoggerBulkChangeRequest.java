@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.master.service.BulkRequestValidator;
+
 /**
  * Request to change the logging level of a logger across several instances.
  *
@@ -36,4 +38,14 @@ public record LogLevelLoggerBulkChangeRequest(
         List<String> instanceIds,
         String loggerName,
         @Nullable Long ttlSeconds,
-        String configuredLevel) {}
+        String configuredLevel) {
+
+    /**
+     * Validates the required fields when creating the request.
+     *
+     * @throws IllegalArgumentException if the list is null or has no non-blank ID, or a required text value is blank
+     */
+    public LogLevelLoggerBulkChangeRequest {
+        BulkRequestValidator.validate(instanceIds, loggerName, configuredLevel);
+    }
+}

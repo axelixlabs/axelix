@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -292,8 +293,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     @Test
     void givenInstanceIdsAreEmpty_shouldReturnBadRequest_WhenUpdatingLoggingLevelBulk() {
         // given.
-        LogLevelLoggerBulkChangeRequest requestBody =
-                new LogLevelLoggerBulkChangeRequest(List.of(), "logger.name", null, "DEBUG");
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody =
+                Map.of("instanceIds", List.of(), "loggerName", "logger.name", "configuredLevel", "DEBUG");
 
         // when.
         ResponseEntity<String> response =
@@ -325,8 +327,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     @Test
     void givenConfiguredLevelIsEmpty_shouldReturnBadRequest__WhenUpdatingLoggingLevelBulk() {
         // given.
-        LogLevelLoggerBulkChangeRequest requestBody =
-                new LogLevelLoggerBulkChangeRequest(List.of(activeInstanceId), "logger.name", null, " ");
+        Map<String, Object> requestBody =
+                Map.of("instanceIds", List.of(activeInstanceId), "loggerName", "logger.name", "configuredLevel", " ");
 
         // when.
         ResponseEntity<String> response =

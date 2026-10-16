@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.util.CollectionUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -34,26 +34,18 @@ public final class BulkRequestValidator {
     private BulkRequestValidator() {}
 
     /**
-     * Checks whether a bulk request lacks an instance ID containing text or any required text value.
+     * Validates the target instance list and required text values of a bulk request.
      *
      * @param instanceIds the target instance IDs; must contain at least one non-blank ID
      * @param requiredFields the text values that must contain at least one non-whitespace character
-     * @return {@code true} if the instance list is null, empty or contains no non-blank ID, or any required text value is
-     *         null, empty or whitespace-only; {@code false} otherwise
+     * @throws IllegalArgumentException if the list is null or has no non-blank ID, or a required text value is blank
      */
-    public static boolean hasMissingRequiredFields(
-            @Nullable List<String> instanceIds, @Nullable String... requiredFields) {
-
-        if (CollectionUtils.isEmpty(instanceIds) || instanceIds.stream().noneMatch(StringUtils::hasText)) {
-            return true;
-        }
-
+    public static void validate(@Nullable List<String> instanceIds, @Nullable String... requiredFields) {
+        Assert.notNull(instanceIds, "Instance IDs must not be null");
+        Assert.isTrue(
+                instanceIds.stream().anyMatch(StringUtils::hasText), "At least one instance ID must contain text");
         for (@Nullable String field : requiredFields) {
-            if (!StringUtils.hasText(field)) {
-                return true;
-            }
+            Assert.hasText(field, "Required field must contain text");
         }
-
-        return false;
     }
 }
