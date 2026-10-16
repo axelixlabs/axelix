@@ -363,7 +363,21 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                   "email": "alice@example.com",
                   "jobTitle": "Engineering Manager",
                   "organizationalUnit": "Engineering",
-                  "roles": ["ADMIN"],
+                  "roles": [
+                    {
+                      "name": "ADMIN",
+                      "description": "Everything an editor can do, plus reading sensitive configuration values.",
+                      "grantedAt": null
+                    }
+                  ],
+                  "authorities": [
+                    "CACHES_CLEAR",
+                    "CACHES_TOGGLE",
+                    "CONFIG_PROPS_VALUES_READ",
+                    "ENV_VALUES_READ",
+                    "GARBAGE_COLLECTOR",
+                    "SCHEDULED_TASKS_MODIFY"
+                  ],
                   "userOrigin": "LOCAL",
                   "status": "SUSPENDED",
                   "lastLoginAt": null
@@ -380,6 +394,68 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         assertThatJson(response.getBody()).isEqualTo(expectedUser);
         assertThat(response.getBody()).doesNotContain("password");
         assertSuccessfulCallback(MasterWebEndpoints.USER_READ_ONE, superAdmin.getActor());
+    }
+
+    @Test
+    void shouldAccumulateTheAuthoritiesOfEveryRoleTheUserHolds() {
+        // given. ADMIN and EDITOR overlap, so a concatenation would repeat the four authorities they share
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "aliceSecret", "ADMIN");
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+        userService.updateUserPatch(
+                alice.id(),
+                "alice",
+                null,
+                null,
+                "alice@example.com",
+                null,
+                null,
+                null,
+                Set.of("EDITOR", "ADMIN"),
+                null);
+
+        // language=json
+        String expectedUser = """
+                {
+                  "id": "%s",
+                  "username": "alice",
+                  "firstName": null,
+                  "lastName": null,
+                  "email": "alice@example.com",
+                  "jobTitle": null,
+                  "organizationalUnit": null,
+                  "roles": [
+                    {
+                      "name": "ADMIN",
+                      "description": "Everything an editor can do, plus reading sensitive configuration values.",
+                      "grantedAt": null
+                    },
+                    {
+                      "name": "EDITOR",
+                      "description": "Performs runtime operations on the monitored applications, including destructive ones such as clearing caches.",
+                      "grantedAt": null
+                    }
+                  ],
+                  "authorities": [
+                    "CACHES_CLEAR",
+                    "CACHES_TOGGLE",
+                    "CONFIG_PROPS_VALUES_READ",
+                    "ENV_VALUES_READ",
+                    "GARBAGE_COLLECTOR",
+                    "SCHEDULED_TASKS_MODIFY"
+                  ],
+                  "userOrigin": "LOCAL",
+                  "status": "ACTIVE",
+                  "lastLoginAt": null
+                }
+                """.formatted(alice.id());
+
+        // when.
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.asUsersFeedViewer();
+        ResponseEntity<String> response = superAdmin.getForEntity(USER_BY_ID_PATH, String.class, alice.id());
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThatJson(response.getBody()).isEqualTo(expectedUser);
     }
 
     @Test

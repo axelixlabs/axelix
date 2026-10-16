@@ -38,10 +38,12 @@ import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
+import com.axelixlabs.axelix.master.api.external.response.UserProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**
@@ -60,6 +62,7 @@ public class UserApi {
     private final UserAuthenticator userAuthenticator;
     private final JwtEncoderService jwtEncoderService;
     private final UserService userService;
+    private final RoleService roleService;
 
     private static final InvalidCredentialsException INVALID_CREDENTIALS_EXCEPTION = new InvalidCredentialsException();
 
@@ -67,11 +70,13 @@ public class UserApi {
             CookieService cookieService,
             UserAuthenticator userAuthenticator,
             JwtEncoderService jwtEncoderService,
-            UserService userService) {
+            UserService userService,
+            RoleService roleService) {
         this.cookieService = cookieService;
         this.userAuthenticator = userAuthenticator;
         this.jwtEncoderService = jwtEncoderService;
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping(path = ApiPaths.UsersApi.USERS_FEED)
@@ -90,10 +95,10 @@ public class UserApi {
     }
 
     @GetMapping(path = ApiPaths.UsersApi.GET_USER_BY_ID)
-    public ResponseEntity<UserResponse> getUser(@PathVariable("userId") String userId) {
+    public ResponseEntity<UserProfileResponse> getUser(@PathVariable("userId") String userId) {
         return userService
                 .findUserById(userId)
-                .map(user -> UserResponse.from(user, userService.findRoleNamesByUserId(user.id())))
+                .map(user -> UserProfileResponse.from(user, roleService.findGrantedRolesOfUser(user.id())))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> {
                     log.warn("User with ID was not found {}", userId);
