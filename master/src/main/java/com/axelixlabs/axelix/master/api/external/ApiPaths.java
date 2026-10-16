@@ -245,12 +245,12 @@ public final class ApiPaths {
         /**
          * Endpoint to enable a specific cache in a cache manager.
          */
-        public static final String ENABLE_CACHE = "/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable";
+        public static final String BULK_ENABLE_CACHE = "/caches/cache/enable";
 
         /**
          * Endpoint to disable a specific cache in a cache manager.
          */
-        public static final String DISABLE_CACHE = "/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable";
+        public static final String BULK_DISABLE_CACHE = "/caches/cache/disable";
     }
 
     public static final class MetricsApi {
