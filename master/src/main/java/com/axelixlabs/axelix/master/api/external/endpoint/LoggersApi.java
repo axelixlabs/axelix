@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
+import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkResetRequest;
 import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
@@ -117,15 +118,21 @@ public class LoggersApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
     }
 
-    @PostMapping(path = ApiPaths.LoggersApi.RESET_FOR_LOGGER)
-    public ResponseEntity<Void> resetLoggingLevelByLoggerName(
-            @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
+    @PostMapping(path = ApiPaths.LoggersApi.LOGGER_BULK_RESET)
+    public ResponseEntity<?> resetLoggingLevelByLoggerName(@RequestBody LogLevelLoggerBulkResetRequest request) {
+        HttpPayload payload = new DefaultHttpPayload(Map.of("name", request.loggerName()));
 
-        endpointInvoker.invokeNoValue(
-                InstanceId.of(instanceId),
-                ActuatorEndpoints.RESET_FOR_LOGGER,
-                new DefaultHttpPayload(Map.of("name", loggerName)));
-
-        return ResponseEntity.noContent().build();
+        try {
+            endpointInvoker.invokeNoValueForInstances(
+                    request.instanceIds(), ActuatorEndpoints.RESET_FOR_LOGGER, payload);
+            return ResponseEntity.noContent().build();
+        } catch (PartiallyUpdatedException e) {
+            // TODO: A partial update is generally not the client's fault, so 400 Bad Request is not
+            //  really the right status here. We keep it for now since it is a minor issue that should
+            //  rarely happen in practice, but this should be revisited in the future.
+            return ResponseEntity.badRequest()
+                    .body(new SimpleApiError(
+                            ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
+        }
     }
 }

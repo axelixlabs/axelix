@@ -56,6 +56,7 @@ class MasterWebEndpointResolverTest {
                 // Non-templated paths.
                 Arguments.of("/applications/grid", HttpMethod.GET, MasterWebEndpoints.INSTANCES_READ),
                 Arguments.of("/users/login", HttpMethod.POST, MasterWebEndpoints.LOCAL_LOGIN),
+                Arguments.of("/loggers/logger/reset", HttpMethod.POST, MasterWebEndpoints.LOGGERS_BULK_RESET),
                 Arguments.of("/caches/clear", HttpMethod.DELETE, MasterWebEndpoints.CACHES_CLEAR_ALL),
                 Arguments.of("/caches/cache/clear", HttpMethod.DELETE, MasterWebEndpoints.CACHE_CLEAR_ONE),
                 Arguments.of("/caches/cache/enable", HttpMethod.POST, MasterWebEndpoints.CACHE_ENABLE),
@@ -73,10 +74,7 @@ class MasterWebEndpointResolverTest {
 
                 // Multiple template variables.
                 Arguments.of("/metrics/42/jvm.memory.used", HttpMethod.GET, MasterWebEndpoints.METRIC_READ_ONE),
-                Arguments.of("/loggers/42/logger/com.foo.Bar", HttpMethod.GET, MasterWebEndpoints.LOGGER_READ_ONE),
-
-                // Multiple template variables followed by a static segment.
-                Arguments.of("/loggers/42/logger/com.foo.Bar/reset", HttpMethod.POST, MasterWebEndpoints.LOGGER_RESET));
+                Arguments.of("/loggers/42/logger/com.foo.Bar", HttpMethod.GET, MasterWebEndpoints.LOGGER_READ_ONE));
     }
 
     private static Stream<Arguments> unresolvableRequests() {

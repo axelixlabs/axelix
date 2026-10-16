@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,8 +36,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
+import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkResetRequest;
 import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
@@ -68,9 +72,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
     private static MockWebServer mockWebServer;
 
-    private List<String> invokedPaths;
+    private final List<String> invokedPaths = new CopyOnWriteArrayList<>();
 
-    private AtomicInteger failingLoggerUpdateStatusCode;
+    private final AtomicInteger failingLoggerUpdateStatusCode = new AtomicInteger(500);
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -91,8 +95,6 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
     @BeforeEach
     void prepare() {
-        invokedPaths = new CopyOnWriteArrayList<>();
-        failingLoggerUpdateStatusCode = new AtomicInteger(500);
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
@@ -103,10 +105,12 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                 if (path.equals("/" + activeInstanceId + "/axelix-loggers/group/groupName/change-level")) {
                     return new MockResponse();
                 }
-                if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/reset.logger.name/reset")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/reset.logger.name/reset")
+                        || path.equals("/" + siblingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset")) {
                     return new MockResponse();
                 }
-                if (path.equals("/" + failingInstanceId + "/axelix-loggers/logger/logger.name/change-level")) {
+                if (path.equals("/" + failingInstanceId + "/axelix-loggers/logger/logger.name/change-level")
+                        || path.equals("/" + failingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset")) {
                     return new MockResponse().setResponseCode(failingLoggerUpdateStatusCode.get());
                 }
                 if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level")
@@ -131,212 +135,383 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
         registry.deRegister(InstanceId.of(activeInstanceId));
         registry.deRegister(InstanceId.of(siblingInstanceId));
         registry.deRegister(InstanceId.of(failingInstanceId));
+        invokedPaths.clear();
+        failingLoggerUpdateStatusCode.set(500);
     }
 
-    @Test
-    void shouldSetLoggingLevelByGroupName() {
-        String groupName = "groupName";
-        GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
+    @Nested
+    class ChangeLoggerLevel {
 
-        // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
-        ResponseEntity<String> body = viewer.postForEntity(
-                "/api/external/loggers/{instanceId}/group/{groupName}",
-                requestBody,
-                String.class,
-                activeInstanceId,
-                groupName);
+        @Test
+        void shouldSetLoggingLevelByLoggerNameAcrossInstances() {
+            // given.
+            LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
+                    List.of(activeInstanceId, siblingInstanceId), "logger.name", null, "DEBUG");
 
-        // then.
-        assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertSuccessfulCallback(MasterWebEndpoints.LOGGER_GROUP_CHANGE, viewer.getActor());
+            // when.
+            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            ResponseEntity<String> response =
+                    viewer.postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder(
+                            "/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level",
+                            "/" + siblingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
+            assertSuccessfulCallback(MasterWebEndpoints.LOGGERS_BULK_CHANGE, viewer.getActor());
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {400, 500})
+        void shouldReturnBadRequestAndInvokeAllInstances_WhenLoggerUpdatePartiallyFails(int failureStatusCode) {
+            // given.
+            failingLoggerUpdateStatusCode.set(failureStatusCode);
+            LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
+                    List.of(failingInstanceId, activeInstanceId), "logger.name", null, "DEBUG");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder(
+                            "/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level",
+                            "/" + failingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
+        }
+
+        @Test
+        void shouldReturnBadRequestForUnregisteredInstance_OnLoggerBulkChange() {
+            // given.
+            String instanceId = "unregistered-loggers-logger-instance";
+            LogLevelLoggerBulkChangeRequest requestBody =
+                    new LogLevelLoggerBulkChangeRequest(List.of(instanceId), "logger.name", null, "DEBUG");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        void shouldRejectMissingInstanceIds_WhenUpdatingLoggingLevelBulk(List<String> instanceIds) {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", instanceIds);
+            requestBody.put("loggerName", "logger.name");
+            requestBody.put("configuredLevel", "DEBUG");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
+
+        @Test
+        void shouldDeduplicateInstanceIds_WhenUpdatingLoggingLevelBulk() {
+            // given.
+            LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
+                    List.of(activeInstanceId, activeInstanceId), "logger.name", null, "DEBUG");
+
+            // when.
+            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            ResponseEntity<String> response =
+                    viewer.postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            assertThat(invokedPaths)
+                    .containsExactly("/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level");
+            assertSuccessfulCallback(MasterWebEndpoints.LOGGERS_BULK_CHANGE, viewer.getActor());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = " ")
+        void shouldRejectMissingConfiguredLevel_WhenUpdatingLoggingLevelBulk(String configuredLevel) {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", List.of(activeInstanceId));
+            requestBody.put("loggerName", "logger.name");
+            requestBody.put("configuredLevel", configuredLevel);
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = " ")
+        void shouldRejectMissingLoggerName_WhenUpdatingLoggingLevelBulk(String loggerName) {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", List.of(activeInstanceId));
+            requestBody.put("loggerName", loggerName);
+            requestBody.put("configuredLevel", "DEBUG");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
+
+        @Test
+        void shouldRejectBlankInstanceIds_WhenUpdatingLoggingLevelBulk() {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody =
+                    Map.of("instanceIds", List.of("", " "), "loggerName", "logger.name", "configuredLevel", "DEBUG");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
+
+        @Test
+        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenUpdatingOnUnknownInstance() {
+            // given.
+            LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
+                    List.of("unknown-logger-instance", siblingInstanceId), "logger.name", null, "DEBUG");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactly("/" + siblingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
+        }
     }
 
-    @Test
-    void shouldSetLoggingLevelByLoggerNameAcrossInstances() {
-        // given.
-        LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
-                List.of(activeInstanceId, siblingInstanceId), "logger.name", null, "DEBUG");
+    @Nested
+    class ChangeGroupLevel {
 
-        // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
-        ResponseEntity<String> response =
-                viewer.postForEntity("/api/external/loggers/logger", requestBody, String.class);
+        @Test
+        void shouldSetLoggingLevelByGroupName() {
+            String groupName = "groupName";
+            GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertThat(invokedPaths)
-                .containsExactlyInAnyOrder(
-                        "/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level",
-                        "/" + siblingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
-        assertSuccessfulCallback(MasterWebEndpoints.LOGGERS_BULK_CHANGE, viewer.getActor());
+            // when.
+            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            ResponseEntity<String> body = viewer.postForEntity(
+                    "/api/external/loggers/{instanceId}/group/{groupName}",
+                    requestBody,
+                    String.class,
+                    activeInstanceId,
+                    groupName);
+
+            // then.
+            assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertSuccessfulCallback(MasterWebEndpoints.LOGGER_GROUP_CHANGE, viewer.getActor());
+        }
+
+        @Test
+        @DisplayName("Should return 500 on EndpointInvocationError")
+        void shouldReturnInternalServerError_WhenInvokedOnUnknownInstance() {
+            String instanceId = UUID.randomUUID().toString();
+            String groupName = "groupName";
+            GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
+            registry.register(TestInstanceFactory.create(instanceId));
+
+            // when.
+            ResponseEntity<?> response = restTemplate
+                    .asViewer()
+                    .postForEntity(
+                            "/api/external/loggers/{instanceId}/group/{groupName}",
+                            requestBody,
+                            Void.class,
+                            instanceId,
+                            groupName);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        @Test
+        void shouldReturnBadRequestForUnregisteredInstance_OnGroupName() {
+            String instanceId = "unregistered-loggers-group-instance";
+            String groupName = "groupName";
+            GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
+
+            // when.
+            ResponseEntity<String> response = restTemplate
+                    .asViewer()
+                    .postForEntity(
+                            "/api/external/loggers/{instanceId}/group/{groupName}",
+                            requestBody,
+                            String.class,
+                            instanceId,
+                            groupName);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @Test
-    void shouldResetLoggingLevelByLoggerName() {
-        String loggerName = "reset.logger.name";
+    @Nested
+    class ResetLoggerLevel {
 
-        // when
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
-        ResponseEntity<String> response = viewer.postForEntity(
-                "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
-                null,
-                String.class,
-                activeInstanceId,
-                loggerName);
+        @Test
+        void shouldResetLoggingLevelOnSingleInstance() {
+            // given.
+            LogLevelLoggerBulkResetRequest requestBody =
+                    new LogLevelLoggerBulkResetRequest(List.of(activeInstanceId), "reset.logger.name");
+            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
 
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertSuccessfulCallback(MasterWebEndpoints.LOGGER_RESET, viewer.getActor());
-    }
+            // when.
+            ResponseEntity<String> response =
+                    viewer.postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
-    @ParameterizedTest
-    @ValueSource(ints = {400, 500})
-    void shouldReturnBadRequestAndInvokeAllInstances_WhenLoggerUpdatePartiallyFails(int failureStatusCode) {
-        // given.
-        failingLoggerUpdateStatusCode.set(failureStatusCode);
-        LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
-                List.of(activeInstanceId, failingInstanceId), "logger.name", null, "DEBUG");
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder(
+                            "/" + activeInstanceId + "/axelix-loggers/logger/reset.logger.name/reset");
+            assertSuccessfulCallback(MasterWebEndpoints.LOGGERS_BULK_RESET, viewer.getActor());
+        }
 
-        // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+        @Test
+        void shouldResetLoggingLevelAcrossInstances() {
+            // given.
+            LogLevelLoggerBulkResetRequest requestBody = new LogLevelLoggerBulkResetRequest(
+                    List.of(activeInstanceId, siblingInstanceId), "reset.logger.name");
+            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
-        assertThat(invokedPaths)
-                .containsExactlyInAnyOrder(
-                        "/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level",
-                        "/" + failingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
-    }
+            // when.
+            ResponseEntity<String> response =
+                    viewer.postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
-    @Test
-    @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerError_WhenInvokedOnUnknownInstance() {
-        String instanceId = UUID.randomUUID().toString();
-        String groupName = "groupName";
-        GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
-        registry.register(TestInstanceFactory.create(instanceId));
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder(
+                            "/" + activeInstanceId + "/axelix-loggers/logger/reset.logger.name/reset",
+                            "/" + siblingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset");
+            assertSuccessfulCallback(MasterWebEndpoints.LOGGERS_BULK_RESET, viewer.getActor());
+        }
 
-        // when.
-        ResponseEntity<?> response = restTemplate
-                .asViewer()
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/group/{groupName}",
-                        requestBody,
-                        Void.class,
-                        instanceId,
-                        groupName);
+        @ParameterizedTest
+        @ValueSource(ints = {400, 500})
+        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenLoggerResetPartiallyFails(int failureStatusCode) {
+            // given.
+            failingLoggerUpdateStatusCode.set(failureStatusCode);
+            LogLevelLoggerBulkResetRequest requestBody = new LogLevelLoggerBulkResetRequest(
+                    List.of(failingInstanceId, siblingInstanceId), "reset.logger.name");
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+            // when.
+            ResponseEntity<String> response = restTemplate
+                    .asViewer()
+                    .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
-    @Test
-    @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerError_WhenResettingOnUnknonInstance() {
-        String instanceId = UUID.randomUUID().toString();
-        String loggerName = "reset.logger.name";
-        registry.register(TestInstanceFactory.create(instanceId));
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder(
+                            "/" + failingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset",
+                            "/" + siblingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset");
+        }
 
-        // when.
-        ResponseEntity<?> response = restTemplate
-                .asViewer()
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
-                        null,
-                        Void.class,
-                        instanceId,
-                        loggerName);
+        @Test
+        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenResettingOnUnknownInstance() {
+            // given.
+            LogLevelLoggerBulkResetRequest requestBody = new LogLevelLoggerBulkResetRequest(
+                    List.of("unknown-logger-instance", siblingInstanceId), "reset.logger.name");
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+            // when.
+            ResponseEntity<String> response = restTemplate
+                    .asViewer()
+                    .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
-    @Test
-    void shouldReturnBadRequestForUnregisteredInstance_OnGroupName() {
-        String instanceId = "unregistered-loggers-group-instance";
-        String groupName = "groupName";
-        GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactly("/" + siblingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset");
+        }
 
-        // when.
-        ResponseEntity<String> response = restTemplate
-                .asViewer()
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/group/{groupName}",
-                        requestBody,
-                        String.class,
-                        instanceId,
-                        groupName);
+        @ParameterizedTest
+        @NullAndEmptySource
+        void shouldRejectMissingInstanceIds_WhenResettingLoggingLevel(List<String> instanceIds) {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", instanceIds);
+            requestBody.put("loggerName", "reset.logger.name");
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
+            // when.
+            ResponseEntity<String> response = restTemplate
+                    .asViewer()
+                    .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
-    @Test
-    void shouldReturnBadRequestForUnregisteredInstance_OnLoggerBulkChange() {
-        // given.
-        String instanceId = "unregistered-loggers-logger-instance";
-        LogLevelLoggerBulkChangeRequest requestBody =
-                new LogLevelLoggerBulkChangeRequest(List.of(instanceId), "logger.name", null, "DEBUG");
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
 
-        // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+        @Test
+        void shouldRejectBlankInstanceIds_WhenResettingLoggingLevel() {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody =
+                    Map.of("instanceIds", List.of("", " "), "loggerName", "reset.logger.name");
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(invokedPaths).isEmpty();
-    }
+            // when.
+            ResponseEntity<String> response = restTemplate
+                    .asViewer()
+                    .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
-    @Test
-    void givenInstanceIdsAreEmpty_shouldReturnBadRequest_WhenUpdatingLoggingLevelBulk() {
-        // given.
-        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
-        Map<String, Object> requestBody =
-                Map.of("instanceIds", List.of(), "loggerName", "logger.name", "configuredLevel", "DEBUG");
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
 
-        // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = " ")
+        void shouldRejectMissingLoggerName_WhenResettingLoggingLevel(String loggerName) {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", List.of(activeInstanceId));
+            requestBody.put("loggerName", loggerName);
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(invokedPaths).isEmpty();
-    }
+            // when.
+            ResponseEntity<String> response = restTemplate
+                    .asViewer()
+                    .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
-    @Test
-    void shouldDeduplicateInstanceIds_WhenUpdatingLoggingLevelBulk() {
-        // given.
-        LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
-                List.of(activeInstanceId, activeInstanceId), "logger.name", null, "DEBUG");
-
-        // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
-        ResponseEntity<String> response =
-                viewer.postForEntity("/api/external/loggers/logger", requestBody, String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertThat(invokedPaths)
-                .containsExactly("/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level");
-        assertSuccessfulCallback(MasterWebEndpoints.LOGGERS_BULK_CHANGE, viewer.getActor());
-    }
-
-    @Test
-    void givenConfiguredLevelIsEmpty_shouldReturnBadRequest__WhenUpdatingLoggingLevelBulk() {
-        // given.
-        Map<String, Object> requestBody =
-                Map.of("instanceIds", List.of(activeInstanceId), "loggerName", "logger.name", "configuredLevel", " ");
-
-        // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(invokedPaths).isEmpty();
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
     }
 
     @Override
@@ -347,7 +522,6 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                         "/api/external/loggers/00000000-0000-0000-0000-000000000001/group/groupName"),
                 new TestableMasterWebEndpoint(MasterWebEndpoints.LOGGERS_BULK_CHANGE, "/api/external/loggers/logger"),
                 new TestableMasterWebEndpoint(
-                        MasterWebEndpoints.LOGGER_RESET,
-                        "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/reset.logger.name/reset"));
+                        MasterWebEndpoints.LOGGERS_BULK_RESET, "/api/external/loggers/logger/reset"));
     }
 }

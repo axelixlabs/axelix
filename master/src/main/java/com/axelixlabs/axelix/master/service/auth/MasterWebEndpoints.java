@@ -92,8 +92,8 @@ public final class MasterWebEndpoints {
             register("loggers:change-level", HttpMethod.POST, ApiPaths.LoggersApi.LOGGER_BULK_CHANGE, null);
     public static final MasterWebEndpoint LOGGER_GROUP_CHANGE =
             register("logger-group:change-level", HttpMethod.POST, ApiPaths.LoggersApi.GROUP_NAME, null);
-    public static final MasterWebEndpoint LOGGER_RESET =
-            register("logger:reset", HttpMethod.POST, ApiPaths.LoggersApi.RESET_FOR_LOGGER, null);
+    public static final MasterWebEndpoint LOGGERS_BULK_RESET =
+            register("logger:reset", HttpMethod.POST, ApiPaths.LoggersApi.LOGGER_BULK_RESET, null);
 
     // Caches
     public static final MasterWebEndpoint CACHES_READ =
