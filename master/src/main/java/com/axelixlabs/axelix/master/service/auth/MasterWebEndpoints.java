@@ -104,10 +104,13 @@ public final class MasterWebEndpoints {
             register("caches:enable", HttpMethod.POST, ApiPaths.CachesApi.ENABLE_CACHE, OssAuthority.CACHES_TOGGLE);
     public static final MasterWebEndpoint CACHE_DISABLE =
             register("caches:disable", HttpMethod.POST, ApiPaths.CachesApi.DISABLE_CACHE, OssAuthority.CACHES_TOGGLE);
-    public static final MasterWebEndpoint CACHE_CLEAR_ONE =
-            register("caches:clear-one", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_NAME, OssAuthority.CACHES_CLEAR);
-    public static final MasterWebEndpoint CACHES_CLEAR_ALL =
-            register("caches:clear-all", HttpMethod.DELETE, ApiPaths.CachesApi.INSTANCE_ID, OssAuthority.CACHES_CLEAR);
+    public static final MasterWebEndpoint CACHE_CLEAR_ONE = register(
+            "caches:clear-one",
+            HttpMethod.DELETE,
+            ApiPaths.CachesApi.CACHE_BULK_CLEAR_CACHE,
+            OssAuthority.CACHES_CLEAR);
+    public static final MasterWebEndpoint CACHES_CLEAR_ALL = register(
+            "caches:clear-all", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL, OssAuthority.CACHES_CLEAR);
 
     // Scheduled tasks
     public static final MasterWebEndpoint SCHEDULED_TASKS_READ =

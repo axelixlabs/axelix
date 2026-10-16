@@ -19,21 +19,27 @@ package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.api.error.SimpleApiError;
+import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.api.external.request.caches.CacheBulkClearRequest;
+import com.axelixlabs.axelix.master.api.external.request.caches.CachesBulkClearRequest;
+import com.axelixlabs.axelix.master.service.BulkRequestValidator;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
+import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 
 /**
- * The API for managing caches. Endpoints for clearing the application caches.
+ * The API for clearing caches across several instances.
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
@@ -47,18 +53,41 @@ public class CachesClearApi {
         this.endpointInvoker = endpointInvoker;
     }
 
-    @DeleteMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
-    public void clearAllCaches(@PathVariable("instanceId") String instanceId) {
-        endpointInvoker.invokeNoValue(
-                InstanceId.of(instanceId), ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
+    @DeleteMapping(ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL)
+    public ResponseEntity<?> clearAllCaches(@RequestBody CachesBulkClearRequest request) {
+        if (BulkRequestValidator.hasMissingRequiredFields(request.instanceIds())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            endpointInvoker.invokeNoValueForInstances(
+                    request.instanceIds(), ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
+            return ResponseEntity.noContent().build();
+        } catch (PartiallyUpdatedException e) {
+            return ResponseEntity.badRequest()
+                    .body(new SimpleApiError(
+                            ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
+        }
     }
 
-    @DeleteMapping(path = ApiPaths.CachesApi.CACHE_NAME)
-    public void clearSpecificCacheEntity(
-            @PathVariable("instanceId") String instanceId,
-            @PathVariable("cacheName") String cacheName,
-            @RequestParam("cacheManager") String cacheManager) {
-        HttpPayload payload = new DefaultHttpPayload(Map.of("cacheName", cacheName, "cacheManagerName", cacheManager));
-        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.CLEAR_SINGLE_CACHE, payload);
+    @DeleteMapping(ApiPaths.CachesApi.CACHE_BULK_CLEAR_CACHE)
+    public ResponseEntity<?> clearSpecificCacheEntity(@RequestBody CacheBulkClearRequest request) {
+        if (BulkRequestValidator.hasMissingRequiredFields(
+                request.instanceIds(), request.cacheManagerName(), request.cacheName())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        HttpPayload payload = new DefaultHttpPayload(
+                Map.of("cacheName", request.cacheName(), "cacheManagerName", request.cacheManagerName()));
+
+        try {
+            endpointInvoker.invokeNoValueForInstances(
+                    request.instanceIds(), ActuatorEndpoints.CLEAR_SINGLE_CACHE, payload);
+            return ResponseEntity.noContent().build();
+        } catch (PartiallyUpdatedException e) {
+            return ResponseEntity.badRequest()
+                    .body(new SimpleApiError(
+                            ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
+        }
     }
 }

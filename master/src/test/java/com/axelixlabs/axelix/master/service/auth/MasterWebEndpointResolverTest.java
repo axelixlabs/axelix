@@ -56,10 +56,11 @@ class MasterWebEndpointResolverTest {
                 // Non-templated paths.
                 Arguments.of("/applications/grid", HttpMethod.GET, MasterWebEndpoints.INSTANCES_READ),
                 Arguments.of("/users/login", HttpMethod.POST, MasterWebEndpoints.LOCAL_LOGIN),
+                Arguments.of("/caches/clear", HttpMethod.DELETE, MasterWebEndpoints.CACHES_CLEAR_ALL),
+                Arguments.of("/caches/cache/clear", HttpMethod.DELETE, MasterWebEndpoints.CACHE_CLEAR_ONE),
 
                 // Single trailing template variable.
                 Arguments.of("/env/feed/42", HttpMethod.GET, MasterWebEndpoints.ENVIRONMENT_READ),
-                Arguments.of("/caches/42", HttpMethod.DELETE, MasterWebEndpoints.CACHES_CLEAR_ALL),
 
                 // Template variable followed by a static segment.
                 Arguments.of("/garbage-collector/logs/42/enable", HttpMethod.POST, MasterWebEndpoints.GC_LOG_ENABLE),
@@ -71,7 +72,6 @@ class MasterWebEndpointResolverTest {
                 // Multiple template variables.
                 Arguments.of("/metrics/42/jvm.memory.used", HttpMethod.GET, MasterWebEndpoints.METRIC_READ_ONE),
                 Arguments.of("/loggers/42/logger/com.foo.Bar", HttpMethod.GET, MasterWebEndpoints.LOGGER_READ_ONE),
-                Arguments.of("/caches/42/cache/orders", HttpMethod.DELETE, MasterWebEndpoints.CACHE_CLEAR_ONE),
                 Arguments.of(
                         "/caches/42/cacheManager/orders/disable", HttpMethod.POST, MasterWebEndpoints.CACHE_DISABLE),
 

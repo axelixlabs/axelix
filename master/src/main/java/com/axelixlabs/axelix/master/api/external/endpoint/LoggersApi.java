@@ -17,16 +17,11 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.List;
 import java.util.Map;
-
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +39,7 @@ import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerB
 import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.BulkRequestValidator;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
@@ -95,7 +91,9 @@ public class LoggersApi {
     @PostMapping(path = ApiPaths.LoggersApi.LOGGER_BULK_CHANGE)
     public ResponseEntity<?> setLoggingLevelByLoggerName(@RequestBody LogLevelLoggerBulkChangeRequest request) {
 
-        if (request == null || isInvalid(request.instanceIds(), request.loggerName(), request.configuredLevel())) {
+        if (request == null
+                || BulkRequestValidator.hasMissingRequiredFields(
+                        request.instanceIds(), request.loggerName(), request.configuredLevel())) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -136,12 +134,5 @@ public class LoggersApi {
                 new DefaultHttpPayload(Map.of("name", loggerName)));
 
         return ResponseEntity.noContent().build();
-    }
-
-    private boolean isInvalid(
-            @Nullable List<String> instanceIds, @Nullable String name, @Nullable String configuredLevel) {
-        return CollectionUtils.isEmpty(instanceIds)
-                || !StringUtils.hasText(name)
-                || !StringUtils.hasText(configuredLevel);
     }
 }

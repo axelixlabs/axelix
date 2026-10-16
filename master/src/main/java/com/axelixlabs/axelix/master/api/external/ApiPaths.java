@@ -218,6 +218,16 @@ public final class ApiPaths {
     public static final class CachesApi {
 
         /**
+         * Endpoint to clear all caches across instances.
+         */
+        public static final String CACHE_BULK_CLEAR_ALL = "/caches/clear";
+
+        /**
+         * Endpoint to clear a specific cache across instances.
+         */
+        public static final String CACHE_BULK_CLEAR_CACHE = "/caches/cache/clear";
+
+        /**
          * Caches endpoint with instance ID.
          */
         public static final String INSTANCE_ID = "/caches/{instanceId}";
