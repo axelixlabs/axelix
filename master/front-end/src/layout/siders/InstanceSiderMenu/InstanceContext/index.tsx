@@ -22,14 +22,13 @@ import { useTranslation } from "react-i18next";
 import { InstanceCommit } from "@/components/InstanceChips";
 import { useInstancePreviewData } from "@/hooks";
 import type { TInstanceOption } from "@/models";
-import { DEMO_INSTANCES } from "@/utils/instances";
 
 import { InstanceList } from "./InstanceList";
 import styles from "./styles.module.css";
 
 export const InstanceContext = () => {
     const { t } = useTranslation();
-    const instance = useInstancePreviewData();
+    const preview = useInstancePreviewData();
     const [open, setOpen] = useState<boolean>(false);
     const [selectedInstance, setSelectedInstance] = useState<TInstanceOption | null>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
@@ -51,7 +50,7 @@ export const InstanceContext = () => {
         return () => document.removeEventListener("keydown", handleEscape);
     }, [open]);
 
-    if (instance.loading) {
+    if (preview.loading) {
         return (
             <div className={styles.MainWrapper}>
                 <Skeleton active title paragraph={{ rows: 1 }} />
@@ -59,19 +58,17 @@ export const InstanceContext = () => {
         );
     }
 
-    if (!instance.response) {
+    if (!preview.response) {
         return null;
     }
 
-    const displayedInstance = selectedInstance ?? instance.response;
+    const displayedInstance = selectedInstance ?? preview.response.current;
     const { name, commitShaShort, deployedFor } = displayedInstance;
-    const instances = [instance.response, ...DEMO_INSTANCES];
+    const instances = preview.response.siblings;
 
-    // TODO: Replace the visual-only selection with navigation when the backend provides
-    // real instances grouped by application (groupId + artifactId). The list currently
-    // contains mock instances, and page data still uses the instanceId from the URL.
-    // Selecting a real instance must update the route so every instance page loads
-    // its data, preserving the current section when available and falling back to Details.
+    // TODO: Replace the visual-only selection with navigation. Page data still uses the
+    // instanceId from the URL. Selecting an instance must update the route so every instance
+    // page loads its data, preserving the current section when available and falling back to Details.
     const selectInstance = (selected: TInstanceOption): void => {
         setSelectedInstance(selected);
         setOpen(false);
