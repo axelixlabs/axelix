@@ -18,7 +18,9 @@
 package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -67,8 +69,8 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
     private static MockWebServer mockWebServer;
 
-    private List<String> invokedPaths;
-    private AtomicInteger failingCacheOperationStatusCode;
+    private final List<String> invokedPaths = new CopyOnWriteArrayList<>();
+    private final AtomicInteger failingCacheOperationStatusCode = new AtomicInteger(500);
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -89,8 +91,6 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
     @BeforeEach
     void prepare() {
-        invokedPaths = new CopyOnWriteArrayList<>();
-        failingCacheOperationStatusCode = new AtomicInteger(500);
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
@@ -126,6 +126,8 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
         registry.deRegister(InstanceId.of(activeInstanceId));
         registry.deRegister(InstanceId.of(siblingInstanceId));
         registry.deRegister(InstanceId.of(failingInstanceId));
+        invokedPaths.clear();
+        failingCacheOperationStatusCode.set(500);
     }
 
     @ParameterizedTest
@@ -262,7 +264,11 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("cacheOperations")
     void shouldRejectNullInstanceIds(String operation) {
         // given.
-        CacheBulkStatusChangeRequest requestBody = new CacheBulkStatusChangeRequest(null, "manager", "orders");
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("instanceIds", null);
+        requestBody.put("cacheManagerName", "manager");
+        requestBody.put("cacheName", "orders");
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -278,7 +284,11 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("cacheOperations")
     void shouldRejectEmptyInstanceIds(String operation) {
         // given.
-        CacheBulkStatusChangeRequest requestBody = new CacheBulkStatusChangeRequest(List.of(), "manager", "orders");
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("instanceIds", List.of());
+        requestBody.put("cacheManagerName", "manager");
+        requestBody.put("cacheName", "orders");
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -294,8 +304,11 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("cacheOperations")
     void shouldRejectNullCacheManagerName(String operation) {
         // given.
-        CacheBulkStatusChangeRequest requestBody =
-                new CacheBulkStatusChangeRequest(List.of(activeInstanceId), null, "orders");
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("instanceIds", List.of(activeInstanceId));
+        requestBody.put("cacheManagerName", null);
+        requestBody.put("cacheName", "orders");
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -311,8 +324,11 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("cacheOperations")
     void shouldRejectEmptyCacheManagerName(String operation) {
         // given.
-        CacheBulkStatusChangeRequest requestBody =
-                new CacheBulkStatusChangeRequest(List.of(activeInstanceId), "", "orders");
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("instanceIds", List.of(activeInstanceId));
+        requestBody.put("cacheManagerName", "");
+        requestBody.put("cacheName", "orders");
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -328,8 +344,11 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("cacheOperations")
     void shouldRejectBlankCacheManagerName(String operation) {
         // given.
-        CacheBulkStatusChangeRequest requestBody =
-                new CacheBulkStatusChangeRequest(List.of(activeInstanceId), " ", "orders");
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("instanceIds", List.of(activeInstanceId));
+        requestBody.put("cacheManagerName", " ");
+        requestBody.put("cacheName", "orders");
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -345,8 +364,11 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("cacheOperations")
     void shouldRejectNullCacheName(String operation) {
         // given.
-        CacheBulkStatusChangeRequest requestBody =
-                new CacheBulkStatusChangeRequest(List.of(activeInstanceId), "manager", null);
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("instanceIds", List.of(activeInstanceId));
+        requestBody.put("cacheManagerName", "manager");
+        requestBody.put("cacheName", null);
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -362,8 +384,11 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("cacheOperations")
     void shouldRejectEmptyCacheName(String operation) {
         // given.
-        CacheBulkStatusChangeRequest requestBody =
-                new CacheBulkStatusChangeRequest(List.of(activeInstanceId), "manager", "");
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("instanceIds", List.of(activeInstanceId));
+        requestBody.put("cacheManagerName", "manager");
+        requestBody.put("cacheName", "");
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -379,8 +404,11 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("cacheOperations")
     void shouldRejectBlankCacheName(String operation) {
         // given.
-        CacheBulkStatusChangeRequest requestBody =
-                new CacheBulkStatusChangeRequest(List.of(activeInstanceId), "manager", " ");
+        // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("instanceIds", List.of(activeInstanceId));
+        requestBody.put("cacheManagerName", "manager");
+        requestBody.put("cacheName", " ");
 
         // when.
         ResponseEntity<String> response = restTemplate

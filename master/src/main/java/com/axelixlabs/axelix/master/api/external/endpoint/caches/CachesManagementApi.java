@@ -31,7 +31,6 @@ import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.request.BulkRequestValidator;
 import com.axelixlabs.axelix.master.api.external.request.caches.CacheBulkStatusChangeRequest;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
@@ -54,11 +53,6 @@ public class CachesManagementApi {
 
     @PostMapping(ApiPaths.CachesApi.BULK_ENABLE_CACHE)
     public ResponseEntity<?> enableCache(@RequestBody CacheBulkStatusChangeRequest request) {
-        if (BulkRequestValidator.hasMissingRequiredFields(
-                request.instanceIds(), request.cacheManagerName(), request.cacheName())) {
-            return ResponseEntity.badRequest().build();
-        }
-
         HttpPayload payload = new DefaultHttpPayload(
                 Map.of("cacheName", request.cacheName(), "cacheManagerName", request.cacheManagerName()));
 
@@ -66,6 +60,9 @@ public class CachesManagementApi {
             endpointInvoker.invokeNoValueForInstances(request.instanceIds(), ActuatorEndpoints.ENABLE_CACHE, payload);
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
+            // TODO: A partial update is generally not the client's fault, so 400 Bad Request is not
+            //  really the right status here. We keep it for now since it is a minor issue that should
+            //  rarely happen in practice, but this should be revisited in the future.
             return ResponseEntity.badRequest()
                     .body(new SimpleApiError(
                             ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
@@ -74,11 +71,6 @@ public class CachesManagementApi {
 
     @PostMapping(ApiPaths.CachesApi.BULK_DISABLE_CACHE)
     public ResponseEntity<?> disableCache(@RequestBody CacheBulkStatusChangeRequest request) {
-        if (BulkRequestValidator.hasMissingRequiredFields(
-                request.instanceIds(), request.cacheManagerName(), request.cacheName())) {
-            return ResponseEntity.badRequest().build();
-        }
-
         HttpPayload payload = new DefaultHttpPayload(
                 Map.of("cacheName", request.cacheName(), "cacheManagerName", request.cacheManagerName()));
 
@@ -86,6 +78,7 @@ public class CachesManagementApi {
             endpointInvoker.invokeNoValueForInstances(request.instanceIds(), ActuatorEndpoints.DISABLE_CACHE, payload);
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
+            // TODO: See the note on the 400 Bad Request status in enableCache.
             return ResponseEntity.badRequest()
                     .body(new SimpleApiError(
                             ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
