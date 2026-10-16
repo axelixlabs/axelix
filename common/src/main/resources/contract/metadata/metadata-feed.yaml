@@ -560,3 +560,4 @@ components:
         - LIST_BACKED_MANY_TO_MANY
         - CASCADE_REMOVE_OR_ALL
         - UNIDIRECTIONAL_ONE_TO_MANY
+        - TO_STRING
