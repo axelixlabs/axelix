@@ -100,8 +100,8 @@ public class DataSourceSetupExtension implements ClassTemplateInvocationContextP
 
         @Override
         public void afterClassTemplateInvocation(ExtensionContext context) throws Exception {
-            CONTAINERS.computeIfPresent(ossRdbms, (_, lifecycle) -> lifecycle.tearDown());
             evictSpringContext(context);
+            CONTAINERS.computeIfPresent(ossRdbms, (_, lifecycle) -> lifecycle.tearDown());
         }
     }
 
