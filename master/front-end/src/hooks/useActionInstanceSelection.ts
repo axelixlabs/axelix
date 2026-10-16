@@ -17,13 +17,11 @@
  */
 import { useEffect, useState } from "react";
 
-import { DEMO_INSTANCES } from "@/utils/instances";
-
 import { useInstancePreviewData } from "./useInstancePreviewData";
 
 /** Keeps the visual action scope local to each page, independently of data refreshes. */
 export const useActionInstanceSelection = (instanceId: string) => {
-    const instance = useInstancePreviewData();
+    const preview = useInstancePreviewData();
     const [selectedInstanceIds, setSelectedInstanceIds] = useState<string[]>([instanceId]);
 
     useEffect(() => {
@@ -31,8 +29,8 @@ export const useActionInstanceSelection = (instanceId: string) => {
     }, [instanceId]);
 
     return {
-        currentInstance: instance.response,
-        instances: instance.response ? [instance.response, ...DEMO_INSTANCES] : [],
+        currentInstance: preview.response?.current ?? null,
+        instances: preview.response?.siblings ?? [],
         selectedInstanceIds,
         onSelectionChange: setSelectedInstanceIds,
     };

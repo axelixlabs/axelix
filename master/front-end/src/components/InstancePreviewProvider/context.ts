@@ -19,4 +19,11 @@ import { createContext } from "react";
 
 import type { IInstanceCard, StatefulRequest } from "@/models";
 
-export const InstancePreviewContext = createContext<StatefulRequest<IInstanceCard | null> | null>(null);
+export interface IInstancePreview {
+    /** The instance whose view is currently open */
+    current: IInstanceCard;
+    /** All instances of the current instance's application, including the current instance itself */
+    siblings: IInstanceCard[];
+}
+
+export const InstancePreviewContext = createContext<StatefulRequest<IInstancePreview | null> | null>(null);

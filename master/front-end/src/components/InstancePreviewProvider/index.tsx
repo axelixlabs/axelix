@@ -19,9 +19,9 @@ import type { AxiosResponse } from "axios";
 import { type PropsWithChildren, useEffect, useRef, useState } from "react";
 
 import { type IInstanceCard, type IServiceCardsResponseBody, StatefulRequest } from "@/models";
-import { getWallboardData } from "@/services";
+import { getInstanceSiblings } from "@/services";
 
-import { InstancePreviewContext } from "./context";
+import { type IInstancePreview, InstancePreviewContext } from "./context";
 
 interface IProps {
     /** The instance shared by the sidebar and all pages in this layout */
@@ -29,7 +29,7 @@ interface IProps {
 }
 
 export const InstancePreviewProvider = ({ instanceId, children }: PropsWithChildren<IProps>) => {
-    const [instance, setInstance] = useState(StatefulRequest.loading<IInstanceCard | null>());
+    const [preview, setPreview] = useState(StatefulRequest.loading<IInstancePreview | null>());
     const requestRef = useRef<Promise<AxiosResponse<IServiceCardsResponseBody>> | null>(null);
 
     // TODO: Discuss instance lifecycle and refresh behavior before implementing live updates.
@@ -42,16 +42,18 @@ export const InstancePreviewProvider = ({ instanceId, children }: PropsWithChild
         const isCurrentInstance = (item: IInstanceCard): boolean => item.instanceId === instanceId;
 
         // Reuse the request when StrictMode re-runs the effect during development.
-        requestRef.current ??= getWallboardData();
+        requestRef.current ??= getInstanceSiblings(instanceId);
         requestRef.current
             .then((response) => {
                 if (active) {
-                    setInstance(StatefulRequest.success(response.data.instances.find(isCurrentInstance) ?? null));
+                    const siblings = response.data.instances;
+                    const current = siblings.find(isCurrentInstance);
+                    setPreview(StatefulRequest.success(current ? { current, siblings } : null));
                 }
             })
             .catch(() => {
                 if (active) {
-                    setInstance(StatefulRequest.error(""));
+                    setPreview(StatefulRequest.error(""));
                 }
             });
 
@@ -60,5 +62,5 @@ export const InstancePreviewProvider = ({ instanceId, children }: PropsWithChild
         };
     }, [instanceId]);
 
-    return <InstancePreviewContext.Provider value={instance}>{children}</InstancePreviewContext.Provider>;
+    return <InstancePreviewContext.Provider value={preview}>{children}</InstancePreviewContext.Provider>;
 };
