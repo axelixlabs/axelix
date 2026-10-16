@@ -17,9 +17,11 @@
  */
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router";
 
 import { Accordion } from "@/components";
+import { normalizeHtmlElementId } from "@/helpers";
 import { type IBean } from "@/models";
 
 import { BeanAccordionChildren } from "../BeanAccordionChildren";
@@ -51,6 +53,7 @@ interface IProps {
 
 export const BeansAccordionsList = ({ effectiveBeans, selectedBeanName, selectBean, beansFeed }: IProps) => {
     const ref = useRef<HTMLDivElement>(null);
+    const { hash } = useLocation();
 
     const rowVirtualizer = useVirtualizer({
         count: effectiveBeans.length,
@@ -60,6 +63,17 @@ export const BeansAccordionsList = ({ effectiveBeans, selectedBeanName, selectBe
     });
 
     const virtualItems = rowVirtualizer.getVirtualItems();
+
+    const activeId = hash ? hash.replace("#", "") : null;
+    const activeBeanIndex = activeId
+        ? effectiveBeans.findIndex(({ beanName }) => normalizeHtmlElementId(beanName) === activeId)
+        : -1;
+
+    useEffect(() => {
+        if (activeBeanIndex >= 0) {
+            rowVirtualizer.scrollToIndex(activeBeanIndex, { align: "start" });
+        }
+    }, [activeBeanIndex]);
 
     return (
         <>
@@ -72,6 +86,8 @@ export const BeansAccordionsList = ({ effectiveBeans, selectedBeanName, selectBe
                 >
                     {virtualItems.map(({ key, index, start }) => {
                         const bean = effectiveBeans[index];
+                        const id = normalizeHtmlElementId(bean.beanName);
+                        const isActiveBean = id === activeId;
 
                         return (
                             <div
@@ -85,7 +101,8 @@ export const BeansAccordionsList = ({ effectiveBeans, selectedBeanName, selectBe
                             >
                                 <Accordion
                                     header={<BeanAccordionLabels bean={bean} />}
-                                    accordionExpanded={Boolean(selectedBeanName === bean.beanName)}
+                                    headerStyles={isActiveBean ? "Highlight" : undefined}
+                                    accordionExpanded={selectedBeanName === bean.beanName || isActiveBean}
                                 >
                                     <BeanAccordionChildren bean={bean} beansFeed={beansFeed} selectBean={selectBean} />
                                 </Accordion>
