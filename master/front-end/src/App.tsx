@@ -49,7 +49,11 @@ export const App = () => {
             lineHeight: typography.lineHeight.normal,
         },
         components: {
+            // Menus are rendered only in the siders, whose own background shows through the items
             Menu: {
+                itemBg: "transparent",
+                subMenuItemBg: "transparent",
+                activeBarBorderWidth: 0,
                 itemSelectedBg: palette.green[50],
                 itemSelectedColor: palette.green[700],
                 // Greyed-out entries of the features an instance does not have
