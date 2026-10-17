@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ConfigProvider, Layout } from "antd";
+import { Layout } from "antd";
 import type { JSX } from "react";
 import { Outlet, useParams } from "react-router";
 
@@ -47,19 +47,7 @@ export const MainLayout = ({ siderContent }: IProps) => {
 
                 {siderContent && (
                     <Sider width={270} className={styles.Sider}>
-                        <ConfigProvider
-                            theme={{
-                                components: {
-                                    Menu: {
-                                        itemBg: "transparent",
-                                        subMenuItemBg: "transparent",
-                                        activeBarBorderWidth: 0,
-                                    },
-                                },
-                            }}
-                        >
-                            <div className={styles.SiderScrollContainer}>{siderContent}</div>
-                        </ConfigProvider>
+                        <div className={styles.SiderScrollContainer}>{siderContent}</div>
                     </Sider>
                 )}
 
