@@ -2,7 +2,7 @@
     border-radius: 16px;
     background-color: #f9fafb;
     box-shadow: var(--axelix-box-shadow-light);
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     transition: all 0.3s;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .UNKNOWN {
-    background-color: var(--axelix-light-grey);
+    background-color: var(--axelix-grey-100);
 }
 
 .Header {
@@ -27,7 +27,7 @@
     align-items: flex-start;
     justify-content: space-between;
     column-gap: 8px;
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
     min-height: 75px;
 }
 
@@ -64,12 +64,12 @@
 
 .Value {
     font-weight: 500;
-    color: var(--axelix-primary-black);
+    color: var(--axelix-grey-900);
 }
 
 .Footer {
     padding-top: 10px;
-    border-top: 1px dashed var(--axelix-medium-grey);
+    border-top: 1px dashed var(--axelix-grey-300);
     display: flex;
     justify-content: space-between;
 }

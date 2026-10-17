@@ -22,40 +22,12 @@
     --axelix-space-10: 40px;
     --axelix-space-12: 48px;
 
-    /* Legacy names, kept as aliases of the src/theme/tokens.ts ramps until the components are migrated */
-    --axelix-primary-green: var(--axelix-green-600);
-    --axelix-primary-dark-green: var(--axelix-green-700);
-    --axelix-primary-light-green: var(--axelix-green-50);
-    --axelix-extra-light-grey: var(--axelix-grey-50);
-    --axelix-light-grey: var(--axelix-grey-100);
-    --axelix-medium-grey: var(--axelix-grey-300);
-    --axelix-bold-grey: var(--axelix-grey-500);
-    --axelix-primary-red: var(--axelix-red-600);
-    --axelix-primary-light-red: var(--axelix-red-50);
-    --axelix-primary-orange: var(--axelix-orange-500);
-    --axelix-primary-white: #fff;
-    --axelix-primary-black: var(--axelix-grey-900);
-    --axelix-primary-blue: var(--axelix-blue-600);
-    --axelix-primary-light-blue: var(--axelix-blue-400);
+    /* Radii and elevation */
     --axelix-border-radius-large: 8px;
     --axelix-border-radius-small: 4px;
     --axelix-border-radius-pill: 999px;
     --axelix-box-shadow-bold: 4px 6px 14px rgb(15 23 42 / 25%);
     --axelix-box-shadow-light: 0 4px 20px rgb(0 0 0 / 10%);
-    --prop-accent: var(--axelix-green-600);
-    --prop-accent-strong: var(--axelix-green-700);
-    --prop-accent-border: var(--axelix-green-200);
-    --prop-danger: var(--axelix-red-700);
-    --prop-danger-border: var(--axelix-red-200);
-    --prop-danger-on-dark: var(--axelix-red-300);
-    --prop-dep-error: var(--axelix-orange-700);
-    --prop-dep-error-surface: var(--axelix-orange-50);
-    --prop-dep-error-border: var(--axelix-orange-300);
-    --prop-dep-error-on-dark: var(--axelix-orange-400);
-    --prop-dep-warn: #854a0e;
-    --prop-dep-warn-surface: #fefbe8;
-    --prop-dep-warn-border: #fde68a;
-    --prop-dep-warn-on-dark: #fde047;
 }
 
 *,
@@ -74,7 +46,7 @@ html {
 
 body {
     font-family: var(--axelix-font-family);
-    color: var(--axelix-primary-black);
+    color: var(--axelix-grey-900);
 }
 
 ul,
@@ -88,20 +60,20 @@ a {
     transition: color 0.3s;
 
     &:hover {
-        color: var(--axelix-primary-green);
+        color: var(--axelix-green-600);
     }
 }
 
 .AccentedLink {
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
 
     &:hover {
-        color: var(--axelix-primary-dark-green);
+        color: var(--axelix-green-700);
     }
 }
 
 .MainContainer {
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
     max-width: 1450px;
     padding: 0 40px;
     width: 100%;
@@ -131,7 +103,7 @@ a {
 }
 
 .AccordionsWrapper {
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
     overflow: hidden;
 }
@@ -166,11 +138,11 @@ a {
 
 @keyframes highlight-fade {
     0% {
-        background-color: var(--axelix-primary-green);
+        background-color: var(--axelix-green-600);
     }
 
     100% {
-        background-color: var(--axelix-primary-light-green);
+        background-color: var(--axelix-green-50);
     }
 }
 

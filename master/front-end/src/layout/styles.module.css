@@ -6,7 +6,7 @@
     position: fixed;
     top: var(--axelix-header-height);
     height: calc(100vh - var(--axelix-header-height));
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
     z-index: 10;
 }
 
@@ -21,7 +21,7 @@
 .Content {
     padding: 24px;
     border-radius: var(--axelix-border-radius-large);
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
 }
 
 /*

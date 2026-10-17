@@ -1,6 +1,6 @@
 .Member {
     word-break: break-all;
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
     padding-bottom: 8px;
     margin-bottom: 8px;
 }

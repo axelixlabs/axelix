@@ -3,11 +3,11 @@
     grid-template-columns: 1fr 1fr;
     gap: 4px;
     align-items: baseline;
-    background-color: var(--axelix-extra-light-grey);
-    border: 1px solid var(--axelix-medium-grey);
+    background-color: var(--axelix-grey-50);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
     padding: 12px 16px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .ActiveLicenseKeyInfoLabel {
@@ -17,7 +17,7 @@
 
 .ActiveLicenseKeyInfoOrg {
     font-weight: 500;
-    color: var(--axelix-primary-black);
+    color: var(--axelix-grey-900);
 }
 
 .ActiveLicenseKeyInfoValue {

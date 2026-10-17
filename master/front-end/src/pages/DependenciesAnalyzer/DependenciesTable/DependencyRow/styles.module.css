@@ -3,7 +3,7 @@
     grid-template-columns: var(--da-columns);
     gap: 16px;
     align-items: center;
-    background-color: var(--row-bg, var(--axelix-primary-white));
+    background-color: var(--row-bg, var(--axelix-white));
     border-left: 3px solid var(--row-accent, transparent);
 
     &:hover {
@@ -42,7 +42,7 @@
 }
 
 .Project {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     white-space: nowrap;
 }
 
@@ -54,11 +54,11 @@
 }
 
 .Scope {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .DirectScope {
-    color: var(--axelix-primary-black);
+    color: var(--axelix-grey-900);
 }
 
 .Content {

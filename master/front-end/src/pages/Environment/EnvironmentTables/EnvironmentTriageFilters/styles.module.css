@@ -7,8 +7,8 @@
 
 /* TODO: fix in the future */
 .Chip {
-    --chip-accent: var(--axelix-bold-grey);
-    --chip-surface: var(--axelix-extra-light-grey);
+    --chip-accent: var(--axelix-grey-500);
+    --chip-surface: var(--axelix-grey-50);
 
     display: inline-flex;
     align-items: center;
@@ -16,7 +16,7 @@
     padding: 6px 12px;
     font-weight: 600;
     color: #475467;
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
     box-shadow: var(--axelix-box-shadow-light);
     cursor: pointer;
@@ -38,23 +38,23 @@
 }
 
 .Dangerous {
-    --chip-accent: var(--prop-danger);
-    --chip-surface: var(--axelix-primary-light-red);
+    --chip-accent: var(--axelix-red-700);
+    --chip-surface: var(--axelix-red-50);
 }
 
 .DeprecatedError {
-    --chip-accent: var(--prop-dep-error);
-    --chip-surface: var(--prop-dep-error-surface);
+    --chip-accent: var(--axelix-orange-700);
+    --chip-surface: var(--axelix-orange-50);
 }
 
 .DeprecatedWarning {
-    --chip-accent: var(--prop-dep-warn);
-    --chip-surface: var(--prop-dep-warn-surface);
+    --chip-accent: var(--axelix-yellow-800);
+    --chip-surface: var(--axelix-yellow-50);
 }
 
 .Suppressed {
     --chip-accent: #475467;
-    --chip-surface: var(--axelix-extra-light-grey);
+    --chip-surface: var(--axelix-grey-50);
 }
 
 .Dot {
@@ -69,23 +69,23 @@
     padding-inline: 4px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
-    color: var(--axelix-bold-grey);
-    background-color: var(--axelix-medium-grey);
+    color: var(--axelix-grey-500);
+    background-color: var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-small);
 }
 
 .Selected .Count {
     color: var(--chip-accent);
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
 }
 
 .Clear {
     padding: 6px 4px;
     font-weight: 600;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     cursor: pointer;
 
     &:hover {
-        color: var(--axelix-primary-black);
+        color: var(--axelix-grey-900);
     }
 }

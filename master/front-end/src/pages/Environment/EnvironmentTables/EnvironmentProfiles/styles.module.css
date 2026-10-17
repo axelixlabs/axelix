@@ -6,7 +6,7 @@
     height: 32px;
     padding-inline: 12px;
     font-weight: 600;
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
     box-shadow: var(--axelix-box-shadow-light);
     cursor: pointer;
@@ -16,7 +16,7 @@
 
 .Trigger:hover,
 .TriggerOpen {
-    border-color: var(--axelix-primary-black);
+    border-color: var(--axelix-grey-900);
 }
 
 .TriggerIcon {

@@ -1,15 +1,15 @@
 .MainWrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border-top: 1px solid var(--axelix-medium-grey);
+    border-top: 1px solid var(--axelix-grey-300);
 }
 
 .RecordChunk {
     padding-block: 16px;
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
 
     &:nth-child(odd) {
-        border-right: 1px solid var(--axelix-medium-grey);
+        border-right: 1px solid var(--axelix-grey-300);
     }
 
     &:nth-child(even) {
@@ -18,6 +18,6 @@
 }
 
 .RecordLabel {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     text-transform: uppercase;
 }

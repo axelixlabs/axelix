@@ -3,8 +3,8 @@
     flex-direction: column;
     gap: 16px;
     padding: 16px 16px 16px 45px;
-    background-color: var(--axelix-extra-light-grey);
-    border-top: 1px solid var(--axelix-medium-grey);
+    background-color: var(--axelix-grey-50);
+    border-top: 1px solid var(--axelix-grey-300);
 }
 
 .Section {
@@ -24,9 +24,9 @@
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .PathSummary {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }

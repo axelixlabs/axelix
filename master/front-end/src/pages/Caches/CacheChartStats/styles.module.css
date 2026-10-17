@@ -29,7 +29,7 @@
 }
 
 .HeaderLine {
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
     grid-column: 1 / 5;
 }
 

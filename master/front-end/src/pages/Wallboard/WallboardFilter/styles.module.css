@@ -13,7 +13,7 @@
 
 .Label {
     font-weight: 500;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .ActionsButtonsWrapper {

@@ -28,7 +28,7 @@ interface IProps {
 
 const RADIUS = 52;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const LINE_FALLBACK_COLOR = "var(--axelix-bold-grey)";
+const LINE_FALLBACK_COLOR = "var(--axelix-grey-500)";
 
 // TODO: Improve this component in the future
 export const PlatformDistributionCard = ({ distribution }: IProps) => {
@@ -84,7 +84,7 @@ export const PlatformDistributionCard = ({ distribution }: IProps) => {
                                 cy="70"
                                 r={RADIUS}
                                 fill="none"
-                                stroke="var(--axelix-light-grey)"
+                                stroke="var(--axelix-grey-100)"
                                 strokeWidth="22"
                             />
                             {arcs.map((arc) => (

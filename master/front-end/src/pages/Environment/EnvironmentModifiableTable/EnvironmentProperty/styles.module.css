@@ -9,8 +9,8 @@
 }
 
 .DangerousRow {
-    background-color: var(--axelix-primary-light-red);
-    border-left-color: var(--prop-danger);
+    background-color: var(--axelix-red-50);
+    border-left-color: var(--axelix-red-700);
 
     &:hover {
         background-color: #fee4e2;
@@ -18,8 +18,8 @@
 }
 
 .DeprecatedErrorRow {
-    background-color: var(--prop-dep-error-surface);
-    border-left-color: var(--prop-dep-error);
+    background-color: var(--axelix-orange-50);
+    border-left-color: var(--axelix-orange-700);
 
     &:hover {
         background-color: #fef0c7;
@@ -27,8 +27,8 @@
 }
 
 .DeprecatedWarningRow {
-    background-color: var(--prop-dep-warn-surface);
-    border-left-color: var(--prop-dep-warn);
+    background-color: var(--axelix-yellow-50);
+    border-left-color: var(--axelix-yellow-800);
 
     &:hover {
         background-color: #fef7c3;
@@ -36,7 +36,7 @@
 }
 
 .SuppressedRow {
-    background-color: var(--axelix-extra-light-grey);
+    background-color: var(--axelix-grey-50);
 }
 
 .KeyChunk {

@@ -5,12 +5,12 @@
 }
 
 .TimerIcon {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     cursor: pointer;
     transition: color 0.3s;
 
     &:hover {
-        color: var(--axelix-primary-green);
+        color: var(--axelix-green-600);
     }
 }
 
@@ -19,7 +19,7 @@
     height: 4px;
     width: 4px;
     border-radius: 50%;
-    background-color: var(--axelix-primary-green);
+    background-color: var(--axelix-green-600);
     flex-shrink: 0;
     box-shadow: 0 0 0 2px #bbf7d0;
     transition: box-shadow 0.3s;
@@ -27,7 +27,7 @@
 
 .BadgeContent {
     font-weight: 500;
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
     user-select: none;
 }
 

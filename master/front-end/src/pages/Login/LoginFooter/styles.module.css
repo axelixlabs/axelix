@@ -5,10 +5,10 @@
 }
 
 .Version {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     font-weight: 500;
 }
 
 .Divider {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }

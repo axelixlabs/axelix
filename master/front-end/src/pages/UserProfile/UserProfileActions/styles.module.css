@@ -31,5 +31,5 @@
 
 /* TODO: Fix this in future */
 .DeleteUser:hover {
-    background-color: var(--axelix-primary-red) !important;
+    background-color: var(--axelix-red-600) !important;
 }

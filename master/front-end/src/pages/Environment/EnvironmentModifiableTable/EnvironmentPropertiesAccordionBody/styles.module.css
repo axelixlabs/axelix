@@ -1,11 +1,11 @@
 .EmptySource {
     padding: 25px 15px;
     text-align: center;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .RowAccordion {
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
 }
 
 .RowHeader.RowHeader {
@@ -20,6 +20,6 @@
 
 .RowBody {
     padding: 16px 16px 16px 45px;
-    background-color: var(--axelix-extra-light-grey);
-    border-top: 1px solid var(--axelix-medium-grey);
+    background-color: var(--axelix-grey-50);
+    border-top: 1px solid var(--axelix-grey-300);
 }

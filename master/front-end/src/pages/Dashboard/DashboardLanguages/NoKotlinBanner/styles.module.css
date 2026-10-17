@@ -4,7 +4,7 @@
     justify-content: space-between;
     gap: 20px;
     padding: 16px 22px;
-    border: 1px dashed var(--axelix-medium-grey);
+    border: 1px dashed var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
 }
 
@@ -12,7 +12,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 /* TODO: Fix in the future */
@@ -26,10 +26,10 @@
 }
 
 .Message {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .Date {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     font-variant-numeric: tabular-nums;
 }

@@ -14,7 +14,7 @@
         so overflow-y would not work.
     */
     height: calc(100vh - 240px);
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
     overflow-y: auto;
 }

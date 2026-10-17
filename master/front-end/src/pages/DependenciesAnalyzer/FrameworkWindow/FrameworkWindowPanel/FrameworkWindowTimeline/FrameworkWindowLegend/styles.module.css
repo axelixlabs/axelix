@@ -4,7 +4,7 @@
     justify-content: space-between;
     gap: 8px;
     flex-wrap: wrap;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .LegendItem {
@@ -21,9 +21,9 @@
 }
 
 .OssDot {
-    background-color: var(--axelix-primary-green);
+    background-color: var(--axelix-green-600);
 }
 
 .CommercialDot {
-    background-color: var(--axelix-primary-orange);
+    background-color: var(--axelix-orange-500);
 }

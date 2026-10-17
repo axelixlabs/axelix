@@ -1,5 +1,5 @@
 .MainWrapper {
-    border-bottom-color: var(--axelix-light-grey);
+    border-bottom-color: var(--axelix-grey-100);
 }
 
 .MainWrapper:last-child {
@@ -35,7 +35,7 @@
 }
 
 .Origin {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -45,7 +45,7 @@
     justify-self: start;
     padding: 4px 8px;
     border-radius: var(--axelix-border-radius-small);
-    background-color: var(--axelix-light-grey);
+    background-color: var(--axelix-grey-100);
 
     /* TODO: Fix in the future */
     color: #475569;
@@ -63,7 +63,7 @@
 }
 
 .Range {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .Problems {
@@ -79,13 +79,13 @@
     align-items: center;
     padding: 4px 8px;
     border-radius: 999px;
-    background-color: var(--axelix-light-grey);
-    color: var(--axelix-bold-grey);
+    background-color: var(--axelix-grey-100);
+    color: var(--axelix-grey-500);
     font-weight: 600;
 }
 
 .NoProblemsInline {
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
     font-weight: 600;
 }
 

@@ -10,6 +10,6 @@
     place-items: center;
     height: 30px;
     width: 30px;
-    color: var(--axelix-primary-white);
+    color: var(--axelix-white);
     border-radius: var(--axelix-border-radius-large);
 }

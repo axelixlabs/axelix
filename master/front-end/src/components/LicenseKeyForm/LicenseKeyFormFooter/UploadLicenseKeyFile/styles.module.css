@@ -5,7 +5,7 @@
 .FileUploadLabel {
     cursor: pointer;
     transition: text-decoration 0.3s;
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
 
     &:hover {
         text-decoration: underline;

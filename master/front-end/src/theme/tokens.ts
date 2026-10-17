@@ -19,10 +19,11 @@
 /**
  * The single source of the console's colors and typography. The antd theme reads these values
  * directly, and {@link applyDesignTokens} exposes them to CSS as `--axelix-*` custom properties,
- * e.g. `palette.green[600]` becomes `--axelix-green-600` and `typography.fontSize.body`
- * becomes `--axelix-font-size-body`.
+ * e.g. `palette.green[600]` becomes `--axelix-green-600`, `palette.white` becomes `--axelix-white`
+ * and `typography.fontSize.body` becomes `--axelix-font-size-body`.
  */
 export const palette = {
+    white: "#fff",
     // Text on white: 900 primary, 600 secondary, 500 tertiary (all WCAG AA); 400 placeholders/disabled only
     grey: {
         25: "#fcfcfd",
@@ -64,6 +65,13 @@ export const palette = {
         500: "#f79009",
         700: "#b54708",
     },
+    // A lower-severity warning than orange, e.g. the "warn" level of the dependency analysis
+    yellow: {
+        50: "#fefbe8",
+        200: "#fde68a",
+        300: "#fde047",
+        800: "#854a0e",
+    },
     blue: {
         50: "#eff8ff",
         100: "#d1e9ff",
@@ -99,6 +107,11 @@ export const typography = {
 
 export const applyDesignTokens = (style: Pick<CSSStyleDeclaration, "setProperty">): void => {
     for (const [hue, shades] of Object.entries(palette)) {
+        if (typeof shades === "string") {
+            style.setProperty(`--axelix-${hue}`, shades);
+            continue;
+        }
+
         for (const [shade, color] of Object.entries(shades)) {
             style.setProperty(`--axelix-${hue}-${shade}`, color);
         }

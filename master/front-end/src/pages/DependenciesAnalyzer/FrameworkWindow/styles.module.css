@@ -16,9 +16,9 @@
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .CaptionSource {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }

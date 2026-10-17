@@ -7,10 +7,10 @@
     --da-columns: minmax(0, 1fr) 110px 120px;
 
     min-width: 750px;
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
     overflow: hidden;
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
 }
 
 .HeaderRow {
@@ -19,11 +19,11 @@
     gap: 16px;
     align-items: center;
     padding: 12px 20px 12px 45px;
-    background-color: var(--axelix-primary-light-green);
-    border-bottom: 1px solid var(--axelix-light-grey);
+    background-color: var(--axelix-green-50);
+    border-bottom: 1px solid var(--axelix-grey-100);
     font-weight: 600;
     text-transform: uppercase;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .AlignEnd {

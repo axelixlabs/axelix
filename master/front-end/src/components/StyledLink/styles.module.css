@@ -5,8 +5,8 @@
     transition-duration: 0.3s;
 
     &:hover {
-        border-bottom: 1px solid var(--axelix-primary-blue);
-        color: var(--axelix-primary-blue);
+        border-bottom: 1px solid var(--axelix-blue-600);
+        color: var(--axelix-blue-600);
     }
 }
 

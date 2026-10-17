@@ -9,8 +9,8 @@
     flex-direction: column;
     row-gap: 4px;
     padding: 10px 12px;
-    border-bottom: 1px solid var(--axelix-medium-grey);
-    color: var(--axelix-bold-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
+    color: var(--axelix-grey-500);
 }
 
 .DropdownTitle {
@@ -32,11 +32,11 @@
 }
 
 .ProfileRow:not(:last-child) {
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
 }
 
 .ProfileOrder {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .ProfileName {
@@ -46,5 +46,5 @@
 .HighestPrecedenceProfile .ProfileOrder,
 .HighestPrecedenceProfile .ProfileName {
     font-weight: 600;
-    color: var(--axelix-primary-black);
+    color: var(--axelix-grey-900);
 }

@@ -6,7 +6,7 @@
     gap: 20px;
     text-align: center;
     padding: 20px;
-    border: 1px solid var(--axelix-light-grey);
+    border: 1px solid var(--axelix-grey-100);
     border-radius: var(--axelix-border-radius-large);
     height: 100%;
 }
@@ -16,7 +16,7 @@
     width: 75px;
     height: 75px;
     border-radius: 50%;
-    background-color: var(--axelix-primary-light-green);
+    background-color: var(--axelix-green-50);
 }
 
 .Check::after {
@@ -26,8 +26,8 @@
     left: 24px;
     width: 28px;
     height: 15px;
-    border-left: 5px solid var(--axelix-primary-green);
-    border-bottom: 5px solid var(--axelix-primary-green);
+    border-left: 5px solid var(--axelix-green-600);
+    border-bottom: 5px solid var(--axelix-green-600);
     transform: rotate(-45deg);
 }
 
@@ -37,5 +37,5 @@
 
 .Description {
     max-width: 450px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }

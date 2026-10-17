@@ -30,10 +30,20 @@ describe("applyDesignTokens", () => {
         const properties = collectDesignTokens();
 
         for (const [hue, shades] of Object.entries(palette)) {
+            if (typeof shades === "string") {
+                continue;
+            }
+
             for (const [shade, color] of Object.entries(shades)) {
                 expect(properties.get(`--axelix-${hue}-${shade}`)).toBe(color);
             }
         }
+    });
+
+    it("Exposes a single color as a --axelix-<name> variable", () => {
+        const properties = collectDesignTokens();
+
+        expect(properties.get("--axelix-white")).toBe("#fff");
     });
 
     it("Exposes the typography with CSS units", () => {

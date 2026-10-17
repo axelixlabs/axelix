@@ -7,7 +7,7 @@
 
 .Caption {
     font-weight: 600;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .Chip {
@@ -16,9 +16,9 @@
     gap: 8px;
     padding: 6px 12px;
     border-radius: 999px;
-    border: 1px solid var(--axelix-medium-grey);
-    background-color: var(--axelix-primary-white);
-    color: var(--axelix-bold-grey);
+    border: 1px solid var(--axelix-grey-300);
+    background-color: var(--axelix-white);
+    color: var(--axelix-grey-500);
     font-weight: 600;
     cursor: pointer;
     user-select: none;
@@ -58,5 +58,5 @@
     border-color: var(--dot-color);
 
     /* TODO: Improve in future */
-    background-color: color-mix(in srgb, var(--dot-color) 10%, var(--axelix-primary-white));
+    background-color: color-mix(in srgb, var(--dot-color) 10%, var(--axelix-white));
 }

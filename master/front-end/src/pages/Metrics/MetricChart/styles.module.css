@@ -4,7 +4,7 @@
 }
 
 .Dot {
-    fill: var(--axelix-primary-white);
-    stroke: var(--axelix-primary-green);
+    fill: var(--axelix-white);
+    stroke: var(--axelix-green-600);
     stroke-width: 3px;
 }

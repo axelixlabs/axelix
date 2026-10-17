@@ -13,7 +13,7 @@
 }
 
 .Overlay {
-    background-color: var(--axelix-bold-grey);
+    background-color: var(--axelix-grey-500);
     opacity: 0.15;
 }
 
@@ -32,11 +32,11 @@
     row-gap: 16px;
     width: min(100%, 450px);
     padding: 20px;
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
     box-shadow: var(--axelix-box-shadow-bold);
-    color: var(--axelix-bold-grey);
-    background-color: var(--axelix-primary-white);
+    color: var(--axelix-grey-500);
+    background-color: var(--axelix-white);
 }
 
 /* TODO: Improve in the future */
@@ -53,12 +53,12 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: var(--axelix-bold-grey);
+    background-color: var(--axelix-grey-500);
 }
 
 .Title {
     font-weight: 600;
-    color: var(--axelix-primary-black);
+    color: var(--axelix-grey-900);
 }
 
 .Footer {
@@ -67,10 +67,10 @@
     justify-content: space-between;
     gap: 16px;
     padding-top: 16px;
-    border-top: 1px solid var(--axelix-medium-grey);
+    border-top: 1px solid var(--axelix-grey-300);
 }
 
 .LastScan {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     font-variant-numeric: tabular-nums;
 }

@@ -20,7 +20,7 @@
 }
 
 .TooltipName {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     overflow-wrap: anywhere;
 }
 
@@ -28,12 +28,12 @@
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     cursor: help;
     transition: color 0.3s;
 
     &:hover {
-        color: var(--axelix-primary-black);
+        color: var(--axelix-grey-900);
     }
 }
 
@@ -46,13 +46,13 @@
 
 .FlaggedCounter {
     font-weight: 600;
-    color: var(--axelix-primary-red);
-    background-color: var(--axelix-primary-light-red);
-    border: 1px solid var(--prop-danger-border);
+    color: var(--axelix-red-600);
+    background-color: var(--axelix-red-50);
+    border: 1px solid var(--axelix-red-200);
 }
 
 .PropertiesCounter {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }

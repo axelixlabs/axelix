@@ -1,7 +1,7 @@
 .MainWrapper {
     padding-bottom: 16px;
     margin-bottom: 16px;
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
 }
 
 .ToolbarRow {
@@ -20,9 +20,9 @@
 .NoResults {
     padding: 50px;
     text-align: center;
-    color: var(--axelix-bold-grey);
-    background-color: var(--axelix-extra-light-grey);
-    border: 1px solid var(--axelix-medium-grey);
+    color: var(--axelix-grey-500);
+    background-color: var(--axelix-grey-50);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
 }
 

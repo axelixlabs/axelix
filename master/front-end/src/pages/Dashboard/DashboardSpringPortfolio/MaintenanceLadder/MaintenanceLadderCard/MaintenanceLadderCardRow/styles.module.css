@@ -13,11 +13,11 @@
 }
 
 .DotOk {
-    background-color: var(--axelix-primary-green);
+    background-color: var(--axelix-green-600);
 }
 
 .DotNo {
-    background-color: var(--axelix-primary-orange);
+    background-color: var(--axelix-orange-500);
 }
 
 .LineLabel {
@@ -31,7 +31,7 @@
     position: relative;
     height: 11px;
     border-radius: var(--axelix-border-radius-large);
-    background-color: var(--axelix-extra-light-grey);
+    background-color: var(--axelix-grey-50);
     overflow: hidden;
 }
 
@@ -39,7 +39,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color: var(--axelix-primary-green);
+    background-color: var(--axelix-green-600);
     border-radius: var(--axelix-border-radius-large);
 }
 
@@ -48,7 +48,7 @@
     top: 0;
     bottom: 0;
     right: 0;
-    background: linear-gradient(90deg, var(--axelix-medium-grey), rgb(217 217 217 / 0%));
+    background: linear-gradient(90deg, var(--axelix-grey-300), rgb(217 217 217 / 0%));
 }
 
 .EndsCell {
@@ -56,12 +56,12 @@
 }
 
 .EndsOk {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .EndsNo,
 .AppsNo {
-    color: var(--axelix-primary-red);
+    color: var(--axelix-red-600);
 }
 
 .AppsCell {
@@ -70,5 +70,5 @@
 }
 
 .AppsOk {
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
 }

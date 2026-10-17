@@ -3,7 +3,7 @@
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
 }
 
 .Tab {
@@ -15,7 +15,7 @@
     /* TODO: Remove in future */
     font: inherit;
     font-weight: 600;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 
     /* TODO: Remove in future */
     background: none;
@@ -28,21 +28,21 @@
         color 0.15s;
 
     &:hover {
-        color: var(--axelix-primary-black);
+        color: var(--axelix-grey-900);
     }
 }
 
 .ActiveTab {
     font-weight: 700;
-    color: var(--axelix-primary-black);
-    border-bottom-color: var(--axelix-primary-green);
+    color: var(--axelix-grey-900);
+    border-bottom-color: var(--axelix-green-600);
 }
 
 .Count {
-    color: var(--axelix-medium-grey);
+    color: var(--axelix-grey-300);
     font-variant-numeric: tabular-nums;
 }
 
 .ActiveTab .Count {
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
 }

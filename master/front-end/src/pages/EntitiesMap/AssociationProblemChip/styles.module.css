@@ -38,7 +38,7 @@
 }
 
 .Outlined {
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
     border: 1px solid currentcolor;
 }
 

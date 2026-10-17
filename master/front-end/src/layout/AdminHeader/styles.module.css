@@ -4,12 +4,12 @@
     left: 0;
     right: 0;
     z-index: 1000;
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: var(--axelix-header-height);
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
     box-shadow: var(--axelix-box-shadow-light);
     padding: 0 50px;
 }

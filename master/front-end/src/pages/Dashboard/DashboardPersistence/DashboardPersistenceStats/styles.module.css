@@ -10,7 +10,7 @@
 }
 
 .Label {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     text-transform: uppercase;
     letter-spacing: 1px;
 }

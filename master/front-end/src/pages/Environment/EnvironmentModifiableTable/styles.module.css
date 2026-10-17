@@ -1,5 +1,5 @@
 .MainWrapper {
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
     box-shadow: var(--axelix-box-shadow-light);
     overflow: hidden;
@@ -10,7 +10,7 @@
     align-items: center;
     min-height: 45px;
     padding-inline: 35px 15px;
-    background-color: var(--axelix-extra-light-grey);
+    background-color: var(--axelix-grey-50);
     border-radius: var(--axelix-border-radius-large) var(--axelix-border-radius-large) 0 0;
 
     &::before {

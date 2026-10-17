@@ -7,10 +7,10 @@
     --em-columns: minmax(0, 2.4fr) 150px minmax(220px, 2.6fr);
 
     min-width: 750px;
-    border: 1px solid var(--axelix-light-grey);
+    border: 1px solid var(--axelix-grey-100);
     border-radius: var(--axelix-border-radius-large);
     overflow: hidden;
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
 }
 
 .HeaderRow {
@@ -21,9 +21,9 @@
 
     /* left padding matches the row arrow inset so columns line up */
     padding: 12px 20px 12px 45px;
-    background-color: var(--axelix-primary-light-green);
-    border-bottom: 1px solid var(--axelix-light-grey);
+    background-color: var(--axelix-green-50);
+    border-bottom: 1px solid var(--axelix-grey-100);
     font-weight: 700;
     text-transform: uppercase;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }

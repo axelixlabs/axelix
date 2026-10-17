@@ -1,5 +1,5 @@
 .MainWrapper {
-  border-bottom: 1px solid var(--axelix-medium-grey);
+  border-bottom: 1px solid var(--axelix-grey-300);
 }
 
 .ContentWrapper {
@@ -20,7 +20,7 @@
   position: relative;
   cursor: pointer;
   padding: 12px 16px;
-  background-color: var(--axelix-extra-light-grey);
+  background-color: var(--axelix-grey-50);
 }
 
 .HeaderWrapper:not(.HideArrow) {

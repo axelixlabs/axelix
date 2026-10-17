@@ -4,12 +4,12 @@
     gap: 20px;
     flex-wrap: wrap;
     margin-bottom: 16px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .SectionTitle {
     font-weight: 600;
     letter-spacing: 1px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     text-transform: uppercase;
 }

@@ -1,7 +1,7 @@
 /* TODO: this css class CustomizedAntdTable is used also for scheduled tasks, and I do not think it is correct */
 .CustomizedTable {
     width: 100%;
-    border: 1px solid var(--axelix-light-grey);
+    border: 1px solid var(--axelix-grey-100);
     border-radius: var(--axelix-border-radius-large);
     border-collapse: separate;
     border-spacing: 0;
@@ -15,9 +15,9 @@
 .TableHeader {
     display: grid;
     grid-template-columns: 1fr;
-    background-color: var(--axelix-primary-light-green);
+    background-color: var(--axelix-green-50);
     font-weight: 600;
-    border-bottom: 1px solid var(--axelix-light-grey);
+    border-bottom: 1px solid var(--axelix-grey-100);
     border-top-left-radius: var(--axelix-border-radius-large);
     border-top-right-radius: var(--axelix-border-radius-large);
 }
@@ -42,7 +42,7 @@
     align-items: center;
     padding: 16px;
     word-break: break-all;
-    border-right: 1px solid var(--axelix-light-grey);
+    border-right: 1px solid var(--axelix-grey-100);
 }
 
 .RowChunk:last-child {

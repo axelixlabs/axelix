@@ -11,14 +11,14 @@
 }
 
 .Prose {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .Label {
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .Reference {
@@ -29,7 +29,7 @@
 }
 
 .ReferenceLink {
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
     overflow-wrap: anywhere;
 
     &:hover {
@@ -41,5 +41,5 @@
     width: 12px;
     height: 12px;
     flex-shrink: 0;
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
 }

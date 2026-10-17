@@ -11,5 +11,5 @@
 .Line {
     flex: 1;
     height: 1px;
-    background-color: var(--axelix-medium-grey);
+    background-color: var(--axelix-grey-300);
 }

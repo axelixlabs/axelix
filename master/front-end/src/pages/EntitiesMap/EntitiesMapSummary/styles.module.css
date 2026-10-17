@@ -9,9 +9,9 @@
     flex-direction: column;
     gap: 8px;
     padding: 20px;
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
 }
 
 .Card:nth-child(2) {
@@ -23,12 +23,12 @@
 .Card:nth-child(3) {
     /* TODO: Improve in the future */
     border-color: #bbf7d0;
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
 }
 
 .Label {
     text-transform: uppercase;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 @media (width <=720px) {

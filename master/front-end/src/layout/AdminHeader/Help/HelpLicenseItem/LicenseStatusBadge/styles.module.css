@@ -6,12 +6,12 @@
 }
 
 .EnterpriseBadge {
-    color: var(--axelix-primary-white);
-    background-color: var(--axelix-primary-green);
+    color: var(--axelix-white);
+    background-color: var(--axelix-green-600);
 }
 
 .OSSBadge {
-    color: var(--axelix-primary-green);
-    background-color: var(--axelix-primary-white);
-    border: 1px solid var(--axelix-primary-green);
+    color: var(--axelix-green-600);
+    background-color: var(--axelix-white);
+    border: 1px solid var(--axelix-green-600);
 }

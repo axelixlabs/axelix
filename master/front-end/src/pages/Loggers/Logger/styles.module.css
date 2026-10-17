@@ -15,11 +15,11 @@
 .ResetIcon {
     border-radius: 4px;
     transition: background-color 0.3s, opacity 0.3s;
-    color: var(--axelix-primary-red);
+    color: var(--axelix-red-600);
 
     &:hover {
         cursor: pointer;
-        background-color: var(--axelix-primary-light-red);
+        background-color: var(--axelix-red-50);
     }
 }
 

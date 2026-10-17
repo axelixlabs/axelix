@@ -1,8 +1,8 @@
 .MainWrapper {
     border-radius: 16px;
     padding: 24px;
-    background-color: var(--axelix-primary-white);
-    border: 1px solid var(--axelix-medium-grey);
+    background-color: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-300);
     box-shadow: var(--axelix-box-shadow-bold);
 }
 
@@ -11,7 +11,7 @@
 }
 
 .Subtitle {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     text-transform: uppercase;
     letter-spacing: 1.2px;
     font-weight: 500;

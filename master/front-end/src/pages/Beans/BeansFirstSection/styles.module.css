@@ -11,12 +11,12 @@
 }
 
 .Tag {
-    background-color: var(--axelix-primary-green);
-    color: var(--axelix-primary-white);
-    border-color: var(--axelix-primary-green);;
+    background-color: var(--axelix-green-600);
+    color: var(--axelix-white);
+    border-color: var(--axelix-green-600);;
 
     &:hover {
-        background-color: var(--axelix-primary-dark-green);
+        background-color: var(--axelix-green-700);
     }
 }
 

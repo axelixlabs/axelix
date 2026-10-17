@@ -18,7 +18,7 @@
         background-color 0.12s;
 
     &:hover {
-        color: var(--axelix-primary-white);
+        color: var(--axelix-white);
         background-color: var(--risk-color);
     }
 }
@@ -33,24 +33,24 @@
 }
 
 .Dangerous {
-    --risk-color: var(--prop-danger);
-    --risk-surface: var(--axelix-primary-light-red);
-    --risk-border: var(--prop-danger-border);
-    --risk-on-dark: var(--prop-danger-on-dark);
+    --risk-color: var(--axelix-red-700);
+    --risk-surface: var(--axelix-red-50);
+    --risk-border: var(--axelix-red-200);
+    --risk-on-dark: var(--axelix-red-300);
 }
 
 .DeprecatedError {
-    --risk-color: var(--prop-dep-error);
-    --risk-surface: var(--prop-dep-error-surface);
-    --risk-border: var(--prop-dep-error-border);
-    --risk-on-dark: var(--prop-dep-error-on-dark);
+    --risk-color: var(--axelix-orange-700);
+    --risk-surface: var(--axelix-orange-50);
+    --risk-border: var(--axelix-orange-300);
+    --risk-on-dark: var(--axelix-orange-400);
 }
 
 .DeprecatedWarning {
-    --risk-color: var(--prop-dep-warn);
-    --risk-surface: var(--prop-dep-warn-surface);
-    --risk-border: var(--prop-dep-warn-border);
-    --risk-on-dark: var(--prop-dep-warn-on-dark);
+    --risk-color: var(--axelix-yellow-800);
+    --risk-surface: var(--axelix-yellow-50);
+    --risk-border: var(--axelix-yellow-200);
+    --risk-on-dark: var(--axelix-yellow-300);
 }
 
 .Tooltip {
@@ -68,14 +68,14 @@
     text-transform: uppercase;
     color: var(--risk-on-dark);
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-grey-300);
 }
 
 .TooltipHintLabel {
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     margin-bottom: 4px;
 }
 

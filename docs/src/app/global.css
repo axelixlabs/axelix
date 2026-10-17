@@ -14,7 +14,7 @@
 /*
  * Two greens per theme, on purpose — they are different roles, not a mistake to tidy up.
  *
- *   brand    #00ab55 — the logo and filled brand surfaces (`--axelix-primary-green`
+ *   brand    #00ab55 — the logo and filled brand surfaces (`--axelix-green-500`
  *            in master/front-end). Never used as text: only 2.77:1 on the light
  *            background, which fails WCAG AA.
  *   text     the same hue, darkened for light and lightened for dark until it clears

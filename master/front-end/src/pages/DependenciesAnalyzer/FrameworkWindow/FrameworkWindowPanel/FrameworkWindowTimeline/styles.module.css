@@ -9,11 +9,11 @@
     height: 10px;
     border-radius: 6px;
     overflow: hidden;
-    background-color: var(--axelix-medium-grey);
+    background-color: var(--axelix-grey-300);
 }
 
 .OssSegment {
-    background-color: var(--axelix-primary-green);
+    background-color: var(--axelix-green-600);
 }
 
 .CommercialSegment {
@@ -31,7 +31,7 @@
     top: -18px;
     width: 2px;
     height: 20px;
-    background-color: var(--axelix-primary-black);
+    background-color: var(--axelix-grey-900);
 }
 
 .TodayLabel {

@@ -14,9 +14,9 @@
     font: inherit;
     font-weight: 600;
     border-radius: 7px;
-    border: 1px solid var(--axelix-medium-grey);
-    background-color: var(--axelix-primary-white);
-    color: var(--axelix-bold-grey);
+    border: 1px solid var(--axelix-grey-300);
+    background-color: var(--axelix-white);
+    color: var(--axelix-grey-500);
     cursor: pointer;
     user-select: none;
     transition:
@@ -53,7 +53,7 @@
     border-color: var(--dot-color);
 
     /* TODO: Improve in future */
-    background-color: color-mix(in srgb, var(--dot-color) 10%, var(--axelix-primary-white));
+    background-color: color-mix(in srgb, var(--dot-color) 10%, var(--axelix-white));
 }
 
 .Count {
@@ -61,13 +61,13 @@
     font-variant-numeric: tabular-nums;
     padding: 1px 5px;
     border-radius: var(--axelix-border-radius-small);
-    color: var(--axelix-bold-grey);
-    background-color: var(--axelix-light-grey);
+    color: var(--axelix-grey-500);
+    background-color: var(--axelix-grey-100);
 }
 
 .ActiveChip .Count {
     color: var(--dot-color);
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
 }
 
 .Clear {
@@ -75,12 +75,12 @@
     padding: 6px 4px;
     font: inherit;
     font-weight: 600;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     background: none;
     border: none;
     cursor: pointer;
 
     &:hover {
-        color: var(--axelix-primary-black);
+        color: var(--axelix-grey-900);
     }
 }

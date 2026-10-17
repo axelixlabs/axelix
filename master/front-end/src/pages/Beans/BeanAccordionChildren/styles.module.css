@@ -14,7 +14,7 @@
 }
 
 .AccordionBodyChunkList:not(:last-child) {
-  border-bottom: 1px solid var(--axelix-medium-grey);
+  border-bottom: 1px solid var(--axelix-grey-300);
   margin-bottom: 8px;
   padding-bottom: 8px;
 }
@@ -39,10 +39,10 @@
 
 .Flag:global(.ant-checkbox-wrapper:hover .ant-checkbox-inner),
 .Flag :global(.ant-checkbox-inner) {
-  border-color: var(--axelix-medium-grey) !important;
+  border-color: var(--axelix-grey-300) !important;
 }
 
 .Flag:global(.ant-checkbox-wrapper:hover .ant-checkbox-checked .ant-checkbox-inner),
 .Flag :global(.ant-checkbox-wrapper:hover .ant-checkbox-inner) {
-  background-color: var(--axelix-primary-green) !important;
+  background-color: var(--axelix-green-600) !important;
 }

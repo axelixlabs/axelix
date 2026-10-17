@@ -1,5 +1,5 @@
 .FunctionsTitle {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
     margin-bottom: 8px;
     text-transform: uppercase;
 }
@@ -17,7 +17,7 @@
     column-gap: 8px;
     padding: 4px 8px;
     border-radius: var(--axelix-border-radius-large);
-    border: 1px solid var(--axelix-medium-grey);
+    border: 1px solid var(--axelix-grey-300);
     user-select: none;
     cursor: default;
 }
