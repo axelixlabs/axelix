@@ -44,6 +44,7 @@ export const App = () => {
             controlItemBgActive: palette.green[50],
             controlItemBgActiveHover: palette.green[100],
             fontFamily: typography.fontFamily,
+            fontFamilyCode: typography.fontFamilyCode,
             fontSize: typography.fontSize.body,
             lineHeight: typography.lineHeight.normal,
         },

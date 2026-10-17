@@ -2,14 +2,13 @@
     position: relative;
     display: block;
     width: calc(100% - 36px);
-    margin: 12px 12px 14px 24px;
+    margin: 12px 12px 16px 24px;
     padding: 12px;
     font: inherit;
     text-align: left;
-    background: var(--axelix-primary-white);
-    border: 1px solid #e0e7e2;
+    background: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
-    box-shadow: 0 1px 2px rgb(28 56 38 / 3%);
     cursor: pointer;
     transition:
         border-color 180ms,
@@ -19,34 +18,32 @@
 }
 
 .MainWrapper:hover {
-    background: #fbfdfc;
-    border-color: #9ccdb1;
-    box-shadow: 0 3px 10px rgb(28 56 38 / 6%);
+    border-color: var(--axelix-green-200);
 }
 
 .MainWrapper:active {
-    background: #f3faf6;
+    background: var(--axelix-green-50);
     transform: translateY(1px);
 }
 
 .MainWrapper:focus-visible {
-    outline: 3px solid #72d5a0;
-    outline-offset: -3px;
+    outline: 2px solid var(--axelix-green-500);
+    outline-offset: 2px;
 }
 
 .MainWrapper.Pressed {
-    background: var(--axelix-primary-white);
-    border-color: var(--axelix-primary-green);
-    box-shadow: 0 0 0 3px rgb(0 173 86 / 5%);
+    background: var(--axelix-white);
+    border-color: var(--axelix-green-600);
+    box-shadow: 0 0 0 3px var(--axelix-green-50);
 }
 
 .Name {
     display: block;
-    padding-right: 17px;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.5;
-    color: #344a3c;
+    padding-right: 16px;
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-semibold);
+    line-height: var(--axelix-line-height-tight);
+    color: var(--axelix-grey-900);
     overflow-wrap: anywhere;
 }
 
@@ -56,7 +53,7 @@
     height: 12px;
     flex-shrink: 0;
     fill: none;
-    stroke: #555;
+    stroke: var(--axelix-grey-500);
     stroke-width: 1.2;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -66,7 +63,7 @@
     position: absolute;
     right: 12px;
     top: 16px;
-    stroke: #86958b;
+    stroke: var(--axelix-grey-500);
     stroke-width: 1.4;
     transform: rotate(180deg);
     transition: transform 200ms;
@@ -81,20 +78,20 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
-    border-top: 1px solid #edf1ee;
-    padding-top: 9px;
-    margin-top: 10px;
-    color: #303030;
-    font-size: 11px;
+    gap: 8px;
+    border-top: 1px solid var(--axelix-grey-200);
+    padding-top: 8px;
+    margin-top: 8px;
+    color: var(--axelix-grey-600);
+    font-size: var(--axelix-font-size-caption);
 }
 
 .Time {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     margin-left: auto;
-    font-weight: 500;
+    font-weight: var(--axelix-font-weight-medium);
     white-space: nowrap;
 }
 

@@ -1,6 +1,6 @@
 .MainWrapper {
     min-height: 100vh;
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
 }
 
 .Sider {
@@ -41,7 +41,7 @@
 
 .ContentLayout {
     margin-top: var(--axelix-header-height);
-    background-color: var(--axelix-primary-white);
+    background-color: var(--axelix-white);
 }
 
 /* Targets the thread-dump page */

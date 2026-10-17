@@ -2,29 +2,29 @@
 .Checkbox.Checkbox {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
+    gap: 12px;
     width: 100%;
     margin: 0;
 }
 
 .Checkbox.Checkbox {
-    padding: 11px 10px;
+    padding: 12px 8px;
     margin: 1px 0;
-    border-radius: 5px;
-    background: var(--axelix-primary-white);
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-white);
     transition: background 150ms;
 }
 
 .Checkbox.Checkbox:hover {
-    background: #f4f7f5;
+    background: var(--axelix-grey-50);
 }
 
 .Checkbox.Checkbox.Selected {
-    background: #eef8f2;
+    background: var(--axelix-green-50);
 }
 
 .Checkbox.Checkbox.Selected:hover {
-    background: #e5f4eb;
+    background: var(--axelix-green-100);
 }
 
 .Checkbox :global(.ant-checkbox) {
@@ -48,10 +48,10 @@
 
 .Name {
     display: block;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.5;
-    color: #304137;
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-medium);
+    line-height: var(--axelix-line-height-normal);
+    color: var(--axelix-grey-900);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -60,8 +60,8 @@
 .Meta {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 5px;
+    gap: 8px;
+    margin-top: 4px;
 }
 
 .Status {
@@ -73,7 +73,7 @@
 .Lock {
     width: 16px;
     margin-top: 1px;
-    color: #91a096;
+    color: var(--axelix-grey-400);
     flex-shrink: 0;
 }
 
