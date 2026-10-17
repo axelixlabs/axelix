@@ -394,7 +394,9 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNullOrEmpty();
+        assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE))
+                .allSatisfy(
+                        cookieHeader -> assertThat(cookieHeader.toLowerCase()).contains("max-age=0"));
         assertThat(userRepository.findByUsername(username)).isEmpty();
     }
 

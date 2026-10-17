@@ -27,11 +27,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
+import com.axelixlabs.axelix.master.service.auth.CookieService;
 
 /**
  * The {@link OncePerRequestFilter} that is supposed to handle exceptions
@@ -44,10 +47,13 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
 
     private final ApiExceptionTranslator apiExceptionTranslator;
     private final JsonMapper jsonMapper;
+    private final CookieService cookieService;
 
-    public ExceptionHandlingFilter(ApiExceptionTranslator apiExceptionTranslator, JsonMapper jsonMapper) {
+    public ExceptionHandlingFilter(
+            ApiExceptionTranslator apiExceptionTranslator, JsonMapper jsonMapper, CookieService cookieService) {
         this.apiExceptionTranslator = apiExceptionTranslator;
         this.jsonMapper = jsonMapper;
+        this.cookieService = cookieService;
     }
 
     @Override
@@ -80,8 +86,26 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
 
     private void handleApiError(HttpServletResponse response, ApiError apiError) throws IOException {
         response.setStatus(apiError.statusCode());
+
+        if (apiError.statusCode() == HttpStatus.UNAUTHORIZED.value()) {
+            expireAuthCookies(response);
+        }
+
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(jsonMapper.writeValueAsString(apiError.errorBody()));
         response.getWriter().flush();
+    }
+
+    /**
+     * The UI considers the user authenticated as long as the authorities cookie is present, so
+     * on 401 we have to expire it along with the auth cookie, otherwise the UI would never get
+     * to the login page.
+     */
+    private void expireAuthCookies(HttpServletResponse response) {
+        response.addHeader(
+                HttpHeaders.SET_COOKIE, cookieService.buildExpiredAuthCookie().toString());
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                cookieService.buildExpiredAuthMetadataCookie().toString());
     }
 }

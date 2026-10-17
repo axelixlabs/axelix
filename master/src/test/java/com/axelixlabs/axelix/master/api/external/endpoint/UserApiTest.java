@@ -148,9 +148,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-
-        String cookieHeader = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
-        assertThat(cookieHeader).isNull();
+        assertAuthCookiesExpired(response);
         assertAuthenticationFailure(MasterWebEndpoints.LOCAL_LOGIN);
     }
 
@@ -190,7 +188,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNullOrEmpty();
+        assertAuthCookiesExpired(response);
         assertAuthenticationFailure(MasterWebEndpoints.LOCAL_LOGIN);
     }
 
@@ -283,6 +281,29 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         // then.
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertAuthenticationFailure(MasterWebEndpoints.LOGOUT);
+    }
+
+    @Test
+    void shouldExpireAuthoritiesCookieWhenAuthCookieIsMissing() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.COOKIE, CookieProperties.AUTHORITIES_COOKIE_NAME + "=W1VTRVJTX1JFQURd");
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.exchange(USERS_FEED_PATH, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertAuthCookiesExpired(response);
+    }
+
+    private static void assertAuthCookiesExpired(ResponseEntity<String> response) {
+        assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE))
+                .containsExactlyInAnyOrder(
+                        CookieProperties.AUTH_COOKIE_NAME
+                                + "=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict",
+                        CookieProperties.AUTHORITIES_COOKIE_NAME
+                                + "=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict");
     }
 
     @Test

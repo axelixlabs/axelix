@@ -31,6 +31,7 @@ import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
 import com.axelixlabs.axelix.master.filter.ExceptionHandlingFilter;
+import com.axelixlabs.axelix.master.service.auth.CookieService;
 
 /**
  * General Auto-configuration of Axelix project.
@@ -54,8 +55,8 @@ public class AxelixAutoConfiguration {
 
     @Bean
     public ExceptionHandlingFilter exceptionHandlingFilter(
-            ApiExceptionTranslator apiExceptionTranslator, JsonMapper jsonMapper) {
-        return new ExceptionHandlingFilter(apiExceptionTranslator, jsonMapper);
+            ApiExceptionTranslator apiExceptionTranslator, JsonMapper jsonMapper, CookieService cookieService) {
+        return new ExceptionHandlingFilter(apiExceptionTranslator, jsonMapper, cookieService);
     }
 
     @Bean
