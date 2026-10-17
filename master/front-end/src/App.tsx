@@ -26,11 +26,32 @@ import "./i18n/i18n";
 
 export const App = () => {
     const theme: ThemeConfig = {
+        // antd derives hover/active shades from these, so they must be literals; keep them equal to the :root ramps in index.css
         token: {
-            colorPrimary: "#00ab55",
+            colorPrimary: "#008743",
+            colorSuccess: "#008743",
+            colorError: "#d92d20",
+            colorWarning: "#f79009",
+            colorInfo: "#1570ef",
+            colorLink: "#008743",
+            colorText: "#101828",
+            colorTextSecondary: "#475467",
+            colorTextTertiary: "#667085",
+            colorTextQuaternary: "#98a2b3",
+            colorBorder: "#d0d5dd",
+            colorBorderSecondary: "#eaecf0",
+            // antd's generated tints of the primary green come out muddy, so the selected-item backgrounds are pinned to the green ramp
+            controlItemBgActive: "#e6f7ee",
+            controlItemBgActiveHover: "#ccefdd",
             fontFamily: "Golos, Helvetica, Arial, sans-serif",
-            fontSize: 15,
+            fontSize: 14,
             lineHeight: 1.5,
+        },
+        components: {
+            Menu: {
+                itemSelectedBg: "#e6f7ee",
+                itemSelectedColor: "#007038",
+            },
         },
     };
 
