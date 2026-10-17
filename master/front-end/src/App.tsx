@@ -44,11 +44,16 @@ export const App = () => {
             controlItemBgActive: palette.green[50],
             controlItemBgActiveHover: palette.green[100],
             fontFamily: typography.fontFamily,
+            fontFamilyCode: typography.fontFamilyCode,
             fontSize: typography.fontSize.body,
             lineHeight: typography.lineHeight.normal,
         },
         components: {
+            // Menus are rendered only in the siders, whose own background shows through the items
             Menu: {
+                itemBg: "transparent",
+                subMenuItemBg: "transparent",
+                activeBarBorderWidth: 0,
                 itemSelectedBg: palette.green[50],
                 itemSelectedColor: palette.green[700],
             },

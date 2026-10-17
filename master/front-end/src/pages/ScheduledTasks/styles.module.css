@@ -78,3 +78,10 @@
     width: 100%;
     column-gap: 8px;
 }
+
+.FirstSection {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}

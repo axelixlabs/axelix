@@ -67,3 +67,5 @@ export * from "./enums/caches";
 export * from "./enums/beans";
 export * from "./enums/users";
 export * from "./enums/mcp";
+
+export * from "./types/instances";

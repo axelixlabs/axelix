@@ -20,3 +20,7 @@ import { apiFetch } from "@/api";
 export const getWallboardData = () => {
     return apiFetch.get("applications/grid");
 };
+
+export const getInstanceSiblings = (instanceId: string) => {
+    return apiFetch.get(`applications/siblings/${instanceId}`);
+};

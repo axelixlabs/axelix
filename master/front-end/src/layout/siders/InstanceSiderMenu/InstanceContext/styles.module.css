@@ -1,0 +1,109 @@
+.MainWrapper {
+    position: relative;
+    display: block;
+    width: calc(100% - 36px);
+    margin: 12px 12px 16px 24px;
+    padding: 12px;
+    font: inherit;
+    text-align: left;
+    background: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-large);
+    cursor: pointer;
+    transition:
+        border-color 180ms,
+        box-shadow 180ms,
+        background 180ms,
+        transform 120ms;
+}
+
+.MainWrapper:hover {
+    border-color: var(--axelix-green-200);
+}
+
+.MainWrapper:active {
+    background: var(--axelix-green-50);
+    transform: translateY(1px);
+}
+
+.MainWrapper:focus-visible {
+    outline: 2px solid var(--axelix-green-500);
+    outline-offset: 2px;
+}
+
+.MainWrapper.Pressed {
+    background: var(--axelix-white);
+    border-color: var(--axelix-green-600);
+    box-shadow: 0 0 0 3px var(--axelix-green-50);
+}
+
+.Name {
+    display: block;
+    padding-right: 16px;
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-semibold);
+    line-height: var(--axelix-line-height-tight);
+    color: var(--axelix-grey-900);
+    overflow-wrap: anywhere;
+}
+
+.MainWrapper svg,
+.Time svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: var(--axelix-grey-500);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.MainWrapper .Arrow {
+    position: absolute;
+    right: 12px;
+    top: 16px;
+    stroke: var(--axelix-grey-500);
+    stroke-width: 1.4;
+    transform: rotate(180deg);
+    transition: transform 200ms;
+}
+
+.Pressed .Arrow {
+    transform: rotate(0deg);
+}
+
+.Meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-top: 1px solid var(--axelix-grey-200);
+    padding-top: 8px;
+    margin-top: 8px;
+    color: var(--axelix-grey-600);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Time {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    font-weight: var(--axelix-font-weight-medium);
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Popup {
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+        transition: none !important;
+    }
+
+    .MainWrapper,
+    .MainWrapper .Arrow {
+        transition: none;
+    }
+}

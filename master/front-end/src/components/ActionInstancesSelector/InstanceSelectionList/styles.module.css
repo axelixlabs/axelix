@@ -1,0 +1,97 @@
+.MainWrapper {
+    width: max-content;
+    min-width: min(320px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+    padding: 8px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+    box-shadow: var(--axelix-box-shadow-light);
+    overflow: hidden;
+    animation: selector-in 160ms ease-out;
+}
+
+.Current {
+    padding: 12px 8px;
+    background: var(--axelix-green-50);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.SelectAll {
+    margin: 4px 0;
+}
+
+.AllCheckbox.AllCheckbox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    margin: 0;
+    padding: 8px;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-medium);
+    color: var(--axelix-grey-600);
+    border-bottom: 1px solid var(--axelix-grey-200);
+}
+
+.AllCheckbox:hover {
+    background: var(--axelix-grey-50);
+    color: var(--axelix-grey-900);
+}
+
+.AllCheckbox :global(.ant-checkbox) {
+    order: 2;
+    flex-shrink: 0;
+}
+
+.AllCheckbox :global(.ant-checkbox-label) {
+    order: 1;
+    padding: 0;
+    flex: 1;
+    text-align: left;
+}
+
+.Options {
+    margin: 0;
+    padding: 2px 0;
+    max-height: 328px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--axelix-grey-300) transparent;
+    scrollbar-gutter: stable;
+}
+
+.Current,
+.SelectAll {
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    overflow-y: auto;
+}
+
+.Footer {
+    margin: 4px -8px -8px;
+    padding: 8px 16px;
+    background: var(--axelix-grey-50);
+    color: var(--axelix-grey-600);
+    font-size: var(--axelix-font-size-caption);
+    line-height: var(--axelix-line-height-normal);
+}
+
+@keyframes selector-in {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .MainWrapper {
+        animation: none;
+    }
+}

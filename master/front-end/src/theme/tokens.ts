@@ -86,6 +86,8 @@ export const palette = {
 // The font sizes mirror the scale antd derives from the 14px base
 export const typography = {
     fontFamily: "Golos, Helvetica, Arial, sans-serif",
+    // For machine values such as commit SHAs
+    fontFamilyCode: "ui-monospace, SFMono-Regular, Consolas, monospace",
     fontSize: {
         caption: 12,
         body: 14,
@@ -118,6 +120,7 @@ export const applyDesignTokens = (style: Pick<CSSStyleDeclaration, "setProperty"
     }
 
     style.setProperty("--axelix-font-family", typography.fontFamily);
+    style.setProperty("--axelix-font-family-code", typography.fontFamilyCode);
 
     for (const [role, size] of Object.entries(typography.fontSize)) {
         style.setProperty(`--axelix-font-size-${role}`, `${size}px`);

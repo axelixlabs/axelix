@@ -50,6 +50,7 @@ describe("applyDesignTokens", () => {
         const properties = collectDesignTokens();
 
         expect(properties.get("--axelix-font-family")).toBe("Golos, Helvetica, Arial, sans-serif");
+        expect(properties.get("--axelix-font-family-code")).toBe("ui-monospace, SFMono-Regular, Consolas, monospace");
         expect(properties.get("--axelix-font-size-body")).toBe("14px");
         expect(properties.get("--axelix-font-size-page-title")).toBe("24px");
         expect(properties.get("--axelix-line-height-normal")).toBe("1.5");
