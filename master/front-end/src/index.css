@@ -9,18 +9,7 @@
 :root {
     --axelix-header-height: 65px;
 
-    /* Type scale (mirrors the antd scale derived from the 14px base) */
-    --axelix-font-size-caption: 12px;
-    --axelix-font-size-body: 14px;
-    --axelix-font-size-subtitle: 16px;
-    --axelix-font-size-title: 20px;
-    --axelix-font-size-page-title: 24px;
-    --axelix-font-size-display: 30px;
-    --axelix-line-height-tight: 1.25;
-    --axelix-line-height-normal: 1.5;
-    --axelix-font-weight-regular: 400;
-    --axelix-font-weight-medium: 500;
-    --axelix-font-weight-semibold: 600;
+    /* Colors (--axelix-<hue>-<shade>) and typography (--axelix-font-*, --axelix-line-height-*) are defined in src/theme/tokens.ts */
 
     /* Spacing scale (4px grid) */
     --axelix-space-1: 4px;
@@ -33,55 +22,7 @@
     --axelix-space-10: 40px;
     --axelix-space-12: 48px;
 
-    /* Neutral ramp. Text on white: 900 primary, 600 secondary, 500 tertiary (all WCAG AA); 400 placeholders/disabled only */
-    --axelix-grey-25: #fcfcfd;
-    --axelix-grey-50: #f9fafb;
-    --axelix-grey-100: #f2f4f7;
-    --axelix-grey-200: #eaecf0;
-    --axelix-grey-300: #d0d5dd;
-    --axelix-grey-400: #98a2b3;
-    --axelix-grey-500: #667085;
-    --axelix-grey-600: #475467;
-    --axelix-grey-700: #344054;
-    --axelix-grey-800: #1d2939;
-    --axelix-grey-900: #101828;
-
-    /* Brand / success. 500 is the brand green for decoration only; 600 is the AA-compliant shade for actions, links and text */
-    --axelix-green-50: #e6f7ee;
-    --axelix-green-100: #ccefdd;
-    --axelix-green-200: #99dfbb;
-    --axelix-green-500: #00ab55;
-    --axelix-green-600: #008743;
-    --axelix-green-700: #007038;
-
-    /* Error */
-    --axelix-red-50: #fef3f2;
-    --axelix-red-100: #fee4e2;
-    --axelix-red-200: #fecdca;
-    --axelix-red-300: #fda29b;
-    --axelix-red-500: #f04438;
-    --axelix-red-600: #d92d20;
-    --axelix-red-700: #b42318;
-
-    /* Warning */
-    --axelix-orange-50: #fffaeb;
-    --axelix-orange-100: #fef0c7;
-    --axelix-orange-200: #fedf89;
-    --axelix-orange-300: #fec84b;
-    --axelix-orange-400: #fdb022;
-    --axelix-orange-500: #f79009;
-    --axelix-orange-700: #b54708;
-
-    /* Info */
-    --axelix-blue-50: #eff8ff;
-    --axelix-blue-100: #d1e9ff;
-    --axelix-blue-200: #b2ddff;
-    --axelix-blue-400: #53b1fd;
-    --axelix-blue-500: #2e90fa;
-    --axelix-blue-600: #1570ef;
-    --axelix-blue-700: #175cd3;
-
-    /* Legacy names, kept as aliases of the ramps above until the components are migrated */
+    /* Legacy names, kept as aliases of the src/theme/tokens.ts ramps until the components are migrated */
     --axelix-primary-green: var(--axelix-green-600);
     --axelix-primary-dark-green: var(--axelix-green-700);
     --axelix-primary-light-green: var(--axelix-green-50);
@@ -132,7 +73,7 @@ html {
 }
 
 body {
-    font-family: Golos, Helvetica, Arial, sans-serif;
+    font-family: var(--axelix-font-family);
     color: var(--axelix-primary-black);
 }
 

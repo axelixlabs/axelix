@@ -19,6 +19,7 @@ import { App as AntdApp, ConfigProvider, type ThemeConfig } from "antd";
 import { Provider } from "react-redux";
 
 import { store } from "@/store";
+import { palette, typography } from "@/theme/tokens";
 
 import { AppRoutes } from "./routes";
 
@@ -26,31 +27,30 @@ import "./i18n/i18n";
 
 export const App = () => {
     const theme: ThemeConfig = {
-        // antd derives hover/active shades from these, so they must be literals; keep them equal to the :root ramps in index.css
         token: {
-            colorPrimary: "#008743",
-            colorSuccess: "#008743",
-            colorError: "#d92d20",
-            colorWarning: "#f79009",
-            colorInfo: "#1570ef",
-            colorLink: "#008743",
-            colorText: "#101828",
-            colorTextSecondary: "#475467",
-            colorTextTertiary: "#667085",
-            colorTextQuaternary: "#98a2b3",
-            colorBorder: "#d0d5dd",
-            colorBorderSecondary: "#eaecf0",
+            colorPrimary: palette.green[600],
+            colorSuccess: palette.green[600],
+            colorError: palette.red[600],
+            colorWarning: palette.orange[500],
+            colorInfo: palette.blue[600],
+            colorLink: palette.green[600],
+            colorText: palette.grey[900],
+            colorTextSecondary: palette.grey[600],
+            colorTextTertiary: palette.grey[500],
+            colorTextQuaternary: palette.grey[400],
+            colorBorder: palette.grey[300],
+            colorBorderSecondary: palette.grey[200],
             // antd's generated tints of the primary green come out muddy, so the selected-item backgrounds are pinned to the green ramp
-            controlItemBgActive: "#e6f7ee",
-            controlItemBgActiveHover: "#ccefdd",
-            fontFamily: "Golos, Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            lineHeight: 1.5,
+            controlItemBgActive: palette.green[50],
+            controlItemBgActiveHover: palette.green[100],
+            fontFamily: typography.fontFamily,
+            fontSize: typography.fontSize.body,
+            lineHeight: typography.lineHeight.normal,
         },
         components: {
             Menu: {
-                itemSelectedBg: "#e6f7ee",
-                itemSelectedColor: "#007038",
+                itemSelectedBg: palette.green[50],
+                itemSelectedColor: palette.green[700],
             },
         },
     };
