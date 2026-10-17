@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.LazyLoadingTarget;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionalKey;
@@ -49,6 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStats;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmOptions.AOT_CACHE_OPTION;
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmOptions.SHARED_ARCHIVE_FILE;
@@ -59,6 +61,7 @@ import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmO
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
 
@@ -75,6 +78,9 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
     private final TransactionAttributesRegistry transactionAttributesRegistry;
     private final JpaEntitiesProfileProvider entitiesMapProvider;
 
+    @Nullable
+    private final ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
+
     /**
      * Creates a new DefaultInsightsInfoProvider.
      *
@@ -89,13 +95,15 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
             VmOptionsAccessor vmOptionsAccessor,
             TransactionStatsCollector transactionStatsCollector,
             TransactionAttributesRegistry transactionAttributesRegistry,
-            JpaEntitiesProfileProvider entitiesMapProvider) {
+            JpaEntitiesProfileProvider entitiesMapProvider,
+            @Nullable ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
         this.openSessionInViewStateProvider = openSessionInViewStateProvider;
         this.gcLogService = gcLogService;
         this.vmOptionsAccessor = vmOptionsAccessor;
         this.transactionStatsCollector = transactionStatsCollector;
         this.transactionAttributesRegistry = transactionAttributesRegistry;
         this.entitiesMapProvider = entitiesMapProvider;
+        this.scheduledTaskExecutionHistory = scheduledTaskExecutionHistory;
     }
 
     @Override
@@ -111,11 +119,14 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                         .featureId(FeatureId.OSIV.getId())
                         .enabled(openSessionInViewStateProvider.isOpenSessionInViewEnabled())))
                 .persistenceInsights(assemblePersistenceInsights())
-                // Scheduled-task execution history is switched off for the 1.2 release: the capture side
-                // (TaskTrackingRunnable / ScheduledTaskExecutionHistory) is deliberately not wired into any
-                // starter, and Master does not record the field either (GH-1617). Keep this list empty until
-                // the feature ships end-to-end.
+                // Scheduled-task executions are delivered through the heartbeat v2 only, see
+                // getScheduledTaskExecutions(). The initial registration never carries them.
                 .scheduledTaskExecutions(List.of());
+    }
+
+    @Override
+    public List<ScheduledTaskExecution> getScheduledTaskExecutions() {
+        return scheduledTaskExecutionHistory != null ? scheduledTaskExecutionHistory.mark() : List.of();
     }
 
     @Override
