@@ -2,44 +2,42 @@
     width: max-content;
     min-width: min(320px, calc(100vw - 32px));
     max-width: calc(100vw - 32px);
-    padding: 6px;
-    border: 1px solid #dfe5e1;
-    border-radius: 9px;
-    background: var(--axelix-primary-white);
-    box-shadow:
-        0 10px 32px rgb(22 52 33 / 10%),
-        0 2px 6px rgb(22 52 33 / 3%);
+    padding: 8px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+    box-shadow: var(--axelix-box-shadow-light);
     overflow: hidden;
     animation: selector-in 160ms ease-out;
 }
 
 .Current {
-    padding: 12px 10px 13px;
-    background: #e3f4eb;
-    border-radius: 5px;
+    padding: 12px 8px;
+    background: var(--axelix-green-50);
+    border-radius: var(--axelix-border-radius-small);
 }
 
 .SelectAll {
-    margin: 5px 0 3px;
+    margin: 4px 0;
 }
 
 .AllCheckbox.AllCheckbox {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
+    gap: 12px;
     width: 100%;
     margin: 0;
-    padding: 10px;
-    font-size: 11px;
-    font-weight: 500;
-    color: #728177;
-    border-bottom: 1px solid #edf0ee;
+    padding: 8px;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-medium);
+    color: var(--axelix-grey-600);
+    border-bottom: 1px solid var(--axelix-grey-200);
 }
 
 .AllCheckbox:hover {
-    background: #fafcfb;
-    color: #344a3b;
+    background: var(--axelix-grey-50);
+    color: var(--axelix-grey-900);
 }
 
 .AllCheckbox :global(.ant-checkbox) {
@@ -60,7 +58,7 @@
     max-height: 328px;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: #d2dcd5 transparent;
+    scrollbar-color: var(--axelix-grey-300) transparent;
     scrollbar-gutter: stable;
 }
 
@@ -72,12 +70,12 @@
 }
 
 .Footer {
-    margin: 5px -6px -6px;
-    padding: 10px 16px;
-    background: #f8faf9;
-    color: #7e8e84;
-    font-size: 11px;
-    line-height: 1.4;
+    margin: 4px -8px -8px;
+    padding: 8px 16px;
+    background: var(--axelix-grey-50);
+    color: var(--axelix-grey-600);
+    font-size: var(--axelix-font-size-caption);
+    line-height: var(--axelix-line-height-normal);
 }
 
 @keyframes selector-in {

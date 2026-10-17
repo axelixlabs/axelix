@@ -1,15 +1,13 @@
 .Trigger.Trigger {
     height: auto;
-    padding: 4px 11px;
+    padding: 4px 12px;
     gap: 8px;
-    border-radius: 6px;
-    border-color: #d8e2dc;
-    background: var(--axelix-primary-white);
-    color: #34473c;
-    font-size: 15px;
-    line-height: 1.5;
-    font-weight: 500;
-    box-shadow: 0 1px 2px rgb(21 45 29 / 3%);
+    border-color: var(--axelix-grey-300);
+    background: var(--axelix-white);
+    color: var(--axelix-grey-900);
+    font-size: var(--axelix-font-size-body);
+    line-height: var(--axelix-line-height-normal);
+    font-weight: var(--axelix-font-weight-medium);
     transition:
         background 180ms,
         border-color 180ms,
@@ -18,10 +16,9 @@
 }
 
 .Trigger.Trigger:hover {
-    background: #f6fbf8;
-    border-color: #8bc9a6;
-    color: #34473c;
-    box-shadow: 0 2px 5px rgb(21 45 29 / 5%);
+    background: var(--axelix-white);
+    border-color: var(--axelix-green-200);
+    color: var(--axelix-grey-900);
 }
 
 .Trigger.Trigger:active {
@@ -29,13 +26,13 @@
 }
 
 .Trigger.Trigger.Open {
-    background: #f0faf4;
-    border-color: var(--axelix-primary-green);
-    box-shadow: 0 0 0 3px rgb(0 173 86 / 6%);
+    background: var(--axelix-white);
+    border-color: var(--axelix-green-600);
+    box-shadow: 0 0 0 3px var(--axelix-green-50);
 }
 
 .Trigger.Trigger:focus-visible {
-    outline: 3px solid #72d5a0;
+    outline: 2px solid var(--axelix-green-500);
     outline-offset: 2px;
 }
 
@@ -50,11 +47,11 @@
 .Stack {
     width: 16px;
     height: 16px;
-    color: #71867a;
+    color: var(--axelix-grey-500);
 }
 
 .Open .Stack {
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
 }
 
 .Count.Count {
@@ -63,11 +60,11 @@
     margin: 0;
     padding: 0 6px;
     border: 0;
-    border-radius: 5px;
-    background: #eef5f0;
-    color: #44805b;
-    font-size: 11px;
-    font-weight: 600;
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
     line-height: 20px;
     text-align: center;
 }
@@ -75,7 +72,7 @@
 .Arrow {
     width: 12px;
     height: 12px;
-    color: #83948a;
+    color: var(--axelix-grey-500);
     transform: rotate(180deg);
     transition: transform 200ms;
 }

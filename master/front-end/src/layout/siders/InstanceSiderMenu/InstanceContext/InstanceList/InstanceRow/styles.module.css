@@ -4,34 +4,34 @@
     gap: 8px;
     align-items: start;
     width: 100%;
-    min-height: 61px;
-    padding: 12px 10px;
+    min-height: 60px;
+    padding: 12px 8px;
     border: 0;
-    border-radius: 5px;
-    background: var(--axelix-primary-white);
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-white);
     text-align: left;
     font: inherit;
-    font-size: 11px;
+    font-size: var(--axelix-font-size-caption);
     cursor: pointer;
     transition: background 150ms;
 }
 
 .MainWrapper.Selected {
-    background: #eef8f2;
+    background: var(--axelix-green-50);
 }
 
 .MainWrapper:hover,
 .MainWrapper:focus-visible {
-    background: #f0faf4;
+    background: var(--axelix-grey-50);
 }
 
 .MainWrapper.Selected:hover,
 .MainWrapper.Selected:focus-visible {
-    background: #e5f4eb;
+    background: var(--axelix-green-100);
 }
 
 .MainWrapper:focus-visible {
-    outline: 2px solid #72d5a0;
+    outline: 2px solid var(--axelix-green-500);
     outline-offset: -2px;
 }
 
@@ -44,15 +44,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    line-height: 16px;
-    font-weight: 700;
-    color: #344054;
+    font-size: var(--axelix-font-size-body);
+    line-height: var(--axelix-line-height-normal);
+    font-weight: var(--axelix-font-weight-medium);
+    color: var(--axelix-grey-900);
 }
 
 .Commit {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
     margin-top: 4px;
 }
@@ -61,8 +62,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 5px;
-    transform: translateY(-3px);
+    gap: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
