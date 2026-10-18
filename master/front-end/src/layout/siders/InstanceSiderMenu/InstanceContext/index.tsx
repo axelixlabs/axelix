@@ -18,9 +18,10 @@
 import { Popover, Skeleton } from "antd";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
 
 import { InstanceCommit } from "@/components/InstanceChips";
-import { useInstancePreviewData } from "@/hooks";
+import { useInstanceProfile, useInstanceSiblings } from "@/hooks";
 import type { TInstanceOption } from "@/models";
 
 import { InstanceList } from "./InstanceList";
@@ -28,7 +29,9 @@ import styles from "./styles.module.css";
 
 export const InstanceContext = () => {
     const { t } = useTranslation();
-    const preview = useInstancePreviewData();
+    const { instanceId } = useParams();
+    const profile = useInstanceProfile();
+    const { siblings, load } = useInstanceSiblings(instanceId!);
     const [open, setOpen] = useState<boolean>(false);
     const [selectedInstance, setSelectedInstance] = useState<TInstanceOption | null>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
@@ -50,7 +53,7 @@ export const InstanceContext = () => {
         return () => document.removeEventListener("keydown", handleEscape);
     }, [open]);
 
-    if (preview.loading) {
+    if (profile.loading) {
         return (
             <div className={styles.MainWrapper}>
                 <Skeleton active title paragraph={{ rows: 1 }} />
@@ -58,13 +61,22 @@ export const InstanceContext = () => {
         );
     }
 
-    if (!preview.response) {
+    if (!profile.response) {
         return null;
     }
 
-    const displayedInstance = selectedInstance ?? preview.response.current;
+    const currentInstance = profile.response.instance;
+    const displayedInstance = selectedInstance ?? currentInstance;
     const { name, commitShaShort, deployedFor } = displayedInstance;
-    const instances = preview.response.siblings;
+    // Until the siblings arrive, the list shows just the current instance
+    const instances = siblings.length > 0 ? siblings : [currentInstance];
+
+    const handleOpenChange = (visible: boolean): void => {
+        setOpen(visible);
+        if (visible) {
+            load();
+        }
+    };
 
     // TODO: Replace the visual-only selection with navigation. Page data still uses the
     // instanceId from the URL. Selecting an instance must update the route so every instance
@@ -81,7 +93,7 @@ export const InstanceContext = () => {
             placement="bottomLeft"
             arrow={false}
             open={open}
-            onOpenChange={setOpen}
+            onOpenChange={handleOpenChange}
             afterOpenChange={(visible) => {
                 if (visible) {
                     document.getElementById(menuId)?.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus();
@@ -111,7 +123,7 @@ export const InstanceContext = () => {
                 onKeyDown={(event) => {
                     if (event.key === "ArrowDown") {
                         event.preventDefault();
-                        setOpen(true);
+                        handleOpenChange(true);
                     }
                 }}
             >

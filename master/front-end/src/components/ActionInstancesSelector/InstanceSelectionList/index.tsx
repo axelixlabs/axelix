@@ -23,7 +23,7 @@ import type { IProps as ISelectorProps } from "../index";
 import { InstanceSelectionRow } from "./InstanceSelectionRow";
 import styles from "./styles.module.css";
 
-interface IProps extends Omit<ISelectorProps, "currentInstance"> {
+interface IProps extends Omit<ISelectorProps, "currentInstance" | "totalInstances" | "onOpen"> {
     /** The current instance cannot be deselected */
     currentInstance: NonNullable<ISelectorProps["currentInstance"]>;
 

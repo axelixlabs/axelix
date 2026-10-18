@@ -28,21 +28,29 @@ export interface IProps {
     /** The instance of the page, always included in the selection */
     currentInstance: TInstanceOption | null;
 
-    /** Available preview instances */
+    /** Available preview instances, loaded when the selector opens */
     instances: TInstanceOption[];
+
+    /** How many instances the application has, known before they are loaded */
+    totalInstances: number;
 
     /** Identifiers selected on this page */
     selectedInstanceIds: string[];
 
     /** Updates the visual selection without executing actions */
     onSelectionChange: (instanceIds: string[]) => void;
+
+    /** Loads the instances, called every time the selector opens */
+    onOpen: () => void;
 }
 
 export const ActionInstancesSelector = ({
     currentInstance,
     instances,
+    totalInstances,
     selectedInstanceIds,
     onSelectionChange,
+    onOpen,
 }: IProps) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState<boolean>(false);
@@ -65,9 +73,17 @@ export const ActionInstancesSelector = ({
         return () => document.removeEventListener("keydown", handleEscape);
     }, [open]);
 
-    if (!currentInstance) {
+    // There is nothing to choose from in an application with a single instance
+    if (!currentInstance || totalInstances <= 1) {
         return null;
     }
+
+    const handleOpenChange = (visible: boolean): void => {
+        setOpen(visible);
+        if (visible) {
+            onOpen();
+        }
+    };
 
     const selectedCount = instances.filter(
         (instance) =>
@@ -80,7 +96,7 @@ export const ActionInstancesSelector = ({
             placement="bottomRight"
             arrow={false}
             open={open}
-            onOpenChange={setOpen}
+            onOpenChange={handleOpenChange}
             destroyOnHidden
             align={{ offset: [0, 8] }}
             classNames={{ root: styles.Popup }}
@@ -113,7 +129,7 @@ export const ActionInstancesSelector = ({
                 onKeyDown={(event) => {
                     if (event.key === "ArrowDown") {
                         event.preventDefault();
-                        setOpen(true);
+                        handleOpenChange(true);
                     }
                 }}
             >
@@ -124,7 +140,7 @@ export const ActionInstancesSelector = ({
                 </svg>
                 {t("InstanceContext.instances")}
                 <Tag className={styles.Count}>
-                    {selectedCount === instances.length ? t("ActionInstancesSelector.all") : selectedCount}
+                    {selectedCount === totalInstances ? t("ActionInstancesSelector.all") : selectedCount}
                 </Tag>
                 <svg className={styles.Arrow} viewBox="0 0 24 24" aria-hidden="true">
                     <path d="m5 15 7-7 7 7" />

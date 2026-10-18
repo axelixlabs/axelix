@@ -18,42 +18,43 @@
 import type { AxiosResponse } from "axios";
 import { type PropsWithChildren, useEffect, useRef, useState } from "react";
 
-import { type IInstanceCard, type IServiceCardsResponseBody, StatefulRequest } from "@/models";
-import { getInstanceSiblings } from "@/services";
+import { type IInstanceProfileResponse, StatefulRequest } from "@/models";
+import { getInstanceProfile } from "@/services";
 
-import { type IInstancePreview, InstancePreviewContext } from "./context";
+import { InstanceProfileContext } from "./context";
 
 interface IProps {
     /** The instance shared by the sidebar and all pages in this layout */
     instanceId: string;
 }
 
-export const InstancePreviewProvider = ({ instanceId, children }: PropsWithChildren<IProps>) => {
-    const [preview, setPreview] = useState(StatefulRequest.loading<IInstancePreview | null>());
-    const requestRef = useRef<Promise<AxiosResponse<IServiceCardsResponseBody>> | null>(null);
+/**
+ * Loads the profile of the instance once per instance view and shares it with the sidebar and the pages: the instance
+ * itself, the number of its siblings and the features it has. The siblings themselves are loaded on demand.
+ */
+export const InstanceProfileProvider = ({ instanceId, children }: PropsWithChildren<IProps>) => {
+    const [profile, setProfile] = useState(StatefulRequest.loading<IInstanceProfileResponse>());
+    const requestRef = useRef<Promise<AxiosResponse<IInstanceProfileResponse>> | null>(null);
 
     // TODO: Discuss instance lifecycle and refresh behavior before implementing live updates.
-    // Metadata is currently loaded once per layout instance. Instances may appear, disappear,
+    // The profile is currently loaded once per layout instance. Instances may appear, disappear,
     // or change status while the page is open. Agree on the refresh strategy, how to reconcile
     // each page's selection when instances disappear, and what to do if the current instance
     // disappears. Keep the existing data visible while refreshing.
     useEffect(() => {
         let active = true;
-        const isCurrentInstance = (item: IInstanceCard): boolean => item.instanceId === instanceId;
 
         // Reuse the request when StrictMode re-runs the effect during development.
-        requestRef.current ??= getInstanceSiblings(instanceId);
+        requestRef.current ??= getInstanceProfile(instanceId);
         requestRef.current
             .then((response) => {
                 if (active) {
-                    const siblings = response.data.instances;
-                    const current = siblings.find(isCurrentInstance);
-                    setPreview(StatefulRequest.success(current ? { current, siblings } : null));
+                    setProfile(StatefulRequest.success(response.data));
                 }
             })
             .catch(() => {
                 if (active) {
-                    setPreview(StatefulRequest.error(""));
+                    setProfile(StatefulRequest.error(""));
                 }
             });
 
@@ -62,5 +63,5 @@ export const InstancePreviewProvider = ({ instanceId, children }: PropsWithChild
         };
     }, [instanceId]);
 
-    return <InstancePreviewContext.Provider value={preview}>{children}</InstancePreviewContext.Provider>;
+    return <InstanceProfileContext.Provider value={profile}>{children}</InstanceProfileContext.Provider>;
 };

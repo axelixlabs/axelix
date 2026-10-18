@@ -15,17 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useContext } from "react";
+import { createContext } from "react";
 
-import { InstancePreviewContext } from "@/components/InstancePreviewProvider/context";
+import type { IInstanceProfileResponse, StatefulRequest } from "@/models";
 
-/** Reads the instance metadata shared by the current layout. */
-export const useInstancePreviewData = () => {
-    const instance = useContext(InstancePreviewContext);
-
-    if (!instance) {
-        throw new Error("useInstancePreviewData must be used within InstancePreviewProvider");
-    }
-
-    return instance;
-};
+export const InstanceProfileContext = createContext<StatefulRequest<IInstanceProfileResponse> | null>(null);

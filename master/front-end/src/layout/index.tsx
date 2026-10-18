@@ -20,7 +20,7 @@ import type { JSX } from "react";
 import { Outlet, useParams } from "react-router";
 
 import { AccessProvider } from "@/components";
-import { InstancePreviewProvider } from "@/components/InstancePreviewProvider";
+import { InstanceProfileProvider } from "@/components/InstanceProfileProvider";
 
 import { AdminHeader } from "./AdminHeader";
 // License key entry is moving to the Enterprise distro; banner temporarily disabled.
@@ -63,9 +63,9 @@ export const MainLayout = ({ siderContent }: IProps) => {
     );
 
     return instanceId ? (
-        <InstancePreviewProvider key={instanceId} instanceId={instanceId}>
+        <InstanceProfileProvider key={instanceId} instanceId={instanceId}>
             {layout}
-        </InstancePreviewProvider>
+        </InstanceProfileProvider>
     ) : (
         layout
     );

@@ -17,20 +17,27 @@
  */
 import { useEffect, useState } from "react";
 
-import { useInstancePreviewData } from "./useInstancePreviewData";
+import { useInstanceProfile } from "./useInstanceProfile";
+import { useInstanceSiblings } from "./useInstanceSiblings";
 
 /** Keeps the visual action scope local to each page, independently of data refreshes. */
 export const useActionInstanceSelection = (instanceId: string) => {
-    const preview = useInstancePreviewData();
+    const profile = useInstanceProfile();
+    const { siblings, load } = useInstanceSiblings(instanceId);
     const [selectedInstanceIds, setSelectedInstanceIds] = useState<string[]>([instanceId]);
 
     useEffect(() => {
         setSelectedInstanceIds([instanceId]);
     }, [instanceId]);
 
+    const currentInstance = profile.response?.instance ?? null;
+
     return {
-        currentInstance: preview.response?.current ?? null,
-        instances: preview.response?.siblings ?? [],
+        currentInstance,
+        // Until the siblings arrive, the list shows just the current instance
+        instances: siblings.length > 0 ? siblings : currentInstance ? [currentInstance] : [],
+        totalInstances: profile.response ? profile.response.siblingsCount + 1 : 0,
+        onOpen: load,
         selectedInstanceIds,
         onSelectionChange: setSelectedInstanceIds,
     };

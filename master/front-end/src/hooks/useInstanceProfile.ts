@@ -15,15 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { createContext } from "react";
+import { useContext } from "react";
 
-import type { IInstanceCard, StatefulRequest } from "@/models";
+import { InstanceProfileContext } from "@/components/InstanceProfileProvider/context";
 
-export interface IInstancePreview {
-    /** The instance whose view is currently open */
-    current: IInstanceCard;
-    /** All instances of the current instance's application, including the current instance itself */
-    siblings: IInstanceCard[];
-}
+/** Reads the profile of the instance shared by the current layout. */
+export const useInstanceProfile = () => {
+    const profile = useContext(InstanceProfileContext);
 
-export const InstancePreviewContext = createContext<StatefulRequest<IInstancePreview | null> | null>(null);
+    if (!profile) {
+        throw new Error("useInstanceProfile must be used within InstanceProfileProvider");
+    }
+
+    return profile;
+};
