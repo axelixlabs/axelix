@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.3-002-sqlite-drop-roles-from-users" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <columnExists tableName="users" columnName="roles"/>
+    </preConditions>
+
+    <comment>
+      Drops the legacy users.roles JSON column. Its content was copied into users_roles by 1.1-010, and since 1.1
+      nothing reads or writes it anymore. Native ALTER TABLE DROP COLUMN is used instead of dropColumn, because the
+      latter makes Liquibase rebuild the whole table on SQLite, which users_roles references (see 1.1-011).
+    </comment>
+
+    <sql>ALTER TABLE users DROP COLUMN roles;</sql>
+  </changeSet>
+</databaseChangeLog>

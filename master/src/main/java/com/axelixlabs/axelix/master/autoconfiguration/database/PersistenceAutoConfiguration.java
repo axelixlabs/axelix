@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -29,7 +28,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +46,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.OssRdbms;
-import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -209,46 +206,8 @@ public class PersistenceAutoConfiguration {
         @Override
         protected @NonNull List<?> userConverters() {
             return List.of(
-                    new RolesWritingConverter(jsonMapper),
-                    new RolesReadingConverter(jsonMapper),
                     new PersistenceInsightsWritingConverter(jsonMapper),
                     new PersistenceInsightsReadingConverter(jsonMapper));
-        }
-
-        @Deprecated(forRemoval = true, since = "1.1") // GH-1515
-        @WritingConverter
-        public static class RolesWritingConverter implements Converter<UserEntity.Roles, String> {
-
-            private final JsonMapper jsonMapper;
-
-            public RolesWritingConverter(JsonMapper jsonMapper) {
-                this.jsonMapper = jsonMapper;
-            }
-
-            @Override
-            public String convert(UserEntity.Roles source) {
-                return jsonMapper.writeValueAsString(source.values());
-            }
-        }
-
-        @Deprecated(forRemoval = true, since = "1.1") // GH-1515
-        @ReadingConverter
-        public static class RolesReadingConverter implements Converter<String, UserEntity.Roles> {
-
-            private final JsonMapper jsonMapper;
-
-            public RolesReadingConverter(JsonMapper jsonMapper) {
-                this.jsonMapper = jsonMapper;
-            }
-
-            @Override
-            public UserEntity.Roles convert(String source) {
-                if (source.isBlank()) {
-                    return new UserEntity.Roles(Set.of());
-                }
-                Set<String> roles = jsonMapper.readValue(source, new TypeReference<>() {});
-                return new UserEntity.Roles(roles);
-            }
         }
 
         @WritingConverter

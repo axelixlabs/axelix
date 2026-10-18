@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.domain.iam;
 
 import java.time.Instant;
-import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -38,12 +37,9 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param password     Hash of the user's password, which may be {@code null}.
  * @param oidcSubject  Stable OIDC identity of the user, computed as the {@code hash(iss + sub)}. Non-{@code null} only for
  *                     {@link UserOrigin#OIDC} users; used to deduplicate them across username changes.
- * @param roles        Names of the roles granted to this user (e.g. {@code ADMIN}, {@code EDITOR}, {@code VIEWER}).
  * @param userOrigin   Origin of the user account.
  * @param status       Status that controls whether the user can log in.
  * @param lastLoginAt  Timestamp of the most recent successful login. {@code null} until the user logs in for the first time.
- *
- * @deprecated roles - since 1.1, we're using {@link RoleEntity}.
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
@@ -59,19 +55,9 @@ public record UserEntity(
         @Nullable String organizationalUnit,
         @Nullable String password,
         @Nullable String oidcSubject,
-
-        @Nullable @Deprecated(forRemoval = true, since = "1.1")
-        Roles roles,
-
         UserOrigin userOrigin,
         UserStatus status,
         @Nullable Instant lastLoginAt) {
-
-    public record Roles(Set<String> values) {
-        public Roles {
-            values = Set.copyOf(values);
-        }
-    }
 
     @Override
     public String toString() {

@@ -57,8 +57,7 @@ public record UserResponse(
 
     /**
      * @param user      The user to expose.
-     * @param roleNames Names of the roles granted to the user, read from {@code users_roles} rather than from the
-     *                  legacy {@code users.roles} column.
+     * @param roleNames Names of the roles granted to the user.
      */
     public static UserResponse from(UserEntity user, Set<String> roleNames) {
         return new UserResponse(

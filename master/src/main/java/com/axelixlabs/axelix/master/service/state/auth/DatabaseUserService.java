@@ -98,7 +98,6 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(organizationalUnit),
                 passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 null,
-                null,
                 UserOrigin.LOCAL,
                 UserStatus.ACTIVE,
                 null);
@@ -138,7 +137,6 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(organizationalUnit),
                 null,
                 requireNonBlankTrimmed(oidcSubject),
-                null,
                 UserOrigin.OIDC,
                 UserStatus.ACTIVE,
                 Instant.now()); // the assumption is that the user is created during the initial login
