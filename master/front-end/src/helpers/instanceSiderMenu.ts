@@ -17,30 +17,15 @@
  */
 import type { TMenuItem } from "@/models";
 
+// Only the category holding the current page starts open, falling back to "general" for pages outside any category
 export const findOpenInstanceKeys = (items: TMenuItem[], pathname: string): string[] => {
-    const openKeys: string[] = [];
-    let hasJvmChildMatch = false;
+    const current = items.find(
+        (item) =>
+            item &&
+            "children" in item &&
+            Array.isArray(item.children) &&
+            item.children.some((child) => String(child?.key) === pathname),
+    );
 
-    for (const item of items) {
-        if (!item?.key) {
-            continue;
-        }
-
-        if (item.key !== "JVM") {
-            openKeys.push(String(item.key));
-            continue;
-        }
-
-        if (!("children" in item) || !Array.isArray(item.children)) {
-            continue;
-        }
-
-        hasJvmChildMatch = item.children.some((child) => String(child?.key) === pathname);
-    }
-
-    if (hasJvmChildMatch) {
-        openKeys.push("JVM");
-    }
-
-    return openKeys;
+    return [current ? String(current.key) : "general"];
 };

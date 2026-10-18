@@ -53,6 +53,18 @@ export const InstanceSiderMenu = () => {
     }, [instanceId]);
 
     const items = getInstanceItems(instanceId!, t, features);
+    const [openKeys, setOpenKeys] = useState<string[]>(() => findOpenInstanceKeys(items, pathname));
+
+    // Follow the current page when it changes from outside the sider, e.g. through a link on the page
+    useEffect(() => {
+        setOpenKeys(findOpenInstanceKeys(items, pathname));
+    }, [pathname]);
+
+    // Only one category stays open at a time, so the sider fits the viewport without scrolling
+    const handleOpenChange = (keys: string[]): void => {
+        const opened = keys.find((key) => !openKeys.includes(key));
+        setOpenKeys(opened ? [opened] : keys);
+    };
 
     return (
         <>
@@ -62,7 +74,8 @@ export const InstanceSiderMenu = () => {
                 mode="inline"
                 items={items}
                 selectedKeys={[pathname]}
-                defaultOpenKeys={findOpenInstanceKeys(items, pathname)}
+                openKeys={openKeys}
+                onOpenChange={handleOpenChange}
             />
         </>
     );

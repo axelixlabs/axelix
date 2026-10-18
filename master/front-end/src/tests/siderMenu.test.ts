@@ -27,10 +27,10 @@ const DEPENDENCIES_PATH = "/instance/abc/dependencies";
 
 const dependenciesEntry = (features: EInstanceFeature[] | null): { key: unknown; disabled?: boolean } | undefined => {
     const items = getInstanceItems("abc", t, features);
-    const insights = items.find((item) => item?.key === "insights") as {
+    const general = items.find((item) => item?.key === "general") as {
         children: { key: unknown; disabled?: boolean }[];
     };
-    return insights.children.find((child) => child.key === DEPENDENCIES_PATH);
+    return general.children.find((child) => child.key === DEPENDENCIES_PATH);
 };
 
 describe("getInstanceItems dependency-analysis gating", () => {

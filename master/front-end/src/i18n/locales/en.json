@@ -143,8 +143,8 @@
         }
     },
     "Sider": {
-        "insights": "Insights",
-        "details": "Details",
+        "general": "General",
+        "overview": "Overview",
         "metrics": "Metrics",
         "environment": "Properties",
         "beans" : "Beans",

@@ -70,11 +70,11 @@ export const getInstanceItems = (
 ): TMenuItem[] => {
     const basePath = `/instance/${instanceId}`;
 
-    const insightsMenuItemsData: ISiderMenuItem[] = [
+    const generalMenuItemsData: ISiderMenuItem[] = [
         {
             path: `${basePath}/details`,
             icon: <DetailsIcon />,
-            label: t("Sider.details"),
+            label: t("Sider.overview"),
         },
         {
             path: `${basePath}/metrics`,
@@ -101,25 +101,25 @@ export const getInstanceItems = (
             label: t("Sider.environment"),
         },
         {
+            path: `${basePath}/config-props`,
+            icon: <ConfigPropsIcon />,
+            label: t("Sider.configurationProperties"),
+        },
+        {
             path: `${basePath}/beans`,
             icon: <BeansIcon />,
             label: t("Sider.beans"),
         },
         {
-            path: `${basePath}/config-props`,
-            icon: <ConfigPropsIcon />,
-            label: t("Sider.configurationProperties"),
+            path: `${basePath}/conditions`,
+            icon: <ConditionsIcon />,
+            label: t("Sider.conditions"),
         },
         {
             path: `${basePath}/scheduled-tasks`,
             icon: <ScheduledTasksIcon />,
             label: t("Sider.scheduledTasks"),
             feature: EInstanceFeature.SCHEDULED_TASKS,
-        },
-        {
-            path: `${basePath}/conditions`,
-            icon: <ConditionsIcon />,
-            label: t("Sider.conditions"),
         },
         {
             path: `${basePath}/caches`,
@@ -133,6 +133,9 @@ export const getInstanceItems = (
             label: t("Sider.transactionControl"),
             feature: EInstanceFeature.TRANSACTIONS,
         },
+    ];
+
+    const jpaMenuItemsData: ISiderMenuItem[] = [
         {
             path: `${basePath}/entities-map`,
             icon: <EntitiesMapIcon />,
@@ -156,22 +159,28 @@ export const getInstanceItems = (
 
     return [
         {
-            key: "insights",
+            key: "general",
             icon: <InsightsIcon />,
-            label: t("Sider.insights"),
-            children: createMenuItems(insightsMenuItemsData, availableFeatures),
-        },
-        {
-            key: "spring",
-            icon: <SpringIcon />,
-            label: "Spring Framework",
-            children: createMenuItems(springMenuItemsData, availableFeatures),
+            label: t("Sider.general"),
+            children: createMenuItems(generalMenuItemsData, availableFeatures),
         },
         {
             key: "JVM",
             icon: <JVMIcon />,
             label: "JVM",
             children: createMenuItems(jvmMenuItemsData, availableFeatures),
+        },
+        {
+            key: "spring",
+            icon: <SpringIcon />,
+            label: "Spring Boot",
+            children: createMenuItems(springMenuItemsData, availableFeatures),
+        },
+        {
+            key: "jpa",
+            icon: <EntitiesMapIcon />,
+            label: "JPA",
+            children: createMenuItems(jpaMenuItemsData, availableFeatures),
         },
     ];
 };
