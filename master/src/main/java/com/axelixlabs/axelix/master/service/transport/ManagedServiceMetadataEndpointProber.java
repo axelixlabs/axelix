@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import java.net.http.HttpClient;
+
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
@@ -40,8 +42,9 @@ public class ManagedServiceMetadataEndpointProber extends AbstractEndpointProber
     public ManagedServiceMetadataEndpointProber(
             InstanceRegistry instanceRegistry,
             MessageDeserializationStrategy<BasicRegistrationMetadata> messageDeserializationStrategy,
-            SecurityContextExecutor securityContextExecutor) {
-        super(instanceRegistry, messageDeserializationStrategy, securityContextExecutor);
+            SecurityContextExecutor securityContextExecutor,
+            HttpClient httpClient) {
+        super(instanceRegistry, messageDeserializationStrategy, securityContextExecutor, httpClient);
     }
 
     @Override

@@ -58,12 +58,12 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     protected AbstractEndpointProber(
             InstanceRegistry instanceRegistry,
             MessageDeserializationStrategy<O> messageDeserializationStrategy,
-            SecurityContextExecutor securityContextExecutor) {
+            SecurityContextExecutor securityContextExecutor,
+            HttpClient httpClient) {
         this.instanceRegistry = instanceRegistry;
         this.messageDeserializationStrategy = messageDeserializationStrategy;
         this.securityContextExecutor = securityContextExecutor;
-        this.httpClient =
-                HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
+        this.httpClient = httpClient;
     }
 
     @Override

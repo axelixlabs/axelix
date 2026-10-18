@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
+
 import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -62,5 +65,14 @@ public class AxelixAutoConfiguration {
     @Bean
     public RestClient restClient() {
         return RestClient.builder().build();
+    }
+
+    /**
+     * The {@link HttpClient} shared among all of the endpoint probers. Each {@link HttpClient} owns its
+     * own selector thread and executor, so it is intentionally shared rather than created per prober.
+     */
+    @Bean
+    public HttpClient endpointProbersHttpClient() {
+        return HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
     }
 }

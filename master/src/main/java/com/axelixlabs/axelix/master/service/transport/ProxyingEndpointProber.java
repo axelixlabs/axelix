@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import java.net.http.HttpClient;
+
 import org.jspecify.annotations.NonNull;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
@@ -37,8 +39,9 @@ public class ProxyingEndpointProber extends AbstractEndpointProber<byte[]> {
     public ProxyingEndpointProber(
             InstanceRegistry instanceRegistry,
             ActuatorEndpoint actuatorEndpoint,
-            SecurityContextExecutor securityContextExecutor) {
-        super(instanceRegistry, binary -> binary, securityContextExecutor);
+            SecurityContextExecutor securityContextExecutor,
+            HttpClient httpClient) {
+        super(instanceRegistry, binary -> binary, securityContextExecutor, httpClient);
         this.actuatorEndpoint = actuatorEndpoint;
     }
 

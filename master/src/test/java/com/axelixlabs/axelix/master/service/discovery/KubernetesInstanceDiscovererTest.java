@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.discovery;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -106,9 +107,15 @@ class KubernetesInstanceDiscovererTest {
         public ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber(
                 InstanceRegistry instanceRegistry,
                 MetadataJacksonMessageDeserializationStrategy deserializationStrategy,
-                SecurityContextExecutor securityContextExecutor) {
+                SecurityContextExecutor securityContextExecutor,
+                HttpClient httpClient) {
             return new ManagedServiceMetadataEndpointProber(
-                    instanceRegistry, deserializationStrategy, securityContextExecutor);
+                    instanceRegistry, deserializationStrategy, securityContextExecutor, httpClient);
+        }
+
+        @Bean
+        public HttpClient httpClient() {
+            return HttpClient.newHttpClient();
         }
 
         @Bean

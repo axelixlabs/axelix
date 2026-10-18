@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.transport;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -329,34 +330,44 @@ public class DefaultEndpointInvokerTest {
 
         @Bean
         public DiscardingAbstractEndpointProber invokeNoValueMethodEndpointProber(
-                InstanceRegistry instanceRegistry, SecurityContextExecutor securityContextExecutor) {
+                InstanceRegistry instanceRegistry,
+                SecurityContextExecutor securityContextExecutor,
+                HttpClient httpClient) {
             return new DiscardingAbstractEndpointProber(
-                    instanceRegistry, METHOD_INVOKE_NO_VALUE, securityContextExecutor);
+                    instanceRegistry, METHOD_INVOKE_NO_VALUE, securityContextExecutor, httpClient);
         }
 
         @Bean
         public DiscardingAbstractEndpointProber invokeNoValueMethodWithBadRequestEndpointProber(
-                InstanceRegistry instanceRegistry, SecurityContextExecutor securityContextExecutor) {
+                InstanceRegistry instanceRegistry,
+                SecurityContextExecutor securityContextExecutor,
+                HttpClient httpClient) {
             return new DiscardingAbstractEndpointProber(
-                    instanceRegistry, METHOD_INVOKE_NO_VALUE_BAD_REQUEST, securityContextExecutor);
+                    instanceRegistry, METHOD_INVOKE_NO_VALUE_BAD_REQUEST, securityContextExecutor, httpClient);
         }
 
         @Bean
         public DefaultEndpointProber<JsonNode> invokeMethodEndpointProber(
                 InstanceRegistry instanceRegistry,
                 TestJacksonMessageDeserializationStrategy deserializationStrategy,
-                SecurityContextExecutor securityContextExecutor) {
+                SecurityContextExecutor securityContextExecutor,
+                HttpClient httpClient) {
             return new DefaultEndpointProber<>(
-                    instanceRegistry, deserializationStrategy, securityContextExecutor, METHOD_INVOKE);
+                    instanceRegistry, deserializationStrategy, securityContextExecutor, METHOD_INVOKE, httpClient);
         }
 
         @Bean
         public DefaultEndpointProber<JsonNode> invokeMethodWithBadRequestEndpointProber(
                 InstanceRegistry instanceRegistry,
                 TestJacksonMessageDeserializationStrategy deserializationStrategy,
-                SecurityContextExecutor securityContextExecutor) {
+                SecurityContextExecutor securityContextExecutor,
+                HttpClient httpClient) {
             return new DefaultEndpointProber<>(
-                    instanceRegistry, deserializationStrategy, securityContextExecutor, METHOD_INVOKE_BAD_REQUEST);
+                    instanceRegistry,
+                    deserializationStrategy,
+                    securityContextExecutor,
+                    METHOD_INVOKE_BAD_REQUEST,
+                    httpClient);
         }
 
         @Component
