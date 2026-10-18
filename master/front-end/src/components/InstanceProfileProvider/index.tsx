@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type { AxiosResponse } from "axios";
-import { type PropsWithChildren, useEffect, useRef, useState } from "react";
+import { type PropsWithChildren, useEffect, useState } from "react";
 
 import { type IInstanceProfileResponse, StatefulRequest } from "@/models";
 import { getInstanceProfile } from "@/services";
@@ -34,7 +34,6 @@ interface IProps {
  */
 export const InstanceProfileProvider = ({ instanceId, children }: PropsWithChildren<IProps>) => {
     const [profile, setProfile] = useState(StatefulRequest.loading<IInstanceProfileResponse>());
-    const requestRef = useRef<Promise<AxiosResponse<IInstanceProfileResponse>> | null>(null);
 
     // TODO: Discuss instance lifecycle and refresh behavior before implementing live updates.
     // The profile is currently loaded once per layout instance. Instances may appear, disappear,
@@ -44,10 +43,8 @@ export const InstanceProfileProvider = ({ instanceId, children }: PropsWithChild
     useEffect(() => {
         let active = true;
 
-        // Reuse the request when StrictMode re-runs the effect during development.
-        requestRef.current ??= getInstanceProfile(instanceId);
-        requestRef.current
-            .then((response) => {
+        getInstanceProfile(instanceId)
+            .then((response: AxiosResponse<IInstanceProfileResponse>) => {
                 if (active) {
                     setProfile(StatefulRequest.success(response.data));
                 }
