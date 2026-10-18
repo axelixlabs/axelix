@@ -62,6 +62,7 @@ export const MainLayout = ({ siderContent }: IProps) => {
         </>
     );
 
+    // instanceId exists === we're in the "instance view"
     return instanceId ? (
         <InstanceProfileProvider key={instanceId} instanceId={instanceId}>
             {layout}
