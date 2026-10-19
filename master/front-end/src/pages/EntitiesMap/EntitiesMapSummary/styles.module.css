@@ -15,14 +15,12 @@
 }
 
 .Card:nth-child(2) {
-    /* TODO: Improve in the future */
-    border-color: #fecaca;
-    color: #dc2626;
+    border-color: var(--axelix-red-200);
+    color: var(--axelix-red-600);
 }
 
 .Card:nth-child(3) {
-    /* TODO: Improve in the future */
-    border-color: #bbf7d0;
+    border-color:  var(--axelix-green-100);
     color: var(--axelix-green-600);
 }
 

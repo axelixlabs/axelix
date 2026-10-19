@@ -76,23 +76,6 @@ export interface ILoggersResponseBody {
     loggers: ILogger[];
 }
 
-export interface IMappedLoggersResponse {
-    /**
-     * All possible logging levels that are supported by the logging system inside the instance
-     */
-    levels: string[];
-
-    /**
-     * All loggers
-     */
-    loggers: ILogger[];
-
-    /**
-     * All logger groups data
-     */
-    groups: ILoggerGroup[];
-}
-
 export interface ISetLoggerLevelRequestData {
     /**
      * Instance id

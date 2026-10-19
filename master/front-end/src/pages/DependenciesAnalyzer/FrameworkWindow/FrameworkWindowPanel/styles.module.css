@@ -24,7 +24,7 @@
 .Supported {
     --accent-color: var(--axelix-green-600);
     --accent-bg: var(--axelix-green-50);
-    --accent-border: #bbf7d0;
+    --accent-border: var(--axelix-green-100);
 }
 
 .Window {

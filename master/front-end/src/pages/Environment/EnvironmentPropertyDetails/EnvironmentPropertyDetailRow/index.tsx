@@ -26,7 +26,7 @@ interface IProps {
 export const EnvironmentPropertyDetailRow = ({ children, label }: PropsWithChildren<IProps>) => {
     return (
         <>
-            <div className={styles.DetailRow}>
+            <div className={`TextUltraSmall ${styles.DetailRow}`}>
                 <span className={styles.DetailLabel}>{label}</span>
                 <div className={styles.DetailValue}>{children}</div>
             </div>

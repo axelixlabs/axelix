@@ -3,9 +3,6 @@
     flex-direction: column;
     gap: 8px;
     max-width: 300px;
-    padding: 12px 14px;
-    color: #cbd5e1;
-    font-size: 12.5px;
-    line-height: 1.5;
+    padding: 15px;
     text-wrap: pretty;
 }

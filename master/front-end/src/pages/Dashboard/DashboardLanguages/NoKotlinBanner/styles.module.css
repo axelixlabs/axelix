@@ -25,10 +25,6 @@
     padding: 1px 7px;
 }
 
-.Message {
-    color: var(--axelix-grey-500);
-}
-
 .Date {
     color: var(--axelix-grey-500);
     font-variant-numeric: tabular-nums;

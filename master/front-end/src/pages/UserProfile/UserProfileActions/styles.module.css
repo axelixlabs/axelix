@@ -21,7 +21,7 @@
     width: 18px;
     height: 18px;
     margin-top: 2px;
-    color: #faad14;
+    color: var(--axelix-orange-400);
 }
 
 /* TODO: Fix this in future */

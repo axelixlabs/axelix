@@ -40,7 +40,7 @@
 .MetaBadge {
     font-size: 11.5px;
     font-weight: 600;
-    color: #475569;
+    color: var(--axelix-grey-600);
     background-color: var(--axelix-grey-100);
     border-radius: var(--axelix-border-radius-small);
     padding: 3px 8px;
@@ -85,7 +85,7 @@
 .Field {
     font-size: 13px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--axelix-grey-900);
 }
 
 .Badges {

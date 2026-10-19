@@ -7,13 +7,12 @@
     border-left: 3px solid var(--row-accent, transparent);
 
     &:hover {
-        /* TODO: Improve in future */
-        background-color: #f9f9f9;
+        background-color: var(--axelix-grey-50);
     }
 }
 
 /* TODO: Improve in future */
-.MAINTENAnce {
+.MAINTENANCE {
     --row-accent: var(--status-maintenance);
     --row-bg: #fffdf7;
 }

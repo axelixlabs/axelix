@@ -6,9 +6,9 @@
     --status-maintenance: #b54708;
     --status-maintenance-bg: #fffaeb;
     --status-maintenance-border: #fec84b;
-    --status-dormant: #faad14;
-    --status-dormant-bg: #fffbe6;
-    --status-dormant-border: #ffe58f;
+    --status-dormant: var(--axelix-orange-400);
+    --status-dormant-bg: var(--axelix-yellow-50);
+    --status-dormant-border: var(--axelix-yellow-200);
 
     display: flex;
     flex-direction: column;

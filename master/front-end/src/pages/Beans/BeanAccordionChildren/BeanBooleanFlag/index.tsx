@@ -18,7 +18,7 @@
 import { Checkbox } from "antd";
 import { useTranslation } from "react-i18next";
 
-import styles from "../styles.module.css";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -40,9 +40,7 @@ export const BeanBooleanFlag = ({ value, valueTag }: IProps) => {
     return (
         <>
             <div className={styles.AccordionBodyChunkTitle}>{t(`Beans.${valueTag}`)}:</div>
-            <div>
-                <Checkbox checked={value} className={styles.Flag} />
-            </div>
+            <Checkbox checked={value} className={styles.Flag} tabIndex={-1} />
         </>
     );
 };

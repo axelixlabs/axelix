@@ -33,19 +33,18 @@ interface IProps {
     placement?: TooltipPlacement;
 }
 
-/**
- * A light, design-aligned tooltip: a plain white surface with dark text, distinct from the accented
- * {@link InfoTooltip}. The trigger is provided as children.
- */
 export const HintTooltip = ({ children, content, placement = "top" }: PropsWithChildren<IProps>) => {
     return (
-        <Tooltip
-            title={<div className={styles.Content}>{content}</div>}
-            placement={placement}
-            color="#0f172a"
-            styles={{ container: { padding: 0 } }}
-        >
-            {children}
-        </Tooltip>
+        <>
+            <Tooltip
+                title={<div className={`TextUltraSmall ${styles.Content}`}>{content}</div>}
+                placement={placement}
+                // TODO: Improve in the future
+                color="#0f172a"
+                styles={{ container: { padding: 0 } }}
+            >
+                {children}
+            </Tooltip>
+        </>
     );
 };

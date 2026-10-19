@@ -48,6 +48,7 @@ export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithCh
                     </div>
                 }
                 placement={placement}
+                // TODO: Improve in the future
                 color="#1890ff"
             >
                 {children ?? <QuestionIcon color="#00ab55" className={styles.QuestionIcon} />}

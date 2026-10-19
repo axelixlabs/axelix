@@ -18,7 +18,7 @@
 }
 
 .Row:hover {
-    background-color: #f9f9f9;
+    background-color: var(--axelix-grey-50);
 }
 
 .Entity {

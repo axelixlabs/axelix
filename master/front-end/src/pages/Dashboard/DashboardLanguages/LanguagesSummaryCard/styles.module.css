@@ -60,7 +60,7 @@
 .BadgeLts {
     color: #15803d;
     background-color: #ecfdf5;
-    border-color: #bbf7d0;
+    border-color: var(--axelix-green-100);
 }
 
 .BadgeNonLts {

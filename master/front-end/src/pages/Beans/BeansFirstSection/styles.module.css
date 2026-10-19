@@ -13,7 +13,7 @@
 .Tag {
     background-color: var(--axelix-green-600);
     color: var(--axelix-white);
-    border-color: var(--axelix-green-600);;
+    border-color: var(--axelix-green-600);
 
     &:hover {
         background-color: var(--axelix-green-700);

@@ -15,10 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
-/**
- * The stable, wire-level ids of the features a managed instance may have, see the InstanceFeature contract schema.
- */
 export enum EInstanceFeature {
     CACHES = "caches",
     SCHEDULED_TASKS = "scheduled-tasks",

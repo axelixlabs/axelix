@@ -21,7 +21,7 @@
 .InfoIcon {
     height: 80px;
     width: 80px;
-    color: #1890ff;
+    color: var(--axelix-blue-500);
 }
 
 .Title {

@@ -4,8 +4,8 @@
     --problem-eager-bg: #fff7ed;
     --problem-list-mtm: #7c3aed;
     --problem-list-mtm-bg: #f5f3ff;
-    --problem-cascade: #dc2626;
-    --problem-cascade-bg: #fef2f2;
+    --problem-cascade: var(--axelix-red-600);
+    --problem-cascade-bg: var(--axelix-red-50);
     --problem-unidirectional: #0891b2;
     --problem-unidirectional-bg: #ecfeff;
 
