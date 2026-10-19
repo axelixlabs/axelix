@@ -27,3 +27,4 @@ export { useAuthority } from "./useAuthority";
 
 export { useInstanceProfile } from "./useInstanceProfile";
 export { useInstanceSiblings } from "./useInstanceSiblings";
+export { useActionInstanceSelection } from "./useActionInstanceSelection";

@@ -1,0 +1,95 @@
+.Trigger.Trigger {
+    height: auto;
+    padding: 4px 12px;
+    gap: 8px;
+    border-color: var(--axelix-grey-300);
+    background: var(--axelix-white);
+    color: var(--axelix-grey-900);
+    font-size: var(--axelix-font-size-body);
+    line-height: var(--axelix-line-height-normal);
+    font-weight: var(--axelix-font-weight-medium);
+    transition:
+        background 180ms,
+        border-color 180ms,
+        box-shadow 180ms,
+        transform 120ms;
+}
+
+.Trigger.Trigger:hover {
+    background: var(--axelix-white);
+    border-color: var(--axelix-green-200);
+    color: var(--axelix-grey-900);
+}
+
+.Trigger.Trigger:active {
+    transform: translateY(1px);
+}
+
+.Trigger.Trigger.Open {
+    background: var(--axelix-white);
+    border-color: var(--axelix-green-600);
+    box-shadow: 0 0 0 3px var(--axelix-green-50);
+}
+
+.Trigger.Trigger:focus-visible {
+    outline: 2px solid var(--axelix-green-500);
+    outline-offset: 2px;
+}
+
+.Trigger svg {
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.Stack {
+    width: 16px;
+    height: 16px;
+    color: var(--axelix-grey-500);
+}
+
+.Open .Stack {
+    color: var(--axelix-green-600);
+}
+
+.Count.Count {
+    height: 20px;
+    min-width: 20px;
+    margin: 0;
+    padding: 0 6px;
+    border: 0;
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    line-height: 20px;
+    text-align: center;
+}
+
+.Arrow {
+    width: 12px;
+    height: 12px;
+    color: var(--axelix-grey-500);
+    transform: rotate(180deg);
+    transition: transform 200ms;
+}
+
+.Open .Arrow {
+    transform: rotate(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Trigger.Trigger,
+    .Arrow {
+        transition: none;
+    }
+
+    .Popup {
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+        transition: none !important;
+    }
+}

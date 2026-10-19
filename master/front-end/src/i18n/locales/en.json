@@ -1,6 +1,11 @@
 {
     "ActionInstancesSelector": {
-        "current": "Current"
+        "all": "All",
+        "current": "Current",
+        "alwaysIncluded": "Current instance is always included",
+        "selectAllOthers": "Select all other instances",
+        "selectedCount": "Selected: {{count}} / {{total}}",
+        "instances": "Instances"
     },
     "InstanceContext": {
         "instancesCount": "Instances · {{count}}",

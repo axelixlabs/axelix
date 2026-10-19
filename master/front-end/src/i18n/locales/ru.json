@@ -1,6 +1,11 @@
 {
     "ActionInstancesSelector": {
-        "current": "Текущий"
+        "all": "Все",
+        "current": "Текущий",
+        "alwaysIncluded": "Текущий инстанс всегда выбран",
+        "selectAllOthers": "Выбрать все остальные инстансы",
+        "selectedCount": "Выбрано: {{count}} / {{total}}",
+        "instances": "Инстансы"
     },
     "InstanceContext": {
         "instancesCount": "Инстансы · {{count}}",
