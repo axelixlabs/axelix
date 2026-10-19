@@ -402,6 +402,117 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
+    void shouldRefreshKnownInstanceViaMetadataV2Endpoint() throws InterruptedException {
+        String service = "service-with-metadata-v2";
+        String instanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String metadataResponse = """
+            {
+              "version": "1.3.0",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
+              }
+            }
+            """;
+
+        // language=json
+        String metadataV2Response = """
+            {
+              "healthStatus" : "DOWN",
+              "memoryDetails" : {
+                "heap" : 500
+              },
+              "transactions" : [
+                {
+                  "transactionOrigin" : "APPLICATION_DECLARATIVE",
+                  "transactionalKey" : {
+                    "className" : "org.springframework.samples.petclinic.OwnerService",
+                    "methodName" : "findOwners"
+                  },
+                  "transactionOverallStats" : {
+                    "minMs" : 1,
+                    "maxMs" : 3,
+                    "averageMs" : 2
+                  },
+                  "lazyLoadingTargets" : [ ],
+                  "inMemoryPagination" : { },
+                  "externalCalls" : [ ]
+                }
+              ]
+            }
+            """;
+
+        mockWebServer.enqueue(
+                new MockResponse().setBody(metadataResponse).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(metadataV2Response)
+                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        ServiceInstance k8sInstance = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceId)
+                .set(Select.field("serviceId"), service)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(service));
+        Mockito.when(discoveryClient.getInstances(service)).thenReturn(List.of(k8sInstance));
+        subject.performDiscovery();
+
+        // when.
+        subject.performDiscovery();
+
+        // then.
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata/v2");
+
+        assertThat(instanceRegistry.getAll()).singleElement().satisfies(instance -> {
+            assertThat(instance.id().instanceId()).isEqualTo(instanceId);
+            assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.DOWN);
+            assertThat(instance.memoryUsage().heap()).isEqualTo(500);
+            assertThat(instance.commitShaShort()).isEqualTo("a8b0929");
+            assertThat(instance.latestHeartBeat()).isNull();
+        });
+
+        HistoricalApplicationSnapshot snapshot = jdbcAggregateTemplate.findById(
+                new SnapshotId("org.springframework.samples", "petclinic", LocalDate.now(ZoneOffset.UTC)),
+                HistoricalApplicationSnapshot.class);
+
+        assertThat(snapshot).isNotNull();
+        assertThat(snapshot.insights().persistenceInsights().getTransactions())
+                .singleElement()
+                .satisfies(transaction -> assertThat(
+                                transaction.getTransactionalKey().getMethodName())
+                        .isEqualTo("findOwners"));
+    }
+
+    @Test
     void shouldDeregisterK8sInstanceWhenNoLongerInDiscovery() {
         String serviceId = "test-service";
         String instanceId = UUID.randomUUID().toString();

@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.discovery;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -98,15 +99,27 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 """, this.getClass().getSimpleName());
         }
 
-        Set<BasicRegistrationMetadata> collectiveMetadata = discoveredInstances.stream()
-                .map(DiscoveredInstanceProfile::metadata)
-                .collect(Collectors.toSet());
-
         Set<Instance> instances = discoveredInstances.stream()
                 .map(DiscoveredInstanceProfile::instance)
                 .collect(Collectors.toSet());
 
-        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = discoveredInstances.stream()
+        List<DiscoveredInstanceProfile.Registration> registrations = discoveredInstances.stream()
+                .filter(DiscoveredInstanceProfile.Registration.class::isInstance)
+                .map(DiscoveredInstanceProfile.Registration.class::cast)
+                .toList();
+
+        List<DiscoveredInstanceProfile.Refresh> refreshes = discoveredInstances.stream()
+                .filter(DiscoveredInstanceProfile.Refresh.class::isInstance)
+                .map(DiscoveredInstanceProfile.Refresh.class::cast)
+                .toList();
+
+        Set<BasicRegistrationMetadata> collectiveMetadata = registrations.stream()
+                .map(DiscoveredInstanceProfile.Registration::metadata)
+                .collect(Collectors.toSet());
+
+        // TODO: Once the scheduled task execution history is enabled (GH-1617), report the executions of the
+        //  known instances via the metadata v2 as well, with a delivery acknowledgement for the starter's history
+        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = registrations.stream()
                 .map(scheduledTaskExecutionResultConverter::convert)
                 .flatMap(Set::stream)
                 .collect(Collectors.toSet());
@@ -115,6 +128,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
             instanceRegistry.register(instances);
             databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
             scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
+            refreshes.forEach(refresh -> databaseHistoricalApplicationSnapshotService.reloadTransactions(
+                    refresh.instance().applicationId(), refresh.metadataV2().getTransactions()));
         });
     }
 }

@@ -98,6 +98,12 @@ class AxelixMetadataEndpointTest {
         }
 
         @Bean
+        public MetadataV2Assembler metadataV2Assembler(
+                HealthDetectionFunction healthDetectionFunction, InsightsInfoProvider insightsInfoProvider) {
+            return new MetadataV2Assembler(healthDetectionFunction, insightsInfoProvider);
+        }
+
+        @Bean
         public AxelixInfoProperties axelixInfoProperties(@Value(AXELIX_INFO_LOCATION) Resource axelixInfoResource)
                 throws IOException {
 
@@ -162,6 +168,26 @@ class AxelixMetadataEndpointTest {
                         + "}");
     }
 
+    @Test
+    void shouldReceiveMetadataV2() {
+        // when.
+        ResponseEntity<String> result =
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metadata/v2", String.class);
+
+        // then.
+        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+        JsonAssertions.assertThatJson(result.getBody())
+                .isEqualTo("{\n" + "  \"healthStatus\" : \"UP\",\n"
+                        + "  \"memoryDetails\" : {\n"
+                        + "    \"heap\" : \"#{json-unit.ignore}\"\n"
+                        + "  },\n"
+                        + "  \"transactions\" : [ ]\n"
+                        + "}");
+    }
+
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-metadata")
     void negativeAuthTests() {}
+
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-metadata/v2")
+    void negativeMetadataV2AuthTests() {}
 }

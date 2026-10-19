@@ -20,10 +20,11 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadatav2.MetadataV2;
 
 /**
  * Custom Spring Boot Actuator endpoint. Provides access to basic build information
@@ -32,18 +33,22 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistration
  * @since 18.09.2025
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-metadata")
+@RestControllerEndpoint(id = "axelix-metadata")
 public class AxelixMetadataEndpoint {
 
     private static final Logger log = LoggerFactory.getLogger(AxelixMetadataEndpoint.class);
 
     private final BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler;
+    private final MetadataV2Assembler metadataV2Assembler;
 
-    public AxelixMetadataEndpoint(BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler) {
+    public AxelixMetadataEndpoint(
+            BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
+            MetadataV2Assembler metadataV2Assembler) {
         this.basicRegistrationMetadataAssembler = basicRegistrationMetadataAssembler;
+        this.metadataV2Assembler = metadataV2Assembler;
     }
 
-    @ReadOperation
+    @GetMapping
     public BasicRegistrationMetadata getMetadata() {
         log.debug("Received request for metadata assembly");
 
@@ -52,5 +57,10 @@ public class AxelixMetadataEndpoint {
         log.debug("Assembled metadata for this service : {}", serviceMetadata);
 
         return serviceMetadata;
+    }
+
+    @GetMapping("/v2")
+    public MetadataV2 getMetadataV2() {
+        return metadataV2Assembler.assemble();
     }
 }

@@ -152,6 +152,15 @@ public class InstanceSelfRegistrationInternalApi {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
+        if (!compatibilityDetectionStrategy.isCompatible(instance.get().starterVersion())) {
+            log.warn(
+                    "Rejecting heartbeat of '{}': its Axelix starter version '{}' is not supported by this Axelix Master",
+                    instanceId.instanceId(),
+                    instance.get().starterVersion());
+            instanceRegistry.deRegister(instanceId);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
         Instance.InstanceStatus status =
                 switch (heartBeatMetadataV2.getHealthStatus()) {
                     case UP -> Instance.InstanceStatus.UP;

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,13 +52,18 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.JavaVersion;
+import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
+import com.axelixlabs.axelix.master.service.serde.MetadataV2JacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
+import com.axelixlabs.axelix.master.service.transport.MetadataV2EndpointProber;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -84,6 +90,9 @@ class KubernetesInstanceDiscovererTest {
 
     @Autowired
     private ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber;
+
+    @Autowired
+    private MetadataV2EndpointProber metadataV2EndpointProber;
 
     @Autowired
     private CompatibilityDetectionStrategy compatibilityDetectionStrategy;
@@ -124,8 +133,20 @@ class KubernetesInstanceDiscovererTest {
         }
 
         @Bean
+        public MetadataV2EndpointProber metadataV2EndpointProber(
+                InstanceRegistry instanceRegistry,
+                SecurityContextExecutor securityContextExecutor,
+                HttpClient httpClient) {
+            return new MetadataV2EndpointProber(
+                    instanceRegistry,
+                    new MetadataV2JacksonMessageDeserializationStrategy(new ObjectMapper()),
+                    securityContextExecutor,
+                    httpClient);
+        }
+
+        @Bean
         public AxelixVersionDiscoverer axelixVersionDiscoverer() {
-            return () -> "1.0.0-SNAPSHOT";
+            return () -> "1.3.0-SNAPSHOT";
         }
 
         @Bean
@@ -147,7 +168,12 @@ class KubernetesInstanceDiscovererTest {
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
         subject = new KubernetesInstanceDiscoverer(
-                discoveryClient, managedServiceMetadataEndpointProber, compatibilityDetectionStrategy, instanceFactory);
+                discoveryClient,
+                managedServiceMetadataEndpointProber,
+                metadataV2EndpointProber,
+                compatibilityDetectionStrategy,
+                instanceRegistry,
+                instanceFactory);
     }
 
     @AfterEach
@@ -829,5 +855,326 @@ class KubernetesInstanceDiscovererTest {
         assertThat(profiles)
                 .extracting(profile -> profile.instance().id().instanceId())
                 .containsOnly(healthyK8SInstanceId);
+    }
+
+    @Test
+    void shouldRefreshKnownInstanceViaMetadataV2Endpoint() throws InterruptedException {
+        String serviceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString();
+        Instance knownInstance = TestInstanceFactory.withStarterVersion(
+                instanceId, "1.3.0", mockWebServer.url("/actuator").toString());
+
+        // language=json
+        String response = """
+            {
+              "healthStatus" : "DOWN",
+              "memoryDetails" : {
+                "heap" : 500
+              },
+              "transactions" : [ ]
+            }
+            """;
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                if ("/actuator/axelix-metadata/v2".equals(request.getPath())) {
+                    return new MockResponse()
+                            .setBody(response)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        });
+
+        mockDiscoveredPod(serviceId, instanceId);
+        Mockito.when(instanceRegistry.get(InstanceId.of(instanceId))).thenReturn(Optional.of(knownInstance));
+
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+
+        assertThat(profiles).singleElement().isInstanceOfSatisfying(DiscoveredInstanceProfile.Refresh.class, it -> {
+            assertThat(it.instance()).isEqualTo(knownInstance.copy(Instance.InstanceStatus.DOWN, new MemoryUsage(500)));
+            assertThat(it.metadataV2().getTransactions()).isEmpty();
+        });
+        assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata/v2");
+    }
+
+    @Test
+    void shouldSkipKnownInstanceWhenItIsUnreachable() {
+        String serviceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString();
+
+        // both the metadata v2 and the full metadata fallback fail
+        mockWebServer.enqueue(new MockResponse().setResponseCode(503));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(503));
+
+        mockDiscoveredPod(serviceId, instanceId);
+        Mockito.when(instanceRegistry.get(InstanceId.of(instanceId)))
+                .thenReturn(Optional.of(TestInstanceFactory.withStarterVersion(
+                        instanceId, "1.3.0", mockWebServer.url("/actuator").toString())));
+
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+
+        assertThat(profiles).isEmpty();
+        assertThat(mockWebServer.getRequestCount()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldFallBackToFullMetadataWhenMetadataV2Fails() throws InterruptedException {
+        String serviceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String fullMetadata = """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
+              }
+            }
+            """;
+
+        // e.g. a starter that does not serve the metadata v2 yet
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                if ("/actuator/axelix-metadata".equals(request.getPath())) {
+                    return new MockResponse()
+                            .setBody(fullMetadata)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        });
+
+        mockDiscoveredPod(serviceId, instanceId);
+        Mockito.when(instanceRegistry.get(InstanceId.of(instanceId)))
+                .thenReturn(Optional.of(TestInstanceFactory.withStarterVersion(
+                        instanceId,
+                        "1.3.0-SNAPSHOT",
+                        mockWebServer.url("/actuator").toString())));
+
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+
+        assertThat(profiles).singleElement().isInstanceOf(DiscoveredInstanceProfile.Registration.class);
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata/v2");
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
+    }
+
+    @Test
+    void shouldFallBackToFullMetadataWhenMetadataV2IsIncomplete() throws InterruptedException {
+        String serviceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String incompleteMetadataV2 = """
+            {
+              "healthStatus" : "UP",
+              "transactions" : [ ]
+            }
+            """;
+
+        // language=json
+        String fullMetadata = """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
+              }
+            }
+            """;
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String body =
+                        "/actuator/axelix-metadata/v2".equals(request.getPath()) ? incompleteMetadataV2 : fullMetadata;
+                return new MockResponse().setBody(body).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+            }
+        });
+
+        mockDiscoveredPod(serviceId, instanceId);
+        Mockito.when(instanceRegistry.get(InstanceId.of(instanceId)))
+                .thenReturn(Optional.of(TestInstanceFactory.withStarterVersion(
+                        instanceId, "1.3.0", mockWebServer.url("/actuator").toString())));
+
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+
+        assertThat(profiles).singleElement().isInstanceOf(DiscoveredInstanceProfile.Registration.class);
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata/v2");
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
+    }
+
+    @Test
+    void shouldSkipKnownInstanceOutsideCompatibilityWindow() throws InterruptedException {
+        String serviceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString();
+        // newer than the 1.3.0-SNAPSHOT master, so outside its compatibility window
+        String starterVersion = "1.4.0";
+
+        // language=json
+        String fullMetadata = """
+            {
+              "version": "%s",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
+              }
+            }
+            """.formatted(starterVersion);
+
+        mockWebServer.enqueue(
+                new MockResponse().setBody(fullMetadata).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        mockDiscoveredPod(serviceId, instanceId);
+        Mockito.when(instanceRegistry.get(InstanceId.of(instanceId)))
+                .thenReturn(Optional.of(TestInstanceFactory.withStarterVersion(
+                        instanceId,
+                        starterVersion,
+                        mockWebServer.url("/actuator").toString())));
+
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+
+        assertThat(profiles).isEmpty();
+        assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
+    }
+
+    @Test
+    void shouldFetchFullMetadataOfKnownInstanceWithOldStarter() throws InterruptedException {
+        String serviceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response = """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
+              }
+            }
+            """;
+
+        mockWebServer.enqueue(
+                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        mockDiscoveredPod(serviceId, instanceId);
+        Mockito.when(instanceRegistry.get(InstanceId.of(instanceId)))
+                .thenReturn(Optional.of(TestInstanceFactory.withStarterVersion(
+                        instanceId, "1.2.0", mockWebServer.url("/actuator").toString())));
+
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+
+        assertThat(profiles).singleElement().isInstanceOf(DiscoveredInstanceProfile.Registration.class);
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
+    }
+
+    private void mockDiscoveredPod(String serviceId, String instanceId) {
+        ServiceInstance pod = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceId)
+                .set(Select.field("serviceId"), serviceId)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(serviceId));
+        Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(pod));
     }
 }

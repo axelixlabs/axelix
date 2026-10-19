@@ -28,7 +28,9 @@ import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.AbstractInstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
+import com.axelixlabs.axelix.master.service.transport.MetadataV2EndpointProber;
 
 /**
  * Kubernetes implementation of {@link InstancesDiscoverer}.
@@ -50,9 +52,17 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     public KubernetesInstanceDiscoverer(
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+            MetadataV2EndpointProber metadataV2EndpointProber,
             CompatibilityDetectionStrategy compatibilityDetectionStrategy,
+            InstanceRegistry instanceRegistry,
             InstanceFactory instanceFactory) {
-        super(log, discoveryClient, managedServiceMetadataEndpointProber, compatibilityDetectionStrategy);
+        super(
+                log,
+                discoveryClient,
+                managedServiceMetadataEndpointProber,
+                metadataV2EndpointProber,
+                compatibilityDetectionStrategy,
+                instanceRegistry);
         this.instanceFactory = instanceFactory;
     }
 

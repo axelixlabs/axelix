@@ -70,6 +70,10 @@ public record Instance(
         @Nullable DetectedFeatures detectedFeatures) {
 
     public Instance copy(InstanceStatus instanceStatus) {
+        return copy(instanceStatus, this.memoryUsage);
+    }
+
+    public Instance copy(InstanceStatus instanceStatus, MemoryUsage memoryUsage) {
         return new Instance(
                 this.id,
                 this.applicationId,
@@ -85,7 +89,7 @@ public record Instance(
                 this.deployedAt,
                 this.latestHeartBeat,
                 instanceStatus,
-                this.memoryUsage,
+                memoryUsage,
                 this.actuatorUrl,
                 this.detectedFeatures);
     }

@@ -43,6 +43,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStat
 import com.axelixlabs.axelix.sbs.spring.core.master.HealthDetectionFunction;
 import com.axelixlabs.axelix.sbs.spring.core.master.InstanceFeaturesDetector;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.MetadataV2Assembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
@@ -136,9 +137,16 @@ public class AxelixMetadataEndpointAutoConfiguration {
     }
 
     @Bean
+    public MetadataV2Assembler metadataV2Assembler(
+            HealthDetectionFunction healthDetectionFunction, InsightsInfoProvider insightsInfoProvider) {
+        return new MetadataV2Assembler(healthDetectionFunction, insightsInfoProvider);
+    }
+
+    @Bean
     public AxelixMetadataEndpoint axelixMetadataEndpoint(
-            BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler) {
-        return new AxelixMetadataEndpoint(basicRegistrationMetadataAssembler);
+            BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
+            MetadataV2Assembler metadataV2Assembler) {
+        return new AxelixMetadataEndpoint(basicRegistrationMetadataAssembler, metadataV2Assembler);
     }
 
     private HealthStatus getCurrentHealth(@Nullable HealthEndpoint healthEndpoint) {

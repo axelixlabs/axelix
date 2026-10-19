@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.discovery;
 
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadatav2.MetadataV2;
 import com.axelixlabs.axelix.master.domain.Instance;
 
 /**
@@ -25,5 +26,19 @@ import com.axelixlabs.axelix.master.domain.Instance;
  * assembled about the auto-discovered instance we're about register.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
-public record DiscoveredInstanceProfile(Instance instance, BasicRegistrationMetadata metadata) {}
+public sealed interface DiscoveredInstanceProfile {
+
+    Instance instance();
+
+    /**
+     * The instance assembled from its full registration metadata.
+     */
+    record Registration(Instance instance, BasicRegistrationMetadata metadata) implements DiscoveredInstanceProfile {}
+
+    /**
+     * The already known instance refreshed with its metadataV2.
+     */
+    record Refresh(Instance instance, MetadataV2 metadataV2) implements DiscoveredInstanceProfile {}
+}

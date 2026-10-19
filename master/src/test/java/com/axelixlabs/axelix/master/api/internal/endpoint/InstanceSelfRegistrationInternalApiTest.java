@@ -58,6 +58,7 @@ import com.axelixlabs.axelix.master.domain.features.DetectedFeatures;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.CapturingIamWebInterceptor;
 import com.axelixlabs.axelix.master.utils.CycloneDxDocuments;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -488,6 +489,23 @@ public class InstanceSelfRegistrationInternalApiTest {
                 Arguments.of(
                         "transactions",
                         JSON_HEARTBEAT_V2.replaceAll("\"transactions\" : \\[[\\s\\S]*]", "\"transactions\" : null")));
+    }
+
+    @Test
+    void shouldRejectHeartbeatAndDeRegisterInstanceWhenStarterVersionIsNotSupported() {
+        // given. e.g. registered before the Master was upgraded past the starter's compatibility window
+        instanceRegistry.register(TestInstanceFactory.withStarterVersion(TEST_INSTANCE_ID, "9.0.0"));
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT_V2), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+
+        // and then.
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isEmpty();
     }
 
     @Test

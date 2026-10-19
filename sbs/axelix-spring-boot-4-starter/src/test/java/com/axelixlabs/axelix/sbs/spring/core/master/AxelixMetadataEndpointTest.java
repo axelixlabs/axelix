@@ -100,6 +100,31 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
             """);
     }
 
+    @Test
+    void shouldReceiveMetadataV2() {
+        // when.
+        ResponseEntity<String> result =
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metadata/v2", String.class);
+
+        // then.
+        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+        JsonAssertions.assertThatJson(result.getBody())
+                .isEqualTo(
+                        // language=json
+                        """
+            {
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : "#{json-unit.ignore}"
+              },
+              "transactions" : [ ]
+            }
+            """);
+    }
+
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-metadata")
     void negativeAuthTests() {}
+
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-metadata/v2")
+    void negativeMetadataV2AuthTests() {}
 }

@@ -44,6 +44,7 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
                 "heartbeat" to "HeartBeatMetadata",
                 "heartbeatv2" to "HeartBeatMetadataV2",
                 "initialregistrationrequest" to "InitialSelfRegistrationRequest",
+                "metadatav2" to "MetadataV2",
             )[featurePackage]
             if (ownModel != null) {
                 globalProperties.set(mapOf("models" to ownModel, "modelDocs" to "false", "modelTests" to "false"))

@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.service.discovery;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,10 +34,18 @@ import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadatav2.MetadataV2;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.MemoryUsage;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
+import com.axelixlabs.axelix.master.service.transport.MetadataV2EndpointProber;
 
 /**
  * Abstract implementation of {@link InstancesDiscoverer} that performs common tasks like checking
@@ -60,17 +69,23 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     private final Logger logger;
     private final DiscoveryClient discoveryClient;
     private final ManagedServiceMetadataEndpointProber managedServiceProber;
+    private final MetadataV2EndpointProber metadataV2Prober;
     private final CompatibilityDetectionStrategy compatibilityDetectionStrategy;
+    private final InstanceRegistry instanceRegistry;
 
     public AbstractInstancesDiscoverer(
             Logger logger,
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-            CompatibilityDetectionStrategy compatibilityDetectionStrategy) {
+            MetadataV2EndpointProber metadataV2EndpointProber,
+            CompatibilityDetectionStrategy compatibilityDetectionStrategy,
+            InstanceRegistry instanceRegistry) {
         this.discoveryClient = discoveryClient;
         this.managedServiceProber = managedServiceMetadataEndpointProber;
+        this.metadataV2Prober = metadataV2EndpointProber;
         this.logger = logger;
         this.compatibilityDetectionStrategy = compatibilityDetectionStrategy;
+        this.instanceRegistry = instanceRegistry;
     }
 
     @Override
@@ -88,17 +103,82 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
             if (!CollectionUtils.isEmpty(instances)) {
                 result.addAll(instances.stream()
-                        .map(this::getManagedServiceMetadata)
-                        .filter(Objects::nonNull)
-                        .filter(this::isCompatibleVersion)
-                        .filter(this::hasApplicationId)
-                        .map(this::toDomainInstanceSafe)
+                        .map(this::discoverInstance)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet()));
             }
         }
 
         return result;
+    }
+
+    private @Nullable DiscoveredInstanceProfile discoverInstance(ServiceInstance serviceInstance) {
+        Optional<Instance> knownInstance = Optional.ofNullable(serviceInstance.getInstanceId())
+                .flatMap(instanceId -> instanceRegistry.get(InstanceId.of(instanceId)));
+
+        if (knownInstance.isPresent()
+                && servesMetadataV2(knownInstance.get())
+                && compatibilityDetectionStrategy.isCompatible(
+                        knownInstance.get().starterVersion())) {
+            DiscoveredInstanceProfile.Refresh refreshed = refresh(knownInstance.get());
+
+            if (refreshed != null) {
+                return refreshed;
+            }
+        }
+
+        return Optional.ofNullable(getManagedServiceMetadata(serviceInstance))
+                .filter(this::isCompatibleVersion)
+                .filter(this::hasApplicationId)
+                .map(this::toDomainInstanceSafe)
+                .orElse(null);
+    }
+
+    // TODO: Remove in 1.6, once the starters before 1.3 (without the metadata v2 endpoint) fall out of the window
+    private static boolean servesMetadataV2(Instance instance) {
+        return SemanticVersion.tryParse(instance.starterVersion())
+                .filter(version -> version.major() > 1 || (version.major() == 1 && version.minor() >= 3))
+                .isPresent();
+    }
+
+    private DiscoveredInstanceProfile.@Nullable Refresh refresh(Instance instance) {
+        try {
+            MetadataV2 metadataV2 = metadataV2Prober.invoke(instance.actuatorUrl(), NoHttpPayload.INSTANCE);
+
+            if (!hasRequiredFields(metadataV2)) {
+                logger.debug(
+                        "The managed service with id : {} returned an incomplete metadata v2. Falling back to the full metadata",
+                        instance.id().instanceId());
+                return null;
+            }
+
+            return new DiscoveredInstanceProfile.Refresh(
+                    instance.copy(
+                            toInstanceStatus(metadataV2),
+                            new MemoryUsage(metadataV2.getMemoryDetails().getHeap())),
+                    metadataV2);
+        } catch (EndpointInvocationException | BadRequestException error) {
+            logger.debug(
+                    "Unable to fetch the metadata v2 of the managed service with id : {}. Falling back to the full metadata",
+                    instance.id().instanceId(),
+                    error);
+            return null;
+        }
+    }
+
+    private static boolean hasRequiredFields(MetadataV2 metadataV2) {
+        return metadataV2.getHealthStatus() != null
+                && metadataV2.getMemoryDetails() != null
+                && metadataV2.getMemoryDetails().getHeap() != null
+                && metadataV2.getTransactions() != null;
+    }
+
+    private static InstanceStatus toInstanceStatus(MetadataV2 metadataV2) {
+        return switch (metadataV2.getHealthStatus()) {
+            case UP -> InstanceStatus.UP;
+            case DOWN -> InstanceStatus.DOWN;
+            case UNKNOWN -> InstanceStatus.UNKNOWN;
+        };
     }
 
     protected record IntermediateInstanceProfile(ServiceInstance serviceInstance, BasicRegistrationMetadata metadata) {}
@@ -110,7 +190,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
             BasicRegistrationMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
 
             return new IntermediateInstanceProfile(serviceInstance, metadata);
-        } catch (EndpointInvocationException error) {
+        } catch (EndpointInvocationException | BadRequestException error) {
             logger.debug(
                     "Unable to reach the managed service with id : {}. Skipping instance registration",
                     serviceInstance.getInstanceId(),
@@ -142,9 +222,11 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         }
     }
 
-    private @Nullable DiscoveredInstanceProfile toDomainInstanceSafe(IntermediateInstanceProfile intermediateProfile) {
+    private DiscoveredInstanceProfile.@Nullable Registration toDomainInstanceSafe(
+            IntermediateInstanceProfile intermediateProfile) {
         try {
-            return new DiscoveredInstanceProfile(toDomainInstance(intermediateProfile), intermediateProfile.metadata());
+            return new DiscoveredInstanceProfile.Registration(
+                    toDomainInstance(intermediateProfile), intermediateProfile.metadata());
         } catch (IllegalArgumentException e) {
             logger.warn(
                     "Unable to convert the discovered service : {} to its internal representation to make it manageable. Skipping registration",

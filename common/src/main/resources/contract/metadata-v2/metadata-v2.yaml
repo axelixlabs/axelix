@@ -1,0 +1,242 @@
+openapi: 3.1.0
+info:
+  title: metadata-v2
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'metadata-v2' operation.
+    This operation returns the lightweight metadata of an already known auto-discovered instance,
+    so that the Master does not have to fetch the full registration metadata on every poll.
+  x-axelix-introduced-in: 1.3.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-metadata/v2:
+    get:
+      operationId: getMetadataV2
+      summary: Returns the lightweight metadata of the service instance.
+      responses:
+        '200':
+          description: The lightweight metadata of the service instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataV2'
+components:
+  schemas:
+    MetadataV2:
+      type: object
+      description: Represents the lightweight metadata of a service instance.
+      required:
+        - healthStatus
+        - memoryDetails
+        - transactions
+      properties:
+        healthStatus:
+          description: >-
+            The health status of the given instance that is reported by the starter infrastructure.
+            Never absent.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/HealthStatus'
+        memoryDetails:
+          description: The current memory details of the given instance. Never absent.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/MemoryDetails'
+        transactions:
+          type: array
+          description: >-
+            The aggregated information about the transactions inside the instance, accumulated
+            since the instance has started.
+          x-axelix-introduced-in: 1.3.0
+          items:
+            $ref: '#/components/schemas/TransactionAggregatedProfile'
+    HealthStatus:
+      type: string
+      description: The health status of the given instance during registration.
+      enum:
+        - UP
+        - DOWN
+        - UNKNOWN
+    MemoryDetails:
+      type: object
+      description: Memory details of the given Instance.
+      required:
+        - heap
+      properties:
+        heap:
+          type: integer
+          format: int64
+          description: The estimated heap size of the given instance.
+          x-axelix-introduced-in: 1.3.0
+    TransactionAggregatedProfile:
+      type: object
+      description: Aggregated information about a particular transactional method in the instance.
+      required:
+        - transactionOrigin
+        - transactionalKey
+        - transactionOverallStats
+        - lazyLoadingTargets
+        - inMemoryPagination
+        - externalCalls
+      properties:
+        transactionOrigin:
+          description: The origin of the transaction, i.e. how exactly the transaction was created.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/TransactionOrigin'
+        transactionalKey:
+          description: The key that identifies the transactional method.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/TransactionalKey'
+        transactionOverallStats:
+          description: >-
+            The min/max/avg call duration aggregated across every invocation of the transactional
+            method.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/ExecutionStats'
+        lazyLoadingTargets:
+          type: array
+          description: The aggregated counts of lazy-loading (N+1) occasions detected in the transaction.
+          x-axelix-introduced-in: 1.3.0
+          items:
+            $ref: '#/components/schemas/CountedLazyLoadingTarget'
+        inMemoryPagination:
+          type: object
+          description: >-
+            The in-memory pagination counters detected in the transaction, keyed by the offending
+            query.
+          x-axelix-introduced-in: 1.3.0
+          additionalProperties:
+            type: integer
+            format: int32
+        externalCalls:
+          type: array
+          description: >-
+            The aggregated timing of the blocking calls made to external endpoints from within the
+            transaction.
+          x-axelix-introduced-in: 1.3.0
+          items:
+            $ref: '#/components/schemas/ExternalCallInsight'
+        propagation:
+          type: string
+          description: >-
+            The declared propagation behavior of the transaction (e.g. 'REQUIRED'). Absent when it
+            could not be determined.
+          x-axelix-introduced-in: 1.3.0
+        isolation:
+          type: string
+          description: >-
+            The declared isolation level of the transaction (e.g. 'DEFAULT'). Absent when it could
+            not be determined.
+          x-axelix-introduced-in: 1.3.0
+        readOnly:
+          type: boolean
+          description: >-
+            Whether the transaction was declared read-only. Absent when it could not be determined
+            (e.g. an older agent that did not report it).
+          x-axelix-introduced-in: 1.3.0
+    TransactionOrigin:
+      type: string
+      description: The origin of the transaction, i.e. how exactly the transaction was created.
+      enum:
+        - SPRING_INFRASTRUCTURE
+        - APPLICATION_DECLARATIVE
+        - APPLICATION_IMPERATIVE
+    TransactionalKey:
+      type: object
+      description: The key that identifies the transactional method.
+      required:
+        - className
+        - methodName
+      properties:
+        className:
+          type: string
+          description: The class name that declares the transactional method.
+          x-axelix-introduced-in: 1.3.0
+        methodName:
+          type: string
+          description: The name of the transactional method.
+          x-axelix-introduced-in: 1.3.0
+    ExecutionStats:
+      type: object
+      description: The min/max/avg duration statistics of repeated executions.
+      required:
+        - minMs
+        - maxMs
+        - averageMs
+      properties:
+        minMs:
+          type: integer
+          format: int64
+          description: The minimum observed duration, in milliseconds.
+          x-axelix-introduced-in: 1.3.0
+        maxMs:
+          type: integer
+          format: int64
+          description: The maximum observed duration, in milliseconds.
+          x-axelix-introduced-in: 1.3.0
+        averageMs:
+          type: integer
+          format: int64
+          description: The average observed duration, in milliseconds.
+          x-axelix-introduced-in: 1.3.0
+    CountedLazyLoadingTarget:
+      type: object
+      description: The aggregated count of lazy-loading (N+1) occasions for a particular association.
+      required:
+        - target
+        - count
+      properties:
+        target:
+          description: The association that was presumably lazy loaded.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/LazyLoadingTarget'
+        count:
+          type: integer
+          format: int32
+          description: The number of lazy-loading occasions observed.
+          x-axelix-introduced-in: 1.3.0
+    LazyLoadingTarget:
+      type: object
+      description: The particular association that presumably was lazy loaded.
+      required:
+        - ownerEntityClass
+        - associationPropertyName
+      properties:
+        ownerEntityClass:
+          type: string
+          description: The fully qualified name of the entity on which the association was lazy loaded.
+          x-axelix-introduced-in: 1.3.0
+        associationPropertyName:
+          type: string
+          description: The name of the lazy-loaded association property.
+          x-axelix-introduced-in: 1.3.0
+    ExternalCallInsight:
+      type: object
+      description: >-
+        Aggregated timing of the blocking calls made to a single external endpoint from within a
+        transactional method, folded across every invocation of that method.
+      required:
+        - type
+        - target
+        - stats
+      properties:
+        type:
+          description: The client that performed the call, e.g. an HTTP client or a messaging client.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/TypeExternalCall'
+        target:
+          type: string
+          description: >-
+            Where the call went: the request method and url for an HTTP call.
+          x-axelix-introduced-in: 1.3.0
+        stats:
+          description: >-
+            The min/max/avg call duration aggregated across every invocation of the transactional
+            method.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/ExecutionStats'
+    TypeExternalCall:
+      type: string
+      description: The client that performed a blocking call to an external system.
+      enum:
+        - HTTP_CLIENT
+        - KAFKA
+        - RABBIT

@@ -106,6 +106,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // Metadata
     public static final ActuatorEndpoint METADATA = endpoint("/axelix-metadata", HttpMethod.GET);
+    public static final ActuatorEndpoint METADATA_V2 = endpoint("/axelix-metadata/v2", HttpMethod.GET);
 
     // Metric
     public static final ActuatorEndpoint GET_METRIC_GROUPS = endpoint("/axelix-metrics", HttpMethod.GET);

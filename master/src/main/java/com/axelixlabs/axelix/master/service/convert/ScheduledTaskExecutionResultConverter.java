@@ -48,7 +48,7 @@ public class ScheduledTaskExecutionResultConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTaskExecutionResultConverter.class);
 
-    public Set<ScheduledTaskExecutionResult> convert(DiscoveredInstanceProfile discoveredInstanceProfile) {
+    public Set<ScheduledTaskExecutionResult> convert(DiscoveredInstanceProfile.Registration discoveredInstanceProfile) {
         return convert(
                 discoveredInstanceProfile.metadata(),
                 discoveredInstanceProfile.instance().id().instanceId());

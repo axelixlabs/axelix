@@ -82,6 +82,10 @@ public final class TestInstanceFactory {
     }
 
     public static Instance withStarterVersion(String id, String starterVersion) {
+        return withStarterVersion(id, starterVersion, DEFAULT_URL);
+    }
+
+    public static Instance withStarterVersion(String id, String starterVersion, String url) {
         return new Instance(
                 InstanceId.of(id),
                 DEFAULT_APPLICATION_ID,
@@ -98,7 +102,7 @@ public final class TestInstanceFactory {
                 Instant.now(),
                 DEFAULT_STATUS,
                 new MemoryUsage(1000L),
-                DEFAULT_URL,
+                url,
                 null);
     }
 

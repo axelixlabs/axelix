@@ -90,6 +90,12 @@ abstract class AbstractMasterSharedContextTest {
         }
 
         @Bean
+        public MetadataV2Assembler metadataV2Assembler(
+                HealthDetectionFunction healthDetectionFunction, InsightsInfoProvider insightsInfoProvider) {
+            return new MetadataV2Assembler(healthDetectionFunction, insightsInfoProvider);
+        }
+
+        @Bean
         public BasicRegistrationMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
