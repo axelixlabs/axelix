@@ -121,8 +121,8 @@
         }
     },
     "Sider": {
-        "insights": "Аналитика",
-        "details": "Детали",
+        "general": "Общее",
+        "overview": "Обзор",
         "metrics": "Метрики",
         "beans": "Бины",
         "environment": "Окружение",
