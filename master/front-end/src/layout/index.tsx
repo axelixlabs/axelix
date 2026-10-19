@@ -17,9 +17,10 @@
  */
 import { Layout } from "antd";
 import type { JSX } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useParams } from "react-router";
 
 import { AccessProvider } from "@/components";
+import { InstanceProfileProvider } from "@/components/InstanceProfileProvider";
 
 import { AdminHeader } from "./AdminHeader";
 // License key entry is moving to the Enterprise distro; banner temporarily disabled.
@@ -36,7 +37,9 @@ interface IProps {
 }
 
 export const MainLayout = ({ siderContent }: IProps) => {
-    return (
+    const { instanceId } = useParams();
+
+    const layout = (
         <>
             <AccessProvider />
             <Layout className={styles.MainWrapper}>
@@ -57,5 +60,14 @@ export const MainLayout = ({ siderContent }: IProps) => {
                 </Layout>
             </Layout>
         </>
+    );
+
+    // instanceId exists === we're in the "instance view"
+    return instanceId ? (
+        <InstanceProfileProvider key={instanceId} instanceId={instanceId}>
+            {layout}
+        </InstanceProfileProvider>
+    ) : (
+        layout
     );
 };

@@ -16,14 +16,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Menu } from "antd";
-import type { AxiosResponse } from "axios";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router";
 
 import { findOpenInstanceKeys } from "@/helpers";
-import { EInstanceFeature, type IInstanceProfileResponse } from "@/models";
-import { getInstanceProfile } from "@/services";
+import { useInstanceProfile } from "@/hooks";
 import { getInstanceItems } from "@/utils";
 
 import styles from "./styles.module.css";
@@ -34,22 +31,9 @@ export const InstanceSiderMenu = () => {
     const { pathname } = useLocation();
     const { instanceId } = useParams();
 
-    // null while unknown, so that nothing is greyed out before the profile arrives
-    const [features, setFeatures] = useState<EInstanceFeature[] | null>(null);
-
-    useEffect(() => {
-        if (!instanceId) {
-            return;
-        }
-
-        getInstanceProfile(instanceId)
-            .then((response: AxiosResponse<IInstanceProfileResponse>) => setFeatures(response.data.features))
-            // safe fallback in case of problems: keep every entry available rather than grey them all out
-            .catch(() => {
-                console.warn(`The profile of instance '${instanceId}' is not available. Performing a safe fallback`);
-                setFeatures(null);
-            });
-    }, [instanceId]);
+    // null while unknown (loading or failed), so that nothing is greyed out without a reason
+    const profile = useInstanceProfile();
+    const features = profile.response?.features ?? null;
 
     const items = getInstanceItems(instanceId!, t, features);
 
