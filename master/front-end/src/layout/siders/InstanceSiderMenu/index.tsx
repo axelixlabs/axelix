@@ -24,6 +24,7 @@ import { findOpenInstanceCategory } from "@/helpers";
 import { useInstanceProfile } from "@/hooks";
 import { getInstanceItems } from "@/utils";
 
+import { InstanceContext } from "./InstanceContext";
 import styles from "./styles.module.css";
 
 export const InstanceSiderMenu = () => {
@@ -51,13 +52,16 @@ export const InstanceSiderMenu = () => {
     };
 
     return (
-        <Menu
-            className={styles.Menu}
-            mode="inline"
-            items={items}
-            selectedKeys={[pathname]}
-            openKeys={openCategory ? [openCategory] : []}
-            onOpenChange={handleOpenChange}
-        />
+        <>
+            {instanceId && <InstanceContext key={instanceId} />}
+            <Menu
+                className={styles.Menu}
+                mode="inline"
+                items={items}
+                selectedKeys={[pathname]}
+                openKeys={openCategory ? [openCategory] : []}
+                onOpenChange={handleOpenChange}
+            />
+        </>
     );
 };

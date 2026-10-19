@@ -26,3 +26,4 @@ export { useConfirmableAction } from "./useConfirmableAction";
 export { useAuthority } from "./useAuthority";
 
 export { useInstanceProfile } from "./useInstanceProfile";
+export { useInstanceSiblings } from "./useInstanceSiblings";

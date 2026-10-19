@@ -18,6 +18,7 @@
 import type { TFunction } from "i18next";
 import { describe, expect, it } from "vitest";
 
+import { switchInstancePath } from "@/helpers";
 import { EInstanceFeature } from "@/models";
 import { getInstanceItems } from "@/utils";
 
@@ -44,5 +45,23 @@ describe("getInstanceItems dependency-analysis gating", () => {
 
     it("keeps the Dependency Analyzer entry enabled while the features are unknown", () => {
         expect(dependenciesEntry(null)?.disabled).toBeFalsy();
+    });
+});
+
+describe("switchInstancePath", () => {
+    it("keeps the section when switching to another instance", () => {
+        // when.
+        const result = switchInstancePath("/instance/abc/caches", "abc", "xyz");
+
+        // then.
+        expect(result).toBe("/instance/xyz/caches");
+    });
+
+    it("replaces only the instance segment, even when the id appears later in the path", () => {
+        // when.
+        const result = switchInstancePath("/instance/abc/beans/abc", "abc", "xyz");
+
+        // then.
+        expect(result).toBe("/instance/xyz/beans/abc");
     });
 });

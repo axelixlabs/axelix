@@ -1,0 +1,43 @@
+.MainWrapper {
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    padding: 12px 8px 8px;
+    background: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-light);
+    animation: menu-in 160ms ease-out;
+}
+
+.Heading {
+    padding: 0 4px 12px;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-600);
+}
+
+.Options {
+    max-height: min(390px, 60vh);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--axelix-grey-300) transparent;
+    padding-right: 4px;
+}
+
+@keyframes menu-in {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .MainWrapper {
+        animation: none;
+    }
+}

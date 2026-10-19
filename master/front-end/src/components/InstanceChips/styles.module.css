@@ -1,0 +1,80 @@
+.Commit.Commit,
+.Status.Status {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    margin: 0;
+    padding: 3px 6px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-grey-100);
+    color: var(--axelix-grey-700);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    line-height: var(--axelix-line-height-normal);
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.Commit svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: var(--axelix-grey-500);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.Status.Status {
+    border-color: var(--axelix-green-200);
+    background: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+    font-family: inherit;
+    font-weight: var(--axelix-font-weight-medium);
+}
+
+.Status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--axelix-green-500);
+}
+
+.Status.Down {
+    background: var(--axelix-red-50);
+    border-color: var(--axelix-red-200);
+    color: var(--axelix-red-700);
+}
+
+.Down::before {
+    background: var(--axelix-red-500);
+}
+
+.Status.Unknown {
+    background: var(--axelix-grey-100);
+    border-color: var(--axelix-grey-200);
+    color: var(--axelix-grey-600);
+}
+
+.Unknown::before {
+    background: var(--axelix-grey-400);
+}
+
+.CurrentTag.CurrentTag {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 3px 6px;
+    margin: 0;
+    border: 1px solid var(--axelix-blue-200);
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-blue-50);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-medium);
+    line-height: var(--axelix-line-height-normal);
+    color: var(--axelix-blue-700);
+    white-space: nowrap;
+}

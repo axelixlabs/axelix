@@ -29,3 +29,8 @@ export const findOpenInstanceCategory = (items: TMenuItem[], pathname: string): 
 
     return current ? String(current.key) : "general";
 };
+
+// The same section of another instance, e.g. '/instance/a/caches' -> '/instance/b/caches'
+export const switchInstancePath = (pathname: string, fromInstanceId: string, toInstanceId: string): string => {
+    return pathname.replace(`/instance/${fromInstanceId}`, `/instance/${toInstanceId}`);
+};
