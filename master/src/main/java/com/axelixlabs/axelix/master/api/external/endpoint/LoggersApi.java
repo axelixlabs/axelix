@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,9 @@ import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerB
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkResetRequest;
 import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.BulkInstancesResolver;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
@@ -54,11 +57,15 @@ import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 public class LoggersApi {
 
     private final EndpointInvoker endpointInvoker;
+    private final BulkInstancesResolver bulkInstancesResolver;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     public LoggersApi(
-            EndpointInvoker endpointInvoker, JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
+            EndpointInvoker endpointInvoker,
+            BulkInstancesResolver bulkInstancesResolver,
+            JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
         this.endpointInvoker = endpointInvoker;
+        this.bulkInstancesResolver = bulkInstancesResolver;
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
@@ -98,7 +105,8 @@ public class LoggersApi {
                         .ttlSeconds(request.ttlSeconds())));
 
         try {
-            endpointInvoker.invokeNoValueForInstances(request.instanceIds(), ActuatorEndpoints.SET_ONE_LOGGER, payload);
+            List<Instance> instances = bulkInstancesResolver.resolve(request.instanceIds());
+            endpointInvoker.invokeNoValueForInstances(instances, ActuatorEndpoints.SET_ONE_LOGGER, payload);
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
             return ResponseEntity.badRequest()
@@ -123,8 +131,8 @@ public class LoggersApi {
         HttpPayload payload = new DefaultHttpPayload(Map.of("name", request.loggerName()));
 
         try {
-            endpointInvoker.invokeNoValueForInstances(
-                    request.instanceIds(), ActuatorEndpoints.RESET_FOR_LOGGER, payload);
+            List<Instance> instances = bulkInstancesResolver.resolve(request.instanceIds());
+            endpointInvoker.invokeNoValueForInstances(instances, ActuatorEndpoints.RESET_FOR_LOGGER, payload);
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
             // TODO: A partial update is generally not the client's fault, so 400 Bad Request is not

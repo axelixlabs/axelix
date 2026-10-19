@@ -38,7 +38,9 @@ import com.axelixlabs.axelix.master.contract.logger.LoggersFeedGroup;
 import com.axelixlabs.axelix.master.contract.logger.LoggersFeedLogger;
 import com.axelixlabs.axelix.master.contract.logger.LoggersGroupProfile;
 import com.axelixlabs.axelix.master.contract.logger.SingleLoggerProfile;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.BulkInstancesResolver;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
@@ -54,6 +56,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class LoggersMcpServerTools {
 
     private final EndpointInvoker endpointInvoker;
+    private final BulkInstancesResolver bulkInstancesResolver;
 
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
@@ -61,9 +64,11 @@ public class LoggersMcpServerTools {
 
     public LoggersMcpServerTools(
             EndpointInvoker endpointInvoker,
+            BulkInstancesResolver bulkInstancesResolver,
             JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy,
             ObjectMapper objectMapper) {
         this.endpointInvoker = endpointInvoker;
+        this.bulkInstancesResolver = bulkInstancesResolver;
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
         this.objectMapper = objectMapper;
     }
@@ -294,7 +299,8 @@ public class LoggersMcpServerTools {
                 Map.of("name", loggerName),
                 jacksonMessageSerializationStrategy.serialize(
                         new LogLevelChangeRequest().configuredLevel(loggerLevel).ttlSeconds(ttlSeconds)));
-        endpointInvoker.invokeNoValueForInstances(instanceIds, ActuatorEndpoints.SET_ONE_LOGGER, payload);
+        List<Instance> instances = bulkInstancesResolver.resolve(instanceIds);
+        endpointInvoker.invokeNoValueForInstances(instances, ActuatorEndpoints.SET_ONE_LOGGER, payload);
     }
 
     @McpTool(
@@ -388,9 +394,9 @@ public class LoggersMcpServerTools {
             @McpToolParam(description = """
                 The Logger Name. The exact or approximate name of the logger.
                 Partial names are supported.""") String loggerName) {
-
+        List<Instance> instances = bulkInstancesResolver.resolve(instanceIds);
         endpointInvoker.invokeNoValueForInstances(
-                instanceIds, ActuatorEndpoints.RESET_FOR_LOGGER, new DefaultHttpPayload(Map.of("name", loggerName)));
+                instances, ActuatorEndpoints.RESET_FOR_LOGGER, new DefaultHttpPayload(Map.of("name", loggerName)));
     }
 
     private LoggersFeed getAllLoggers(String instanceId) {

@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.service.transport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,14 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
  * Default {@link EndpointInvoker} that delegates the actual query execution to selected {@link EndpointProber}.
@@ -51,10 +48,7 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
 
     private final Map<ActuatorEndpoint, EndpointProber<?>> endpointProbers;
 
-    private final InstanceRegistry instanceRegistry;
-
-    public DefaultEndpointInvoker(List<EndpointProber<?>> endpointProbers, InstanceRegistry instanceRegistry) {
-        this.instanceRegistry = instanceRegistry;
+    public DefaultEndpointInvoker(List<EndpointProber<?>> endpointProbers) {
         this.endpointProbers =
                 endpointProbers.stream().collect(Collectors.toMap(EndpointProber::supports, Function.identity()));
     }
@@ -81,28 +75,10 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
     }
 
     @Override
-    public void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
+    public void invokeNoValueForInstances(List<Instance> instances, ActuatorEndpoint endpoint, HttpPayload payload)
             throws PartiallyUpdatedException {
 
-        List<InstanceId> ids = instanceIds.stream()
-                .filter(StringUtils::hasText)
-                .distinct()
-                .map(InstanceId::of)
-                .toList();
-
         EndpointProber<?> prober = getEndpointProber(endpoint);
-        List<Instance> instances = instanceRegistry.getAllByIds(ids);
-
-        if (instances.size() != ids.size()) {
-            Set<InstanceId> foundIds = instances.stream().map(Instance::id).collect(Collectors.toSet());
-            List<InstanceId> missingIds =
-                    ids.stream().filter(id -> !foundIds.contains(id)).toList();
-            throw new InstanceNotFoundException(missingIds);
-        }
-
-        if (instances.stream().map(Instance::applicationId).distinct().count() > 1) {
-            throw new BadRequestException("All instances must belong to the same application");
-        }
 
         List<String> failedInstanceIds = new ArrayList<>();
 

@@ -68,16 +68,15 @@ public interface EndpointInvoker {
             throws EndpointInvocationException, BadRequestException, InstanceNotFoundException;
 
     /**
-     * Invoke endpoint on multiple instances with the given payload. Blank and duplicated instance IDs are ignored.
+     * Invoke endpoint on the supplied instances with the given payload.
      *
-     * @param instanceIds the IDs of the {@link Instance}s on which the endpoint is supposed to be invoked.
+     * @param instances the instances on which the endpoint is supposed to be invoked.
      * @param endpoint the endpoint that should be invoked.
      * @param payload the HTTP payload (headers, body etc.) to be sent.
      *
-     * @throws InstanceNotFoundException if any requested instance is missing. No commands are sent.
-     * @throws BadRequestException if the instances belong to different applications. No commands are sent.
+     * @throws EndpointInvocationException if the endpoint is unsupported. No commands are sent.
      * @throws PartiallyUpdatedException in case the invocation failed for some of the requested instances (potentially for everything).
      */
-    void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
+    void invokeNoValueForInstances(List<Instance> instances, ActuatorEndpoint endpoint, HttpPayload payload)
             throws PartiallyUpdatedException;
 }

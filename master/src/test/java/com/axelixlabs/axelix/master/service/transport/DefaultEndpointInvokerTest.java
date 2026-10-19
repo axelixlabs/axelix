@@ -50,6 +50,7 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
@@ -160,9 +161,6 @@ public class DefaultEndpointInvokerTest {
     @AfterEach
     void cleanup() {
         registry.deRegister(InstanceId.of(activeInstanceId));
-        registry.deRegister(InstanceId.of(FIRST_INSTANCE_ID));
-        registry.deRegister(InstanceId.of(SECOND_INSTANCE_ID));
-        registry.deRegister(InstanceId.of(FAILING_INSTANCE_ID));
     }
 
     @Test
@@ -252,44 +250,17 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invokeNoValueForInstances_shouldInvokeEndpointNoValueForAllInstances() {
         // given.
-        registry.register(TestInstanceFactory.create(
+        Instance firstInstance = TestInstanceFactory.create(
                 FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString()));
-        registry.register(TestInstanceFactory.create(
+                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString());
+        Instance secondInstance = TestInstanceFactory.create(
                 SECOND_INSTANCE_ID,
-                mockWebServer.url("/" + SECOND_INSTANCE_ID + "/actuator").toString()));
+                mockWebServer.url("/" + SECOND_INSTANCE_ID + "/actuator").toString());
 
         // when.
         assertThatNoException()
                 .isThrownBy(() -> endpointInvoker.invokeNoValueForInstances(
-                        List.of(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID),
-                        METHOD_INVOKE_NO_VALUE,
-                        NoHttpPayload.INSTANCE));
-
-        // then.
-        assertThat(requests)
-                .extracting(request -> request.getMethod() + " " + request.getPath())
-                .containsExactlyInAnyOrder(
-                        "POST /" + FIRST_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value",
-                        "POST /" + SECOND_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value");
-    }
-
-    @Test
-    void invokeNoValueForInstances_shouldIgnoreBlankAndDuplicatedInstanceIds() {
-        // given.
-        registry.register(TestInstanceFactory.create(
-                FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString()));
-        registry.register(TestInstanceFactory.create(
-                SECOND_INSTANCE_ID,
-                mockWebServer.url("/" + SECOND_INSTANCE_ID + "/actuator").toString()));
-
-        // when.
-        assertThatNoException()
-                .isThrownBy(() -> endpointInvoker.invokeNoValueForInstances(
-                        List.of(FIRST_INSTANCE_ID, "", " ", FIRST_INSTANCE_ID, SECOND_INSTANCE_ID, SECOND_INSTANCE_ID),
-                        METHOD_INVOKE_NO_VALUE,
-                        NoHttpPayload.INSTANCE));
+                        List.of(firstInstance, secondInstance), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE));
 
         // then.
         assertThat(requests)
@@ -302,16 +273,16 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invokeNoValueForInstances_shouldThrowPartiallyUpdatedException_WhenSomeInstancesFail() {
         // given.
-        registry.register(TestInstanceFactory.create(
+        Instance firstInstance = TestInstanceFactory.create(
                 FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString()));
-        registry.register(TestInstanceFactory.create(
+                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString());
+        Instance failingInstance = TestInstanceFactory.create(
                 FAILING_INSTANCE_ID,
-                mockWebServer.url("/" + FAILING_INSTANCE_ID + "/actuator").toString()));
+                mockWebServer.url("/" + FAILING_INSTANCE_ID + "/actuator").toString());
 
         // when.
         ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invokeNoValueForInstances(
-                List.of(FIRST_INSTANCE_ID, FAILING_INSTANCE_ID), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
+                List.of(firstInstance, failingInstance), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
 
         // then.
         assertThatThrownBy(callable)
@@ -328,18 +299,16 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invokeNoValueForInstances_shouldThrowPartiallyUpdatedException_WhenAllInstancesFail() {
         // given.
-        registry.register(TestInstanceFactory.create(
+        Instance firstInstance = TestInstanceFactory.create(
                 FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString()));
-        registry.register(TestInstanceFactory.create(
+                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString());
+        Instance secondInstance = TestInstanceFactory.create(
                 SECOND_INSTANCE_ID,
-                mockWebServer.url("/" + SECOND_INSTANCE_ID + "/actuator").toString()));
+                mockWebServer.url("/" + SECOND_INSTANCE_ID + "/actuator").toString());
 
         // when.
         ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invokeNoValueForInstances(
-                List.of(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID),
-                METHOD_INVOKE_NO_VALUE_BAD_REQUEST,
-                NoHttpPayload.INSTANCE);
+                List.of(firstInstance, secondInstance), METHOD_INVOKE_NO_VALUE_BAD_REQUEST, NoHttpPayload.INSTANCE);
 
         // then.
         assertThatThrownBy(callable)
@@ -357,13 +326,13 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invokeNoValueForInstances_shouldThrowEndpointInvocationException_OnUnknownActuatorEndpoint() {
         // given.
-        registry.register(TestInstanceFactory.create(
+        Instance firstInstance = TestInstanceFactory.create(
                 FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString()));
+                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString());
 
         // when.
         ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invokeNoValueForInstances(
-                List.of(FIRST_INSTANCE_ID), of("/unknown", HttpMethod.POST), NoHttpPayload.INSTANCE);
+                List.of(firstInstance), of("/unknown", HttpMethod.POST), NoHttpPayload.INSTANCE);
 
         // then.
         assertThatThrownBy(callable).isInstanceOf(EndpointInvocationException.class);
@@ -371,50 +340,16 @@ public class DefaultEndpointInvokerTest {
     }
 
     @Test
-    void invokeNoValueForInstances_shouldRejectMissingInstancesBeforeSendingAnyCommands() {
-        // given.
-        registry.register(TestInstanceFactory.create(
-                FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString()));
-
-        // when.
-        ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invokeNoValueForInstances(
-                List.of("missing-first", FIRST_INSTANCE_ID, "missing-last", "missing-first"),
-                METHOD_INVOKE_NO_VALUE,
-                NoHttpPayload.INSTANCE);
-
-        // then.
-        assertThatThrownBy(callable).isInstanceOf(InstanceNotFoundException.class);
-        assertThat(requests).isEmpty();
-    }
-
-    @Test
-    void invokeNoValueForInstances_shouldRejectDifferentApplicationsBeforeSendingAnyCommands() {
-        // given.
-        registry.register(TestInstanceFactory.create(FIRST_INSTANCE_ID, "group", "first-app"));
-        registry.register(TestInstanceFactory.create(SECOND_INSTANCE_ID, "group", "second-app"));
-
-        // when / then.
-        assertThatThrownBy(() -> endpointInvoker.invokeNoValueForInstances(
-                        List.of(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE))
-                .isInstanceOf(BadRequestException.class);
-
-        assertThat(requests).isEmpty();
-    }
-
-    @Test
     void invokeNoValueForInstances_shouldUseLoadedInstanceUrls() {
         // given.
-        registry.register(TestInstanceFactory.create(
-                SECOND_INSTANCE_ID, mockWebServer.url("/second-url/actuator").toString()));
-        registry.register(TestInstanceFactory.create(
-                FIRST_INSTANCE_ID, mockWebServer.url("/first-url/actuator").toString()));
+        Instance secondInstance = TestInstanceFactory.create(
+                SECOND_INSTANCE_ID, mockWebServer.url("/second-url/actuator").toString());
+        Instance firstInstance = TestInstanceFactory.create(
+                FIRST_INSTANCE_ID, mockWebServer.url("/first-url/actuator").toString());
 
         // when.
         endpointInvoker.invokeNoValueForInstances(
-                List.of(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID, FIRST_INSTANCE_ID),
-                METHOD_INVOKE_NO_VALUE,
-                NoHttpPayload.INSTANCE);
+                List.of(firstInstance, secondInstance), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
 
         // then.
         assertThat(requests)
@@ -426,9 +361,12 @@ public class DefaultEndpointInvokerTest {
 
     @Test
     void invokeNoValueForInstances_shouldInvokeUsingLoadedActuatorUrl() {
+        // given.
+        Instance instance = TestInstanceFactory.create(
+                activeInstanceId, mockWebServer.url("/actuator").toString());
+
         // when.
-        endpointInvoker.invokeNoValueForInstances(
-                List.of(activeInstanceId), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
+        endpointInvoker.invokeNoValueForInstances(List.of(instance), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
 
         // then.
         assertThat(requests)
