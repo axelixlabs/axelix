@@ -74,6 +74,8 @@ public interface EndpointInvoker {
      * @param endpoint the endpoint that should be invoked.
      * @param payload the HTTP payload (headers, body etc.) to be sent.
      *
+     * @throws InstanceNotFoundException if any requested instance is missing. No commands are sent.
+     * @throws BadRequestException if the instances belong to different applications. No commands are sent.
      * @throws PartiallyUpdatedException in case the invocation failed for some of the requested instances (potentially for everything).
      */
     void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)

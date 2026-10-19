@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.service.transport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,8 +33,10 @@ import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
  * Default {@link EndpointInvoker} that delegates the actual query execution to selected {@link EndpointProber}.
@@ -48,7 +51,10 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
 
     private final Map<ActuatorEndpoint, EndpointProber<?>> endpointProbers;
 
-    public DefaultEndpointInvoker(List<EndpointProber<?>> endpointProbers) {
+    private final InstanceRegistry instanceRegistry;
+
+    public DefaultEndpointInvoker(List<EndpointProber<?>> endpointProbers, InstanceRegistry instanceRegistry) {
+        this.instanceRegistry = instanceRegistry;
         this.endpointProbers =
                 endpointProbers.stream().collect(Collectors.toMap(EndpointProber::supports, Function.identity()));
     }
@@ -78,18 +84,33 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
     public void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
             throws PartiallyUpdatedException {
 
-        List<String> uniqueInstanceIds =
-                instanceIds.stream().filter(StringUtils::hasText).distinct().toList();
+        List<InstanceId> ids = instanceIds.stream()
+                .filter(StringUtils::hasText)
+                .distinct()
+                .map(InstanceId::of)
+                .toList();
 
         EndpointProber<?> prober = getEndpointProber(endpoint);
+        List<Instance> instances = instanceRegistry.getAllByIds(ids);
+
+        if (instances.size() != ids.size()) {
+            Set<InstanceId> foundIds = instances.stream().map(Instance::id).collect(Collectors.toSet());
+            List<InstanceId> missingIds =
+                    ids.stream().filter(id -> !foundIds.contains(id)).toList();
+            throw new InstanceNotFoundException(missingIds);
+        }
+
+        if (instances.stream().map(Instance::applicationId).distinct().count() > 1) {
+            throw new BadRequestException("All instances must belong to the same application");
+        }
 
         List<String> failedInstanceIds = new ArrayList<>();
 
-        for (String instanceId : uniqueInstanceIds) {
+        for (Instance instance : instances) {
             try {
-                prober.invoke(InstanceId.of(instanceId), payload);
-            } catch (EndpointInvocationException | BadRequestException | InstanceNotFoundException e) {
-                failedInstanceIds.add(instanceId);
+                prober.invoke(instance.actuatorUrl(), payload);
+            } catch (EndpointInvocationException | BadRequestException e) {
+                failedInstanceIds.add(instance.id().instanceId());
             }
         }
 

@@ -82,6 +82,20 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     @Autowired
     private InstanceRegistry registry;
 
+    @Test
+    void shouldRejectInstancesFromDifferentApplicationsWithoutSendingCommands() {
+        registry.register(TestInstanceFactory.create(siblingInstanceId, "another-group", "another-app"));
+        LogLevelLoggerBulkChangeRequest request = new LogLevelLoggerBulkChangeRequest(
+                List.of(activeInstanceId, siblingInstanceId), "logger.name", null, "DEBUG");
+
+        ResponseEntity<String> response =
+                restTemplate.asEditor().postForEntity("/api/external/loggers/logger", request, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).contains("BAD_REQUEST");
+        assertThat(invokedPaths).isEmpty();
+    }
+
     @BeforeAll
     static void startServer() throws IOException {
         mockWebServer = new MockWebServer();
@@ -293,10 +307,13 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
         }
 
         @Test
-        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenUpdatingOnUnknownInstance() {
+        void shouldReturnBadRequestWithoutInvokingAnyInstances_WhenUpdatingOnUnknownInstance() {
             // given.
             LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
-                    List.of("unknown-logger-instance", siblingInstanceId), "logger.name", null, "DEBUG");
+                    List.of("unknown-logger-instance", siblingInstanceId, "another-missing-instance"),
+                    "logger.name",
+                    null,
+                    "DEBUG");
 
             // when.
             ResponseEntity<String> response =
@@ -304,9 +321,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
-            assertThat(invokedPaths)
-                    .containsExactly("/" + siblingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
+            assertThat(response.getBody()).contains("INSTANCE_NOT_FOUND");
+            assertThat(invokedPaths).isEmpty();
         }
     }
 
@@ -440,10 +456,11 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
         }
 
         @Test
-        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenResettingOnUnknownInstance() {
+        void shouldReturnBadRequestWithoutInvokingAnyInstances_WhenResettingOnUnknownInstance() {
             // given.
             LogLevelLoggerBulkResetRequest requestBody = new LogLevelLoggerBulkResetRequest(
-                    List.of("unknown-logger-instance", siblingInstanceId), "reset.logger.name");
+                    List.of("unknown-logger-instance", siblingInstanceId, "another-missing-instance"),
+                    "reset.logger.name");
 
             // when.
             ResponseEntity<String> response = restTemplate
@@ -452,9 +469,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
-            assertThat(invokedPaths)
-                    .containsExactly("/" + siblingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset");
+            assertThat(response.getBody()).contains("INSTANCE_NOT_FOUND");
+            assertThat(invokedPaths).isEmpty();
         }
 
         @ParameterizedTest

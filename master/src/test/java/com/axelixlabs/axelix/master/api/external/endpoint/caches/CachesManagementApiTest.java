@@ -242,10 +242,10 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
     @ParameterizedTest
     @MethodSource("cacheOperations")
-    void shouldReturnBadRequestAndInvokeRemainingInstances_WhenInstanceIsUnknown(String operation) {
+    void shouldReturnBadRequestWithoutInvokingAnyInstances_WhenInstanceIsUnknown(String operation) {
         // given.
         CacheBulkStatusChangeRequest requestBody = new CacheBulkStatusChangeRequest(
-                List.of("unknown-cache-instance", siblingInstanceId), "manager", "orders");
+                List.of("unknown-cache-instance", siblingInstanceId, "another-missing-instance"), "manager", "orders");
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -254,10 +254,8 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
-        assertThat(invokedPaths)
-                .containsExactlyInAnyOrder(
-                        "/" + siblingInstanceId + "/actuator/axelix-caches/manager/orders/" + operation);
+        assertThat(response.getBody()).contains("INSTANCE_NOT_FOUND");
+        assertThat(invokedPaths).isEmpty();
     }
 
     @ParameterizedTest

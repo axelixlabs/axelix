@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.exception;
 
+import java.util.List;
+
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -33,5 +35,10 @@ public class InstanceNotFoundException extends RuntimeException {
 
     public InstanceNotFoundException(InstanceId instanceId) {
         super("The application's instance with id '%s' is not found".formatted(instanceId));
+    }
+
+    public InstanceNotFoundException(List<InstanceId> instanceIds) {
+        super("Instances with the following IDs were not found: "
+                + instanceIds.stream().map(InstanceId::instanceId).toList());
     }
 }

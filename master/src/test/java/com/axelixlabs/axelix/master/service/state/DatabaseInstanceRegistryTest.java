@@ -70,6 +70,22 @@ class DatabaseInstanceRegistryTest {
     }
 
     @Test
+    void getAllByIds_shouldLoadOnlyExistingSelectedInstances() {
+        instanceRegistry.register(TestInstanceFactory.create("selected-instance"));
+        instanceRegistry.register(TestInstanceFactory.create("unselected-instance"));
+
+        List<Instance> instances = instanceRegistry.getAllByIds(
+                List.of(InstanceId.of("selected-instance"), InstanceId.of("missing-instance")));
+
+        assertThat(instances).extracting(Instance::id).containsExactly(InstanceId.of("selected-instance"));
+    }
+
+    @Test
+    void getAllByIds_shouldReturnEmptyListForEmptySelection() {
+        assertThat(instanceRegistry.getAllByIds(List.of())).isEmpty();
+    }
+
+    @Test
     void reload_shouldPersistInstance() {
 
         // given.
