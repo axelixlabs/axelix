@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.util.concurrent.ScheduledFuture;
 
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
@@ -32,13 +31,14 @@ import org.springframework.util.Assert;
  *
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
+ * @author Dmitry Mazurov
  */
 public final class TriggerBasedTaskRescheduler implements TaskRescheduler {
 
-    private final TaskScheduler taskScheduler;
+    private final TaskSchedulerProvider taskSchedulerProvider;
 
-    public TriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
-        this.taskScheduler = taskScheduler;
+    public TriggerBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+        this.taskSchedulerProvider = taskSchedulerProvider;
     }
 
     @Override
@@ -50,8 +50,9 @@ public final class TriggerBasedTaskRescheduler implements TaskRescheduler {
                         newTask.getClass()));
 
         // returned rescheduledFuture may be null in case the supplied Trigger won't fire anymore
-        ScheduledFuture<?> rescheduledFuture =
-                taskScheduler.schedule(newTask.getRunnable(), ((TriggerTask) newTask).getTrigger());
+        ScheduledFuture<?> rescheduledFuture = taskSchedulerProvider
+                .getTaskScheduler()
+                .schedule(newTask.getRunnable(), ((TriggerTask) newTask).getTrigger());
 
         task.replaceScheduledState(rescheduledFuture, newTask);
     }

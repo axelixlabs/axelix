@@ -57,6 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  * @author Vyacheslav Yanin
+ * @author Dmitry Mazurov
  */
 @SpringBootTest
 @Import(ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class)
@@ -301,13 +302,18 @@ class ScheduledTaskServiceTest {
         }
 
         @Bean
-        TaskRescheduler testTriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
-            return new TriggerBasedTaskRescheduler(taskScheduler);
+        TaskSchedulerProvider testTaskSchedulerProvider(TaskScheduler taskScheduler) {
+            return () -> taskScheduler;
         }
 
         @Bean
-        TaskRescheduler testIntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
-            return new IntervalBasedTaskRescheduler(taskScheduler);
+        TaskRescheduler testTriggerBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+            return new TriggerBasedTaskRescheduler(taskSchedulerProvider);
+        }
+
+        @Bean
+        TaskRescheduler testIntervalBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+            return new IntervalBasedTaskRescheduler(taskSchedulerProvider);
         }
 
         @Bean

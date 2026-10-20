@@ -23,11 +23,12 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ApplicationTaskSchedulerProvider;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
@@ -35,6 +36,7 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskSchedulerProvider;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskRescheduler;
 
 /**
@@ -53,8 +55,18 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
 public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
-    TaskManagementThreadPools taskManagementThreadPools() {
-        return new TaskManagementThreadPools();
+    TaskManagementExecutor taskManagementExecutor() {
+        return new TaskManagementExecutor();
+    }
+
+    // The declared type must not be a SchedulingConfigurer: Spring Boot looks at it only, and in the older versions
+    // it does not create its own 'taskScheduler' when there is a SchedulingConfigurer bean. Spring itself still
+    // finds the configurer by the actual type of the instance, so the bean must be created before the context
+    // refresh, i.e. it must not be lazy.
+    @Bean
+    @Lazy(false)
+    public TaskSchedulerProvider taskSchedulerProvider() {
+        return new ApplicationTaskSchedulerProvider();
     }
 
     @Bean
@@ -66,18 +78,18 @@ public class ScheduledTaskManagementAutoConfiguration {
     ScheduledTaskService scheduledTaskService(
             ScheduledTasksRegistry scheduledTasksRegistry,
             List<TaskRescheduler> taskReschedulers,
-            TaskManagementThreadPools taskManagementThreadPools) {
-        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, taskManagementThreadPools.executor());
+            TaskManagementExecutor taskManagementExecutor) {
+        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, taskManagementExecutor.executor());
     }
 
     @Bean
-    TaskRescheduler intervalBasedTaskRescheduler(TaskManagementThreadPools taskManagementThreadPools) {
-        return new IntervalBasedTaskRescheduler(taskManagementThreadPools.scheduler());
+    public TaskRescheduler intervalBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+        return new IntervalBasedTaskRescheduler(taskSchedulerProvider);
     }
 
     @Bean
-    TaskRescheduler triggerBasedTaskRescheduler(TaskManagementThreadPools taskManagementThreadPools) {
-        return new TriggerBasedTaskRescheduler(taskManagementThreadPools.scheduler());
+    public TaskRescheduler triggerBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+        return new TriggerBasedTaskRescheduler(taskSchedulerProvider);
     }
 
     @Bean
@@ -91,20 +103,13 @@ public class ScheduledTaskManagementAutoConfiguration {
         return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
     }
 
-    static final class TaskManagementThreadPools implements AutoCloseable {
-
-        static final String SCHEDULER_NAME = "ax-scheduler-";
+    static final class TaskManagementExecutor implements AutoCloseable {
 
         static final String EXECUTOR_NAME = "ax-executor-";
 
-        private final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-
         private final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
-        TaskManagementThreadPools() {
-            scheduler.setPoolSize(1);
-            scheduler.setThreadNamePrefix(SCHEDULER_NAME);
-
+        TaskManagementExecutor() {
             executor.setCorePoolSize(1);
             executor.setMaxPoolSize(3);
             executor.setAllowCoreThreadTimeOut(false);
@@ -113,12 +118,7 @@ public class ScheduledTaskManagementAutoConfiguration {
             executor.setWaitForTasksToCompleteOnShutdown(true);
             executor.setThreadNamePrefix(EXECUTOR_NAME);
 
-            scheduler.initialize();
             executor.initialize();
-        }
-
-        ThreadPoolTaskScheduler scheduler() {
-            return scheduler;
         }
 
         ThreadPoolTaskExecutor executor() {
@@ -127,7 +127,6 @@ public class ScheduledTaskManagementAutoConfiguration {
 
         @Override
         public void close() {
-            scheduler.destroy();
             executor.destroy();
         }
     }

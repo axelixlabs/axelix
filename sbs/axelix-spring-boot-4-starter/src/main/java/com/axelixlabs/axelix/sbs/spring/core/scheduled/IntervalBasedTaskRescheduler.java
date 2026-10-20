@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
 
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.Task;
@@ -31,31 +30,36 @@ import org.springframework.scheduling.config.Task;
  *
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
+ * @author Dmitry Mazurov
  */
 public final class IntervalBasedTaskRescheduler implements TaskRescheduler {
 
-    private final TaskScheduler taskScheduler;
+    private final TaskSchedulerProvider taskSchedulerProvider;
 
-    public IntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
-        this.taskScheduler = taskScheduler;
+    public IntervalBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+        this.taskSchedulerProvider = taskSchedulerProvider;
     }
 
     @Override
     public void reschedule(ManagedScheduledTask task, Task newTask) {
         if (newTask instanceof FixedDelayTask fixedDelayTask) {
-            ScheduledFuture<?> scheduledFuture = taskScheduler.scheduleWithFixedDelay(
-                    newTask.getRunnable(),
-                    Instant.now().plus(fixedDelayTask.getInitialDelayDuration()),
-                    fixedDelayTask.getIntervalDuration());
+            ScheduledFuture<?> scheduledFuture = taskSchedulerProvider
+                    .getTaskScheduler()
+                    .scheduleWithFixedDelay(
+                            newTask.getRunnable(),
+                            Instant.now().plus(fixedDelayTask.getInitialDelayDuration()),
+                            fixedDelayTask.getIntervalDuration());
 
             task.replaceScheduledState(scheduledFuture, newTask);
         }
 
         if (newTask instanceof FixedRateTask fixedRateTask) {
-            ScheduledFuture<?> scheduledFuture = taskScheduler.scheduleAtFixedRate(
-                    newTask.getRunnable(),
-                    Instant.now().plus(fixedRateTask.getInitialDelayDuration()),
-                    fixedRateTask.getIntervalDuration());
+            ScheduledFuture<?> scheduledFuture = taskSchedulerProvider
+                    .getTaskScheduler()
+                    .scheduleAtFixedRate(
+                            newTask.getRunnable(),
+                            Instant.now().plus(fixedRateTask.getInitialDelayDuration()),
+                            fixedRateTask.getIntervalDuration());
 
             task.replaceScheduledState(scheduledFuture, newTask);
         }
