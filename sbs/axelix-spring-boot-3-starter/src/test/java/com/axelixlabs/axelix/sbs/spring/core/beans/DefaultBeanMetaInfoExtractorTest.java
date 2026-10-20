@@ -17,10 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.beans;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.Scope;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 
@@ -31,6 +37,11 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
 import com.axelixlabs.axelix.sbs.spring.core.contract.beans.SyntheticBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration test for {@link DefaultBeanMetaInfoExtractor}.
@@ -43,6 +54,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
+
+    private static final String INACTIVE_SCOPE = "inactive";
+
+    private static final String INACTIVE_SCOPED_TARGET = "scopedTarget.inactiveScopedBean";
 
     @Autowired
     private BeanMetaInfoExtractor metaInfoExtractor;
@@ -294,4 +309,68 @@ class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
             assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
+
+    @Test // GH-1800
+    void shouldExtractMetadataWithoutAccessingInactiveScopedBean() {
+        // given.
+        DefaultListableBeanFactory isolatedBeanFactory = new DefaultListableBeanFactory();
+        Scope inactiveScope = mock(Scope.class);
+        when(inactiveScope.get(anyString(), any())).thenThrow(new IllegalStateException("Scope is not active"));
+
+        isolatedBeanFactory.registerScope(INACTIVE_SCOPE, inactiveScope);
+
+        RootBeanDefinition beanDefinition = new RootBeanDefinition(NonInstantiatedBean.class);
+        beanDefinition.setScope(INACTIVE_SCOPE);
+        isolatedBeanFactory.registerBeanDefinition(INACTIVE_SCOPED_TARGET, beanDefinition);
+
+        // when.
+        metaInfoExtractor.extract(INACTIVE_SCOPED_TARGET, isolatedBeanFactory);
+
+        // then.
+        verifyNoInteractions(inactiveScope);
+    }
+
+    @Test // GH-1800
+    void shouldExtractMetadataWithoutInstantiatingLazyBean() {
+        // given.
+        DefaultListableBeanFactory isolatedBeanFactory = new DefaultListableBeanFactory();
+        AtomicBoolean beanInstantiated = new AtomicBoolean();
+
+        RootBeanDefinition beanDefinition = new RootBeanDefinition(NonInstantiatedBean.class);
+        beanDefinition.setLazyInit(true);
+        beanDefinition.setInstanceSupplier(() -> {
+            beanInstantiated.set(true);
+            return new NonInstantiatedBean();
+        });
+        isolatedBeanFactory.registerBeanDefinition("lazyBean", beanDefinition);
+
+        // when.
+        metaInfoExtractor.extract("lazyBean", isolatedBeanFactory);
+
+        // then.
+        assertThat(beanInstantiated.get()).isFalse();
+    }
+
+    @Test // GH-1800
+    void shouldExtractMetadataWithoutInstantiatingPrototypeBean() {
+        // given.
+        DefaultListableBeanFactory isolatedBeanFactory = new DefaultListableBeanFactory();
+        AtomicBoolean beanInstantiated = new AtomicBoolean();
+
+        RootBeanDefinition beanDefinition = new RootBeanDefinition(NonInstantiatedBean.class);
+        beanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+        beanDefinition.setInstanceSupplier(() -> {
+            beanInstantiated.set(true);
+            return new NonInstantiatedBean();
+        });
+        isolatedBeanFactory.registerBeanDefinition("prototypeBean", beanDefinition);
+
+        // when.
+        metaInfoExtractor.extract("prototypeBean", isolatedBeanFactory);
+
+        // then.
+        assertThat(beanInstantiated.get()).isFalse();
+    }
+
+    private static class NonInstantiatedBean {}
 }

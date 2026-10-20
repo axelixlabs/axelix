@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.beans;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,16 +79,17 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     @Override
     public BeanMetaInfo extract(String beanName, ConfigurableListableBeanFactory beanFactory) {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-        Object bean = beanFactory.getBean(beanName);
+        Class<?> beanType = beanFactory.containsSingleton(beanName)
+                ? beanFactory.getBean(beanName).getClass()
+                : Objects.requireNonNull(beanFactory.getType(beanName, false));
         Set<String> positiveConditionsKeys = conditionsKeys();
 
-        Class<?> beanType = bean.getClass();
         ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(beanType, beanType.isHidden());
 
         BeanSource beanSource = analyzeBeanSource(beanDefinition, beanName);
 
         return new BeanMetaInfo(
-                getConditionRef(positiveConditionsKeys, beanDefinition, beanSource, beanName, bean),
+                getConditionRef(positiveConditionsKeys, beanDefinition, beanSource, beanName, beanType),
                 beanProxyingType,
                 beanDefinition.isLazyInit(),
                 beanDefinition.isPrimary(),
@@ -203,14 +205,14 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             BeanDefinition beanDefinition,
             BeanSource beanSource,
             String beanName,
-            Object bean) {
+            Class<?> beanType) {
 
         Class<?> configPropsTarget;
 
         if (beanSource instanceof BeanMethod) {
             configPropsTarget = extractEnclosingClass(beanDefinition, beanName);
         } else {
-            configPropsTarget = bean.getClass();
+            configPropsTarget = beanType;
         }
 
         String normalizedBeanName =
