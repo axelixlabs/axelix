@@ -414,6 +414,35 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanInstantiated.get()).isFalse();
     }
 
+    @Test // GH-1800
+    void shouldExtractMetadataWhenBeanTypeCannotBeDeterminedWithoutInitialization() {
+        // given.
+        DefaultListableBeanFactory isolatedBeanFactory = new DefaultListableBeanFactory();
+        AtomicBoolean factoryInstantiated = new AtomicBoolean();
+        org.springframework.beans.factory.FactoryBean<?> factoryBean =
+                mock(org.springframework.beans.factory.FactoryBean.class);
+
+        RootBeanDefinition beanDefinition = new RootBeanDefinition(org.springframework.beans.factory.FactoryBean.class);
+        beanDefinition.setLazyInit(true);
+        beanDefinition.setPrimary(true);
+        beanDefinition.setInstanceSupplier(() -> {
+            factoryInstantiated.set(true);
+            return factoryBean;
+        });
+        isolatedBeanFactory.registerBeanDefinition("unknownTypeBean", beanDefinition);
+
+        // when.
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract("unknownTypeBean", isolatedBeanFactory);
+
+        // then.
+        assertThat(beanMetaInfo.getProxyType()).isEqualTo(ProxyType.UNKNOWN);
+        assertThat(beanMetaInfo.isLazyInit()).isTrue();
+        assertThat(beanMetaInfo.isPrimary()).isTrue();
+        assertThat(beanMetaInfo.getAutoConfigurationRef()).isNull();
+        assertThat(factoryInstantiated.get()).isFalse();
+        verifyNoInteractions(factoryBean);
+    }
+
     private static class NonInstantiatedBean {}
 
     @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})

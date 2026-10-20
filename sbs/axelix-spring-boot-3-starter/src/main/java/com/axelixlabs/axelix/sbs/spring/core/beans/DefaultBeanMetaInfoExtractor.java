@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.beans;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,10 +80,10 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
         Class<?> beanType = beanFactory.containsSingleton(beanName)
                 ? beanFactory.getBean(beanName).getClass()
-                : Objects.requireNonNull(beanFactory.getType(beanName, false));
+                : beanFactory.getType(beanName, false);
         Set<String> positiveConditionsKeys = conditionsKeys();
 
-        ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(beanType, beanType.isHidden());
+        ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(beanType, beanType != null && beanType.isHidden());
 
         BeanSource beanSource = analyzeBeanSource(beanDefinition, beanName);
 
@@ -205,7 +204,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             BeanDefinition beanDefinition,
             BeanSource beanSource,
             String beanName,
-            Class<?> beanType) {
+            @Nullable Class<?> beanType) {
 
         Class<?> configPropsTarget;
 
@@ -218,7 +217,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
         String normalizedBeanName =
                 conditionalBeanRefBuilder.buildBeanRef(configPropsTarget, beanDefinition.getFactoryMethodName());
 
-        if (positiveConditionsKeys.contains(normalizedBeanName)) {
+        if (normalizedBeanName != null && positiveConditionsKeys.contains(normalizedBeanName)) {
             return normalizedBeanName;
         } else {
             return null;

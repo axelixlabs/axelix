@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.core.utils;
 
 import java.lang.reflect.Proxy;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
 
 /**
@@ -48,11 +50,16 @@ public class ProxyUtils {
     /**
      * Determines the type of proxy used by the given bean class.
      *
-     * @param isRuntimeGeneratedClass   whether the class is runtime-generated (hidden or synthetic)
-     * @param beanType                  the bean class at runtime.
-     * @return the proxy type, or ProxyType#NO_PROXYING if the class is not proxied.
+     * @param isRuntimeGeneratedClass   whether the class is runtime-generated (hidden or synthetic);
+     *                                  ignored when {@code beanType} is {@code null}.
+     * @param beanType                  the bean class, or {@code null} if its type cannot be determined.
+     * @return the proxy type, {@link ProxyType#NO_PROXYING} if the class is not proxied,
+     *         or {@link ProxyType#UNKNOWN} if {@code beanType} is {@code null}.
      */
-    public static ProxyType analyzeProxyType(Class<?> beanType, boolean isRuntimeGeneratedClass) {
+    public static ProxyType analyzeProxyType(@Nullable Class<?> beanType, boolean isRuntimeGeneratedClass) {
+        if (beanType == null) {
+            return ProxyType.UNKNOWN;
+        }
         if (Proxy.isProxyClass(beanType)) {
             return ProxyType.JDK_PROXY;
         } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR) && !isRuntimeGeneratedClass) {
