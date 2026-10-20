@@ -56,6 +56,7 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyUtils;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Andrey Kotov
  * @since 04.07.2025
  */
 @NullMarked
@@ -78,16 +79,17 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     @Override
     public BeanMetaInfo extract(String beanName, ConfigurableListableBeanFactory beanFactory) {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-        Object bean = beanFactory.getBean(beanName);
+        Class<?> beanType = beanFactory.containsSingleton(beanName)
+                ? beanFactory.getBean(beanName).getClass()
+                : beanFactory.getType(beanName, false);
         Set<String> positiveConditionsKeys = conditionsKeys();
 
-        Class<?> beanType = bean.getClass();
-        ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(beanType, beanType.isHidden());
+        ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(beanType, beanType != null && beanType.isHidden());
 
         BeanSource beanSource = analyzeBeanSource(beanDefinition, beanName);
 
         return new BeanMetaInfo(
-                getConditionRef(positiveConditionsKeys, beanDefinition, beanSource, beanName, bean),
+                getConditionRef(positiveConditionsKeys, beanDefinition, beanSource, beanName, beanType),
                 beanProxyingType,
                 beanDefinition.isLazyInit(),
                 beanDefinition.isPrimary(),
@@ -203,20 +205,20 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             BeanDefinition beanDefinition,
             BeanSource beanSource,
             String beanName,
-            Object bean) {
+            @Nullable Class<?> beanType) {
 
         Class<?> configPropsTarget;
 
         if (beanSource instanceof BeanMethod) {
             configPropsTarget = extractEnclosingClass(beanDefinition, beanName);
         } else {
-            configPropsTarget = bean.getClass();
+            configPropsTarget = beanType;
         }
 
         String normalizedBeanName =
                 conditionalBeanRefBuilder.buildBeanRef(configPropsTarget, beanDefinition.getFactoryMethodName());
 
-        if (positiveConditionsKeys.contains(normalizedBeanName)) {
+        if (normalizedBeanName != null && positiveConditionsKeys.contains(normalizedBeanName)) {
             return normalizedBeanName;
         } else {
             return null;

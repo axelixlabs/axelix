@@ -127,11 +127,14 @@ components:
           x-axelix-introduced-in: 1.2.0
     ProxyType:
       type: string
-      description: The proxying approach that has been applied for the given bean.
+      description: >-
+        The proxying approach that has been applied for the given bean.
+        UNKNOWN means the proxying approach cannot be determined because the bean type is unknown.
       enum:
         - JDK_PROXY
         - CGLIB
         - NO_PROXYING
+        - UNKNOWN
     BeanOrigin:
       type: string
       description: >-
