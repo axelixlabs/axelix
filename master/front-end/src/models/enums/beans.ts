@@ -19,6 +19,7 @@ export enum EProxyType {
     JDK_PROXY = "JDK_PROXY",
     CGLIB = "CGLIB",
     NO_PROXYING = "NO_PROXYING",
+    UNKNOWN = "UNKNOWN",
 }
 
 /**

@@ -22,7 +22,7 @@ import { EProxyType, ESearchSubject, type IBean } from "@/models";
 import { normalizeHtmlElementId } from "./globals";
 
 export const resolveProxying = (t: TFunction, proxyType: EProxyType | null): string => {
-    if (!proxyType) {
+    if (!proxyType || proxyType === EProxyType.UNKNOWN) {
         return t("Beans.unknownProxyingType");
     }
 
