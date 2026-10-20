@@ -56,6 +56,7 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyUtils;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Andrey Kotov
  * @since 04.07.2025
  */
 @NullMarked

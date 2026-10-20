@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Andrey Kotov
  */
 public class ProxyUtils {
     /**

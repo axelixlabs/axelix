@@ -52,6 +52,7 @@ import static org.mockito.Mockito.when;
  * @since 07.07.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Andrey Kotov
  */
 class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
 

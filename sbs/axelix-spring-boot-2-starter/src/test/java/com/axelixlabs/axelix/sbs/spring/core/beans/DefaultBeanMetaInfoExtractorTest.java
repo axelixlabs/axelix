@@ -93,6 +93,7 @@ import static org.mockito.Mockito.when;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Vyacheslav Yanin
+ * @author Andrey Kotov
  */
 @SpringBootTest(classes = DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.class)
 class DefaultBeanMetaInfoExtractorTest {
