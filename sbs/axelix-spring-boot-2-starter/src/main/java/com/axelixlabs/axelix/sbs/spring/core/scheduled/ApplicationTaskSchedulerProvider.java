@@ -17,7 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -34,9 +38,13 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 public final class ApplicationTaskSchedulerProvider
         implements TaskSchedulerProvider, SchedulingConfigurer, AutoCloseable {
 
+    private static final Logger log = LoggerFactory.getLogger(ApplicationTaskSchedulerProvider.class);
+
     public static final String FALLBACK_THREAD_NAME_PREFIX = "ax-scheduler-";
 
     private final ThreadPoolTaskScheduler fallbackScheduler = new ThreadPoolTaskScheduler();
+
+    private final AtomicBoolean fallbackReported = new AtomicBoolean();
 
     private volatile @Nullable ScheduledTaskRegistrar registrar;
 
@@ -56,7 +64,16 @@ public final class ApplicationTaskSchedulerProvider
         ScheduledTaskRegistrar currentRegistrar = this.registrar;
         TaskScheduler scheduler = currentRegistrar != null ? currentRegistrar.getScheduler() : null;
 
-        return scheduler != null ? scheduler : fallbackScheduler;
+        if (scheduler != null) {
+            return scheduler;
+        }
+
+        if (fallbackReported.compareAndSet(false, true)) {
+            log.warn(
+                    "Could not obtain the application's TaskScheduler, re-scheduled tasks will run on the Axelix fallback scheduler");
+        }
+
+        return fallbackScheduler;
     }
 
     @Override

@@ -23,7 +23,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -38,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 20.10.2026
  * @author Dmitry Mazurov
  */
+@ExtendWith(OutputCaptureExtension.class)
 class ApplicationTaskSchedulerProviderTest {
 
     private final ApplicationTaskSchedulerProvider provider = new ApplicationTaskSchedulerProvider();
@@ -95,6 +99,39 @@ class ApplicationTaskSchedulerProviderTest {
 
         // then
         assertThatThrownBy(() -> scheduler.schedule(() -> {}, Instant.now())).isInstanceOf(TaskRejectedException.class);
+    }
+
+    @Test // GH-1726
+    void shouldWarn_whenFallsBackToOwnScheduler(CapturedOutput output) {
+        // when
+        provider.getTaskScheduler();
+
+        // then
+        assertThat(output).contains("Axelix fallback scheduler");
+    }
+
+    @Test // GH-1726
+    void shouldNotWarn_whenRegistrarHasScheduler(CapturedOutput output) {
+        // given
+        ScheduledTaskRegistrar registrar = new ScheduledTaskRegistrar();
+        registrar.setTaskScheduler(new ThreadPoolTaskScheduler());
+        provider.configureTasks(registrar);
+
+        // when
+        provider.getTaskScheduler();
+
+        // then
+        assertThat(output).doesNotContain("Axelix fallback scheduler");
+    }
+
+    @Test // GH-1726
+    void shouldWarnOnlyOnce_whenFallsBackToOwnSchedulerRepeatedly(CapturedOutput output) {
+        // when
+        provider.getTaskScheduler();
+        provider.getTaskScheduler();
+
+        // then
+        assertThat(output.getAll()).containsOnlyOnce("Axelix fallback scheduler");
     }
 
     private static String threadNameOf(TaskScheduler scheduler) throws Exception {
