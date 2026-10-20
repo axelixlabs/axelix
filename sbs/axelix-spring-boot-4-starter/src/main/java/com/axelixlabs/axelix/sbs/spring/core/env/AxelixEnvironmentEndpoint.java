@@ -17,11 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
+import java.security.Principal;
+
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.AxelixPrincipal;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
 
 /**
@@ -35,13 +39,17 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
 public class AxelixEnvironmentEndpoint {
 
     private final EnvironmentService environmentService;
+    private final SecurityContextExecutor securityContextExecutor;
 
-    public AxelixEnvironmentEndpoint(EnvironmentService environmentService) {
+    public AxelixEnvironmentEndpoint(
+            EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
         this.environmentService = environmentService;
+        this.securityContextExecutor = securityContextExecutor;
     }
 
     @GetMapping
-    public EnvironmentFeed environment(@Nullable String pattern) {
-        return environmentService.getEnvironmentFeed(pattern);
+    public EnvironmentFeed environment(@Nullable String pattern, @Nullable Principal principal) {
+        return AxelixPrincipal.callWithin(
+                principal, securityContextExecutor, () -> environmentService.getEnvironmentFeed(pattern));
     }
 }

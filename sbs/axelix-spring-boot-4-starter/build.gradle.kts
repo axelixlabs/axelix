@@ -21,6 +21,7 @@ dependencies {
     // Compile
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
     compileOnly("org.springframework.boot:spring-boot-starter-web")
+    compileOnly("org.springframework.boot:spring-boot-starter-webflux")
     compileOnly("org.springframework.cloud:spring-cloud-context")
     compileOnly("org.springframework.boot:spring-boot-starter-data-jpa")
     compileOnly("org.springframework.kafka:spring-kafka")
@@ -45,6 +46,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-restclient")
     testImplementation("org.springframework.cloud:spring-cloud-starter")
     testImplementation("org.springframework.boot:spring-boot-starter-cache")

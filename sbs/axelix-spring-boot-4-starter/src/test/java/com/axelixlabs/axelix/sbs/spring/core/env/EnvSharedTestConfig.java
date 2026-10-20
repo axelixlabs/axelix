@@ -185,8 +185,9 @@ public class EnvSharedTestConfig {
 
     @Bean
     public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-            @Qualifier(EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE) EnvironmentService environmentService) {
-        return new AxelixEnvironmentEndpoint(environmentService);
+            @Qualifier(EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE) EnvironmentService environmentService,
+            SecurityContextExecutor securityContextExecutor) {
+        return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
     }
 
     @Bean(SAMPLE_BEAN_NAME)

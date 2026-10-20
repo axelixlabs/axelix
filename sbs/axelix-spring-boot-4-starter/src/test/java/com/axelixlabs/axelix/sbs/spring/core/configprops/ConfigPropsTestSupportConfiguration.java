@@ -118,8 +118,9 @@ public class ConfigPropsTestSupportConfiguration {
     @Bean
     public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
             @Qualifier(EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE)
-                    DefaultConfigurationPropertiesService configurationPropertiesService) {
-        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
+                    DefaultConfigurationPropertiesService configurationPropertiesService,
+            SecurityContextExecutor securityContextExecutor) {
+        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService, securityContextExecutor);
     }
 
     @ConfigurationProperties(prefix = "axelix.prop.test")

@@ -88,7 +88,8 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     }
 
     @Bean
-    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
-        return new AxelixEnvironmentEndpoint(environmentService);
+    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
+            EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
+        return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
     }
 }
