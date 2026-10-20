@@ -21,8 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.contract.logs.LogEntry;
 import com.axelixlabs.axelix.sbs.spring.core.logs.AxelixLogsEndpoint;
 
@@ -32,11 +34,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link AxelixLogsEndpointAutoConfiguration}
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 class AxelixLogsEndpointAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(AxelixLogsEndpointAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(
+                    ConfigurationPropertiesAutoConfiguration.class, AxelixLogsEndpointAutoConfiguration.class));
 
     @Test
     void shouldCaptureLogEntriesInDefaultScenario() {
@@ -68,5 +72,59 @@ class AxelixLogsEndpointAutoConfigurationTest {
     @Test
     void shouldNotActivateAutoConfigurationWithoutRequiredProperty() {
         contextRunner.run(context -> assertThat(context).doesNotHaveBean(AxelixLogsEndpoint.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldKeepTheDefaultAmountOfLogEntries() {
+        contextRunner
+                .withPropertyValues("management.endpoints.web.exposure.include=axelix-logs")
+                .run(context -> {
+                    // given.
+                    SlidingWindow<LogEntry> logEntries = context.getBean("logEntries", SlidingWindow.class);
+                    fill(logEntries, 1001);
+
+                    // when.
+                    int buffered = context.getBean(AxelixLogsEndpoint.class).tail(null).getEntries().size();
+
+                    // then.
+                    assertThat(buffered).isEqualTo(1000);
+                });
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldKeepTheConfiguredAmountOfLogEntries() {
+        contextRunner
+                .withPropertyValues(
+                        "management.endpoints.web.exposure.include=axelix-logs", "axelix.sbs.logs.max-entries=2")
+                .run(context -> {
+                    // given.
+                    SlidingWindow<LogEntry> logEntries = context.getBean("logEntries", SlidingWindow.class);
+                    fill(logEntries, 5);
+
+                    // when.
+                    int buffered = context.getBean(AxelixLogsEndpoint.class).tail(null).getEntries().size();
+
+                    // then.
+                    assertThat(buffered).isEqualTo(2);
+                });
+    }
+
+    @Test
+    void shouldNotActivateAutoConfigurationWhenTheAmountOfLogEntriesIsNotPositive() {
+        contextRunner
+                .withPropertyValues(
+                        "management.endpoints.web.exposure.include=axelix-logs", "axelix.sbs.logs.max-entries=0")
+                .run(context -> {
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure()).hasRootCauseInstanceOf(IllegalArgumentException.class);
+                });
+    }
+
+    private static void fill(SlidingWindow<LogEntry> logEntries, int amount) {
+        for (int i = 0; i < amount; i++) {
+            logEntries.put(new LogEntry().message("entry " + i));
+        }
     }
 }
