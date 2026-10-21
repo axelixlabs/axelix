@@ -221,7 +221,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
         }
 
         @Test
-        void shouldReturnBadRequestWithoutInvokingAnyInstances_WhenInstanceIsUnknown() {
+        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenInstanceIsUnknown() {
             // given.
             CachesBulkClearRequest requestBody =
                     new CachesBulkClearRequest(List.of("unknown-cache-instance", siblingInstanceId));
@@ -237,8 +237,9 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-            assertThat(response.getBody()).contains("INSTANCE_NOT_FOUND");
-            assertThat(invokedPaths).isEmpty();
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder("/" + siblingInstanceId + "/actuator/axelix-caches/clear");
         }
 
         @ParameterizedTest
@@ -351,7 +352,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
         }
 
         @Test
-        void shouldReturnBadRequestWithoutInvokingAnyInstances_WhenInstanceIsUnknown() {
+        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenInstanceIsUnknown() {
             // given.
             CacheBulkClearRequest requestBody = new CacheBulkClearRequest(
                     List.of("unknown-cache-instance", siblingInstanceId), "manager", "orders");
@@ -367,8 +368,10 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-            assertThat(response.getBody()).contains("INSTANCE_NOT_FOUND");
-            assertThat(invokedPaths).isEmpty();
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder(
+                            "/" + siblingInstanceId + "/actuator/axelix-caches/manager/orders/clear");
         }
 
         @ParameterizedTest

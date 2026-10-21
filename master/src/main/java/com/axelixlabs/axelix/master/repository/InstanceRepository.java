@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.repository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +52,16 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
         WHERE target.instance_id = :instanceId
         """)
     List<Instance> findSiblings(@Param("instanceId") String instanceId);
+
+    @Query("""
+        SELECT COUNT(*)
+        FROM (
+            SELECT DISTINCT group_id, artifact_id
+            FROM instances
+            WHERE instance_id IN (:instanceIds)
+        ) applications
+        """)
+    int countDistinctApplications(@Param("instanceIds") Collection<String> instanceIds);
 
     @Modifying
     @Query("DELETE FROM instances WHERE latest_heart_beat IS NOT NULL AND latest_heart_beat < :threshold")

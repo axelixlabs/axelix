@@ -29,10 +29,9 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
-import com.axelixlabs.axelix.master.service.BulkInstancesResolver;
+import com.axelixlabs.axelix.master.service.BulkInstancesValidator;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -45,11 +44,11 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class CacheMcpServerTools {
 
     private final EndpointInvoker endpointInvoker;
-    private final BulkInstancesResolver bulkInstancesResolver;
+    private final BulkInstancesValidator bulkInstancesValidator;
 
-    public CacheMcpServerTools(EndpointInvoker endpointInvoker, BulkInstancesResolver bulkInstancesResolver) {
+    public CacheMcpServerTools(EndpointInvoker endpointInvoker, BulkInstancesValidator bulkInstancesValidator) {
         this.endpointInvoker = endpointInvoker;
-        this.bulkInstancesResolver = bulkInstancesResolver;
+        this.bulkInstancesValidator = bulkInstancesValidator;
     }
 
     @McpTool(
@@ -118,9 +117,9 @@ public class CacheMcpServerTools {
     public void clearAllCaches(
             @McpToolParam(description = "The IDs of the instances to apply the operation to")
                     List<String> instanceIds) {
-        List<Instance> instances = bulkInstancesResolver.resolve(instanceIds);
+        bulkInstancesValidator.validate(instanceIds);
         endpointInvoker.invokeNoValueForInstances(
-                instances, ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
+                instanceIds, ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
     }
 
     @McpTool(
@@ -160,7 +159,7 @@ public class CacheMcpServerTools {
             @McpToolParam(description = "The Cache Name (also serves as the entry key)") String cacheName) {
 
         HttpPayload payload = new DefaultHttpPayload(Map.of("cacheName", cacheName, "cacheManagerName", cacheManager));
-        List<Instance> instances = bulkInstancesResolver.resolve(instanceIds);
-        endpointInvoker.invokeNoValueForInstances(instances, ActuatorEndpoints.CLEAR_SINGLE_CACHE, payload);
+        bulkInstancesValidator.validate(instanceIds);
+        endpointInvoker.invokeNoValueForInstances(instanceIds, ActuatorEndpoints.CLEAR_SINGLE_CACHE, payload);
     }
 }

@@ -92,11 +92,6 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public List<Instance> getAllByIds(Collection<InstanceId> instanceIds) {
-        return instanceRepository.findAllById(instanceIds);
-    }
-
-    @Override
     public Set<Instance> findByQuery(String query) {
         return instanceRepository.findByNameLikeIgnoreCase("%" + query + "%");
     }

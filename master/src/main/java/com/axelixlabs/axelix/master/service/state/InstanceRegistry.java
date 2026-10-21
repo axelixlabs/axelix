@@ -103,11 +103,6 @@ public interface InstanceRegistry {
     List<Instance> getAll();
 
     /**
-     * Loads only the instances with the given IDs. Missing instances are omitted.
-     */
-    List<Instance> getAllByIds(Collection<InstanceId> instanceIds);
-
-    /**
      * Find instance by the arbitrary search query
      *
      * @return {@link Instance}

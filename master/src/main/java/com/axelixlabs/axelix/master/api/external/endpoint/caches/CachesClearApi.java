@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -35,8 +34,7 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.caches.CacheBulkClearRequest;
 import com.axelixlabs.axelix.master.api.external.request.caches.CachesBulkClearRequest;
-import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.service.BulkInstancesResolver;
+import com.axelixlabs.axelix.master.service.BulkInstancesValidator;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 
@@ -50,19 +48,19 @@ import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 public class CachesClearApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final BulkInstancesResolver bulkInstancesResolver;
+    private final BulkInstancesValidator bulkInstancesValidator;
 
-    public CachesClearApi(EndpointInvoker endpointInvoker, BulkInstancesResolver bulkInstancesResolver) {
+    public CachesClearApi(EndpointInvoker endpointInvoker, BulkInstancesValidator bulkInstancesValidator) {
         this.endpointInvoker = endpointInvoker;
-        this.bulkInstancesResolver = bulkInstancesResolver;
+        this.bulkInstancesValidator = bulkInstancesValidator;
     }
 
     @DeleteMapping(ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL)
     public ResponseEntity<?> clearAllCaches(@RequestBody CachesBulkClearRequest request) {
         try {
-            List<Instance> instances = bulkInstancesResolver.resolve(request.instanceIds());
+            bulkInstancesValidator.validate(request.instanceIds());
             endpointInvoker.invokeNoValueForInstances(
-                    instances, ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
+                    request.instanceIds(), ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
             // TODO: A partial update is generally not the client's fault, so 400 Bad Request is not
@@ -80,8 +78,9 @@ public class CachesClearApi {
                 Map.of("cacheName", request.cacheName(), "cacheManagerName", request.cacheManagerName()));
 
         try {
-            List<Instance> instances = bulkInstancesResolver.resolve(request.instanceIds());
-            endpointInvoker.invokeNoValueForInstances(instances, ActuatorEndpoints.CLEAR_SINGLE_CACHE, payload);
+            bulkInstancesValidator.validate(request.instanceIds());
+            endpointInvoker.invokeNoValueForInstances(
+                    request.instanceIds(), ActuatorEndpoints.CLEAR_SINGLE_CACHE, payload);
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
             // TODO: See the note on the 400 Bad Request status in clearAllCaches.

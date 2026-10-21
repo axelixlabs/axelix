@@ -19,9 +19,9 @@ package com.axelixlabs.axelix.master.service.transport;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -49,8 +49,8 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
@@ -74,9 +74,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Import(DefaultEndpointInvokerTest.DefaultEndpointInvokerTestConfiguration.class)
 public class DefaultEndpointInvokerTest {
     private static final String activeInstanceId = UUID.randomUUID().toString();
-    private static final String FIRST_INSTANCE_ID = "first-instance";
-    private static final String SECOND_INSTANCE_ID = "second-instance";
-    private static final String FAILING_INSTANCE_ID = "failing-instance";
 
     public static final ActuatorEndpoint METHOD_INVOKE = of("/axelix-test/invoke", HttpMethod.GET);
     public static final ActuatorEndpoint METHOD_INVOKE_BAD_REQUEST =
@@ -86,8 +83,6 @@ public class DefaultEndpointInvokerTest {
             of("/axelix-test/invoke-no-value/bad-request", HttpMethod.POST);
 
     private static MockWebServer mockWebServer;
-
-    private final List<RecordedRequest> requests = new CopyOnWriteArrayList<>();
 
     @Autowired
     private InstanceRegistry registry;
@@ -108,7 +103,6 @@ public class DefaultEndpointInvokerTest {
 
     @BeforeEach
     void prepare() {
-        requests.clear();
         // language=json
         String jsonResponse = """
         {
@@ -133,24 +127,23 @@ public class DefaultEndpointInvokerTest {
 
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
-                requests.add(request);
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + FAILING_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value")) {
-                    return new MockResponse().setResponseCode(500);
-                } else if (path.endsWith("/actuator/axelix-test/invoke")) {
-                    return new MockResponse()
-                            .setBody(jsonResponse)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.endsWith("/actuator/axelix-test/invoke/bad-request")
-                        || path.endsWith("/actuator/axelix-test/invoke-no-value/bad-request")) {
-                    return new MockResponse().setResponseCode(400);
-                } else if (path.endsWith("/actuator/axelix-test/invoke-no-value")) {
-                    return new MockResponse();
-                } else {
-                    return new MockResponse().setResponseCode(404);
-                }
+                return switch (path) {
+                    case "/actuator/axelix-test/invoke" ->
+                        new MockResponse()
+                                .setBody(jsonResponse)
+                                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+
+                    case "/actuator/axelix-test/invoke/bad-request",
+                            "/actuator/axelix-test/invoke-no-value/bad-request" ->
+                        new MockResponse().setResponseCode(400);
+
+                    case "/actuator/axelix-test/invoke-no-value" -> new MockResponse();
+
+                    default -> new MockResponse().setResponseCode(404);
+                };
             }
         });
 
@@ -250,128 +243,86 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invokeNoValueForInstances_shouldInvokeEndpointNoValueForAllInstances() {
         // given.
-        Instance firstInstance = TestInstanceFactory.create(
-                FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString());
-        Instance secondInstance = TestInstanceFactory.create(
-                SECOND_INSTANCE_ID,
-                mockWebServer.url("/" + SECOND_INSTANCE_ID + "/actuator").toString());
+        RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
         assertThatNoException()
-                .isThrownBy(() -> endpointInvoker.invokeNoValueForInstances(
-                        List.of(firstInstance, secondInstance), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE));
+                .isThrownBy(() -> subject.invokeNoValueForInstances(
+                        List.of("first-instance", "second-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE));
 
         // then.
-        assertThat(requests)
-                .extracting(request -> request.getMethod() + " " + request.getPath())
-                .containsExactlyInAnyOrder(
-                        "POST /" + FIRST_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value",
-                        "POST /" + SECOND_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value");
+        assertThat(prober.invokedInstanceIds()).containsExactly("first-instance", "second-instance");
+    }
+
+    @Test
+    void invokeNoValueForInstances_shouldIgnoreBlankAndDuplicatedInstanceIds() {
+        // given.
+        RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
+
+        // when.
+        assertThatNoException()
+                .isThrownBy(() -> subject.invokeNoValueForInstances(
+                        List.of("first-instance", "", " ", "first-instance", "second-instance", "second-instance"),
+                        METHOD_INVOKE_NO_VALUE,
+                        NoHttpPayload.INSTANCE));
+
+        // then.
+        assertThat(prober.invokedInstanceIds()).containsExactly("first-instance", "second-instance");
     }
 
     @Test
     void invokeNoValueForInstances_shouldThrowPartiallyUpdatedException_WhenSomeInstancesFail() {
         // given.
-        Instance firstInstance = TestInstanceFactory.create(
-                FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString());
-        Instance failingInstance = TestInstanceFactory.create(
-                FAILING_INSTANCE_ID,
-                mockWebServer.url("/" + FAILING_INSTANCE_ID + "/actuator").toString());
+        RecordingEndpointProber prober =
+                new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of("failed-instance"));
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
-        ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invokeNoValueForInstances(
-                List.of(firstInstance, failingInstance), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
+        ThrowableAssert.ThrowingCallable callable = () -> subject.invokeNoValueForInstances(
+                List.of("successful-instance", "failed-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
 
         // then.
         assertThatThrownBy(callable)
                 .isInstanceOfSatisfying(
                         PartiallyUpdatedException.class,
-                        e -> assertThat(e.failedInstanceIds()).containsExactly(FAILING_INSTANCE_ID));
-        assertThat(requests)
-                .extracting(request -> request.getMethod() + " " + request.getPath())
-                .containsExactlyInAnyOrder(
-                        "POST /" + FIRST_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value",
-                        "POST /" + FAILING_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value");
+                        e -> assertThat(e.failedInstanceIds()).containsExactly("failed-instance"));
+        assertThat(prober.invokedInstanceIds()).containsExactly("successful-instance", "failed-instance");
     }
 
     @Test
-    void invokeNoValueForInstances_shouldThrowPartiallyUpdatedException_WhenAllInstancesFail() {
+    void invokeNoValueForInstances_shouldThrowBadRequestException_WhenAllInstancesFail() {
         // given.
-        Instance firstInstance = TestInstanceFactory.create(
-                FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString());
-        Instance secondInstance = TestInstanceFactory.create(
-                SECOND_INSTANCE_ID,
-                mockWebServer.url("/" + SECOND_INSTANCE_ID + "/actuator").toString());
+        RecordingEndpointProber prober =
+                new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of("first-instance", "second-instance"));
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
-        ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invokeNoValueForInstances(
-                List.of(firstInstance, secondInstance), METHOD_INVOKE_NO_VALUE_BAD_REQUEST, NoHttpPayload.INSTANCE);
+        ThrowableAssert.ThrowingCallable callable = () -> subject.invokeNoValueForInstances(
+                List.of("first-instance", "second-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
 
         // then.
         assertThatThrownBy(callable)
                 .isInstanceOfSatisfying(
                         PartiallyUpdatedException.class,
-                        e -> assertThat(e.failedInstanceIds())
-                                .containsExactlyInAnyOrder(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID));
-        assertThat(requests)
-                .extracting(request -> request.getMethod() + " " + request.getPath())
-                .containsExactlyInAnyOrder(
-                        "POST /" + FIRST_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value/bad-request",
-                        "POST /" + SECOND_INSTANCE_ID + "/actuator/axelix-test/invoke-no-value/bad-request");
+                        e -> assertThat(e.failedInstanceIds()).containsExactly("first-instance", "second-instance"));
+        assertThat(prober.invokedInstanceIds()).containsExactly("first-instance", "second-instance");
     }
 
     @Test
     void invokeNoValueForInstances_shouldThrowEndpointInvocationException_OnUnknownActuatorEndpoint() {
         // given.
-        Instance firstInstance = TestInstanceFactory.create(
-                FIRST_INSTANCE_ID,
-                mockWebServer.url("/" + FIRST_INSTANCE_ID + "/actuator").toString());
+        RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
-        ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invokeNoValueForInstances(
-                List.of(firstInstance), of("/unknown", HttpMethod.POST), NoHttpPayload.INSTANCE);
+        ThrowableAssert.ThrowingCallable callable = () ->
+                subject.invokeNoValueForInstances(List.of("first-instance"), METHOD_INVOKE, NoHttpPayload.INSTANCE);
 
         // then.
         assertThatThrownBy(callable).isInstanceOf(EndpointInvocationException.class);
-        assertThat(requests).isEmpty();
-    }
-
-    @Test
-    void invokeNoValueForInstances_shouldUseLoadedInstanceUrls() {
-        // given.
-        Instance secondInstance = TestInstanceFactory.create(
-                SECOND_INSTANCE_ID, mockWebServer.url("/second-url/actuator").toString());
-        Instance firstInstance = TestInstanceFactory.create(
-                FIRST_INSTANCE_ID, mockWebServer.url("/first-url/actuator").toString());
-
-        // when.
-        endpointInvoker.invokeNoValueForInstances(
-                List.of(firstInstance, secondInstance), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
-
-        // then.
-        assertThat(requests)
-                .extracting(request -> request.getMethod() + " " + request.getPath())
-                .containsExactlyInAnyOrder(
-                        "POST /first-url/actuator/axelix-test/invoke-no-value",
-                        "POST /second-url/actuator/axelix-test/invoke-no-value");
-    }
-
-    @Test
-    void invokeNoValueForInstances_shouldInvokeUsingLoadedActuatorUrl() {
-        // given.
-        Instance instance = TestInstanceFactory.create(
-                activeInstanceId, mockWebServer.url("/actuator").toString());
-
-        // when.
-        endpointInvoker.invokeNoValueForInstances(List.of(instance), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
-
-        // then.
-        assertThat(requests)
-                .extracting(request -> request.getMethod() + " " + request.getPath())
-                .containsExactly("POST /actuator/axelix-test/invoke-no-value");
+        assertThat(prober.invokedInstanceIds()).isEmpty();
     }
 
     @TestConfiguration
@@ -436,6 +387,45 @@ public class DefaultEndpointInvokerTest {
             public @NonNull Class<JsonNode> supported() {
                 return JsonNode.class;
             }
+        }
+    }
+
+    private static class RecordingEndpointProber implements EndpointProber<Object> {
+
+        private final ActuatorEndpoint endpoint;
+        private final List<String> failingInstanceIds;
+        private final List<String> invokedInstanceIds = new ArrayList<>();
+
+        RecordingEndpointProber(ActuatorEndpoint endpoint, List<String> failingInstanceIds) {
+            this.endpoint = endpoint;
+            this.failingInstanceIds = failingInstanceIds;
+        }
+
+        @Override
+        public @NonNull Object invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
+                throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
+            invokedInstanceIds.add(instanceId.instanceId());
+
+            if (failingInstanceIds.contains(instanceId.instanceId())) {
+                throw new InstanceNotFoundException(instanceId);
+            }
+
+            return new Object();
+        }
+
+        @Override
+        public @NonNull Object invoke(@NonNull String baseUrl, HttpPayload httpPayload)
+                throws EndpointInvocationException, BadRequestException {
+            return new Object();
+        }
+
+        @Override
+        public @NonNull ActuatorEndpoint supports() {
+            return endpoint;
+        }
+
+        List<String> invokedInstanceIds() {
+            return invokedInstanceIds;
         }
     }
 }

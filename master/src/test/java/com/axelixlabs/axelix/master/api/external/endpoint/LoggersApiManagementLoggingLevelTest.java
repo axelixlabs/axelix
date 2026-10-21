@@ -307,13 +307,10 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
         }
 
         @Test
-        void shouldReturnBadRequestWithoutInvokingAnyInstances_WhenUpdatingOnUnknownInstance() {
+        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenUpdatingOnUnknownInstance() {
             // given.
             LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
-                    List.of("unknown-logger-instance", siblingInstanceId, "another-missing-instance"),
-                    "logger.name",
-                    null,
-                    "DEBUG");
+                    List.of("unknown-logger-instance", siblingInstanceId), "logger.name", null, "DEBUG");
 
             // when.
             ResponseEntity<String> response =
@@ -321,8 +318,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-            assertThat(response.getBody()).contains("INSTANCE_NOT_FOUND");
-            assertThat(invokedPaths).isEmpty();
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactly("/" + siblingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
         }
     }
 
@@ -456,11 +454,10 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
         }
 
         @Test
-        void shouldReturnBadRequestWithoutInvokingAnyInstances_WhenResettingOnUnknownInstance() {
+        void shouldReturnBadRequestAndInvokeRemainingInstances_WhenResettingOnUnknownInstance() {
             // given.
             LogLevelLoggerBulkResetRequest requestBody = new LogLevelLoggerBulkResetRequest(
-                    List.of("unknown-logger-instance", siblingInstanceId, "another-missing-instance"),
-                    "reset.logger.name");
+                    List.of("unknown-logger-instance", siblingInstanceId), "reset.logger.name");
 
             // when.
             ResponseEntity<String> response = restTemplate
@@ -469,8 +466,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-            assertThat(response.getBody()).contains("INSTANCE_NOT_FOUND");
-            assertThat(invokedPaths).isEmpty();
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactly("/" + siblingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset");
         }
 
         @ParameterizedTest

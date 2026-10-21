@@ -28,10 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
-import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 
@@ -75,18 +75,21 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
     }
 
     @Override
-    public void invokeNoValueForInstances(List<Instance> instances, ActuatorEndpoint endpoint, HttpPayload payload)
+    public void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
             throws PartiallyUpdatedException {
+
+        List<String> uniqueInstanceIds =
+                instanceIds.stream().filter(StringUtils::hasText).distinct().toList();
 
         EndpointProber<?> prober = getEndpointProber(endpoint);
 
         List<String> failedInstanceIds = new ArrayList<>();
 
-        for (Instance instance : instances) {
+        for (String instanceId : uniqueInstanceIds) {
             try {
-                prober.invoke(instance.actuatorUrl(), payload);
-            } catch (EndpointInvocationException | BadRequestException e) {
-                failedInstanceIds.add(instance.id().instanceId());
+                prober.invoke(InstanceId.of(instanceId), payload);
+            } catch (EndpointInvocationException | BadRequestException | InstanceNotFoundException e) {
+                failedInstanceIds.add(instanceId);
             }
         }
 

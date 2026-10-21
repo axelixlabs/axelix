@@ -28,23 +28,21 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Integration tests for {@link BulkInstancesResolver}.
+ * Integration tests for {@link BulkInstancesValidator}.
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest
-class BulkInstancesResolverTest {
+class BulkInstancesValidatorTest {
 
     private static final String FIRST_INSTANCE_ID = "first-instance";
     private static final String SECOND_INSTANCE_ID = "second-instance";
@@ -53,7 +51,7 @@ class BulkInstancesResolverTest {
     private InstanceRegistry registry;
 
     @Autowired
-    private BulkInstancesResolver resolver;
+    private BulkInstancesValidator validator;
 
     @AfterEach
     void cleanup() {
@@ -62,71 +60,26 @@ class BulkInstancesResolverTest {
     }
 
     @Test
-    void shouldReturnSelectedInstancesFromSameApplication() {
+    void shouldAcceptInstancesFromSameApplication() {
         // given.
         registry.register(TestInstanceFactory.create(FIRST_INSTANCE_ID));
         registry.register(TestInstanceFactory.create(SECOND_INSTANCE_ID));
-
-        // when.
-        List<Instance> instances = resolver.resolve(List.of(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID));
-
-        // then.
-        assertThat(instances)
-                .extracting(instance -> instance.id().instanceId())
-                .containsExactlyInAnyOrder(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID);
-    }
-
-    @Test
-    void shouldIgnoreBlankAndDuplicatedIds() {
-        // given.
-        registry.register(TestInstanceFactory.create(FIRST_INSTANCE_ID));
-        registry.register(TestInstanceFactory.create(SECOND_INSTANCE_ID));
-
-        // when.
-        List<Instance> instances = resolver.resolve(
-                List.of(FIRST_INSTANCE_ID, "", " ", FIRST_INSTANCE_ID, SECOND_INSTANCE_ID, SECOND_INSTANCE_ID));
-
-        // then.
-        assertThat(instances)
-                .extracting(instance -> instance.id().instanceId())
-                .containsExactlyInAnyOrder(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID);
-    }
-
-    @Test
-    void shouldReturnEmptyListForEmptySelection() {
-        // given.
-        List<String> ids = List.of();
-
-        // when.
-        List<Instance> instances = resolver.resolve(ids);
-
-        // then.
-        assertThat(instances).isEmpty();
-    }
-
-    @Test
-    void shouldRejectSelectionContainingMissingInstances() {
-        // given.
-        registry.register(TestInstanceFactory.create(FIRST_INSTANCE_ID));
 
         // when.
         ThrowableAssert.ThrowingCallable callable =
-                () -> resolver.resolve(List.of("missing-first", FIRST_INSTANCE_ID, "missing-last", "missing-first"));
+                () -> validator.validate(List.of(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID));
 
         // then.
-        assertThatThrownBy(callable).isInstanceOf(InstanceNotFoundException.class);
+        assertThatCode(callable).doesNotThrowAnyException();
     }
 
     @Test
-    void shouldRejectSelectionWhenNoInstancesExist() {
-        // given.
-        List<String> ids = List.of("missing-first", "missing-last");
-
+    void shouldAcceptEmptySelection() {
         // when.
-        ThrowableAssert.ThrowingCallable callable = () -> resolver.resolve(ids);
+        ThrowableAssert.ThrowingCallable callable = () -> validator.validate(List.of());
 
         // then.
-        assertThatThrownBy(callable).isInstanceOf(InstanceNotFoundException.class);
+        assertThatCode(callable).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
@@ -138,7 +91,7 @@ class BulkInstancesResolverTest {
 
         // when.
         ThrowableAssert.ThrowingCallable callable =
-                () -> resolver.resolve(List.of(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID));
+                () -> validator.validate(List.of(FIRST_INSTANCE_ID, SECOND_INSTANCE_ID));
 
         // then.
         assertThatThrownBy(callable).isInstanceOf(BadRequestException.class);
