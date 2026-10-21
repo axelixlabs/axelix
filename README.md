@@ -95,7 +95,7 @@ multi-master deployments and the security model.
 Getting started is two steps: run **Axelix Master**, then add the **Axelix Starter** and build plugin
 to each Spring Boot service you want to manage.
 
-> The snippets below pin `1.2.0` for illustration. Check the
+> The snippets below pin `1.2.1` for illustration. Check the
 > [Releases page](https://github.com/axelixlabs/axelix/releases) for the latest published tag.
 
 ### 1. Run Axelix Master
@@ -121,10 +121,18 @@ production. Before deploying to production:
 java -jar master.jar
 ```
 
-**With Docker.** The release image is published to GitHub Container Registry:
+**With Docker.** The release image is published to GitHub Container Registry and Docker Hub.
+
+From GitHub Container Registry:
 
 ```bash
-docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:1.2.0
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:1.2.1
+```
+
+From Docker Hub:
+
+```bash
+docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:1.2.1
 ```
 
 **On Kubernetes.** Install the first-party Helm chart, which also wires the RBAC needed for
@@ -158,20 +166,20 @@ First, declare the starter coordinate matching your Spring Boot major version:
 
 ```kotlin
 // Spring Boot 4.x
-implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.0")
+implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.1")
 
 // Spring Boot 3.x
-implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.2.0")
+implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.2.1")
 
 // Spring Boot 2.7.x
-implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.2.0")
+implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.2.1")
 ```
 
 Then apply the Axelix build plugin. With Gradle:
 
 ```kotlin
 plugins {
-    id("com.axelixlabs.axelix") version "1.2.0"
+    id("com.axelixlabs.axelix") version "1.2.1"
 }
 ```
 
@@ -181,7 +189,7 @@ Or, with Maven:
 <plugin>
   <groupId>com.axelixlabs</groupId>
   <artifactId>axelix-maven-plugin</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
   <executions>
     <execution>
       <goals>

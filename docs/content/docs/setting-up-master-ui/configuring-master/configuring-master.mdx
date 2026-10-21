@@ -15,7 +15,7 @@ A few facts to fix in your head before you copy any of the snippets below — th
 - **Database**: Master supports three engines, picked automatically from the JDBC URL prefix — **SQLite**
   (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), and **MySQL** (`jdbc:mysql:`). The default is SQLite, with a
   file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
-- **Front-end assets**: the `axelix-1.2.0.jar` and the published Docker image both bundle the UI — there is nothing
+- **Front-end assets**: the `axelix-1.2.1.jar` and the published Docker image both bundle the UI — there is nothing
   extra to wire up for the web interface.
 - **Authentication**: Master ships with a built-in super-admin account `admin / admin` and (since Axelix 1.2) a built-in, publicly known
   JWT signing key. In any non-throwaway environment you must change both — see [Configuration reference](#configuration-reference).
@@ -117,12 +117,28 @@ java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.ja
 
 or, for a container, pass it as an environment variable and mount the file in:
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```bash
 docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
   ghcr.io/axelixlabs/axelix
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  docker.io/axelixlabs/axelix
+```
+
+  </Tab>
+</Tabs>
 
 ### Loading configuration from a Spring Cloud Config Server
 
@@ -760,32 +776,74 @@ Master is then reachable at `http://localhost:2935`. Sign in with the super-admi
 ## Run with Docker
 
 If you have containerization support, then the recommended way to install Axelix Master is via the docker image. The release
-pipeline publishes the image to GitHub Container Registry and tags the newest release as `latest`, so you can pull it
+pipeline publishes the image to GitHub Container Registry and Docker Hub and tags the newest release as `latest`, so you can pull it
 without a version:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
 
 ```bash
 docker pull ghcr.io/axelixlabs/axelix
 ```
 
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker pull docker.io/axelixlabs/axelix
+```
+
+  </Tab>
+</Tabs>
+
 :::note
 To run a specific version, append its tag to the image name, e.g.:
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```
-ghcr.io/axelixlabs/axelix:1.2.0
+ghcr.io/axelixlabs/axelix:1.2.1
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```
+docker.io/axelixlabs/axelix:1.2.1
+```
+
+  </Tab>
+</Tabs>
 
 Check the [Releases page](https://github.com/axelixlabs/axelix/releases) for the published tags.
 
 For production, pull the image by its digest instead of a tag:
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```
 ghcr.io/axelixlabs/axelix@sha256:<digest>
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```
+docker.io/axelixlabs/axelix@sha256:<digest>
+```
+
+  </Tab>
+</Tabs>
 :::
 
 ### Run command
 
 A minimal run, suitable for a first look:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
 
 <Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
   <Tab value="Built-in key (local trial)">
@@ -810,6 +868,35 @@ docker run --rm -p 2935:2935 \
   </Tab>
 </Tabs>
 
+  </Tab>
+  <Tab value="Docker Hub">
+
+<Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
+  <Tab value="Built-in key (local trial)">
+
+```bash
+docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix
+```
+
+With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
+a signing key](#running-without-a-signing-key).
+
+  </Tab>
+  <Tab value="Your own key">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+</Tabs>
+
 A few notes about this command:
 
 - The image runs as the non-root user `axelix` and uses an Ahead-of-Time class loading cache built at image-build time,
@@ -828,6 +915,9 @@ that keeps secrets out of the startup log.
 Supplying configuration via individual environment variables follows the relaxed-binding rules from [Supplying
 properties](#supplying-properties), passed with `-e`. This is what the run command above uses:
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```bash
 docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
@@ -837,6 +927,22 @@ docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
+  -e AXELIX_MASTER_DATABASE_USERNAME=axelix \
+  -e AXELIX_MASTER_DATABASE_PASSWORD=... \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix
+```
+
+  </Tab>
+</Tabs>
 
 #### System Properties (-D) via `JAVA_TOOL_OPTIONS`
 
@@ -851,6 +957,9 @@ password, or database credentials in it — pass those as discrete `-e` environm
 
 The example of using it can be found below:
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```bash
 docker run --rm -p 2935:2935 \
   -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
@@ -858,6 +967,20 @@ docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix
+```
+
+  </Tab>
+</Tabs>
 
 #### External config file
 <ReleasedInNotice version="1.1.0" />
@@ -877,6 +1000,9 @@ axelix:
 
 And then passing it as the volume to the docker command:
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```bash
 docker run --rm -p 2935:2935 \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
@@ -886,6 +1012,21 @@ docker run --rm -p 2935:2935 \
   ghcr.io/axelixlabs/axelix
 ```
 
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix
+```
+
+  </Tab>
+</Tabs>
+
 ## Run with Docker Compose
 
 Logically, it is fully possible to run Axelix Master in the Docker Compose deployment.
@@ -893,6 +1034,9 @@ Logically, it is fully possible to run Axelix Master in the Docker Compose deplo
 The example below is a complete stack you can drop into a new `docker-compose.yaml`, edit, and start with `docker
 compose up -d`. The `master` service uses the `latest` image here — pin a specific tag (see [Run with Docker](#run-with-docker))
 before shipping.
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
 
 ```yaml title="docker-compose.yaml"
 services:
@@ -930,6 +1074,49 @@ services:
 volumes:
   axelix-pgdata:
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: axelix
+      POSTGRES_USER: ${AXELIX_DB_USERNAME:?set AXELIX_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AXELIX_DB_PASSWORD:?set AXELIX_DB_PASSWORD}
+    volumes:
+      - axelix-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  master:
+    image: docker.io/axelixlabs/axelix
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "2935:2935"
+    environment:
+      AXELIX_MASTER_DATABASE_URL: jdbc:postgresql://postgres:5432/axelix
+      AXELIX_MASTER_DATABASE_USERNAME: ${AXELIX_DB_USERNAME}
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_USERNAME: ${AXELIX_ADMIN_USERNAME}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_PASSWORD: ${AXELIX_ADMIN_PASSWORD}
+      AXELIX_MASTER_AUTH_COOKIE_SECURE: "false"
+
+volumes:
+  axelix-pgdata:
+```
+
+  </Tab>
+</Tabs>
 
 Each `AXELIX_MASTER_*` key maps to the matching property through relaxed binding (see [Supplying
 properties](#supplying-properties)). Passing them as discrete environment variables — rather than bundling them into
@@ -970,6 +1157,9 @@ axelix:
         secure: false
 ```
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```yaml title="docker-compose.yaml"
   master:
     image: ghcr.io/axelixlabs/axelix
@@ -980,6 +1170,23 @@ axelix:
       AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
       AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+  master:
+    image: docker.io/axelixlabs/axelix
+    volumes:
+      - ./master.yaml:/etc/axelix/master.yaml:ro
+    environment:
+      AXELIX_MASTER_CONFIG_LOCATION: file:/etc/axelix/master.yaml
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+</Tabs>
 
 Keep secrets — the JWT signing key, the super-admin password, database credentials — out of a committed file, and pass
 those as discrete environment variables as shown above.

@@ -99,7 +99,7 @@ java \
   -Daxelix.master.database.password=... \
   -Daxelix.master.migrations.username=axelix_migrator \
   -Daxelix.master.migrations.password=... \
-  -jar axelix-1.1.0.jar
+  -jar master.jar
 ```
 
 :::warning
@@ -124,6 +124,9 @@ java \
 секреты](../configuring-master/configuring-master.mdx#способы-задания-свойств).
 :::
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```bash
 docker run --rm -p 2935:2935 \
   -e JAVA_TOOL_OPTIONS="\
@@ -132,8 +135,25 @@ docker run --rm -p 2935:2935 \
     -Daxelix.master.database.password=... \
     -Daxelix.master.migrations.username=axelix_migrator \
     -Daxelix.master.migrations.password=..." \
-  ghcr.io/axelixlabs/axelix:1.1.0
+  ghcr.io/axelixlabs/axelix:1.2.1
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e JAVA_TOOL_OPTIONS="\
+    -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+    -Daxelix.master.database.username=axelix_app \
+    -Daxelix.master.database.password=... \
+    -Daxelix.master.migrations.username=axelix_migrator \
+    -Daxelix.master.migrations.password=..." \
+  docker.io/axelixlabs/axelix:1.2.1
+```
+
+  </Tab>
+</Tabs>
 
 :::note
 Начиная с Axelix `1.2.0` Master по умолчанию слушает порт `2935`. До этого релиза портом по умолчанию был `8080`,
@@ -144,10 +164,13 @@ docker run --rm -p 2935:2935 \
 
 Добавьте свойства миграций в `JAVA_TOOL_OPTIONS` сервиса `master`, рядом с настройками базы данных.
 
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
 ```yaml title="docker-compose.yaml"
 services:
   master:
-    image: ghcr.io/axelixlabs/axelix:1.1.0
+    image: ghcr.io/axelixlabs/axelix:1.2.1
     ports:
       - "2935:2935"
     environment:
@@ -158,6 +181,27 @@ services:
         -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
         -Daxelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
 ```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+services:
+  master:
+    image: docker.io/axelixlabs/axelix:1.2.1
+    ports:
+      - "2935:2935"
+    environment:
+      JAVA_TOOL_OPTIONS: >-
+        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
+        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
+        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
+        -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
+        -Daxelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </Tab>
+</Tabs>
 
 Значения передайте через файл `.env` рядом с файлом Compose:
 

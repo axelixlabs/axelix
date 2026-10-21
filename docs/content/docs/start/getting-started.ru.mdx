@@ -6,7 +6,7 @@ description: "Эта страница описывает рекомендуем�
 ---
 
 :::note
-Сниппеты на этой странице используют версию `1.2.0` для наглядности. Проверьте [страницу
+Сниппеты на этой странице используют версию `1.2.1` для наглядности. Проверьте [страницу
 релизов](https://github.com/axelixlabs/axelix/releases), чтобы узнать последний опубликованный тег, и подставьте его в
 свои команды.
 :::
@@ -70,11 +70,11 @@ JAR](../setting-up-master-ui/configuring-master/configuring-master.mdx#запу�
 Compose](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-с-docker-compose) или [Kubernetes с официальным Helm-чартом](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-в-kubernetes).
 Минимальный запуск для каждого способа:
 
-<Tabs items={['Docker', 'Kubernetes (Helm)', 'JAR']}>
-  <Tab value="Docker">
+<Tabs items={['Docker GHCR', 'Docker Hub', 'Kubernetes (Helm)', 'JAR']}>
+  <Tab value="Docker GHCR">
 
 Образ публикуется в GitHub Container Registry. Без тега Docker скачивает `latest` — последний релиз, чтобы
-зафиксировать версию, допишите тег, например `:1.2.0`:
+зафиксировать версию, допишите тег, например `:1.2.1`:
 
 <Tabs groupId="jwt-key" items={['Встроенный ключ (локально)', 'Свой ключ']}>
   <Tab value="Встроенный ключ (локально)">
@@ -94,6 +94,39 @@ docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
+```
+
+  </Tab>
+</Tabs>
+
+Как передать подключение к базе и остальную конфигурацию — см. [Запуск с
+Docker](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-с-docker), а вариант с Compose — в разделе [Запуск с Docker
+Compose](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-с-docker-compose).
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+Образ публикуется в Docker Hub. Без тега Docker скачивает `latest` — последний релиз, чтобы
+зафиксировать версию, допишите тег, например `:1.2.1`:
+
+<Tabs groupId="jwt-key" items={['Встроенный ключ (локально)', 'Свой ключ']}>
+  <Tab value="Встроенный ключ (локально)">
+
+```bash
+docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix
+```
+
+Если JWT-свойства не заданы, Master использует встроенный ключ подписи. Подходит только для локального знакомства, см.
+[Запуск без ключа подписи](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-без-ключа-подписи).
+
+  </Tab>
+  <Tab value="Свой ключ">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix
 ```
 
   </Tab>
@@ -214,11 +247,11 @@ build-плагина — см. [Совместимость и версионир
 
 ```kotlin title="build.gradle.kts"
 plugins {
-    id("com.axelixlabs.axelix") version "1.2.0"
+    id("com.axelixlabs.axelix") version "1.2.1"
 }
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.0")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.1")
 }
 ```
 
@@ -233,7 +266,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-4-starter</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
   </dependency>
 </dependencies>
 
@@ -242,7 +275,7 @@ dependencies {
     <plugin>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-maven-plugin</artifactId>
-      <version>1.2.0</version>
+      <version>1.2.1</version>
       <executions>
         <execution>
           <goals>
