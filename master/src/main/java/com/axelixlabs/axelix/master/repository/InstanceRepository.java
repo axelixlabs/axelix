@@ -56,10 +56,11 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
     @Query("""
         SELECT COUNT(*)
         FROM (
-            SELECT DISTINCT group_id, artifact_id
+            SELECT group_id, artifact_id
             FROM instances
             WHERE instance_id IN (:instanceIds)
-        ) applications
+            GROUP BY group_id, artifact_id
+        ) instances_by_application
         """)
     int countDistinctApplications(@Param("instanceIds") Collection<String> instanceIds);
 
