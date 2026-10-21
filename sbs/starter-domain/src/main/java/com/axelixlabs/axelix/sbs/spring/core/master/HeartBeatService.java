@@ -48,6 +48,7 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  * @since 05.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Andrey Kotov
  */
 public class HeartBeatService implements Closeable {
 
@@ -89,7 +90,7 @@ public class HeartBeatService implements Closeable {
         this.heartBeatMetadataAssembler = heartBeatMetadataAssembler;
 
         this.executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable);
+            Thread thread = new Thread(runnable, "axelix-heartbeat");
             thread.setDaemon(true);
             return thread;
         });
