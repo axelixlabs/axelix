@@ -29,7 +29,7 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.2.1/axelix-helm-chart-1.2.1.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.2.1/axelix-1.2.1.tgz
     version: 1.2.1
   - annotations:
       artifacthub.io/license: MIT
@@ -59,7 +59,7 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.2.0/axelix-helm-chart-1.2.0.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.2.0/axelix-1.2.0.tgz
     version: 1.2.0
   - annotations:
       artifacthub.io/license: MIT
@@ -89,7 +89,7 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.1.1/axelix-helm-chart-1.1.1.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.1.1/axelix-1.1.1.tgz
     version: 1.1.1
   - annotations:
       artifacthub.io/license: MIT
@@ -119,7 +119,7 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.1.0/axelix-helm-chart-1.1.0.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.1.0/axelix-1.1.0.tgz
     version: 1.1.0
   - annotations:
       artifacthub.io/license: MIT
@@ -149,7 +149,7 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.0.3/axelix-helm-chart-1.0.3.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.0.3/axelix-1.0.3.tgz
     version: 1.0.3
   - annotations:
       artifacthub.io/license: MIT
@@ -179,7 +179,7 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.0.1/axelix-helm-chart-1.0.1.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.0.1/axelix-1.0.1.tgz
     version: 1.0.1
   - annotations:
       artifacthub.io/license: MIT
@@ -209,7 +209,7 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.0.0/axelix-helm-chart-1.0.0.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.0.0/axelix-1.0.0.tgz
     version: 1.0.0
   - annotations:
       artifacthub.io/license: MIT
@@ -239,7 +239,7 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.0.0-M2/axelix-helm-chart-1.0.0-m2.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.0.0-M2/axelix-1.0.0-m2.tgz
     version: 1.0.0-m2
   - annotations:
       artifacthub.io/license: MIT
@@ -269,6 +269,6 @@ entries:
     - https://github.com/axelixlabs/helm-charts
     type: application
     urls:
-    - https://github.com/axelixlabs/axelix/releases/download/v1.0.0-M1/axelix-helm-chart-1.0.0-m1.tgz
+    - https://github.com/axelixlabs/axelix/releases/download/v1.0.0-M1/axelix-1.0.0-m1.tgz
     version: 1.0.0-m1
 generated: "2026-10-20T15:56:14.596571814Z"
