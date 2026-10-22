@@ -125,6 +125,13 @@ const AUTHOR_PROFILES: Record<string, AuthorProfile> = {
       // { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/mikhail-polivakha-7995571ab/" },
     ],
   },
+  "sergey-cherkasov": {
+    title: "Developer Advocate at Axelix Labs",
+    bio: "Java developer in the Spring Boot ecosystem with a focus on developer experience — helping teams understand, debug, and get the most out of their applications in production. Interested in architecture, infrastructure, and automation.",
+    links: [
+      { kind: "github", label: "GitHub", url: "https://github.com/sergeycherkasovv" },
+    ],
+  },
 };
 
 /** The editorial profile for an author slug, or `null` if there isn't one. */

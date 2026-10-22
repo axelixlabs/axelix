@@ -1,0 +1,96 @@
+---
+title: "Axelix 1.2.1: Security fix, fewer threads, and more"
+date: 2026-10-22
+authors: ["Sergey Cherkasov"]
+tags: ["Releases"]
+heroImagePath: /posts/axelix-1-2-1/preview.png
+description: "Axelix 1.2.1 is a patch release that ships a security fix for services running Actuator on a separate management port, reduces thread usage in Master, and closes four bugs affecting the Beans page, the Properties page, and the login redirect."
+metaDescription: "Axelix 1.2.1 is a patch release that ships a security fix for services running Actuator on a separate management port, reduces thread usage in Master, and closes four bugs affecting the Beans page, the Properties page, and the login redirect."
+---
+
+# Axelix 1.2.1
+
+Axelix 1.2.1 is out. It is a patch release — no new features, no breaking changes, and it is fully compatible with
+the rest of the 1.2 line. Like every Axelix release, it ships the whole fleet together: the Spring Boot starters,
+the build plugins, and Master (JAR / Docker image / Helm chart), all under the same version.
+
+We recommend upgrading both Master and the starters, because this release includes a security fix.
+
+## Security
+
+### JWT filter now covers services with a separate management port
+
+[CVSS 7.0 · High · CWE-306, CWE-288](https://github.com/axelixlabs/axelix/security/advisories/GHSA-gq4j-56mw-8f43)
+
+If a service set `management.server.port` to a value different from the main application port, the Axelix Spring Boot
+starter did not register its JWT authorization filter on the management context. As a result, the Axelix actuator
+endpoints — including heap dump download and cache clearing — were reachable without a valid token on that port.
+Services that serve Actuator on the application port are not affected.
+
+**Affected packages** (all three starters, versions < 1.2.1):
+- [`com.axelixlabs:axelix-spring-boot-2-starter`](https://central.sonatype.com/artifact/com.axelixlabs/axelix-spring-boot-2-starter)
+- [`com.axelixlabs:axelix-spring-boot-3-starter`](https://central.sonatype.com/artifact/com.axelixlabs/axelix-spring-boot-3-starter)
+- [`com.axelixlabs:axelix-spring-boot-4-starter`](https://central.sonatype.com/artifact/com.axelixlabs/axelix-spring-boot-4-starter)
+
+**If you cannot upgrade immediately:** serve Actuator on the application port or restrict network access to the management port. If the management port may have been exposed to untrusted networks, rotate secrets held by the application, including the Axelix JWT signing key.
+
+### Docker image: `zlib` and `libpng` upgraded
+
+The Master Docker image has been rebuilt with `zlib 1.3.2-r1` and `libpng 1.6.59-r0` to address
+CVE-2026-46675 and CVE-2026-85091. No change is needed on your side beyond pulling the new image.
+
+## Bug fixes
+
+### The Beans page no longer instantiates beans
+
+To collect bean metadata, the starter previously called `getBean()` for every registered bean. This had two
+unintended side-effects: it instantiated lazy beans (defeating the purpose of lazy initialization), and it created
+a fresh instance of every prototype-scoped bean — one for each collection call.
+
+From 1.2.1, the starter inspects beans that already exist in the context and resolves the type for the rest from
+their `BeanDefinition`. If the type cannot be determined (for example, for a factory bean whose concrete type is
+unknown at definition time), the UI shows it as `unknown`. Lazy beans stay lazy, and prototype beans are no longer
+created as a side-effect of the Beans page loading.
+
+### Master: one shared HTTP client instead of one per endpoint
+
+Every actuator endpoint that Master calls on a managed service previously had its own `HttpClient` instance — and each
+`HttpClient` brought its own selector thread and thread pool. For a fleet of services with many endpoints, this added
+up to a noticeable thread count in Master.
+
+All of those clients now share a single instance. The fix is transparent: behavior does not change, but the number of
+threads Master holds is measurably lower.
+
+### The UI redirects to the login page when the session expires
+
+When Master returned a `401`, the session cookie was not cleared. The UI used that cookie to decide whether the
+user was signed in, so it kept showing pages that failed to load silently instead of redirecting to `/login`.
+From 1.2.1, a `401` clears the cookie and triggers the redirect.
+
+### The "Injected in" link on the Properties page opens the right bean
+
+Clicking the link that shows where a property is injected now navigates to the correct bean. In earlier 1.2.x
+releases the link could open an unrelated entry.
+
+## Artifacts
+
+| Artifact | Link |
+|---|---|
+| JAR | [axelix-1.2.1.jar](https://github.com/axelixlabs/axelix/releases/download/v1.2.1/axelix-1.2.1.jar) |
+| Docker Hub | [axelixlabs/axelix](https://hub.docker.com/r/axelixlabs/axelix) — `docker pull axelixlabs/axelix:1.2.1` |
+| GHCR | `docker pull ghcr.io/axelixlabs/axelix:1.2.1` |
+| Helm chart | [axelix-1.2.1.tgz](https://github.com/axelixlabs/axelix/releases/download/v1.2.1/axelix-1.2.1.tgz) · [Artifact Hub](https://artifacthub.io/packages/helm/axelix/axelix) |
+
+## Upgrading
+
+1.2.1 is a drop-in upgrade for any 1.2.x installation. Update the version of the Spring Boot starter and build
+plugin in your `pom.xml` or `build.gradle`, and pull the new Master image — see the [database migrations guide](https://axelix.io/docs/setting-up-master-ui/migrations/migrations) before upgrading Master. No configuration changes are required.
+
+Refer to the [setup docs](https://axelix.io/docs/start/getting-started) if you are installing Axelix for the first
+time.
+
+## Full changelog
+
+**Full Changelog**: https://github.com/axelixlabs/axelix/compare/v1.2.0...v1.2.1
+
+Thanks to all contributors who made this release happen!
