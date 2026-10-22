@@ -21,14 +21,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ApplicationTaskSchedulerProvider;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
@@ -36,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskSchedulerProvider;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskRescheduler;
 
 /**
@@ -46,14 +46,27 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
  * @author Sergey Cherkasov
  * @author Dmitry Kiselev
  * @author Ilya Naumov
+ * @author Dmitry Mazurov
  * @since 14.10.2025
  */
 @AxelixAutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
 
-    public static final String THREAD_POOL_TASK_EXECUTOR_QUALIFIER = "schedulingThreadPoolTaskExecutor";
-    public static final String TASK_SCHEDULER_QUALIFIER = "schedulingTaskScheduler";
+    @Bean
+    TaskManagementExecutor taskManagementExecutor() {
+        return new TaskManagementExecutor();
+    }
+
+    // The declared type must not be a SchedulingConfigurer: Spring Boot looks at it only, and in the older versions
+    // it does not create its own 'taskScheduler' when there is a SchedulingConfigurer bean. Spring itself still
+    // finds the configurer by the actual type of the instance, so the bean must be created before the context
+    // refresh, i.e. it must not be lazy.
+    @Bean
+    @Lazy(false)
+    public TaskSchedulerProvider taskSchedulerProvider() {
+        return new ApplicationTaskSchedulerProvider();
+    }
 
     @Bean
     public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
@@ -61,21 +74,21 @@ public class ScheduledTaskManagementAutoConfiguration {
     }
 
     @Bean
-    public ScheduledTaskService scheduledTaskService(
+    ScheduledTaskService scheduledTaskService(
             ScheduledTasksRegistry scheduledTasksRegistry,
             List<TaskRescheduler> taskReschedulers,
-            @Qualifier(THREAD_POOL_TASK_EXECUTOR_QUALIFIER) ThreadPoolTaskExecutor threadPoolTaskExecutor) {
-        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, threadPoolTaskExecutor);
+            TaskManagementExecutor taskManagementExecutor) {
+        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, taskManagementExecutor.executor());
     }
 
     @Bean
-    public TaskRescheduler intervalBasedTaskRescheduler(@Qualifier(TASK_SCHEDULER_QUALIFIER) TaskScheduler scheduler) {
-        return new IntervalBasedTaskRescheduler(scheduler);
+    public TaskRescheduler intervalBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+        return new IntervalBasedTaskRescheduler(taskSchedulerProvider);
     }
 
     @Bean
-    public TaskRescheduler triggerBasedTaskRescheduler(@Qualifier(TASK_SCHEDULER_QUALIFIER) TaskScheduler scheduler) {
-        return new TriggerBasedTaskRescheduler(scheduler);
+    public TaskRescheduler triggerBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+        return new TriggerBasedTaskRescheduler(taskSchedulerProvider);
     }
 
     @Bean
@@ -89,24 +102,31 @@ public class ScheduledTaskManagementAutoConfiguration {
         return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
     }
 
-    @Bean
-    @Qualifier(TASK_SCHEDULER_QUALIFIER)
-    public ThreadPoolTaskScheduler schedulingTaskScheduler() {
-        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(1);
-        return taskScheduler;
-    }
+    static final class TaskManagementExecutor implements AutoCloseable {
 
-    @Bean
-    @Qualifier(THREAD_POOL_TASK_EXECUTOR_QUALIFIER)
-    public ThreadPoolTaskExecutor schedulingThreadPoolTaskExecutor() {
-        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-        threadPoolTaskExecutor.setCorePoolSize(1);
-        threadPoolTaskExecutor.setMaxPoolSize(3);
-        threadPoolTaskExecutor.setAllowCoreThreadTimeOut(false);
-        threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
-        threadPoolTaskExecutor.setAwaitTerminationSeconds(30);
-        threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
-        return threadPoolTaskExecutor;
+        static final String EXECUTOR_NAME = "ax-executor-";
+
+        private final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+        TaskManagementExecutor() {
+            executor.setCorePoolSize(1);
+            executor.setMaxPoolSize(3);
+            executor.setAllowCoreThreadTimeOut(false);
+            executor.setPrestartAllCoreThreads(true);
+            executor.setAwaitTerminationSeconds(30);
+            executor.setWaitForTasksToCompleteOnShutdown(true);
+            executor.setThreadNamePrefix(EXECUTOR_NAME);
+
+            executor.initialize();
+        }
+
+        ThreadPoolTaskExecutor executor() {
+            return executor;
+        }
+
+        @Override
+        public void close() {
+            executor.destroy();
+        }
     }
 }

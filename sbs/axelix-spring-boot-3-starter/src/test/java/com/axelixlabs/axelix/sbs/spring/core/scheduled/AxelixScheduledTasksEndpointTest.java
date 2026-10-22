@@ -69,6 +69,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Dmitry Mazurov
  * @since 14.10.2025
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -589,13 +590,18 @@ class AxelixScheduledTasksEndpointTest {
         }
 
         @Bean
-        TaskRescheduler testTriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
-            return new TriggerBasedTaskRescheduler(taskScheduler);
+        TaskSchedulerProvider testTaskSchedulerProvider(TaskScheduler taskScheduler) {
+            return () -> taskScheduler;
         }
 
         @Bean
-        TaskRescheduler testIntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
-            return new IntervalBasedTaskRescheduler(taskScheduler);
+        TaskRescheduler testTriggerBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+            return new TriggerBasedTaskRescheduler(taskSchedulerProvider);
+        }
+
+        @Bean
+        TaskRescheduler testIntervalBasedTaskRescheduler(TaskSchedulerProvider taskSchedulerProvider) {
+            return new IntervalBasedTaskRescheduler(taskSchedulerProvider);
         }
 
         @Bean
