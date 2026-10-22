@@ -29,7 +29,7 @@ import {
     EnvironmentIcon,
     GCIcon,
     InsightsIcon,
-    JVMIcon,
+    JavaMonoIcon,
     LoggersIcon,
     MetricsIcon,
     ScheduledTasksIcon,
@@ -166,8 +166,8 @@ export const getInstanceItems = (
         },
         {
             key: "JVM",
-            icon: <JVMIcon />,
-            label: "JVM",
+            icon: <JavaMonoIcon />,
+            label: "Java",
             children: createMenuItems(jvmMenuItemsData, availableFeatures),
         },
         {
