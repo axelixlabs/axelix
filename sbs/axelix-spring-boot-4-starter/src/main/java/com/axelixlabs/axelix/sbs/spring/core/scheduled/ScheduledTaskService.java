@@ -37,11 +37,16 @@ import org.springframework.scheduling.support.CronTrigger;
 /**
  * Service for managing scheduled tasks with enable/disable functionality.
  *
+ * <p>The tasks that come from a {@code ScheduledTaskRegistrar} declared by the user without
+ * {@code @EnableScheduling} cannot be re-scheduled (enabled again, or have the cron expression or interval
+ * modified), as the scheduler of the application is not available.
+ *
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
  * @author Vyacheslav Yanin
+ * @author Dmitry Mazurov
  */
 public final class ScheduledTaskService implements AutoCloseable {
 

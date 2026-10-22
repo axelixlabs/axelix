@@ -17,17 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
-import org.springframework.core.task.TaskRejectedException;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -41,15 +32,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 20.10.2026
  * @author Dmitry Mazurov
  */
-@ExtendWith(OutputCaptureExtension.class)
 class ApplicationTaskSchedulerProviderTest {
 
     private final ApplicationTaskSchedulerProvider provider = new ApplicationTaskSchedulerProvider();
-
-    @AfterEach
-    void tearDown() {
-        provider.close();
-    }
 
     @Test // GH-1726
     void shouldReturnSchedulerOfTheRegistrar_whenRegistrarHasScheduler() {
@@ -67,78 +52,23 @@ class ApplicationTaskSchedulerProviderTest {
     }
 
     @Test // GH-1726
-    void shouldFallBackToOwnScheduler_whenThereIsNoRegistrar() throws Exception {
+    void shouldThrow_whenThereIsNoRegistrar() {
         // given: configureTasks was never called, e.g. @EnableScheduling is absent
 
-        // when
-        TaskScheduler scheduler = provider.getTaskScheduler();
-
-        // then
-        assertThat(threadNameOf(scheduler)).startsWith(ApplicationTaskSchedulerProvider.FALLBACK_THREAD_NAME_PREFIX);
+        // when, then
+        assertThatThrownBy(provider::getTaskScheduler)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("@EnableScheduling");
     }
 
     @Test // GH-1726
-    void shouldFallBackToOwnScheduler_whenRegistrarHasNoScheduler() throws Exception {
+    void shouldThrow_whenRegistrarHasNoScheduler() {
         // given
         provider.configureTasks(new ScheduledTaskRegistrar());
 
-        // when
-        TaskScheduler scheduler = provider.getTaskScheduler();
-
-        // then
-        assertThat(threadNameOf(scheduler)).startsWith(ApplicationTaskSchedulerProvider.FALLBACK_THREAD_NAME_PREFIX);
-    }
-
-    @Test // GH-1726
-    void shouldShutDownFallbackScheduler_whenClosed() {
-        // given
-        TaskScheduler scheduler = provider.getTaskScheduler();
-
-        // when
-        provider.close();
-
-        // then
-        assertThatThrownBy(() -> scheduler.schedule(() -> {}, Instant.now())).isInstanceOf(TaskRejectedException.class);
-    }
-
-    @Test // GH-1726
-    void shouldWarn_whenFallsBackToOwnScheduler(CapturedOutput output) {
-        // when
-        provider.getTaskScheduler();
-
-        // then
-        assertThat(output).contains("Axelix fallback scheduler");
-    }
-
-    @Test // GH-1726
-    void shouldNotWarn_whenRegistrarHasScheduler(CapturedOutput output) {
-        // given
-        ScheduledTaskRegistrar registrar = new ScheduledTaskRegistrar();
-        registrar.setTaskScheduler(new ThreadPoolTaskScheduler());
-        provider.configureTasks(registrar);
-
-        // when
-        provider.getTaskScheduler();
-
-        // then
-        assertThat(output).doesNotContain("Axelix fallback scheduler");
-    }
-
-    @Test // GH-1726
-    void shouldWarnOnlyOnce_whenFallsBackToOwnSchedulerRepeatedly(CapturedOutput output) {
-        // when
-        provider.getTaskScheduler();
-        provider.getTaskScheduler();
-
-        // then
-        assertThat(output.getAll()).containsOnlyOnce("Axelix fallback scheduler");
-    }
-
-    private static String threadNameOf(TaskScheduler scheduler) throws Exception {
-        CompletableFuture<String> threadName = new CompletableFuture<>();
-
-        scheduler.schedule(() -> threadName.complete(Thread.currentThread().getName()), Instant.now());
-
-        return threadName.get(5, TimeUnit.SECONDS);
+        // when, then
+        assertThatThrownBy(provider::getTaskScheduler)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("@EnableScheduling");
     }
 }

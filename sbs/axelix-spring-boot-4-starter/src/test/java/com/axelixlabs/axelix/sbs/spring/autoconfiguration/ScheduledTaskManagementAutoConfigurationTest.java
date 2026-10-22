@@ -18,11 +18,9 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -36,14 +34,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration.TaskManagementExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ApplicationTaskSchedulerProvider;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ManagedScheduledTask;
@@ -55,6 +51,7 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskSchedulerProvider;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskRescheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Integration tests for {@link ScheduledTaskManagementAutoConfiguration}
@@ -134,7 +131,7 @@ class ScheduledTaskManagementAutoConfigurationTest {
     }
 
     @Test
-    void shouldActivateReschedulers_backedByFallbackScheduler_whenSchedulingNotEnabled() {
+    void shouldCreateReschedulers_whenSchedulingNotEnabled() {
         // given
         new ApplicationContextRunner()
                 .withPropertyValues(ENDPOINT_EXPOSURE_PROPERTY)
@@ -160,11 +157,9 @@ class ScheduledTaskManagementAutoConfigurationTest {
                     assertThat(context).hasSingleBean(IntervalBasedTaskRescheduler.class);
                     assertThat(context).hasSingleBean(TriggerBasedTaskRescheduler.class);
 
-                    // there is no registrar without @EnableScheduling, so the tasks run on the fallback scheduler
-                    TaskScheduler scheduler =
-                            context.getBean(TaskSchedulerProvider.class).getTaskScheduler();
-                    assertThat(threadNameOf(scheduler))
-                            .startsWith(ApplicationTaskSchedulerProvider.FALLBACK_THREAD_NAME_PREFIX);
+                    // there is no registrar without @EnableScheduling, so the scheduler is not available
+                    TaskSchedulerProvider provider = context.getBean(TaskSchedulerProvider.class);
+                    assertThatThrownBy(provider::getTaskScheduler).isInstanceOf(IllegalStateException.class);
                 });
     }
 
@@ -347,14 +342,6 @@ class ScheduledTaskManagementAutoConfigurationTest {
 
         // the re-scheduled task keeps running on the very same scheduler
         assertThat(executions.poll(5, TimeUnit.SECONDS)).startsWith(threadNamePrefix);
-    }
-
-    private static String threadNameOf(TaskScheduler scheduler) throws Exception {
-        CompletableFuture<String> threadName = new CompletableFuture<>();
-
-        scheduler.schedule(() -> threadName.complete(Thread.currentThread().getName()), Instant.now());
-
-        return threadName.get(5, TimeUnit.SECONDS);
     }
 
     @TestConfiguration

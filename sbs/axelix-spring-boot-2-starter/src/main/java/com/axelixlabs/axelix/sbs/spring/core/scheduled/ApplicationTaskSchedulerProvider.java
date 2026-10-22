@@ -17,67 +17,40 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 /**
- * {@link TaskSchedulerProvider} that takes the scheduler from the {@link ScheduledTaskRegistrar} and
- * falls back to its own single-threaded one.
+ * {@link TaskSchedulerProvider} that takes the scheduler from the {@link ScheduledTaskRegistrar}.
  *
  * @since 20.10.2026
  * @author Dmitry Mazurov
  */
-public final class ApplicationTaskSchedulerProvider
-        implements TaskSchedulerProvider, SchedulingConfigurer, AutoCloseable {
-
-    private static final Logger log = LoggerFactory.getLogger(ApplicationTaskSchedulerProvider.class);
-
-    public static final String FALLBACK_THREAD_NAME_PREFIX = "ax-scheduler-";
-
-    private final ThreadPoolTaskScheduler fallbackScheduler = new ThreadPoolTaskScheduler();
-
-    private final AtomicBoolean fallbackReported = new AtomicBoolean();
+public final class ApplicationTaskSchedulerProvider implements TaskSchedulerProvider, SchedulingConfigurer {
 
     private volatile @Nullable ScheduledTaskRegistrar registrar;
-
-    public ApplicationTaskSchedulerProvider() {
-        fallbackScheduler.setPoolSize(1);
-        fallbackScheduler.setThreadNamePrefix(FALLBACK_THREAD_NAME_PREFIX);
-        fallbackScheduler.initialize();
-    }
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         this.registrar = taskRegistrar;
     }
 
+    /**
+     * @throws IllegalStateException if the scheduler of the application is not available
+     */
     @Override
     public TaskScheduler getTaskScheduler() {
         ScheduledTaskRegistrar currentRegistrar = this.registrar;
         TaskScheduler scheduler = currentRegistrar != null ? currentRegistrar.getScheduler() : null;
 
-        if (scheduler != null) {
-            return scheduler;
+        if (scheduler == null) {
+            throw new IllegalStateException("Could not obtain the application's TaskScheduler to re-schedule the task: "
+                    + "re-scheduling is supported only when scheduling is enabled with @EnableScheduling");
         }
 
-        if (fallbackReported.compareAndSet(false, true)) {
-            log.warn(
-                    "Could not obtain the application's TaskScheduler, re-scheduled tasks will run on the Axelix fallback scheduler");
-        }
-
-        return fallbackScheduler;
-    }
-
-    @Override
-    public void close() {
-        fallbackScheduler.destroy();
+        return scheduler;
     }
 }
