@@ -18,7 +18,7 @@
 import type { TMenuItem } from "@/models";
 
 // Only the category holding the current page starts open, falling back to "general" for pages outside any category
-export const findOpenInstanceKeys = (items: TMenuItem[], pathname: string): string[] => {
+export const findOpenInstanceCategory = (items: TMenuItem[], pathname: string): string => {
     const current = items.find(
         (item) =>
             item &&
@@ -27,5 +27,5 @@ export const findOpenInstanceKeys = (items: TMenuItem[], pathname: string): stri
             item.children.some((child) => String(child?.key) === pathname),
     );
 
-    return [current ? String(current.key) : "general"];
+    return current ? String(current.key) : "general";
 };
