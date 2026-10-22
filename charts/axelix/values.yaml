@@ -105,7 +105,7 @@ deployment:
 
 image:
 
-  # -- Reference to the axelix master image to be used. Can either be a human-readable "tag" like 1.2.0, or
+  # -- Reference to the axelix master image to be used. Can either be a human-readable "tag" like 1.2.1, or
   # might be the sha256 image hash, like sha256:<SHA_VALUE>. If not set, defaults to the appVersion of the chart.
   ref: ""
 
