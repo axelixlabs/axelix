@@ -70,14 +70,10 @@ const Caches = () => {
                 if (instanceId) {
                     setClearAllCaches(StatelessRequest.loading());
 
-                    clearAllCachesData(instanceId)
-                        .then((value) => {
-                            if (value.status === 200) {
-                                setClearAllCaches(StatelessRequest.success());
-                                message.success(t("Caches.cleared"));
-                            } else {
-                                setClearAllCaches(StatelessRequest.error(""));
-                            }
+                    clearAllCachesData(instanceSelection.selectedInstanceIds)
+                        .then(() => {
+                            setClearAllCaches(StatelessRequest.success());
+                            message.success(t("Caches.cleared"));
                         })
                         .catch((error: AxiosError<IErrorResponse>) => {
                             setClearAllCaches(StatelessRequest.error(extractErrorCode(error?.response?.data)));
@@ -111,7 +107,11 @@ const Caches = () => {
 
             <EmptyHandler isEmpty={effectiveCacheManagers.length === 0}>
                 {effectiveCacheManagers.map((cacheManager) => (
-                    <CacheManagerSection key={cacheManager.name} cacheManager={cacheManager} />
+                    <CacheManagerSection
+                        key={cacheManager.name}
+                        cacheManager={cacheManager}
+                        instanceIds={instanceSelection.selectedInstanceIds}
+                    />
                 ))}
             </EmptyHandler>
         </>

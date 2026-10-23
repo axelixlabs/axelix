@@ -101,9 +101,9 @@ export interface ISetLoggerLevelRequestData {
 
 export interface IResetLoggerLevelRequestData {
     /**
-     * Instance id
+     * The instances to apply the action to
      */
-    instanceId: string;
+    instanceIds: string[];
 
     /**
      * Logger name
@@ -113,9 +113,9 @@ export interface IResetLoggerLevelRequestData {
 
 export interface IChangeLoggerGroupLevelRequestData {
     /**
-     * Instance id of service
+     * The instances to apply the action to
      */
-    instanceId: string;
+    instanceIds: string[];
 
     /**
      * The name of a logger group

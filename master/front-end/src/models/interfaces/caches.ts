@@ -65,9 +65,9 @@ export interface ICachesResponseBody {
 
 export interface IClearCacheRequestData {
     /**
-     * Instance ID of the service
+     * The instances to apply the action to
      */
-    instanceId: string;
+    instanceIds: string[];
 
     /**
      * Name of the cache
@@ -77,14 +77,14 @@ export interface IClearCacheRequestData {
     /**
      * Name of the cache manager associated with the cache
      */
-    cacheManager: string;
+    cacheManagerName: string;
 }
 
 export interface IUpdateCacheStatusRequestData {
     /**
-     * Instance id of service
+     * The instances to apply the action to
      */
-    instanceId: string;
+    instanceIds: string[];
 
     /**
      * Name of the cache manager

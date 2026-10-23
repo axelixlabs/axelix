@@ -19,7 +19,6 @@ import { App } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
 
 import { ResetIcon } from "@/assets";
 import { TooltipWithCopy } from "@/components";
@@ -46,13 +45,17 @@ interface IProps {
      * Fetches loggers data.
      */
     fetchLoggersData: () => void;
+
+    /**
+     * The instances the logging level changes apply to
+     */
+    instanceIds: string[];
 }
 
-export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
+export const Logger = ({ levels, logger, fetchLoggersData, instanceIds }: IProps) => {
     // TODO: Add loading handler in future after fetchData and StatefulRequest refactoring
     const { t } = useTranslation();
     const { effectiveLevel, configuredLevel, name, temporaryLevelInitiatedAt, temporaryLevelRollsBackAt } = logger;
-    const { instanceId } = useParams();
 
     const { message } = App.useApp();
 
@@ -104,7 +107,7 @@ export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
         }
 
         setLoggerLevel({
-            instanceIds: [instanceId!],
+            instanceIds: instanceIds,
             loggerName: logger.name,
             configuredLevel: level,
             ttlSeconds: ttlSeconds,
@@ -116,7 +119,7 @@ export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
 
     const handleLoggerReset = (loggerName: string): void => {
         resetLogger({
-            instanceId: instanceId!,
+            instanceIds: instanceIds,
             loggerName: loggerName,
         }).then(() => {
             message.success(t("Loggers.reset"));

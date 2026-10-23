@@ -32,28 +32,22 @@ export const getSingleCacheData = (data: IGetSingleCacheData) => {
     });
 };
 
-export const clearAllCachesData = (instanceId: string) => {
-    return apiFetch.delete(`caches/${instanceId}`);
-};
-
-export const clearCacheData = (data: IClearCacheRequestData) => {
-    const { instanceId, cacheName, cacheManager } = data;
-
-    return apiFetch.delete(`caches/${instanceId}/cache/${cacheName}`, {
-        params: {
-            cacheManager: cacheManager,
+export const clearAllCachesData = (instanceIds: string[]) => {
+    return apiFetch.delete("caches/clear", {
+        data: {
+            instanceIds: instanceIds,
         },
     });
 };
 
-export const enableCache = (data: IUpdateCacheStatusRequestData) => {
-    const { instanceId, cacheManagerName, cacheName } = data;
+export const clearCacheData = (data: IClearCacheRequestData) => {
+    return apiFetch.delete("caches/cache/clear", { data });
+};
 
-    return apiFetch.post(`caches/${instanceId}/${cacheManagerName}/${cacheName}/enable`);
+export const enableCache = (data: IUpdateCacheStatusRequestData) => {
+    return apiFetch.post("caches/cache/enable", data);
 };
 
 export const disableCache = (data: IUpdateCacheStatusRequestData) => {
-    const { instanceId, cacheManagerName, cacheName } = data;
-
-    return apiFetch.post(`caches/${instanceId}/${cacheManagerName}/${cacheName}/disable`);
+    return apiFetch.post("caches/cache/disable", data);
 };

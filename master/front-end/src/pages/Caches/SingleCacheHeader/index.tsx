@@ -21,7 +21,6 @@ import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
 
 import { NoRequiredAuthorityTooltip, TooltipWithCopy } from "@/components";
 import { extractErrorCode } from "@/helpers";
@@ -43,12 +42,16 @@ interface IProps {
      * Single cache data
      */
     cache: ICacheData;
+
+    /**
+     * The instances the cache actions apply to
+     */
+    instanceIds: string[];
 }
 
-export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
+export const SingleCacheHeader = ({ cacheManagerName, cache, instanceIds }: IProps) => {
     const cachesClearAccess = useAuthority(EAuthorities.CACHES_CLEAR);
 
-    const { instanceId } = useParams();
     const { t } = useTranslation();
     const { message } = App.useApp();
     const confirmAction = useConfirmableAction();
@@ -64,9 +67,9 @@ export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
             onOk() {
                 setClearSingleCache(StatelessRequest.loading());
                 clearCacheData({
-                    instanceId: instanceId!,
+                    instanceIds: instanceIds,
                     cacheName: cache.name,
-                    cacheManager: cacheManagerName,
+                    cacheManagerName: cacheManagerName,
                 })
                     .then(() => {
                         setClearSingleCache(StatelessRequest.success());
@@ -102,7 +105,7 @@ export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
                     />
                 </NoRequiredAuthorityTooltip>
                 <div>
-                    <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} />
+                    <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} instanceIds={instanceIds} />
                 </div>
             </div>
         </>

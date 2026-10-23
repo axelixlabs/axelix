@@ -17,7 +17,6 @@
  */
 import { App } from "antd";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
 
 import { Accordion, TooltipWithCopy } from "@/components";
 import type { ILoggerGroup } from "@/models";
@@ -42,18 +41,21 @@ interface IProps {
      * Fetches loggers data.
      */
     fetchLoggersData: () => void;
+
+    /**
+     * The instances the logging level changes apply to
+     */
+    instanceIds: string[];
 }
 
-export const LoggerGroups = ({ loggerGroups, levels, fetchLoggersData }: IProps) => {
+export const LoggerGroups = ({ loggerGroups, levels, fetchLoggersData, instanceIds }: IProps) => {
     // TODO: Add loading handler in future after fetchData and StatefulRequest refactoring
     const { t } = useTranslation();
     const { message } = App.useApp();
 
-    const { instanceId } = useParams();
-
     const handleChange = (level: string, groupName: string): void => {
         changeLoggerGroupLevel({
-            instanceId: instanceId!,
+            instanceIds: instanceIds,
             configuredLevel: level,
             groupName: groupName,
         }).then(() => {

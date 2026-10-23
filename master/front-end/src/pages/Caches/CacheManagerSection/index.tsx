@@ -31,9 +31,14 @@ interface IProps {
      * Single cache manager data
      */
     cacheManager: ICachesManager;
+
+    /**
+     * The instances the cache actions apply to
+     */
+    instanceIds: string[];
 }
 
-export const CacheManagerSection = ({ cacheManager }: IProps) => {
+export const CacheManagerSection = ({ cacheManager, instanceIds }: IProps) => {
     const { t } = useTranslation();
 
     const [withDropDown, withoutDropDown] = splitCaches(cacheManager.caches);
@@ -52,7 +57,13 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                 {[
                     ...withDropDown.map((cache) => (
                         <Accordion
-                            header={<SingleCacheHeader cacheManagerName={cacheManager.name} cache={cache} />}
+                            header={
+                                <SingleCacheHeader
+                                    cacheManagerName={cacheManager.name}
+                                    cache={cache}
+                                    instanceIds={instanceIds}
+                                />
+                            }
                             children={<CacheAccordionBody cache={cache} cacheManagerName={cacheManager.name} />}
                             key={cache.name}
                             wrapperStyles={styles.WrapperStyles}
@@ -62,7 +73,11 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                     )),
                     ...withoutDropDown.map((cache) => (
                         <div className={styles.SingleCacheSimpleDataWrapper} key={cache.name}>
-                            <SingleCacheHeader cacheManagerName={cacheManager.name} cache={cache} />
+                            <SingleCacheHeader
+                                cacheManagerName={cacheManager.name}
+                                cache={cache}
+                                instanceIds={instanceIds}
+                            />
                         </div>
                     )),
                 ]}

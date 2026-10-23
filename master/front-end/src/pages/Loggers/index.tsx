@@ -92,6 +92,7 @@ const Loggers = () => {
                         effectiveLoggers={effectiveLoggers}
                         levels={levels}
                         fetchLoggersData={fetchLoggersData}
+                        instanceIds={instanceSelection.selectedInstanceIds}
                     />
                 </EmptyHandler>
             </Activity>
@@ -102,6 +103,7 @@ const Loggers = () => {
                         loggerGroups={effectiveLoggerGroups}
                         levels={levels}
                         fetchLoggersData={fetchLoggersData}
+                        instanceIds={instanceSelection.selectedInstanceIds}
                     />
                 </EmptyHandler>
             </Activity>

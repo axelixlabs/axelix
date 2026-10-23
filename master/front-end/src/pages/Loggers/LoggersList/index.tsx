@@ -40,9 +40,14 @@ interface IProps {
      * Fetches loggers data.
      */
     fetchLoggersData: () => void;
+
+    /**
+     * The instances the logging level changes apply to
+     */
+    instanceIds: string[];
 }
 
-export const LoggersList = ({ effectiveLoggers, levels, fetchLoggersData }: IProps) => {
+export const LoggersList = ({ effectiveLoggers, levels, fetchLoggersData, instanceIds }: IProps) => {
     const parentRef = useRef<HTMLDivElement>(null);
 
     const rowVirtualizer = useVirtualizer({
@@ -73,7 +78,12 @@ export const LoggersList = ({ effectiveLoggers, levels, fetchLoggersData }: IPro
                                 }}
                                 key={key}
                             >
-                                <Logger logger={logger} levels={levels} fetchLoggersData={fetchLoggersData} />
+                                <Logger
+                                    logger={logger}
+                                    levels={levels}
+                                    fetchLoggersData={fetchLoggersData}
+                                    instanceIds={instanceIds}
+                                />
                             </div>
                         );
                     })}

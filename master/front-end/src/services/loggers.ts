@@ -38,15 +38,9 @@ export const setLoggerLevel = (data: ISetLoggerLevelRequestData) => {
 };
 
 export const resetLogger = (data: IResetLoggerLevelRequestData) => {
-    const { instanceId, loggerName } = data;
-
-    return apiFetch.post(`loggers/${instanceId}/logger/${loggerName}/reset`);
+    return apiFetch.post("loggers/logger/reset", data);
 };
 
 export const changeLoggerGroupLevel = (data: IChangeLoggerGroupLevelRequestData) => {
-    const { instanceId, groupName, configuredLevel } = data;
-
-    return apiFetch.post(`loggers/${instanceId}/group/${groupName}`, {
-        configuredLevel: configuredLevel,
-    });
+    return apiFetch.post("loggers/group", data);
 };

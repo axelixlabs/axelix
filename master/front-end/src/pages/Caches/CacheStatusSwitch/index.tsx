@@ -19,7 +19,6 @@ import { App, Switch } from "antd";
 import type { AxiosError } from "axios";
 import { type KeyboardEvent, type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
 
 import { NoRequiredAuthorityTooltip } from "@/components";
 import { extractErrorCode } from "@/helpers";
@@ -37,13 +36,17 @@ interface IProps {
      * Single cache data
      */
     cache: ICacheData;
+
+    /**
+     * The instances the cache actions apply to
+     */
+    instanceIds: string[];
 }
 
-export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
+export const CacheStatusSwitch = ({ cacheManagerName, cache, instanceIds }: IProps) => {
     const cachesToggleAccess = useAuthority(EAuthorities.CACHES_TOGGLE);
 
     const { t } = useTranslation();
-    const { instanceId } = useParams();
     const { message } = App.useApp();
     const confirmAction = useConfirmableAction();
     const [mutationRequest, setMutationRequest] = useState(StatelessRequest.inactive());
@@ -58,7 +61,7 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
                 setMutationRequest(StatelessRequest.loading());
 
                 const requestBody = {
-                    instanceId: instanceId!,
+                    instanceIds: instanceIds,
                     cacheManagerName: cacheManagerName,
                     cacheName: cache.name,
                 };
