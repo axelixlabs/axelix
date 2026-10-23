@@ -62,10 +62,10 @@
         "stylelint-config-standard": "^40.0.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.65.0",
-        "vite": "^8.1.5",
+        "vite": "^8.1.6",
         "vite-plugin-eslint": "^1.8.1",
         "vite-plugin-svgr": "^4.5.0",
-        "vitest": "^4.1.11"
+        "vitest": "^4.1.12"
     },
     "overrides": {
         "@babel/core": "^7.29.6",
@@ -76,7 +76,7 @@
         "postcss": "^8.5.18",
         "brace-expansion@1": "1.1.21",
         "brace-expansion@2": "2.1.7",
-        "@vitest/mocker": "^4.1.11",
+        "@vitest/mocker": "^4.1.12",
         "qs": "^6.16.0",
         "colord": "^2.9.4",
         "@humanfs/node": "^0.16.8"
