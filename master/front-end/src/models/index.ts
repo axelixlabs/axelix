@@ -19,6 +19,7 @@ export * from "./interfaces/dashboard/dashboardSpringPortfolio";
 export * from "./interfaces/dashboard/dashboardPersistence";
 export * from "./interfaces/dashboard/dashboardLanguages";
 export * from "./interfaces/instanceProfile";
+export * from "./interfaces/instances";
 export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/transactional";
 export * from "./interfaces/dependencies";
@@ -66,5 +67,3 @@ export * from "./enums/caches";
 export * from "./enums/beans";
 export * from "./enums/users";
 export * from "./enums/mcp";
-
-export * from "./types/instances";

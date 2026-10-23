@@ -15,6 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IInstanceCard } from "../interfaces/wallboard";
+import type { EInstanceStatus } from "@/models";
 
-export type TInstanceOption = Pick<IInstanceCard, "instanceId" | "name" | "commitShaShort" | "status" | "deployedAt">;
+/**
+ * An instance as the instance switcher lists it. Every IInstanceCard is one.
+ */
+export interface IInstanceOption {
+    instanceId: string;
+    name: string;
+    commitShaShort: string;
+    status: EInstanceStatus;
+    /** The moment the instance was deployed at, in seconds since the epoch, if known */
+    deployedAt: number | null;
+}

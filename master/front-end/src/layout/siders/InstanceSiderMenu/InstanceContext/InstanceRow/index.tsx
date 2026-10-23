@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { InstanceCommit, InstanceCurrentTag, InstanceStatusTag, InstanceUptime } from "@/components/InstanceChips";
-import type { TInstanceOption } from "@/models";
+import type { IInstanceOption } from "@/models";
 
 import contextStyles from "../styles.module.css";
 
@@ -24,7 +24,7 @@ import styles from "./styles.module.css";
 
 interface IProps {
     /** Instance data shown in this row */
-    instance: TInstanceOption;
+    instance: IInstanceOption;
 
     /** Whether this is the instance currently being viewed */
     current: boolean;
