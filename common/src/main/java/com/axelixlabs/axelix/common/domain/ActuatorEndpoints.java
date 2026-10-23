@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Dmitry Mazurov
  */
 public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
@@ -121,6 +122,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
             endpoint("/axelix-scheduled-tasks/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK =
             endpoint("/axelix-scheduled-tasks/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint RESET_SCHEDULED_TASK =
+            endpoint("/axelix-scheduled-tasks/reset", HttpMethod.POST);
     public static final ActuatorEndpoint EXECUTE_SCHEDULED_TASK =
             endpoint("/axelix-scheduled-tasks/execute", HttpMethod.POST);
 

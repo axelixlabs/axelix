@@ -35,10 +35,10 @@ import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.support.CronTrigger;
 
 /**
- * Service for managing scheduled tasks with enable/disable functionality.
+ * Service for managing scheduled tasks with enable/disable/reset functionality.
  *
  * <p>The tasks that come from a {@code ScheduledTaskRegistrar} declared by the user without
- * {@code @EnableScheduling} cannot be re-scheduled (enabled again, or have the cron expression or interval
+ * {@code @EnableScheduling} cannot be re-scheduled (enabled again, reset, or have the cron expression or interval
  * modified) or run manually, as the scheduler of the application is not available.
  *
  * @since 14.10.2025
@@ -115,14 +115,46 @@ public final class ScheduledTaskService implements AutoCloseable {
     }
 
     /**
+     * Restore the original schedule of the task with the given id, i.e. the one the task was registered
+     * with. Does nothing if the schedule of the task was not modified, or if the task is disabled.
+     *
+     * @param taskId the id of the task to reset.
+     */
+    public void resetTask(String taskId) {
+        try {
+            ManagedScheduledTask task = registry.findRequired(taskId);
+            Task originalTask = task.getOriginalTask();
+
+            if (originalTask == null || !task.isEnabled()) {
+                log.debug("Nothing to reset for the scheduled task: {}", taskId);
+                return;
+            }
+
+            for (TaskRescheduler taskRescheduler : taskReschedulers) {
+                if (taskRescheduler.supports(task)) {
+                    taskRescheduler.reschedule(task, originalTask);
+                }
+            }
+        } catch (ScheduledTaskNotFoundException e) {
+            log.info("Failed to reset task: {}", taskId, e);
+            throw e;
+        }
+    }
+
+    /**
      * Modify the cron expression for the task with the given id.
      *
      * @param taskId            the id of the task to re-schedule.
      * @param newCronExpression the new cron expression to apply.
+     * @throws IllegalArgumentException if the task is not a cron-based one.
      */
     public void modifyCronExpression(String taskId, String newCronExpression) {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
+
+            if (!(task.getTask() instanceof CronTask)) {
+                throw new IllegalArgumentException("The task '%s' is not a cron-based task".formatted(taskId));
+            }
 
             CronTask cronTask =
                     new CronTask(task.getRunnable(), new CronTrigger(newCronExpression, ZoneId.systemDefault()));

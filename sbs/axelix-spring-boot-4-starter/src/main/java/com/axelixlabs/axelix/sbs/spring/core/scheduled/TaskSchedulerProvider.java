@@ -17,10 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.config.FixedDelayTask;
+import org.springframework.scheduling.config.FixedRateTask;
+import org.springframework.scheduling.config.ScheduledTask;
+import org.springframework.scheduling.config.TriggerTask;
 
 /**
- * Provides the {@link TaskScheduler} to re-schedule the tasks on.
+ * Provides the {@link TaskScheduler} to re-schedule the tasks on, and schedules the tasks on it.
  *
  * @since 20.10.2026
  * @author Dmitry Mazurov
@@ -33,4 +39,31 @@ public interface TaskSchedulerProvider {
      * not wrapped.
      */
     TaskScheduler getTaskScheduler();
+
+    /**
+     * Schedules the given {@link FixedDelayTask} on the scheduler of the application.
+     *
+     * @return the handle of the scheduled task, or {@code null} if no new handle was created for the task.
+     * @throws IllegalStateException if the scheduler of the application is not available
+     */
+    @Nullable
+    ScheduledTask scheduleFixedDelayTask(FixedDelayTask task);
+
+    /**
+     * Schedules the given {@link FixedRateTask} on the scheduler of the application.
+     *
+     * @return the handle of the scheduled task, or {@code null} if no new handle was created for the task.
+     * @throws IllegalStateException if the scheduler of the application is not available
+     */
+    @Nullable
+    ScheduledTask scheduleFixedRateTask(FixedRateTask task);
+
+    /**
+     * Schedules the given {@link TriggerTask} (including the cron-based one) on the scheduler of the application.
+     *
+     * @return the handle of the scheduled task, or {@code null} if no new handle was created for the task.
+     * @throws IllegalStateException if the scheduler of the application is not available
+     */
+    @Nullable
+    ScheduledTask scheduleTriggerTask(TriggerTask task);
 }
