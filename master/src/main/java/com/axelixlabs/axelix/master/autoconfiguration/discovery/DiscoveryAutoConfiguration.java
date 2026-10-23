@@ -45,7 +45,7 @@ import com.axelixlabs.axelix.master.service.scheduled.ScheduledTaskExecutionHist
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
-import com.axelixlabs.axelix.master.service.transport.MetadataV2EndpointProber;
+import com.axelixlabs.axelix.master.service.transport.MasterPingEndpointProber;
 
 /**
  * Auto-configuration for K8S related components.
@@ -109,14 +109,14 @@ public class DiscoveryAutoConfiguration {
         public KubernetesInstanceDiscoverer kubernetesInstanceDiscoverer(
                 DiscoveryClient discoveryClient,
                 ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-                MetadataV2EndpointProber metadataV2EndpointProber,
+                MasterPingEndpointProber masterPingEndpointProber,
                 CompatibilityDetectionStrategy compatibilityDetectionStrategy,
                 InstanceRegistry instanceRegistry,
                 InstanceFactory instanceFactory) {
             return new KubernetesInstanceDiscoverer(
                     discoveryClient,
                     managedServiceMetadataEndpointProber,
-                    metadataV2EndpointProber,
+                    masterPingEndpointProber,
                     compatibilityDetectionStrategy,
                     instanceRegistry,
                     instanceFactory);

@@ -35,8 +35,8 @@ import org.springframework.util.StringUtils;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.common.utils.SemanticVersion;
+import com.axelixlabs.axelix.master.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadatav2.MetadataV2;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.InstanceId;
@@ -45,7 +45,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
-import com.axelixlabs.axelix.master.service.transport.MetadataV2EndpointProber;
+import com.axelixlabs.axelix.master.service.transport.MasterPingEndpointProber;
 
 /**
  * Abstract implementation of {@link InstancesDiscoverer} that performs common tasks like checking
@@ -66,10 +66,13 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     //  we can do that in case of automatic discovery.
     protected static final String ACTUATOR_ENDPOINT_POSTFIX = "/actuator";
 
+    @Deprecated(forRemoval = true, since = "1.3")
+    private static final SemanticVersion PING_ENDPOINT_SINCE = SemanticVersion.parse("1.3.0-SNAPSHOT");
+
     private final Logger logger;
     private final DiscoveryClient discoveryClient;
     private final ManagedServiceMetadataEndpointProber managedServiceProber;
-    private final MetadataV2EndpointProber metadataV2Prober;
+    private final MasterPingEndpointProber masterPingProber;
     private final CompatibilityDetectionStrategy compatibilityDetectionStrategy;
     private final InstanceRegistry instanceRegistry;
 
@@ -77,12 +80,12 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
             Logger logger,
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-            MetadataV2EndpointProber metadataV2EndpointProber,
+            MasterPingEndpointProber masterPingEndpointProber,
             CompatibilityDetectionStrategy compatibilityDetectionStrategy,
             InstanceRegistry instanceRegistry) {
         this.discoveryClient = discoveryClient;
         this.managedServiceProber = managedServiceMetadataEndpointProber;
-        this.metadataV2Prober = metadataV2EndpointProber;
+        this.masterPingProber = masterPingEndpointProber;
         this.logger = logger;
         this.compatibilityDetectionStrategy = compatibilityDetectionStrategy;
         this.instanceRegistry = instanceRegistry;
@@ -116,15 +119,17 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         Optional<Instance> knownInstance = Optional.ofNullable(serviceInstance.getInstanceId())
                 .flatMap(instanceId -> instanceRegistry.get(InstanceId.of(instanceId)));
 
-        if (knownInstance.isPresent()
-                && servesMetadataV2(knownInstance.get())
-                && compatibilityDetectionStrategy.isCompatible(
-                        knownInstance.get().starterVersion())) {
-            DiscoveredInstanceProfile.Refresh refreshed = refresh(knownInstance.get());
-
-            if (refreshed != null) {
-                return refreshed;
+        if (knownInstance.isPresent() && servesMasterPing(knownInstance.get())) {
+            if (!compatibilityDetectionStrategy.isCompatible(knownInstance.get().starterVersion())) {
+                logger.warn(
+                        "Skipping the instance '{}': it is registered, but its Axelix starter version '{}' is not supported "
+                                + "by this Axelix Master. This is unexpected, please report it to the Axelix maintainers",
+                        knownInstance.get().id().instanceId(),
+                        knownInstance.get().starterVersion());
+                return null;
             }
+
+            return refresh(knownInstance.get());
         }
 
         return Optional.ofNullable(getManagedServiceMetadata(serviceInstance))
@@ -134,47 +139,34 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
                 .orElse(null);
     }
 
-    // TODO: Remove in 1.6, once the starters before 1.3 (without the metadata v2 endpoint) fall out of the window
-    private static boolean servesMetadataV2(Instance instance) {
+    // TODO: Remove in 1.6, once the starters before 1.3 (without the ping endpoint) fall out of the window
+    @Deprecated(forRemoval = true, since = "1.3")
+    private static boolean servesMasterPing(Instance instance) {
         return SemanticVersion.tryParse(instance.starterVersion())
-                .filter(version -> version.major() > 1 || (version.major() == 1 && version.minor() >= 3))
+                .filter(version -> version.isAtLeast(PING_ENDPOINT_SINCE))
                 .isPresent();
     }
 
     private DiscoveredInstanceProfile.@Nullable Refresh refresh(Instance instance) {
         try {
-            MetadataV2 metadataV2 = metadataV2Prober.invoke(instance.actuatorUrl(), NoHttpPayload.INSTANCE);
-
-            if (!hasRequiredFields(metadataV2)) {
-                logger.debug(
-                        "The managed service with id : {} returned an incomplete metadata v2. Falling back to the full metadata",
-                        instance.id().instanceId());
-                return null;
-            }
+            MasterPing masterPing = masterPingProber.invoke(instance.actuatorUrl(), NoHttpPayload.INSTANCE);
 
             return new DiscoveredInstanceProfile.Refresh(
                     instance.copy(
-                            toInstanceStatus(metadataV2),
-                            new MemoryUsage(metadataV2.getMemoryDetails().getHeap())),
-                    metadataV2);
+                            toInstanceStatus(masterPing),
+                            new MemoryUsage(masterPing.getMemoryDetails().getHeap())),
+                    masterPing);
         } catch (EndpointInvocationException | BadRequestException error) {
-            logger.debug(
-                    "Unable to fetch the metadata v2 of the managed service with id : {}. Falling back to the full metadata",
+            logger.warn(
+                    "Unable to fetch the master ping of the managed service with id : {}. Skipping it",
                     instance.id().instanceId(),
                     error);
             return null;
         }
     }
 
-    private static boolean hasRequiredFields(MetadataV2 metadataV2) {
-        return metadataV2.getHealthStatus() != null
-                && metadataV2.getMemoryDetails() != null
-                && metadataV2.getMemoryDetails().getHeap() != null
-                && metadataV2.getTransactions() != null;
-    }
-
-    private static InstanceStatus toInstanceStatus(MetadataV2 metadataV2) {
-        return switch (metadataV2.getHealthStatus()) {
+    private static InstanceStatus toInstanceStatus(MasterPing masterPing) {
+        return switch (masterPing.getHealthStatus()) {
             case UP -> InstanceStatus.UP;
             case DOWN -> InstanceStatus.DOWN;
             case UNKNOWN -> InstanceStatus.UNKNOWN;

@@ -118,7 +118,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 .collect(Collectors.toSet());
 
         // TODO: Once the scheduled task execution history is enabled (GH-1617), report the executions of the
-        //  known instances via the metadata v2 as well, with a delivery acknowledgement for the starter's history
+        //  known instances via the master ping as well, with a delivery acknowledgement for the starter's history
         Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = registrations.stream()
                 .map(scheduledTaskExecutionResultConverter::convert)
                 .flatMap(Set::stream)
@@ -129,7 +129,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
             databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
             scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
             refreshes.forEach(refresh -> databaseHistoricalApplicationSnapshotService.reloadTransactions(
-                    refresh.instance().applicationId(), refresh.metadataV2().getTransactions()));
+                    refresh.instance().applicationId(), refresh.masterPing().getTransactions()));
         });
     }
 }

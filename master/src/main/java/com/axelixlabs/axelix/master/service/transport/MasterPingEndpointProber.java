@@ -26,21 +26,21 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
-import com.axelixlabs.axelix.master.contract.metadatav2.MetadataV2;
+import com.axelixlabs.axelix.master.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#METADATA_V2} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#PING} endpoint.
  *
  * @author Nikita Kirillov
  */
 @Service
-public class MetadataV2EndpointProber extends AbstractEndpointProber<MetadataV2> {
+public class MasterPingEndpointProber extends AbstractEndpointProber<MasterPing> {
 
-    public MetadataV2EndpointProber(
+    public MasterPingEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<MetadataV2> messageDeserializationStrategy,
+            MessageDeserializationStrategy<MasterPing> messageDeserializationStrategy,
             SecurityContextExecutor securityContextExecutor,
             HttpClient httpClient) {
         super(instanceRegistry, messageDeserializationStrategy, securityContextExecutor, httpClient);
@@ -48,6 +48,6 @@ public class MetadataV2EndpointProber extends AbstractEndpointProber<MetadataV2>
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.METADATA_V2;
+        return ActuatorEndpoints.PING;
     }
 }

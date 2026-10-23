@@ -154,7 +154,8 @@ public class InstanceSelfRegistrationInternalApi {
 
         if (!compatibilityDetectionStrategy.isCompatible(instance.get().starterVersion())) {
             log.warn(
-                    "Rejecting heartbeat of '{}': its Axelix starter version '{}' is not supported by this Axelix Master",
+                    "Rejecting heartbeat of '{}': it is registered, but its Axelix starter version '{}' is not supported "
+                            + "by this Axelix Master. This is unexpected, please report it to the Axelix maintainers",
                     instanceId.instanceId(),
                     instance.get().starterVersion());
             instanceRegistry.deRegister(instanceId);

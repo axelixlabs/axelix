@@ -402,8 +402,8 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    void shouldRefreshKnownInstanceViaMetadataV2Endpoint() throws InterruptedException {
-        String service = "service-with-metadata-v2";
+    void shouldRefreshKnownInstanceViaMasterPingEndpoint() throws InterruptedException {
+        String service = "service-with-master-ping";
         String instanceId = UUID.randomUUID().toString();
 
         // language=json
@@ -441,7 +441,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             """;
 
         // language=json
-        String metadataV2Response = """
+        String masterPingResponse = """
             {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
@@ -470,7 +470,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         mockWebServer.enqueue(
                 new MockResponse().setBody(metadataResponse).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
         mockWebServer.enqueue(new MockResponse()
-                .setBody(metadataV2Response)
+                .setBody(masterPingResponse)
                 .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
         ServiceInstance k8sInstance = Instancio.of(KubernetesServiceInstance.class)
@@ -490,7 +490,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
         // then.
         assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata/v2");
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-ping");
 
         assertThat(instanceRegistry.getAll()).singleElement().satisfies(instance -> {
             assertThat(instance.id().instanceId()).isEqualTo(instanceId);

@@ -20,30 +20,30 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 
+import com.axelixlabs.axelix.sbs.spring.core.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MemoryDetails;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadatav2.MetadataV2;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
- * Assembles the wire {@link MetadataV2}.
+ * Assembles the wire {@link MasterPing}.
  *
  * @author Nikita Kirillov
  */
-public class MetadataV2Assembler {
+public class MasterPingAssembler {
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
     private final HealthDetectionFunction healthDetectionFunction;
     private final InsightsInfoProvider insightsInfoProvider;
 
-    public MetadataV2Assembler(
+    public MasterPingAssembler(
             HealthDetectionFunction healthDetectionFunction, InsightsInfoProvider insightsInfoProvider) {
         this.healthDetectionFunction = healthDetectionFunction;
         this.insightsInfoProvider = insightsInfoProvider;
     }
 
-    public MetadataV2 assemble() {
-        return new MetadataV2()
+    public MasterPing assemble() {
+        return new MasterPing()
                 .healthStatus(healthDetectionFunction.get())
                 .memoryDetails(new MemoryDetails()
                         .heap(memoryMXBean.getHeapMemoryUsage().getUsed()))

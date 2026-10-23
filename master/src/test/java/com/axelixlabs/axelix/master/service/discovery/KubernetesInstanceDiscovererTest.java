@@ -58,11 +58,11 @@ import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
+import com.axelixlabs.axelix.master.service.serde.MasterPingJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.MetadataV2JacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
-import com.axelixlabs.axelix.master.service.transport.MetadataV2EndpointProber;
+import com.axelixlabs.axelix.master.service.transport.MasterPingEndpointProber;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor;
 
@@ -92,7 +92,7 @@ class KubernetesInstanceDiscovererTest {
     private ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber;
 
     @Autowired
-    private MetadataV2EndpointProber metadataV2EndpointProber;
+    private MasterPingEndpointProber masterPingEndpointProber;
 
     @Autowired
     private CompatibilityDetectionStrategy compatibilityDetectionStrategy;
@@ -133,13 +133,13 @@ class KubernetesInstanceDiscovererTest {
         }
 
         @Bean
-        public MetadataV2EndpointProber metadataV2EndpointProber(
+        public MasterPingEndpointProber masterPingEndpointProber(
                 InstanceRegistry instanceRegistry,
                 SecurityContextExecutor securityContextExecutor,
                 HttpClient httpClient) {
-            return new MetadataV2EndpointProber(
+            return new MasterPingEndpointProber(
                     instanceRegistry,
-                    new MetadataV2JacksonMessageDeserializationStrategy(new ObjectMapper()),
+                    new MasterPingJacksonMessageDeserializationStrategy(new ObjectMapper()),
                     securityContextExecutor,
                     httpClient);
         }
@@ -170,7 +170,7 @@ class KubernetesInstanceDiscovererTest {
         subject = new KubernetesInstanceDiscoverer(
                 discoveryClient,
                 managedServiceMetadataEndpointProber,
-                metadataV2EndpointProber,
+                masterPingEndpointProber,
                 compatibilityDetectionStrategy,
                 instanceRegistry,
                 instanceFactory);
@@ -858,7 +858,7 @@ class KubernetesInstanceDiscovererTest {
     }
 
     @Test
-    void shouldRefreshKnownInstanceViaMetadataV2Endpoint() throws InterruptedException {
+    void shouldRefreshKnownInstanceViaMasterPingEndpoint() throws InterruptedException {
         String serviceId = UUID.randomUUID().toString();
         String instanceId = UUID.randomUUID().toString();
         Instance knownInstance = TestInstanceFactory.withStarterVersion(
@@ -878,7 +878,7 @@ class KubernetesInstanceDiscovererTest {
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
-                if ("/actuator/axelix-metadata/v2".equals(request.getPath())) {
+                if ("/actuator/axelix-ping".equals(request.getPath())) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -894,19 +894,17 @@ class KubernetesInstanceDiscovererTest {
 
         assertThat(profiles).singleElement().isInstanceOfSatisfying(DiscoveredInstanceProfile.Refresh.class, it -> {
             assertThat(it.instance()).isEqualTo(knownInstance.copy(Instance.InstanceStatus.DOWN, new MemoryUsage(500)));
-            assertThat(it.metadataV2().getTransactions()).isEmpty();
+            assertThat(it.masterPing().getTransactions()).isEmpty();
         });
         assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata/v2");
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-ping");
     }
 
     @Test
-    void shouldSkipKnownInstanceWhenItIsUnreachable() {
+    void shouldSkipKnownInstanceWhenMasterPingFails() throws InterruptedException {
         String serviceId = UUID.randomUUID().toString();
         String instanceId = UUID.randomUUID().toString();
 
-        // both the metadata v2 and the full metadata fallback fail
-        mockWebServer.enqueue(new MockResponse().setResponseCode(503));
         mockWebServer.enqueue(new MockResponse().setResponseCode(503));
 
         mockDiscoveredPod(serviceId, instanceId);
@@ -917,186 +915,16 @@ class KubernetesInstanceDiscovererTest {
         Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
         assertThat(profiles).isEmpty();
-        assertThat(mockWebServer.getRequestCount()).isEqualTo(2);
+        assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
+        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-ping");
     }
 
     @Test
-    void shouldFallBackToFullMetadataWhenMetadataV2Fails() throws InterruptedException {
-        String serviceId = UUID.randomUUID().toString();
-        String instanceId = UUID.randomUUID().toString();
-
-        // language=json
-        String fullMetadata = """
-            {
-              "version": "1.0.0-SNAPSHOT",
-              "serviceVersion" : "3.5.0-SNAPSHOT",
-              "groupId" : "org.springframework.samples",
-              "artifactId" : "petclinic",
-              "commitShortSha" : "a8b0929",
-              "jdkVendor" : "BellSoft",
-              "gcInUse" : "G1",
-              "softwareVersions" : {
-                "springBoot" : "3.5.0",
-                "java" : "25",
-                "springFramework" : "6.1.2",
-                "kotlin" : null
-              },
-              "healthStatus" : "UP",
-              "memoryDetails" : {
-                "heap" : 12000
-              },
-              "insights" : {
-                "hotSpot" : {
-                  "projectLeyden" : [ ],
-                  "gc" : [ ],
-                  "projectLilliputh" : [ ]
-                },
-                "springFramework" : [ ],
-                "persistenceInsights" : {
-                  "transactions" : [ ]
-                }
-              }
-            }
-            """;
-
-        // e.g. a starter that does not serve the metadata v2 yet
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
-                if ("/actuator/axelix-metadata".equals(request.getPath())) {
-                    return new MockResponse()
-                            .setBody(fullMetadata)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                }
-                return new MockResponse().setResponseCode(404);
-            }
-        });
-
-        mockDiscoveredPod(serviceId, instanceId);
-        Mockito.when(instanceRegistry.get(InstanceId.of(instanceId)))
-                .thenReturn(Optional.of(TestInstanceFactory.withStarterVersion(
-                        instanceId,
-                        "1.3.0-SNAPSHOT",
-                        mockWebServer.url("/actuator").toString())));
-
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
-
-        assertThat(profiles).singleElement().isInstanceOf(DiscoveredInstanceProfile.Registration.class);
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata/v2");
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
-    }
-
-    @Test
-    void shouldFallBackToFullMetadataWhenMetadataV2IsIncomplete() throws InterruptedException {
-        String serviceId = UUID.randomUUID().toString();
-        String instanceId = UUID.randomUUID().toString();
-
-        // language=json
-        String incompleteMetadataV2 = """
-            {
-              "healthStatus" : "UP",
-              "transactions" : [ ]
-            }
-            """;
-
-        // language=json
-        String fullMetadata = """
-            {
-              "version": "1.0.0-SNAPSHOT",
-              "serviceVersion" : "3.5.0-SNAPSHOT",
-              "groupId" : "org.springframework.samples",
-              "artifactId" : "petclinic",
-              "commitShortSha" : "a8b0929",
-              "jdkVendor" : "BellSoft",
-              "gcInUse" : "G1",
-              "softwareVersions" : {
-                "springBoot" : "3.5.0",
-                "java" : "25",
-                "springFramework" : "6.1.2",
-                "kotlin" : null
-              },
-              "healthStatus" : "UP",
-              "memoryDetails" : {
-                "heap" : 12000
-              },
-              "insights" : {
-                "hotSpot" : {
-                  "projectLeyden" : [ ],
-                  "gc" : [ ],
-                  "projectLilliputh" : [ ]
-                },
-                "springFramework" : [ ],
-                "persistenceInsights" : {
-                  "transactions" : [ ]
-                }
-              }
-            }
-            """;
-
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
-                String body =
-                        "/actuator/axelix-metadata/v2".equals(request.getPath()) ? incompleteMetadataV2 : fullMetadata;
-                return new MockResponse().setBody(body).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-            }
-        });
-
-        mockDiscoveredPod(serviceId, instanceId);
-        Mockito.when(instanceRegistry.get(InstanceId.of(instanceId)))
-                .thenReturn(Optional.of(TestInstanceFactory.withStarterVersion(
-                        instanceId, "1.3.0", mockWebServer.url("/actuator").toString())));
-
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
-
-        assertThat(profiles).singleElement().isInstanceOf(DiscoveredInstanceProfile.Registration.class);
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata/v2");
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
-    }
-
-    @Test
-    void shouldSkipKnownInstanceOutsideCompatibilityWindow() throws InterruptedException {
+    void shouldSkipKnownInstanceOutsideCompatibilityWindow() {
         String serviceId = UUID.randomUUID().toString();
         String instanceId = UUID.randomUUID().toString();
         // newer than the 1.3.0-SNAPSHOT master, so outside its compatibility window
         String starterVersion = "1.4.0";
-
-        // language=json
-        String fullMetadata = """
-            {
-              "version": "%s",
-              "serviceVersion" : "3.5.0-SNAPSHOT",
-              "groupId" : "org.springframework.samples",
-              "artifactId" : "petclinic",
-              "commitShortSha" : "a8b0929",
-              "jdkVendor" : "BellSoft",
-              "gcInUse" : "G1",
-              "softwareVersions" : {
-                "springBoot" : "3.5.0",
-                "java" : "25",
-                "springFramework" : "6.1.2",
-                "kotlin" : null
-              },
-              "healthStatus" : "UP",
-              "memoryDetails" : {
-                "heap" : 12000
-              },
-              "insights" : {
-                "hotSpot" : {
-                  "projectLeyden" : [ ],
-                  "gc" : [ ],
-                  "projectLilliputh" : [ ]
-                },
-                "springFramework" : [ ],
-                "persistenceInsights" : {
-                  "transactions" : [ ]
-                }
-              }
-            }
-            """.formatted(starterVersion);
-
-        mockWebServer.enqueue(
-                new MockResponse().setBody(fullMetadata).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
         mockDiscoveredPod(serviceId, instanceId);
         Mockito.when(instanceRegistry.get(InstanceId.of(instanceId)))
@@ -1108,8 +936,7 @@ class KubernetesInstanceDiscovererTest {
         Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
         assertThat(profiles).isEmpty();
-        assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-metadata");
+        assertThat(mockWebServer.getRequestCount()).isZero();
     }
 
     @Test

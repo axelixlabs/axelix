@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.master.AxelixPingEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultBasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultInstanceFeaturesDetector;
@@ -43,7 +44,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStat
 import com.axelixlabs.axelix.sbs.spring.core.master.HealthDetectionFunction;
 import com.axelixlabs.axelix.sbs.spring.core.master.InstanceFeaturesDetector;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.MetadataV2Assembler;
+import com.axelixlabs.axelix.sbs.spring.core.master.MasterPingAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
@@ -138,16 +139,20 @@ public class AxelixMetadataEndpointAutoConfiguration {
     }
 
     @Bean
-    public MetadataV2Assembler metadataV2Assembler(
+    public MasterPingAssembler masterPingAssembler(
             HealthDetectionFunction healthDetectionFunction, InsightsInfoProvider insightsInfoProvider) {
-        return new MetadataV2Assembler(healthDetectionFunction, insightsInfoProvider);
+        return new MasterPingAssembler(healthDetectionFunction, insightsInfoProvider);
     }
 
     @Bean
     public AxelixMetadataEndpoint axelixMetadataEndpoint(
-            BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
-            MetadataV2Assembler metadataV2Assembler) {
-        return new AxelixMetadataEndpoint(basicRegistrationMetadataAssembler, metadataV2Assembler);
+            BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler) {
+        return new AxelixMetadataEndpoint(basicRegistrationMetadataAssembler);
+    }
+
+    @Bean
+    public AxelixPingEndpoint axelixPingEndpoint(MasterPingAssembler masterPingAssembler) {
+        return new AxelixPingEndpoint(masterPingAssembler);
     }
 
     private HealthStatus getCurrentHealth(@Nullable HealthEndpoint healthEndpoint) {

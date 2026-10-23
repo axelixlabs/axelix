@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.discovery;
 
+import com.axelixlabs.axelix.master.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadatav2.MetadataV2;
 import com.axelixlabs.axelix.master.domain.Instance;
 
 /**
@@ -38,7 +38,7 @@ public sealed interface DiscoveredInstanceProfile {
     record Registration(Instance instance, BasicRegistrationMetadata metadata) implements DiscoveredInstanceProfile {}
 
     /**
-     * The already known instance refreshed with its metadataV2.
+     * The already known instance refreshed with its masterPing.
      */
-    record Refresh(Instance instance, MetadataV2 metadataV2) implements DiscoveredInstanceProfile {}
+    record Refresh(Instance instance, MasterPing masterPing) implements DiscoveredInstanceProfile {}
 }

@@ -22,22 +22,22 @@ import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.contract.metadatav2.MetadataV2;
+import com.axelixlabs.axelix.master.contract.masterping.MasterPing;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link MetadataV2}.
+ * {@link JacksonMessageDeserializationStrategy} for {@link MasterPing}.
  *
  * @author Nikita Kirillov
  */
 @Component
-public class MetadataV2JacksonMessageDeserializationStrategy extends JacksonMessageDeserializationStrategy<MetadataV2> {
+public class MasterPingJacksonMessageDeserializationStrategy extends JacksonMessageDeserializationStrategy<MasterPing> {
 
-    public MetadataV2JacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
+    public MasterPingJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     @Override
-    public @NonNull Class<MetadataV2> supported() {
-        return MetadataV2.class;
+    public @NonNull Class<MasterPing> supported() {
+        return MasterPing.class;
     }
 }
