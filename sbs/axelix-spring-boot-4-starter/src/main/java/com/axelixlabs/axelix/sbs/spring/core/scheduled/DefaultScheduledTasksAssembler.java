@@ -20,9 +20,12 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.FixedRateTask;
+import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
 
@@ -39,6 +42,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ServiceSched
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  * @author Vyacheslav Yanin
+ * @author Dmitry Mazurov
  */
 public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, AutoCloseable {
 
@@ -90,7 +94,8 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
         return new ScheduledCronTask()
                 .runnable(new ScheduledTaskRunnable().target(target))
                 .expression(task.getExpression())
-                .enabled(managedScheduledTask.isEnabled());
+                .enabled(managedScheduledTask.isEnabled())
+                .originalExpression(originalExpression(managedScheduledTask));
     }
 
     private ScheduledFixedRateTask assembleFixedRateTask(
@@ -101,7 +106,8 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
                 .runnable(new ScheduledTaskRunnable().target(target))
                 .interval(task.getIntervalDuration().toMillis())
                 .initialDelay(task.getInitialDelayDuration().toMillis())
-                .enabled(managedScheduledTask.isEnabled());
+                .enabled(managedScheduledTask.isEnabled())
+                .originalInterval(originalInterval(managedScheduledTask));
     }
 
     private ScheduledFixedDelayTask assembleFixedDelayMap(
@@ -112,7 +118,8 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
                 .runnable(new ScheduledTaskRunnable().target(target))
                 .interval(task.getIntervalDuration().toMillis())
                 .initialDelay(task.getInitialDelayDuration().toMillis())
-                .enabled(managedScheduledTask.isEnabled());
+                .enabled(managedScheduledTask.isEnabled())
+                .originalInterval(originalInterval(managedScheduledTask));
     }
 
     private ScheduledCustomTask assembleCustomMap(TriggerTask task, ManagedScheduledTask managedScheduledTask) {
@@ -122,6 +129,20 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
                 .runnable(new ScheduledTaskRunnable().target(target))
                 .trigger(task.getTrigger().toString())
                 .enabled(managedScheduledTask.isEnabled());
+    }
+
+    private @Nullable String originalExpression(ManagedScheduledTask managedScheduledTask) {
+        Task original = managedScheduledTask.getOriginalTask();
+
+        return original instanceof CronTask cronTask ? cronTask.getExpression() : null;
+    }
+
+    private @Nullable Long originalInterval(ManagedScheduledTask managedScheduledTask) {
+        Task original = managedScheduledTask.getOriginalTask();
+
+        return original instanceof IntervalTask intervalTask
+                ? intervalTask.getIntervalDuration().toMillis()
+                : null;
     }
 
     @Override

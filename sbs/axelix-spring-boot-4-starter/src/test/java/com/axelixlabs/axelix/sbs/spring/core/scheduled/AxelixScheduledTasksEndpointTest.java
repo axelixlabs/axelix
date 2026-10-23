@@ -53,6 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTas
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskEnableRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskResetRequest;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
@@ -534,8 +535,120 @@ class AxelixScheduledTasksEndpointTest {
         assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
 
+    @Test // GH-1835
+    void shouldReturnOriginalExpression_afterCronExpressionModification() {
+        modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, "*/5 * * * * *");
+
+        assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(CRON_TASK_ID_FOR_MODIFY);
+            assertThatJson(task).node("expression").isEqualTo("*/5 * * * * *");
+            assertThatJson(task).node("originalExpression").isEqualTo("*/2 * * * * *");
+        });
+    }
+
+    @Test // GH-1835
+    void shouldResetCronExpression_testCronTask() {
+        modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, "*/5 * * * * *");
+
+        resetScheduledTask(CRON_TASK_ID_FOR_MODIFY);
+
+        assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(CRON_TASK_ID_FOR_MODIFY);
+            assertThatJson(task).node("expression").isEqualTo("*/2 * * * * *");
+            assertThatJson(task).node("originalExpression").isNull();
+            assertThatJson(task).node("enabled").isEqualTo(true);
+        });
+    }
+
+    @Test // GH-1835
+    void shouldResetInterval_testFixedDelayTask() {
+        ScheduledTaskIntervalModifyRequest request = new ScheduledTaskIntervalModifyRequest()
+                .trigger(FIXED_DELAY_TASK_ID_FOR_MODIFY)
+                .interval(555555L);
+        restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+
+        assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(FIXED_DELAY_TASK_ID_FOR_MODIFY);
+            assertThatJson(task).node("interval").isEqualTo(555555);
+            assertThatJson(task).node("originalInterval").isEqualTo(20000000);
+        });
+
+        resetScheduledTask(FIXED_DELAY_TASK_ID_FOR_MODIFY);
+
+        assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(FIXED_DELAY_TASK_ID_FOR_MODIFY);
+            assertThatJson(task).node("interval").isEqualTo(20000000);
+            assertThatJson(task).node("originalInterval").isNull();
+        });
+    }
+
+    @Test // GH-1835
+    void shouldReturnBadRequest_modifyCronExpressionForCustomTask() {
+        ScheduledTaskCronExpressionModifyRequest request = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger(CUSTOM_TASK_ID)
+                .cronExpression("*/5 * * * * *");
+
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/cron-expression",
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+        assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(CUSTOM_TASK_ID);
+            assertThatJson(task).node("trigger").isEqualTo(CUSTOM_TRIGGER);
+        });
+    }
+
+    @Test // GH-1835
+    void shouldReturnBadRequest_resetForNonExistentTask() {
+        // language=json
+        String request = """
+                {
+                  "trigger": "%s"
+                }
+                """.formatted(NON_EXISTENT_TASK_ID);
+
+        // when
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity("/actuator/axelix-scheduled-tasks/reset", defaultJsonEntity(request), Void.class);
+
+        // then
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-scheduled-tasks")
     void negativeAuthTests() {}
+
+    private void resetScheduledTask(String target) {
+        ScheduledTaskResetRequest request = new ScheduledTaskResetRequest().trigger(target);
+
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity("/actuator/axelix-scheduled-tasks/reset", defaultJsonEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+    }
+
+    private void modifyCronExpression(String target, String cronExpression) {
+        ScheduledTaskCronExpressionModifyRequest request =
+                new ScheduledTaskCronExpressionModifyRequest().trigger(target).cronExpression(cronExpression);
+
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/cron-expression",
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+    }
 
     private void enableScheduledTask(String target) {
         ScheduledTaskEnableRequest request = new ScheduledTaskEnableRequest().trigger(target);
@@ -589,8 +702,8 @@ class AxelixScheduledTasksEndpointTest {
         }
 
         @Bean
-        TaskSchedulerProvider testTaskSchedulerProvider(TaskScheduler taskScheduler) {
-            return () -> taskScheduler;
+        TaskSchedulerProvider testTaskSchedulerProvider() {
+            return new ApplicationTaskSchedulerProvider();
         }
 
         @Bean

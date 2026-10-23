@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Dmitry Mazurov
  */
 @NullMarked
 public class DefaultAuthorityResolver implements AuthorityResolver {
@@ -54,6 +55,7 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         map.put(ActuatorEndpoints.EXECUTE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
         map.put(ActuatorEndpoints.ENABLE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
         map.put(ActuatorEndpoints.DISABLE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.RESET_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
 
         // CACHES_CLEAR
         map.put(ActuatorEndpoints.CLEAR_ALL_CACHES, OssAuthority.CACHES_CLEAR);

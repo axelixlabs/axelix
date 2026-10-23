@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link DefaultAuthorityResolver}.
  *
  * @author Cherkasov Sergey
+ * @author Dmitry Mazurov
  */
 class DefaultAuthorityResolverTest {
 
@@ -70,6 +71,7 @@ class DefaultAuthorityResolverTest {
                         OssAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of("/axelix-scheduled-tasks/enable", HttpMethod.POST, OssAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of("/axelix-scheduled-tasks/disable", HttpMethod.POST, OssAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/axelix-scheduled-tasks/reset", HttpMethod.POST, OssAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of("/axelix-scheduled-tasks/execute", HttpMethod.POST, OssAuthority.SCHEDULED_TASKS_MODIFY),
 
                 // CACHES_CLEAR

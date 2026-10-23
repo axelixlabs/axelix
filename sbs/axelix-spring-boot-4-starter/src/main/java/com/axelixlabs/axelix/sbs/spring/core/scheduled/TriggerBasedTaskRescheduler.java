@@ -17,9 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.util.concurrent.ScheduledFuture;
-
 import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
 import org.springframework.scheduling.support.CronTrigger;
@@ -48,12 +47,8 @@ public final class TriggerBasedTaskRescheduler implements TaskRescheduler {
                 "Expected a new task schedule to be an instance of the TriggerTask, but was %s"
                         .formatted(newTask.getClass()));
 
-        // returned rescheduledFuture may be null in case the supplied Trigger won't fire anymore
-        ScheduledFuture<?> rescheduledFuture = taskSchedulerProvider
-                .getTaskScheduler()
-                .schedule(newTask.getRunnable(), ((TriggerTask) newTask).getTrigger());
-
-        task.replaceScheduledState(rescheduledFuture, newTask);
+        ScheduledTask scheduledTask = taskSchedulerProvider.scheduleTriggerTask((TriggerTask) newTask);
+        task.replaceScheduledState(scheduledTask);
     }
 
     @Override
