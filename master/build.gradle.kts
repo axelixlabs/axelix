@@ -120,6 +120,9 @@ dependencies {
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
+
+    testRuntimeOnly("com.github.seregamorph:spring-test-timeline:0.1-SNAPSHOT")
+    testRuntimeOnly("com.github.seregamorph:spring-test-smart-context:1.2-SNAPSHOT")
 }
 
 configurations.all {
@@ -140,6 +143,12 @@ tasks.processResources {
     }
 
     exclude("application-local.yaml")
+}
+
+tasks.test {
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 contracts {
