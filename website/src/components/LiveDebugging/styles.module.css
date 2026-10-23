@@ -1,0 +1,51 @@
+.MainWrapper {
+  padding-block: clamp(80px, 8vw, 112px);
+  border-top: 1px solid var(--axelix-line);
+}
+
+.Inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  gap: 56px;
+  align-items: center;
+}
+
+.Title {
+  margin-top: 16px;
+  font-size: clamp(30px, 3.2vw, 44px);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.024em;
+  text-wrap: balance;
+}
+
+.Description {
+  max-width: 540px;
+  margin-top: 18px;
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: var(--axelix-ink-2);
+}
+
+.List {
+  display: flex;
+  flex-direction: column;
+  margin-top: 28px;
+  border-top: 1px solid var(--axelix-line-2);
+  list-style: none;
+}
+
+.Item {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  padding-block: 12px;
+  border-bottom: 1px solid var(--axelix-line);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.Check {
+  font-weight: 600;
+  color: var(--axelix-green-500);
+}

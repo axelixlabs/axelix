@@ -20,5 +20,8 @@ import { SITE_URL } from "@/utils";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    return [{ url: new URL("/", SITE_URL).toString(), lastModified: new Date() }];
+    return ["/", "/enterprise", "/about", "/community", "/contact"].map((path) => ({
+        url: new URL(path, SITE_URL).toString(),
+        lastModified: new Date(),
+    }));
 }

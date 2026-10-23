@@ -1,0 +1,49 @@
+.Inner {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  align-items: center;
+}
+
+.Description {
+  max-width: 480px;
+}
+
+.Cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+}
+
+.Card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  border-radius: 16px;
+  background-color: var(--axelix-paper);
+  border: 1px solid var(--axelix-line-2);
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--axelix-green-500);
+  }
+}
+
+.Logo {
+  height: 84px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+.CardDescription {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--axelix-ink-2);
+}
+
+.CardCta {
+  margin-top: auto;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--axelix-green-600);
+}

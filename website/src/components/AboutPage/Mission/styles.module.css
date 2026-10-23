@@ -1,0 +1,68 @@
+.Inner {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.Text {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.Stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  column-gap: 24px;
+}
+
+.Stat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 24px 24px 0;
+  border-top: 1px solid color-mix(in srgb, var(--axelix-ink) 14%, transparent);
+}
+
+.StatValue {
+  font-size: clamp(44px, 4.6vw, 64px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--axelix-green-700);
+}
+
+.StatDescription {
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--axelix-ink-2);
+}
+
+.StatSource {
+  margin-top: auto;
+  font-size: 12.5px;
+  color: var(--axelix-ink-3);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--axelix-green-600);
+  }
+}
+
+.StoryLink {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  background-color: var(--axelix-ink);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--axelix-ink-2);
+  }
+}

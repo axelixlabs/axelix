@@ -1,0 +1,47 @@
+.MainWrapper {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  padding: 8px;
+  border-radius: 14px;
+  background-color: var(--axelix-paper);
+  border: 1px solid var(--axelix-line-2);
+  box-shadow: 0 24px 50px -24px color-mix(in srgb, var(--axelix-green-900) 35%, transparent);
+
+  /* Bridges the gap to the nav item so the pointer can cross it. */
+  &::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 0;
+    right: 0;
+    height: 9px;
+  }
+}
+
+.Link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--axelix-bg);
+  }
+}
+
+.LinkTitle {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.LinkDescription {
+  font-size: 13px;
+  color: var(--axelix-ink-3);
+}

@@ -18,24 +18,81 @@
 import {
     EInstallConfigurationVariant,
     ESpringBootVariant,
-    INavLink,
+    IHeaderMenu,
     TInstallSpringBootArtifact,
     TInstallStepNames,
 } from "@/models";
 import { IInstallConfigurationOptions, IInstallSpringBootOptions } from "@/models";
 
-export const NAV_LINKS: INavLink[] = [
-    { href: "#reference-app", label: "Why Axelix?" },
-    { href: "#capabilities", label: "Debugging" },
-    { href: "#install", label: "Install" },
-    { href: "#enterprise", label: "Enterprise" },
-    { href: "#faq", label: "FAQ" },
-];
-
 export const SITE_URL = "https://axelix.io";
 export const DOCS_URL = "https://axelix.io/docs/product/introduction";
+export const MOTIVATION_DOCS_URL = "https://axelix.io/docs/product/motivation";
 export const BLOG_URL = "https://axelix.io/blog";
 export const GITHUB_URL = "https://github.com/axelixlabs/axelix";
+export const GITHUB_ISSUES_URL = "https://github.com/axelixlabs/axelix/issues";
+export const CONTACT_EMAIL = "hello@axelix.io";
+export const ENTERPRISE_EMAIL = "enterprise@axelix.io";
+
+// Landing anchors are root-relative so they keep working from sub-pages.
+export const ENTERPRISE_HREF = "/enterprise";
+export const ABOUT_HREF = "/about";
+export const COMMUNITY_HREF = "/community";
+export const CONTACT_HREF = "/contact";
+export const GET_STARTED_HREF = "/#install";
+
+export const HEADER_MENUS: IHeaderMenu[] = [
+    {
+        key: "product",
+        label: "Product",
+        columns: [
+            {
+                heading: "Product",
+                links: [
+                    { title: "Why", description: "Why now, and why we build Axelix.", href: "/#problem" },
+                    {
+                        title: "What it does",
+                        description: "Catch code, config and library problems, and debug live services.",
+                        href: "/#quality",
+                    },
+                    { title: "Install", description: "Add Axelix to a Spring Boot service.", href: GET_STARTED_HREF },
+                    { title: "FAQ", description: "License, safety and platform support.", href: "/#faq" },
+                ],
+            },
+        ],
+    },
+    {
+        key: "resources",
+        label: "Resources",
+        columns: [
+            {
+                heading: "Learn",
+                links: [
+                    { title: "Docs", description: "Guides and reference.", href: DOCS_URL, external: true },
+                    {
+                        title: "Blog",
+                        description: "Engineering articles from the team.",
+                        href: BLOG_URL,
+                        external: true,
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        key: "company",
+        label: "Company",
+        columns: [
+            {
+                heading: "Axelix",
+                links: [
+                    { title: "About", description: "Who builds Axelix and why.", href: ABOUT_HREF },
+                    { title: "Community", description: "Contribute, events and talks.", href: COMMUNITY_HREF },
+                    { title: "Contact", description: "Email, issues and security reports.", href: CONTACT_HREF },
+                ],
+            },
+        ],
+    },
+];
 export const DEMO_APP_URL = "https://github.com/axelixlabs/order-service-demo";
 
 export const installSpringBootArtifact: TInstallSpringBootArtifact = {
@@ -76,3 +133,6 @@ export const installConfigurationOptions: IInstallConfigurationOptions[] = [
         label: "properties",
     },
 ];
+
+export const getLinkTargetProps = (external?: boolean) =>
+    external ? { target: "_blank", rel: "noopener noreferrer" } : {};

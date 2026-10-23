@@ -1,0 +1,64 @@
+.MainWrapper {
+  color: #e7eee0;
+  background:
+    radial-gradient(ellipse 60% 60% at 10% 0%, color-mix(in srgb, var(--axelix-green-500) 22%, transparent), transparent 60%),
+    var(--axelix-green-900);
+}
+
+.Title {
+  color: #f5f8ee;
+}
+
+.Description {
+  max-width: 520px;
+  color: #c9dbb1;
+}
+
+.Steps {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 30%, transparent);
+  list-style: none;
+}
+
+.Step {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding-block: 22px;
+  border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 20%, transparent);
+  color: #fff;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--axelix-green-300);
+  }
+}
+
+.StepIndex {
+  font-family: var(--axelix-code);
+  font-size: 13px;
+  color: var(--axelix-green-400);
+}
+
+.StepText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.StepTitle {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.StepDescription {
+  font-size: 14.5px;
+  color: #c9dbb1;
+}
+
+.Arrow {
+  font-size: 18px;
+}

@@ -1,0 +1,40 @@
+.Eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--axelix-green-600);
+}
+
+.Title {
+  margin-top: 18px;
+  font-size: clamp(32px, 3.6vw, 52px);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.026em;
+  text-wrap: balance;
+}
+
+.MonoLabel {
+  font-family: var(--axelix-code);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.PrimaryButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  background-color: var(--axelix-green-500);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--axelix-green-600);
+  }
+}

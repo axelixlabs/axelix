@@ -1,0 +1,68 @@
+.MainWrapper {
+  padding-block: clamp(56px, 6vw, 80px);
+  color: #e7eee0;
+  background:
+    radial-gradient(ellipse 65% 55% at 90% 0%, color-mix(in srgb, var(--axelix-green-500) 22%, transparent), transparent 60%),
+    var(--axelix-green-900);
+}
+
+.Inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+
+.Text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+}
+
+.Title {
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  color: #f5f8ee;
+}
+
+.Description {
+  font-size: 17px;
+  line-height: 1.55;
+  color: #c9dbb1;
+}
+
+.Actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.PrimaryButton,
+.SecondaryButton {
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+.PrimaryButton {
+  background-color: var(--axelix-green-500);
+
+  &:hover {
+    background-color: var(--axelix-green-600);
+  }
+}
+
+.SecondaryButton {
+  border: 1px solid color-mix(in srgb, var(--axelix-green-400) 40%, transparent);
+
+  &:hover {
+    background-color: rgb(255 255 255 / 6%);
+  }
+}

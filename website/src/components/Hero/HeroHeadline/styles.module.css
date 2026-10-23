@@ -2,25 +2,13 @@
     margin: 0 auto;
     font-family: var(--axelix-font);
     font-weight: 500;
-    font-size: clamp(44px, 6.6vw, 92px);
-    line-height: 0.98;
+    font-size: clamp(40px, 5.6vw, 76px);
+    line-height: 1;
     letter-spacing: -0.034em;
     color: var(--axelix-ink);
+    text-wrap: balance;
 }
 
-.GreenText,
-.GreenTextBold {
+.GreenText {
     color: var(--axelix-green-500);
-}
-
-.GreenTextBold {
-    font-weight: bold;
-}
-
-.Lede {
-    margin-top: 48px;
-    font-size: clamp(17px, 1.5vw, 20px);
-    line-height: 1.45;
-    color: var(--axelix-ink-2);
-    max-width: 680px;
 }

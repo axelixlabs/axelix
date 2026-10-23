@@ -17,6 +17,8 @@
  */
 import { DiscordIcon, EmailIcon, ExternalLinkIcon, GithubIcon, LinkedinIcon, LogoIcon, XTwitterIcon } from "@/assets";
 
+import Link from "next/link";
+
 import { FooterVersion } from "./FooterVersion";
 import styles from "./styles.module.css";
 
@@ -58,7 +60,7 @@ const Footer = () => {
                             <h4>Product</h4>
                             <ul>
                                 <li>
-                                    <a href="#reference-app">Why Axelix?</a>
+                                    <Link href="/#problem">Why Axelix?</Link>
                                 </li>
                                 <li>
                                     <a href="#install">Install</a>
@@ -104,9 +106,7 @@ const Footer = () => {
                             <h4>Company</h4>
                             <ul>
                                 <li>
-                                    <a href="#" target="_blank" rel="noopener noreferrer">
-                                        About
-                                    </a>
+                                    <a href="/about">About</a>
                                 </li>
                                 <li>
                                     <a href="https://axelix.io/blog" target="_blank" rel="noopener noreferrer">
@@ -143,11 +143,6 @@ const Footer = () => {
                             </ul>
                         </div>
                     </div>
-                </div>
-
-                {/* Watermark */}
-                <div className={styles.Watermark}>
-                    <span>AXELIX</span>
                 </div>
 
                 {/* Bottom strip */}

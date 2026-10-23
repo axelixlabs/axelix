@@ -1,0 +1,148 @@
+.MainWrapper {
+  padding-block: 112px;
+}
+
+.Inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  gap: 56px;
+  align-items: start;
+}
+
+.Description {
+  max-width: 540px;
+  margin-top: 24px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--axelix-ink-2);
+  text-wrap: pretty;
+}
+
+.SourceLink {
+  display: inline-flex;
+  margin-top: 28px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--axelix-green-600);
+}
+
+.Commitments {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.Commitment {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 20px;
+  padding: 22px 24px;
+  border-radius: 14px;
+  background-color: var(--axelix-paper);
+  border: 1px solid var(--axelix-line-2);
+
+  @media (width <= 480px) {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.CommitmentLabel {
+  padding-top: 4px;
+  letter-spacing: 0.12em;
+  color: var(--axelix-green-600);
+}
+
+.CommitmentText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.CommitmentTitle {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.CommitmentBody {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--axelix-ink-2);
+}
+
+.DropIn {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 40px;
+  align-items: center;
+  margin-top: 56px;
+  padding: 40px;
+  border-radius: 18px;
+  color: #e7eee0;
+  background-color: var(--axelix-green-900);
+
+  @media (width <= 768px) {
+    padding: 28px 24px;
+  }
+}
+
+.DropInIntro {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.DropInLabel {
+  color: var(--axelix-green-300);
+}
+
+.DropInTitle {
+  font-size: clamp(26px, 2.6vw, 36px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #f5f8ee;
+  text-wrap: balance;
+}
+
+.DropInDescription {
+  max-width: 520px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: #c9dbb1;
+  text-wrap: pretty;
+}
+
+.Step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 14px;
+  padding-block: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 20%, transparent);
+}
+
+.StepNumber {
+  padding-top: 2px;
+  font-family: var(--axelix-code);
+  font-size: 13px;
+  color: var(--axelix-green-400);
+}
+
+.StepText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.StepTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.StepBody {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #c9dbb1;
+}

@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { SparklesIcon } from "@/assets";
+import { ENTERPRISE_HREF } from "@/utils";
 
 import styles from "./styles.module.css";
 
@@ -25,7 +26,7 @@ export const HeroActions = () => {
             <a href="#install" className={`${styles.ActionButton} ${styles.GreenButton}`}>
                 Get started free <span className={styles.Arrow}>→</span>
             </a>
-            <a href="#enterprise" className={styles.ActionButton}>
+            <a href={ENTERPRISE_HREF} className={styles.ActionButton}>
                 <SparklesIcon width="16" height="16" />
                 Explore Enterprise
                 <span className={styles.Badge}>In development</span>

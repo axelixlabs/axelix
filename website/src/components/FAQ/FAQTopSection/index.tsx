@@ -15,16 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { SectionLabel } from "../../SectionLabel";
+
 import styles from "./styles.module.css";
 
 export const FAQTopSection = () => {
     return (
         <div className={styles.MainWrapper}>
             <div>
-                <span className={styles.Eyebrow}>FAQ</span>
-                <h2 className={styles.Title}>
-                    Questions, <span className="UnderlinedText">answered.</span>
-                </h2>
+                <SectionLabel index="05" label="FAQ" />
+                <h2 className={styles.Title}>Questions, answered.</h2>
             </div>
             <p className={styles.IntroText}>
                 Everything you&apos;d ask before installing it into production - license, safety, platform support, and

@@ -1,0 +1,29 @@
+.Section {
+  padding-block: clamp(64px, 7vw, 96px);
+  border-top: 1px solid var(--axelix-line);
+}
+
+.PaperSection {
+  background-color: var(--axelix-paper);
+}
+
+.TwoColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 56px;
+  align-items: start;
+}
+
+.Heading {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.Title {
+  font-size: clamp(30px, 3.2vw, 44px);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.024em;
+  text-wrap: balance;
+}

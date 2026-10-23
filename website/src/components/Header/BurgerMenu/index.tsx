@@ -18,30 +18,21 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-import { NAV_LINKS } from "../../../utils";
+import { ENTERPRISE_HREF, HEADER_MENUS, getLinkTargetProps } from "../../../utils";
 import { ExternalLinks } from "../ExternalLinks";
 
 import { BurgerButton } from "./BurgerButton";
 import styles from "./styles.module.css";
 
+const MOBILE_MENUS = HEADER_MENUS.map(({ key, label, columns }) => ({
+    key,
+    label,
+    links: columns.flatMap(({ links }) => links),
+}));
+
 export const BurgerMenu = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [hash, setHash] = useState<string>("");
     const wrapperRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const updateHash = (): void => {
-            setHash(window.location.hash);
-        };
-
-        updateHash();
-
-        window.addEventListener("hashchange", updateHash);
-
-        return () => {
-            window.removeEventListener("hashchange", updateHash);
-        };
-    }, []);
 
     useEffect(() => {
         if (!isOpen) {
@@ -74,16 +65,25 @@ export const BurgerMenu = () => {
             {isOpen && (
                 <div className={styles.MobileMenu}>
                     <nav className={styles.NavLinks}>
-                        {NAV_LINKS.map(({ href, label }) => (
-                            <a
-                                key={href}
-                                href={href}
-                                className={`${styles.NavLink} ${hash === href ? styles.NavLinkActive : ""}`}
-                                onClick={closeMenu}
-                            >
-                                {label}
-                            </a>
+                        {MOBILE_MENUS.map(({ key, label, links }) => (
+                            <div key={key} className={styles.Group}>
+                                <span className={styles.GroupHeading}>{label}</span>
+                                {links.map(({ title, href, external }) => (
+                                    <a
+                                        key={title}
+                                        href={href}
+                                        className={styles.NavLink}
+                                        onClick={closeMenu}
+                                        {...getLinkTargetProps(external)}
+                                    >
+                                        {title}
+                                    </a>
+                                ))}
+                            </div>
                         ))}
+                        <a href={ENTERPRISE_HREF} className={styles.NavLink} onClick={closeMenu}>
+                            Enterprise
+                        </a>
                     </nav>
                     <div className={styles.Divider} />
                     <ExternalLinks onLinkClick={closeMenu} fullWidth />

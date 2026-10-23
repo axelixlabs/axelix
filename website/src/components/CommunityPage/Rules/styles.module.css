@@ -1,0 +1,56 @@
+.MainWrapper {
+  padding-block: clamp(48px, 5vw, 72px) clamp(72px, 8vw, 112px);
+}
+
+.Card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 32px;
+  border-radius: 16px;
+  background-color: var(--axelix-paper);
+  border: 1px solid var(--axelix-line-2);
+
+  @media (width <= 480px) {
+    padding: 24px;
+  }
+}
+
+.Text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 640px;
+}
+
+.Title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.Description {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--axelix-ink-2);
+}
+
+.Links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.Link {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--axelix-line-3);
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--axelix-green-500);
+  }
+}

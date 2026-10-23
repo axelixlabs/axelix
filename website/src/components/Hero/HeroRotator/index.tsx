@@ -18,34 +18,36 @@
 "use client";
 import { useEffect, useState } from "react";
 
-import { NAV_LINKS } from "../../../utils";
-
 import styles from "./styles.module.css";
 
-export const NavLinks = () => {
-    const [hash, setHash] = useState<string>("");
+// Stub phrases, to be replaced with the final copy.
+const PHRASES = [
+    { lead: "See", text: "which property value won, and where it came from" },
+    { lead: "Catch", text: "N+1 queries and eager fetching" },
+    { lead: "Stop", text: "them before production, with Enterprise" },
+];
+
+const ROTATE_INTERVAL_MS = 2500;
+
+const nextIndex = (current: number): number => (current + 1) % PHRASES.length;
+
+export const HeroRotator = () => {
+    const [index, setIndex] = useState<number>(0);
 
     useEffect(() => {
-        const updateHash = () => {
-            setHash(window.location.hash);
-        };
+        const interval = setInterval(() => setIndex(nextIndex), ROTATE_INTERVAL_MS);
 
-        updateHash();
-
-        window.addEventListener("hashchange", updateHash);
-
-        return () => {
-            window.removeEventListener("hashchange", updateHash);
-        };
+        return () => clearInterval(interval);
     }, []);
 
+    const { lead, text } = PHRASES[index];
+
     return (
-        <div className={styles.MainWrapper}>
-            {NAV_LINKS.map(({ href, label }) => (
-                <a key={href} href={href} className={`${styles.Link} ${hash === href ? styles.ActiveLink : ""}`}>
-                    {label}
-                </a>
-            ))}
-        </div>
+        <p className={styles.Rotator} aria-live="polite">
+            <span>{lead}</span>
+            <span key={index} className={styles.Phrase}>
+                {text}
+            </span>
+        </p>
     );
 };

@@ -1,0 +1,42 @@
+.List {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  border-top: 1px solid var(--axelix-line-3);
+}
+
+.Row {
+  display: grid;
+  grid-template-columns: 28px minmax(110px, 150px) minmax(0, 1fr) 20px;
+  gap: 16px;
+  align-items: center;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--axelix-line-2);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--axelix-green-600);
+  }
+
+  @media (width <= 480px) {
+    grid-template-columns: 28px minmax(0, 1fr) 20px;
+  }
+}
+
+.Name {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.Description {
+  font-size: 14.5px;
+  color: var(--axelix-ink-3);
+
+  @media (width <= 480px) {
+    display: none;
+  }
+}
+
+.Arrow {
+  font-size: 18px;
+}

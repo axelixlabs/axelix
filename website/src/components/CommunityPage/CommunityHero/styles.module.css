@@ -1,0 +1,111 @@
+.MainWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* The site header is fixed, so the hero clears its 64px. */
+  min-height: calc(64px + clamp(560px, 72vh, 720px));
+  padding-block: calc(64px + clamp(72px, 8vw, 112px)) clamp(72px, 8vw, 112px);
+  overflow: hidden;
+  background-color: #0a1205;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgb(10 22 4 / 97%) 0%,
+      rgb(10 22 4 / 90%) 38%,
+      rgb(10 22 4 / 35%) 70%,
+      rgb(10 22 4 / 15%) 100%
+    );
+  }
+}
+
+.Photo {
+  object-fit: cover;
+  object-position: 70% 55%;
+}
+
+.Inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.Content {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 640px;
+}
+
+.Title {
+  font-size: clamp(44px, 6vw, 84px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.034em;
+  color: #f5f8ee;
+  text-wrap: balance;
+}
+
+.Accent {
+  color: var(--axelix-green-400);
+}
+
+.Description {
+  max-width: 520px;
+  font-size: clamp(17px, 1.5vw, 20px);
+  line-height: 1.5;
+  color: #c9dbb1;
+  text-wrap: pretty;
+}
+
+.Actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.PrimaryButton,
+.SecondaryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+.PrimaryButton {
+  background-color: var(--axelix-green-500);
+
+  &:hover {
+    background-color: var(--axelix-green-600);
+  }
+}
+
+.SecondaryButton {
+  border: 1px solid color-mix(in srgb, var(--axelix-green-400) 45%, transparent);
+
+  &:hover {
+    background-color: rgb(255 255 255 / 6%);
+  }
+}
+
+.Caption {
+  position: absolute;
+  right: clamp(20px, 4vw, 56px);
+  bottom: 22px;
+  z-index: 1;
+  font-size: 13px;
+  color: rgb(255 255 255 / 85%);
+
+  b {
+    font-weight: 500;
+    color: #fff;
+  }
+}

@@ -1,0 +1,192 @@
+.MainWrapper {
+  padding-block: clamp(80px, 8vw, 112px);
+  background-color: var(--axelix-paper);
+  border-top: 1px solid var(--axelix-line);
+}
+
+.Inner {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.Heading {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  gap: 56px;
+  align-items: end;
+
+  @media (width <= 1024px) {
+    gap: 24px;
+  }
+}
+
+.Title {
+  margin-top: 16px;
+  font-size: clamp(30px, 3.2vw, 44px);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.024em;
+  text-wrap: balance;
+}
+
+.Description {
+  max-width: 560px;
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: var(--axelix-ink-2);
+  text-wrap: pretty;
+}
+
+/* The spread keeps its desktop width and scrolls sideways on narrow screens. */
+.Scroller {
+  width: 100%;
+  overflow-x: auto;
+  padding-block: 8px 24px;
+}
+
+.Book {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 960px;
+}
+
+.Tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.Tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--axelix-line-3);
+  background-color: var(--axelix-paper);
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    border-color 0.3s,
+    background-color 0.3s;
+
+  &:hover {
+    border-color: var(--axelix-green-500);
+  }
+}
+
+.TabActive {
+  border-color: var(--axelix-green-500);
+  background-color: var(--axelix-bg);
+}
+
+.TabFile {
+  font-family: var(--axelix-code);
+  font-size: 12.5px;
+  color: var(--axelix-ink-3);
+}
+
+.Spread {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 414px;
+  border-radius: 16px;
+  perspective: 2600px;
+  box-shadow: 0 40px 70px -40px color-mix(in srgb, var(--axelix-green-900) 55%, transparent);
+}
+
+.Page {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 3;
+  width: 50%;
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(0.55, 0.05, 0.25, 1);
+}
+
+.Flipping {
+  transform: rotateY(-180deg);
+}
+
+.Resetting,
+.Resetting .FrontShade {
+  transition: none;
+}
+
+.Face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform: rotateY(0deg) translateZ(1px);
+}
+
+.Back {
+  transform: rotateY(180deg) translateZ(1px);
+}
+
+.FrontShade,
+.BackShade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.FrontShade {
+  border-radius: 0 16px 16px 0;
+  background: linear-gradient(90deg, rgb(0 0 0 / 45%), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.6s;
+
+  .Flipping & {
+    opacity: 1;
+  }
+}
+
+.BackShade {
+  border-radius: 16px 0 0 16px;
+  background: linear-gradient(270deg, rgb(0 0 0 / 18%), transparent 40%);
+}
+
+.Spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 4;
+  width: 36px;
+  margin-left: -18px;
+  background: linear-gradient(90deg, transparent, rgb(0 0 0 / 16%) 50%, transparent);
+  pointer-events: none;
+}
+
+.Footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.TurnButton {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--axelix-line-3);
+  background-color: var(--axelix-paper);
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--axelix-green-500);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .Page,
+  .FrontShade {
+    transition: none;
+  }
+}

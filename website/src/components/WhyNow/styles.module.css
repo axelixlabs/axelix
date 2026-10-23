@@ -1,0 +1,183 @@
+.MainWrapper {
+  padding-block: clamp(80px, 9vw, 128px) clamp(72px, 8vw, 120px);
+  color: #e7eee0;
+  background:
+    radial-gradient(ellipse 70% 60% at 12% 0%, color-mix(in srgb, var(--axelix-green-500) 22%, transparent), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 95% 100%, color-mix(in srgb, var(--axelix-green-500) 18%, transparent), transparent 65%),
+    var(--axelix-green-900);
+}
+
+.Title {
+  max-width: 960px;
+  margin-top: 24px;
+  font-size: clamp(36px, 4.6vw, 64px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  color: #f5f8ee;
+  text-wrap: balance;
+}
+
+.Underlined {
+  text-decoration: underline;
+  text-decoration-color: var(--axelix-green-500);
+  text-decoration-thickness: 8px;
+  text-underline-offset: 6px;
+}
+
+.Description {
+  max-width: 720px;
+  margin-top: 24px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #c9dbb1;
+  text-wrap: pretty;
+}
+
+.Stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 20px;
+  margin-top: 64px;
+}
+
+/* Subgrid keeps the value, text, source and note rows aligned across cards. */
+.Stat {
+  display: grid;
+  grid-row: span 5;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  align-items: start;
+  padding: 28px;
+  border-radius: 16px;
+  background-color: rgb(255 255 255 / 4%);
+  border: 1px solid color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
+}
+
+.StatLabel {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--axelix-green-400);
+}
+
+.StatValue {
+  margin-top: 20px;
+  font-size: clamp(56px, 6vw, 80px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+
+.StatDescription {
+  margin-top: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #e7eee0;
+}
+
+.StatSource,
+.StatNoteLink {
+  color: var(--axelix-green-300);
+}
+
+.StatSource {
+  margin-top: 12px;
+  font-size: 12.5px;
+}
+
+.StatNoteWrapper {
+  padding-top: 24px;
+}
+
+.StatNote {
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #c9dbb1;
+}
+
+.Jobs {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 72px;
+}
+
+.JobsTitle {
+  max-width: 900px;
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.024em;
+  color: #fff;
+  text-wrap: balance;
+}
+
+.Accent {
+  color: var(--axelix-green-400);
+}
+
+.JobCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: 20px;
+}
+
+.JobCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px;
+  border-radius: 16px;
+  background-color: var(--axelix-paper);
+  color: var(--axelix-ink);
+  box-shadow: 0 24px 50px -28px rgb(0 0 0 / 60%);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f8ee;
+  }
+}
+
+.JobIndex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--axelix-green-500);
+
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: var(--axelix-line-3);
+  }
+}
+
+.JobTitle {
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.JobDescription {
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--axelix-ink-2);
+}
+
+.JobButton {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background-color: var(--axelix-green-500);
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 500;
+}

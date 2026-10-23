@@ -38,6 +38,7 @@ export const FAQList = () => {
                             type="button"
                             onClick={() => setOpen(isOpen ? null : index)}
                         >
+                            <span className={styles.Number}>{String(index + 1).padStart(2, "0")}</span>
                             <span className={styles.Question}>{question}</span>
                             <span className={styles.Icon}>
                                 <PlusIcon height="16" width="16" />

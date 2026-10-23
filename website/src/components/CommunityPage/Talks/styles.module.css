@@ -1,0 +1,25 @@
+.Body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 8px;
+  padding-top: 24px;
+  border-top: 1px solid var(--axelix-line-3);
+}
+
+.Button {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  background-color: var(--axelix-ink);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--axelix-ink-2);
+  }
+}

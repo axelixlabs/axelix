@@ -2,7 +2,7 @@
     display: none;
     justify-content: flex-end;
 
-    @media (width <= 768px) {
+    @media (width <= 1024px) {
         display: flex;
     }
 }
@@ -12,6 +12,8 @@
     top: calc(100% + 8px);
     left: 0;
     right: 0;
+    max-height: calc(100dvh - 80px);
+    overflow-y: auto;
     padding: 6px;
     border-radius: 16px;
     background-color: var(--axelix-paper);
@@ -42,9 +44,19 @@
     }
 }
 
-.NavLinkActive {
-    background-color: color-mix(in srgb, var(--axelix-green-500) 14%, transparent);
-    color: var(--axelix-green-800);
+.Group {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 6px;
+}
+
+.GroupHeading {
+    padding: 10px 14px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--axelix-green-600);
 }
 
 .Divider {

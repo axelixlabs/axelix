@@ -1,0 +1,41 @@
+.Description {
+  max-width: 480px;
+}
+
+.Channels {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--axelix-ink) 15%, transparent);
+}
+
+.Channel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding-block: 22px;
+  border-bottom: 1px solid var(--axelix-line-2);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--axelix-green-600);
+  }
+}
+
+.ChannelText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ChannelLabel {
+  font-size: 13px;
+  color: var(--axelix-ink-3);
+}
+
+.ChannelValue,
+.Arrow {
+  font-size: 20px;
+  font-weight: 500;
+}

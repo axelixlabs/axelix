@@ -1,0 +1,33 @@
+.MainWrapper {
+  /* The site header is fixed, so the hero clears its 64px. */
+  padding-block: calc(64px + clamp(72px, 9vw, 128px)) clamp(64px, 7vw, 104px);
+  background-image: radial-gradient(color-mix(in srgb, var(--axelix-green-500) 16%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.Inner {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.Title {
+  max-width: 1040px;
+  font-size: clamp(44px, 6.2vw, 88px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.034em;
+  text-wrap: balance;
+}
+
+.Accent {
+  color: var(--axelix-green-500);
+}
+
+.Description {
+  max-width: 720px;
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.5;
+  color: var(--axelix-ink-2);
+  text-wrap: pretty;
+}

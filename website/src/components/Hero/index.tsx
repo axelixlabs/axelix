@@ -17,8 +17,8 @@
  */
 import { HeroActions } from "./HeroActions";
 import { HeroBackground } from "./HeroBackground";
-import { HeroBenefits } from "./HeroBenefits";
 import { HeroHeadline } from "./HeroHeadline";
+import { HeroRotator } from "./HeroRotator";
 import { HeroVideo } from "./HeroVideo";
 import styles from "./styles.module.css";
 
@@ -31,9 +31,9 @@ export const Hero = () => {
                 <div className={styles.ContentWrapper}>
                     <HeroHeadline />
 
-                    <HeroActions />
+                    <HeroRotator />
 
-                    <HeroBenefits />
+                    <HeroActions />
                 </div>
 
                 <HeroVideo />

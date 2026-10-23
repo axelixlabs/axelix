@@ -16,24 +16,27 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 export const HERO_HEADLINE_SEGMENTS = [
-    { text: "Make sure your ", highlighted: false },
-    { text: "Java", highlighted: true },
-    { text: " microservices are ready for the ", highlighted: false },
-    { text: "AI", highlighted: true },
-    { text: " era.", highlighted: false },
+    { text: "See what your ", highlighted: false },
+    { text: "Spring Boot", highlighted: true },
+    { text: " apps are really doing in production, and ", highlighted: false },
+    { text: "what's wrong", highlighted: true },
+    { text: " with them", highlighted: false },
 ] as const;
 
-export const HERO_INTRO_SEGMENTS = [
-    { text: "The ", highlighted: false },
-    { text: "AI-Native", highlighted: true },
-    { text: ", Open Core solution for the AI era: its open-source core ", highlighted: false },
-    { text: "pinpoints", highlighted: true },
-    { text: " what holds your Java back, while Axelix Enterprise ", highlighted: false },
-    { text: "enforces", highlighted: true },
-    { text: " optimization policies across the whole ecosystem. ", highlighted: false },
-    { text: "At scale", highlighted: true },
-    { text: ".", highlighted: false },
-] as const;
+// Feeds llms.txt (INTRO below); the hero itself no longer renders this text.
+export const HERO_INTRO_SEGMENTS: readonly { text: string; href?: string }[] = [
+    {
+        text:
+            "Axelix shows the live state of every running service: which property value won and where it came from, " +
+            "why each bean exists or doesn't, transactions, loggers and dependencies. It flags the misconfigurations " +
+            "and anti-patterns that pass every test and still hurt you in prod, like Open Session In View, N+1 queries " +
+            "and eager fetching. With ",
+    },
+    { text: "Axelix Enterprise", href: "/enterprise" },
+    {
+        text: ", you can stop them from reaching production at all. For you in the web console, and for your AI agent through MCP.",
+    },
+];
 
 export const HEADLINE = HERO_HEADLINE_SEGMENTS.map(({ text }) => text).join("");
 export const INTRO = HERO_INTRO_SEGMENTS.map(({ text }) => text).join("");

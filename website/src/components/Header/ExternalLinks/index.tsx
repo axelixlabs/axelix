@@ -15,9 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { GithubIcon } from "@/assets";
-
-import { BLOG_URL, DOCS_URL, GITHUB_URL } from "../../../utils";
+import { BLOG_URL, DOCS_URL, GET_STARTED_HREF, GITHUB_URL } from "../../../utils";
 
 import styles from "./styles.module.css";
 
@@ -31,33 +29,40 @@ export const ExternalLinks = ({ onLinkClick, fullWidth }: IProps) => {
 
     return (
         <div className={`${styles.MainWrapper} ${fullWidth ? styles.MainWrapperFullWidth : ""}`}>
-            <a
-                href={DOCS_URL}
-                className={`${styles.DocsLink} ${linkClassName}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={onLinkClick}
-            >
-                Docs
-            </a>
-            <a
-                href={BLOG_URL}
-                className={`${styles.DocsLink} ${linkClassName}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={onLinkClick}
-            >
-                Blog
-            </a>
+            {/* The burger menu already lists Docs and Blog under Resources. */}
+            {!fullWidth && (
+                <>
+                    <a
+                        href={DOCS_URL}
+                        className={styles.DocsLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={onLinkClick}
+                    >
+                        Docs
+                    </a>
+                    <a
+                        href={BLOG_URL}
+                        className={styles.DocsLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={onLinkClick}
+                    >
+                        Blog
+                    </a>
+                </>
+            )}
             <a
                 href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${styles.GitHubIcon} ${linkClassName}`}
+                className={`${styles.GitHubLink} ${linkClassName}`}
                 onClick={onLinkClick}
             >
-                <GithubIcon width="11" height="11" />
-                GitHub
+                ★ GitHub
+            </a>
+            <a href={GET_STARTED_HREF} className={`${styles.GetStartedLink} ${linkClassName}`} onClick={onLinkClick}>
+                Get started
             </a>
         </div>
     );

@@ -15,17 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { SectionLabel } from "../../SectionLabel";
+
 import styles from "./styles.module.css";
 
 export const InstallTopSection = () => {
     return (
         <div className={styles.MainWrapper}>
             <div>
-                <span className={styles.Eyebrow}>Install</span>
-                <h2 className={styles.Title}>
-                    Install Axelix Master. Add library & plugin -{" "}
-                    <span className="UnderlinedText">that&#39;s all you need</span>
-                </h2>
+                <SectionLabel index="04" label="Install" />
+                <h2 className={styles.Title}>Install Axelix Master. Add library & plugin - that&#39;s all you need</h2>
             </div>
             <p className={styles.IntroText}>
                 Pick how you run things - Docker Compose, Kubernetes or even on just VMs or bare metal. Install the

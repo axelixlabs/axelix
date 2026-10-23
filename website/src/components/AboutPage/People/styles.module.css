@@ -1,0 +1,53 @@
+.MainWrapper {
+  padding-block: clamp(56px, 6vw, 80px);
+  color: #e7eee0;
+  background:
+    radial-gradient(ellipse 60% 60% at 10% 0%, color-mix(in srgb, var(--axelix-green-500) 22%, transparent), transparent 60%),
+    var(--axelix-green-900);
+}
+
+.Inner {
+  align-items: center;
+}
+
+.Title {
+  color: #f5f8ee;
+}
+
+.Description {
+  max-width: 560px;
+  color: #c9dbb1;
+}
+
+.Figure {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.Photo {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--axelix-green-400) 28%, transparent);
+}
+
+.PhotoImage {
+  object-fit: cover;
+  object-position: 72% 42%;
+}
+
+.Caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13.5px;
+  color: #c9dbb1;
+
+  b {
+    font-weight: 500;
+    color: #fff;
+  }
+}

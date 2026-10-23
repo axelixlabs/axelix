@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Capabilities, Enterprise, FAQ, Hero, HowExactly, Install, ReferenceApp, Reveal } from "@/components";
+import { EditionsBanner, FAQ, Hero, Install, LiveDebugging, QualityGate, Reveal, WhyNow } from "@/components";
 
 export default function Page() {
     return (
@@ -24,17 +24,19 @@ export default function Page() {
                 <Hero />
             </Reveal>
             <Reveal>
-                <ReferenceApp />
+                <WhyNow />
             </Reveal>
-            <HowExactly />
             <Reveal>
-                <Capabilities />
+                <QualityGate />
+            </Reveal>
+            <Reveal>
+                <LiveDebugging />
+            </Reveal>
+            <Reveal>
+                <EditionsBanner />
             </Reveal>
             <Reveal>
                 <Install />
-            </Reveal>
-            <Reveal>
-                <Enterprise />
             </Reveal>
             <Reveal>
                 <FAQ />

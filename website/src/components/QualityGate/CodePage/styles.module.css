@@ -1,0 +1,71 @@
+.MainWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0 16px 16px 0;
+  background-color: var(--axelix-ink);
+  color: #d8e3cf;
+  font-family: var(--axelix-code);
+  font-size: 12.5px;
+  line-height: 21px;
+}
+
+.Header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+  font-size: 12px;
+  color: var(--axelix-ink-4);
+}
+
+.Path {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.Summary {
+  white-space: nowrap;
+  color: #f28b7d;
+}
+
+.Lines {
+  flex: 1;
+  padding-block: 12px;
+  overflow: hidden;
+}
+
+.Line {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  min-height: 21px;
+}
+
+.LineNumber {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 12px;
+  color: var(--axelix-ink-3);
+}
+
+.Mark {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  color: var(--axelix-ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.Code {
+  padding-right: 16px;
+  white-space: pre;
+}

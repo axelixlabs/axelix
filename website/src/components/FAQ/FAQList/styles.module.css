@@ -1,7 +1,11 @@
 .MainWrapper {
     padding: 0;
     margin-bottom: 60px;
-    max-width: 920px;
+    --number-column: 56px;
+
+    @media (width <= 640px) {
+        --number-column: 32px;
+    }
 }
 
 .ClickableLink {
@@ -21,10 +25,10 @@
 
 .WrapperButton {
     width: 100%;
-    display: flex;
+    display: grid;
+    grid-template-columns: var(--number-column) minmax(0, 1fr) 36px;
     align-items: center;
-    justify-content: space-between;
-    gap: 24px;
+    gap: 16px;
     padding-block: 26px;
     background: none;
     border: 0;
@@ -36,6 +40,12 @@
     &:hover {
         color: var(--axelix-green-700);
     }
+}
+
+.Number {
+    font-family: var(--axelix-code);
+    font-size: 13px;
+    color: var(--axelix-ink-3);
 }
 
 .Question {
@@ -87,11 +97,11 @@
 
 .Answer p {
     margin: 0;
-    padding: 0 56px 28px 0;
+    padding: 0 52px 28px calc(var(--number-column) + 16px);
     font-size: 15.5px;
     line-height: 1.65;
     color: var(--axelix-ink-2);
-    max-width: 700px;
+    max-width: calc(var(--number-column) + 16px + 760px);
 }
 
 .Answer p + p {

@@ -15,26 +15,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { SectionLabel } from "../../SectionLabel";
+
 import styles from "./styles.module.css";
 
-export const HeroBenefits = () => {
+export const AboutHero = () => {
     return (
-        <div className={styles.BenefitsWrapper}>
-            <div>
-                <div className={styles.Label}>Built for</div>
-                <div className={styles.Value}>Production</div>
-                <div className={styles.SmallValue}>not only sandbox envs</div>
+        <section className={styles.MainWrapper}>
+            <div className={`MainContainer ${styles.Inner}`}>
+                <SectionLabel label="About" />
+                <h1 className={styles.Title}>
+                    Axelix is developed by <span className={styles.Accent}>Axelix Labs</span>.
+                </h1>
+                <p className={styles.Description}>
+                    We&apos;re a small team of engineers and contributors to Spring modules. We&apos;ve spent years
+                    inside Spring Boot services in production, and Axelix is the tool we kept wishing we had.
+                </p>
             </div>
-            <div>
-                <div className={styles.Label}>Exposed to</div>
-                <div className={styles.Value}>Humans &amp; agents</div>
-                <div className={styles.SmallValue}>same RBAC, same audit</div>
-            </div>
-            <div>
-                <div className={styles.Label}>Install</div>
-                <div className={styles.Value}>Fast setup</div>
-                <span className={styles.SmallValue}>docker · helm · Jar</span>
-            </div>
-        </div>
+        </section>
     );
 };

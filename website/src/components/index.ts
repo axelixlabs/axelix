@@ -15,13 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+export { AboutPage } from "./AboutPage";
 export { Capabilities } from "./Capabilities";
+export { CommunityPage } from "./CommunityPage";
+export { ContactPage } from "./ContactPage";
+export { EditionsBanner } from "./EditionsBanner";
 export { Enterprise } from "./Enterprise";
+export { EnterprisePage } from "./EnterprisePage";
 export { HowExactly } from "./HowExactly";
 export { Install } from "./Install";
+export { LiveDebugging } from "./LiveDebugging";
 export { Problem } from "./Problem";
+export { QualityGate } from "./QualityGate";
 export { ReferenceApp } from "./ReferenceApp";
 export { Reveal } from "./Reveal";
+export { SectionLabel } from "./SectionLabel";
+export { WhyNow } from "./WhyNow";
 export { default as Footer } from "./Footer";
 export { Header } from "./Header";
 export { Hero } from "./Hero";

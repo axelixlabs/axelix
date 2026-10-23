@@ -1,0 +1,202 @@
+.MainWrapper {
+  padding-block: 112px;
+  background-color: var(--axelix-paper);
+  border-top: 1px solid var(--axelix-line);
+}
+
+.Title {
+  max-width: 1040px;
+}
+
+.Cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 20px;
+  margin-top: 56px;
+}
+
+.Card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+  border-radius: 18px;
+}
+
+.OssCard {
+  background-color: var(--axelix-bg);
+  border: 1px solid var(--axelix-line-2);
+  color: var(--axelix-ink-3);
+}
+
+.EnterpriseCard {
+  background-color: var(--axelix-green-900);
+  color: var(--axelix-green-300);
+}
+
+.CardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.CardBadge {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+
+  .OssCard & {
+    color: var(--axelix-green-700);
+    background-color: var(--axelix-green-100);
+  }
+
+  .EnterpriseCard & {
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 40%, transparent);
+  }
+}
+
+.CardTitle {
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+
+  .OssCard & {
+    color: var(--axelix-ink);
+  }
+
+  .EnterpriseCard & {
+    color: #fff;
+  }
+}
+
+.CardSubtitle {
+  margin-top: 6px;
+  font-size: 15.5px;
+
+  .OssCard & {
+    color: var(--axelix-ink-2);
+  }
+
+  .EnterpriseCard & {
+    color: #c9dbb1;
+  }
+}
+
+.Points {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.45;
+
+  .OssCard & {
+    color: var(--axelix-ink);
+  }
+
+  .EnterpriseCard & {
+    color: #e7eee0;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 8px;
+
+    &::before {
+      content: "✓";
+      color: var(--axelix-green-500);
+    }
+  }
+
+  .EnterpriseCard & li::before {
+    color: var(--axelix-green-400);
+  }
+}
+
+.OutlineButton {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--axelix-ink);
+  border: 1px solid color-mix(in srgb, var(--axelix-ink) 20%, transparent);
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--axelix-green-500);
+  }
+}
+
+.CardButton {
+  margin-top: auto;
+}
+
+.Comparison {
+  margin-top: 72px;
+}
+
+.ComparisonTitle {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+}
+
+.Table {
+  margin-top: 20px;
+  border-top: 1px solid color-mix(in srgb, var(--axelix-ink) 15%, transparent);
+}
+
+.Row {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) 1fr 1fr;
+  gap: 24px;
+  padding-block: 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--axelix-ink-2);
+  border-bottom: 1px solid var(--axelix-line);
+
+  /* On narrow screens the area spans the row and the two editions sit below it. */
+  @media (width <= 768px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+
+    > :first-child {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.HeaderRow {
+  padding-block: 14px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--axelix-ink-3);
+  border-bottom-color: var(--axelix-line-2);
+
+  @media (width <= 768px) {
+    > :first-child {
+      display: none;
+    }
+  }
+}
+
+.EnterpriseHeader {
+  font-weight: 600;
+  color: var(--axelix-green-600);
+}
+
+.Area {
+  font-weight: 500;
+  color: var(--axelix-ink);
+}
+
+.Missing {
+  color: var(--axelix-ink-4);
+}

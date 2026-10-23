@@ -1,0 +1,80 @@
+.MainWrapper {
+  padding-block: 96px;
+  color: var(--axelix-green-300);
+  background:
+    radial-gradient(ellipse 65% 55% at 90% 0%, color-mix(in srgb, var(--axelix-green-500) 22%, transparent), transparent 60%),
+    var(--axelix-green-900);
+}
+
+.Inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  align-items: center;
+  gap: 56px;
+}
+
+.Intro {
+  max-width: 640px;
+}
+
+.Title {
+  margin-top: 14px;
+  color: #f5f8ee;
+}
+
+.Description {
+  margin-top: 18px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: #c9dbb1;
+}
+
+.Steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px;
+  border-radius: 16px;
+  background-color: rgb(10 28 4 / 55%);
+  border: 1px solid color-mix(in srgb, var(--axelix-green-400) 28%, transparent);
+}
+
+.Step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 14px;
+  padding-block: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+}
+
+.StepNumber {
+  padding-top: 2px;
+  font-family: var(--axelix-code);
+  font-size: 13px;
+  color: var(--axelix-green-400);
+}
+
+.StepText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.StepTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.StepBody {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #c9dbb1;
+}
+
+.Button {
+  gap: 10px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+}

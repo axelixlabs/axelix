@@ -1,0 +1,49 @@
+.MainWrapper {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  border-top: 1px solid var(--axelix-line-3);
+}
+
+.Row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding-block: 22px;
+  border-bottom: 1px solid var(--axelix-line-2);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--axelix-green-600);
+  }
+}
+
+.Text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.Label,
+.Note {
+  color: var(--axelix-ink-3);
+}
+
+.Label {
+  font-size: 13px;
+}
+
+.Value {
+  font-size: 20px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.Note {
+  font-size: 14px;
+}
+
+.Arrow {
+  font-size: 20px;
+}

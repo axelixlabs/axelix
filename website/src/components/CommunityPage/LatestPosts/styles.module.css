@@ -1,0 +1,57 @@
+.Inner {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.HeadingRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.Title {
+  max-width: 820px;
+}
+
+.Posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 24px;
+}
+
+.Post {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--axelix-green-700);
+  }
+}
+
+.Cover {
+  width: 100%;
+  aspect-ratio: 40 / 21;
+  border-radius: 14px;
+  background-color: var(--axelix-green-900);
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--axelix-line-2);
+}
+
+.Meta {
+  font-size: 13px;
+  color: var(--axelix-ink-3);
+}
+
+.PostTitle {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: pretty;
+}

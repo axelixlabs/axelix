@@ -1,0 +1,35 @@
+.Section {
+  padding-block: clamp(72px, 8vw, 112px);
+}
+
+.PaperSection {
+  background-color: var(--axelix-paper);
+  border-top: 1px solid var(--axelix-line);
+}
+
+.TwoColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 56px;
+}
+
+.Heading {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.Title {
+  font-size: clamp(32px, 3.6vw, 52px);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.026em;
+  text-wrap: balance;
+}
+
+.Lead {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--axelix-ink-2);
+  text-wrap: pretty;
+}

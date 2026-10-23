@@ -19,9 +19,22 @@ import { ReactNode } from "react";
 
 import { EInstallConfigurationVariant, EInstallMethod, ESpringBootVariant } from "../enums";
 
-export interface INavLink {
+export interface IHeaderMenuLink {
+    title: string;
+    description: string;
     href: string;
+    external?: boolean;
+}
+
+export interface IHeaderMenuColumn {
+    heading: string;
+    links: IHeaderMenuLink[];
+}
+
+export interface IHeaderMenu {
+    key: string;
     label: string;
+    columns: IHeaderMenuColumn[];
 }
 
 export interface IInstallSpringBootOptions {

@@ -1,0 +1,31 @@
+.MainWrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--axelix-ink);
+
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: color-mix(in srgb, var(--axelix-ink) 15%, transparent);
+  }
+}
+
+.Index {
+  color: var(--axelix-green-500);
+}
+
+.Dark {
+  color: #f5f8ee;
+
+  &::after {
+    background-color: color-mix(in srgb, var(--axelix-green-400) 30%, transparent);
+  }
+
+  .Index {
+    color: var(--axelix-green-400);
+  }
+}

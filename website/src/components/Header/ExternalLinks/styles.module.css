@@ -2,36 +2,46 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    column-gap: 8px;
+    column-gap: 16px;
 }
 
 .DocsLink,
-.GitHubIcon {
+.GitHubLink,
+.GetStartedLink {
     display: flex;
     align-items: center;
-    padding: 4px 12px;
-    border-radius: 999px;
     font-family: var(--axelix-font);
-    font-size: 12.5px;
+    font-size: 13.5px;
     line-height: 1;
     font-weight: 500;
+    border-radius: 8px;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
 .MainWrapperFullWidth {
     justify-content: stretch;
+    column-gap: 8px;
 }
 
 .LinkFullWidth {
     flex: 1;
     justify-content: center;
-    border-radius: 8px;
     padding: 9px 12px;
 }
 
 .DocsLink {
-    border: 1px solid color-mix(in srgb, var(--axelix-ink) 18%, transparent);
     color: var(--axelix-ink);
-    transition: background-color 0.3s, border-color 0.3s;
+
+    &:hover {
+        color: var(--axelix-green-600);
+    }
+}
+
+.GitHubLink {
+    column-gap: 8px;
+    padding: 8px 14px;
+    color: var(--axelix-ink);
+    border: 1px solid color-mix(in srgb, var(--axelix-ink) 18%, transparent);
 
     &:hover {
         background-color: color-mix(in srgb, var(--axelix-ink) 6%, transparent);
@@ -39,9 +49,14 @@
     }
 }
 
-.GitHubIcon {
-    column-gap: 8px;
-    background-color: var(--axelix-ink);
+.GetStartedLink {
+    padding: 8px 16px;
     color: #fff;
+    background-color: var(--axelix-ink);
     border: 1px solid var(--axelix-ink);
+
+    &:hover {
+        background-color: var(--axelix-green-900);
+        border-color: var(--axelix-green-900);
+    }
 }

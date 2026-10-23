@@ -1,0 +1,89 @@
+.MainWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  overflow: hidden;
+  padding: 20px 28px;
+  border-radius: 16px 0 0 16px;
+  background-color: var(--axelix-bg);
+}
+
+.Kicker {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--axelix-green-600);
+}
+
+.Title {
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.Intro {
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--axelix-ink-2);
+}
+
+.List {
+  margin-top: 18px;
+  border-top: 1px solid var(--axelix-line-2);
+}
+
+.Finding {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  padding-block: 9px;
+  border-bottom: 1px solid var(--axelix-line-2);
+}
+
+.Mark {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  color: var(--axelix-ink);
+  font-family: var(--axelix-code);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.FindingText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.FindingHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.Rule {
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.Severity {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.Body {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--axelix-ink-2);
+}
