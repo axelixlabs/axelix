@@ -35,7 +35,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -46,9 +45,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelGroupBulkChangeRequest;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkResetRequest;
-import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -103,7 +102,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                 assert path != null;
                 invokedPaths.add(path);
 
-                if (path.equals("/" + activeInstanceId + "/axelix-loggers/group/groupName/change-level")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-loggers/group/groupName/change-level")
+                        || path.equals("/" + siblingInstanceId + "/axelix-loggers/group/groupName/change-level")) {
                     return new MockResponse();
                 }
                 if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/reset.logger.name/reset")
@@ -111,7 +111,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     return new MockResponse();
                 }
                 if (path.equals("/" + failingInstanceId + "/axelix-loggers/logger/logger.name/change-level")
-                        || path.equals("/" + failingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset")) {
+                        || path.equals("/" + failingInstanceId + "/axelix-loggers/logger/reset.logger.name/reset")
+                        || path.equals("/" + failingInstanceId + "/axelix-loggers/group/groupName/change-level")) {
                     return new MockResponse().setResponseCode(failingLoggerUpdateStatusCode.get());
                 }
                 if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level")
@@ -333,64 +334,114 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     class ChangeGroupLevel {
 
         @Test
-        void shouldSetLoggingLevelByGroupName() {
-            String groupName = "groupName";
-            GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
+        void shouldSetLoggingLevelByGroupNameAcrossInstances() {
+            // given.
+            LogLevelGroupBulkChangeRequest requestBody = new LogLevelGroupBulkChangeRequest(
+                    List.of(activeInstanceId, siblingInstanceId), "groupName", "INFO");
 
             // when.
             IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
-            ResponseEntity<String> body = viewer.postForEntity(
-                    "/api/external/loggers/{instanceId}/group/{groupName}",
-                    requestBody,
-                    String.class,
-                    activeInstanceId,
-                    groupName);
+            ResponseEntity<String> response =
+                    viewer.postForEntity("/api/external/loggers/group", requestBody, String.class);
 
             // then.
-            assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder(
+                            "/" + activeInstanceId + "/axelix-loggers/group/groupName/change-level",
+                            "/" + siblingInstanceId + "/axelix-loggers/group/groupName/change-level");
             assertSuccessfulCallback(MasterWebEndpoints.LOGGER_GROUP_CHANGE, viewer.getActor());
         }
 
-        @Test
-        @DisplayName("Should return 500 on EndpointInvocationError")
-        void shouldReturnInternalServerError_WhenInvokedOnUnknownInstance() {
-            String instanceId = UUID.randomUUID().toString();
-            String groupName = "groupName";
-            GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
-            registry.register(TestInstanceFactory.create(instanceId));
+        @ParameterizedTest
+        @ValueSource(ints = {400, 500})
+        void shouldReturnBadRequestAndInvokeAllInstances_WhenGroupUpdatePartiallyFails(int failureStatusCode) {
+            // given.
+            failingLoggerUpdateStatusCode.set(failureStatusCode);
+            LogLevelGroupBulkChangeRequest requestBody = new LogLevelGroupBulkChangeRequest(
+                    List.of(failingInstanceId, activeInstanceId), "groupName", "INFO");
 
             // when.
-            ResponseEntity<?> response = restTemplate
-                    .asViewer()
-                    .postForEntity(
-                            "/api/external/loggers/{instanceId}/group/{groupName}",
-                            requestBody,
-                            Void.class,
-                            instanceId,
-                            groupName);
-
-            // then.
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        @Test
-        void shouldReturnBadRequestForUnregisteredInstance_OnGroupName() {
-            String instanceId = "unregistered-loggers-group-instance";
-            String groupName = "groupName";
-            GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
-
-            // when.
-            ResponseEntity<String> response = restTemplate
-                    .asViewer()
-                    .postForEntity(
-                            "/api/external/loggers/{instanceId}/group/{groupName}",
-                            requestBody,
-                            String.class,
-                            instanceId,
-                            groupName);
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody()).contains("PARTIALLY_UPDATED");
+            assertThat(invokedPaths)
+                    .containsExactlyInAnyOrder(
+                            "/" + activeInstanceId + "/axelix-loggers/group/groupName/change-level",
+                            "/" + failingInstanceId + "/axelix-loggers/group/groupName/change-level");
+        }
+
+        @Test
+        void shouldReturnBadRequestForUnregisteredInstance_OnGroupBulkChange() {
+            // given.
+            LogLevelGroupBulkChangeRequest requestBody = new LogLevelGroupBulkChangeRequest(
+                    List.of("unregistered-loggers-group-instance"), "groupName", "INFO");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
+
+        @Test
+        void shouldReturnBadRequestWithoutInvokingAnyInstances_WhenUpdatingGroupOnInstancesOfDifferentApplications() {
+            // given.
+            LogLevelGroupBulkChangeRequest requestBody = new LogLevelGroupBulkChangeRequest(
+                    List.of(activeInstanceId, anotherApplicationInstanceId), "groupName", "INFO");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody()).contains("BAD_REQUEST");
+            assertThat(invokedPaths).isEmpty();
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        void shouldRejectMissingInstanceIds_WhenUpdatingGroupLevelBulk(List<String> instanceIds) {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", instanceIds);
+            requestBody.put("groupName", "groupName");
+            requestBody.put("configuredLevel", "INFO");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = " ")
+        void shouldRejectMissingGroupName_WhenUpdatingGroupLevelBulk(String groupName) {
+            // given.
+            // Use a map to send invalid input: the request constructor would reject it before the HTTP call.
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("instanceIds", List.of(activeInstanceId));
+            requestBody.put("groupName", groupName);
+            requestBody.put("configuredLevel", "INFO");
+
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(invokedPaths).isEmpty();
         }
     }
 
@@ -553,9 +604,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
         return Set.of(
-                new TestableMasterWebEndpoint(
-                        MasterWebEndpoints.LOGGER_GROUP_CHANGE,
-                        "/api/external/loggers/00000000-0000-0000-0000-000000000001/group/groupName"),
+                new TestableMasterWebEndpoint(MasterWebEndpoints.LOGGER_GROUP_CHANGE, "/api/external/loggers/group"),
                 new TestableMasterWebEndpoint(MasterWebEndpoints.LOGGERS_BULK_CHANGE, "/api/external/loggers/logger"),
                 new TestableMasterWebEndpoint(
                         MasterWebEndpoints.LOGGERS_BULK_RESET, "/api/external/loggers/logger/reset"));

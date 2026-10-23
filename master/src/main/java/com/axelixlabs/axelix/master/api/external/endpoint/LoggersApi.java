@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelGroupBulkChangeRequest;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkResetRequest;
 import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
@@ -113,15 +114,24 @@ public class LoggersApi {
         }
     }
 
-    @PostMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
-    public void setLoggingLevelByGroupName(
-            @PathVariable("instanceId") String instanceId,
-            @PathVariable("groupName") String groupName,
-            @RequestBody GroupLogLevelChangeRequest request) {
+    @PostMapping(path = ApiPaths.LoggersApi.LOGGER_GROUP_BULK_CHANGE)
+    public ResponseEntity<?> setLoggingLevelByGroupName(@RequestBody LogLevelGroupBulkChangeRequest request) {
 
-        HttpPayload payload =
-                HttpPayload.json(Map.of("name", groupName), jacksonMessageSerializationStrategy.serialize(request));
-        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
+        HttpPayload payload = HttpPayload.json(
+                Map.of("name", request.groupName()),
+                jacksonMessageSerializationStrategy.serialize(
+                        new GroupLogLevelChangeRequest().configuredLevel(request.configuredLevel())));
+
+        try {
+            bulkInstancesValidator.validate(request.instanceIds());
+            endpointInvoker.invokeNoValueForInstances(
+                    request.instanceIds(), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
+            return ResponseEntity.noContent().build();
+        } catch (PartiallyUpdatedException e) {
+            return ResponseEntity.badRequest()
+                    .body(new SimpleApiError(
+                            ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
+        }
     }
 
     @PostMapping(path = ApiPaths.LoggersApi.LOGGER_BULK_RESET)

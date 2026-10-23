@@ -93,7 +93,7 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint LOGGERS_BULK_CHANGE =
             register("loggers:change-level", HttpMethod.POST, ApiPaths.LoggersApi.LOGGER_BULK_CHANGE, null);
     public static final MasterWebEndpoint LOGGER_GROUP_CHANGE =
-            register("logger-group:change-level", HttpMethod.POST, ApiPaths.LoggersApi.GROUP_NAME, null);
+            register("logger-group:change-level", HttpMethod.POST, ApiPaths.LoggersApi.LOGGER_GROUP_BULK_CHANGE, null);
     public static final MasterWebEndpoint LOGGERS_BULK_RESET =
             register("logger:reset", HttpMethod.POST, ApiPaths.LoggersApi.LOGGER_BULK_RESET, null);
 

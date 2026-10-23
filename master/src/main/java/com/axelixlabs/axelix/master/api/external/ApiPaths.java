@@ -180,6 +180,11 @@ public final class ApiPaths {
         public static final String GROUP_NAME = "/loggers/{instanceId}/group/{groupName}";
 
         /**
+         * Endpoint to change the logging level of a logger group by its name across instances.
+         */
+        public static final String LOGGER_GROUP_BULK_CHANGE = "/loggers/group";
+
+        /**
          * Endpoint to reset the logging level of a logger by its name across instances.
          */
         public static final String LOGGER_BULK_RESET = "/loggers/logger/reset";
