@@ -1,0 +1,37 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: start;
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Details {
+    min-width: 0;
+}
+
+.Name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--axelix-font-size-body);
+    line-height: var(--axelix-line-height-normal);
+    font-weight: var(--axelix-font-weight-medium);
+    color: var(--axelix-grey-900);
+}
+
+.Commit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.Right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}

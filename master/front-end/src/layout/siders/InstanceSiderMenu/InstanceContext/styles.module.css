@@ -95,6 +95,27 @@
     white-space: nowrap;
 }
 
+/* The instances menu: antd draws its items, with their hover, keyboard and selected states */
+.Popup :global(.ant-dropdown-menu) {
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    max-height: min(440px, 60vh);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--axelix-grey-300) transparent;
+}
+
+.Popup :global(.ant-dropdown-menu-item-group-title) {
+    padding: 4px 8px 8px;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-600);
+}
+
+.Popup :global(.ant-dropdown-menu-item) {
+    padding: 12px 8px;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .Popup {
         animation-duration: 0s !important;

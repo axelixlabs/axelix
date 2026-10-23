@@ -3,18 +3,9 @@
         "current": "Текущий"
     },
     "InstanceContext": {
-        "instances": "Инстансы",
         "instancesCount": "Инстансы · {{count}}",
-        "selectInstance": "Выбрать инстанс: {{name}}",
-        "status": {
-            "UP": "Статус инстанса: работает",
-            "DOWN": "Статус инстанса: недоступен",
-            "UNKNOWN": "Статус инстанса: неизвестен"
-        },
-        "currentInstance": "Текущий инстанс: {{name}}",
         "commit": "Хеш коммита",
-        "uptime": "Время работы",
-        "uptimeValue": "Время работы: {{value}}"
+        "uptime": "Время работы"
     },
     "search": "Поиск",
     "noData": "Нет данных",

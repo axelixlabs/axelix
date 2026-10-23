@@ -3,18 +3,9 @@
         "current": "Current"
     },
     "InstanceContext": {
-        "instances": "Instances",
         "instancesCount": "Instances · {{count}}",
-        "selectInstance": "Select instance: {{name}}",
-        "status": {
-            "UP": "Instance status: up",
-            "DOWN": "Instance status: down",
-            "UNKNOWN": "Instance status: unknown"
-        },
-        "currentInstance": "Current instance: {{name}}",
         "commit": "Commit hash",
-        "uptime": "Uptime",
-        "uptimeValue": "Uptime: {{value}}"
+        "uptime": "Uptime"
     },
     "search": "Search",
     "noData": "No data",

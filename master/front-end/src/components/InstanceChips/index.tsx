@@ -58,15 +58,10 @@ export const InstanceCommit = ({ commitShaShort }: ICommitProps) => {
 };
 
 export const InstanceStatusTag = ({ status }: IStatusProps) => {
-    const { t } = useTranslation();
     const statusStyle =
         status === EInstanceStatus.DOWN ? styles.Down : status === EInstanceStatus.UNKNOWN ? styles.Unknown : "";
 
-    return (
-        <Tag className={`${styles.Status} ${statusStyle}`} aria-label={t(`InstanceContext.status.${status}`)}>
-            {status}
-        </Tag>
-    );
+    return <Tag className={`${styles.Status} ${statusStyle}`}>{status}</Tag>;
 };
 
 export const InstanceCurrentTag = () => {
@@ -99,7 +94,7 @@ export const InstanceUptime = ({ deployedAt, className }: IUptimeProps) => {
                 <circle cx="8" cy="8" r="6" />
                 <path d="M8 4v4l3 2" />
             </svg>
-            <span aria-label={t("InstanceContext.uptimeValue", { value })}>{value}</span>
+            <span>{value}</span>
         </span>
     );
 };

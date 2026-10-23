@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
-
 import { InstanceCommit, InstanceCurrentTag, InstanceStatusTag, InstanceUptime } from "@/components/InstanceChips";
 import type { TInstanceOption } from "@/models";
 
-import contextStyles from "../../styles.module.css";
+import contextStyles from "../styles.module.css";
 
 import styles from "./styles.module.css";
 
@@ -28,37 +26,24 @@ interface IProps {
     /** Instance data shown in this row */
     instance: TInstanceOption;
 
-    /** Whether this row is selected */
-    selected: boolean;
-
-    /** Selects this row */
-    onSelect: (instance: TInstanceOption) => void;
+    /** Whether this is the instance currently being viewed */
+    current: boolean;
 }
 
-export const InstanceRow = ({ instance, selected, onSelect }: IProps) => {
-    const { t } = useTranslation();
-
+export const InstanceRow = ({ instance, current }: IProps) => {
     return (
-        <button
-            type="button"
-            role="menuitemradio"
-            aria-checked={selected}
-            aria-label={t("InstanceContext.selectInstance", { name: instance.name })}
-            title={instance.name}
-            className={`${styles.MainWrapper} ${selected ? styles.Selected : ""}`}
-            onClick={() => onSelect(instance)}
-        >
+        <span className={styles.MainWrapper} title={instance.name}>
             <span className={styles.Details}>
                 <span className={styles.Name}>{instance.name}</span>
                 <span className={styles.Commit}>
                     <InstanceCommit commitShaShort={instance.commitShaShort} />
-                    {selected && <InstanceCurrentTag />}
+                    {current && <InstanceCurrentTag />}
                 </span>
             </span>
             <span className={styles.Right}>
                 <InstanceStatusTag status={instance.status} />
                 <InstanceUptime deployedAt={instance.deployedAt} className={contextStyles.Time} />
             </span>
-        </button>
+        </span>
     );
 };
