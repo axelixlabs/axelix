@@ -17,9 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ScheduledFuture;
 
 import org.jspecify.annotations.Nullable;
@@ -28,17 +26,18 @@ import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
-import org.springframework.util.ReflectionUtils;
 
 /**
  * Decorates the standard {@link ScheduledTask}, and provides additional information
- * about the decorated task, such as the {@link #id} of the task.
+ * about the decorated task, such as the {@link #id} of the task, and the {@link Task}
+ * it was registered with, if its schedule was modified.
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
  * @author Vyacheslav Yanin
+ * @author Dmitry Mazurov
  */
 public class ManagedScheduledTask implements AutoCloseable {
 
@@ -53,9 +52,15 @@ public class ManagedScheduledTask implements AutoCloseable {
     private final String id;
 
     /**
-     * The original Spring scheduled task being managed.
+     * The current Spring scheduled task being managed. It is replaced on every re-scheduling.
      */
     private ScheduledTask scheduledTask;
+
+    /**
+     * The {@link Task} the scheduled task was registered with, kept while its schedule is modified.
+     * {@code null} if the schedule was not modified, or was brought back to the original one.
+     */
+    private @Nullable Task originalTask;
 
     static {
         try {
@@ -111,28 +116,42 @@ public class ManagedScheduledTask implements AutoCloseable {
     }
 
     /**
-     * Replace the internal {@link ManagedScheduledTask} with the new one, created from passed parameters.
-     *
-     * @param newExecutionSchedule execution schedule handle. May be null, which typically (in Spring Framework) means
-     *                             that the trigger won't fire anymore.
-     * @param newTask the new {@link Task}.
+     * @return the {@link Task} the scheduled task was registered with, or {@code null}
+     *         if the schedule was not modified.
      */
-    public void replaceScheduledState(@Nullable ScheduledFuture<?> newExecutionSchedule, Task newTask) {
-        try {
-            // Cancel the old Spring ScheduledTask
-            this.scheduledTask.cancel(false);
+    public @Nullable Task getOriginalTask() {
+        return originalTask;
+    }
 
-            // Construct a new Spring ScheduledTask
-            Constructor<ScheduledTask> constructor = ScheduledTask.class.getDeclaredConstructor(Task.class);
-            ReflectionUtils.makeAccessible(constructor);
-            this.scheduledTask = constructor.newInstance(newTask);
-            SCHEDULED_TASK_FUTURE_FIELD.set(this.scheduledTask, newExecutionSchedule);
-
-        } catch (IllegalAccessException | NoSuchMethodException e) {
-            throw new IllegalStateException("Failed to set 'future' in ScheduledTask", e);
-        } catch (InvocationTargetException | InstantiationException e) {
-            throw new RuntimeException(e);
+    /**
+     * Replace the internal {@link ScheduledTask} with the new one, cancelling the old one. Keeps track
+     * of the original schedule, so that it can be restored later. The original schedule is considered restored
+     * only if the new {@link ScheduledTask} was created from the very same original {@link Task} instance.
+     *
+     * @param newScheduledTask the new {@link ScheduledTask}, already submitted for execution. If {@code null},
+     *                         nothing is replaced and the current {@link ScheduledTask} stays in effect.
+     */
+    public void replaceScheduledState(@Nullable ScheduledTask newScheduledTask) {
+        if (newScheduledTask == null) {
+            return;
         }
+
+        Task newTask = newScheduledTask.getTask();
+        Task currentTask = this.scheduledTask.getTask();
+
+        if (newTask != currentTask) {
+            if (newTask == this.originalTask) {
+                // back to the original schedule: reset, or the original value entered manually
+                this.originalTask = null;
+            } else if (this.originalTask == null) {
+                // the first modification
+                this.originalTask = currentTask;
+            }
+        }
+
+        // Cancel the old Spring ScheduledTask
+        this.scheduledTask.cancel(false);
+        this.scheduledTask = newScheduledTask;
     }
 
     @Override

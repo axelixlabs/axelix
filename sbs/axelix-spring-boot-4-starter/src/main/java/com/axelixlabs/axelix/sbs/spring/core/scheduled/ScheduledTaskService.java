@@ -35,10 +35,10 @@ import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.support.CronTrigger;
 
 /**
- * Service for managing scheduled tasks with enable/disable functionality.
+ * Service for managing scheduled tasks with enable/disable/reset functionality.
  *
  * <p>The tasks that come from a {@code ScheduledTaskRegistrar} declared by the user without
- * {@code @EnableScheduling} cannot be re-scheduled (enabled again, or have the cron expression or interval
+ * {@code @EnableScheduling} cannot be re-scheduled (enabled again, reset, or have the cron expression or interval
  * modified) or run manually, as the scheduler of the application is not available.
  *
  * @since 14.10.2025
@@ -115,17 +115,48 @@ public final class ScheduledTaskService implements AutoCloseable {
     }
 
     /**
+     * Restore the original schedule of the task with the given id, i.e. the one the task was registered
+     * with. Does nothing if the schedule of the task was not modified, or if the task is disabled.
+     *
+     * @param taskId the id of the task to reset.
+     */
+    public void resetTask(String taskId) {
+        try {
+            ManagedScheduledTask task = registry.findRequired(taskId);
+            Task originalTask = task.getOriginalTask();
+
+            if (originalTask == null || !task.isEnabled()) {
+                log.debug("Nothing to reset for the scheduled task: {}", taskId);
+                return;
+            }
+
+            for (TaskRescheduler taskRescheduler : taskReschedulers) {
+                if (taskRescheduler.supports(task)) {
+                    taskRescheduler.reschedule(task, originalTask);
+                }
+            }
+        } catch (ScheduledTaskNotFoundException e) {
+            log.info("Failed to reset task: {}", taskId, e);
+            throw e;
+        }
+    }
+
+    /**
      * Modify the cron expression for the task with the given id.
      *
      * @param taskId            the id of the task to re-schedule.
      * @param newCronExpression the new cron expression to apply.
+     * @throws IllegalArgumentException if the task is not a cron-based one.
      */
     public void modifyCronExpression(String taskId, String newCronExpression) {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
-            CronTask cronTask =
-                    new CronTask(task.getRunnable(), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
+            if (!(task.getTask() instanceof CronTask)) {
+                throw new IllegalArgumentException("The task '%s' is not a cron-based task".formatted(taskId));
+            }
+
+            CronTask cronTask = resolveCronTask(task, newCronExpression);
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
@@ -148,11 +179,11 @@ public final class ScheduledTaskService implements AutoCloseable {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
-            IntervalTask updatedTask = recreateIntervalTask(task.getTask(), newInterval);
+            Task intervalTask = resolveIntervalTask(task, newInterval);
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
-                    taskRescheduler.reschedule(task, updatedTask);
+                    taskRescheduler.reschedule(task, intervalTask);
                 }
             }
         } catch (ScheduledTaskNotFoundException e) {
@@ -181,6 +212,35 @@ public final class ScheduledTaskService implements AutoCloseable {
         }
     }
 
+    /**
+     * The zone of a {@link CronTask} is not readable, so if the expression is the same as the one of the original
+     * (or of the current, if the schedule was not modified) task, then that task is reused as is, preserving its zone.
+     */
+    private CronTask resolveCronTask(ManagedScheduledTask task, String newCronExpression) {
+        Task base = originalOrCurrent(task);
+
+        if (base instanceof CronTask baseCron && baseCron.getExpression().equals(newCronExpression)) {
+            return baseCron;
+        }
+
+        return new CronTask(task.getRunnable(), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
+    }
+
+    /**
+     * If the interval is the same as the one of the original (or of the current, if the schedule was not modified)
+     * task, then that task is reused as is, so that the task is no longer considered modified.
+     */
+    private Task resolveIntervalTask(ManagedScheduledTask task, Duration newInterval) {
+        Task base = originalOrCurrent(task);
+
+        if (base instanceof IntervalTask baseInterval
+                && baseInterval.getIntervalDuration().equals(newInterval)) {
+            return base;
+        }
+
+        return recreateIntervalTask(task.getTask(), newInterval);
+    }
+
     private IntervalTask recreateIntervalTask(Task task, Duration interval) {
         if (task instanceof FixedDelayTask t) {
             return new FixedDelayTask(t.getRunnable(), interval, t.getInitialDelayDuration());
@@ -200,6 +260,15 @@ public final class ScheduledTaskService implements AutoCloseable {
         } else {
             log.debug("No future to cancel for task: {}", managedTask.getId());
         }
+    }
+
+    /**
+     * @return the {@link Task} the scheduled task was registered with: the original one if the schedule was modified,
+     *         the current one otherwise.
+     */
+    private static Task originalOrCurrent(ManagedScheduledTask task) {
+        Task original = task.getOriginalTask();
+        return original != null ? original : task.getTask();
     }
 
     @Override
