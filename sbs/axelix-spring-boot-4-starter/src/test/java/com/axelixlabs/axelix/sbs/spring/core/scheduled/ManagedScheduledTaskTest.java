@@ -27,10 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.FixedDelayTask;
-import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.scheduling.config.Task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,63 +60,14 @@ class ManagedScheduledTaskTest {
     }
 
     @Test // GH-1835
-    void shouldNotBeModified_whenNothingWasReplaced() {
-        // given
-        ManagedScheduledTask task = managed(fixedDelay(HOUR, Duration.ZERO));
-
-        // then
-        assertThat(task.getOriginalTask()).isNull();
-    }
-
-    @Test // GH-1835
-    void shouldBeModified_whenFixedDelayIntervalDiffers() {
-        // given
-        FixedDelayTask original = fixedDelay(HOUR, Duration.ZERO);
-        ManagedScheduledTask task = managed(original);
-
-        // when
-        replace(task, fixedDelay(Duration.ofHours(2), Duration.ZERO));
-
-        // then
-        assertThat(task.getOriginalTask()).isSameAs(original);
-    }
-
-    @Test // GH-1835
-    void shouldNotBeModified_whenIntervalIsBackToOriginalValue() {
-        // given
-        ManagedScheduledTask task = managed(fixedRate(HOUR, Duration.ofMinutes(5)));
-        replace(task, fixedRate(Duration.ofHours(2), Duration.ofMinutes(5)));
-
-        // when: equal by value to the original one, but a different instance
-        replace(task, fixedRate(HOUR, Duration.ofMinutes(5)));
-
-        // then
-        assertThat(task.getOriginalTask()).isNull();
-    }
-
-    @Test // GH-1835
-    void shouldNotBeModified_whenOriginalTaskIsRestoredByTheSameInstance() {
-        // given
-        FixedDelayTask original = fixedDelay(HOUR, Duration.ZERO);
-        ManagedScheduledTask task = managed(original);
-        replace(task, fixedDelay(Duration.ofHours(2), Duration.ZERO));
-
-        // when
-        replace(task, original);
-
-        // then
-        assertThat(task.getOriginalTask()).isNull();
-    }
-
-    @Test // GH-1835
     void shouldKeepFirstOriginalTask_whenModifiedSeveralTimes() {
         // given
-        FixedDelayTask original = fixedDelay(HOUR, Duration.ZERO);
+        FixedDelayTask original = fixedDelay(HOUR);
         ManagedScheduledTask task = managed(original);
 
         // when
-        replace(task, fixedDelay(Duration.ofHours(2), Duration.ZERO));
-        replace(task, fixedDelay(Duration.ofHours(3), Duration.ZERO));
+        task.replaceScheduledState(scheduled(fixedDelay(Duration.ofHours(2))));
+        task.replaceScheduledState(scheduled(fixedDelay(Duration.ofHours(3))));
 
         // then
         assertThat(task.getOriginalTask()).isSameAs(original);
@@ -127,9 +76,9 @@ class ManagedScheduledTaskTest {
     @Test // GH-1835
     void shouldCancelPreviousScheduledTask_whenReplaced() {
         // given
-        ManagedScheduledTask task = managed(fixedDelay(HOUR, Duration.ZERO));
+        ManagedScheduledTask task = managed(fixedDelay(HOUR));
         ScheduledFuture<?> previousFuture = task.getFuture();
-        ScheduledTask newScheduledTask = scheduled(fixedDelay(Duration.ofHours(2), Duration.ZERO));
+        ScheduledTask newScheduledTask = scheduled(fixedDelay(Duration.ofHours(2)));
 
         // when
         task.replaceScheduledState(newScheduledTask);
@@ -143,7 +92,7 @@ class ManagedScheduledTaskTest {
     @Test // GH-1835
     void shouldKeepCurrentScheduledTask_whenReplacedWithNull() {
         // given
-        ManagedScheduledTask task = managed(fixedDelay(HOUR, Duration.ZERO));
+        ManagedScheduledTask task = managed(fixedDelay(HOUR));
         ScheduledTask scheduledTaskBefore = task.getScheduledTask();
 
         // when
@@ -155,33 +104,15 @@ class ManagedScheduledTaskTest {
         assertThat(task.getOriginalTask()).isNull();
     }
 
-    private ManagedScheduledTask managed(Task task) {
+    private ManagedScheduledTask managed(FixedDelayTask task) {
         return new ManagedScheduledTask("test-task", scheduled(task));
     }
 
-    private void replace(ManagedScheduledTask managedTask, Task newTask) {
-        managedTask.replaceScheduledState(scheduled(newTask));
+    private ScheduledTask scheduled(FixedDelayTask task) {
+        return Objects.requireNonNull(registrar.scheduleFixedDelayTask(task));
     }
 
-    private ScheduledTask scheduled(Task task) {
-        ScheduledTask scheduledTask;
-
-        if (task instanceof FixedDelayTask fixedDelayTask) {
-            scheduledTask = registrar.scheduleFixedDelayTask(fixedDelayTask);
-        } else if (task instanceof FixedRateTask fixedRateTask) {
-            scheduledTask = registrar.scheduleFixedRateTask(fixedRateTask);
-        } else {
-            throw new IllegalArgumentException("Unsupported task type: " + task.getClass());
-        }
-
-        return Objects.requireNonNull(scheduledTask);
-    }
-
-    private static FixedDelayTask fixedDelay(Duration interval, Duration initialDelay) {
-        return new FixedDelayTask(() -> {}, interval, initialDelay);
-    }
-
-    private static FixedRateTask fixedRate(Duration interval, Duration initialDelay) {
-        return new FixedRateTask(() -> {}, interval, initialDelay);
+    private static FixedDelayTask fixedDelay(Duration interval) {
+        return new FixedDelayTask(() -> {}, interval, Duration.ZERO);
     }
 }

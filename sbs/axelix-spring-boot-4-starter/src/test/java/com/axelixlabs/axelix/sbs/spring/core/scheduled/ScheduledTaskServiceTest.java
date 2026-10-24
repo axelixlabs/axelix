@@ -42,6 +42,7 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -264,20 +265,41 @@ class ScheduledTaskServiceTest {
     }
 
     @Test // GH-1835
-    void shouldMarkTaskAsModified_whenCronExpressionModified() {
-        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, "*/5 * * * * *");
-
-        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
-        assertThat(task.getOriginalTask()).isNotNull();
-    }
-
-    @Test // GH-1835
     void shouldNotMarkTaskAsModified_whenCronExpressionModifiedBackToOriginal() {
+        Task originalTask =
+                taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow().getTask();
         taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, "*/5 * * * * *");
         taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, ORIGINAL_CRON_EXPRESSION_FOR_MODIFY);
 
         ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
         assertThat(task.getOriginalTask()).isNull();
+        // the original task is put back as is, since its zone cannot be read to build an equal one
+        assertThat(task.getTask()).isSameAs(originalTask);
+    }
+
+    @Test // GH-1835
+    void shouldNotChangeTask_whenCronExpressionIsTheSameAsCurrent() {
+        Task originalTask =
+                taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow().getTask();
+
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, ORIGINAL_CRON_EXPRESSION_FOR_MODIFY);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.getOriginalTask()).isNull();
+        assertThat(task.getTask()).isSameAs(originalTask);
+    }
+
+    @Test // GH-1835
+    void shouldNotMarkTaskAsModified_whenIntervalModifiedBackToOriginal() {
+        Task originalTask =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow().getTask();
+        taskService.modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, Duration.ofMillis(555555L));
+        taskService.modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, Duration.ofMillis(200));
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.getOriginalTask()).isNull();
+        assertThat(task.getTask()).isSameAs(originalTask);
     }
 
     @Test // GH-1835
