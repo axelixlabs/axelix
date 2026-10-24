@@ -18,6 +18,7 @@
 export * from "./dashboard/dashboardSpringPortfolio";
 export * from "./dashboard/dashboardPersistence";
 export * from "./dashboard/dashboardLanguages";
+export * from "./dashboard/dashboardDependencies";
 export * from "./scheduledTasks";
 export * from "./transactional";
 export * from "./dependencies";

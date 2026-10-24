@@ -45,6 +45,10 @@ const getDashboardItems = (): TMenuItem[] => {
             path: "/dashboard/persistence",
             label: "Persistence",
         },
+        {
+            path: "/dashboard/dependencies",
+            label: "Dependency Health",
+        },
     ];
 
     return [

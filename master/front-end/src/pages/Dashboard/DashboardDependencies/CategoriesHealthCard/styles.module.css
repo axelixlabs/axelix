@@ -1,0 +1,94 @@
+.Body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.Caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: var(--axelix-grey-500);
+}
+
+.CaptionLabel {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.Legend {
+    display: flex;
+    gap: 14px;
+}
+
+.LegendItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.LegendSwatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}
+
+.Tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.Tile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    min-height: 38px;
+    padding: 0 10px;
+    font: inherit;
+    text-align: left;
+    color: var(--axelix-grey-900);
+    background-color: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: 7px;
+    cursor: pointer;
+
+    &:hover {
+        border-color: var(--axelix-grey-400);
+    }
+}
+
+.ActiveTile {
+    font-weight: var(--axelix-font-weight-semibold);
+    background-color: var(--axelix-green-50);
+    border-color: var(--axelix-green-200);
+}
+
+.EmptyTile {
+    color: var(--axelix-grey-400);
+}
+
+.TileHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.TileCount {
+    font-weight: var(--axelix-font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+}
+
+.TileBar {
+    display: flex;
+    gap: 2px;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    background-color: var(--axelix-grey-100);
+}

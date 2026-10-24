@@ -314,6 +314,69 @@
             "readTheDocs": "Read the docs",
             "appsRecorded": "<0>{{count}}</0> apps recorded"
         },
+        "Dependencies": {
+            "title": "Dependency Health",
+            "subtitle": "Curated open-source projects that have left active development, and their footprint across the estate",
+            "services": "Services",
+            "projects": "Projects",
+            "badges": {
+                "SUNSET": "Discontinued",
+                "MAINTENANCE": "Maintenance",
+                "DORMANT": "Dormant"
+            },
+            "usesStatus": {
+                "SUNSET": "use a discontinued project",
+                "MAINTENANCE": "use a maintenance-mode project",
+                "DORMANT": "use a dormant project"
+            },
+            "servicesEyebrow": "Dependency health · Ecosystem view",
+            "servicesDescriptor": "<0>{{risky}}</0> of <1>{{total}}</1> services use a risky dependency",
+            "uses": "Uses",
+            "share": "Share",
+            "rowLabels": {
+                "SUNSET": "Discontinued projects",
+                "MAINTENANCE": "Maintenance-mode projects",
+                "DORMANT": "Dormant projects"
+            },
+            "noneOfThese": "None of these",
+            "definitions": {
+                "SUNSET": "The project has announced the end of development or archived its repository. No further releases are planned, security fixes included.",
+                "MAINTENANCE": "The project has declared that it only ships critical bug and security fixes. No new features; a successor is usually recommended.",
+                "DORMANT": "No releases for an extended period, and the project has declared no maintenance or end-of-life status. It may still work, but no one is known to be fixing it."
+            },
+            "overlapNote": "Adds up to {{sum}}%. A service can appear in several rows.",
+            "overlapTitle": "Groups overlap",
+            "overlapBody": "A service is counted once in every row whose status it has. One using a discontinued and a dormant project appears in both, so the percentages add up to more than 100%. Each ring is measured against all {{total}} services.",
+            "reportedBy": "Reported by <0>{{count}}</0> services",
+            "lastScan": "Last scan {{date}}",
+            "categoriesEyebrow": "Dependency health · By category",
+            "categoriesDescriptor": "<0>{{risky}}</0> of <1>{{total}}</1> tracked projects represent an operational risk",
+            "allCategories": "All {{count}} categories",
+            "categoriesFooter": "Status as declared upstream or observed by Axelix",
+            "trackedCaption": "Tracked projects",
+            "trackedLegend": "Status applies to the project, not a version · Share = services that resolve the project",
+            "categoryPlaceholder": "All categories",
+            "statusFilter": "Status",
+            "columns": {
+                "project": "Project",
+                "status": "Status",
+                "succession": "Succession",
+                "category": "Category",
+                "services": "Services"
+            },
+            "successor": "Successor",
+            "none": "None",
+            "detail": {
+                "projectStatus": "Project status",
+                "libraries": "Libraries",
+                "supersededBy": "Superseded by",
+                "replacement": "Replacement",
+                "noSuccessor": "No successor published",
+                "reference": "Reference"
+            },
+            "footer": "{{from}}–{{to}} of {{total}} projects",
+            "noMatch": "No projects match"
+        },
         "Persistence": {
             "title": "Persistence Dashboard",
             "subtitle": "Database access patterns · N+1 detection · In-memory pagination",

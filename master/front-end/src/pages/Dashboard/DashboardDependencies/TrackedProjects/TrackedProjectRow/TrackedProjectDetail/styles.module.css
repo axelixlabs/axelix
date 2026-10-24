@@ -1,0 +1,58 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 8px 16px;
+    align-items: baseline;
+    margin: 0 18px 14px 60px;
+    padding: 14px 16px;
+    background-color: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: 8px;
+    color: var(--axelix-grey-700);
+}
+
+.Muted {
+    color: var(--axelix-grey-500);
+}
+
+.Label {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+}
+
+.Libraries {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.Libraries,
+.Code {
+    font-family: var(--axelix-font-family-code);
+    overflow-wrap: anywhere;
+}
+
+.Reference {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.ReferenceLink {
+    color: var(--axelix-green-600);
+    overflow-wrap: anywhere;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.ReferenceIcon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    color: var(--axelix-green-600);
+}
