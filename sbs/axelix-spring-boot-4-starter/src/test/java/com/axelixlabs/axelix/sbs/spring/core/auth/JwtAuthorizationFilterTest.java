@@ -54,6 +54,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
@@ -436,8 +437,9 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
-            return new AxelixEnvironmentEndpoint(environmentService);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
+                EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
+            return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
         }
 
         @Bean

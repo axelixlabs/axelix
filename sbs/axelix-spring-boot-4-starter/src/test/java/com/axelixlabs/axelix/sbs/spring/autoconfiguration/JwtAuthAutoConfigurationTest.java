@@ -25,6 +25,7 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAu
 import org.springframework.boot.actuate.autoconfigure.web.server.ManagementContextAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.test.context.runner.ReactiveWebApplicationContextRunner;
 import org.springframework.boot.test.context.runner.WebApplicationContextRunner;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.webmvc.autoconfigure.DispatcherServletAutoConfiguration;
@@ -36,6 +37,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ReactiveJwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
@@ -50,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JwtAuthAutoConfigurationTest {
 
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+    private final WebApplicationContextRunner contextRunner = new WebApplicationContextRunner()
             .withPropertyValues(
                     "axelix.sbs.auth.jwt",
                     "axelix.sbs.auth.jwt.algorithm=HMAC512",
@@ -78,6 +80,21 @@ class JwtAuthAutoConfigurationTest {
             assertThat(context).hasSingleBean(WebIdentityAccessManager.class);
             assertThat(context).hasSingleBean(SecurityContextExecutor.class);
         });
+    }
+
+    @Test
+    void shouldRegisterReactiveFilterInMainContext_whenApplicationIsReactive() {
+        new ReactiveWebApplicationContextRunner()
+                .withConfiguration(AutoConfigurations.of(
+                        JwtAuthAutoConfiguration.class,
+                        SecurityContextExecutorAutoConfiguration.class,
+                        EndpointAutoConfiguration.class,
+                        WebEndpointAutoConfiguration.class,
+                        ManagementContextAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context).hasSingleBean(ReactiveJwtAuthorizationFilter.class);
+                    assertThat(context).doesNotHaveBean(FilterRegistrationBean.class);
+                });
     }
 
     @Test

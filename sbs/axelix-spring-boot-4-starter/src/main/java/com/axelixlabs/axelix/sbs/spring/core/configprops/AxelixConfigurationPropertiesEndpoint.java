@@ -17,9 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import java.security.Principal;
 
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.AxelixPrincipal;
 import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 /**
@@ -28,18 +34,24 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationP
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-configprops")
+@RestControllerEndpoint(id = "axelix-configprops")
 public class AxelixConfigurationPropertiesEndpoint {
 
     private final ConfigurationPropertiesService configurationPropertiesService;
+    private final SecurityContextExecutor securityContextExecutor;
 
-    public AxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesService configurationPropertiesService) {
+    public AxelixConfigurationPropertiesEndpoint(
+            ConfigurationPropertiesService configurationPropertiesService,
+            SecurityContextExecutor securityContextExecutor) {
         this.configurationPropertiesService = configurationPropertiesService;
+        this.securityContextExecutor = securityContextExecutor;
     }
 
-    @ReadOperation
-    public ConfigurationPropertiesFeed configurationProperties() {
-        return configurationPropertiesService.getConfigProps();
+    @GetMapping
+    public ConfigurationPropertiesFeed configurationProperties(@Nullable Principal principal) {
+        return AxelixPrincipal.callWithin(
+                principal, securityContextExecutor, configurationPropertiesService::getConfigProps);
     }
 }

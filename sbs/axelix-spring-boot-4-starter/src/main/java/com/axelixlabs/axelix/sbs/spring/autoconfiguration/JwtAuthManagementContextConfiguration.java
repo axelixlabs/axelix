@@ -21,16 +21,20 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointPr
 import org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration;
 import org.springframework.boot.actuate.autoconfigure.web.ManagementContextType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ReactiveJwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
 
 /**
- * Registers {@link JwtAuthorizationFilter} in the context that serves Actuator: the main context,
- * or the management child context when Actuator runs on a separate {@code management.server.port}.
+ * Registers {@link JwtAuthorizationFilter} (servlet) or {@link ReactiveJwtAuthorizationFilter} (WebFlux) in the
+ * context that serves Actuator: the main context, or the management child context when Actuator runs on a
+ * separate {@code management.server.port}.
  *
  * @since 19.10.2026
  * @author Nikita Kirillov
@@ -39,16 +43,32 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
 @ConditionalOnBean(WebIdentityAccessManager.class)
 public class JwtAuthManagementContextConfiguration {
 
-    @Bean
-    public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            WebIdentityAccessManager webIdentityAccessManager,
-            SecurityContextExecutor securityContextExecutor,
-            WebEndpointProperties webEndpointProperties) {
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    static class ServletJwtAuthConfiguration {
 
-        var jwtAuthorizationFilter = new JwtAuthorizationFilter(
-                webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
-        var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
-        registration.setName("jwtAuthorizationFilter");
-        return registration;
+        @Bean
+        public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
+                WebIdentityAccessManager webIdentityAccessManager,
+                SecurityContextExecutor securityContextExecutor,
+                WebEndpointProperties webEndpointProperties) {
+
+            var jwtAuthorizationFilter = new JwtAuthorizationFilter(
+                    webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
+            var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
+            registration.setName("jwtAuthorizationFilter");
+            return registration;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+    static class ReactiveJwtAuthConfiguration {
+
+        @Bean
+        public ReactiveJwtAuthorizationFilter reactiveJwtAuthorizationFilter(
+                WebIdentityAccessManager webIdentityAccessManager, WebEndpointProperties webEndpointProperties) {
+            return new ReactiveJwtAuthorizationFilter(webIdentityAccessManager, webEndpointProperties.getBasePath());
+        }
     }
 }
