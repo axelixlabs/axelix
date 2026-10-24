@@ -23,8 +23,6 @@ import java.util.concurrent.ScheduledFuture;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.config.CronTask;
-import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
@@ -127,7 +125,8 @@ public class ManagedScheduledTask implements AutoCloseable {
 
     /**
      * Replace the internal {@link ScheduledTask} with the new one, cancelling the old one. Keeps track
-     * of the original schedule, so that it can be restored later.
+     * of the original schedule, so that it can be restored later. The original schedule is considered restored
+     * only if the new {@link ScheduledTask} was created from the very same original {@link Task} instance.
      *
      * @param newScheduledTask the new {@link ScheduledTask}, already submitted for execution. If {@code null},
      *                         nothing is replaced and the current {@link ScheduledTask} stays in effect.
@@ -141,9 +140,13 @@ public class ManagedScheduledTask implements AutoCloseable {
         Task currentTask = this.scheduledTask.getTask();
 
         if (newTask != currentTask) {
-            Task original = this.originalTask != null ? this.originalTask : currentTask;
-            boolean backToOriginal = newTask == original || sameSchedule(original, newTask);
-            this.originalTask = backToOriginal ? null : original;
+            if (newTask == this.originalTask) {
+                // back to the original schedule: reset, or the original value entered manually
+                this.originalTask = null;
+            } else if (this.originalTask == null) {
+                // the first modification
+                this.originalTask = currentTask;
+            }
         }
 
         // Cancel the old Spring ScheduledTask
@@ -156,18 +159,5 @@ public class ManagedScheduledTask implements AutoCloseable {
         if (this.scheduledTask != null) {
             this.scheduledTask.cancel();
         }
-    }
-
-    private static boolean sameSchedule(Task original, Task current) {
-        if (original instanceof CronTask originalCron && current instanceof CronTask currentCron) {
-            return originalCron.getExpression().equals(currentCron.getExpression());
-        }
-
-        if (original instanceof IntervalTask originalInterval && current instanceof IntervalTask currentInterval) {
-            return originalInterval.getIntervalDuration().equals(currentInterval.getIntervalDuration());
-        }
-
-        // tasks of different kinds have no comparable schedule
-        return false;
     }
 }

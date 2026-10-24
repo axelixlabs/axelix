@@ -160,8 +160,7 @@ public final class ScheduledTaskService implements AutoCloseable {
                 throw new IllegalArgumentException("The task '%s' is not a cron-based task".formatted(taskId));
             }
 
-            CronTask cronTask =
-                    new CronTask(runnable(task), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
+            CronTask cronTask = resolveCronTask(task, newCronExpression);
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
@@ -184,11 +183,11 @@ public final class ScheduledTaskService implements AutoCloseable {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
-            IntervalTask updatedTask = recreateIntervalTask(task.getTask(), runnable(task), newInterval);
+            Task intervalTask = resolveIntervalTask(task, newInterval);
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
-                    taskRescheduler.reschedule(task, updatedTask);
+                    taskRescheduler.reschedule(task, intervalTask);
                 }
             }
         } catch (ScheduledTaskNotFoundException e) {
@@ -223,6 +222,35 @@ public final class ScheduledTaskService implements AutoCloseable {
     }
 
     /**
+     * The zone of a {@link CronTask} is not readable, so if the expression is the same as the one of the original
+     * (or of the current, if the schedule was not modified) task, then that task is reused as is, preserving its zone.
+     */
+    private CronTask resolveCronTask(ManagedScheduledTask task, String newCronExpression) {
+        Task base = originalOrCurrent(task);
+
+        if (base instanceof CronTask baseCron && baseCron.getExpression().equals(newCronExpression)) {
+            return baseCron;
+        }
+
+        return new CronTask(runnable(task), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
+    }
+
+    /**
+     * If the interval is the same as the one of the original (or of the current, if the schedule was not modified)
+     * task, then that task is reused as is, so that the task is no longer considered modified.
+     */
+    private Task resolveIntervalTask(ManagedScheduledTask task, Duration newInterval) {
+        Task base = originalOrCurrent(task);
+
+        if (base instanceof IntervalTask baseInterval
+                && baseInterval.getIntervalDuration().equals(newInterval)) {
+            return base;
+        }
+
+        return recreateIntervalTask(task.getTask(), runnable(task), newInterval);
+    }
+
+    /**
      * @return the runnable to schedule the task with anew. The runnable of the {@link Task} is wrapped by Spring, so
      *         scheduling it would wrap it once more, and the tools looking the runnable up, e.g. ShedLock, would not
      *         recognize it.
@@ -252,6 +280,15 @@ public final class ScheduledTaskService implements AutoCloseable {
         } else {
             log.debug("No future to cancel for task: {}", managedTask.getId());
         }
+    }
+
+    /**
+     * @return the {@link Task} the scheduled task was registered with: the original one if the schedule was modified,
+     *         the current one otherwise.
+     */
+    private static Task originalOrCurrent(ManagedScheduledTask task) {
+        Task original = task.getOriginalTask();
+        return original != null ? original : task.getTask();
     }
 
     @Override
