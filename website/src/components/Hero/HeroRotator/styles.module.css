@@ -2,12 +2,15 @@
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
+    align-content: center;
     justify-content: center;
     gap: 0 10px;
-    margin-top: 32px;
-    min-height: 32px;
-    font-size: clamp(18px, 1.6vw, 22px);
+    margin-top: 36px;
+    /* Fixed to two lines so a longer phrase never pushes the buttons down. */
+    height: 2.8em;
+    font-size: clamp(18px, 1.7vw, 22px);
     line-height: 1.4;
+    text-align: center;
     color: var(--axelix-ink-2);
 }
 
