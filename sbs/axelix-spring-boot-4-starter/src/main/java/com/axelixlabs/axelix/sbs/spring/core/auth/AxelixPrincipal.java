@@ -18,12 +18,8 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.security.Principal;
-import java.util.function.Supplier;
-
-import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 
 /**
  * {@link Principal} that carries the Axelix {@link SecurityContext} of the request on the reactive stack.
@@ -36,17 +32,5 @@ public record AxelixPrincipal(SecurityContext securityContext) implements Princi
     @Override
     public String getName() {
         return securityContext.currentUser().getUsername();
-    }
-
-    /**
-     * Runs the given action within the {@link SecurityContext} carried by the principal, if it is an
-     * {@link AxelixPrincipal}. Otherwise, the action is run as is.
-     */
-    public static <V> V callWithin(
-            @Nullable Principal principal, SecurityContextExecutor securityContextExecutor, Supplier<V> action) {
-        if (principal instanceof AxelixPrincipal axelixPrincipal) {
-            return securityContextExecutor.callWithinSecurityContext(action::get, axelixPrincipal.securityContext());
-        }
-        return action.get();
     }
 }

@@ -49,7 +49,13 @@ public class AxelixEnvironmentEndpoint {
 
     @GetMapping
     public EnvironmentFeed environment(@Nullable String pattern, @Nullable Principal principal) {
-        return AxelixPrincipal.callWithin(
-                principal, securityContextExecutor, () -> environmentService.getEnvironmentFeed(pattern));
+        if (principal instanceof AxelixPrincipal axelixPrincipal) {
+            // we're using reactive
+            return securityContextExecutor.callWithinSecurityContext(
+                    () -> environmentService.getEnvironmentFeed(pattern), axelixPrincipal.securityContext());
+        } else {
+            // we're working on the standard servlet app, JwtAuthorizationFilter has already set the security context
+            return environmentService.getEnvironmentFeed(pattern);
+        }
     }
 }

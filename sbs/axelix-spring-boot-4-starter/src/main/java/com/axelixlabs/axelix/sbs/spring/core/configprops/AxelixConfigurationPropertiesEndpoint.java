@@ -51,7 +51,13 @@ public class AxelixConfigurationPropertiesEndpoint {
 
     @GetMapping
     public ConfigurationPropertiesFeed configurationProperties(@Nullable Principal principal) {
-        return AxelixPrincipal.callWithin(
-                principal, securityContextExecutor, configurationPropertiesService::getConfigProps);
+        if (principal instanceof AxelixPrincipal axelixPrincipal) {
+            // we're using reactive
+            return securityContextExecutor.callWithinSecurityContext(
+                    configurationPropertiesService::getConfigProps, axelixPrincipal.securityContext());
+        } else {
+            // we're working on the standard servlet app, JwtAuthorizationFilter has already set the security context
+            return configurationPropertiesService.getConfigProps();
+        }
     }
 }
