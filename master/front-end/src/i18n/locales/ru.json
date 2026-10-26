@@ -373,7 +373,7 @@
                 "status": "Статус",
                 "succession": "Преемник",
                 "category": "Категория",
-                "applications": "Приложения"
+                "applications": "Сервисы"
             },
             "successor": "Есть",
             "none": "Нет",
@@ -672,7 +672,7 @@
             "OTHER": "Прочее"
         },
         "statuses": {
-            "SUNSET": "Официально прекращён",
+            "SUNSET": "Прекращён",
             "MAINTENANCE": "В режиме поддержки",
             "DORMANT": "Неактивный",
             "ACTIVE": "Активно разрабатывается"
