@@ -21,13 +21,12 @@ import { useTranslation } from "react-i18next";
 import type { IUsedLibrary } from "@/models";
 import { DEPENDENCY_VERSIONS_SHOWN, DEPENDENCY_VERSION_COLORS } from "@/utils";
 
+import { VersionRow } from "./VersionRow";
 import styles from "./styles.module.css";
 
 interface IProps {
     usedLibrary: IUsedLibrary;
 }
-
-const percentageOf = (count: number, total: number) => Math.round((count * 100) / total);
 
 export const LibraryVersions = ({ usedLibrary }: IProps) => {
     const { t } = useTranslation();
@@ -38,29 +37,20 @@ export const LibraryVersions = ({ usedLibrary }: IProps) => {
 
     const shownVersions = allVersions ? versions : versions.slice(0, DEPENDENCY_VERSIONS_SHOWN);
     const olderVersions = versions.slice(DEPENDENCY_VERSIONS_SHOWN);
+    const olderApplications = olderVersions.reduce((sum, version) => sum + version.applicationCount, 0);
     const mostUsedVersion = Math.max(...versions.map((version) => version.applicationCount));
 
     return (
         <>
             <div className={`TextSmall ${styles.MainWrapper}`}>
-                {shownVersions.map(({ version, applicationCount: versionApplications }, index) => (
-                    <div key={version} className={styles.Row}>
-                        <span className={styles.Version}>{version}</span>
-                        <span className={styles.Track}>
-                            <span
-                                className={styles.Bar}
-                                style={{
-                                    width: `${(versionApplications * 100) / mostUsedVersion}%`,
-                                    backgroundColor:
-                                        DEPENDENCY_VERSION_COLORS[index] ?? DEPENDENCY_VERSION_COLORS.at(-1),
-                                }}
-                            />
-                        </span>
-                        <span className={styles.Count}>{versionApplications}</span>
-                        <span className={`TextUltraSmall ${styles.Share}`}>
-                            {percentageOf(versionApplications, applicationCount)}%
-                        </span>
-                    </div>
+                {shownVersions.map((versionUsage, index) => (
+                    <VersionRow
+                        key={versionUsage.version}
+                        versionUsage={versionUsage}
+                        mostUsedVersion={mostUsedVersion}
+                        libraryApplications={applicationCount}
+                        color={DEPENDENCY_VERSION_COLORS[index] ?? DEPENDENCY_VERSION_COLORS.at(-1)!}
+                    />
                 ))}
 
                 {olderVersions.length > 0 && (
@@ -69,10 +59,7 @@ export const LibraryVersions = ({ usedLibrary }: IProps) => {
                             ? t("Dashboard.Dependencies.detail.showFewer")
                             : t("Dashboard.Dependencies.detail.olderVersions", {
                                   count: olderVersions.length,
-                                  applications: olderVersions.reduce(
-                                      (sum, version) => sum + version.applicationCount,
-                                      0,
-                                  ),
+                                  applications: olderApplications,
                               })}
                     </button>
                 )}

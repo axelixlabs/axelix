@@ -74,3 +74,15 @@ export interface IDependencyLibrariesResponseBody {
     page: number;
     size: number;
 }
+
+/**
+ * A ring of the applications donut: the applications that use the libraries of one support status, or none of them.
+ */
+export interface IApplicationsRing {
+    key: string;
+    color: string;
+    label: string;
+    hint?: string;
+    count: number;
+    percentage: number;
+}

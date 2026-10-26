@@ -21,7 +21,6 @@
 }
 
 .Caret,
-.Muted,
 .Category {
     color: var(--axelix-grey-500);
 }
@@ -33,14 +32,6 @@
     white-space: nowrap;
 }
 
-.Successor {
-    font-weight: var(--axelix-font-weight-semibold);
-    color: var(--axelix-grey-700);
-    border: 1px solid var(--axelix-grey-300);
-    border-radius: 5px;
-    padding: 1px 7px;
-}
-
 .Category {
     font-weight: var(--axelix-font-weight-semibold);
     letter-spacing: 0.04em;
@@ -50,32 +41,5 @@
 .Applications {
     justify-self: end;
     font-weight: var(--axelix-font-weight-semibold);
-    font-variant-numeric: tabular-nums;
-}
-
-.ShareCell {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.ShareTrack {
-    flex: 1;
-    height: 6px;
-    border-radius: 3px;
-    overflow: hidden;
-    background-color: var(--axelix-grey-100);
-}
-
-.ShareBar {
-    display: block;
-    height: 100%;
-    background-color: var(--axelix-grey-400);
-}
-
-.ShareValue {
-    width: 34px;
-    text-align: right;
-    color: var(--axelix-grey-600);
     font-variant-numeric: tabular-nums;
 }

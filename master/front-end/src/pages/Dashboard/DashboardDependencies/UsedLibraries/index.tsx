@@ -15,30 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Pagination } from "antd";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Loader, PageSearch } from "@/components";
-import { fetchData } from "@/helpers";
-import {
-    type EDependencyEcosystem,
-    type ESupportStatus,
-    type IDependenciesDashboardResponseBody,
-    type IDependencyLibrariesResponseBody,
-    StatefulRequest,
-} from "@/models";
-import { getDashboardDependencyLibraries } from "@/services";
-import {
-    DEPENDENCY_HEALTH_PAGE_SIZE,
-    SUPPORT_STATUS_ORDER,
-    dependencyHealthColor,
-    supportSignalLabelKey,
-} from "@/utils";
+import type { EDependencyEcosystem, IDependenciesDashboardResponseBody } from "@/models";
 
 import { CategoryFilter } from "./CategoryFilter";
+import { LibrariesFooter } from "./LibrariesFooter";
+import { LibrariesHeader } from "./LibrariesHeader";
+import { StatusFilter } from "./StatusFilter";
 import { UsedLibraryRow } from "./UsedLibraryRow";
 import styles from "./styles.module.css";
+import { useLibrariesPage } from "./useLibrariesPage";
 
 interface IProps {
     totalLibraries: number;
@@ -50,49 +38,10 @@ interface IProps {
 export const UsedLibraries = ({ totalLibraries, librariesByStatus, activeEcosystems, onEcosystemsChange }: IProps) => {
     const { t } = useTranslation();
 
-    const [search, setSearch] = useState<string>("");
-    const [activeStatuses, setActiveStatuses] = useState<ESupportStatus[]>([]);
-    const [page, setPage] = useState<number>(1);
-    const [libraries, setLibraries] = useState(StatefulRequest.loading<IDependencyLibrariesResponseBody>());
-
-    // The ecosystems are also toggled from the category tiles, every filter change starts over from the first page
-    const [filteredEcosystems, setFilteredEcosystems] = useState<EDependencyEcosystem[]>(activeEcosystems);
-    if (filteredEcosystems !== activeEcosystems) {
-        setFilteredEcosystems(activeEcosystems);
-        setPage(1);
-    }
-
-    useEffect(() => {
-        // The previous page stays on screen until the requested one arrives, and a stale response is dropped
-        let stale = false;
-
-        fetchData<IDependencyLibrariesResponseBody>(
-            (update) => !stale && setLibraries(update),
-            () =>
-                getDashboardDependencyLibraries({
-                    search: search.trim() || undefined,
-                    status: activeStatuses,
-                    ecosystem: activeEcosystems,
-                    page: page - 1,
-                    size: DEPENDENCY_HEALTH_PAGE_SIZE,
-                }),
-        );
-
-        return () => {
-            stale = true;
-        };
-    }, [search, activeStatuses, activeEcosystems, page]);
-
-    const toggleStatus = (status: ESupportStatus): void => {
-        setPage(1);
-        setActiveStatuses((prev) =>
-            prev.includes(status) ? prev.filter((current) => current !== status) : [...prev, status],
-        );
-    };
+    const { libraries, page, setPage, activeStatuses, changeSearch, toggleStatus } = useLibrariesPage(activeEcosystems);
 
     const rows = libraries.response?.libraries ?? [];
     const matchingLibraries = libraries.response?.matchingLibraries ?? 0;
-    const pageStart = (page - 1) * DEPENDENCY_HEALTH_PAGE_SIZE;
 
     return (
         <>
@@ -106,10 +55,7 @@ export const UsedLibraries = ({ totalLibraries, librariesByStatus, activeEcosyst
                     <div className={styles.Toolbar}>
                         <div className={styles.ToolbarRow}>
                             <PageSearch
-                                setSearch={(value) => {
-                                    setPage(1);
-                                    setSearch(value);
-                                }}
+                                setSearch={changeSearch}
                                 addonAfter={`${matchingLibraries} / ${totalLibraries}`}
                                 removeBottomGutter
                             />
@@ -117,36 +63,15 @@ export const UsedLibraries = ({ totalLibraries, librariesByStatus, activeEcosyst
                             <CategoryFilter activeEcosystems={activeEcosystems} onChange={onEcosystemsChange} />
                         </div>
 
-                        <div className={`TextUltraSmall ${styles.ToolbarRow}`}>
-                            <span className={styles.FilterLabel}>{t("Dashboard.Dependencies.statusFilter")}</span>
-                            {SUPPORT_STATUS_ORDER.map((status) => (
-                                <button
-                                    key={status}
-                                    type="button"
-                                    onClick={() => toggleStatus(status)}
-                                    className={`${styles.Chip} ${styles[status]} ${activeStatuses.includes(status) ? styles.ActiveChip : ""}`}
-                                >
-                                    <span
-                                        className={styles.ChipDot}
-                                        style={{ backgroundColor: dependencyHealthColor[status] }}
-                                    />
-                                    {t(supportSignalLabelKey[status])}
-                                    <span className={styles.ChipCount}>{librariesByStatus[status] ?? 0}</span>
-                                </button>
-                            ))}
-                        </div>
+                        <StatusFilter
+                            librariesByStatus={librariesByStatus}
+                            activeStatuses={activeStatuses}
+                            onToggle={toggleStatus}
+                        />
                     </div>
 
                     <div className={styles.Scroll}>
-                        <div className={`TextUltraSmall ${styles.HeaderRow}`}>
-                            <span />
-                            <span>{t("Dashboard.Dependencies.columns.library")}</span>
-                            <span>{t("Dashboard.Dependencies.columns.status")}</span>
-                            <span>{t("Dashboard.Dependencies.columns.succession")}</span>
-                            <span>{t("Dashboard.Dependencies.columns.category")}</span>
-                            <span className={styles.AlignEnd}>{t("Dashboard.Dependencies.columns.applications")}</span>
-                            <span>{t("Dashboard.Dependencies.share")}</span>
-                        </div>
+                        <LibrariesHeader />
 
                         {libraries.loading && !libraries.response ? (
                             <Loader />
@@ -160,25 +85,12 @@ export const UsedLibraries = ({ totalLibraries, librariesByStatus, activeEcosyst
                         )}
                     </div>
 
-                    <div className={`TextUltraSmall ${styles.Footer}`}>
-                        <span>
-                            {rows.length
-                                ? t("Dashboard.Dependencies.footer", {
-                                      from: pageStart + 1,
-                                      to: pageStart + rows.length,
-                                      total: matchingLibraries,
-                                  })
-                                : t("Dashboard.Dependencies.noMatch")}
-                        </span>
-                        <Pagination
-                            size="small"
-                            current={page}
-                            pageSize={DEPENDENCY_HEALTH_PAGE_SIZE}
-                            total={matchingLibraries}
-                            showSizeChanger={false}
-                            onChange={setPage}
-                        />
-                    </div>
+                    <LibrariesFooter
+                        page={page}
+                        shownLibraries={rows.length}
+                        matchingLibraries={matchingLibraries}
+                        onPageChange={setPage}
+                    />
                 </div>
             </div>
         </>

@@ -4,38 +4,6 @@
     gap: 10px;
 }
 
-.Caption {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-    color: var(--axelix-grey-500);
-}
-
-.CaptionLabel {
-    font-weight: var(--axelix-font-weight-semibold);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.Legend {
-    display: flex;
-    gap: 14px;
-}
-
-.LegendItem {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.LegendSwatch {
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
-}
-
 .Bars {
     display: flex;
     flex-direction: column;
@@ -44,57 +12,6 @@
 
 .Muted {
     color: var(--axelix-grey-500);
-}
-
-.BarRow {
-    display: grid;
-    grid-template-columns: 110px minmax(0, 1fr) 28px;
-    gap: 12px;
-    align-items: center;
-    height: 28px;
-    padding: 0;
-    font: inherit;
-    text-align: left;
-    color: var(--axelix-grey-700);
-    background: none;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-
-    &:hover {
-        background-color: var(--axelix-grey-50);
-    }
-}
-
-.BarLabel {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.ActiveBarRow .BarLabel {
-    font-weight: var(--axelix-font-weight-semibold);
-    color: var(--axelix-green-700);
-}
-
-.BarTrack {
-    display: flex;
-    height: 10px;
-    border-radius: 3px;
-    overflow: hidden;
-    background-color: var(--axelix-grey-100);
-}
-
-.Bar {
-    display: flex;
-    gap: 2px;
-}
-
-.BarCount {
-    justify-self: end;
-    font-family: var(--axelix-font-family-code);
-    font-weight: var(--axelix-font-weight-semibold);
-    font-variant-numeric: tabular-nums;
 }
 
 .More {

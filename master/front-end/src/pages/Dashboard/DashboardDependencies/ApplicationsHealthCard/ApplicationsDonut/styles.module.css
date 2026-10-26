@@ -1,0 +1,18 @@
+.SVG {
+    flex-shrink: 0;
+    transform: rotate(-90deg);
+}
+
+.Track,
+.Arc {
+    fill: none;
+    stroke-width: 11;
+}
+
+.Track {
+    stroke: var(--axelix-grey-100);
+}
+
+.Arc {
+    stroke-linecap: round;
+}

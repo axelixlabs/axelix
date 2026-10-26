@@ -1,0 +1,39 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr) 40px 40px;
+    gap: 12px;
+    align-items: center;
+    min-height: 30px;
+}
+
+.Version {
+    font-family: var(--axelix-font-family-code);
+    overflow-wrap: anywhere;
+}
+
+.Track {
+    height: 8px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: var(--axelix-grey-100);
+}
+
+.Bar {
+    display: block;
+    height: 100%;
+}
+
+.Count,
+.Share {
+    justify-self: end;
+    font-family: var(--axelix-font-family-code);
+    font-variant-numeric: tabular-nums;
+}
+
+.Count {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Share {
+    color: var(--axelix-grey-500);
+}

@@ -15,13 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button, Checkbox, Popover, Tag } from "antd";
+import { Button, Popover, Tag } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { toggleItem } from "@/helpers";
 import type { EDependencyEcosystem } from "@/models";
-import { DEPENDENCY_ECOSYSTEM_ORDER, dependencyEcosystemLabelKey } from "@/utils";
+import { dependencyEcosystemLabelKey } from "@/utils";
 
+import { CategoryOptions } from "./CategoryOptions";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -34,42 +36,8 @@ export const CategoryFilter = ({ activeEcosystems, onChange }: IProps) => {
 
     const [open, setOpen] = useState<boolean>(false);
 
-    const toggle = (ecosystem: EDependencyEcosystem): void => {
-        onChange(
-            activeEcosystems.includes(ecosystem)
-                ? activeEcosystems.filter((current) => current !== ecosystem)
-                : [...activeEcosystems, ecosystem],
-        );
-    };
-
-    const options = (
-        <div className={styles.Options}>
-            {DEPENDENCY_ECOSYSTEM_ORDER.map((ecosystem) => (
-                <Checkbox
-                    key={ecosystem}
-                    checked={activeEcosystems.includes(ecosystem)}
-                    onChange={() => toggle(ecosystem)}
-                    className={`TextSmall ${styles.Option}`}
-                >
-                    {t(dependencyEcosystemLabelKey[ecosystem])}
-                </Checkbox>
-            ))}
-
-            <div className={`TextUltraSmall ${styles.OptionsFooter}`}>
-                <span>
-                    {activeEcosystems.length
-                        ? t("Dashboard.Dependencies.categoriesSelected", {
-                              count: activeEcosystems.length,
-                              total: DEPENDENCY_ECOSYSTEM_ORDER.length,
-                          })
-                        : t("Dashboard.Dependencies.categoryPlaceholder")}
-                </span>
-                <button type="button" className={styles.Clear} onClick={() => onChange([])}>
-                    {t("Dashboard.Dependencies.clear")}
-                </button>
-            </div>
-        </div>
-    );
+    const toggle = (ecosystem: EDependencyEcosystem): void => onChange(toggleItem(activeEcosystems, ecosystem));
+    const filtered = activeEcosystems.length > 0;
 
     return (
         <>
@@ -81,15 +49,18 @@ export const CategoryFilter = ({ activeEcosystems, onChange }: IProps) => {
                 onOpenChange={setOpen}
                 align={{ offset: [0, 6] }}
                 styles={{ container: { padding: 6, borderRadius: 9 } }}
-                content={options}
+                content={
+                    <CategoryOptions
+                        activeEcosystems={activeEcosystems}
+                        onToggle={toggle}
+                        onClear={() => onChange([])}
+                    />
+                }
             >
-                <Button
-                    className={`${styles.Trigger} ${activeEcosystems.length ? styles.Filtered : ""}`}
-                    aria-expanded={open}
-                >
+                <Button className={`${styles.Trigger} ${filtered ? styles.Filtered : ""}`} aria-expanded={open}>
                     {t("Dashboard.Dependencies.columns.category")}
                     <span className={styles.TriggerValue}>
-                        {activeEcosystems.length
+                        {filtered
                             ? t("Dashboard.Dependencies.selected", { count: activeEcosystems.length })
                             : t("Dashboard.Dependencies.all")}
                     </span>

@@ -13,9 +13,7 @@
     color: var(--axelix-grey-500);
 }
 
-.Caption,
-.FilterLabel,
-.HeaderRow {
+.Caption {
     font-weight: var(--axelix-font-weight-semibold);
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -45,74 +43,9 @@
     flex-wrap: wrap;
 }
 
-.Chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 4px 12px 4px 10px;
-    font: inherit;
-    font-weight: var(--axelix-font-weight-semibold);
-    color: var(--axelix-grey-700);
-    background-color: var(--axelix-white);
-    border: 1px solid var(--axelix-grey-200);
-    border-radius: 999px;
-    cursor: pointer;
-}
-
-.ChipDot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-.ChipCount {
-    font-variant-numeric: tabular-nums;
-    opacity: 0.7;
-}
-
-.ActiveChip.SUNSET {
-    color: var(--axelix-red-700);
-    background-color: var(--axelix-red-50);
-    border-color: var(--axelix-red-300);
-}
-
-.ActiveChip.MAINTENANCE {
-    color: var(--axelix-orange-700);
-    background-color: var(--axelix-orange-50);
-    border-color: var(--axelix-orange-300);
-}
-
-.ActiveChip.DORMANT {
-    color: var(--axelix-purple-700);
-    background-color: var(--axelix-purple-50);
-    border-color: var(--axelix-purple-300);
-}
-
 .Scroll {
+    /* The columns of the header and of the library rows */
     --tp-columns: 28px minmax(0, 1fr) 150px 96px 110px 70px 150px;
 
     overflow-x: auto;
-}
-
-.HeaderRow {
-    display: grid;
-    grid-template-columns: var(--tp-columns);
-    gap: 14px;
-    min-width: 860px;
-    padding: 10px 18px;
-    border-bottom: 1px solid var(--axelix-grey-200);
-}
-
-.AlignEnd {
-    justify-self: end;
-}
-
-.Footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 12px 18px;
-    color: var(--axelix-grey-500);
 }

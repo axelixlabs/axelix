@@ -17,17 +17,13 @@
  */
 import { Trans, useTranslation } from "react-i18next";
 
+import { rankEcosystems, sumOfRisky } from "@/helpers";
 import type { EDependencyEcosystem, IDependenciesDashboardResponseBody } from "@/models";
-import {
-    DEPENDENCY_ECOSYSTEM_ORDER,
-    SUPPORT_STATUS_ORDER,
-    dependencyEcosystemLabelKey,
-    dependencyHealthColor,
-    supportSignalLabelKey,
-} from "@/utils";
 
 import { HealthCard } from "../HealthCard";
 
+import { CategoryBar } from "./CategoryBar";
+import { StatusLegend } from "./StatusLegend";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -42,9 +38,6 @@ interface IProps {
 
 const TOP_CATEGORIES = 5;
 
-const sumOf = (byStatus: IDependenciesDashboardResponseBody["librariesByStatus"]): number =>
-    SUPPORT_STATUS_ORDER.reduce((sum, status) => sum + (byStatus[status] ?? 0), 0);
-
 export const CategoriesHealthCard = ({
     totalLibraries,
     librariesByStatus,
@@ -56,15 +49,7 @@ export const CategoriesHealthCard = ({
 }: IProps) => {
     const { t } = useTranslation();
 
-    // The categories with the most risky libraries first, the ties keep the usual order of the categories
-    const ranked = DEPENDENCY_ECOSYSTEM_ORDER.map((ecosystem) => {
-        const byStatus = riskyLibrariesByEcosystem[ecosystem] ?? {};
-
-        return { ecosystem, byStatus, total: sumOf(byStatus) };
-    })
-        .filter(({ total }) => total > 0)
-        .sort((left, right) => right.total - left.total);
-
+    const ranked = rankEcosystems(riskyLibrariesByEcosystem);
     const top = ranked.slice(0, TOP_CATEGORIES);
     const hidden = ranked.length - top.length;
     const max = Math.max(1, ...top.map(({ total }) => total));
@@ -78,7 +63,7 @@ export const CategoriesHealthCard = ({
                     <Trans
                         t={t}
                         i18nKey="Dashboard.Dependencies.categoriesDescriptor"
-                        values={{ risky: sumOf(librariesByStatus), total: totalLibraries }}
+                        values={{ risky: sumOfRisky(librariesByStatus), total: totalLibraries }}
                         components={[<b key="0" />, <b key="1" />]}
                     />
                 }
@@ -86,20 +71,7 @@ export const CategoriesHealthCard = ({
                 footerRight={lastScan}
             >
                 <div className={styles.Body}>
-                    <div className={`TextUltraSmall ${styles.Caption}`}>
-                        <span className={styles.CaptionLabel}>{t("Dashboard.Dependencies.topCategories")}</span>
-                        <span className={styles.Legend}>
-                            {SUPPORT_STATUS_ORDER.map((status) => (
-                                <span key={status} className={styles.LegendItem}>
-                                    <span
-                                        className={styles.LegendSwatch}
-                                        style={{ backgroundColor: dependencyHealthColor[status] }}
-                                    />
-                                    {t(supportSignalLabelKey[status])}
-                                </span>
-                            ))}
-                        </span>
-                    </div>
+                    <StatusLegend />
 
                     <div className={styles.Bars}>
                         {top.length === 0 && (
@@ -108,31 +80,14 @@ export const CategoriesHealthCard = ({
                             </span>
                         )}
 
-                        {top.map(({ ecosystem, byStatus, total }) => (
-                            <button
-                                key={ecosystem}
-                                type="button"
-                                onClick={() => onToggle(ecosystem)}
-                                className={`${styles.BarRow} ${activeEcosystems.includes(ecosystem) ? styles.ActiveBarRow : ""}`}
-                            >
-                                <span className={`TextSmall ${styles.BarLabel}`}>
-                                    {t(dependencyEcosystemLabelKey[ecosystem])}
-                                </span>
-                                <span className={styles.BarTrack}>
-                                    <span className={styles.Bar} style={{ width: `${(total * 100) / max}%` }}>
-                                        {SUPPORT_STATUS_ORDER.map((status) => (
-                                            <span
-                                                key={status}
-                                                style={{
-                                                    flex: byStatus[status] ?? 0,
-                                                    backgroundColor: dependencyHealthColor[status],
-                                                }}
-                                            />
-                                        ))}
-                                    </span>
-                                </span>
-                                <span className={`TextSmall ${styles.BarCount}`}>{total}</span>
-                            </button>
+                        {top.map((category) => (
+                            <CategoryBar
+                                key={category.ecosystem}
+                                category={category}
+                                max={max}
+                                active={activeEcosystems.includes(category.ecosystem)}
+                                onToggle={() => onToggle(category.ecosystem)}
+                            />
                         ))}
 
                         {hidden > 0 && (

@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { DashboardNoData, EmptyHandler, Loader, PagesFirstSection } from "@/components";
-import { fetchData } from "@/helpers";
+import { fetchData, toggleItem } from "@/helpers";
 import { type EDependencyEcosystem, type IDependenciesDashboardResponseBody, StatefulRequest } from "@/models";
 import { getDashboardDependencies } from "@/services";
 import { DEPENDENCY_DATE_FORMAT } from "@/utils";
@@ -78,9 +78,7 @@ const DashboardDependencies = () => {
     });
 
     const toggleEcosystem = (ecosystem: EDependencyEcosystem): void => {
-        setActiveEcosystems((prev) =>
-            prev.includes(ecosystem) ? prev.filter((current) => current !== ecosystem) : [...prev, ecosystem],
-        );
+        setActiveEcosystems((prev) => toggleItem(prev, ecosystem));
     };
 
     return (

@@ -17,12 +17,14 @@
  */
 import { Trans, useTranslation } from "react-i18next";
 
-import { HintTooltip } from "@/components";
-import type { IDependenciesDashboardResponseBody } from "@/models";
+import { percentageOf } from "@/helpers";
+import type { IApplicationsRing, IDependenciesDashboardResponseBody } from "@/models";
 import { DEPENDENCY_HEALTH_NONE_COLOR, SUPPORT_STATUS_ORDER, dependencyHealthColor } from "@/utils";
 
 import { HealthCard } from "../HealthCard";
 
+import { ApplicationsDonut } from "./ApplicationsDonut";
+import { ApplicationsLegend } from "./ApplicationsLegend";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -31,20 +33,6 @@ interface IProps {
     applicationsByStatus: IDependenciesDashboardResponseBody["applicationsByStatus"];
     lastScan: string;
 }
-
-interface IRing {
-    key: string;
-    color: string;
-    label: string;
-    hint?: string;
-    count: number;
-    percentage: number;
-}
-
-const OUTER_RADIUS = 62;
-const RING_STEP = 14;
-
-const percentageOf = (count: number, total: number) => (total === 0 ? 0 : Math.round((count * 100) / total));
 
 export const ApplicationsHealthCard = ({
     totalApplications,
@@ -56,7 +44,7 @@ export const ApplicationsHealthCard = ({
 
     const healthyApplications = totalApplications - applicationsWithRiskyDependencies;
 
-    const rings: IRing[] = [
+    const rings: IApplicationsRing[] = [
         ...SUPPORT_STATUS_ORDER.map((status) => {
             const count = applicationsByStatus[status] ?? 0;
 
@@ -77,8 +65,6 @@ export const ApplicationsHealthCard = ({
             percentage: percentageOf(healthyApplications, totalApplications),
         },
     ];
-
-    const percentageSum = rings.reduce((sum, ring) => sum + ring.percentage, 0);
 
     return (
         <>
@@ -104,85 +90,8 @@ export const ApplicationsHealthCard = ({
                 footerRight={lastScan}
             >
                 <div className={styles.Body}>
-                    <svg width="150" height="150" viewBox="0 0 140 140" className={`${styles.SVG} DonutSpinSettle`}>
-                        {rings.map(({ key, color, percentage }, index) => {
-                            const radius = OUTER_RADIUS - index * RING_STEP;
-                            const circumference = 2 * Math.PI * radius;
-                            const length = (percentage / 100) * circumference;
-
-                            return (
-                                <g key={key}>
-                                    <circle cx="70" cy="70" r={radius} className={styles.Track} />
-                                    {length > 0 && (
-                                        <circle
-                                            cx="70"
-                                            cy="70"
-                                            r={radius}
-                                            className={styles.Arc}
-                                            stroke={color}
-                                            strokeDasharray={`${length} ${circumference}`}
-                                        />
-                                    )}
-                                </g>
-                            );
-                        })}
-                    </svg>
-
-                    <div className={`TextUltraSmall ${styles.Legend} DonutLegendFade`}>
-                        <div className={styles.LegendHeader}>
-                            <span>{t("Dashboard.Dependencies.uses")}</span>
-                            <span className={styles.AlignEnd}>{t("Dashboard.Dependencies.share")}</span>
-                        </div>
-
-                        {rings.map(({ key, color, label, hint, count, percentage }) => (
-                            <div key={key} className={styles.Row}>
-                                <span className={styles.LabelCell}>
-                                    <span className={styles.Dot} style={{ backgroundColor: color }} />
-                                    <span className={styles.Label}>{label}</span>
-                                    {hint && (
-                                        <HintTooltip
-                                            placement="right"
-                                            content={
-                                                <>
-                                                    <div className={styles.HintTitle} style={{ color }}>
-                                                        {label}
-                                                    </div>
-                                                    <div>{hint}</div>
-                                                </>
-                                            }
-                                        >
-                                            <span className={styles.Question}>?</span>
-                                        </HintTooltip>
-                                    )}
-                                </span>
-                                <span className={styles.Share}>
-                                    <b>{count}</b> <span className={styles.Muted}>({percentage}%)</span>
-                                </span>
-                            </div>
-                        ))}
-
-                        {percentageSum > 100 && (
-                            <div className={styles.OverlapNote}>
-                                <HintTooltip
-                                    content={
-                                        <>
-                                            <div className={styles.HintTitle}>
-                                                {t("Dashboard.Dependencies.overlapTitle")}
-                                            </div>
-                                            <div>
-                                                {t("Dashboard.Dependencies.overlapBody", { total: totalApplications })}
-                                            </div>
-                                        </>
-                                    }
-                                >
-                                    <span className={styles.Info}>i</span>
-                                </HintTooltip>
-                                <span className={styles.Muted}>
-                                    {t("Dashboard.Dependencies.overlapNote", { sum: percentageSum })}
-                                </span>
-                            </div>
-                        )}
-                    </div>
+                    <ApplicationsDonut rings={rings} />
+                    <ApplicationsLegend rings={rings} totalApplications={totalApplications} />
                 </div>
             </HealthCard>
         </>

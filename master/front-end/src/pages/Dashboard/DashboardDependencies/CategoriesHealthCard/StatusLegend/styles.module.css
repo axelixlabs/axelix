@@ -1,0 +1,31 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: var(--axelix-grey-500);
+}
+
+.Caption {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.Legend {
+    display: flex;
+    gap: 14px;
+}
+
+.LegendItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.Swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}

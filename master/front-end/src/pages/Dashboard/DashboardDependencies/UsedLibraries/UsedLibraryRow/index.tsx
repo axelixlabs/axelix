@@ -18,11 +18,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { ESuccessionKind, type IUsedLibrary } from "@/models";
+import type { IUsedLibrary } from "@/models";
 import { dependencyEcosystemLabelKey, dependencyHealthColor, riskyStatusOf, supportSignalLabelKey } from "@/utils";
 
 import { HealthStatusBadge } from "../../HealthStatusBadge";
 
+import { ShareCell } from "./ShareCell";
+import { SuccessionCell } from "./SuccessionCell";
 import { UsedLibraryDetail } from "./UsedLibraryDetail";
 import styles from "./styles.module.css";
 
@@ -49,30 +51,12 @@ export const UsedLibraryRow = ({ usedLibrary }: IProps) => {
                             <HealthStatusBadge status={riskyStatus} label={t(supportSignalLabelKey[riskyStatus])} />
                         )}
                     </span>
-                    <span className="TextUltraSmall">
-                        {riskyStatus &&
-                            (succession?.kind === ESuccessionKind.SUPERSEDED_BY ? (
-                                <span className={styles.Successor}>{t("Dashboard.Dependencies.successor")}</span>
-                            ) : (
-                                <span className={styles.Muted}>{t("Dashboard.Dependencies.none")}</span>
-                            ))}
-                    </span>
+                    <span className="TextUltraSmall">{riskyStatus && <SuccessionCell succession={succession} />}</span>
                     <span className={`TextUltraSmall ${styles.Category}`}>
                         {ecosystem && t(dependencyEcosystemLabelKey[ecosystem])}
                     </span>
                     <span className={`TextSmall ${styles.Applications}`}>{applicationCount}</span>
-                    <span className={styles.ShareCell}>
-                        <span className={styles.ShareTrack}>
-                            <span
-                                className={styles.ShareBar}
-                                style={{
-                                    width: `${share}%`,
-                                    backgroundColor: riskyStatus ? dependencyHealthColor[riskyStatus] : undefined,
-                                }}
-                            />
-                        </span>
-                        <span className={`TextUltraSmall ${styles.ShareValue}`}>{Math.round(share)}%</span>
-                    </span>
+                    <ShareCell share={share} color={riskyStatus ? dependencyHealthColor[riskyStatus] : undefined} />
                 </div>
 
                 {open && <UsedLibraryDetail usedLibrary={usedLibrary} riskyStatus={riskyStatus} />}

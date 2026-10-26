@@ -1,0 +1,9 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 18px;
+    color: var(--axelix-grey-500);
+}

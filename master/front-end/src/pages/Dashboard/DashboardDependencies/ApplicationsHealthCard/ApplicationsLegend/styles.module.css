@@ -1,0 +1,23 @@
+.MainWrapper {
+    flex: 1 1 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.Header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--axelix-grey-300);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    color: var(--axelix-grey-500);
+    text-transform: uppercase;
+}
+
+.AlignEnd {
+    justify-self: end;
+}

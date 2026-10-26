@@ -1,0 +1,31 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.Info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-white);
+    background-color: var(--axelix-grey-900);
+    cursor: help;
+}
+
+.Muted {
+    color: var(--axelix-grey-500);
+}
+
+.HintTitle {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
