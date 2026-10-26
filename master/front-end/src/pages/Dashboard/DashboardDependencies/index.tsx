@@ -25,10 +25,10 @@ import { type EDependencyEcosystem, type IDependenciesDashboardResponseBody, Sta
 import { getDashboardDependencies } from "@/services";
 import { DEPENDENCY_DATE_FORMAT } from "@/utils";
 
+import { ApplicationsHealthCard } from "./ApplicationsHealthCard";
 import { CategoriesHealthCard } from "./CategoriesHealthCard";
 import { HealthSummary } from "./HealthSummary";
-import { ServicesHealthCard } from "./ServicesHealthCard";
-import { TrackedProjects } from "./TrackedProjects";
+import { UsedLibraries } from "./UsedLibraries";
 import styles from "./styles.module.css";
 
 const DashboardDependencies = () => {
@@ -49,14 +49,21 @@ const DashboardDependencies = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const { totalServices, servicesWithRiskyDependencies, servicesByStatus, trackedProjects, lastScannedAt } =
-        dashboard.response!;
+    const {
+        totalApplications,
+        applicationsWithRiskyDependencies,
+        applicationsByStatus,
+        totalLibraries,
+        librariesByStatus,
+        riskyLibrariesByEcosystem,
+        lastScannedAt,
+    } = dashboard.response!;
 
     const firstSection = (
         <PagesFirstSection title={t("Dashboard.Dependencies.title")} subtitle={t("Dashboard.Dependencies.subtitle")} />
     );
 
-    if (totalServices === 0) {
+    if (totalApplications === 0) {
         return (
             <>
                 {firstSection}
@@ -80,29 +87,33 @@ const DashboardDependencies = () => {
         <>
             <div className={styles.MainWrapper}>
                 <div className={styles.FirstSectionWrapper}>
-                    {firstSection}
+                    <div className={styles.TitleWrapper}>{firstSection}</div>
 
-                    <HealthSummary totalServices={totalServices} servicesByStatus={servicesByStatus} />
+                    <HealthSummary totalApplications={totalApplications} applicationsByStatus={applicationsByStatus} />
                 </div>
 
                 <div className={styles.CardsWrapper}>
-                    <ServicesHealthCard
-                        totalServices={totalServices}
-                        servicesWithRiskyDependencies={servicesWithRiskyDependencies}
-                        servicesByStatus={servicesByStatus}
+                    <ApplicationsHealthCard
+                        totalApplications={totalApplications}
+                        applicationsWithRiskyDependencies={applicationsWithRiskyDependencies}
+                        applicationsByStatus={applicationsByStatus}
                         lastScan={lastScan}
                     />
 
                     <CategoriesHealthCard
-                        trackedProjects={trackedProjects}
+                        totalLibraries={totalLibraries}
+                        librariesByStatus={librariesByStatus}
+                        riskyLibrariesByEcosystem={riskyLibrariesByEcosystem}
                         activeEcosystems={activeEcosystems}
                         onToggle={toggleEcosystem}
+                        onShowAll={() => setActiveEcosystems([])}
                         lastScan={lastScan}
                     />
                 </div>
 
-                <TrackedProjects
-                    trackedProjects={trackedProjects}
+                <UsedLibraries
+                    totalLibraries={totalLibraries}
+                    librariesByStatus={librariesByStatus}
                     activeEcosystems={activeEcosystems}
                     onEcosystemsChange={setActiveEcosystems}
                 />

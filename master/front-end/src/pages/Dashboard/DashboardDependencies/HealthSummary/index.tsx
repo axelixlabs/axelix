@@ -25,26 +25,26 @@ import { HealthStatusBadge } from "../HealthStatusBadge";
 import styles from "./styles.module.css";
 
 interface IProps {
-    totalServices: number;
-    servicesByStatus: IDependenciesDashboardResponseBody["servicesByStatus"];
+    totalApplications: number;
+    applicationsByStatus: IDependenciesDashboardResponseBody["applicationsByStatus"];
 }
 
-export const HealthSummary = ({ totalServices, servicesByStatus }: IProps) => {
+export const HealthSummary = ({ totalApplications, applicationsByStatus }: IProps) => {
     const { t } = useTranslation();
 
     return (
         <>
             <div className={styles.MainWrapper}>
                 <div className={styles.TotalWrapper}>
-                    <span className={`TextDisplay ${styles.TotalValue}`}>{totalServices}</span>
+                    <span className={`TextDisplay ${styles.TotalValue}`}>{totalApplications}</span>
                     <span className={`TextUltraSmall ${styles.TotalLabel}`}>
-                        {t("Dashboard.Dependencies.services")}
+                        {t("Dashboard.Dependencies.applications")}
                     </span>
                 </div>
                 <div className={styles.Breakdown}>
                     {SUPPORT_STATUS_ORDER.map((status) => (
                         <span key={status} className={styles.BreakdownRow}>
-                            <span className={styles.Count}>{servicesByStatus[status] ?? 0}</span>
+                            <span className={styles.Count}>{applicationsByStatus[status] ?? 0}</span>
                             <HealthStatusBadge status={status} label={t(`Dashboard.Dependencies.badges.${status}`)} />
                             <span className={`TextUltraSmall ${styles.Hint}`}>
                                 {t(`Dashboard.Dependencies.usesStatus.${status}`)}

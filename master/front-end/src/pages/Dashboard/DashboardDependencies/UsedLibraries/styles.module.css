@@ -45,11 +45,6 @@
     flex-wrap: wrap;
 }
 
-.CategorySelect {
-    width: 260px;
-    max-width: 100%;
-}
-
 .Chip {
     display: inline-flex;
     align-items: center;

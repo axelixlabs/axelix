@@ -12,6 +12,12 @@
     flex-wrap: wrap;
 }
 
+/* The subtitle wraps rather than pushing the summary below the title */
+.TitleWrapper {
+    flex: 1 1 0;
+    min-width: 220px;
+}
+
 .CardsWrapper {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

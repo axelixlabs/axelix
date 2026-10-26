@@ -18,38 +18,39 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { ESuccessionKind, ESupportStatus, type ITrackedProject } from "@/models";
-import { dependencyEcosystemLabelKey, dependencyHealthColor, supportSignalLabelKey } from "@/utils";
+import { ESuccessionKind, type IUsedLibrary } from "@/models";
+import { dependencyEcosystemLabelKey, dependencyHealthColor, riskyStatusOf, supportSignalLabelKey } from "@/utils";
 
 import { HealthStatusBadge } from "../../HealthStatusBadge";
 
-import { TrackedProjectDetail } from "./TrackedProjectDetail";
+import { UsedLibraryDetail } from "./UsedLibraryDetail";
 import styles from "./styles.module.css";
 
 interface IProps {
-    trackedProject: ITrackedProject;
+    usedLibrary: IUsedLibrary;
 }
 
-export const TrackedProjectRow = ({ trackedProject }: IProps) => {
+export const UsedLibraryRow = ({ usedLibrary }: IProps) => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState<boolean>(false);
 
-    const { softwareProject, serviceCount, share } = trackedProject;
-    const { status, succession } = softwareProject;
-    const risky = status !== ESupportStatus.ACTIVE;
+    const { library, status, succession, ecosystem, applicationCount, share } = usedLibrary;
+    const riskyStatus = riskyStatusOf(status);
 
     return (
         <>
             <div className={`${styles.MainWrapper} ${open ? styles.Open : ""}`}>
                 <div className={styles.Row} onClick={() => setOpen((prev) => !prev)}>
                     <span className={`TextUltraSmall ${styles.Caret}`}>{open ? "▴" : "▾"}</span>
-                    <span className={`TextSmall ${styles.Project}`}>{softwareProject.displayName}</span>
+                    <span className={`TextSmall ${styles.Library}`}>{`${library.groupId}:${library.artifactId}`}</span>
                     <span>
-                        {risky && <HealthStatusBadge status={status} label={t(supportSignalLabelKey[status])} />}
+                        {riskyStatus && (
+                            <HealthStatusBadge status={riskyStatus} label={t(supportSignalLabelKey[riskyStatus])} />
+                        )}
                     </span>
                     <span className="TextUltraSmall">
-                        {risky &&
+                        {riskyStatus &&
                             (succession?.kind === ESuccessionKind.SUPERSEDED_BY ? (
                                 <span className={styles.Successor}>{t("Dashboard.Dependencies.successor")}</span>
                             ) : (
@@ -57,16 +58,16 @@ export const TrackedProjectRow = ({ trackedProject }: IProps) => {
                             ))}
                     </span>
                     <span className={`TextUltraSmall ${styles.Category}`}>
-                        {t(dependencyEcosystemLabelKey[softwareProject.ecosystem])}
+                        {ecosystem && t(dependencyEcosystemLabelKey[ecosystem])}
                     </span>
-                    <span className={`TextSmall ${styles.Services}`}>{serviceCount}</span>
+                    <span className={`TextSmall ${styles.Applications}`}>{applicationCount}</span>
                     <span className={styles.ShareCell}>
                         <span className={styles.ShareTrack}>
                             <span
                                 className={styles.ShareBar}
                                 style={{
                                     width: `${share}%`,
-                                    backgroundColor: risky ? dependencyHealthColor[status] : undefined,
+                                    backgroundColor: riskyStatus ? dependencyHealthColor[riskyStatus] : undefined,
                                 }}
                             />
                         </span>
@@ -74,7 +75,7 @@ export const TrackedProjectRow = ({ trackedProject }: IProps) => {
                     </span>
                 </div>
 
-                {open && <TrackedProjectDetail softwareProject={softwareProject} />}
+                {open && <UsedLibraryDetail usedLibrary={usedLibrary} riskyStatus={riskyStatus} />}
             </div>
         </>
     );

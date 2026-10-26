@@ -15,48 +15,73 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Pagination, Select } from "antd";
-import { useState } from "react";
+import { Pagination } from "antd";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { PageSearch } from "@/components";
-import { type EDependencyEcosystem, ESupportStatus, type ITrackedProject } from "@/models";
+import { Loader, PageSearch } from "@/components";
+import { fetchData } from "@/helpers";
 import {
-    DEPENDENCY_ECOSYSTEM_ORDER,
+    type EDependencyEcosystem,
+    type ESupportStatus,
+    type IDependenciesDashboardResponseBody,
+    type IDependencyLibrariesResponseBody,
+    StatefulRequest,
+} from "@/models";
+import { getDashboardDependencyLibraries } from "@/services";
+import {
     DEPENDENCY_HEALTH_PAGE_SIZE,
     SUPPORT_STATUS_ORDER,
-    dependencyEcosystemLabelKey,
     dependencyHealthColor,
     supportSignalLabelKey,
 } from "@/utils";
 
-import { TrackedProjectRow } from "./TrackedProjectRow";
+import { CategoryFilter } from "./CategoryFilter";
+import { UsedLibraryRow } from "./UsedLibraryRow";
 import styles from "./styles.module.css";
 
 interface IProps {
-    trackedProjects: ITrackedProject[];
+    totalLibraries: number;
+    librariesByStatus: IDependenciesDashboardResponseBody["librariesByStatus"];
     activeEcosystems: EDependencyEcosystem[];
     onEcosystemsChange: (ecosystems: EDependencyEcosystem[]) => void;
 }
 
-const matchesSearch = ({ softwareProject }: ITrackedProject, search: string): boolean => {
-    const query = search.trim().toLowerCase();
-
-    return (
-        !query ||
-        softwareProject.displayName.toLowerCase().includes(query) ||
-        softwareProject.libraries.some(({ groupId, artifactId }) =>
-            `${groupId}:${artifactId}`.toLowerCase().includes(query),
-        )
-    );
-};
-
-export const TrackedProjects = ({ trackedProjects, activeEcosystems, onEcosystemsChange }: IProps) => {
+export const UsedLibraries = ({ totalLibraries, librariesByStatus, activeEcosystems, onEcosystemsChange }: IProps) => {
     const { t } = useTranslation();
 
     const [search, setSearch] = useState<string>("");
     const [activeStatuses, setActiveStatuses] = useState<ESupportStatus[]>([]);
     const [page, setPage] = useState<number>(1);
+    const [libraries, setLibraries] = useState(StatefulRequest.loading<IDependencyLibrariesResponseBody>());
+
+    // The ecosystems are also toggled from the category tiles, every filter change starts over from the first page
+    const [filteredEcosystems, setFilteredEcosystems] = useState<EDependencyEcosystem[]>(activeEcosystems);
+    if (filteredEcosystems !== activeEcosystems) {
+        setFilteredEcosystems(activeEcosystems);
+        setPage(1);
+    }
+
+    useEffect(() => {
+        // The previous page stays on screen until the requested one arrives, and a stale response is dropped
+        let stale = false;
+
+        fetchData<IDependencyLibrariesResponseBody>(
+            (update) => !stale && setLibraries(update),
+            () =>
+                getDashboardDependencyLibraries({
+                    search: search.trim() || undefined,
+                    status: activeStatuses,
+                    ecosystem: activeEcosystems,
+                    page: page - 1,
+                    size: DEPENDENCY_HEALTH_PAGE_SIZE,
+                }),
+        );
+
+        return () => {
+            stale = true;
+        };
+    }, [search, activeStatuses, activeEcosystems, page]);
 
     const toggleStatus = (status: ESupportStatus): void => {
         setPage(1);
@@ -65,30 +90,16 @@ export const TrackedProjects = ({ trackedProjects, activeEcosystems, onEcosystem
         );
     };
 
-    const filtered = trackedProjects.filter(
-        (project) =>
-            matchesSearch(project, search) &&
-            (activeEcosystems.length === 0 || activeEcosystems.includes(project.softwareProject.ecosystem)) &&
-            (activeStatuses.length === 0 || activeStatuses.includes(project.softwareProject.status)),
-    );
-
-    // The risky projects first, each group keeps the most widespread first order of the response
-    const sorted = [
-        ...filtered.filter(({ softwareProject }) => softwareProject.status !== ESupportStatus.ACTIVE),
-        ...filtered.filter(({ softwareProject }) => softwareProject.status === ESupportStatus.ACTIVE),
-    ];
-
-    const pages = Math.max(1, Math.ceil(sorted.length / DEPENDENCY_HEALTH_PAGE_SIZE));
-    const currentPage = Math.min(page, pages);
-    const pageStart = (currentPage - 1) * DEPENDENCY_HEALTH_PAGE_SIZE;
-    const pageRows = sorted.slice(pageStart, pageStart + DEPENDENCY_HEALTH_PAGE_SIZE);
+    const rows = libraries.response?.libraries ?? [];
+    const matchingLibraries = libraries.response?.matchingLibraries ?? 0;
+    const pageStart = (page - 1) * DEPENDENCY_HEALTH_PAGE_SIZE;
 
     return (
         <>
             <div className={styles.MainWrapper}>
                 <div className={`TextUltraSmall ${styles.CaptionRow}`}>
-                    <span className={styles.Caption}>{t("Dashboard.Dependencies.trackedCaption")}</span>
-                    <span>{t("Dashboard.Dependencies.trackedLegend")}</span>
+                    <span className={styles.Caption}>{t("Dashboard.Dependencies.librariesCaption")}</span>
+                    <span>{t("Dashboard.Dependencies.librariesLegend")}</span>
                 </div>
 
                 <div className={styles.Table}>
@@ -99,25 +110,11 @@ export const TrackedProjects = ({ trackedProjects, activeEcosystems, onEcosystem
                                     setPage(1);
                                     setSearch(value);
                                 }}
-                                addonAfter={`${filtered.length} / ${trackedProjects.length}`}
+                                addonAfter={`${matchingLibraries} / ${totalLibraries}`}
                                 removeBottomGutter
                             />
 
-                            <Select
-                                mode="multiple"
-                                allowClear
-                                className={styles.CategorySelect}
-                                placeholder={t("Dashboard.Dependencies.categoryPlaceholder")}
-                                value={activeEcosystems}
-                                onChange={(ecosystems) => {
-                                    setPage(1);
-                                    onEcosystemsChange(ecosystems);
-                                }}
-                                options={DEPENDENCY_ECOSYSTEM_ORDER.map((ecosystem) => ({
-                                    value: ecosystem,
-                                    label: t(dependencyEcosystemLabelKey[ecosystem]),
-                                }))}
-                            />
+                            <CategoryFilter activeEcosystems={activeEcosystems} onChange={onEcosystemsChange} />
                         </div>
 
                         <div className={`TextUltraSmall ${styles.ToolbarRow}`}>
@@ -134,13 +131,7 @@ export const TrackedProjects = ({ trackedProjects, activeEcosystems, onEcosystem
                                         style={{ backgroundColor: dependencyHealthColor[status] }}
                                     />
                                     {t(supportSignalLabelKey[status])}
-                                    <span className={styles.ChipCount}>
-                                        {
-                                            trackedProjects.filter(
-                                                ({ softwareProject }) => softwareProject.status === status,
-                                            ).length
-                                        }
-                                    </span>
+                                    <span className={styles.ChipCount}>{librariesByStatus[status] ?? 0}</span>
                                 </button>
                             ))}
                         </div>
@@ -149,37 +140,41 @@ export const TrackedProjects = ({ trackedProjects, activeEcosystems, onEcosystem
                     <div className={styles.Scroll}>
                         <div className={`TextUltraSmall ${styles.HeaderRow}`}>
                             <span />
-                            <span>{t("Dashboard.Dependencies.columns.project")}</span>
+                            <span>{t("Dashboard.Dependencies.columns.library")}</span>
                             <span>{t("Dashboard.Dependencies.columns.status")}</span>
                             <span>{t("Dashboard.Dependencies.columns.succession")}</span>
                             <span>{t("Dashboard.Dependencies.columns.category")}</span>
-                            <span className={styles.AlignEnd}>{t("Dashboard.Dependencies.columns.services")}</span>
+                            <span className={styles.AlignEnd}>{t("Dashboard.Dependencies.columns.applications")}</span>
                             <span>{t("Dashboard.Dependencies.share")}</span>
                         </div>
 
-                        {pageRows.map((trackedProject) => (
-                            <TrackedProjectRow
-                                key={trackedProject.softwareProject.id.value}
-                                trackedProject={trackedProject}
-                            />
-                        ))}
+                        {libraries.loading && !libraries.response ? (
+                            <Loader />
+                        ) : (
+                            rows.map((usedLibrary) => (
+                                <UsedLibraryRow
+                                    key={`${usedLibrary.library.groupId}:${usedLibrary.library.artifactId}`}
+                                    usedLibrary={usedLibrary}
+                                />
+                            ))
+                        )}
                     </div>
 
                     <div className={`TextUltraSmall ${styles.Footer}`}>
                         <span>
-                            {sorted.length
+                            {rows.length
                                 ? t("Dashboard.Dependencies.footer", {
                                       from: pageStart + 1,
-                                      to: pageStart + pageRows.length,
-                                      total: sorted.length,
+                                      to: pageStart + rows.length,
+                                      total: matchingLibraries,
                                   })
                                 : t("Dashboard.Dependencies.noMatch")}
                         </span>
                         <Pagination
                             size="small"
-                            current={currentPage}
+                            current={page}
                             pageSize={DEPENDENCY_HEALTH_PAGE_SIZE}
-                            total={sorted.length}
+                            total={matchingLibraries}
                             showSizeChanger={false}
                             onChange={setPage}
                         />

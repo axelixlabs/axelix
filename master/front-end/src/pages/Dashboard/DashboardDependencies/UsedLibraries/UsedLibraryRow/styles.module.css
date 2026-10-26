@@ -26,8 +26,8 @@
     color: var(--axelix-grey-500);
 }
 
-.Project {
-    font-weight: var(--axelix-font-weight-medium);
+.Library {
+    font-family: var(--axelix-font-family-code);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -47,7 +47,7 @@
     text-transform: uppercase;
 }
 
-.Services {
+.Applications {
     justify-self: end;
     font-weight: var(--axelix-font-weight-semibold);
     font-variant-numeric: tabular-nums;

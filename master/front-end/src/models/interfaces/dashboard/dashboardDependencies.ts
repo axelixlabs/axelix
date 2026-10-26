@@ -15,21 +15,62 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ESupportStatus, ISoftwareProject } from "@/models";
-
-export interface ITrackedProject {
-    softwareProject: ISoftwareProject;
-    serviceCount: number;
-    share: number;
-}
+import type {
+    EDependencyEcosystem,
+    ESupportStatus,
+    IDependencyLibrary,
+    ISoftwareProjectReference,
+    ISoftwareProjectSuccession,
+} from "@/models";
 
 /**
  * Response body of {@code GET /api/external/dashboard/dependencies}.
  */
 export interface IDependenciesDashboardResponseBody {
-    totalServices: number;
-    servicesWithRiskyDependencies: number;
-    servicesByStatus: Partial<Record<ESupportStatus, number>>;
-    trackedProjects: ITrackedProject[];
+    totalApplications: number;
+    applicationsWithRiskyDependencies: number;
+    applicationsByStatus: Partial<Record<ESupportStatus, number>>;
+    totalLibraries: number;
+    librariesByStatus: Partial<Record<ESupportStatus, number>>;
+    riskyLibrariesByEcosystem: Partial<Record<EDependencyEcosystem, Partial<Record<ESupportStatus, number>>>>;
     lastScannedAt: string;
+}
+
+export interface IVersionUsage {
+    version: string;
+    applicationCount: number;
+}
+
+/**
+ * A library used by at least one application. The curation fields are {@code null} for the libraries Axelix does
+ * not curate, e.g. an organization's internal ones.
+ */
+export interface IUsedLibrary {
+    library: IDependencyLibrary;
+    applicationCount: number;
+    share: number;
+    versions: IVersionUsage[];
+    status: ESupportStatus | null;
+    ecosystem: EDependencyEcosystem | null;
+    summary: string | null;
+    succession: ISoftwareProjectSuccession | null;
+    reference: ISoftwareProjectReference | null;
+}
+
+export interface IDependencyLibrariesRequestParams {
+    search?: string;
+    status: ESupportStatus[];
+    ecosystem: EDependencyEcosystem[];
+    page: number;
+    size: number;
+}
+
+/**
+ * Response body of {@code GET /api/external/dashboard/dependencies/libraries}.
+ */
+export interface IDependencyLibrariesResponseBody {
+    libraries: IUsedLibrary[];
+    matchingLibraries: number;
+    page: number;
+    size: number;
 }

@@ -28,8 +28,33 @@ export const dependencyHealthColor: Record<TProblemSupportStatus, string> = {
 };
 
 /**
- * The color of the services that use none of the problematic projects.
+ * The color of the applications that use none of the problematic libraries.
  */
 export const DEPENDENCY_HEALTH_NONE_COLOR = "#2DD4BF";
 
 export const DEPENDENCY_HEALTH_PAGE_SIZE = 10;
+
+/**
+ * The colors of the version bars of a library, the newest version first. The versions past the end of the ramp
+ * reuse its last color.
+ */
+export const DEPENDENCY_VERSION_COLORS = [
+    palette.green[500],
+    palette.grey[600],
+    palette.grey[500],
+    palette.grey[400],
+    palette.grey[300],
+    palette.grey[200],
+];
+
+/**
+ * How many of the newest versions of a library are shown before the rest is folded.
+ */
+export const DEPENDENCY_VERSIONS_SHOWN = 4;
+
+/**
+ * @returns the status of a library when it is a risky one, {@code null} for an active or an uncurated library
+ */
+export const riskyStatusOf = (status: ESupportStatus | null): TProblemSupportStatus | null => {
+    return status !== null && status !== ESupportStatus.ACTIVE ? status : null;
+};

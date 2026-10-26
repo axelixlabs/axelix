@@ -36,59 +36,79 @@
     border-radius: 2px;
 }
 
-.Tiles {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-}
-
-.Tile {
+.Bars {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    min-height: 38px;
-    padding: 0 10px;
+    gap: 2px;
+}
+
+.Muted {
+    color: var(--axelix-grey-500);
+}
+
+.BarRow {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr) 28px;
+    gap: 12px;
+    align-items: center;
+    height: 28px;
+    padding: 0;
     font: inherit;
     text-align: left;
-    color: var(--axelix-grey-900);
-    background-color: var(--axelix-white);
-    border: 1px solid var(--axelix-grey-200);
-    border-radius: 7px;
+    color: var(--axelix-grey-700);
+    background: none;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
 
     &:hover {
-        border-color: var(--axelix-grey-400);
+        background-color: var(--axelix-grey-50);
     }
 }
 
-.ActiveTile {
+.BarLabel {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ActiveBarRow .BarLabel {
     font-weight: var(--axelix-font-weight-semibold);
-    background-color: var(--axelix-green-50);
-    border-color: var(--axelix-green-200);
+    color: var(--axelix-green-700);
 }
 
-.EmptyTile {
-    color: var(--axelix-grey-400);
-}
-
-.TileHeader {
+.BarTrack {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
+    height: 10px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: var(--axelix-grey-100);
 }
 
-.TileCount {
+.Bar {
+    display: flex;
+    gap: 2px;
+}
+
+.BarCount {
+    justify-self: end;
+    font-family: var(--axelix-font-family-code);
     font-weight: var(--axelix-font-weight-semibold);
     font-variant-numeric: tabular-nums;
 }
 
-.TileBar {
-    display: flex;
-    gap: 2px;
-    height: 4px;
-    border-radius: 2px;
-    overflow: hidden;
-    background-color: var(--axelix-grey-100);
+.More {
+    align-self: flex-start;
+    margin-top: 6px;
+    padding: 0;
+    font: inherit;
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-green-600);
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }

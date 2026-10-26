@@ -17,7 +17,7 @@
  */
 import { Trans, useTranslation } from "react-i18next";
 
-import { type EDependencyEcosystem, ESupportStatus, type ITrackedProject } from "@/models";
+import type { EDependencyEcosystem, IDependenciesDashboardResponseBody } from "@/models";
 import {
     DEPENDENCY_ECOSYSTEM_ORDER,
     SUPPORT_STATUS_ORDER,
@@ -31,29 +31,54 @@ import { HealthCard } from "../HealthCard";
 import styles from "./styles.module.css";
 
 interface IProps {
-    trackedProjects: ITrackedProject[];
+    totalLibraries: number;
+    librariesByStatus: IDependenciesDashboardResponseBody["librariesByStatus"];
+    riskyLibrariesByEcosystem: IDependenciesDashboardResponseBody["riskyLibrariesByEcosystem"];
     activeEcosystems: EDependencyEcosystem[];
     onToggle: (ecosystem: EDependencyEcosystem) => void;
+    onShowAll: () => void;
     lastScan: string;
 }
 
-export const CategoriesHealthCard = ({ trackedProjects, activeEcosystems, onToggle, lastScan }: IProps) => {
+const TOP_CATEGORIES = 5;
+
+const sumOf = (byStatus: IDependenciesDashboardResponseBody["librariesByStatus"]): number =>
+    SUPPORT_STATUS_ORDER.reduce((sum, status) => sum + (byStatus[status] ?? 0), 0);
+
+export const CategoriesHealthCard = ({
+    totalLibraries,
+    librariesByStatus,
+    riskyLibrariesByEcosystem,
+    activeEcosystems,
+    onToggle,
+    onShowAll,
+    lastScan,
+}: IProps) => {
     const { t } = useTranslation();
 
-    const riskyProjects = trackedProjects
-        .map(({ softwareProject }) => softwareProject)
-        .filter(({ status }) => status !== ESupportStatus.ACTIVE);
+    // The categories with the most risky libraries first, the ties keep the usual order of the categories
+    const ranked = DEPENDENCY_ECOSYSTEM_ORDER.map((ecosystem) => {
+        const byStatus = riskyLibrariesByEcosystem[ecosystem] ?? {};
+
+        return { ecosystem, byStatus, total: sumOf(byStatus) };
+    })
+        .filter(({ total }) => total > 0)
+        .sort((left, right) => right.total - left.total);
+
+    const top = ranked.slice(0, TOP_CATEGORIES);
+    const hidden = ranked.length - top.length;
+    const max = Math.max(1, ...top.map(({ total }) => total));
 
     return (
         <>
             <HealthCard
                 eyebrow={t("Dashboard.Dependencies.categoriesEyebrow")}
-                title={t("Dashboard.Dependencies.projects")}
+                title={t("Dashboard.Dependencies.libraries")}
                 descriptor={
                     <Trans
                         t={t}
                         i18nKey="Dashboard.Dependencies.categoriesDescriptor"
-                        values={{ risky: riskyProjects.length, total: trackedProjects.length }}
+                        values={{ risky: sumOf(librariesByStatus), total: totalLibraries }}
                         components={[<b key="0" />, <b key="1" />]}
                     />
                 }
@@ -62,9 +87,7 @@ export const CategoriesHealthCard = ({ trackedProjects, activeEcosystems, onTogg
             >
                 <div className={styles.Body}>
                     <div className={`TextUltraSmall ${styles.Caption}`}>
-                        <span className={styles.CaptionLabel}>
-                            {t("Dashboard.Dependencies.allCategories", { count: DEPENDENCY_ECOSYSTEM_ORDER.length })}
-                        </span>
+                        <span className={styles.CaptionLabel}>{t("Dashboard.Dependencies.topCategories")}</span>
                         <span className={styles.Legend}>
                             {SUPPORT_STATUS_ORDER.map((status) => (
                                 <span key={status} className={styles.LegendItem}>
@@ -78,37 +101,45 @@ export const CategoriesHealthCard = ({ trackedProjects, activeEcosystems, onTogg
                         </span>
                     </div>
 
-                    <div className={styles.Tiles}>
-                        {DEPENDENCY_ECOSYSTEM_ORDER.map((ecosystem) => {
-                            const projects = riskyProjects.filter((project) => project.ecosystem === ecosystem);
-                            const active = activeEcosystems.includes(ecosystem);
+                    <div className={styles.Bars}>
+                        {top.length === 0 && (
+                            <span className={`TextSmall ${styles.Muted}`}>
+                                {t("Dashboard.Dependencies.noRiskyCategories")}
+                            </span>
+                        )}
 
-                            return (
-                                <button
-                                    key={ecosystem}
-                                    type="button"
-                                    onClick={() => onToggle(ecosystem)}
-                                    className={`${styles.Tile} ${active ? styles.ActiveTile : ""} ${projects.length === 0 ? styles.EmptyTile : ""}`}
-                                >
-                                    <span className={`TextUltraSmall ${styles.TileHeader}`}>
-                                        <span>{t(dependencyEcosystemLabelKey[ecosystem])}</span>
-                                        <span className={styles.TileCount}>{projects.length}</span>
-                                    </span>
-                                    <span className={styles.TileBar}>
+                        {top.map(({ ecosystem, byStatus, total }) => (
+                            <button
+                                key={ecosystem}
+                                type="button"
+                                onClick={() => onToggle(ecosystem)}
+                                className={`${styles.BarRow} ${activeEcosystems.includes(ecosystem) ? styles.ActiveBarRow : ""}`}
+                            >
+                                <span className={`TextSmall ${styles.BarLabel}`}>
+                                    {t(dependencyEcosystemLabelKey[ecosystem])}
+                                </span>
+                                <span className={styles.BarTrack}>
+                                    <span className={styles.Bar} style={{ width: `${(total * 100) / max}%` }}>
                                         {SUPPORT_STATUS_ORDER.map((status) => (
                                             <span
                                                 key={status}
                                                 style={{
-                                                    flex: projects.filter((project) => project.status === status)
-                                                        .length,
+                                                    flex: byStatus[status] ?? 0,
                                                     backgroundColor: dependencyHealthColor[status],
                                                 }}
                                             />
                                         ))}
                                     </span>
-                                </button>
-                            );
-                        })}
+                                </span>
+                                <span className={`TextSmall ${styles.BarCount}`}>{total}</span>
+                            </button>
+                        ))}
+
+                        {hidden > 0 && (
+                            <button type="button" className={`TextUltraSmall ${styles.More}`} onClick={onShowAll}>
+                                {t("Dashboard.Dependencies.moreCategories", { count: hidden })}
+                            </button>
+                        )}
                     </div>
                 </div>
             </HealthCard>

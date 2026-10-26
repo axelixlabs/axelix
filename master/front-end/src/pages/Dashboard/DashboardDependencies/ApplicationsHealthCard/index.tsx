@@ -26,9 +26,9 @@ import { HealthCard } from "../HealthCard";
 import styles from "./styles.module.css";
 
 interface IProps {
-    totalServices: number;
-    servicesWithRiskyDependencies: number;
-    servicesByStatus: IDependenciesDashboardResponseBody["servicesByStatus"];
+    totalApplications: number;
+    applicationsWithRiskyDependencies: number;
+    applicationsByStatus: IDependenciesDashboardResponseBody["applicationsByStatus"];
     lastScan: string;
 }
 
@@ -46,19 +46,19 @@ const RING_STEP = 14;
 
 const percentageOf = (count: number, total: number) => (total === 0 ? 0 : Math.round((count * 100) / total));
 
-export const ServicesHealthCard = ({
-    totalServices,
-    servicesWithRiskyDependencies,
-    servicesByStatus,
+export const ApplicationsHealthCard = ({
+    totalApplications,
+    applicationsWithRiskyDependencies,
+    applicationsByStatus,
     lastScan,
 }: IProps) => {
     const { t } = useTranslation();
 
-    const healthyServices = totalServices - servicesWithRiskyDependencies;
+    const healthyApplications = totalApplications - applicationsWithRiskyDependencies;
 
     const rings: IRing[] = [
         ...SUPPORT_STATUS_ORDER.map((status) => {
-            const count = servicesByStatus[status] ?? 0;
+            const count = applicationsByStatus[status] ?? 0;
 
             return {
                 key: status,
@@ -66,15 +66,15 @@ export const ServicesHealthCard = ({
                 label: t(`Dashboard.Dependencies.rowLabels.${status}`),
                 hint: t(`Dashboard.Dependencies.definitions.${status}`),
                 count,
-                percentage: percentageOf(count, totalServices),
+                percentage: percentageOf(count, totalApplications),
             };
         }),
         {
             key: "NONE",
             color: DEPENDENCY_HEALTH_NONE_COLOR,
             label: t("Dashboard.Dependencies.noneOfThese"),
-            count: healthyServices,
-            percentage: percentageOf(healthyServices, totalServices),
+            count: healthyApplications,
+            percentage: percentageOf(healthyApplications, totalApplications),
         },
     ];
 
@@ -83,13 +83,13 @@ export const ServicesHealthCard = ({
     return (
         <>
             <HealthCard
-                eyebrow={t("Dashboard.Dependencies.servicesEyebrow")}
-                title={t("Dashboard.Dependencies.services")}
+                eyebrow={t("Dashboard.Dependencies.applicationsEyebrow")}
+                title={t("Dashboard.Dependencies.applications")}
                 descriptor={
                     <Trans
                         t={t}
-                        i18nKey="Dashboard.Dependencies.servicesDescriptor"
-                        values={{ risky: servicesWithRiskyDependencies, total: totalServices }}
+                        i18nKey="Dashboard.Dependencies.applicationsDescriptor"
+                        values={{ risky: applicationsWithRiskyDependencies, total: totalApplications }}
                         components={[<b key="0" />, <b key="1" />]}
                     />
                 }
@@ -97,7 +97,7 @@ export const ServicesHealthCard = ({
                     <Trans
                         t={t}
                         i18nKey="Dashboard.Dependencies.reportedBy"
-                        values={{ count: totalServices }}
+                        values={{ count: totalApplications }}
                         components={[<b key="0" />]}
                     />
                 }
@@ -170,7 +170,7 @@ export const ServicesHealthCard = ({
                                                 {t("Dashboard.Dependencies.overlapTitle")}
                                             </div>
                                             <div>
-                                                {t("Dashboard.Dependencies.overlapBody", { total: totalServices })}
+                                                {t("Dashboard.Dependencies.overlapBody", { total: totalApplications })}
                                             </div>
                                         </>
                                     }

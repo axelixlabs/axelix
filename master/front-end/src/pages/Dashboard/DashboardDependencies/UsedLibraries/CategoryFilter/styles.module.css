@@ -1,0 +1,80 @@
+.Trigger.Trigger {
+    height: auto;
+    padding: 5px 11px;
+    gap: 8px;
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-700);
+    background: var(--axelix-white);
+    border-color: var(--axelix-grey-300);
+}
+
+.Trigger.Trigger:hover {
+    color: var(--axelix-grey-700);
+    background: var(--axelix-white);
+    border-color: var(--axelix-grey-400);
+}
+
+.Trigger.Trigger.Filtered {
+    border-color: var(--axelix-green-200);
+}
+
+.TriggerValue {
+    font-weight: var(--axelix-font-weight-regular);
+    color: var(--axelix-grey-500);
+}
+
+.Caret {
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-500);
+}
+
+.Options {
+    display: flex;
+    flex-direction: column;
+    width: 238px;
+}
+
+.Option {
+    padding: 6px 8px;
+    margin: 0;
+    color: var(--axelix-grey-700);
+    border-radius: 6px;
+
+    &:hover {
+        background-color: var(--axelix-grey-50);
+    }
+}
+
+.OptionsFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 8px 4px;
+    margin-top: 4px;
+    color: var(--axelix-grey-500);
+    border-top: 1px solid var(--axelix-grey-100);
+}
+
+.Clear {
+    padding: 0;
+    font: inherit;
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-green-600);
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.Selected.Selected {
+    margin: 0;
+    padding: 2px 6px 2px 9px;
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-700);
+    background-color: var(--axelix-grey-100);
+    border: none;
+    border-radius: 5px;
+}

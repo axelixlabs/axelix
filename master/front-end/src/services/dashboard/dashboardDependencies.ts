@@ -16,7 +16,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { apiFetch } from "@/api";
+import type { IDependencyLibrariesRequestParams } from "@/models";
 
 export const getDashboardDependencies = () => {
     return apiFetch.get("/dashboard/dependencies");
+};
+
+export const getDashboardDependencyLibraries = (params: IDependencyLibrariesRequestParams) => {
+    return apiFetch.get("/dashboard/dependencies/libraries", { params });
 };

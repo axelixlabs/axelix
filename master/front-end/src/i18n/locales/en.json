@@ -316,27 +316,27 @@
         },
         "Dependencies": {
             "title": "Dependency Health",
-            "subtitle": "Curated open-source projects that have left active development, and their footprint across the estate",
-            "services": "Services",
-            "projects": "Projects",
+            "subtitle": "Every library your applications use, how their versions spread, and the ones that have left active development",
+            "applications": "Applications",
+            "libraries": "Libraries",
             "badges": {
                 "SUNSET": "Discontinued",
                 "MAINTENANCE": "Maintenance",
                 "DORMANT": "Dormant"
             },
             "usesStatus": {
-                "SUNSET": "use a discontinued project",
-                "MAINTENANCE": "use a maintenance-mode project",
-                "DORMANT": "use a dormant project"
+                "SUNSET": "use a discontinued library",
+                "MAINTENANCE": "use a maintenance-mode library",
+                "DORMANT": "use a dormant library"
             },
-            "servicesEyebrow": "Dependency health · Ecosystem view",
-            "servicesDescriptor": "<0>{{risky}}</0> of <1>{{total}}</1> services use a risky dependency",
+            "applicationsEyebrow": "Dependency health · Ecosystem view",
+            "applicationsDescriptor": "<0>{{risky}}</0> of <1>{{total}}</1> applications use a risky dependency",
             "uses": "Uses",
             "share": "Share",
             "rowLabels": {
-                "SUNSET": "Discontinued projects",
-                "MAINTENANCE": "Maintenance-mode projects",
-                "DORMANT": "Dormant projects"
+                "SUNSET": "Discontinued libraries",
+                "MAINTENANCE": "Maintenance-mode libraries",
+                "DORMANT": "Dormant libraries"
             },
             "noneOfThese": "None of these",
             "definitions": {
@@ -344,38 +344,49 @@
                 "MAINTENANCE": "The project has declared that it only ships critical bug and security fixes. No new features; a successor is usually recommended.",
                 "DORMANT": "No releases for an extended period, and the project has declared no maintenance or end-of-life status. It may still work, but no one is known to be fixing it."
             },
-            "overlapNote": "Adds up to {{sum}}%. A service can appear in several rows.",
+            "overlapNote": "Adds up to {{sum}}%. An application can appear in several rows.",
             "overlapTitle": "Groups overlap",
-            "overlapBody": "A service is counted once in every row whose status it has. One using a discontinued and a dormant project appears in both, so the percentages add up to more than 100%. Each ring is measured against all {{total}} services.",
-            "reportedBy": "Reported by <0>{{count}}</0> services",
+            "overlapBody": "An application is counted once in every row whose status it has. One using a discontinued and a dormant library appears in both, so the percentages add up to more than 100%. Each ring is measured against all {{total}} applications.",
+            "reportedBy": "Reported by <0>{{count}}</0> applications",
             "lastScan": "Last scan {{date}}",
             "categoriesEyebrow": "Dependency health · By category",
-            "categoriesDescriptor": "<0>{{risky}}</0> of <1>{{total}}</1> tracked projects represent an operational risk",
-            "allCategories": "All {{count}} categories",
+            "categoriesDescriptor": "<0>{{risky}}</0> of <1>{{total}}</1> libraries in use represent an operational risk",
+            "topCategories": "Top categories",
+            "noRiskyCategories": "No category has a risky library",
+            "moreCategories_one": "+{{count}} more category · see table",
+            "moreCategories_other": "+{{count}} more categories · see table",
             "categoriesFooter": "Status as declared upstream or observed by Axelix",
-            "trackedCaption": "Tracked projects",
-            "trackedLegend": "Status applies to the project, not a version · Share = services that resolve the project",
+            "librariesCaption": "Libraries in use",
+            "librariesLegend": "Status applies to the project behind the library, not a version · Share = applications that resolve the library",
             "categoryPlaceholder": "All categories",
+            "categoriesSelected": "{{count}} of {{total}} selected",
+            "selected": "{{count}} selected",
+            "all": "All",
+            "clear": "Clear",
             "statusFilter": "Status",
             "columns": {
-                "project": "Project",
+                "library": "Library",
                 "status": "Status",
                 "succession": "Succession",
                 "category": "Category",
-                "services": "Services"
+                "applications": "Applications"
             },
             "successor": "Successor",
             "none": "None",
             "detail": {
                 "projectStatus": "Project status",
-                "libraries": "Libraries",
                 "supersededBy": "Superseded by",
                 "replacement": "Replacement",
                 "noSuccessor": "No successor published",
-                "reference": "Reference"
+                "reference": "Reference",
+                "statusTab": "Status",
+                "versionsTab": "Versions",
+                "olderVersions_one": "+ {{count}} older version · {{applications}} applications",
+                "olderVersions_other": "+ {{count}} older versions · {{applications}} applications",
+                "showFewer": "Show fewer"
             },
-            "footer": "{{from}}–{{to}} of {{total}} projects",
-            "noMatch": "No projects match"
+            "footer": "{{from}}–{{to}} of {{total}} libraries",
+            "noMatch": "No libraries match"
         },
         "Persistence": {
             "title": "Persistence Dashboard",
