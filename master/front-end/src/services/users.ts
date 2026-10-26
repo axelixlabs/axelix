@@ -33,7 +33,7 @@ export const createUser = (data: ICreateUserRequestData) => {
 export const deleteUser = (userId: string) => {
     return apiFetch.delete("users-management/delete", {
         data: {
-            id: userId,
+            ids: [userId],
         },
     });
 };
