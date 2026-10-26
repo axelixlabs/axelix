@@ -6,9 +6,6 @@ spring:
       - "optional:configserver:"
       - "optional:vault://"
   cloud:
-    compatibility-verifier:
-      # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
-      compatible-boot-versions: 4.1.x
     config:
       # Mirror the production application.yaml: bind the Spring Cloud Config client to the axelix.master.*
       # surface so integration tests can drive it through the same properties users configure. It stays

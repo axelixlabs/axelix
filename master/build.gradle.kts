@@ -11,7 +11,7 @@ plugins {
 }
 
 val springBootVersion = "4.1.1"
-val springCloudVersion = "2025.1.1"
+val springCloudVersion = "2025.1.2"
 val springAiVersion = "2.0.0"
 
 // Not Managed by Spring BOM
