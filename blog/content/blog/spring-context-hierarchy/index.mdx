@@ -1,0 +1,473 @@
+---
+title: "Spring ApplicationContext Hierarchy and a High CVE in Axelix"
+date: 2026-10-26
+authors: ["Mikhail Polivakha"]
+tags: ["Spring Boot", "Security"]
+heroImagePath: /posts/spring-context-hierarchy/preview.png
+description: "A JWT bypass in Axelix appeared only when Actuator ran on a separate management port. We look at why, the Spring ApplicationContext hierarchy, who sees whom in it, and why seeing a bean is not the same as owning it."
+metaDescription: "Why a separate Spring Boot management port creates a child ApplicationContext with its own web server and filter chain, and how that caused a JWT bypass in Axelix (GHSA-gq4j-56mw-8f43), fixed in 1.2.1."
+---
+
+## Introduction
+
+Hi everyone!
+
+My name is Mikhail Polivakha, and I am the Tech Lead of the [Axelix](https://github.com/axelixlabs/axelix) project. If you
+haven't heard of us before, Axelix is a platform for managing and diagnosing Spring Boot applications. The core of the
+project is open source, so the source code, the change history and, as it turned out, our mistakes are open to everyone 😁.
+
+Recently, an external security researcher, [Andrei Kotov (`greatkaa`)](https://github.com/greatkaa), found a vulnerability
+in Axelix. In short: under a certain Spring Boot configuration, our Actuator endpoints could be called without a JWT. We
+have already fixed it in version `1.2.1` and described it in a
+[Security Advisory](https://github.com/axelixlabs/axelix/security/advisories/GHSA-gq4j-56mw-8f43). Andrei, I'll use this
+opportunity to say a big thank you.
+
+Let me say right away that this article is not about how the vulnerability could have been exploited. Honestly, that's
+not all that interesting. What's far more interesting is **why** it appeared at all. We didn't forget to add the filter,
+we didn't get the token signature check wrong, and we didn't mix up a condition in an `if`. The filter was there, and it
+worked perfectly. Just not where we thought it was.
+
+The cause lies in a Spring Framework mechanism that has existed for about twenty years, yet many modern Spring Boot
+developers never think about it at all. I'm talking about the **`ApplicationContext` hierarchy**.
+
+So here's the plan: first, we'll figure out what a context hierarchy is and who sees whom in it. Then we'll look at
+where Spring Boot itself creates one. And only after that will we return to Axelix and see how it all added up to one
+unpleasant story.
+
+Let's dig in.
+
+## Where it all started
+
+Let's start with the symptom, because in my opinion it is very telling. The configuration was completely ordinary:
+
+```yaml
+server:
+  port: 8080
+
+management:
+  server:
+    port: 8081
+```
+
+So the business API lives on `8080`, and Actuator is moved to a separate port, `8081`. A lot of people do this, and it's
+good practice: the management port is easy to close off from the outside world at the network level.
+
+Axelix exposes its endpoints through Actuator (they are called `axelix-*`), and all of them are protected by a JWT filter.
+When Actuator lives on the main port, a request without a token gets the expected `401 Unauthorized`. But on `8081`, the
+very same request suddenly went through.
+
+Friends, note an important detail: the application **started up normally**. No `NoSuchBeanDefinitionException`, no
+warnings in the logs, all endpoints in place, dependencies injected. Everything looks great. These are exactly the most
+unpleasant kind of bugs. **Everything seems to work fine**.
+
+Why does simply changing a port number change the behavior so much? To answer that, we need to take a step back.
+
+## One big context. Or not?
+
+`ApplicationContext` is Spring's central container. It holds bean definitions, creates beans, resolves dependencies, runs
+them through post-processors, publishes events, and manages the lifecycle.
+
+If you write Spring Boot code, you most likely have roughly this model in your head:
+
+> My application has one big Spring context, and all beans live inside it.
+
+And that's fine, because in the vast majority of cases that is exactly how it is. `SpringApplication.run(...)` creates a
+`ServletWebServerApplicationContext`, which starts embedded Tomcat itself, finds servlets and filters itself, and registers
+them itself
+([`ServletWebServerApplicationContext` Javadoc](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/web/server/servlet/context/ServletWebServerApplicationContext.html)).
+One context is more than enough.
+
+But here's the thing: a context in Spring doesn't have to be the only one. `ApplicationContext` has a `getParent()`
+method, and the link is set via `ConfigurableApplicationContext#setParent`. In other words, contexts can form a tree.
+
+## A bit of history. Root and DispatcherServlet
+
+Those who worked with Spring MVC before Spring Boot have almost certainly run into context hierarchies, even if they
+never thought about it specifically. The classic setup looked like this:
+
+```text
+root WebApplicationContext
+  services
+  repositories
+  shared infrastructure
+          |
+          v
+DispatcherServlet WebApplicationContext
+  controllers
+  handler mappings
+  web-specific beans
+```
+
+The root context was created by `ContextLoaderListener` from `web.xml`, and each `DispatcherServlet` started **its own (!)**
+child `WebApplicationContext`. Services and repositories lived at the top and were shared, while the controllers and all
+the MVC infrastructure of a particular servlet lived at the bottom. Moreover, a single root could have several independent
+children
+([Spring MVC documentation](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet/context-hierarchy.html)).
+
+Then Spring Boot came along, everything collapsed into a single context, and most people happily forgot about the
+hierarchy. But the mechanism didn't go anywhere. A second context can still appear today:
+
+- from an explicit call to `parent(...)`, `child(...)` or `sibling(...)` on
+  [`SpringApplicationBuilder`](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/builder/SpringApplicationBuilder.html);
+- from a test with
+  [`@ContextHierarchy`](https://docs.spring.io/spring-framework/reference/testing/testcontext-framework/ctx-management/hierarchies.html);
+- from Spring Cloud, which starts its own child contexts, for example for each Feign client (surprise, dear friends!);
+- and, most importantly for us, from Spring Boot Actuator when a separate management port is used.
+
+We'll come back to that last item. For now, let's understand the main thing: **how contexts in a hierarchy see each
+other**.
+
+## Who sees whom
+
+The rules here are fairly simple, but asymmetric:
+
+- a child sees the parent's beans;
+- a parent **does not see (!)** the child's beans;
+- sibling contexts, that is, children of the same parent, know nothing about each other;
+- if a child declares a bean with the same name as the parent's, the local (child's) definition overrides the parent's.
+
+This is stated explicitly in the
+[`ApplicationContext` Javadoc](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/ApplicationContext.html).
+Let's look at it in code, it's clearer that way:
+
+```java
+@Configuration
+class ParentConfig {
+
+    @Bean
+    SharedService sharedService() {
+        return new SharedService();
+    }
+}
+
+@Configuration
+class ChildConfig {
+
+    @Bean
+    ChildOnlyService childOnlyService(SharedService sharedService) {
+        return new ChildOnlyService(sharedService);
+    }
+}
+```
+
+```java
+var parent = new AnnotationConfigApplicationContext(ParentConfig.class);
+
+var child = new AnnotationConfigApplicationContext();
+child.setParent(parent);
+child.register(ChildConfig.class);
+child.refresh();
+
+child.getBean(SharedService.class);          // OK, found in parent
+child.containsBean("sharedService");         // true
+child.containsLocalBean("sharedService");    // false, not present locally
+
+parent.getBean(ChildOnlyService.class);      // NoSuchBeanDefinitionException
+```
+
+Note the difference between `containsBean` and `containsLocalBean`. The first takes the parent into account, the second
+looks only at the current level. This distinction will come in very handy later.
+
+So, roughly speaking, a child knows where to go upstairs if it can't find something at home. But a parent may not even
+suspect that a particular child exists. The word "parent" creates a pleasant feeling that the elder knows about all the
+younger ones. In Spring, it's exactly the other way around.
+
+## Seeing a bean is not owning it
+
+And now the most important idea of this article. Let me highlight it:
+
+**The fact that a child can get a bean from its parent does not mean that the child "uses" that bean as part of its own
+infrastructure.**
+
+Every context in a hierarchy remains a full-fledged, separate container. It has its own bean definitions, its own
+post-processors, its own lifecycle, its own event multicaster. The hierarchy gives you just one thing: **dependency lookup
+upwards**. Everything else each context does on its own, and only with its own beans.
+
+Here are a few examples of how this shows up:
+
+- a `BeanPostProcessor` declared in the parent does **not** process beans created in the child;
+- `getBeansOfType()` lists only local beans. To walk the ancestors, you need
+  `BeanFactoryUtils.beansOfTypeIncludingAncestors(...)`;
+- events published in the child propagate up to the parent. But the parent's events do not flow down to the children on
+  their own;
+- the parent has no universal API to iterate over all of its children.
+
+There's one more amusing nuance about events. If an `@EventListener` is declared in the parent, it will also receive the
+child's `ContextRefreshedEvent`. So if you do something "on application startup" on this event, then with a child context
+present your code may run twice. That's why it's useful to check which context the event actually came from.
+
+And finally, the example we're discussing all this for. An embedded web server (Tomcat, for instance) is started by a
+specific `ServletWebServerApplicationContext`, and at startup that context registers in the server the `Servlet`s,
+`Filter`s and `ServletContextInitializer`s that are defined **in that context itself**. If your `FilterRegistrationBean`
+lives in the parent, but the server is started by the child, then the filter won't make it into that server. The child
+"sees" it, of course, but that has no effect on which filter chain it builds for its server.
+
+Remember this idea, we'll come back to it shortly.
+
+## A separate Actuator port is a separate context
+
+So, what happens when you set `management.server.port`?
+
+Spring Boot distinguishes between two situations. If `management.server.port` is not set or matches `server.port`,
+Actuator simply lives in the main context. But if the ports differ, Boot creates a **separate child management context**,
+for which the main context is the parent
+([`ManagementContextAutoConfiguration`](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/actuate/autoconfigure/web/server/ManagementContextAutoConfiguration.html)).
+
+Schematically, it looks like this:
+
+```text
+application                          parent
+  server.port=8080                     |
+  web server :8080                     |
+  controllers, services                |
+                                       v
+application:management               child
+  management.server.port=8081
+  web server :8081
+  Actuator handler mappings
+  its own servlet filter chain
+```
+
+So `management.server.port` changes far, *far* more than just the socket number! A second `ApplicationContext` appears,
+a second embedded server, its own handler mappings and its own chain of servlet filters. The Spring Boot documentation,
+by the way, honestly warns about this: a management context on a different port does not use the same web
+infrastructure as the main application
+([Spring Boot Actuator 2.7 reference](https://docs.spring.io/spring-boot/docs/2.7.x/reference/html/actuator.html)).
+But we don't read it, we vibe-code, as everyone knows.
+
+So, in essence, from the web layer's point of view, **you now have two different applications**.
+
+### How a library gets into the management context
+
+A logical question: what if a library (for example, a starter like ours) needs to put something specifically into the
+management context? Spring Boot has a dedicated annotation for that,
+[`@ManagementContextConfiguration`](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/actuate/autoconfigure/web/ManagementContextConfiguration.html).
+It has a `ManagementContextType` parameter:
+
+- `SAME` means the configuration applies when Actuator lives in the main context;
+- `CHILD` means the configuration applies in a separate child management context;
+- `ANY` means the configuration should be applied in both cases.
+
+The annotation alone isn't enough, though. The class also has to be registered in a special file:
+
+```text
+META-INF/spring/org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration.imports
+```
+
+This is very similar to how regular auto-configurations are registered via `AutoConfiguration.imports`, except that Boot
+reads this file when it creates the management context. (Spring Boot 2.7 still also supported `spring.factories` for old
+times' sake, so if you're copying an example from older documentation, check the version.
+[Selector in Boot 2.7](https://github.com/spring-projects/spring-boot/blob/v2.7.18/spring-boot-project/spring-boot-actuator-autoconfigure/src/main/java/org/springframework/boot/actuate/autoconfigure/web/server/ManagementContextConfigurationImportSelector.java),
+[selector in Boot 3.5](https://github.com/spring-projects/spring-boot/blob/3.5.x/spring-boot-project/spring-boot-actuator-autoconfigure/src/main/java/org/springframework/boot/actuate/autoconfigure/web/server/ManagementContextConfigurationImportSelector.java).)
+
+## What happened in Axelix
+
+And now, I think, you can already guess what happened.
+
+A little context on how Axelix works. Our starter is added to the application (`axelix-spring-boot-2-starter`,
+`-3-starter` or `-4-starter`, depending on the Boot version). The starter exposes a set of Actuator endpoints through which
+Axelix collects information about the application: beans, configuration, loggers, caches, and so on. All of these
+endpoints are protected by JWT, and token validation is handled by our `JwtAuthorizationFilter`.
+
+Before version `1.2.1`, this filter was registered in a regular auto-configuration, that is, via a
+`FilterRegistrationBean` in the **main** context
+([Axelix 1.2.0 code](https://github.com/axelixlabs/axelix/blob/v1.2.0/sbs/axelix-spring-boot-3-starter/src/main/java/com/axelixlabs/axelix/sbs/spring/autoconfiguration/JwtAuthAutoConfiguration.java#L109-L118)).
+
+When Actuator lives on the main port, everything is fine:
+
+```text
+single context
+  web server :8080
+  Actuator mappings
+  JwtAuthorizationFilter
+```
+
+The request goes through the filter, there's no token, we get `401`.
+
+But with different ports, the picture looks like this:
+
+```text
+main context
+  web server :8080
+  JwtAuthorizationFilter       <- the filter is here
+          |
+          v
+management child
+  web server :8081
+  Actuator mappings            <- but the endpoints are here
+  no JwtAuthorizationFilter
+```
+
+The management child sees all the beans it needs from the parent perfectly well, so the application starts without a
+single error. The endpoints work. But the server on `8081` builds **its own** filter chain, and our filter isn't in it.
+Exactly what we talked about in the "Seeing a bean is not owning it" section.
+
+The root cause in one sentence: **we registered the JWT filter in the parent context, while Actuator on the separate port
+was served by a different server from the child context.**
+
+The funniest part is that the JWT check itself worked flawlessly. The request simply never reached it.
+
+There was one more symptom that illustrates what was going on nicely. Some endpoints on `8081` responded not with `200`,
+but with `500` and the message `Security Context is expected to be present at this point`. These endpoints expected the
+security context to already be populated, and it was precisely the missing filter that populated it. And even with a
+valid token it was the same: there was simply nobody to process the token.
+
+Honestly, looking back, the bug seems obvious. But at the time the code was written, we, like many others, had that very
+"one big context" model in our heads. And our tests only hit the main port, so they caught nothing. It's a good thing
+there are people like Andrei who look at code from a different angle.
+
+## How we fixed it
+
+The solution suggests itself: the filter has to be registered where the server with Actuator is started. In `1.2.1`, all
+three starters got a separate `JwtAuthManagementContextConfiguration`
+([the fix](https://github.com/axelixlabs/axelix/commit/7989e9b094050906a8225eb3d17b21c95676a8dc)):
+
+```java
+@ManagementContextConfiguration(
+        value = ManagementContextType.CHILD,
+        proxyBeanMethods = false
+)
+@ConditionalOnBean(WebIdentityAccessManager.class)
+public class JwtAuthManagementContextConfiguration {
+
+    @Bean
+    public FilterRegistrationBean<JwtAuthorizationFilter>
+            jwtAuthorizationFilterRegistration(
+                    WebIdentityAccessManager webIdentityAccessManager,
+                    SecurityContextExecutor securityContextExecutor,
+                    WebEndpointProperties webEndpointProperties) {
+
+        var filter = new JwtAuthorizationFilter(
+                webIdentityAccessManager,
+                securityContextExecutor,
+                webEndpointProperties.getBasePath()
+        );
+        var registration = new FilterRegistrationBean<>(filter);
+        registration.setName("jwtAuthorizationFilter");
+        return registration;
+    }
+}
+```
+
+And, of course, the class is listed in each starter's `ManagementContextConfiguration.imports`.
+
+Look how everything we discussed above works here. `WebIdentityAccessManager` and `SecurityContextExecutor` still live in
+the parent, and the child gets them without any trouble via lookup. But the `FilterRegistrationBean` is now created
+**locally** in the management context, so it's the management server that includes the filter in its chain. The
+hierarchy is used exactly as intended: shared services at the top, the web infrastructure of a specific server at the
+bottom.
+
+If we phrase what we restored as a rule, it goes like this: **the server that exposes the Axelix endpoints must itself have
+the JWT filter in its filter chain.**
+
+And, of course, a test. Importantly, it checks the topology specifically, not the presence of a bean "somewhere in the
+container":
+
+```java
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "management.server.port=0"
+)
+class JwtAuthorizationFilterSeparateManagementPortTest {
+
+    @LocalManagementPort
+    private int managementPort;
+
+    @Test
+    void shouldReturnUnauthorized_TokenIsMissing() {
+        var response = restTemplate.getForEntity(
+                "http://localhost:" + managementPort
+                        + "/actuator/axelix-env",
+                String.class
+        );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+}
+```
+
+`management.server.port=0` makes Boot start the management context on a random port, and `@LocalManagementPort` gives us
+that port. The second test in the same class sends a valid token and expects `200 OK`. The same tests exist for Boot 2, 3
+and 4
+([test in 1.2.1](https://github.com/axelixlabs/axelix/blob/v1.2.1/sbs/axelix-spring-boot-3-starter/src/test/java/com/axelixlabs/axelix/sbs/spring/core/auth/JwtAuthorizationFilterSeparateManagementPortTest.java)).
+
+### A small off-topic note about the follow-up
+
+After the release, Andrei pointed out one more thing to us. The first patch left the filter registered both in the main
+context and in the child. Security didn't suffer from this, but with separate ports the filter on the main server was
+essentially redundant: Actuator isn't there anymore.
+
+In [PR #1818](https://github.com/axelixlabs/axelix/pull/1818), we removed the registration from the regular
+auto-configuration and changed `ManagementContextType.CHILD` to `ANY`. Now a single management configuration is
+responsible for the filter in both cases: when the port is shared and when it's separate. At the time of writing, this
+change is already in main but hasn't made it into a release yet. It's an architectural cleanup, not an additional
+security fix, so `1.2.1` closes the issue completely.
+
+## How to look at the hierarchy in your own application
+
+If you've always assumed until now that you have just one context, the first useful step is very simple: stop guessing
+and take a look.
+
+```java
+@Component
+final class ContextTopologyLogger {
+
+    @EventListener
+    void onRefreshed(ContextRefreshedEvent event) {
+        ApplicationContext context = event.getApplicationContext();
+        ApplicationContext parent = context.getParent();
+
+        System.out.printf(
+                "context=%s class=%s parent=%s beans=%d%n",
+                context.getId(),
+                context.getClass().getName(),
+                parent == null ? "<root>" : parent.getId(),
+                context.getBeanDefinitionCount()
+        );
+    }
+}
+```
+
+Remember that events propagate from the child up to the parent? That's exactly why this listener, declared in the main
+context, will also see the management child's refresh. And that's exactly why it's important to take the context from the
+event itself here, rather than from an injected `ApplicationContext`. Run the application with `management.server.port`,
+and you'll see two lines in the logs instead of one.
+
+A few more useful tools:
+
+- `context.getParent()` returns the immediate parent;
+- `containsLocalBean(name)` tells you whether the bean is defined at the current level;
+- `containsBean(name)` also takes parents into account;
+- `BeanFactoryUtils.beanNamesForTypeIncludingAncestors(...)` explicitly searches through all ancestors.
+
+The standard Actuator endpoint `/actuator/beans` also returns a `contexts` object, where a context can have a `parentId`
+([Actuator beans API](https://docs.spring.io/spring-boot/api/rest/actuator/beans.html)). But there's a nuance: the
+endpoint describes the context it lives in and its ancestors. It isn't required to look for its descendants. So the
+result depends on which port you hit.
+
+And a piece of advice for those who write their own starters or simply hook something onto Actuator: if your code has to
+work with a separate management port, then test it specifically on a separate management port. A test that only hits
+`@LocalServerPort` doesn't check the management server at all. We learned this from our own experience.
+
+## Summary
+
+Let's gather the key points:
+
+- An `ApplicationContext` in Spring doesn't have to be the only one. Contexts form a tree, and Spring Boot itself creates
+  such a tree more often than it seems.
+- Visibility in the hierarchy works bottom-up: the child sees the parent, the parent doesn't see the child.
+- Seeing a bean doesn't make it part of another context's infrastructure. Post-processors, events, the filter chain and
+  the web server are each context's own.
+- A `management.server.port` different from `server.port` means a separate child context and a separate web server. Treat
+  it as a second web application.
+- If a library needs to put something into the management context, there's `@ManagementContextConfiguration` for that.
+
+For us, this story was a good reminder that even a very familiar framework can surprise you if you rely on a simplified
+mental model. And a simplified model works for years, right up until it stops working.
+
+Once again, thanks to Andrei for the find and for the careful review of the patch. And if you're curious about how Axelix
+works on the inside, [welcome to GitHub](https://github.com/axelixlabs/axelix), we're open. And to make sure you don't miss
+upcoming releases and write-ups, follow us on [X](https://x.com/axelixlabs) and [LinkedIn](https://www.linkedin.com/company/axelix-labs).
+
+Good luck, everyone!
