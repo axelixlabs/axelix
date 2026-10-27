@@ -19,7 +19,7 @@ import { Trans, useTranslation } from "react-i18next";
 
 import { percentageOf } from "@/helpers";
 import type { IApplicationsRing, TSupportStatusCounts } from "@/models";
-import { DEPENDENCY_HEALTH_NONE_COLOR, SUPPORT_STATUS_ORDER, dependencyHealthColor } from "@/utils";
+import { DEPENDENCY_HEALTH_NONE_COLOR, LIMITED_SUPPORT_STATUS_ORDER, dependencyHealthColor } from "@/utils";
 
 import { HealthCard } from "../HealthCard";
 
@@ -45,7 +45,7 @@ export const ApplicationsHealthCard = ({
     const healthyApplications = totalApplications - applicationsWithRiskyDependencies;
 
     const rings: IApplicationsRing[] = [
-        ...SUPPORT_STATUS_ORDER.map((status) => {
+        ...LIMITED_SUPPORT_STATUS_ORDER.map((status) => {
             const count = applicationsByStatus[status] ?? 0;
 
             return {

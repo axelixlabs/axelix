@@ -17,7 +17,7 @@
  */
 import { EDependencyEcosystem, EFrameworkSupportStatus, ESupportStatus, type TProblemSupportStatus } from "@/models";
 
-export const SUPPORT_STATUS_ORDER: TProblemSupportStatus[] = [
+export const LIMITED_SUPPORT_STATUS_ORDER: TProblemSupportStatus[] = [
     ESupportStatus.SUNSET,
     ESupportStatus.MAINTENANCE,
     ESupportStatus.DORMANT,

@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import type { IRankedEcosystem } from "@/models";
-import { SUPPORT_STATUS_ORDER, dependencyEcosystemLabelKey, dependencyHealthColor } from "@/utils";
+import { LIMITED_SUPPORT_STATUS_ORDER, dependencyEcosystemLabelKey, dependencyHealthColor } from "@/utils";
 
 import styles from "./styles.module.css";
 
@@ -44,7 +44,7 @@ export const CategoryBar = ({ category, max, active, onToggle }: IProps) => {
                 <span className={`TextSmall ${styles.Label}`}>{t(dependencyEcosystemLabelKey[ecosystem])}</span>
                 <span className={styles.Track}>
                     <span className={styles.Bar} style={{ width: `${(total * 100) / max}%` }}>
-                        {SUPPORT_STATUS_ORDER.map((status) => (
+                        {LIMITED_SUPPORT_STATUS_ORDER.map((status) => (
                             <span
                                 key={status}
                                 style={{ flex: byStatus[status] ?? 0, backgroundColor: dependencyHealthColor[status] }}

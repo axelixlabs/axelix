@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import type { TSupportStatusCounts } from "@/models";
-import { SUPPORT_STATUS_ORDER } from "@/utils";
+import { LIMITED_SUPPORT_STATUS_ORDER } from "@/utils";
 
 import { HealthStatusBadge } from "../HealthStatusBadge";
 
@@ -42,7 +42,7 @@ export const HealthSummary = ({ totalApplications, applicationsByStatus }: IProp
                     </span>
                 </div>
                 <div className={styles.Breakdown}>
-                    {SUPPORT_STATUS_ORDER.map((status) => (
+                    {LIMITED_SUPPORT_STATUS_ORDER.map((status) => (
                         <span key={status} className={styles.BreakdownRow}>
                             <span className={styles.Count}>{applicationsByStatus[status] ?? 0}</span>
                             <HealthStatusBadge status={status} label={t(`Dashboard.Dependencies.badges.${status}`)} />

@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type { IRankedEcosystem, TEcosystemSupportStatusCounts, TSupportStatusCounts } from "@/models";
-import { DEPENDENCY_ECOSYSTEM_ORDER, SUPPORT_STATUS_ORDER } from "@/utils";
+import { DEPENDENCY_ECOSYSTEM_ORDER, LIMITED_SUPPORT_STATUS_ORDER } from "@/utils";
 
 /**
  * @returns the {@code item} removed from the {@code items} when it is there, otherwise the {@code items} with it added
@@ -33,7 +33,7 @@ export const percentageOf = (count: number, total: number): number => {
  * @returns the sum of the counts of the risky support statuses
  */
 export const sumOfRisky = (byStatus: TSupportStatusCounts): number => {
-    return SUPPORT_STATUS_ORDER.reduce((sum, status) => sum + (byStatus[status] ?? 0), 0);
+    return LIMITED_SUPPORT_STATUS_ORDER.reduce((sum, status) => sum + (byStatus[status] ?? 0), 0);
 };
 
 /**

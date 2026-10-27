@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import type { ESupportStatus, TSupportStatusCounts } from "@/models";
-import { SUPPORT_STATUS_ORDER, dependencyHealthColor, supportSignalLabelKey } from "@/utils";
+import { LIMITED_SUPPORT_STATUS_ORDER, dependencyHealthColor, supportSignalLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
 
@@ -35,7 +35,7 @@ export const StatusFilter = ({ librariesByStatus, activeStatuses, onToggle }: IP
         <>
             <div className={`TextUltraSmall ${styles.MainWrapper}`}>
                 <span className={styles.Label}>{t("Dashboard.Dependencies.statusFilter")}</span>
-                {SUPPORT_STATUS_ORDER.map((status) => (
+                {LIMITED_SUPPORT_STATUS_ORDER.map((status) => (
                     <button
                         key={status}
                         type="button"
