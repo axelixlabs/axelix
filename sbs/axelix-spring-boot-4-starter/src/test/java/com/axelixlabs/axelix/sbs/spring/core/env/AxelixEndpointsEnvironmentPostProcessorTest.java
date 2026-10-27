@@ -25,16 +25,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.endpoint.EndpointId;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.StandardEnvironment;
 
 import static com.axelixlabs.axelix.sbs.spring.core.env.AxelixEndpointsEnvironmentPostProcessor.INCLUDED_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link AxelixEndpointsEnvironmentPostProcessor}
  *
  * @author Marsel Semenov
+ * @author Andrey Kotov
  */
 class AxelixEndpointsEnvironmentPostProcessorTest {
 
@@ -61,6 +65,22 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
     @BeforeEach
     void setUp() {
         subject = new AxelixEndpointsEnvironmentPostProcessor();
+    }
+
+    @Test // GH-1803
+    void shouldExposeDiscoveredEndpoints() {
+        // given.
+        StandardEnvironment environment = new StandardEnvironment();
+        AxelixEndpointDiscovery endpointDiscovery = mock(AxelixEndpointDiscovery.class);
+        when(endpointDiscovery.discoverEndpointIds(environment)).thenReturn(List.of(EndpointId.of("axelix-custom")));
+        AxelixEndpointsEnvironmentPostProcessor processor =
+                new AxelixEndpointsEnvironmentPostProcessor(endpointDiscovery);
+
+        // when.
+        processor.postProcessEnvironment(environment, new SpringApplication());
+
+        // then.
+        assertThat(environment.getProperty(INCLUDED_PROPERTY).split(",")).containsExactly("health", "axelix-custom");
     }
 
     @Test

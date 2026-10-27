@@ -12,6 +12,7 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfigur
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPropertiesSupportAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPathMappingValidationAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsPublisherAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixInfoPropertiesAutoConfiguration

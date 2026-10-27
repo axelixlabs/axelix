@@ -19,32 +19,38 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.EndpointId;
 import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.env.EnvironmentPostProcessor;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 /**
  * Exposes default endpoints, that Axelix need
  *
  * @author Marsel Semenov
+ * @author Andrey Kotov
  */
 public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
     public static final String INCLUDED_PROPERTY = "management.endpoints.web.exposure.include";
+
+    private final AxelixEndpointDiscovery endpointDiscovery;
+
+    public AxelixEndpointsEnvironmentPostProcessor() {
+        this(new AxelixEndpointDiscovery());
+    }
+
+    AxelixEndpointsEnvironmentPostProcessor(AxelixEndpointDiscovery endpointDiscovery) {
+        this.endpointDiscovery = endpointDiscovery;
+    }
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -64,30 +70,12 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
         }
         current.stream().map(String::strip).filter(s -> !s.isEmpty()).forEach(merged::add);
 
-        merged.addAll(discoverAxelixEndpointIds(environment));
+        endpointDiscovery.discoverEndpointIds(environment).stream()
+                .map(EndpointId::toString)
+                .forEach(merged::add);
         environment
                 .getPropertySources()
                 .addFirst(new MapPropertySource("axelix", Map.of(INCLUDED_PROPERTY, String.join(",", merged))));
-    }
-
-    /**
-     * Discovers the ids of Axelix actuator endpoints by scanning the starter's classes for
-     * {@link Endpoint @Endpoint} — directly present or as a meta-annotation ({@code @RestControllerEndpoint#id}
-     * aliases {@code @Endpoint#id}), so the endpoint declarations stay the single source of truth.
-     */
-    private static List<String> discoverAxelixEndpointIds(ConfigurableEnvironment environment) {
-        ClassPathScanningCandidateComponentProvider scanner =
-                new ClassPathScanningCandidateComponentProvider(false, environment);
-        scanner.addIncludeFilter(new AnnotationTypeFilter(Endpoint.class));
-        return scanner.findCandidateComponents("com.axelixlabs.axelix.sbs").stream()
-                .map(candidate -> ((AnnotatedBeanDefinition) candidate)
-                        .getMetadata()
-                        .getAnnotations()
-                        .get(Endpoint.class)
-                        .getString("id"))
-                .filter(id -> id.startsWith("axelix-"))
-                .sorted()
-                .collect(Collectors.toList());
     }
 
     @Override
