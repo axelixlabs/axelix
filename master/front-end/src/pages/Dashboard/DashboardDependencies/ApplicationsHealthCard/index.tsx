@@ -18,7 +18,7 @@
 import { Trans, useTranslation } from "react-i18next";
 
 import { percentageOf } from "@/helpers";
-import type { IApplicationsRing, IDependenciesDashboardResponseBody } from "@/models";
+import type { IApplicationsRing, TSupportStatusCounts } from "@/models";
 import { DEPENDENCY_HEALTH_NONE_COLOR, SUPPORT_STATUS_ORDER, dependencyHealthColor } from "@/utils";
 
 import { HealthCard } from "../HealthCard";
@@ -30,7 +30,7 @@ import styles from "./styles.module.css";
 interface IProps {
     totalApplications: number;
     applicationsWithRiskyDependencies: number;
-    applicationsByStatus: IDependenciesDashboardResponseBody["applicationsByStatus"];
+    applicationsByStatus: TSupportStatusCounts;
     lastScan: string;
 }
 

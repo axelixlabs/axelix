@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { Loader, PageSearch } from "@/components";
-import type { EDependencyEcosystem, IDependenciesDashboardResponseBody } from "@/models";
+import type { EDependencyEcosystem, TSupportStatusCounts } from "@/models";
 
 import { CategoryFilter } from "./CategoryFilter";
 import { LibrariesFooter } from "./LibrariesFooter";
@@ -30,7 +30,7 @@ import { useLibrariesPage } from "./useLibrariesPage";
 
 interface IProps {
     totalLibraries: number;
-    librariesByStatus: IDependenciesDashboardResponseBody["librariesByStatus"];
+    librariesByStatus: TSupportStatusCounts;
     activeEcosystems: EDependencyEcosystem[];
     onEcosystemsChange: (ecosystems: EDependencyEcosystem[]) => void;
 }

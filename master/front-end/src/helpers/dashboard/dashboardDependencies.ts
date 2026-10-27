@@ -15,16 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EDependencyEcosystem, ESupportStatus, IDependenciesDashboardResponseBody } from "@/models";
+import type { IRankedEcosystem, TEcosystemSupportStatusCounts, TSupportStatusCounts } from "@/models";
 import { DEPENDENCY_ECOSYSTEM_ORDER, SUPPORT_STATUS_ORDER } from "@/utils";
-
-type TCountsByStatus = Partial<Record<ESupportStatus, number>>;
-
-export interface IRankedEcosystem {
-    ecosystem: EDependencyEcosystem;
-    byStatus: TCountsByStatus;
-    total: number;
-}
 
 /**
  * @returns the {@code item} removed from the {@code items} when it is there, otherwise the {@code items} with it added
@@ -40,7 +32,7 @@ export const percentageOf = (count: number, total: number): number => {
 /**
  * @returns the sum of the counts of the risky support statuses
  */
-export const sumOfRisky = (byStatus: TCountsByStatus): number => {
+export const sumOfRisky = (byStatus: TSupportStatusCounts): number => {
     return SUPPORT_STATUS_ORDER.reduce((sum, status) => sum + (byStatus[status] ?? 0), 0);
 };
 
@@ -48,9 +40,7 @@ export const sumOfRisky = (byStatus: TCountsByStatus): number => {
  * Ranks the categories with the most risky libraries first, the ties keep the usual order of the categories. The
  * categories without risky libraries are left out.
  */
-export const rankEcosystems = (
-    riskyLibrariesByEcosystem: IDependenciesDashboardResponseBody["riskyLibrariesByEcosystem"],
-): IRankedEcosystem[] => {
+export const rankEcosystems = (riskyLibrariesByEcosystem: TEcosystemSupportStatusCounts): IRankedEcosystem[] => {
     return DEPENDENCY_ECOSYSTEM_ORDER.map((ecosystem) => {
         const byStatus = riskyLibrariesByEcosystem[ecosystem] ?? {};
 

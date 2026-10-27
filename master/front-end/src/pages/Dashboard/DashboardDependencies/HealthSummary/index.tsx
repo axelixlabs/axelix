@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { IDependenciesDashboardResponseBody } from "@/models";
+import type { TSupportStatusCounts } from "@/models";
 import { SUPPORT_STATUS_ORDER } from "@/utils";
 
 import { HealthStatusBadge } from "../HealthStatusBadge";
@@ -26,7 +26,7 @@ import styles from "./styles.module.css";
 
 interface IProps {
     totalApplications: number;
-    applicationsByStatus: IDependenciesDashboardResponseBody["applicationsByStatus"];
+    applicationsByStatus: TSupportStatusCounts;
 }
 
 export const HealthSummary = ({ totalApplications, applicationsByStatus }: IProps) => {

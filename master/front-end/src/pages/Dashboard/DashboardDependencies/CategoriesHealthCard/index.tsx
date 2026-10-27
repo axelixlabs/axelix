@@ -18,7 +18,7 @@
 import { Trans, useTranslation } from "react-i18next";
 
 import { rankEcosystems, sumOfRisky } from "@/helpers";
-import type { EDependencyEcosystem, IDependenciesDashboardResponseBody } from "@/models";
+import type { EDependencyEcosystem, TEcosystemSupportStatusCounts, TSupportStatusCounts } from "@/models";
 
 import { HealthCard } from "../HealthCard";
 
@@ -28,8 +28,8 @@ import styles from "./styles.module.css";
 
 interface IProps {
     totalLibraries: number;
-    librariesByStatus: IDependenciesDashboardResponseBody["librariesByStatus"];
-    riskyLibrariesByEcosystem: IDependenciesDashboardResponseBody["riskyLibrariesByEcosystem"];
+    librariesByStatus: TSupportStatusCounts;
+    riskyLibrariesByEcosystem: TEcosystemSupportStatusCounts;
     activeEcosystems: EDependencyEcosystem[];
     onToggle: (ecosystem: EDependencyEcosystem) => void;
     onShowAll: () => void;

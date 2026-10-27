@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { IRankedEcosystem } from "@/helpers";
+import type { IRankedEcosystem } from "@/models";
 import { SUPPORT_STATUS_ORDER, dependencyEcosystemLabelKey, dependencyHealthColor } from "@/utils";
 
 import styles from "./styles.module.css";

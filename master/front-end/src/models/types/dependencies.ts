@@ -15,6 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ESupportStatus } from "@/models";
+import type { EDependencyEcosystem, ESupportStatus } from "@/models";
 
 export type TProblemSupportStatus = Exclude<ESupportStatus, ESupportStatus.ACTIVE>;
+
+/**
+ * The number of applications or libraries per support status, a status without any is absent.
+ */
+export type TSupportStatusCounts = Partial<Record<ESupportStatus, number>>;
+
+/**
+ * The support status counts per category, a category without any is absent.
+ */
+export type TEcosystemSupportStatusCounts = Partial<Record<EDependencyEcosystem, TSupportStatusCounts>>;

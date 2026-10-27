@@ -21,6 +21,8 @@ import type {
     IDependencyLibrary,
     ISoftwareProjectReference,
     ISoftwareProjectSuccession,
+    TEcosystemSupportStatusCounts,
+    TSupportStatusCounts,
 } from "@/models";
 
 /**
@@ -29,10 +31,10 @@ import type {
 export interface IDependenciesDashboardResponseBody {
     totalApplications: number;
     applicationsWithRiskyDependencies: number;
-    applicationsByStatus: Partial<Record<ESupportStatus, number>>;
+    applicationsByStatus: TSupportStatusCounts;
     totalLibraries: number;
-    librariesByStatus: Partial<Record<ESupportStatus, number>>;
-    riskyLibrariesByEcosystem: Partial<Record<EDependencyEcosystem, Partial<Record<ESupportStatus, number>>>>;
+    librariesByStatus: TSupportStatusCounts;
+    riskyLibrariesByEcosystem: TEcosystemSupportStatusCounts;
     lastScannedAt: string;
 }
 
@@ -85,4 +87,13 @@ export interface IApplicationsRing {
     hint?: string;
     count: number;
     percentage: number;
+}
+
+/**
+ * A category with the counts of its risky libraries, as ranked on the categories card.
+ */
+export interface IRankedEcosystem {
+    ecosystem: EDependencyEcosystem;
+    byStatus: TSupportStatusCounts;
+    total: number;
 }

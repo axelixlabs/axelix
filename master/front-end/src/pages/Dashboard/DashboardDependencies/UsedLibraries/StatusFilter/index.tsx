@@ -17,13 +17,13 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { ESupportStatus, IDependenciesDashboardResponseBody } from "@/models";
+import type { ESupportStatus, TSupportStatusCounts } from "@/models";
 import { SUPPORT_STATUS_ORDER, dependencyHealthColor, supportSignalLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    librariesByStatus: IDependenciesDashboardResponseBody["librariesByStatus"];
+    librariesByStatus: TSupportStatusCounts;
     activeStatuses: ESupportStatus[];
     onToggle: (status: ESupportStatus) => void;
 }
