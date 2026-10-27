@@ -223,7 +223,7 @@ public final class ScheduledTaskService implements AutoCloseable {
             return baseCron;
         }
 
-        return new CronTask(task.getRunnable(), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
+        return new CronTask(base.getRunnable(), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
     }
 
     /**
@@ -238,7 +238,7 @@ public final class ScheduledTaskService implements AutoCloseable {
             return base;
         }
 
-        return recreateIntervalTask(task.getTask(), newInterval);
+        return recreateIntervalTask(base, newInterval);
     }
 
     private IntervalTask recreateIntervalTask(Task task, Duration interval) {
