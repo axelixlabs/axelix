@@ -15,8 +15,13 @@
     height: calc(100% + 20px); 
     margin-top: -10px;
     overflow-y: auto;
-    scrollbar-width: thin;
+    /* Scrollable, but without a scrollbar: a visible one would take width away from the fixed-width sider */
+    scrollbar-width: none;
     padding-block: 20px 10px; 
+}
+
+.SiderScrollContainer::-webkit-scrollbar {
+    display: none;
 }
 
 .Content {

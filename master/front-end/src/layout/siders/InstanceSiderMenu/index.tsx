@@ -38,18 +38,14 @@ export const InstanceSiderMenu = () => {
     const features = profile.response?.features ?? null;
 
     const items = getInstanceItems(instanceId!, t, features);
-    // Only one category stays open at a time, so the sider fits the viewport without scrolling. null once collapsed
-    const [openCategory, setOpenCategory] = useState<string | null>(() => findOpenInstanceCategory(items, pathname));
+    // Several categories may stay open at once; the sider scrolls when they no longer fit the viewport
+    const [openCategories, setOpenCategories] = useState<string[]>(() => [findOpenInstanceCategory(items, pathname)]);
 
-    // Follow the current page when it changes from outside the sider, e.g. through a link on the page
+    // Reveal the current page when it changes from outside the sider, e.g. through a link on the page
     useEffect(() => {
-        setOpenCategory(findOpenInstanceCategory(items, pathname));
+        const current = findOpenInstanceCategory(items, pathname);
+        setOpenCategories((open) => (open.includes(current) ? open : [...open, current]));
     }, [pathname]);
-
-    // antd reports every open key: keep only the one just opened, or none if the open one was collapsed
-    const handleOpenChange = (keys: string[]): void => {
-        setOpenCategory(keys.find((key) => key !== openCategory) ?? null);
-    };
 
     return (
         <>
@@ -59,8 +55,8 @@ export const InstanceSiderMenu = () => {
                 mode="inline"
                 items={items}
                 selectedKeys={[pathname]}
-                openKeys={openCategory ? [openCategory] : []}
-                onOpenChange={handleOpenChange}
+                openKeys={openCategories}
+                onOpenChange={setOpenCategories}
             />
         </>
     );
