@@ -1,0 +1,26 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.Track {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: var(--axelix-grey-100);
+}
+
+.Bar {
+    display: block;
+    height: 100%;
+    background-color: var(--axelix-grey-400);
+}
+
+.Value {
+    width: 34px;
+    text-align: right;
+    color: var(--axelix-grey-600);
+    font-variant-numeric: tabular-nums;
+}

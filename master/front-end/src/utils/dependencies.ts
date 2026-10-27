@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { EDependencyEcosystem, EFrameworkSupportStatus, ESupportStatus, type TProblemSupportStatus } from "@/models";
+import { EDependencyEcosystem, EFrameworkSupportStatus, ESupportStatus, type TRiskySupportStatus } from "@/models";
 
-export const SUPPORT_STATUS_ORDER: TProblemSupportStatus[] = [
+export const RISKY_SUPPORT_STATUS_ORDER: TRiskySupportStatus[] = [
     ESupportStatus.SUNSET,
     ESupportStatus.MAINTENANCE,
     ESupportStatus.DORMANT,
@@ -43,7 +43,7 @@ export const supportSignalLabelKey: Record<ESupportStatus, string> = {
     [ESupportStatus.ACTIVE]: "DependenciesAnalyzer.statuses.ACTIVE",
 };
 
-export const supportSignalColor: Record<TProblemSupportStatus, string> = {
+export const supportSignalColor: Record<TRiskySupportStatus, string> = {
     [ESupportStatus.SUNSET]: "#b42318",
     [ESupportStatus.MAINTENANCE]: "#b54708",
     [ESupportStatus.DORMANT]: "#faad14",

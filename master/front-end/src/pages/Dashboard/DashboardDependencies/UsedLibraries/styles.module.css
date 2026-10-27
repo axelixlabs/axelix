@@ -1,0 +1,51 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.CaptionRow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    color: var(--axelix-grey-500);
+}
+
+.Caption {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+}
+
+.Table {
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-light);
+    overflow: hidden;
+    background-color: var(--axelix-white);
+}
+
+.Toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--axelix-grey-200);
+}
+
+.ToolbarRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.Scroll {
+    /* The columns of the header and of the library rows */
+    --tp-columns: 28px minmax(0, 1fr) 150px 96px 110px 70px 150px;
+
+    overflow-x: auto;
+}

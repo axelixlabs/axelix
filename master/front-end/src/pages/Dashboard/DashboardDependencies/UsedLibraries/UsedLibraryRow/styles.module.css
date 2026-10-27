@@ -1,0 +1,45 @@
+.MainWrapper {
+    min-width: 860px;
+    border-bottom: 1px solid var(--axelix-grey-200);
+}
+
+.Open {
+    background-color: var(--axelix-grey-25);
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: var(--tp-columns);
+    gap: 14px;
+    align-items: center;
+    padding: 11px 18px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--axelix-grey-50);
+    }
+}
+
+.Caret,
+.Category {
+    color: var(--axelix-grey-500);
+}
+
+.Library {
+    font-family: var(--axelix-font-family-code);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.Category {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.Applications {
+    justify-self: end;
+    font-weight: var(--axelix-font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+}

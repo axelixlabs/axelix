@@ -1,0 +1,58 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    min-height: 26px;
+}
+
+.LabelCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.Dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.Label {
+    color: var(--axelix-grey-700);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.Question {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: 50%;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-500);
+    cursor: help;
+}
+
+.Share {
+    justify-self: end;
+    font-variant-numeric: tabular-nums;
+}
+
+.Muted {
+    color: var(--axelix-grey-500);
+}
+
+.HintTitle {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}

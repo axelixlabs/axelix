@@ -72,6 +72,14 @@ export const palette = {
         300: "#fde047",
         800: "#854a0e",
     },
+    // Observed rather than declared signals, e.g. a dormant project on the dependency health dashboard
+    purple: {
+        50: "#f5f3ff",
+        200: "#ddd6fe",
+        300: "#c4b5fd",
+        400: "#a78bfa",
+        700: "#6d28d9",
+    },
     blue: {
         50: "#eff8ff",
         100: "#d1e9ff",

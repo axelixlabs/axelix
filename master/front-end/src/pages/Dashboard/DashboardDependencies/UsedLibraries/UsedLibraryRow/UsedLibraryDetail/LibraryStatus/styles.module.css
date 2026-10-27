@@ -1,0 +1,46 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 8px 16px;
+    align-items: baseline;
+    padding-bottom: 14px;
+}
+
+.Muted {
+    color: var(--axelix-grey-500);
+}
+
+.Label {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+}
+
+.Code {
+    font-family: var(--axelix-font-family-code);
+    overflow-wrap: anywhere;
+}
+
+.Reference {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.ReferenceLink {
+    color: var(--axelix-green-600);
+    overflow-wrap: anywhere;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.ReferenceIcon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    color: var(--axelix-green-600);
+}

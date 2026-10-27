@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 export * from "./dashboard/dashboardSpringPortfolio";
+export * from "./dashboard/dashboardDependencies";
 export * from "./instanceSiderMenu";
 export * from "./scheduledTasks";
 export * from "./transactional";

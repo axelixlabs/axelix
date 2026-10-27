@@ -1,0 +1,29 @@
+.Badge {
+    display: inline-flex;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    white-space: nowrap;
+    border-radius: 5px;
+    padding: 1px 7px;
+    border: 1px solid var(--badge-border);
+    color: var(--badge-color);
+    background-color: var(--badge-bg);
+}
+
+.SUNSET {
+    --badge-color: var(--axelix-red-700);
+    --badge-bg: var(--axelix-red-50);
+    --badge-border: var(--axelix-red-200);
+}
+
+.MAINTENANCE {
+    --badge-color: var(--axelix-orange-700);
+    --badge-bg: var(--axelix-orange-50);
+    --badge-border: var(--axelix-orange-200);
+}
+
+.DORMANT {
+    --badge-color: var(--axelix-purple-700);
+    --badge-bg: var(--axelix-purple-50);
+    --badge-border: var(--axelix-purple-200);
+}

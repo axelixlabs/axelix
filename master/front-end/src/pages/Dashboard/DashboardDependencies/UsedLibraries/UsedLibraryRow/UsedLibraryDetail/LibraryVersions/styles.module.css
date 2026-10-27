@@ -1,0 +1,20 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+}
+
+.Fold {
+    align-self: flex-start;
+    padding: 6px 0 0;
+    font: inherit;
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-green-600);
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

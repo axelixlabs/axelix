@@ -1,0 +1,11 @@
+.Successor {
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-700);
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: 5px;
+    padding: 1px 7px;
+}
+
+.Muted {
+    color: var(--axelix-grey-500);
+}

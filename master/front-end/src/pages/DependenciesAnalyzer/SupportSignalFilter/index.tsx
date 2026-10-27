@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 
 import { matchesDependencyFilters } from "@/helpers";
 import type { EDependencyEcosystem, ESupportStatus, IResolvedDependency } from "@/models";
-import { SUPPORT_STATUS_ORDER, supportSignalLabelKey } from "@/utils";
+import { RISKY_SUPPORT_STATUS_ORDER, supportSignalLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
 
@@ -59,7 +59,7 @@ export const SupportSignalFilter = ({
     return (
         <>
             <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-                {SUPPORT_STATUS_ORDER.map((status) => {
+                {RISKY_SUPPORT_STATUS_ORDER.map((status) => {
                     const active = activeStatuses.includes(status);
 
                     const filteredDependencies = dependencies.filter(

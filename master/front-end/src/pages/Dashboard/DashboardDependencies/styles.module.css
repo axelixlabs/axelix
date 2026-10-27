@@ -1,0 +1,31 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.FirstSectionWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* The subtitle wraps rather than pushing the summary below the title */
+.TitleWrapper {
+    flex: 1 1 0;
+    min-width: 220px;
+}
+
+.CardsWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+@media (width <= 900px) {
+    .CardsWrapper {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

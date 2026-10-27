@@ -28,6 +28,14 @@ export enum ESupportStatus {
 }
 
 /**
+ * Where a curated project points its users once it stops being actively developed.
+ */
+export enum ESuccessionKind {
+    SUPERSEDED_BY = "SUPERSEDED_BY",
+    NO_DIRECT_REPLACEMENT = "NO_DIRECT_REPLACEMENT",
+}
+
+/**
  * The area of the runtime a resolved dependency belongs to. Used to group the dependency feed into tabs.
  */
 export enum EDependencyEcosystem {

@@ -1,0 +1,52 @@
+.Card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid var(--axelix-grey-300);
+    box-shadow: var(--axelix-box-shadow-light);
+}
+
+.Header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.Eyebrow {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    color: var(--axelix-grey-500);
+    text-transform: uppercase;
+}
+
+.TitleRow {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.Title {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Descriptor {
+    color: var(--axelix-grey-500);
+}
+
+.FooterWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--axelix-grey-300);
+    margin-top: auto;
+    color: var(--axelix-grey-500);
+}
+
+.FooterMono {
+    font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,19 @@
+.MainWrapper {
+    margin: 0 18px 14px 60px;
+    padding: 0 16px;
+    background-color: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: 8px;
+    color: var(--axelix-grey-700);
+}
+
+.TabLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.TabCount {
+    font-family: var(--axelix-font-family-code);
+    color: var(--axelix-grey-500);
+}

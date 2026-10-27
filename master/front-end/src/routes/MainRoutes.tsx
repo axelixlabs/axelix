@@ -28,6 +28,7 @@ import { EAuthorities } from "@/models";
 const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringPortfolio")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
 const DashboardLanguages = Loadable(lazy(() => import("@/pages/Dashboard/DashboardLanguages")));
+const DashboardDependencies = Loadable(lazy(() => import("@/pages/Dashboard/DashboardDependencies")));
 const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
 const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
@@ -66,6 +67,7 @@ export const MainRoutes = () => {
                     <Route path="spring-portfolio" element={<DashboardSpringPortfolio />} />
                     <Route path="languages" element={<DashboardLanguages />} />
                     <Route path="persistence" element={<DashboardPersistence />} />
+                    <Route path="dependencies" element={<DashboardDependencies />} />
                 </Route>
 
                 <Route

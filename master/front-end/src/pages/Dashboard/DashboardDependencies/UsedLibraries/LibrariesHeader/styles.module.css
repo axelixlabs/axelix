@@ -1,0 +1,16 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: var(--tp-columns);
+    gap: 14px;
+    min-width: 860px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--axelix-grey-200);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+}
+
+.AlignEnd {
+    justify-self: end;
+}

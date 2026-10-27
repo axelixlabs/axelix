@@ -1,0 +1,49 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 20px;
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-light);
+}
+
+.TotalWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.TotalValue {
+    font-variant-numeric: tabular-nums;
+}
+
+.TotalLabel {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    color: var(--axelix-grey-500);
+    text-transform: uppercase;
+}
+
+.Breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 20px;
+    border-left: 1px solid var(--axelix-grey-300);
+}
+
+.BreakdownRow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.Count {
+    font-weight: var(--axelix-font-weight-semibold);
+    min-width: 30px;
+    font-variant-numeric: tabular-nums;
+}
+
+.Hint {
+    color: var(--axelix-grey-500);
+}

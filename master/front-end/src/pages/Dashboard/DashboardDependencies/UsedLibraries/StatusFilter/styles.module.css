@@ -1,0 +1,56 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.Label {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+}
+
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 12px 4px 10px;
+    font: inherit;
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-700);
+    background-color: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.Dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.Count {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+}
+
+.Active.SUNSET {
+    color: var(--axelix-red-700);
+    background-color: var(--axelix-red-50);
+    border-color: var(--axelix-red-300);
+}
+
+.Active.MAINTENANCE {
+    color: var(--axelix-orange-700);
+    background-color: var(--axelix-orange-50);
+    border-color: var(--axelix-orange-300);
+}
+
+.Active.DORMANT {
+    color: var(--axelix-purple-700);
+    background-color: var(--axelix-purple-50);
+    border-color: var(--axelix-purple-300);
+}
