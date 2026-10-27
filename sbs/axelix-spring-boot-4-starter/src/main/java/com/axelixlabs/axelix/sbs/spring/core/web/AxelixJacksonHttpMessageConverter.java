@@ -58,6 +58,6 @@ public class AxelixJacksonHttpMessageConverter extends JacksonJsonHttpMessageCon
     }
 
     private static boolean isAxelixPayload(@Nullable Class<?> clazz) {
-        return clazz != null && clazz.getName().startsWith("com.axelixlabs.axelix");
+        return clazz != null && clazz.getName().startsWith("com.axelixlabs.axelix.");
     }
 }
