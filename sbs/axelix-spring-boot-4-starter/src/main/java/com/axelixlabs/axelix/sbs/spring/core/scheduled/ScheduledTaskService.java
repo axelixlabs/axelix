@@ -247,7 +247,7 @@ public final class ScheduledTaskService implements AutoCloseable {
             return base;
         }
 
-        return recreateIntervalTask(task.getTask(), runnable(task), newInterval);
+        return recreateIntervalTask(base, runnable(task), newInterval);
     }
 
     /**
