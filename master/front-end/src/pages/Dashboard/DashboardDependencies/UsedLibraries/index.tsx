@@ -18,6 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { Loader, PageSearch } from "@/components";
+import { useLibrariesPage } from "@/hooks";
 import type { EDependencyEcosystem, TSupportStatusCounts } from "@/models";
 
 import { CategoryFilter } from "./CategoryFilter";
@@ -26,7 +27,6 @@ import { LibrariesHeader } from "./LibrariesHeader";
 import { StatusFilter } from "./StatusFilter";
 import { UsedLibraryRow } from "./UsedLibraryRow";
 import styles from "./styles.module.css";
-import { useLibrariesPage } from "./useLibrariesPage";
 
 interface IProps {
     totalLibraries: number;
