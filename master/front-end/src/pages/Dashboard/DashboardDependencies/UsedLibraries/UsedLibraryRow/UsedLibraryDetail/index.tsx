@@ -18,7 +18,7 @@
 import { Tabs } from "antd";
 import { useTranslation } from "react-i18next";
 
-import type { IUsedLibrary, TProblemSupportStatus } from "@/models";
+import type { IUsedLibrary, TRiskySupportStatus } from "@/models";
 
 import { LibraryStatus } from "./LibraryStatus";
 import { LibraryVersions } from "./LibraryVersions";
@@ -30,7 +30,7 @@ interface IProps {
     /**
      * The status of the library when it is a risky one. Only those have a Status tab.
      */
-    riskyStatus: TProblemSupportStatus | null;
+    riskyStatus: TRiskySupportStatus | null;
 }
 
 export const UsedLibraryDetail = ({ usedLibrary, riskyStatus }: IProps) => {

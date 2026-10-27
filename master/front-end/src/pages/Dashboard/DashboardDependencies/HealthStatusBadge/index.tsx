@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { TProblemSupportStatus } from "@/models";
+import type { TRiskySupportStatus } from "@/models";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    status: TProblemSupportStatus;
+    status: TRiskySupportStatus;
     label: string;
 }
 

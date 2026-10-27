@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { LIMITED_SUPPORT_STATUS_ORDER, dependencyHealthColor, supportSignalLabelKey } from "@/utils";
+import { RISKY_SUPPORT_STATUS_ORDER, dependencyHealthColor, supportSignalLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
 
@@ -29,7 +29,7 @@ export const StatusLegend = () => {
             <div className={`TextUltraSmall ${styles.MainWrapper}`}>
                 <span className={styles.Caption}>{t("Dashboard.Dependencies.topCategories")}</span>
                 <span className={styles.Legend}>
-                    {LIMITED_SUPPORT_STATUS_ORDER.map((status) => (
+                    {RISKY_SUPPORT_STATUS_ORDER.map((status) => (
                         <span key={status} className={styles.LegendItem}>
                             <span
                                 className={styles.Swatch}

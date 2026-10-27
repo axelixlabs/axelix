@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ESupportStatus, type TProblemSupportStatus } from "@/models";
+import { ESupportStatus, type TRiskySupportStatus } from "@/models";
 import { palette } from "@/theme/tokens";
 
 /**
  * The colors of the support statuses in the dependency health charts.
  */
-export const dependencyHealthColor: Record<TProblemSupportStatus, string> = {
+export const dependencyHealthColor: Record<TRiskySupportStatus, string> = {
     [ESupportStatus.SUNSET]: palette.red[500],
     [ESupportStatus.MAINTENANCE]: palette.orange[400],
     [ESupportStatus.DORMANT]: palette.purple[400],
@@ -55,6 +55,6 @@ export const DEPENDENCY_VERSIONS_SHOWN = 4;
 /**
  * @returns the status of a library when it is a risky one, {@code null} for an active or an uncurated library
  */
-export const riskyStatusOf = (status: ESupportStatus | null): TProblemSupportStatus | null => {
+export const riskyStatusOf = (status: ESupportStatus | null): TRiskySupportStatus | null => {
     return status !== null && status !== ESupportStatus.ACTIVE ? status : null;
 };
