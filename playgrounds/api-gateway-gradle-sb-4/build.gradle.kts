@@ -5,7 +5,7 @@ plugins {
     id("com.diffplug.spotless") version "8.6.0"
     // Axelix build plugin (lockstep version). Generates the metadata Axelix Master needs to manage
     // this service. Resolved from mavenLocal (see settings.gradle.kts).
-    id("com.axelixlabs.axelix") version "1.2.1"
+    id("com.axelixlabs.axelix") version "1.2.2"
 }
 
 group = "com.axelixlabs.playground"
@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     // Axelix Spring Boot 4 starter (lockstep version, resolved from mavenLocal).
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.1")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.2")
 
     // This is a stateless edge / API-gateway service: web + actuator only.
     //
