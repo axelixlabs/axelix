@@ -1,0 +1,261 @@
+---
+title: "SIGILL on Startup: How the JDK AOT Cache Crashed Axelix in Docker"
+date: 2026-10-28
+authors: ["Artemy Degtyarev"]
+tags: ["Java", "JVM", "Docker"]
+description: "Axelix Master started crashing with SIGILL right after docker run. We trace it to CPU-specific adapter code stored in the JDK 25 AOT cache, look at the upstream fix, and explain how we ship a multi-arch image with an AOT cache that runs on any CPU."
+metaDescription: "Why a JDK 25 AOT cache built on one CPU crashes with SIGILL on another (AOTAdapterCaching, JDK-8388703), how JDK 25.0.5 and JDK 27 address it, and how to ship a portable multi-arch Docker image with an AOT cache."
+---
+
+## Introduction
+
+Imagine you are deploying an open source Java application in Docker. You pull the image, run it, and before the first
+log line appears, the JVM dies with this:
+
+```text
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGILL (0x4) at pc=..., pid=1, tid=...
+#
+# Problematic frame:
+# v  ~AdapterBlob
+```
+
+That is exactly what happened to some users of [Axelix](https://github.com/axelixlabs/axelix) when they started Axelix
+Master. `SIGILL` means *illegal instruction*: the CPU was asked to execute an instruction it does not support. That is
+not something you expect from a Java application. Java is supposed to be "write once, run anywhere", and bytecode does not
+contain CPU instructions.
+
+We investigated it, fixed it, and wrote this article about it. It is a good story about a new JVM feature, the AOT
+cache, and a small detail of its design that turned out to matter a lot for anyone who ships a pre-built Docker image.
+
+## What we saw
+
+The bug was reported as [#1744](https://github.com/axelixlabs/axelix/issues/1744). The crash logs users sent us all
+pointed to the same frame, `~AdapterBlob`. Only the illegal instruction differed:
+
+- On an **ARM64** machine, the JVM crashed on `ptrue p7.b`. This is an **SVE** (Scalable Vector Extension) instruction,
+  and SVE was missing from the CPU features listed in the crash log.
+- We also reproduced it ourselves on **x86-64**. We started Axelix 1.1.1 on an emulated CPU without AVX, and the JVM
+  crashed on `vzeroupper`, which is an **AVX** instruction.
+
+So two different architectures crashed in the same place, both on a vector instruction the CPU did not have. As an
+immediate mitigation, we removed the AOT cache from the Master image. Axelix 1.2.0 shipped without it. Then we went to
+find out what was actually going on.
+
+To understand that, we first need to look at how the AOT cache works.
+
+## What is the AOT cache?
+
+Every time a JVM starts, it does a lot of the same work again. It reads classes from JARs, parses and verifies
+bytecode, links classes, and runs static initializers. Then it runs the code in the interpreter for a while, collects
+profiles, and only after that can the JIT compiler produce well-optimized machine code. For a Spring Boot application
+with thousands of classes, this work is a large part of the startup time.
+
+[Project Leyden](https://openjdk.org/projects/leyden/) aims to reuse that work between runs. Its first result is the
+**AOT cache**:
+
+- [JEP 483](https://openjdk.org/jeps/483) (JDK 24) — classes are stored in the cache already loaded and linked.
+- [JEP 514](https://openjdk.org/jeps/514) (JDK 25) — simpler command-line ergonomics.
+- [JEP 515](https://openjdk.org/jeps/515) (JDK 25) — method execution profiles are stored too, so the JIT can start
+  optimizing earlier.
+
+```text
+Training run  →  collect data  →  create app.aot
+                                      ↓
+Next runs     ←  use the data from app.aot
+```
+
+### The three phases
+
+Working with the AOT cache has three phases:
+
+1. **Training.** You run the application with a representative workload. The JVM records which classes were loaded and
+   linked and how methods were executed.
+2. **Assembly.** A separate JVM takes the recorded configuration and creates the cache file.
+3. **Production.** Later runs start with `-XX:AOTCache=...` and use the prepared data instead of doing the work again.
+
+In a Dockerfile this is a natural multi-stage build. A simplified version of the Axelix Master Dockerfile looks like
+this:
+
+```dockerfile
+FROM eclipse-temurin:25-jre-alpine AS training
+WORKDIR /application
+COPY build/libs/master.jar master.jar
+
+# 1. Training: start the application up to the context refresh and record what it does
+RUN java -XX:AOTMode=record -XX:AOTConfiguration=app.aotconf \
+    -Dspring.context.exit=onRefresh \
+    -jar master.jar
+
+# 2. Assembly: create the cache from the recorded configuration
+RUN java -XX:AOTMode=create -XX:AOTConfiguration=app.aotconf -XX:AOTCache=app.aot \
+    -jar master.jar
+
+FROM eclipse-temurin:25-jre-alpine AS final
+WORKDIR /application
+COPY --from=training /application/master.jar /application/app.aot ./
+
+# 3. Production
+ENTRYPOINT exec java -XX:AOTCache=app.aot -cp master.jar org.springframework.boot.loader.launch.JarLauncher
+```
+
+`-Dspring.context.exit=onRefresh` is a Spring Framework feature made for this purpose: the application starts, refreshes
+the `ApplicationContext`, and exits. That is enough to warm up everything that matters for startup, and it does not need
+a database or the network.
+
+### What is inside the cache?
+
+In JDK 25, one AOT cache file contains several kinds of data:
+
+- **class metadata** — classes that are already parsed, verified, and linked;
+- **method profiles** — execution statistics collected during training;
+- **heap objects** — some pre-built Java objects, for example the module graph;
+- **the AOT code cache** — real machine code.
+
+The first three are CPU-independent data structures. The last one is the source of our problem.
+
+## AOTAdapterCaching
+
+To see what machine code ends up in the cache, we need to look a little deeper into HotSpot.
+
+When a method is called for the first time, the interpreter executes its bytecode. When the method becomes hot, the
+JIT compiles it into machine code. Interpreted and compiled code use different calling conventions. The interpreter
+passes arguments on its own stack, while compiled code passes them in registers, as defined by the platform ABI. So the
+JVM needs small pieces of glue code between them, called **adapters**:
+
+- **i2c** (interpreted-to-compiled) — used when an interpreted method calls a compiled one;
+- **c2i** (compiled-to-interpreted) — used when a compiled method calls a method that is still interpreted.
+
+Adapters are generated per method signature, and a large application needs thousands of them. Generating them at
+startup takes time, so JDK 25 added the `AOTAdapterCaching` option, which is **on by default**: the adapters are
+generated during the assembly phase and stored in the AOT cache as ready-to-run machine code.
+
+And here is the catch. Like any code that HotSpot generates, adapters are generated for the CPU the JVM is **currently
+running on**. If that CPU supports AVX-512, the adapter may use AVX-512 registers. If it supports SVE, the adapter may
+use SVE instructions. That code is correct on the build machine. On a machine without those features, the first call
+through such an adapter executes an instruction the CPU does not know, and the kernel sends `SIGILL`.
+
+## Why the JVM didn't protect us
+
+The JVM does validate the AOT cache. When the production run starts, it checks the JDK build, the operating system, the
+CPU architecture (x64 vs aarch64), the classpath, the GC, compressed oops, and some other settings. If something does
+not match, the JVM, in the default `-XX:AOTMode=auto`, prints a warning and continues **without** the cache. The startup
+is slower, but nothing breaks.
+
+In JDK 25, however, the JVM did not check one thing: **CPU features within the same architecture**. "x64" covers both a
+modern server CPU with AVX-512 and an old laptop CPU without it. The cache was accepted, and the adapters inside it were
+used as they were.
+
+Now look at how our image was built. The release job runs on a GitHub-hosted runner and builds a multi-platform image:
+
+```bash
+docker build --platform linux/amd64,linux/arm64 --file master-oss/Dockerfile ...
+```
+
+- The **amd64** variant is trained on whatever CPU the runner happens to have. GitHub runners are cloud VMs, and some of
+  them have AVX-512.
+- The **arm64** variant is trained under **QEMU** emulation (`docker/setup-qemu-action`), because the runner itself is
+  x86. QEMU user-mode emulation emulates its `max` CPU model by default, which includes SVE. However, many real ARM64
+  CPUs that people run containers on have no SVE: Apple Silicon Macs, AWS Graviton2, and Ampere Altra.
+
+A multi-platform build runs the whole Dockerfile once per platform, so each variant of the image gets its own cache, and
+`docker pull` picks the variant that matches the host. The architecture always matched. The CPU features within it did
+not: our build machines had more of them than many of our users' machines. That is exactly the pattern that crashed.
+
+## The upstream bug
+
+During the investigation we found
+[adoptium/adoptium-support#1507](https://github.com/adoptium/adoptium-support/issues/1507), "Launching with AOT cache
+fatally crashes with SIGILL (0x4) depending on available CPU instructions". It was the same problem: a cache created on a
+Zen 5 CPU with AVX-512 crashed in `~AdapterBlob` on a Zen 2 CPU without AVX-512. The reporter found it the same way we
+did: GitHub Actions runners sometimes have AVX-512 and sometimes do not.
+
+The issue was moved to OpenJDK as [JDK-8388703](https://bugs.openjdk.org/browse/JDK-8388703). The response from the
+HotSpot developers was pragmatic. Adapters are the only AOT code in JDK 25 (stub caching is already off), and they do
+not improve performance much. So instead of backporting CPU checks, they decided to simply **turn adapter caching off by
+default in JDK 25**. That is the fix in [JDK 25.0.5](https://github.com/openjdk/jdk25u-dev/commit/d9aa7a3b04d42bbed558b44b7f8c2904303c1fe5):
+
+```cpp
+// Disable adapters caching which requires CPU features matching checks
+// (implemented by JDK-8377507 and JDK-8381975) which we don't
+// have in this version of code.
+FLAG_SET_ERGO_IF_DEFAULT(AOTAdapterCaching, false);
+```
+
+The proper fix lives in **JDK 27**:
+
+- [JDK-8377507](https://bugs.openjdk.org/browse/JDK-8377507) — the CPU features of the assembly machine are stored in
+  the AOT code cache;
+- [JDK-8381975](https://bugs.openjdk.org/browse/JDK-8381975) — at startup the stored features must **exactly** match
+  the current CPU.
+
+If they do not match, the JVM logs `AOT Code Cache disabled: cpu features are incompatible`, ignores only the machine
+code, and keeps using everything else in the AOT cache. That is how it should work: the worst case is a little less
+speed-up, never a crash.
+
+## Our fix
+
+The fix is [#1767](https://github.com/axelixlabs/axelix/pull/1767). We brought the AOT cache back, but we create it
+without adapters:
+
+```dockerfile
+# Create AOT cache without CPU-specific adapters to avoid SIGILL on other CPUs
+RUN java \
+    -XX:+UnlockDiagnosticVMOptions \
+    -XX:-AOTAdapterCaching \
+    -XX:AOTMode=create \
+    -XX:AOTConfiguration=app.aotconf \
+    -XX:AOTCache=app.aot \
+    -jar /application/master.jar
+```
+
+`AOTAdapterCaching` is a diagnostic flag, which is why `-XX:+UnlockDiagnosticVMOptions` is needed.
+
+With this flag, the cache contains no machine code at all, and the JVM confirms it on startup:
+
+```text
+[info][aot] Opened AOT cache app.aot.
+[info][aot,codecache,init] AOT Code Cache is empty
+[info][aot] Using AOT-linked classes: true (static archive: has aot-linked classes)
+```
+
+What remains is class metadata, profiles, and heap objects, which are the same on any CPU of a given architecture. The
+adapters are generated at runtime, on the user's machine, for the user's CPU. And removing them does not remove the
+benefit. In a local check of the image built from the fixed Dockerfile, about 72% of the classes loaded during startup
+(10,933 of 15,201) came from the AOT cache, and the time to context refresh dropped from about 7.3 s to about 5.4 s on
+a developer laptop.
+
+We discussed the alternatives in the PR. The first idea was to wait for JDK 25.0.5 and keep adapter caching on. But
+25.0.5 does not make adapters safe. It simply turns them off, so the result is the same as our flag. The second idea
+was to move to JDK 27, where the CPU check exists. Most people run Axelix Master in Docker or Kubernetes, so a new Java
+baseline would not affect them. But Spring Boot 4.1 officially supports Java up to 26, and Java 27 support is expected
+in Spring Boot 4.2. So we merged the explicit flag. It works on today's JDK 25 builds, and it stays correct after
+25.0.5, where it simply matches the new default.
+
+## What about JDK 27?
+
+Once Spring Boot 4.2 is out, we plan to move Axelix to JDK 27. There, turning `AOTAdapterCaching` back on is **safe**:
+on a CPU that does not match, the JVM drops the cached code instead of crashing.
+
+But "safe" is not the same as "useful". JDK 27 requires an *exact* match of CPU features. For an image built on a
+GitHub runner, or trained under QEMU, the chance that a user's CPU has exactly the same feature set is small. For most
+users the cached adapters would simply be thrown away. For a pre-built image to really benefit from AOT code, the JVM
+needs to generate it for a generic, portable CPU baseline. There is an open enhancement for that,
+[JDK-8377630](https://bugs.openjdk.org/browse/JDK-8377630) "Restrict AOT code to a generic set of CPU features". Until
+it lands, the AOT cache in a distributed image is best seen as a cache of *data*, not of *code*.
+
+## Takeaways
+
+- The JDK AOT cache is a real and easy startup win for Spring Boot applications in Docker. A multi-stage Dockerfile with
+  a training stage is enough.
+- On JDK 25 before 25.0.5, if you build the cache on one machine and run it on another, create it with
+  `-XX:+UnlockDiagnosticVMOptions -XX:-AOTAdapterCaching`. Otherwise your users' CPUs must have every feature your build
+  machine had. CI runners and QEMU usually have more.
+- Multi-arch images get a separate cache per architecture automatically, because each platform runs its own training
+  and assembly stages.
+- The JVM validates the AOT cache and falls back safely when something does not match. Machine code stored in the cache
+  is the one exception before JDK 27.
+
+The fix will ship in the next Axelix release. If you are curious about the details, the whole story is in
+[#1744](https://github.com/axelixlabs/axelix/issues/1744) and [#1767](https://github.com/axelixlabs/axelix/pull/1767).

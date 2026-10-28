@@ -132,6 +132,13 @@ const AUTHOR_PROFILES: Record<string, AuthorProfile> = {
       { kind: "github", label: "GitHub", url: "https://github.com/sergeycherkasovv" },
     ],
   },
+  "artemy-degtyarev": {
+    title: "Product Engineer",
+    bio: "Contributor to Axelix and Spring Data Relational. Backend engineer working with Java and Spring Boot. Speaker at conferences such as JPoint.",
+    links: [
+      { kind: "github", label: "GitHub", url: "https://github.com/chrshnv" },
+    ],
+  },
 };
 
 /** The editorial profile for an author slug, or `null` if there isn't one. */
