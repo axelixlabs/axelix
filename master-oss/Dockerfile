@@ -36,7 +36,10 @@ RUN apk add --no-cache --upgrade \
     "libcrypto3>=3.5.7-r0" \
     "libexpat>=2.8.4-r0" \
     "zlib>=1.3.2-r1" \
-    "libpng>=1.6.59-r0"
+    "libpng>=1.6.59-r0" \
+    "brotli-libs>=1.2.1-r0" \
+    "musl>=1.2.6-r3" \
+    "musl-utils>=1.2.6-r3"
 
 # Configure non-root user
 RUN adduser -S axelix
