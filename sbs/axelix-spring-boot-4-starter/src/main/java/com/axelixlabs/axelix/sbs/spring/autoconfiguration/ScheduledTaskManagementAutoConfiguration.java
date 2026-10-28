@@ -27,6 +27,7 @@ import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ApplicationTaskSchedulerProvider;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledAnnotationProcessorRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
@@ -52,6 +53,12 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
 @AxelixAutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
+
+    // Static, since it is a BeanDefinitionRegistryPostProcessor.
+    @Bean
+    public static AxelixScheduledAnnotationProcessorRegistrar axelixScheduledAnnotationProcessorRegistrar() {
+        return new AxelixScheduledAnnotationProcessorRegistrar();
+    }
 
     // The declared type must not be a SchedulingConfigurer: Spring Boot looks at it only, and in the older versions
     // it does not create its own 'taskScheduler' when there is a SchedulingConfigurer bean. Spring itself still

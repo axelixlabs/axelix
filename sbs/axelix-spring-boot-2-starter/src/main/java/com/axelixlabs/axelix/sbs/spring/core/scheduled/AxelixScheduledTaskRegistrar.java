@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.common.utils.Lazy;
  */
 public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
 
-    private final ThreadLocal<@Nullable String> processedAnnotationSuffix = new ThreadLocal<>();
+    private final ThreadLocal<@Nullable String> processingContext = new ThreadLocal<>();
 
     @SuppressWarnings("NullAway.Init")
     private Lazy<ScheduledTaskExecutionHistory> history;
@@ -52,11 +52,11 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
      * @param suffix the suffix of the task id, see {@link AxelixScheduledAnnotationBeanPostProcessor}.
      */
     void process(String suffix, Runnable processing) {
-        processedAnnotationSuffix.set(suffix);
+        processingContext.set(suffix);
         try {
             processing.run();
         } finally {
-            processedAnnotationSuffix.remove();
+            processingContext.remove();
         }
     }
 
@@ -87,7 +87,7 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
      *         before the scheduler was resolved.
      */
     private @Nullable Runnable wrap(Runnable runnable) {
-        String suffix = processedAnnotationSuffix.get();
+        String suffix = processingContext.get();
         if (suffix == null) {
             return null;
         }
