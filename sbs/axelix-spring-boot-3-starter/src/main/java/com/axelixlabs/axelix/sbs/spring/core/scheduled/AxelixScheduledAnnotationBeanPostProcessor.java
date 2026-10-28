@@ -29,6 +29,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.Schedules;
 
+import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotationContext;
 
 /**
@@ -53,7 +54,8 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
     @Override
     public void setBeanFactory(@NonNull BeanFactory beanFactory) {
         super.setBeanFactory(beanFactory);
-        registrar.setHistory(beanFactory.getBean(ScheduledTaskExecutionHistory.class));
+        // looked up lazily, since this processor is created before the regular beans
+        registrar.setHistory(Lazy.of(() -> beanFactory.getBean(ScheduledTaskExecutionHistory.class)));
     }
 
     @Override

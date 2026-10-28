@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.time.Instant;
-
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.SchedulingAwareRunnable;
@@ -48,18 +46,7 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
     public void run() {
         // TODO: the executions of the reactive tasks are recorded wrongly, since run() only subscribes to the
         //  publisher and returns, so the duration and the error of the execution are lost. To be fixed separately.
-        long startNanos = System.nanoTime();
-        Throwable error = null;
-        try {
-            delegate.run();
-        } catch (Throwable e) {
-            error = e;
-            throw e;
-        } finally {
-            long durationMillis = (System.nanoTime() - startNanos) / 1_000_000;
-            history.record(ScheduledTaskExecutions.of(
-                    id, Instant.ofEpochMilli(startNanos / 1_000_000), durationMillis, error));
-        }
+        history.recordExecution(id, delegate);
     }
 
     @Override

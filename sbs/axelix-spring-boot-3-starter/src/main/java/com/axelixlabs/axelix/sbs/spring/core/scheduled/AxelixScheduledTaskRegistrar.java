@@ -26,6 +26,8 @@ import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 
+import com.axelixlabs.axelix.common.utils.Lazy;
+
 /**
  * {@link ScheduledTaskRegistrar} that wraps the runnable of every task declared by a {@code @Scheduled} annotation
  * into the {@link ScheduledAnnotationRunnable}. The tasks registered in any other way, e.g. via
@@ -40,9 +42,9 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
     private final ThreadLocal<@Nullable ScheduledAnnotationContext> processingContext = new ThreadLocal<>();
 
     @SuppressWarnings("NullAway.Init")
-    private ScheduledTaskExecutionHistory history;
+    private Lazy<ScheduledTaskExecutionHistory> history;
 
-    void setHistory(ScheduledTaskExecutionHistory history) {
+    void setHistory(Lazy<ScheduledTaskExecutionHistory> history) {
         this.history = history;
     }
 
@@ -94,7 +96,7 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
             return null;
         }
         return new ScheduledAnnotationRunnable(
-                runnable, runnable + "#" + annotation.suffix(), annotation.qualifier(), history);
+                runnable, runnable + "#" + annotation.suffix(), annotation.qualifier(), history.require());
     }
 
     /**

@@ -33,6 +33,7 @@ import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
 
+import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotationContext;
 
@@ -56,7 +57,7 @@ class AxelixScheduledTaskRegistrarTest {
     void setUp() {
         history = new ScheduledTaskExecutionHistory();
         registrar = new AxelixScheduledTaskRegistrar();
-        registrar.setHistory(history);
+        registrar.setHistory(Lazy.resolved(history));
     }
 
     @AfterEach

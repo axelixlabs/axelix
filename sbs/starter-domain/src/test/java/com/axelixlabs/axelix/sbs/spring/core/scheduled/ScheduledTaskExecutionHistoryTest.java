@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,7 @@ class ScheduledTaskExecutionHistoryTest {
 
     private static final String TASK_ID = "com.example.Job#run()";
     private static final String ANOTHER_TASK_ID = "com.example.AnotherJob#run()";
+    private static final long SLEEP_MILLIS = 30L;
 
     private ScheduledTaskExecutionHistory history;
 
@@ -78,6 +80,55 @@ class ScheduledTaskExecutionHistoryTest {
     }
 
     @Test
+    void recordExecution_shouldRecordSuccessfulExecution() {
+        Instant before = Instant.now();
+
+        history.recordExecution(TASK_ID, () -> {});
+
+        Instant after = Instant.now();
+        ScheduledTaskExecution execution = recordedExecution();
+        assertThat(execution.getTaskId()).isEqualTo(TASK_ID);
+        assertThat(execution.getSuccess()).isTrue();
+        assertThat(execution.getErrorType()).isNull();
+        assertThat(execution.getErrorMessage()).isNull();
+        assertThat(Instant.parse(execution.getStartedAt())).isBetween(before, after);
+    }
+
+    @Test
+    void recordExecution_shouldMeasureDurationOfTheTask() {
+        history.recordExecution(TASK_ID, () -> sleep(SLEEP_MILLIS));
+
+        assertThat(recordedExecution().getDurationMillis()).isGreaterThanOrEqualTo(SLEEP_MILLIS);
+    }
+
+    @Test
+    void recordExecution_shouldRecordFailedExecutionAndRethrowTheFailure() {
+        RuntimeException failure = new IllegalStateException("boom");
+
+        assertThatThrownBy(() -> history.recordExecution(TASK_ID, () -> {
+                    throw failure;
+                }))
+                .isSameAs(failure);
+
+        ScheduledTaskExecution execution = recordedExecution();
+        assertThat(execution.getSuccess()).isFalse();
+        assertThat(execution.getErrorType()).isEqualTo("IllegalStateException");
+        assertThat(execution.getErrorMessage()).isEqualTo("boom");
+    }
+
+    @Test
+    void recordExecution_shouldRecordFailedExecutionAndRethrowTheError() {
+        Error failure = new StackOverflowError();
+
+        assertThatThrownBy(() -> history.recordExecution(TASK_ID, () -> {
+                    throw failure;
+                }))
+                .isSameAs(failure);
+
+        assertThat(recordedExecution().getErrorType()).isEqualTo("StackOverflowError");
+    }
+
+    @Test
     void getExecutions_shouldReturnEmptyListWhenNoExecutionsRecorded() {
         assertThat(history.getExecutions()).isEmpty();
     }
@@ -100,6 +151,19 @@ class ScheduledTaskExecutionHistoryTest {
 
         assertThat(history.getExecutions()).containsExactly(execution);
         assertThat(history.getExecutions()).containsExactly(execution);
+    }
+
+    private ScheduledTaskExecution recordedExecution() {
+        assertThat(history.getExecutions()).hasSize(1);
+        return history.getExecutions().get(0);
+    }
+
+    private static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static List<ScheduledTaskExecution> executions(String taskId, int count) {

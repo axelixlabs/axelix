@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,6 +46,24 @@ public class ScheduledTaskExecutionHistory {
     public void record(ScheduledTaskExecution execution) {
         history.computeIfAbsent(execution.getTaskId(), taskId -> new SlidingWindow<>(HISTORY_MAX_SIZE))
                 .put(execution);
+    }
+
+    /**
+     * Runs the given task and records its execution, whether it succeeds or fails.
+     */
+    public void recordExecution(String taskId, Runnable task) {
+        Instant startedAt = Instant.now();
+        long startNanos = System.nanoTime();
+        Throwable error = null;
+        try {
+            task.run();
+        } catch (Throwable e) {
+            error = e;
+            throw e;
+        } finally {
+            long durationMillis = (System.nanoTime() - startNanos) / 1_000_000;
+            record(ScheduledTaskExecutions.of(taskId, startedAt, durationMillis, error));
+        }
     }
 
     /**
