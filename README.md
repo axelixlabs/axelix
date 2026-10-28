@@ -98,6 +98,14 @@ to each Spring Boot service you want to manage.
 > The snippets below pin `1.2.1` for illustration. Check the
 > [Releases page](https://github.com/axelixlabs/axelix/releases) for the latest published tag.
 
+### Install with an AI agent
+
+Give your coding agent this command, and it will set up Axelix in your project for you:
+
+```
+Install Axelix in my app: run `curl -s https://axelix.io/docs/start/SKILL.md` and use it as a guide
+```
+
 ### 1. Run Axelix Master
 
 Master listens on port `2935` (overridable with `axelix.master.port`) and bundles the UI, so there is nothing extra to build for the web
