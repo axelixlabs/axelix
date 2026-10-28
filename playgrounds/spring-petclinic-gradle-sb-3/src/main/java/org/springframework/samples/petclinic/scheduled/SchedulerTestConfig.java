@@ -10,6 +10,7 @@ import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @Configuration
@@ -30,6 +31,7 @@ public class SchedulerTestConfig implements SchedulingConfigurer {
      * CRON
      */
     @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     public void cronTask() {
         log.info("Running CRON task");
     }
@@ -57,6 +59,8 @@ public class SchedulerTestConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar registrar) {
         registrar.addTriggerTask(this::customTriggerTask, new CustomTrigger());
+        registrar.addCronTask(
+                new CronTask(() -> log.info("Running CRON task declared via SchedulingConfigurer"), "*/15 * * * * *"));
     }
 
     private void customTriggerTask() {

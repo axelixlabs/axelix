@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -36,9 +37,18 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.config.CronTask;
+import org.springframework.scheduling.config.FixedDelayTask;
+import org.springframework.scheduling.config.FixedRateTask;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.scheduling.config.TaskManagementConfigUtils;
 
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledAnnotationBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ManagedScheduledTask;
@@ -53,6 +63,7 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 /**
  * Integration tests for {@link ScheduledTaskManagementAutoConfiguration}
@@ -237,6 +248,186 @@ class ScheduledTaskManagementAutoConfigurationTest {
                         .isEqualTo(5));
     }
 
+    @Test
+    void shouldRegisterSeparateTaskForEveryRepeatableScheduledAnnotation() {
+        contextRunner.withUserConfiguration(RepeatableSchedulingConfig.class).run(context -> {
+            // then
+            assertThat(context.getBean(TaskManagementConfigUtils.SCHEDULED_ANNOTATION_PROCESSOR_BEAN_NAME))
+                    .isInstanceOf(AxelixScheduledAnnotationBeanPostProcessor.class);
+
+            String jobs = RepeatableSchedulingConfig.class.getName();
+            assertThat(context.getBean(ScheduledTasksRegistry.class).getAll())
+                    .filteredOn(task -> task.getId().startsWith(jobs))
+                    .extracting(
+                            ManagedScheduledTask::getId, task -> task.getTask().getClass())
+                    .containsExactlyInAnyOrder(
+                            tuple(jobs + ".cronAndFixedDelay#cron0", CronTask.class),
+                            tuple(jobs + ".cronAndFixedDelay#fixedDelay0", FixedDelayTask.class),
+                            tuple(jobs + ".twoCrons#cron0", CronTask.class),
+                            tuple(jobs + ".twoCrons#cron1", CronTask.class),
+                            tuple(jobs + ".single#fixedRate0", FixedRateTask.class));
+
+            assertThat(context.getBean(ScheduledTasksRegistry.class)
+                            .findRequired(jobs + ".twoCrons#cron1")
+                            .getTask())
+                    .isInstanceOfSatisfying(
+                            CronTask.class,
+                            task -> assertThat(task.getExpression()).isEqualTo("0 0 3 * * *"));
+        });
+    }
+
+    @Test
+    void shouldDisableOnlyTheTaskOfTheGivenRepeatableScheduledAnnotation() {
+        contextRunner.withUserConfiguration(RepeatableSchedulingConfig.class).run(context -> {
+            String jobs = RepeatableSchedulingConfig.class.getName();
+            ScheduledTasksRegistry registry = context.getBean(ScheduledTasksRegistry.class);
+
+            // when
+            context.getBean(ScheduledTaskService.class).disableTask(jobs + ".twoCrons#cron1", false);
+
+            // then
+            assertThat(registry.findRequired(jobs + ".twoCrons#cron1").isEnabled())
+                    .isFalse();
+            assertThat(registry.findRequired(jobs + ".twoCrons#cron0").isEnabled())
+                    .isTrue();
+        });
+    }
+
+    @Test
+    void shouldKeepTheIdOfTheRepeatableScheduledAnnotationTaskWhenRescheduled() {
+        contextRunner.withUserConfiguration(RepeatableSchedulingConfig.class).run(context -> {
+            String jobs = RepeatableSchedulingConfig.class.getName();
+            ScheduledTasksRegistry registry = context.getBean(ScheduledTasksRegistry.class);
+
+            // when
+            context.getBean(ScheduledTaskService.class).modifyCronExpression(jobs + ".twoCrons#cron1", "0 0 4 * * *");
+
+            // then
+            assertThat(registry.findRequired(jobs + ".twoCrons#cron1").getTask())
+                    .isInstanceOfSatisfying(
+                            CronTask.class,
+                            task -> assertThat(task.getExpression()).isEqualTo("0 0 4 * * *"));
+            assertThat(registry.findRequired(jobs + ".twoCrons#cron1").getRunnable())
+                    .hasToString(jobs + ".twoCrons#cron1");
+            assertThat(registry.findRequired(jobs + ".twoCrons#cron0").getTask())
+                    .isInstanceOfSatisfying(
+                            CronTask.class,
+                            task -> assertThat(task.getExpression()).isEqualTo("0 0 2 * * *"));
+        });
+    }
+
+    @Test
+    void shouldRecordTheExecutionsOfScheduledTasks() {
+        contextRunner.withUserConfiguration(RecordedSchedulingConfig.class).run(context -> {
+            String jobs = RecordedSchedulingConfig.class.getName();
+
+            // when: the tasks run right after the start
+
+            // then
+            assertThat(awaitExecutions(context, jobs + ".succeeding#fixedDelay0", 1))
+                    .singleElement()
+                    .satisfies(execution -> {
+                        assertThat(execution.getSuccess()).isTrue();
+                        assertThat(execution.getStartedAt()).isNotBlank();
+                        assertThat(execution.getDurationMillis()).isNotNegative();
+                        assertThat(execution.getErrorType()).isNull();
+                        assertThat(execution.getErrorMessage()).isNull();
+                    });
+            assertThat(awaitExecutions(context, jobs + ".failing#fixedDelay0", 1))
+                    .singleElement()
+                    .satisfies(execution -> {
+                        assertThat(execution.getSuccess()).isFalse();
+                        assertThat(execution.getErrorType()).isEqualTo("IllegalStateException");
+                        assertThat(execution.getErrorMessage()).isEqualTo("boom");
+                    });
+        });
+    }
+
+    @Test
+    void shouldRecordTheExecutionsOfEveryRepeatableScheduledAnnotationOnce() {
+        contextRunner.withUserConfiguration(RepeatableSchedulingConfig.class).run(context -> {
+            String jobs = RepeatableSchedulingConfig.class.getName();
+
+            // when: the interval tasks run right after the start, the cron ones do not run at all
+
+            // then
+            assertThat(awaitExecutions(context, jobs + ".cronAndFixedDelay#fixedDelay0", 1))
+                    .hasSize(1);
+            assertThat(awaitExecutions(context, jobs + ".single#fixedRate0", 1)).hasSize(1);
+            assertThat(executionsOf(context, jobs + ".cronAndFixedDelay#cron0")).isEmpty();
+        });
+    }
+
+    @Test
+    void shouldRecordTheManualExecutionOfScheduledTask() {
+        contextRunner.withUserConfiguration(RecordedSchedulingConfig.class).run(context -> {
+            String taskId = RecordedSchedulingConfig.class.getName() + ".succeeding#fixedDelay0";
+            ScheduledTaskService service = context.getBean(ScheduledTaskService.class);
+            assertThat(awaitExecutions(context, taskId, 1)).hasSize(1);
+            service.disableTask(taskId, false);
+
+            // when
+            service.executeScheduledTask(taskId);
+
+            // then
+            assertThat(awaitExecutions(context, taskId, 2)).hasSize(2);
+        });
+    }
+
+    @Test
+    void shouldNotRecordTheExecutionsOfTasksRegisteredViaSchedulingConfigurer() {
+        contextRunner.withUserConfiguration(SchedulingConfigurerConfig.class).run(context -> {
+            BlockingQueue<String> executions = context.getBean(SchedulingConfigurerConfig.class).executions;
+            String taskId = context.getBean(ScheduledTasksRegistry.class).getAll().stream()
+                    .map(ManagedScheduledTask::getId)
+                    .filter(id -> !id.startsWith(EnableSchedulingConfig.class.getName()))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(executions.poll(5, TimeUnit.SECONDS)).isNotNull();
+
+            // when
+            context.getBean(ScheduledTaskService.class).executeScheduledTask(taskId);
+
+            // then: the task is still run manually, but none of its executions is recorded
+            assertThat(executions.poll(5, TimeUnit.SECONDS)).isNotNull();
+            Thread.sleep(200);
+            assertThat(context.getBean(ScheduledTaskExecutionHistory.class).getExecutions())
+                    .extracting(ScheduledTaskExecution::getTaskId)
+                    .doesNotContain(taskId);
+        });
+    }
+
+    @Test
+    void shouldNotReplaceTheScheduledAnnotationProcessorDeclaredByUser() {
+        new ApplicationContextRunner()
+                .withPropertyValues(ENDPOINT_EXPOSURE_PROPERTY)
+                .withUserConfiguration(UserScheduledAnnotationProcessorConfig.class)
+                .withConfiguration(AutoConfigurations.of(ScheduledTaskManagementAutoConfiguration.class))
+                .run(context -> {
+                    // then
+                    assertThat(context.getBean(TaskManagementConfigUtils.SCHEDULED_ANNOTATION_PROCESSOR_BEAN_NAME))
+                            .isNotInstanceOf(AxelixScheduledAnnotationBeanPostProcessor.class);
+
+                    String taskId = UserScheduledAnnotationProcessorConfig.class.getName() + ".task";
+                    assertThat(context.getBean(ScheduledTasksRegistry.class).getAll())
+                            .extracting(ManagedScheduledTask::getId)
+                            .containsExactly(taskId);
+
+                    // the task is still managed, but its executions are not recorded
+                    BlockingQueue<String> executions =
+                            context.getBean(UserScheduledAnnotationProcessorConfig.class).executions;
+                    assertThat(executions.poll(5, TimeUnit.SECONDS)).isNotNull();
+                    context.getBean(ScheduledTaskService.class).disableTask(taskId, false);
+                    assertThat(context.getBean(ScheduledTasksRegistry.class)
+                                    .findRequired(taskId)
+                                    .isEnabled())
+                            .isFalse();
+                    assertThat(context.getBean(ScheduledTaskExecutionHistory.class)
+                                    .getExecutions())
+                            .isEmpty();
+                });
+    }
+
     private static void assertReschedulesOnThread(AssertableApplicationContext context, String threadNamePrefix)
             throws InterruptedException {
         BlockingQueue<String> executions = context.getBean(EnableSchedulingConfig.class).executionThreads;
@@ -273,6 +464,23 @@ class ScheduledTaskManagementAutoConfigurationTest {
         assertThat(executions.poll(5, TimeUnit.SECONDS)).startsWith(threadNamePrefix);
     }
 
+    private static List<ScheduledTaskExecution> awaitExecutions(
+            AssertableApplicationContext context, String taskId, int count) throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+        List<ScheduledTaskExecution> executions = executionsOf(context, taskId);
+        while (executions.size() < count && System.nanoTime() < deadline) {
+            Thread.sleep(10);
+            executions = executionsOf(context, taskId);
+        }
+        return executions;
+    }
+
+    private static List<ScheduledTaskExecution> executionsOf(AssertableApplicationContext context, String taskId) {
+        return context.getBean(ScheduledTaskExecutionHistory.class).getExecutions().stream()
+                .filter(execution -> execution.getTaskId().equals(taskId))
+                .toList();
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class EnableSchedulingConfig {
@@ -283,6 +491,60 @@ class ScheduledTaskManagementAutoConfigurationTest {
         @Scheduled(fixedDelay = 10000)
         public void someMockTask() {
             executionThreads.add(Thread.currentThread().getName());
+        }
+    }
+
+    @TestConfiguration
+    static class RepeatableSchedulingConfig {
+
+        @Scheduled(cron = "0 0 1 * * *")
+        @Scheduled(fixedDelay = 100000)
+        public void cronAndFixedDelay() {}
+
+        @Scheduled(cron = "0 0 2 * * *")
+        @Scheduled(cron = "0 0 3 * * *")
+        public void twoCrons() {}
+
+        @Scheduled(fixedRate = 100000)
+        public void single() {}
+    }
+
+    @TestConfiguration
+    static class RecordedSchedulingConfig {
+
+        @Scheduled(fixedDelay = 100000)
+        public void succeeding() {}
+
+        @Scheduled(fixedDelay = 100000)
+        public void failing() {
+            throw new IllegalStateException("boom");
+        }
+    }
+
+    @TestConfiguration
+    static class SchedulingConfigurerConfig implements SchedulingConfigurer {
+
+        final BlockingQueue<String> executions = new LinkedBlockingQueue<>();
+
+        @Override
+        public void configureTasks(ScheduledTaskRegistrar registrar) {
+            registrar.addFixedDelayTask(() -> executions.add("executed"), Duration.ofSeconds(100));
+        }
+    }
+
+    @TestConfiguration
+    static class UserScheduledAnnotationProcessorConfig {
+
+        final BlockingQueue<String> executions = new LinkedBlockingQueue<>();
+
+        @Bean(TaskManagementConfigUtils.SCHEDULED_ANNOTATION_PROCESSOR_BEAN_NAME)
+        static ScheduledAnnotationBeanPostProcessor scheduledAnnotationProcessor() {
+            return new ScheduledAnnotationBeanPostProcessor();
+        }
+
+        @Scheduled(fixedDelay = 100000)
+        public void task() {
+            executions.add("executed");
         }
     }
 
