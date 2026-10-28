@@ -86,7 +86,6 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
         if (scheduled.fixedDelay() >= 0 || !scheduled.fixedDelayString().isEmpty()) {
             return "fixedDelay";
         }
-
         return "fixedRate";
     }
 }
