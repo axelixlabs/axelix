@@ -48,7 +48,6 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
     public void run() {
         // TODO: the executions of the reactive tasks are recorded wrongly, since run() only subscribes to the
         //  publisher and returns, so the duration and the error of the execution are lost. To be fixed separately.
-        Instant startedAt = Instant.now();
         long startNanos = System.nanoTime();
         Throwable error = null;
         try {
@@ -58,7 +57,7 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
             throw e;
         } finally {
             long durationMillis = (System.nanoTime() - startNanos) / 1_000_000;
-            history.record(ScheduledTaskExecutions.of(id, startedAt, durationMillis, error));
+            history.record(ScheduledTaskExecutions.of(id, Instant.ofEpochMilli(startNanos / 1_000_000), durationMillis, error));
         }
     }
 

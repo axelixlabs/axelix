@@ -35,15 +35,15 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExec
  */
 public class ScheduledTaskExecutionHistory {
 
-    private final Map<String, SlidingWindow<ScheduledTaskExecution>> history = new ConcurrentHashMap<>();
-    private final ScheduledTaskHistoryConfigurationProperties properties;
+    /**
+     * The maximum number of the latest executions kept per task and reported to master.
+     */
+    private static final int HISTORY_MAX_SIZE = 10;
 
-    public ScheduledTaskExecutionHistory(ScheduledTaskHistoryConfigurationProperties properties) {
-        this.properties = properties;
-    }
+    private final Map<String, SlidingWindow<ScheduledTaskExecution>> history = new ConcurrentHashMap<>();
 
     public void record(ScheduledTaskExecution execution) {
-        history.computeIfAbsent(execution.getTaskId(), taskId -> new SlidingWindow<>(properties.getHistoryMaxSize()))
+        history.computeIfAbsent(execution.getTaskId(), taskId -> new SlidingWindow<>(HISTORY_MAX_SIZE))
                 .put(execution);
     }
 

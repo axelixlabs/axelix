@@ -45,6 +45,9 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.IntervalBasedTaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.TaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.TriggerBasedTaskRescheduler;
 
 import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;

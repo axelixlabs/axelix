@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.util.function.Supplier;
-
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.config.CronTask;
@@ -39,27 +37,24 @@ import org.springframework.scheduling.support.CronTrigger;
  */
 public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
 
-    private final ThreadLocal<@Nullable ScheduledAnnotation> processedAnnotation = new ThreadLocal<>();
+    private final ThreadLocal<@Nullable ScheduledAnnotationContext> processingContext = new ThreadLocal<>();
 
     @SuppressWarnings("NullAway.Init")
-    private Supplier<ScheduledTaskExecutionHistory> history;
+    private ScheduledTaskExecutionHistory history;
 
-    /**
-     * @param history the supplier of the history, invoked when a task is wrapped.
-     */
-    void setHistory(Supplier<ScheduledTaskExecutionHistory> history) {
+    void setHistory(ScheduledTaskExecutionHistory history) {
         this.history = history;
     }
 
     /**
-     * Runs the processing of the given {@code @Scheduled} annotation, during which the tasks are scheduled.
+     * Runs the processing of the given {@code @Scheduled} context, during which the tasks are scheduled.
      */
-    void process(ScheduledAnnotation annotation, Runnable processing) {
-        processedAnnotation.set(annotation);
+    void process(ScheduledAnnotationContext context, Runnable processing) {
+        processingContext.set(context);
         try {
             processing.run();
         } finally {
-            processedAnnotation.remove();
+            processingContext.remove();
         }
     }
 
@@ -94,17 +89,17 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
      *         before the scheduler was resolved.
      */
     private @Nullable Runnable wrap(Runnable runnable) {
-        ScheduledAnnotation annotation = processedAnnotation.get();
+        ScheduledAnnotationContext annotation = processingContext.get();
         if (annotation == null) {
             return null;
         }
         return new ScheduledAnnotationRunnable(
-                runnable, runnable + "#" + annotation.suffix(), annotation.qualifier(), history.get());
+                runnable, runnable + "#" + annotation.suffix(), annotation.qualifier(), history);
     }
 
     /**
      * @param suffix the suffix of the task id, see {@link AxelixScheduledAnnotationBeanPostProcessor}.
      * @param qualifier the qualifier of the scheduler declared by the annotation, if any.
      */
-    record ScheduledAnnotation(String suffix, @Nullable String qualifier) {}
+    record ScheduledAnnotationContext(String suffix, @Nullable String qualifier) {}
 }

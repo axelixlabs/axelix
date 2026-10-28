@@ -32,5 +32,5 @@ public interface TaskSchedulerProvider {
      * it runs a task on the scheduler named in its {@code @Scheduled(scheduler = ...)}, as long as the runnable of
      * the task is passed to it as is, not wrapped.
      */
-    TaskScheduler getTaskScheduler();
+    TaskScheduler getTaskScheduler(/* Scheuled Task Id */ );
 }

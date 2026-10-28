@@ -34,6 +34,8 @@ import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.support.CronTrigger;
 
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.TaskRescheduler;
+
 /**
  * Service for managing scheduled tasks with enable/disable functionality.
  *

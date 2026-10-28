@@ -44,7 +44,6 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 
 import static com.axelixlabs.axelix.common.domain.insights.FeatureId.AOT_CACHE;
 import static com.axelixlabs.axelix.common.domain.insights.FeatureId.APP_CDS;
@@ -420,7 +419,7 @@ class DefaultInsightsInfoProviderTest {
     }
 
     private static ScheduledTaskExecutionHistory emptyScheduledTaskExecutionHistory() {
-        return new ScheduledTaskExecutionHistory(new ScheduledTaskHistoryConfigurationProperties(30));
+        return new ScheduledTaskExecutionHistory();
     }
 
     private static ScheduledTaskExecutionHistory historyWith(ScheduledTaskExecution... executions) {

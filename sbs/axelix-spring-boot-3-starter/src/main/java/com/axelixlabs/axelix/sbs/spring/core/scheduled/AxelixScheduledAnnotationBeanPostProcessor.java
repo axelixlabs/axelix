@@ -29,7 +29,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.Schedules;
 
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotation;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotationContext;
 
 /**
  * {@link ScheduledAnnotationBeanPostProcessor} that gives the task of every {@code @Scheduled} annotation its own id,
@@ -53,13 +53,12 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
     @Override
     public void setBeanFactory(@NonNull BeanFactory beanFactory) {
         super.setBeanFactory(beanFactory);
-        // looked up lazily, since this processor is created before the regular beans
-        registrar.setHistory(() -> beanFactory.getBean(ScheduledTaskExecutionHistory.class));
+        registrar.setHistory(beanFactory.getBean(ScheduledTaskExecutionHistory.class));
     }
 
     @Override
     protected void processScheduled(@NonNull Scheduled scheduled, @NonNull Method method, @NonNull Object bean) {
-        ScheduledAnnotation annotation = new ScheduledAnnotation(suffix(scheduled, method), qualifier(scheduled));
+        ScheduledAnnotationContext annotation = new ScheduledAnnotationContext(suffix(scheduled, method), qualifier(scheduled));
         registrar.process(annotation, () -> super.processScheduled(scheduled, method, bean));
     }
 

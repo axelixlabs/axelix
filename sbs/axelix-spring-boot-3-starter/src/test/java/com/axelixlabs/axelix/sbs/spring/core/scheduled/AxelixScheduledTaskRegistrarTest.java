@@ -34,7 +34,7 @@ import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotation;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,9 +54,9 @@ class AxelixScheduledTaskRegistrarTest {
 
     @BeforeEach
     void setUp() {
-        history = new ScheduledTaskExecutionHistory(new ScheduledTaskHistoryConfigurationProperties(30));
+        history = new ScheduledTaskExecutionHistory();
         registrar = new AxelixScheduledTaskRegistrar();
-        registrar.setHistory(() -> history);
+        registrar.setHistory(history);
     }
 
     @AfterEach
@@ -68,7 +68,7 @@ class AxelixScheduledTaskRegistrarTest {
     void shouldWrapTheTaskScheduledForScheduledAnnotation() {
         // given: the task is registered before the scheduler is resolved, as Spring does on the startup
         ScheduledTask scheduledTask = scheduleFor(
-                new ScheduledAnnotation("cron0", null),
+                new ScheduledAnnotationContext("cron0", null),
                 () -> registrar.scheduleCronTask(new CronTask(new MethodRunnable(), "0 0 1 * * *")));
 
         // when: the scheduler is resolved and the task is scheduled again
@@ -91,11 +91,11 @@ class AxelixScheduledTaskRegistrarTest {
     @Test
     void shouldKeepTheIntervalsOfTheWrappedTasks() {
         ScheduledTask fixedDelayTask = scheduleFor(
-                new ScheduledAnnotation("fixedDelay0", null),
+                new ScheduledAnnotationContext("fixedDelay0", null),
                 () -> registrar.scheduleFixedDelayTask(
                         new FixedDelayTask(new MethodRunnable(), INTERVAL, INITIAL_DELAY)));
         ScheduledTask fixedRateTask = scheduleFor(
-                new ScheduledAnnotation("fixedRate0", null),
+                new ScheduledAnnotationContext("fixedRate0", null),
                 () -> registrar.scheduleFixedRateTask(
                         new FixedRateTask(new MethodRunnable(), INTERVAL, INITIAL_DELAY)));
 
@@ -129,7 +129,7 @@ class AxelixScheduledTaskRegistrarTest {
         assertThat(history.getExecutions()).isEmpty();
     }
 
-    private ScheduledTask scheduleFor(ScheduledAnnotation annotation, Supplier<ScheduledTask> scheduling) {
+    private ScheduledTask scheduleFor(ScheduledAnnotationContext annotation, Supplier<ScheduledTask> scheduling) {
         AtomicReference<ScheduledTask> scheduledTask = new AtomicReference<>();
         registrar.process(annotation, () -> scheduledTask.set(scheduling.get()));
         assertThat(scheduledTask.get()).isNotNull();

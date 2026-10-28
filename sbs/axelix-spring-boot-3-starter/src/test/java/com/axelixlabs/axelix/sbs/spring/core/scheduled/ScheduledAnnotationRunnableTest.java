@@ -41,7 +41,7 @@ class ScheduledAnnotationRunnableTest {
 
     @BeforeEach
     void setUp() {
-        history = new ScheduledTaskExecutionHistory(new ScheduledTaskHistoryConfigurationProperties(30));
+        history = new ScheduledTaskExecutionHistory();
     }
 
     @Test
