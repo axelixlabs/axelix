@@ -58,7 +58,8 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
 
     @Override
     protected void processScheduled(@NonNull Scheduled scheduled, @NonNull Method method, @NonNull Object bean) {
-        ScheduledAnnotationContext annotation = new ScheduledAnnotationContext(suffix(scheduled, method), qualifier(scheduled));
+        ScheduledAnnotationContext annotation =
+                new ScheduledAnnotationContext(suffix(scheduled, method), qualifier(scheduled));
         registrar.process(annotation, () -> super.processScheduled(scheduled, method, bean));
     }
 

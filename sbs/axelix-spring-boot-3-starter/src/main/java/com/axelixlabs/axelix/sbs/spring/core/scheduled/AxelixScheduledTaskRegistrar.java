@@ -101,5 +101,6 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
      * @param suffix the suffix of the task id, see {@link AxelixScheduledAnnotationBeanPostProcessor}.
      * @param qualifier the qualifier of the scheduler declared by the annotation, if any.
      */
-    record ScheduledAnnotationContext(String suffix, @Nullable String qualifier) {}
+    record ScheduledAnnotationContext(
+            String suffix, @Nullable String qualifier) {}
 }

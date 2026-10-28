@@ -57,7 +57,8 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
             throw e;
         } finally {
             long durationMillis = (System.nanoTime() - startNanos) / 1_000_000;
-            history.record(ScheduledTaskExecutions.of(id, Instant.ofEpochMilli(startNanos / 1_000_000), durationMillis, error));
+            history.record(ScheduledTaskExecutions.of(
+                    id, Instant.ofEpochMilli(startNanos / 1_000_000), durationMillis, error));
         }
     }
 
