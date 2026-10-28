@@ -45,11 +45,7 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
     private final AxelixEndpointDiscovery endpointDiscovery;
 
     public AxelixEndpointsEnvironmentPostProcessor() {
-        this(new AxelixEndpointDiscovery());
-    }
-
-    AxelixEndpointsEnvironmentPostProcessor(AxelixEndpointDiscovery endpointDiscovery) {
-        this.endpointDiscovery = endpointDiscovery;
+        this.endpointDiscovery = new AxelixEndpointDiscovery();
     }
 
     @Override

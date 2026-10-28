@@ -17,26 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.LazyInitializationBeanFactoryPostProcessor;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
-import org.springframework.boot.actuate.endpoint.EndpointId;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.core.env.StandardEnvironment;
-
-import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEndpointDiscovery;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link EndpointPathMappingValidationAutoConfiguration}.
@@ -80,19 +69,14 @@ class EndpointPathMappingValidationAutoConfigurationTest {
     @ValueSource(strings = {"axelixbeans", "aXeLiXBeans", "axe.lix.beans", "axe-lix-beans"})
     void shouldRejectEquivalentAxelixEndpointIds(String endpointId) {
         // given.
-        WebEndpointProperties properties = new WebEndpointProperties();
-        properties.getPathMapping().put(endpointId, "custom-beans");
-        StandardEnvironment environment = new StandardEnvironment();
-        AxelixEndpointDiscovery endpointDiscovery = mock(AxelixEndpointDiscovery.class);
-        when(endpointDiscovery.discoverEndpointIds(environment)).thenReturn(List.of(EndpointId.of("axelix-beans")));
-        InitializingBean validator = new EndpointPathMappingValidationAutoConfiguration()
-                .axelixEndpointPathMappingValidator(properties, environment, endpointDiscovery);
+        ApplicationContextRunner runner = contextRunner.withPropertyValues(
+                "management.endpoints.web.path-mapping." + endpointId + "=custom-beans");
 
         // when.
-        Throwable failure = catchThrowable(validator::afterPropertiesSet);
-
-        // then.
-        assertThat(failure).isInstanceOf(IllegalStateException.class);
+        runner.run(context -> {
+            // then.
+            assertThat(context.getStartupFailure()).hasRootCauseInstanceOf(IllegalStateException.class);
+        });
     }
 
     @ParameterizedTest // GH-1803
