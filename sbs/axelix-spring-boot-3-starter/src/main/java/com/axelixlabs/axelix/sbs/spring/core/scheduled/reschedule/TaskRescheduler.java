@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.scheduled;
+package com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule;
 
 import java.util.concurrent.ScheduledFuture;
 
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
+
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ManagedScheduledTask;
 
 /**
  * Interface that is capable to "re-schedule" the {@link ManagedScheduledTask}. Understanding the

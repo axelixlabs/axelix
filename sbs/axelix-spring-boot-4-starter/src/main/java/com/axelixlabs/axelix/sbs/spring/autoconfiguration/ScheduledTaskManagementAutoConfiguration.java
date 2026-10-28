@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
@@ -32,7 +31,6 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpo
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksRegistry;
@@ -95,15 +93,8 @@ public class ScheduledTaskManagementAutoConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties(prefix = ScheduledTaskHistoryConfigurationProperties.CONFIG_PROPS_PREFIX)
-    public ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties() {
-        return new ScheduledTaskHistoryConfigurationProperties();
-    }
-
-    @Bean
-    public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory(
-            ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties) {
-        return new ScheduledTaskExecutionHistory(scheduledTaskHistoryConfigurationProperties);
+    public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {
+        return new ScheduledTaskExecutionHistory();
     }
 
     @Bean

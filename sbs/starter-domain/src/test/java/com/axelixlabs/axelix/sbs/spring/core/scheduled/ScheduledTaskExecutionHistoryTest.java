@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,7 @@ class ScheduledTaskExecutionHistoryTest {
 
     @BeforeEach
     void setUp() {
-        history = history(30);
+        history = new ScheduledTaskExecutionHistory();
     }
 
     @Test
@@ -56,32 +57,24 @@ class ScheduledTaskExecutionHistoryTest {
 
     @Test
     void record_shouldEvictOldestExecutionWhenTaskQueueExceedsTheLimit() {
-        history = history(2);
-        ScheduledTaskExecution first = execution(TASK_ID);
-        ScheduledTaskExecution second = execution(TASK_ID);
-        ScheduledTaskExecution third = execution(TASK_ID);
+        List<ScheduledTaskExecution> executions = executions(TASK_ID, 11);
 
-        history.record(first);
-        history.record(second);
-        history.record(third);
+        executions.forEach(history::record);
 
-        assertThat(history.getExecutions()).containsExactly(second, third);
+        assertThat(history.getExecutions()).containsExactlyElementsOf(executions.subList(1, 11));
     }
 
     @Test
     void record_shouldEvictPerTaskIndependently() {
-        history = history(2);
         ScheduledTaskExecution other = execution(ANOTHER_TASK_ID);
-        ScheduledTaskExecution first = execution(TASK_ID);
-        ScheduledTaskExecution second = execution(TASK_ID);
-        ScheduledTaskExecution third = execution(TASK_ID);
+        List<ScheduledTaskExecution> executions = executions(TASK_ID, 11);
 
         history.record(other);
-        history.record(first);
-        history.record(second);
-        history.record(third);
+        executions.forEach(history::record);
 
-        assertThat(history.getExecutions()).containsExactlyInAnyOrder(other, second, third);
+        List<ScheduledTaskExecution> expected = new ArrayList<>(executions.subList(1, 11));
+        expected.add(other);
+        assertThat(history.getExecutions()).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test
@@ -109,8 +102,12 @@ class ScheduledTaskExecutionHistoryTest {
         assertThat(history.getExecutions()).containsExactly(execution);
     }
 
-    private static ScheduledTaskExecutionHistory history(int historyMaxSize) {
-        return new ScheduledTaskExecutionHistory(new ScheduledTaskHistoryConfigurationProperties(historyMaxSize));
+    private static List<ScheduledTaskExecution> executions(String taskId, int count) {
+        List<ScheduledTaskExecution> executions = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            executions.add(execution(taskId).durationMillis((long) i));
+        }
+        return executions;
     }
 
     private static ScheduledTaskExecution execution(String taskId) {

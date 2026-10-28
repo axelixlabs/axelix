@@ -62,7 +62,6 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggreg
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
 
@@ -144,7 +143,7 @@ class HeartBeatServiceTest {
 
         @Bean
         public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {
-            return new ScheduledTaskExecutionHistory(new ScheduledTaskHistoryConfigurationProperties(30));
+            return new ScheduledTaskExecutionHistory();
         }
 
         @Bean

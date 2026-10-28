@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.scheduled;
+package com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -23,6 +23,9 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.Task;
+
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ManagedScheduledTask;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskSchedulerProvider;
 
 /**
  * {@link TaskRescheduler} that is capable to re-schedule the {@link FixedDelayTask} and

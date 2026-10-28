@@ -54,6 +54,9 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTas
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.IntervalBasedTaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.TaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.TriggerBasedTaskRescheduler;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 

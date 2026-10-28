@@ -21,24 +21,23 @@ import java.util.List;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ApplicationTaskSchedulerProvider;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledAnnotationProcessorRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksRegistry;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskRescheduler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskSchedulerProvider;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.IntervalBasedTaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.TaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.reschedule.TriggerBasedTaskRescheduler;
 
 /**
  * Auto-configuration for scheduled task management functionality.
@@ -54,6 +53,12 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
 @AxelixAutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
+
+    // Static, since it is a BeanDefinitionRegistryPostProcessor.
+    @Bean
+    public static AxelixScheduledAnnotationProcessorRegistrar axelixScheduledAnnotationProcessorRegistrar() {
+        return new AxelixScheduledAnnotationProcessorRegistrar();
+    }
 
     // The declared type must not be a SchedulingConfigurer: Spring Boot looks at it only, and in the older versions
     // it does not create its own 'taskScheduler' when there is a SchedulingConfigurer bean. Spring itself still
@@ -95,15 +100,8 @@ public class ScheduledTaskManagementAutoConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties(prefix = ScheduledTaskHistoryConfigurationProperties.CONFIG_PROPS_PREFIX)
-    public ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties() {
-        return new ScheduledTaskHistoryConfigurationProperties();
-    }
-
-    @Bean
-    public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory(
-            ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties) {
-        return new ScheduledTaskExecutionHistory(scheduledTaskHistoryConfigurationProperties);
+    public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {
+        return new ScheduledTaskExecutionHistory();
     }
 
     @Bean
