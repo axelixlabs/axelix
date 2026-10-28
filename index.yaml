@@ -10,6 +10,36 @@ entries:
           url: https://github.com/axelixlabs/axelix
       artifacthub.io/prerelease: "false"
     apiVersion: v2
+    appVersion: 1.2.2
+    created: "2026-10-28T17:20:13.407015608+03:00"
+    description: Helm chart for deploying Axelix Master to Kubernetes
+    digest: ac60883bc98b3014b0ae4a36c40b75e6a95b4352db7ddf0b2732cd65b5280933
+    home: https://axelix.io
+    icon: https://axelixlabs.github.io/helm-charts/logo.svg
+    keywords:
+    - monitoring
+    - java
+    - spring-boot
+    maintainers:
+    - email: mikhailpolivakha@gmail.com
+      name: Mikhail Polivakha
+    name: axelix
+    sources:
+    - https://github.com/axelixlabs/axelix
+    - https://github.com/axelixlabs/helm-charts
+    type: application
+    urls:
+    - https://github.com/axelixlabs/axelix/releases/download/v1.2.2/axelix-1.2.2.tgz
+    version: 1.2.2
+  - annotations:
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Charts Source
+          url: https://github.com/axelixlabs/helm-charts
+        - name: Upstream Project
+          url: https://github.com/axelixlabs/axelix
+      artifacthub.io/prerelease: "false"
+    apiVersion: v2
     appVersion: 1.2.1
     created: "2026-10-20T15:56:14.596516872Z"
     description: Helm chart for deploying Axelix Master to Kubernetes
@@ -271,4 +301,4 @@ entries:
     urls:
     - https://github.com/axelixlabs/axelix/releases/download/v1.0.0-M1/axelix-1.0.0-m1.tgz
     version: 1.0.0-m1
-generated: "2026-10-20T15:56:14.596571814Z"
+generated: "2026-10-28T17:20:13.405581747+03:00"
