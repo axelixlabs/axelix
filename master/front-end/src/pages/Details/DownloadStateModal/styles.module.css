@@ -1,0 +1,307 @@
+.Title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.Subtitle {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Groups {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 520px;
+    margin-top: 16px;
+    overflow: auto;
+}
+
+.Group {
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.GroupHeader.GroupHeader {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 10px 14px;
+    background-color: var(--axelix-grey-25);
+
+    /* The antd label wrapper around the custom content */
+    > span:last-child {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        padding-inline-end: 0;
+    }
+}
+
+.GroupTitle {
+    flex: 1;
+    color: var(--axelix-grey-700);
+}
+
+.GroupCount {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+    font-variant-numeric: tabular-nums;
+}
+
+.ItemWrapper {
+    border-top: 1px solid var(--axelix-grey-200);
+}
+
+.Item.Item {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    margin: 0;
+    padding: 11px 14px;
+
+    &:hover {
+        background-color: var(--axelix-grey-50);
+    }
+
+    /* Align the box with the item name rather than the middle of the row */
+    :global(.ant-checkbox) {
+        align-self: flex-start;
+        margin-top: 3px;
+    }
+
+    > span:last-child {
+        display: grid;
+        flex: 1;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        padding-inline-end: 0;
+    }
+}
+
+.ItemText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ItemName {
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.ItemDescription {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.ItemSize {
+    color: var(--axelix-grey-500);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    white-space: nowrap;
+}
+
+.Warning {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 14px 12px 40px;
+    padding: 10px 12px;
+    border: 1px solid var(--axelix-orange-200);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-orange-50);
+    color: var(--axelix-grey-700);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.WarningTitle {
+    color: var(--axelix-orange-700);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Run {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.Progress {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ProgressTrack {
+    position: relative;
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-grey-100);
+}
+
+/* The export is a single request, so its progress is unknown: an indeterminate bar */
+.ProgressBar {
+    position: absolute;
+    width: 35%;
+    height: 100%;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-green-500);
+    animation: indeterminate 1.4s ease-in-out infinite;
+}
+
+@keyframes indeterminate {
+    from {
+        left: -35%;
+    }
+
+    to {
+        left: 100%;
+    }
+}
+
+.ProgressLabel {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.RunList {
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.RunItem {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 14px;
+
+    & + & {
+        border-top: 1px solid var(--axelix-grey-100);
+    }
+}
+
+.Spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--axelix-green-100);
+    border-top-color: var(--axelix-green-500);
+    border-radius: var(--axelix-border-radius-pill);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.Done {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid var(--axelix-green-200);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-green-50);
+}
+
+.DoneIcon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+
+    circle {
+        fill: var(--axelix-green-100);
+    }
+
+    path {
+        stroke: var(--axelix-green-700);
+    }
+}
+
+.DoneText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.FileName {
+    color: var(--axelix-grey-600);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    overflow-wrap: anywhere;
+}
+
+.Footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--axelix-grey-200);
+}
+
+.Summary {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+}
+
+.Stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: start;
+}
+
+.StatLabel {
+    color: var(--axelix-grey-400);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.StatValue {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.HeapDot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-orange-500);
+}
+
+.Divider {
+    flex-shrink: 0;
+    width: 1px;
+    height: 30px;
+    background-color: var(--axelix-grey-200);
+}
+
+.Actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 10px;
+}

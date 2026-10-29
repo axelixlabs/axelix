@@ -17,6 +17,8 @@
  */
 import dayjs from "dayjs";
 
+import { EExportableComponent } from "@/models";
+
 export const VALUE_TRANSFORMERS: { [key: string]: (value: string) => string } = {
     commitTimestamp: (timestamp: string) => {
         const unixEpochTime = Number(timestamp);
@@ -27,3 +29,21 @@ export const VALUE_TRANSFORMERS: { [key: string]: (value: string) => string } = 
         }
     },
 };
+
+/**
+ * The state components that can be exported, grouped as the download dialog shows them.
+ */
+export const EXPORTABLE_COMPONENT_GROUPS: { key: "jvm" | "spring"; components: EExportableComponent[] }[] = [
+    { key: "jvm", components: [EExportableComponent.HEAP_DUMP, EExportableComponent.THREAD_DUMP] },
+    {
+        key: "spring",
+        components: [
+            EExportableComponent.BEANS,
+            EExportableComponent.CONDITIONS,
+            EExportableComponent.CONFIG_PROPS,
+            EExportableComponent.ENV,
+            EExportableComponent.CACHES,
+            EExportableComponent.SCHEDULED_TASKS,
+        ],
+    },
+];

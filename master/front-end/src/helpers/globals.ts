@@ -90,7 +90,14 @@ export const commonNormalize = (string: string): string => {
     return canonicalize(string);
 };
 
-export const downloadFile = (data: Blob | string): void => {
+/**
+ * Extract the file name from the given Content-Disposition header value, e.g. {@code attachment; filename="state.zip"}.
+ */
+export const extractFileName = (contentDisposition?: string): string | undefined => {
+    return contentDisposition?.match(/filename="?([^";]+)"?/i)?.[1];
+};
+
+export const downloadFile = (data: Blob | string, fileName: string = ""): void => {
     const mimeType = typeof data === "string" ? EMimeTypes.TEXT_PLAIN : EMimeTypes.ZIP;
 
     const blob = new Blob([data], { type: mimeType });
@@ -99,7 +106,7 @@ export const downloadFile = (data: Blob | string): void => {
     const link = document.createElement("a");
     link.href = url;
 
-    link.setAttribute("download", "");
+    link.setAttribute("download", fileName);
 
     document.body.appendChild(link);
     link.click();
