@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.master.api.external.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.master.api.external.RequiredSince;
+
 /**
  * The profile of a given details.
  *
@@ -91,9 +93,19 @@ public record InstanceDetailsResponse(
     /**
      * The profile of a given OS.
      *
-     * @param name     The name of the operating system.
-     * @param version  The version of the operating system.
-     * @param arch     The architecture of the CPU.
+     * @param name         The name of the operating system.
+     * @param version      The version of the operating system.
+     * @param arch         The architecture of the CPU.
+     * @param pid          The ID of the application process. Should always present since 1.3.0
+     * @param processUser  The OS user the application process runs as. Should always present since 1.3.0
      */
-    public record OSProfile(String name, String version, String arch) {}
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record OSProfile(
+            String name,
+            String version,
+            String arch,
+            // TODO: remove @Nullable from pid and processUser once starters older than 1.3.0 leave the
+            //  compatibility window - every 1.3.0+ starter always reports both of them.
+            @RequiredSince(value = "1.3.0") @Nullable Long pid,
+            @RequiredSince(value = "1.3.0") @Nullable String processUser) {}
 }

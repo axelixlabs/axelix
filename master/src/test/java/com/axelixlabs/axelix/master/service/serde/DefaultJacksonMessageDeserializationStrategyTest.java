@@ -97,7 +97,9 @@ public class DefaultJacksonMessageDeserializationStrategyTest {
              "os": {
                  "name": "Windows 10",
                  "version": "10.0",
-                 "arch": "amd64"
+                 "arch": "amd64",
+                 "pid": 4821,
+                 "processUser": "spring"
              }
         }
         """;
@@ -132,5 +134,7 @@ public class DefaultJacksonMessageDeserializationStrategyTest {
         assertThat(os.getName()).isEqualTo("Windows 10");
         assertThat(os.getVersion()).isEqualTo("10.0");
         assertThat(os.getArch()).isEqualTo("amd64");
+        assertThat(os.getPid()).isEqualTo(4821L);
+        assertThat(os.getProcessUser()).isEqualTo("spring");
     }
 }

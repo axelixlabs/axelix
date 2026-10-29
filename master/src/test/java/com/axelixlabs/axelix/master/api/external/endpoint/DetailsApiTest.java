@@ -96,7 +96,9 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
            "os": {
              "name": "Windows 10",
              "version": "10.0",
-             "arch": "amd64"
+             "arch": "amd64",
+             "pid": 4821,
+             "processUser": "spring"
            }
          }
         """;
@@ -201,7 +203,9 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
              "os": {
                  "name": "Windows 10",
                  "version": "10.0",
-                 "arch": "amd64"
+                 "arch": "amd64",
+                 "pid": 4821,
+                 "processUser": "spring"
              }
          }
         """;

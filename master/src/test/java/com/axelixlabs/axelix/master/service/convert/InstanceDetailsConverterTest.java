@@ -113,6 +113,8 @@ public class InstanceDetailsConverterTest {
         assertThat(os.name()).isEqualTo("Windows 10");
         assertThat(os.version()).isEqualTo("10.0");
         assertThat(os.arch()).isEqualTo("amd64");
+        assertThat(os.pid()).isEqualTo(4821L);
+        assertThat(os.processUser()).isEqualTo("spring");
     }
 
     private static InstanceDetails getInstanceDetails() {
@@ -138,7 +140,12 @@ public class InstanceDetailsConverterTest {
                 .group("org.springframework.samples")
                 .time("2025-10-29T15:10:54.770Z");
 
-        OsDetails osDetails = new OsDetails().name("Windows 10").version("10.0").arch("amd64");
+        OsDetails osDetails = new OsDetails()
+                .name("Windows 10")
+                .version("10.0")
+                .arch("amd64")
+                .pid(4821L)
+                .processUser("spring");
 
         return new InstanceDetails()
                 .git(gitDetails)

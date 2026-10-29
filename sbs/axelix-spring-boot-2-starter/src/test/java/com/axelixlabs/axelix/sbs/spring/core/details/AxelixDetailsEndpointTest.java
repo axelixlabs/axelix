@@ -124,7 +124,10 @@ class AxelixDetailsEndpointTest {
                         entry("group", "com.axelixlabs"),
                         entry("time", "2026-07-24T09:33:48.541842752Z"));
 
-        assertThatJson(responseBody).inPath("os").isObject().containsOnlyKeys("name", "version", "arch");
+        assertThatJson(responseBody)
+                .inPath("os")
+                .isObject()
+                .containsOnlyKeys("name", "version", "arch", "pid", "processUser");
     }
 
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-details")

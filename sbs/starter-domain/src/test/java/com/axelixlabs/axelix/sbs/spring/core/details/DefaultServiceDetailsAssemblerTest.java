@@ -81,5 +81,7 @@ class DefaultServiceDetailsAssemblerTest extends AbstractDetailsSharedContextTes
         assertThat(os.getName()).isNotBlank();
         assertThat(os.getVersion()).isNotBlank();
         assertThat(os.getArch()).isNotBlank();
+        assertThat(os.getPid()).isEqualTo(ProcessHandle.current().pid());
+        assertThat(os.getProcessUser()).isEqualTo(System.getProperty("user.name"));
     }
 }

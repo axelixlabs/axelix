@@ -116,6 +116,11 @@ public class InstanceDetailsConverter implements Converter<DetailsConversionRequ
     }
 
     private OSProfile osDetailsConverter(OsDetails osDetails) {
-        return new OSProfile(osDetails.getName(), osDetails.getVersion(), osDetails.getArch());
+        return new OSProfile(
+                osDetails.getName(),
+                osDetails.getVersion(),
+                osDetails.getArch(),
+                osDetails.getPid(),
+                osDetails.getProcessUser());
     }
 }

@@ -179,3 +179,12 @@ components:
           type: string
           description: The architecture of the CPU.
           x-axelix-introduced-in: 1.2.0
+        pid:
+          type: integer
+          format: int64
+          description: The ID of the process the application runs in.
+          x-axelix-introduced-in: 1.3.0
+        processUser:
+          type: string
+          description: The name of the OS user the application process runs as.
+          x-axelix-introduced-in: 1.3.0

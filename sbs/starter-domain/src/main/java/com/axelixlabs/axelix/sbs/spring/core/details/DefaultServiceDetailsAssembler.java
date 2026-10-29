@@ -101,6 +101,8 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         return new OsDetails()
                 .name(emptyIfNull(System.getProperty("os.name")))
                 .version(emptyIfNull(System.getProperty("os.version")))
-                .arch(emptyIfNull(System.getProperty("os.arch")));
+                .arch(emptyIfNull(System.getProperty("os.arch")))
+                .pid(ProcessHandle.current().pid())
+                .processUser(System.getProperty("user.name"));
     }
 }
