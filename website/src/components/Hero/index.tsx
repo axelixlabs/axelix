@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { AiInstallPrompt } from "../AiInstallPrompt";
+
 import { HeroActions } from "./HeroActions";
 import { HeroBackground } from "./HeroBackground";
 import { HeroHeadline } from "./HeroHeadline";
@@ -33,7 +35,11 @@ export const Hero = () => {
 
                     <HeroRotator />
 
-                    <HeroActions />
+                    <div className={styles.ActionsGroup}>
+                        <HeroActions />
+
+                        <AiInstallPrompt />
+                    </div>
                 </div>
 
                 <HeroVideo />

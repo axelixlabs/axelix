@@ -66,3 +66,9 @@ export interface IAxelixVersionData {
     version: string | null;
     loading: boolean;
 }
+
+export interface IAgent {
+    name: string;
+    icon: ReactNode;
+    dark?: boolean;
+}

@@ -32,7 +32,7 @@ export const StarterMini = ({ artifact, activeSnippetRef }: IProps) => {
     const timers = useRef<Array<ReturnType<typeof setTimeout> | null>>([null, null, null]);
 
     const { version } = useAxelixVersion();
-    const axelixActualVersion = version ?? "1.0.0";
+    const axelixActualVersion = version ?? "1.2.2";
 
     const blocks: { label: string; code: string }[] = [
         {

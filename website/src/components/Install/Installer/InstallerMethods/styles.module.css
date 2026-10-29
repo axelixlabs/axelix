@@ -54,6 +54,7 @@
     background-color: var(--axelix-green-500);
 }
 
+/* Keeps the prompt right under the method buttons; any extra height goes above the footer. */
 .MethodFooter {
     margin-top: auto;
     margin-bottom: 8px;

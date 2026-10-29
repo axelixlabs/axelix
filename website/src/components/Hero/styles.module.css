@@ -1,6 +1,6 @@
 .MainWrapper {
   position: relative;
-  padding-block: 128px 96px;
+  padding-block: 96px;
   overflow: hidden;
   isolation: isolate;
   min-height: 100vh;
@@ -18,4 +18,11 @@
   flex-direction: column;
   align-items: center;
   max-width: 980px;
+}
+
+.ActionsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 100%;
 }

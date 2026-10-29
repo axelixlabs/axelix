@@ -61,3 +61,9 @@
     margin-left: 4px;
     line-height: 1;
 }
+
+@media (width <= 640px) {
+    .ActionsWrapper {
+        flex-direction: column;
+    }
+}

@@ -103,6 +103,60 @@ ol {
   text-underline-offset: 6px;
 }
 
+/* A rotating gradient border; the layer turns by rotate, not an animated angle, so it's composited, not repainted. */
+.ShimmerBorder {
+  --shimmer-width: 1.5px;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.ShimmerBorder::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -2;
+  width: 150%;
+  aspect-ratio: 1;
+  background: conic-gradient(
+    var(--axelix-green-500),
+    var(--axelix-green-200),
+    var(--axelix-green-500),
+    var(--axelix-green-700),
+    var(--axelix-green-500)
+  );
+  translate: -50% -50%;
+  animation: shimmer 4s linear infinite;
+}
+
+.ShimmerBorder:hover::before,
+.ShimmerBorder:focus-within::before {
+  animation-play-state: paused;
+}
+
+.ShimmerBorder::after {
+  content: "";
+  position: absolute;
+  inset: var(--shimmer-width);
+  z-index: -1;
+  border-radius: inherit;
+  background-color: var(--shimmer-fill, var(--axelix-paper));
+}
+
+@keyframes shimmer {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ShimmerBorder::before {
+    animation: none;
+  }
+}
+
 @keyframes pulse {
   0%,
   100% {
