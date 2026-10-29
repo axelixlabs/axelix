@@ -92,7 +92,6 @@
                 "small": "< {{mb}} МБ"
             },
             "download": "Скачать .zip",
-            "selectAtLeastOne": "Выберите хотя бы один элемент",
             "close": "Закрыть"
         },
         "spring": {

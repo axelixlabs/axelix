@@ -95,9 +95,7 @@ export const DownloadStateFooter = ({ phase, chosen, total, onClose, onStart }: 
                             loading={phase === "run"}
                             onClick={onStart}
                         >
-                            {chosen.length === 0
-                                ? t("Details.DownloadState.selectAtLeastOne")
-                                : t("Details.DownloadState.download")}
+                            {t("Details.DownloadState.download")}
                         </Button>
                     )}
                 </div>

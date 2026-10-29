@@ -90,7 +90,6 @@
                 "small": "< {{mb}} MB"
             },
             "download": "Download .zip",
-            "selectAtLeastOne": "Select at least one item",
             "close": "Close"
         },
         "spring": {
