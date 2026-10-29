@@ -22,7 +22,7 @@ import { useParams } from "react-router";
 
 import { DownloadIcon } from "@/assets";
 import { Loader, UniversalModal } from "@/components";
-import { downloadFile } from "@/helpers";
+import { downloadFile, resolveInitials } from "@/helpers";
 import { EExportableComponent } from "@/models";
 import { exportStateData } from "@/services";
 
@@ -33,11 +33,16 @@ interface IProps {
      * The name of the instance
      */
     instanceName: string;
+
+    /**
+     * The group ID of the application
+     */
+    groupId: string;
 }
 
 const allComponents = Object.values(EExportableComponent);
 
-export const DetailsHeader = ({ instanceName }: IProps) => {
+export const DetailsHeader = ({ instanceName, groupId }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
@@ -82,13 +87,18 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
-                <div className={`TextLarge ${styles.MainTitle}`}>{instanceName}</div>
-                <Button
-                    type="primary"
-                    icon={<DownloadIcon />}
-                    onClick={() => setIsModalOpen(true)}
-                    className={styles.Download}
-                >
+                <div className={styles.Identity}>
+                    <span className={styles.Initials}>{resolveInitials(instanceName)}</span>
+                    <div className={styles.Names}>
+                        <span className={`TextMedium ${styles.MainTitle}`}>{instanceName}</span>
+                        {groupId && (
+                            <span className={styles.GroupId}>
+                                groupId: <span className={styles.GroupIdValue}>{groupId}</span>
+                            </span>
+                        )}
+                    </div>
+                </div>
+                <Button icon={<DownloadIcon />} onClick={() => setIsModalOpen(true)} className={styles.Download}>
                     {t("Details.downloadState")}
                 </Button>
                 <UniversalModal

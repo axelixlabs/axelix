@@ -31,6 +31,7 @@ export interface IDetailsRuntime {
     javaVersion: string;
     jdkVendor: string;
     kotlinVersion?: string;
+    garbageCollector: string;
 }
 
 export interface IDetailsSpring {
@@ -50,6 +51,8 @@ export interface IDetailsOS {
     name: string;
     version: string;
     arch: string;
+    pid?: number;
+    processUser?: string;
 }
 
 export interface IDetailsResponseBody {

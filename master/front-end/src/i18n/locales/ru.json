@@ -66,13 +66,26 @@
         "os": {
             "name": "Семейство",
             "version": "Версия",
-            "arch": "Архитектура CPU"
+            "arch": "Архитектура CPU",
+            "pid": "PID",
+            "processUser": "Пользователь процесса"
         },
         "build": {
             "group": "Группа",
             "version": "Версия",
             "artifact": "Имя артефакта",
             "time": "Время сборки"
+        },
+        "garbageCollectors": {
+            "G1": "G1",
+            "SHENADOAH": "Shenandoah",
+            "GEN_SHENADOAH": "Generational Shenandoah",
+            "ZGC": "ZGC",
+            "EPSILONGC": "Epsilon",
+            "PARALLEL": "Parallel",
+            "SERIAL": "Serial",
+            "CMS": "CMS",
+            "UNKNOWN": "Неизвестно"
         },
         "git": {
             "commitShaShort": "Коммит",

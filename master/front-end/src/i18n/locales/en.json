@@ -64,13 +64,26 @@
         "os": {
             "name": "OS Family",
             "version": "Kernel Version",
-            "arch": "CPU Architecture"
+            "arch": "CPU Architecture",
+            "pid": "PID",
+            "processUser": "Process User"
         },
         "build": {
             "group": "Group ID",
             "version": "Version",
             "artifact": "Artifact ID",
             "time": "Build Timestamp"
+        },
+        "garbageCollectors": {
+            "G1": "G1",
+            "SHENADOAH": "Shenandoah",
+            "GEN_SHENADOAH": "Generational Shenandoah",
+            "ZGC": "ZGC",
+            "EPSILONGC": "Epsilon",
+            "PARALLEL": "Parallel",
+            "SERIAL": "Serial",
+            "CMS": "CMS",
+            "UNKNOWN": "Unknown"
         },
         "git": {
             "commitShaShort": "Commit SHA",

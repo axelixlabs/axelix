@@ -1,15 +1,84 @@
 .InnerWrapper {
-    display: flex;
-    column-gap: 20px;
+    display: grid;
+    grid-template-columns: 1.22fr 1fr;
+    align-items: start;
+    gap: 18px;
+
+    @media (width <= 1100px) {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 .ColumnWrapper {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    gap: 18px;
+    min-width: 0;
 }
 
-.CardIcon {
-    height: 16px;
-    width: 16px;
+.Text {
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Code,
+.CodeStrong,
+.CodeMuted,
+.Chip,
+.BranchChip {
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    font-variant-numeric: tabular-nums;
+}
+
+.Code {
+    color: var(--axelix-grey-900);
+}
+
+.CodeStrong {
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.CodeMuted {
+    color: var(--axelix-grey-600);
+}
+
+.Chip,
+.BranchChip {
+    padding: 2px 8px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-small);
+    background-color: var(--axelix-grey-50);
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.BranchChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-color: var(--axelix-green-200);
+    background-color: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+
+    svg {
+        width: 12px;
+        height: 12px;
+        flex-shrink: 0;
+    }
+}
+
+.Avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-blue-50);
+    color: var(--axelix-blue-700);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
 }

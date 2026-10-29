@@ -15,11 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export enum ECopyableField {
-    COMMIT_SHA_SHORT = "commitShaShort",
-    BRANCH = "branch",
-    ARTIFACT = "artifact",
-}
 
 /**
  * The particular component of the state that can be exported.

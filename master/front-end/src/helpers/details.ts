@@ -15,36 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { FC, SVGProps } from "react";
-
-import { FreeBSDIcon, JavaIcon, KotlinIcon, LinuxIcon, WindowsIcon } from "@/assets";
-import { ECopyableField, type IDetailsRuntime } from "@/models";
 
 /**
- * Resolve the Icon to be used on the details card for the given Operating System.
+ * Resolve the short initials shown in the tile next to the instance name, e.g. "sp" for "spring-petclinic".
  *
- * @param osName operating system name
+ * @param serviceName the name of the service
  */
-export function resolveOsIcon(osName: string): FC<SVGProps<SVGSVGElement>> {
-    switch (osName.trim().toLowerCase()) {
-        case "windows":
-            return WindowsIcon;
-        case "freebsd":
-            return FreeBSDIcon;
-        default:
-            return LinuxIcon;
+export function resolveInitials(serviceName: string): string {
+    const words = serviceName.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+
+    if (words.length > 1) {
+        return (words[0][0] + words[1][0]).toLowerCase();
     }
-}
 
-export function isCopyableField(field: string): boolean {
-    return (Object.values(ECopyableField) as string[]).includes(field);
-}
-
-/**
- * Resolve the Icon to be used on the details card for the given runtime.
- *
- * @param runtime the runtime information
- */
-export function resolveLangIcon(runtime: IDetailsRuntime): FC<SVGProps<SVGSVGElement>> {
-    return runtime.kotlinVersion ? KotlinIcon : JavaIcon;
+    return serviceName.slice(0, 2).toLowerCase();
 }
