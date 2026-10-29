@@ -66,9 +66,7 @@ export const InstallerMethods = ({ installMethod, setInstallMethod }: IProps) =>
                 </button>
             ))}
 
-            <div className={styles.AiInstallPromptWrapper}>
-                <AiInstallPrompt compact />
-            </div>
+            <AiInstallPrompt compact />
 
             <div className={styles.MethodFooter}>
                 <p className={styles.Description}>{INSTALLATION_METHODS[installMethod].description}</p>
