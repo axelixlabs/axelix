@@ -17,6 +17,18 @@ release, it ships the whole fleet together: the Spring Boot starters, the build 
 This release stops the starters from taking over your application's task scheduling, brings the AOT cache back to the
 Master Docker image, and patches CVEs in that image. We recommend upgrading both Master and the starters.
 
+## Security
+
+### Docker image: `brotli-libs` and `musl` upgraded
+
+The Master Docker image has been rebuilt with `brotli-libs 1.2.1-r0` and `musl` / `musl-utils 1.2.6-r3` to address
+CVE-2026-111497 and CVE-2026-107891. No change is needed on your side beyond pulling the new image.
+
+### UI build dependencies
+
+`vite`, `vitest`, `@vitest/mocker`, `follow-redirects`, `fast-uri`, `qs` and `zod` have been upgraded in the Master UI build. These are build- and
+test-time dependencies only, so they are not part of the UI that Master serves.
+
 ## Bug fixes
 
 ### The starter no longer replaces your task scheduler
@@ -29,8 +41,10 @@ own `taskScheduler` and `applicationTaskExecutor`. The result:
 - `spring.task.scheduling.*` and `spring.task.execution.*` properties were silently ignored;
 - scheduler and executor customizers, as well as virtual threads, had no effect.
 
-From 1.2.2, the starter uses the application's own scheduler and reschedules tasks on it when you manage them from
-the UI. Your scheduling configuration applies again, exactly as it would without Axelix.
+From 1.2.2, the starter no longer creates its own scheduler, so Spring Boot configures `taskScheduler` and
+`applicationTaskExecutor` as usual, and Axelix reschedules tasks on the application's scheduler when you manage them
+from the UI. Re-enabling a task or changing its schedule requires `@EnableScheduling`: tasks registered through a
+custom `ScheduledTaskRegistrar` without it cannot be rescheduled.
 
 ### Master starts faster again: the AOT cache is back
 
@@ -41,18 +55,6 @@ any CPU.
 With the cache in place, Master starts about **25% faster**, and with a bounded heap (`-Xmx` or a container memory
 limit) its RSS is about **7% smaller**. The full story of the crash and the fix is in
 [a separate write-up](https://axelix.io/blog/aot-cache-sigill).
-
-## Security
-
-### Docker image: `brotli-libs` and `musl` upgraded
-
-The Master Docker image has been rebuilt with `brotli-libs 1.2.1-r0` and `musl` / `musl-utils 1.2.6-r3` to address
-CVE-2026-111497 and CVE-2026-107891. No change is needed on your side beyond pulling the new image.
-
-### UI build dependencies
-
-`vite`, `vitest`, `fast-uri`, `qs` and `zod` have been upgraded in the Master UI build. These are build- and
-test-time dependencies only, so they are not part of the UI that Master serves.
 
 ## Heads-up: changes in scheduled tasks management
 
@@ -86,5 +88,4 @@ time.
 
 **Full Changelog**: https://github.com/axelixlabs/axelix/compare/v1.2.1...v1.2.2
 
-Thanks to everyone who contributed to this release: [@mipo256](https://github.com/mipo256),
-[@chrshnv](https://github.com/chrshnv), and [@dima-bzz](https://github.com/dima-bzz)!
+Thanks to all contributors who made this release happen!
