@@ -6,11 +6,15 @@ on:
     paths:
       - 'master-e2e-tests/**'
       - 'charts/**'
+      # Must stay after 'charts/**': the last matching pattern wins, so placed above it the exclusion has no effect.
+      - '!charts/**/README.md'
   push:
     branches: [ master ]
     paths:
       - 'master-e2e-tests/**'
       - 'charts/**'
+      # Must stay after 'charts/**': the last matching pattern wins, so placed above it the exclusion has no effect.
+      - '!charts/**/README.md'
   workflow_dispatch:
   workflow_call:
   schedule:
