@@ -1,18 +1,58 @@
 .MainWrapper {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    column-gap: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--axelix-grey-200);
+}
+
+.Identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.Initials {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-grey-900);
+    color: var(--axelix-green-500);
+    font-family: var(--axelix-font-family-code);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Names {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
 }
 
 .MainTitle {
-    margin-bottom: 40px;
-    word-break: normal;
+    color: var(--axelix-grey-900);
+    overflow-wrap: anywhere;
+}
+
+.GroupId {
+    color: var(--axelix-grey-500);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.GroupIdValue {
+    color: var(--axelix-grey-700);
 }
 
 .Download {
-    width: fit-content;
-    justify-self: end;
+    flex-shrink: 0;
 }
 
 .List {
