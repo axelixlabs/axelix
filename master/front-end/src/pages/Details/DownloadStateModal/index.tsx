@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { downloadFile, extractFileName } from "@/helpers";
-import type { EExportableComponent } from "@/models";
+import type { EExportableComponent, TStateExportStage } from "@/models";
 import { exportStateData } from "@/services";
 import { EXPORTABLE_COMPONENT_GROUPS } from "@/utils";
 
@@ -53,23 +53,21 @@ export const DownloadStateModal = ({ open, onClose }: IProps) => {
     const { t } = useTranslation();
 
     const [selected, setSelected] = useState<EExportableComponent[]>(DEFAULT_SELECTION);
-    const [phase, setPhase] = useState<"pick" | "run" | "done">("pick");
+    const [stage, setStage] = useState<TStateExportStage>("pick");
     const [fileName, setFileName] = useState<string>();
     const abortController = useRef<AbortController>(null);
 
     useEffect(() => {
         if (open) {
             setSelected(DEFAULT_SELECTION);
-            setPhase("pick");
+            setStage("pick");
         }
     }, [open]);
 
-    // Keep the dialog order, so the progress list matches the checklist
-    const chosen = ALL_COMPONENTS.filter((component) => selected.includes(component));
-
     const toggle = (components: EExportableComponent[], on: boolean): void => {
+        // Keep the selection in the dialog order, so the progress list matches the checklist
         setSelected((prev) =>
-            on ? [...new Set([...prev, ...components])] : prev.filter((component) => !components.includes(component)),
+            ALL_COMPONENTS.filter((component) => (components.includes(component) ? on : prev.includes(component))),
         );
     };
 
@@ -81,22 +79,22 @@ export const DownloadStateModal = ({ open, onClose }: IProps) => {
     const start = (): void => {
         const controller = new AbortController();
         abortController.current = controller;
-        setPhase("run");
+        setStage("run");
 
         exportStateData(
-            { instanceId: instanceId!, body: { components: chosen.map((component) => ({ component })) } },
+            { instanceId: instanceId!, body: { components: selected.map((component) => ({ component })) } },
             controller.signal,
         )
             .then((response) => {
                 const name = extractFileName(response.headers["content-disposition"]);
                 downloadFile(response.data, name);
                 setFileName(name);
-                setPhase("done");
+                setStage("done");
             })
             .catch(() => {
                 // Either cancelled by the user, or the error is already reported by the api interceptor
                 if (!controller.signal.aborted) {
-                    setPhase("pick");
+                    setStage("pick");
                 }
             });
     };
@@ -112,22 +110,22 @@ export const DownloadStateModal = ({ open, onClose }: IProps) => {
                 title={
                     <div className={styles.Title}>
                         <span className="TextMedium">{t("Details.DownloadState.title")}</span>
-                        <span className={styles.Subtitle}>{t(`Details.DownloadState.subtitle.${phase}`)}</span>
+                        <span className={styles.Subtitle}>{t(`Details.DownloadState.subtitle.${stage}`)}</span>
                     </div>
                 }
                 footer={
                     <DownloadStateFooter
-                        phase={phase}
-                        chosen={chosen}
+                        stage={stage}
+                        selected={selected}
                         total={ALL_COMPONENTS.length}
                         onClose={close}
                         onStart={start}
                     />
                 }
             >
-                {phase === "pick" && <StateChecklist selected={selected} onToggle={toggle} />}
-                {phase === "run" && <StateCollecting components={chosen} />}
-                {phase === "done" && <StateSaved fileName={fileName} />}
+                {stage === "pick" && <StateChecklist selected={selected} onToggle={toggle} />}
+                {stage === "run" && <StateCollecting components={selected} />}
+                {stage === "done" && <StateSaved fileName={fileName} />}
             </Modal>
         </>
     );

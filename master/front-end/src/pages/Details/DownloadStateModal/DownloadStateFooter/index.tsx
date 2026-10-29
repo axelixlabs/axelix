@@ -19,20 +19,20 @@ import { Button } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { DownloadIcon } from "@/assets";
-import { EExportableComponent } from "@/models";
+import { EExportableComponent, type TStateExportStage } from "@/models";
 
 import styles from "../styles.module.css";
 
 interface IProps {
     /**
-     * The current phase of the export
+     * The current stage of the export
      */
-    phase: "pick" | "run" | "done";
+    stage: TStateExportStage;
 
     /**
      * The selected components
      */
-    chosen: EExportableComponent[];
+    selected: EExportableComponent[];
 
     /**
      * The total number of exportable components
@@ -50,12 +50,12 @@ interface IProps {
     onStart: () => void;
 }
 
-export const DownloadStateFooter = ({ phase, chosen, total, onClose, onStart }: IProps) => {
+export const DownloadStateFooter = ({ stage, selected, total, onClose, onStart }: IProps) => {
     const { t } = useTranslation();
 
-    const withHeap = chosen.includes(EExportableComponent.HEAP_DUMP);
+    const withHeap = selected.includes(EExportableComponent.HEAP_DUMP);
     // Everything but the heap dump stays well below a megabyte
-    const smallCount = chosen.length - (withHeap ? 1 : 0);
+    const smallCount = selected.length - (withHeap ? 1 : 0);
 
     let sizeLabel = smallCount ? t("Details.DownloadState.size.small", { mb: smallCount }) : "—";
     if (withHeap) {
@@ -71,7 +71,7 @@ export const DownloadStateFooter = ({ phase, chosen, total, onClose, onStart }: 
                     <div className={styles.Stat}>
                         <span className={styles.StatLabel}>{t("Details.DownloadState.selected")}</span>
                         <span className={styles.StatValue}>
-                            {t("Details.DownloadState.count", { selected: chosen.length, total })}
+                            {t("Details.DownloadState.count", { selected: selected.length, total })}
                         </span>
                     </div>
                     <span className={styles.Divider} />
@@ -79,20 +79,20 @@ export const DownloadStateFooter = ({ phase, chosen, total, onClose, onStart }: 
                         <span className={styles.StatLabel}>{t("Details.DownloadState.sizeZipped")}</span>
                         <span className={styles.StatValue}>
                             {sizeLabel}
-                            {withHeap && phase === "pick" && <span className={styles.HeapDot} />}
+                            {withHeap && stage === "pick" && <span className={styles.HeapDot} />}
                         </span>
                     </div>
                 </div>
                 <div className={styles.Actions}>
                     <Button onClick={onClose}>
-                        {phase === "done" ? t("Details.DownloadState.close") : t("cancel")}
+                        {stage === "done" ? t("Details.DownloadState.close") : t("cancel")}
                     </Button>
-                    {phase !== "done" && (
+                    {stage !== "done" && (
                         <Button
                             type="primary"
                             icon={<DownloadIcon />}
-                            disabled={chosen.length === 0}
-                            loading={phase === "run"}
+                            disabled={selected.length === 0}
+                            loading={stage === "run"}
                             onClick={onStart}
                         >
                             {t("Details.DownloadState.download")}
