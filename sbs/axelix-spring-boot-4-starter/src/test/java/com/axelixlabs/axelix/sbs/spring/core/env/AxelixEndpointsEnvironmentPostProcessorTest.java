@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link AxelixEndpointsEnvironmentPostProcessor}
  *
  * @author Marsel Semenov
+ * @author Andrey Kotov
  */
 class AxelixEndpointsEnvironmentPostProcessorTest {
 
