@@ -69,7 +69,7 @@ class AxelixScheduledTaskRegistrarTest {
     void shouldWrapTheTaskScheduledForScheduledAnnotation() {
         // given: the task is registered before the scheduler is resolved, as Spring does on the startup
         ScheduledTask scheduledTask = scheduleFor(
-                new ScheduledAnnotationContext("cron0", null),
+                new ScheduledAnnotationContext("cron0", null, false),
                 () -> registrar.scheduleCronTask(new CronTask(new MethodRunnable(), "0 0 1 * * *")));
 
         // when: the scheduler is resolved and the task is scheduled again
@@ -92,11 +92,11 @@ class AxelixScheduledTaskRegistrarTest {
     @Test
     void shouldKeepTheIntervalsOfTheWrappedTasks() {
         ScheduledTask fixedDelayTask = scheduleFor(
-                new ScheduledAnnotationContext("fixedDelay0", null),
+                new ScheduledAnnotationContext("fixedDelay0", null, false),
                 () -> registrar.scheduleFixedDelayTask(
                         new FixedDelayTask(new MethodRunnable(), INTERVAL, INITIAL_DELAY)));
         ScheduledTask fixedRateTask = scheduleFor(
-                new ScheduledAnnotationContext("fixedRate0", null),
+                new ScheduledAnnotationContext("fixedRate0", null, false),
                 () -> registrar.scheduleFixedRateTask(
                         new FixedRateTask(new MethodRunnable(), INTERVAL, INITIAL_DELAY)));
 
@@ -128,6 +128,13 @@ class AxelixScheduledTaskRegistrarTest {
 
         runnable.run();
         assertThat(history.getExecutions()).isEmpty();
+    }
+
+    @Test // the tests run on Spring Framework 6.0, which does not support the reactive tasks
+    void afterPropertiesSet_shouldNotSetUpTheRecordingRegistryWithoutTheSupportOfTheReactiveTasks() {
+        registrar.afterPropertiesSet();
+
+        assertThat(registrar.getObservationRegistry()).isNull();
     }
 
     private ScheduledTask scheduleFor(ScheduledAnnotationContext annotation, Supplier<ScheduledTask> scheduling) {

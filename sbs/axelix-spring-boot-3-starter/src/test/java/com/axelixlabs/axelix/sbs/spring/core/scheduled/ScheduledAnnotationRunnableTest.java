@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +41,7 @@ class ScheduledAnnotationRunnableTest {
     void run_shouldRunTheDelegateAndRecordTheExecutionUnderTheIdOfTheTask() {
         AtomicBoolean ran = new AtomicBoolean();
 
-        new ScheduledAnnotationRunnable(() -> ran.set(true), TASK_ID, null, history).run();
+        regular(() -> ran.set(true)).run();
 
         assertThat(ran).isTrue();
         assertThat(history.getExecutions())
@@ -51,9 +52,39 @@ class ScheduledAnnotationRunnableTest {
     @Test
     void shouldExposeTheIdAndTheQualifier() {
         ScheduledAnnotationRunnable runnable =
-                new ScheduledAnnotationRunnable(() -> {}, TASK_ID, "otherScheduler", history);
+                new ScheduledAnnotationRunnable(() -> {}, TASK_ID, "otherScheduler", false, history);
 
         assertThat(runnable).hasToString(TASK_ID);
         assertThat(runnable.getQualifier()).isEqualTo("otherScheduler");
+    }
+
+    @Test
+    void run_shouldExposeTheIdOfReactiveTaskWhileSubscribingOnly() {
+        AtomicReference<String> taskIdWhileSubscribing = new AtomicReference<>();
+
+        reactive(() -> taskIdWhileSubscribing.set(ScheduledAnnotationRunnable.currentReactiveTaskId()))
+                .run();
+
+        assertThat(taskIdWhileSubscribing).hasValue(TASK_ID);
+        assertThat(ScheduledAnnotationRunnable.currentReactiveTaskId()).isNull();
+        assertThat(history.getExecutions()).isEmpty();
+    }
+
+    @Test
+    void run_shouldNotExposeTheIdOfRegularTask() {
+        AtomicReference<String> taskIdWhileRunning = new AtomicReference<>("not set");
+
+        regular(() -> taskIdWhileRunning.set(ScheduledAnnotationRunnable.currentReactiveTaskId()))
+                .run();
+
+        assertThat(taskIdWhileRunning.get()).isNull();
+    }
+
+    private ScheduledAnnotationRunnable regular(Runnable delegate) {
+        return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, false, history);
+    }
+
+    private ScheduledAnnotationRunnable reactive(Runnable delegate) {
+        return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, true, history);
     }
 }

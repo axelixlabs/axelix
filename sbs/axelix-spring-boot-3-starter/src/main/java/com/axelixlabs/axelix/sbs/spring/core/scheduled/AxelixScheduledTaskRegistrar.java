@@ -17,7 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.FixedDelayTask;
@@ -35,17 +38,66 @@ import com.axelixlabs.axelix.common.utils.Lazy;
  *
  * <p>The one-time tasks of Spring Framework 6.1+ are left as is too.
  *
+ * <p>The executions of the reactive tasks end only when their publishers complete, which only the observations of
+ * Spring Framework 6.1+ know about. So the observation registry of this registrar always records them, whether the
+ * application has its own registry or not.
+ *
  * @author Nikita Kirillov
  */
 public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
+
+    private static final Logger log = LoggerFactory.getLogger(AxelixScheduledTaskRegistrar.class);
 
     private final ThreadLocal<@Nullable ScheduledAnnotationContext> processingContext = new ThreadLocal<>();
 
     @SuppressWarnings("NullAway.Init")
     private Lazy<ScheduledTaskExecutionHistory> history;
 
+    private @Nullable ObservationRegistry observationRegistry;
+
+    private boolean reactiveTaskScheduled;
+
     void setHistory(Lazy<ScheduledTaskExecutionHistory> history) {
         this.history = history;
+    }
+
+    /**
+     * Overrides the method that exists since Spring Framework 6.1, so it deliberately has no {@code @Override}.
+     */
+    public void setObservationRegistry(@Nullable ObservationRegistry observationRegistry) {
+        this.observationRegistry = observationRegistry;
+    }
+
+    /**
+     * Overrides the method that exists since Spring Framework 6.1, so it deliberately has no {@code @Override}.
+     *
+     * @return the registry of the application, if any, or an own one, in both cases recording the executions of the
+     *         reactive tasks. Absent before {@link #afterPropertiesSet()} and without the support of the reactive tasks.
+     */
+    public @Nullable ObservationRegistry getObservationRegistry() {
+        return observationRegistry;
+    }
+
+    /**
+     * Makes the observation registry record the executions of the reactive tasks. The registry of the application is
+     * set before, and the tasks start running only after.
+     */
+    @Override
+    public void afterPropertiesSet() {
+        // unlike Spring Framework 6.0, Spring Framework 6.1+ that supports the reactive tasks depends on Micrometer
+        if (AxelixScheduledAnnotationBeanPostProcessor.REACTIVE_SUPPORT_PRESENT) {
+            ObservationRegistry applicationRegistry = observationRegistry;
+            observationRegistry =
+                    ScheduledTaskExecutionObservationHandler.recording(applicationRegistry, history.require());
+            if (reactiveTaskScheduled
+                    && observationRegistry == applicationRegistry
+                    && !ScheduledTaskExecutionObservationHandler.observesScheduledTasks(applicationRegistry)) {
+                log.warn("The observations of the scheduled tasks are disabled in the application, e.g. by the "
+                        + "'management.observations.enable.tasks.scheduled.execution' property, so the executions of "
+                        + "the reactive @Scheduled tasks are not recorded");
+            }
+        }
+        super.afterPropertiesSet();
     }
 
     /**
@@ -95,14 +147,22 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
         if (annotation == null) {
             return null;
         }
+        if (annotation.reactive()) {
+            reactiveTaskScheduled = true;
+        }
         return new ScheduledAnnotationRunnable(
-                runnable, runnable + "#" + annotation.suffix(), annotation.qualifier(), history.require());
+                runnable,
+                runnable + "#" + annotation.suffix(),
+                annotation.qualifier(),
+                annotation.reactive(),
+                history.require());
     }
 
     /**
      * @param suffix the suffix of the task id, see {@link AxelixScheduledAnnotationBeanPostProcessor}.
      * @param qualifier the qualifier of the scheduler declared by the annotation, if any.
+     * @param reactive whether the annotated method is the reactive one.
      */
     record ScheduledAnnotationContext(
-            String suffix, @Nullable String qualifier) {}
+            String suffix, @Nullable String qualifier, boolean reactive) {}
 }

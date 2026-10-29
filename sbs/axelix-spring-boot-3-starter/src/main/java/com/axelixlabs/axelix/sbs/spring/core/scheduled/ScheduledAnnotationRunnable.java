@@ -25,28 +25,57 @@ import org.springframework.scheduling.SchedulingAwareRunnable;
  * The runnable of the task declared by a single {@code @Scheduled} annotation. Its string representation is the id of
  * the task, which tells apart the tasks of the repeatable {@code @Scheduled} annotations of the same method.
  *
+ * <p>The execution of a regular task is recorded right here. The execution of a reactive task ends only when its
+ * publisher completes, so it is recorded by the {@link ScheduledTaskExecutionObservationHandler}.
+ *
  * @author Nikita Kirillov
  */
 public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnable {
 
+    private static final ThreadLocal<@Nullable String> CURRENT_REACTIVE_TASK_ID = new ThreadLocal<>();
+
     private final Runnable delegate;
     private final String id;
     private final @Nullable String qualifier;
+    private final boolean reactive;
     private final ScheduledTaskExecutionHistory history;
 
     public ScheduledAnnotationRunnable(
-            Runnable delegate, String id, @Nullable String qualifier, ScheduledTaskExecutionHistory history) {
+            Runnable delegate,
+            String id,
+            @Nullable String qualifier,
+            boolean reactive,
+            ScheduledTaskExecutionHistory history) {
         this.delegate = delegate;
         this.id = id;
         this.qualifier = qualifier;
+        this.reactive = reactive;
         this.history = history;
     }
 
     @Override
     public void run() {
-        // TODO: the executions of the reactive tasks are recorded wrongly, since run() only subscribes to the
-        //  publisher and returns, so the duration and the error of the execution are lost. To be fixed separately.
-        history.recordExecution(id, delegate);
+        if (reactive) {
+            runReactive();
+        } else {
+            history.recordExecution(id, delegate);
+        }
+    }
+
+    private void runReactive() {
+        CURRENT_REACTIVE_TASK_ID.set(id);
+        try {
+            delegate.run();
+        } finally {
+            CURRENT_REACTIVE_TASK_ID.remove();
+        }
+    }
+
+    /**
+     * @return the id of the reactive task that the current thread is subscribing to, if any.
+     */
+    static @Nullable String currentReactiveTaskId() {
+        return CURRENT_REACTIVE_TASK_ID.get();
     }
 
     @Override
