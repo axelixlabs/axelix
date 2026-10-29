@@ -95,7 +95,7 @@ multi-master deployments and the security model.
 Getting started is two steps: run **Axelix Master**, then add the **Axelix Starter** and build plugin
 to each Spring Boot service you want to manage.
 
-> The snippets below pin `1.2.1` for illustration. Check the
+> The snippets below pin `1.2.2` for illustration. Check the
 > [Releases page](https://github.com/axelixlabs/axelix/releases) for the latest published tag.
 
 ### Install with an AI agent
@@ -123,10 +123,10 @@ production. Before deploying to production:
   with `axelix.sbs.auth.jwt.algorithm`.
 
 **As a JAR.** On the [Releases page](https://github.com/axelixlabs/axelix/releases), expand the
-**Assets** section of the latest release and download `axelix-1.2.1.jar`, then run:
+**Assets** section of the latest release and download `axelix-1.2.2.jar`, then run:
 
 ```bash
-java -jar axelix-1.2.1.jar
+java -jar axelix-1.2.2.jar
 ```
 
 Every release artifact of Master is named `axelix` plus the release version: the JAR `axelix-<version>.jar`, the
@@ -137,13 +137,13 @@ Docker image `axelix:<version>`, and the Helm chart archive `axelix-<version>.tg
 From GitHub Container Registry:
 
 ```bash
-docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:1.2.1
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:1.2.2
 ```
 
 From Docker Hub:
 
 ```bash
-docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:1.2.1
+docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:1.2.2
 ```
 
 **On Kubernetes.** Install the first-party Helm chart, which also wires the RBAC needed for
@@ -177,20 +177,20 @@ First, declare the starter coordinate matching your Spring Boot major version:
 
 ```kotlin
 // Spring Boot 4.x
-implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.1")
+implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.2")
 
 // Spring Boot 3.x
-implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.2.1")
+implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.2.2")
 
 // Spring Boot 2.7.x
-implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.2.1")
+implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.2.2")
 ```
 
 Then apply the Axelix build plugin. With Gradle:
 
 ```kotlin
 plugins {
-    id("com.axelixlabs.axelix") version "1.2.1"
+    id("com.axelixlabs.axelix") version "1.2.2"
 }
 ```
 
@@ -200,7 +200,7 @@ Or, with Maven:
 <plugin>
   <groupId>com.axelixlabs</groupId>
   <artifactId>axelix-maven-plugin</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
   <executions>
     <execution>
       <goals>

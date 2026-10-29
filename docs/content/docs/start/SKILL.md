@@ -5,7 +5,7 @@ description: "Install Axelix into a Spring Boot service: the Axelix Spring Boot 
 ---
 
 <!-- Maintainers: when Axelix 1.3.0 (reactive support) is released, add the WebFlux steps and remove the WebFlux stop in Step 1. -->
-<!-- Maintainers: on every release, update the fallback version `1.2.1` in Step 1. -->
+<!-- Maintainers: on every release, update the fallback version `1.2.2` in Step 1. -->
 
 > **For people reading this page:** this page is an instruction for AI coding agents. To install Axelix, give
 > your agent this command:
@@ -73,8 +73,8 @@ Get `VERSION` by running this command. Don't use web search: its results can be 
 curl -s https://repo1.maven.org/maven2/com/axelixlabs/axelix-spring-boot-3-starter/maven-metadata.xml | grep '<release>'
 ```
 
-`<release>1.2.1</release>` means `VERSION` is `1.2.1`. If the command fails (for example, there is no network
-access), use `1.2.1` and say so in Step 2. All versions: https://github.com/axelixlabs/axelix/releases
+`<release>1.2.2</release>` means `VERSION` is `1.2.2`. If the command fails (for example, there is no network
+access), use `1.2.2` and say so in Step 2. All versions: https://github.com/axelixlabs/axelix/releases
 
 **Stop** if Spring Boot is older than 2.7 or Java is older than 11 ("Axelix needs Spring Boot 2.7+ and Java 11+"),
 or if the app uses only `spring-boot-starter-webflux` and `VERSION` is lower than 1.3.0 ("Reactive services are

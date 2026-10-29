@@ -4,7 +4,7 @@ description: "Установка Axelix в Spring Boot сервис: Axelix Spri
 ---
 
 <!-- Maintainers: when Axelix 1.3.0 (reactive support) is released, add the WebFlux steps and remove the WebFlux stop in Step 1. -->
-<!-- Maintainers: on every release, update the fallback version `1.2.1` in Step 1. -->
+<!-- Maintainers: on every release, update the fallback version `1.2.2` in Step 1. -->
 
 > **Для людей, читающих эту страницу:** это инструкция для ИИ-агентов. Чтобы установить Axelix, дайте вашему агенту
 > эту команду:
@@ -74,8 +74,8 @@ AXELIX         = что уже настроено: стартер, плагин 
 curl -s https://repo1.maven.org/maven2/com/axelixlabs/axelix-spring-boot-3-starter/maven-metadata.xml | grep '<release>'
 ```
 
-`<release>1.2.1</release>` означает, что `VERSION` равен `1.2.1`. Если команда не сработала (например, нет доступа к
-сети), используй `1.2.1` и скажи об этом в шаге 2. Все версии: https://github.com/axelixlabs/axelix/releases
+`<release>1.2.2</release>` означает, что `VERSION` равен `1.2.2`. Если команда не сработала (например, нет доступа к
+сети), используй `1.2.2` и скажи об этом в шаге 2. Все версии: https://github.com/axelixlabs/axelix/releases
 
 **Остановись**, если Spring Boot ниже 2.7 или Java ниже 11 («Axelix требует Spring Boot 2.7+ и Java 11+»), или
 если приложение использует только `spring-boot-starter-webflux`, а `VERSION` ниже 1.3.0 («Реактивные сервисы

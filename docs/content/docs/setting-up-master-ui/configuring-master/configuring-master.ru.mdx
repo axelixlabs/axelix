@@ -18,7 +18,7 @@ import styles from './styles.module.css';
 - **База данных**: Master поддерживает три движка, которые выбираются автоматически по префиксу URL-адреса JDBC —
   **SQLite** (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), **MySQL** (`jdbc:mysql:`). По умолчанию используется
   SQLite с файлом `axelix.db` в рабочем каталоге. Liquibase выполняет миграцию схемы при каждом запуске.
-- **Веб-интерфейс**: `axelix-1.2.1.jar` и опубликованный образ Docker содержат пользовательский интерфейс — для
+- **Веб-интерфейс**: `axelix-1.2.2.jar` и опубликованный образ Docker содержат пользовательский интерфейс — для
   подключения веб-интерфейса ничего дополнительно настраивать не нужно.
 - **Аутентификация**: в Master встроена учётная запись суперадминистратора `admin / admin`, а начиная с Axelix 1.2 —
   также встроенный, общеизвестный ключ для подписи JWT. В любой среде, даже в тестовой, необходимо изменить оба
@@ -121,7 +121,7 @@ Spring Boot: отдельный файл, каталог или список ч�
 файла, на который оно указывает:
 
 ```bash
-java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-1.2.1.jar
+java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-1.2.2.jar
 ```
 
 или, для контейнера, передайте его как переменную окружения и смонтируйте файл внутрь:
@@ -188,7 +188,7 @@ Config Server, а не в локальном файле.
 java \
   -Daxelix.master.external-config.spring-cloud-config.enabled=true \
   -Daxelix.master.external-config.spring-cloud-config.uri=http://config-server:8888 \
-  -jar axelix-1.2.1.jar
+  -jar axelix-1.2.2.jar
 ```
 
 :::warning
@@ -270,7 +270,7 @@ java \
   -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
   -Daxelix.master.external-config.spring-cloud-vault.uri=http://localhost:8200 \
   -Daxelix.master.external-config.spring-cloud-vault.token=hvs.6j4cuewowBGit65rheNoceI7 \
-  -jar axelix-1.2.1.jar
+  -jar axelix-1.2.2.jar
 ```
 
 Токен сам по себе является секретом, а форма с `-D` выше помещает его в командную строку. Это приемлемо для быстрой
@@ -301,7 +301,7 @@ java \
   -Daxelix.master.external-config.spring-cloud-vault.authentication=APPROLE \
   -Daxelix.master.external-config.spring-cloud-vault.app-role.role-id=5f3420cd-2c65-4a0e-87f4-b525b8e26a54 \
   -Daxelix.master.external-config.spring-cloud-vault.app-role.secret-id=f8e77c67-40b6-49aa-a548-e50c62a765b3 \
-  -jar axelix-1.2.1.jar
+  -jar axelix-1.2.2.jar
 ```
 
 `secret-id` сам по себе является секретом, поэтому на контейнерных платформах передавайте его переменной окружения
@@ -707,19 +707,19 @@ axelix:
 ## Запуск как JAR
 
 По своей сути Axelix Master — это просто JVM-процесс, поэтому он поставляется в виде JAR и запускается простой командой
-`java -jar axelix-1.2.1.jar` (разумеется, на практике всё будет чуть сложнее). Если по каким-либо причинам вы не используете
+`java -jar axelix-1.2.2.jar` (разумеется, на практике всё будет чуть сложнее). Если по каким-либо причинам вы не используете
 контейнеризацию, то этот вариант для вас.
 
 ### 1. Скачайте JAR
 
 Возьмите JAR-файл Axelix Master, прикреплённый к нужному вам релизу, со [страницы
-релизов](https://github.com/axelixlabs/axelix/releases). Имя JAR содержит версию релиза, например `axelix-1.2.1.jar`
-для Axelix `1.2.1`, см. [Имена артефактов](../../more/compatibility-and-versioning.mdx#имена-артефактов).
+релизов](https://github.com/axelixlabs/axelix/releases). Имя JAR содержит версию релиза, например `axelix-1.2.2.jar`
+для Axelix `1.2.2`, см. [Имена артефактов](../../more/compatibility-and-versioning.mdx#имена-артефактов).
 Опубликованный артефакт уже включает пользовательский интерфейс, поэтому ничего больше собирать не нужно.
 
 ### 2. Настройте и запустите Master
 
-Для локального знакомства в Axelix 1.2.0 и новее достаточно `java -jar axelix-1.2.1.jar`: Master использует встроенный
+Для локального знакомства в Axelix 1.2.0 и новее достаточно `java -jar axelix-1.2.2.jar`: Master использует встроенный
 ключ подписи JWT. Если вы настраиваете Axelix в реальной среде (даже не в production), обязательно передайте собственный
 ключ подписи и алгоритм; всё остальное может остаться на значениях по умолчанию для первого запуска. Передать эту
 конфигурацию Master можно любым из трёх взаимозаменяемых способов — Axelix Master читает их все одинаково (см.
@@ -735,7 +735,7 @@ axelix:
   <Tab value="Встроенный ключ (локально)">
 
 ```bash
-java -jar axelix-1.2.1.jar
+java -jar axelix-1.2.2.jar
 ```
 
 Если JWT-свойства не заданы, Master использует встроенный ключ подписи. Подходит только для локального знакомства, см.
@@ -748,7 +748,7 @@ java -jar axelix-1.2.1.jar
 export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
 export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
 
-java -jar axelix-1.2.1.jar
+java -jar axelix-1.2.2.jar
 ```
 
   </Tab>
@@ -762,7 +762,7 @@ java -jar axelix-1.2.1.jar
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.2.1.jar
+  -jar axelix-1.2.2.jar
 ```
 
 :::warning
@@ -786,7 +786,7 @@ axelix:
 ```
 
 ```bash
-java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-1.2.1.jar
+java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-1.2.2.jar
 ```
 
 После этого Master доступен по адресу `http://localhost:2935`. Войдите с учётными данными суперадминистратора, которые
@@ -822,14 +822,14 @@ docker pull docker.io/axelixlabs/axelix
   <Tab value="Docker GHCR">
 
 ```
-ghcr.io/axelixlabs/axelix:1.2.1
+ghcr.io/axelixlabs/axelix:1.2.2
 ```
 
   </Tab>
   <Tab value="Docker Hub">
 
 ```
-docker.io/axelixlabs/axelix:1.2.1
+docker.io/axelixlabs/axelix:1.2.2
 ```
 
   </Tab>

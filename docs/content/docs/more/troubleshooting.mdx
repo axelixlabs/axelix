@@ -119,7 +119,7 @@ Finally, start Master itself as a JAR with the **same** algorithm and signing ke
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC256 \
   -Daxelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn \
-  -jar axelix-1.2.1.jar
+  -jar axelix-1.2.2.jar
 ```
 
 A mismatched key rejects the heartbeat with `401` instead of registering it. See [Configuring Spring Boot
