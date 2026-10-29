@@ -23,7 +23,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.boot.LazyInitializationBeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,6 +38,32 @@ class EndpointPathMappingValidationAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(EndpointPathMappingValidationAutoConfiguration.class));
+
+    @Test // GH-1803
+    void shouldStartWhenAutoConfigurationIsDiscovered() {
+        // given.
+        ApplicationContextRunner runner = new ApplicationContextRunner().withUserConfiguration(TestApplication.class);
+
+        // when.
+        runner.run(context -> {
+            // then.
+            assertThat(context).hasNotFailed();
+        });
+    }
+
+    @Test // GH-1803
+    void shouldRejectMappingWhenAutoConfigurationIsDiscovered() {
+        // given.
+        ApplicationContextRunner runner = new ApplicationContextRunner()
+                .withUserConfiguration(TestApplication.class)
+                .withPropertyValues("management.endpoints.web.path-mapping.axelix-beans=custom-beans");
+
+        // when.
+        runner.run(context -> {
+            // then.
+            assertThat(context.getStartupFailure()).hasRootCauseInstanceOf(IllegalStateException.class);
+        });
+    }
 
     @Test // GH-1803
     void shouldStartWithoutPathMappings() {
@@ -145,4 +173,8 @@ class EndpointPathMappingValidationAutoConfigurationTest {
             assertThat(context).hasNotFailed();
         });
     }
+
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    static class TestApplication {}
 }
