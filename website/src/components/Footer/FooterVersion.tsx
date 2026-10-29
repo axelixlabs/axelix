@@ -21,5 +21,5 @@ import { useAxelixVersion } from "@/hooks/useAxelixVersion";
 export const FooterVersion = () => {
     const { version } = useAxelixVersion();
 
-    return <span>v{version ?? "1.0.0"}</span>;
+    return <span>v{version ?? "1.2.2"}</span>;
 };

@@ -112,7 +112,7 @@ export const Installer = () => {
                                 <K8sSnippet refEl={activeSnippetRef} />
                             )}
                             {installStep === 1 && installMethod === EInstallMethod.BARE && (
-                                <BareMetal refEl={activeSnippetRef} />
+                                <BareMetal refEl={activeSnippetRef} axelixVersionData={axelixVersionData} />
                             )}
 
                             {installStep === 2 && (

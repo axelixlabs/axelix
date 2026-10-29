@@ -40,6 +40,10 @@ export const COMMUNITY_HREF = "/community";
 export const CONTACT_HREF = "/contact";
 export const GET_STARTED_HREF = "/#install";
 
+// Keep in sync with the "Install with an AI agent" prompt in the root README.md.
+export const AI_INSTALL_PROMPT =
+    "Install Axelix in my app: run `curl -s https://axelix.io/docs/start/SKILL.md` and use it as a guide";
+
 export const HEADER_MENUS: IHeaderMenu[] = [
     {
         key: "product",

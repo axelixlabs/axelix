@@ -1,0 +1,180 @@
+.MainWrapper {
+    container-type: inline-size;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 6px 6px 10px;
+    border-radius: 12px;
+    box-shadow:
+        0 1px 2px var(--axelix-line),
+        0 0 18px color-mix(in srgb, var(--axelix-green-400) 35%, transparent);
+}
+
+/* Width of VISIBLE_AGENTS badges (32px, overlapping by 8px), so the sliding queue never moves the caption. */
+.Agents {
+    display: flex;
+    flex-shrink: 0;
+    width: 128px;
+    overflow-x: clip;
+}
+
+.Agent {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    overflow: hidden;
+    border: 1px solid var(--axelix-line-2);
+    border-radius: 8px;
+    background-color: var(--axelix-paper);
+    box-shadow: 0 1px 2px var(--axelix-line);
+    color: var(--axelix-ink);
+
+    & + & {
+        margin-left: -8px;
+    }
+}
+
+.Agent.Dark {
+    border-color: var(--axelix-paper);
+    background-color: var(--axelix-ink);
+    color: #fff;
+}
+
+.Agent svg {
+    width: 20px;
+    height: 16px;
+}
+
+.Caption {
+    font-size: 14px;
+    color: var(--axelix-ink-3);
+    white-space: nowrap;
+}
+
+.CopyButton {
+    display: inline-grid;
+    place-items: center;
+    margin-left: auto;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background-color: var(--axelix-ink);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition-duration: 0.3s;
+
+    &:hover {
+        background-color: var(--axelix-ink-2);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--axelix-green-500);
+        outline-offset: 2px;
+    }
+}
+
+.CopyLabel,
+.CopiedLabel {
+    grid-area: 1 / 1;
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+.CopiedLabel {
+    opacity: 0;
+    transform: translateY(4px);
+    color: var(--axelix-green-300);
+}
+
+.Copied .CopyLabel {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.Copied .CopiedLabel {
+    opacity: 1;
+    transform: none;
+}
+
+.Status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.Compact {
+    gap: 8px;
+    padding: 5px;
+}
+
+.Compact .CopyButton {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.Leaving {
+    animation: leave 0.5s ease-in-out forwards;
+}
+
+.Entering {
+    animation: enter 0.5s ease-in-out;
+}
+
+/* The margins cancel the -8px overlap the leaving and entering badges hand over to their neighbours. */
+@keyframes leave {
+    to {
+        width: 0;
+        margin-right: 8px;
+        border-width: 0;
+        opacity: 0;
+        transform: scale(0.6);
+    }
+}
+
+@keyframes enter {
+    from {
+        width: 0;
+        margin-left: 0;
+        border-width: 0;
+        opacity: 0;
+        transform: scale(0.6);
+    }
+}
+
+/* Narrow prompts clip the queue to three badges; the two waiting behind fade in as they slide into place. */
+@container (width < 260px) {
+    .Agents {
+        width: 80px;
+    }
+
+    .Agent {
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .Agent:nth-last-child(-n + 2) {
+        opacity: 0;
+    }
+}
+
+@container (width < 480px) {
+    .Caption {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .CopyLabel,
+    .CopiedLabel {
+        transition: none;
+    }
+}

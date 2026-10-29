@@ -15,13 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { IAxelixVersionData } from "@/models";
+
+import { AxelixVersion } from "../AxelixVersion";
 import styles from "../shared.module.css";
 
 interface IProps {
     refEl: any;
+    axelixVersionData: IAxelixVersionData;
 }
 
-export const BareMetal = ({ refEl }: IProps) => {
+export const BareMetal = ({ refEl, axelixVersionData }: IProps) => {
     return (
         <pre
             className={styles.Snippet}
@@ -45,7 +49,11 @@ export const BareMetal = ({ refEl }: IProps) => {
                     </span>
                 </span>
                 <span className={styles.Line}>
-                    <span className={styles.Cm}>java -jar master.jar</span>
+                    <span className={styles.Cm}>
+                        java -jar axelix-
+                        <AxelixVersion axelixVersionData={axelixVersionData} />
+                        .jar
+                    </span>
                 </span>
             </code>
         </pre>

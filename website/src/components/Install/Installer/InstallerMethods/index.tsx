@@ -18,6 +18,7 @@
 import { ComposeIcon, DockerIcon, K8sIcon, ServerIcon } from "@/assets";
 import { EInstallMethod, IInstallMethods } from "@/models";
 
+import { AiInstallPrompt } from "../../../AiInstallPrompt";
 import { INSTALLATION_METHODS } from "../installationMethods";
 
 import styles from "./styles.module.css";
@@ -64,6 +65,10 @@ export const InstallerMethods = ({ installMethod, setInstallMethod }: IProps) =>
                     {label}
                 </button>
             ))}
+
+            <div className={styles.AiInstallPromptWrapper}>
+                <AiInstallPrompt compact />
+            </div>
 
             <div className={styles.MethodFooter}>
                 <p className={styles.Description}>{INSTALLATION_METHODS[installMethod].description}</p>

@@ -16,8 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { CheckIcon, CopyIcon } from "@/assets";
-
-import { useRef, useState } from "react";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 import styles from "./styles.module.css";
 
@@ -26,21 +25,13 @@ interface IProps {
 }
 
 export const CopySnippet = ({ activeSnippetRef }: IProps) => {
-    const [copied, setCopied] = useState(false);
-    const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [copied, copy] = useCopyToClipboard();
 
     async function copyMain() {
         const el = activeSnippetRef.current;
         if (!el) return;
         const text = (el.innerText || "").replace(/\u00a0/g, " ");
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopied(true);
-            if (copyTimer.current) clearTimeout(copyTimer.current);
-            copyTimer.current = setTimeout(() => setCopied(false), 1200);
-        } catch {
-            /* clipboard blocked */
-        }
+        await copy(text);
     }
 
     return (

@@ -54,8 +54,21 @@
     background-color: var(--axelix-green-500);
 }
 
+/* Centres the prompt with up to 24px either side; any extra height goes below it. */
+.AiInstallPromptWrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    &::before,
+    &::after {
+        content: "";
+        flex: 1 1 0;
+        max-height: 24px;
+    }
+}
+
 .MethodFooter {
-    margin-top: auto;
     margin-bottom: 8px;
     display: flex;
     flex-direction: column;

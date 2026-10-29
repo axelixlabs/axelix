@@ -1,27 +1,45 @@
 .MainWrapper {
     width: 100%;
     max-width: 960px;
-    margin-top: 72px;
+    margin-top: 24px;
 }
 
 .Frame {
     --tilt-progress: 0;
 
-    border: 12px solid var(--axelix-green-500);
-    border-radius: 24px;
-    box-shadow:
-        0 50px 90px -40px color-mix(in srgb, var(--axelix-green-900) 55%, transparent),
-        0 0 0 4px color-mix(in srgb, var(--axelix-green-500) 18%, transparent);
+    position: relative;
     transform-origin: center 90%;
     transform: perspective(1800px) rotateX(calc(26deg * (1 - var(--tilt-progress))))
         scale(calc(0.88 + 0.12 * var(--tilt-progress)));
     will-change: transform;
 }
 
+/* A blurred copy of the poster, so the glow takes its colours; shifted down to keep off the content above. */
+.Glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(28px) saturate(1.8);
+    opacity: 0.5;
+    transform: translateY(6%) scale(0.92);
+    pointer-events: none;
+}
+
+.Bezel {
+    --shimmer-fill: #000;
+
+    padding: var(--shimmer-width);
+    border-radius: 16px;
+    box-shadow: 0 50px 90px -40px color-mix(in srgb, var(--axelix-green-900) 55%, transparent);
+}
+
 .Screen {
     position: relative;
     aspect-ratio: 16 / 9;
-    border-radius: 14px;
+    border-radius: inherit;
     background-color: #000;
     overflow: hidden;
 }
@@ -38,22 +56,25 @@
 .PlayButton {
     position: relative;
     display: inline-flex;
+    justify-content: center;
     align-items: center;
-    gap: 12px;
-    height: 60px;
-    padding-inline: 30px;
-    border: 2px solid var(--axelix-green-600);
-    border-radius: 999px;
-    background-color: var(--axelix-green-500);
+    width: 76px;
+    height: 76px;
+    border: 1px solid rgb(255 255 255 / 30%);
+    border-radius: 50%;
+    background-color: color-mix(in srgb, var(--axelix-ink) 60%, transparent);
+    backdrop-filter: blur(10px);
     color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    box-shadow: 0 12px 32px color-mix(in srgb, var(--axelix-green-900) 28%, transparent);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 25%);
     transition:
         background-color 0.3s,
-        border-color 0.3s,
         transform 0.3s;
+}
+
+.PlayButton svg {
+    width: 30px;
+    height: 30px;
+    margin-left: 4px;
 }
 
 .PosterButton {
@@ -65,9 +86,8 @@
     height: 100%;
 
     &:hover .PlayButton {
-        background-color: var(--axelix-green-600);
-        border-color: var(--axelix-green-700);
-        transform: translateY(-1px);
+        background-color: color-mix(in srgb, var(--axelix-ink) 75%, transparent);
+        transform: scale(1.06);
     }
 
     &:focus-visible {
@@ -84,25 +104,36 @@
 }
 
 @media (width <= 768px) {
-    .MainWrapper {
-        margin-top: 56px;
+    .Glow {
+        filter: blur(18px) saturate(1.8);
     }
 
-    .Frame {
-        border-width: 6px;
-        border-radius: 16px;
+    .Bezel {
+        border-radius: 12px;
     }
 
     .PlayButton {
-        gap: 10px;
-        height: 46px;
-        padding-inline: 20px;
-        font-size: 15px;
+        width: 56px;
+        height: 56px;
+    }
+
+    .PlayButton svg {
+        width: 22px;
+        height: 22px;
+        margin-left: 3px;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .Frame {
         --tilt-progress: 1;
+    }
+
+    .PlayButton {
+        transition: background-color 0.3s;
+    }
+
+    .PosterButton:hover .PlayButton {
+        transform: none;
     }
 }

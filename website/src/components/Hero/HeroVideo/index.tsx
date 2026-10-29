@@ -80,37 +80,39 @@ export const HeroVideo = () => {
     return (
         <div ref={wrapperRef} className={styles.MainWrapper}>
             <div ref={frameRef} className={styles.Frame}>
-                <div className={styles.Screen}>
-                    {playing ? (
-                        <iframe
-                            className={styles.Player}
-                            src={VIDEO_SRC}
-                            title="Axelix product preview"
-                            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                            allowFullScreen
-                        />
-                    ) : (
-                        <button
-                            className={styles.PosterButton}
-                            type="button"
-                            aria-label="Play the Axelix product preview"
-                            onClick={() => setPlaying(true)}
-                        >
-                            <img
-                                className={styles.Poster}
-                                src={POSTER_SRC}
-                                alt=""
-                                width={1280}
-                                height={720}
-                                loading="lazy"
-                                decoding="async"
+                <img className={styles.Glow} src={POSTER_SRC} alt="" loading="lazy" decoding="async" />
+                <div className={`ShimmerBorder ${styles.Bezel}`}>
+                    <div className={styles.Screen}>
+                        {playing ? (
+                            <iframe
+                                className={styles.Player}
+                                src={VIDEO_SRC}
+                                title="Axelix product preview"
+                                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                                allowFullScreen
                             />
-                            <span className={styles.PlayButton}>
-                                <PlayIcon width="22" height="22" />
-                                PLAY
-                            </span>
-                        </button>
-                    )}
+                        ) : (
+                            <button
+                                className={styles.PosterButton}
+                                type="button"
+                                aria-label="Play the Axelix product preview"
+                                onClick={() => setPlaying(true)}
+                            >
+                                <img
+                                    className={styles.Poster}
+                                    src={POSTER_SRC}
+                                    alt=""
+                                    width={1280}
+                                    height={720}
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                                <span className={styles.PlayButton}>
+                                    <PlayIcon />
+                                </span>
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
