@@ -10,7 +10,7 @@ export function GET() {
 
   const posts = getSortedPosts()
     .map((page) => {
-      const link = abs(`/${page.slugs.join("/")}`);
+      const link = abs(`/${page.slugs.join("/")}.md`);
       const description = page.data.description ?? page.data.metaDescription ?? "";
       return `- [${page.data.title}](${link})${description ? `: ${description}` : ""}`;
     })
