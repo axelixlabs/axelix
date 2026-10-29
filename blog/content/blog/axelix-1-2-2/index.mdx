@@ -1,0 +1,91 @@
+---
+title: "Axelix 1.2.2: Your scheduler is back, faster Master startup, and CVE fixes"
+date: 2026-10-29
+authors: ["Sergey Cherkasov"]
+tags: ["Releases"]
+heroImagePath: /posts/axelix-1-2-2/preview.png
+description: "Axelix 1.2.2 is a patch release that stops the starter from replacing the application's task scheduler, brings the AOT cache back to the Master Docker image for ~25% faster startup, and patches CVEs in the Master image."
+metaDescription: "Axelix 1.2.2 is a patch release that stops the starter from replacing the application's task scheduler, brings the AOT cache back to the Master Docker image for ~25% faster startup, and patches CVEs in the Master image."
+---
+
+# Axelix 1.2.2
+
+Axelix 1.2.2 is out. It is a patch release, fully compatible with the rest of the 1.2 line. Like every Axelix
+release, it ships the whole fleet together: the Spring Boot starters, the build plugins, and Master
+(JAR / Docker image / Helm chart), all under the same version.
+
+This release stops the starters from taking over your application's task scheduling, brings the AOT cache back to the
+Master Docker image, and patches CVEs in that image. We recommend upgrading both Master and the starters.
+
+## Security
+
+### Docker image: `brotli-libs` and `musl` upgraded
+
+The Master Docker image has been rebuilt with `brotli-libs 1.2.1-r0` and `musl` / `musl-utils 1.2.6-r3` to address
+CVE-2026-111497 and CVE-2026-107891. No change is needed on your side beyond pulling the new image.
+
+### UI build dependencies
+
+`vite`, `vitest`, `@vitest/mocker`, `follow-redirects`, `fast-uri`, `qs` and `zod` have been upgraded in the Master UI build. These are build- and
+test-time dependencies only, so they are not part of the UI that Master serves.
+
+## Bug fixes
+
+### The starter no longer replaces your task scheduler
+
+When the `axelix-scheduled-tasks` endpoint was exposed, the starter registered its own single-threaded `TaskScheduler`
+and a `ThreadPoolTaskExecutor`. Because Spring Boot backs off when such beans already exist, it no longer created its
+own `taskScheduler` and `applicationTaskExecutor`. The result:
+
+- all `@Scheduled` tasks in the application ran on that one Axelix thread;
+- `spring.task.scheduling.*` and `spring.task.execution.*` properties were silently ignored;
+- scheduler and executor customizers, as well as virtual threads, had no effect.
+
+From 1.2.2, the starter no longer creates its own scheduler, so Spring Boot configures `taskScheduler` and
+`applicationTaskExecutor` as usual, and Axelix reschedules tasks on the application's scheduler when you manage them
+from the UI. Re-enabling a task or changing its schedule requires `@EnableScheduling`: tasks registered through a
+custom `ScheduledTaskRegistrar` without it cannot be rescheduled.
+
+### Master starts faster again: the AOT cache is back
+
+The AOT cache was removed from the Master Docker image in 1.2.0, because the JVM crashed with `SIGILL` when the image
+ran on a CPU different from the one it was built on. The cache is now built without CPU-specific code, so it works on
+any CPU.
+
+With the cache in place, Master starts about **25% faster**, and with a bounded heap (`-Xmx` or a container memory
+limit) its RSS is about **7% smaller**. The full story of the crash and the fix is in
+[a separate write-up](https://axelix.io/blog/aot-cache-sigill).
+
+## Heads-up: changes in scheduled tasks management
+
+There are no breaking changes in 1.2.2 — [compatibility is guaranteed within `major.minor`](https://axelix.io/docs/more/compatibility-and-versioning).
+Still, the scheduler fix changes a few things you may notice:
+
+- The `ScheduledTaskManagementAutoConfiguration.TASK_SCHEDULER_QUALIFIER` and `THREAD_POOL_TASK_EXECUTOR_QUALIFIER`
+  constants, and the `schedulingTaskScheduler` / `schedulingThreadPoolTaskExecutor` beans they named, are gone. If
+  your code injected those beans, inject the application's `TaskScheduler` instead.
+- Your `@Scheduled` tasks now run on Spring Boot's scheduler, so their thread names change, and your
+  `spring.task.scheduling.*` settings start to apply.
+
+## Artifacts
+
+| Artifact | Link |
+|---|---|
+| JAR | [axelix-1.2.2.jar](https://github.com/axelixlabs/axelix/releases/download/v1.2.2/axelix-1.2.2.jar) |
+| Docker Hub | [axelixlabs/axelix](https://hub.docker.com/r/axelixlabs/axelix) — `docker pull axelixlabs/axelix:1.2.2` |
+| GHCR | `docker pull ghcr.io/axelixlabs/axelix:1.2.2` |
+| Helm chart | [axelix-1.2.2.tgz](https://github.com/axelixlabs/axelix/releases/download/v1.2.2/axelix-1.2.2.tgz) · [Artifact Hub](https://artifacthub.io/packages/helm/axelix/axelix) |
+
+## Upgrading
+
+1.2.2 is a drop-in upgrade for any 1.2.x installation. Update the version of the Spring Boot starter and build
+plugin in your `pom.xml` or `build.gradle`, and pull the new Master image — see the [database migrations guide](https://axelix.io/docs/setting-up-master-ui/migrations/migrations) before upgrading Master. No configuration changes are required.
+
+Refer to the [setup docs](https://axelix.io/docs/start/getting-started) if you are installing Axelix for the first
+time.
+
+## Full changelog
+
+**Full Changelog**: https://github.com/axelixlabs/axelix/compare/v1.2.1...v1.2.2
+
+Thanks to all contributors who made this release happen!
