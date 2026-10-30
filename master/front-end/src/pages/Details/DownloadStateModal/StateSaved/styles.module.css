@@ -1,0 +1,43 @@
+.Done {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid var(--axelix-green-200);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-green-50);
+}
+
+.DoneIcon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+
+    circle {
+        fill: var(--axelix-green-100);
+    }
+
+    path {
+        stroke: var(--axelix-green-700);
+    }
+}
+
+.DoneText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.SavedTitle {
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.FileName {
+    color: var(--axelix-grey-600);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    overflow-wrap: anywhere;
+}

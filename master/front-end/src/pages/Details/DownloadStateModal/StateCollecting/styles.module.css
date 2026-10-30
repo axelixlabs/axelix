@@ -1,0 +1,90 @@
+.Run {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.Progress {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ProgressTrack {
+    position: relative;
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-grey-100);
+}
+
+/* The export is a single request, so its progress is unknown: an indeterminate bar */
+.ProgressBar {
+    position: absolute;
+    width: 35%;
+    height: 100%;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-green-500);
+    animation: indeterminate 1.4s ease-in-out infinite;
+}
+
+@keyframes indeterminate {
+    from {
+        left: -35%;
+    }
+
+    to {
+        left: 100%;
+    }
+}
+
+.ProgressLabel {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.RunList {
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.RunItem {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 14px;
+
+    & + & {
+        border-top: 1px solid var(--axelix-grey-100);
+    }
+}
+
+.ItemName {
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.ItemSize {
+    color: var(--axelix-grey-500);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    white-space: nowrap;
+}
+
+.Spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--axelix-green-100);
+    border-top-color: var(--axelix-green-500);
+    border-radius: var(--axelix-border-radius-pill);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

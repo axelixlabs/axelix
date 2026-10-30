@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import styles from "../styles.module.css";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -37,7 +37,7 @@ export const StateSaved = ({ fileName }: IProps) => {
                     <path d="m5 8.2 2 2 4-4.2" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <div className={styles.DoneText}>
-                    <span className={styles.ItemName}>{t("Details.DownloadState.saved")}</span>
+                    <span className={styles.SavedTitle}>{t("Details.DownloadState.saved")}</span>
                     {fileName && <span className={styles.FileName}>{fileName}</span>}
                 </div>
             </div>

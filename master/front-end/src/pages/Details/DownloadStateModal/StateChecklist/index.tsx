@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { EExportableComponent } from "@/models";
 import { EXPORTABLE_COMPONENT_GROUPS } from "@/utils";
 
-import styles from "../styles.module.css";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**

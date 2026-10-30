@@ -1,0 +1,61 @@
+.Footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--axelix-grey-200);
+}
+
+.Summary {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+}
+
+.Stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: start;
+}
+
+.StatLabel {
+    color: var(--axelix-grey-400);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.StatValue {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.HeapDot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-orange-500);
+}
+
+.Divider {
+    flex-shrink: 0;
+    width: 1px;
+    height: 30px;
+    background-color: var(--axelix-grey-200);
+}
+
+.Actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 10px;
+}

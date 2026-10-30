@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { DownloadIcon } from "@/assets";
 import { EExportableComponent, type TStateExportStage } from "@/models";
 
-import styles from "../styles.module.css";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**

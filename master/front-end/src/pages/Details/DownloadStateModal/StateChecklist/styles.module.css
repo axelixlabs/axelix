@@ -1,0 +1,115 @@
+.Groups {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 520px;
+    margin-top: 16px;
+    overflow: auto;
+}
+
+.Group {
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.GroupHeader.GroupHeader {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 10px 14px;
+    background-color: var(--axelix-grey-25);
+
+    /* The antd label wrapper around the custom content */
+    > span:last-child {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        padding-inline-end: 0;
+    }
+}
+
+.GroupTitle {
+    flex: 1;
+    color: var(--axelix-grey-700);
+}
+
+.GroupCount {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+    font-variant-numeric: tabular-nums;
+}
+
+.ItemWrapper {
+    border-top: 1px solid var(--axelix-grey-200);
+}
+
+.Item.Item {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    margin: 0;
+    padding: 11px 14px;
+
+    &:hover {
+        background-color: var(--axelix-grey-50);
+    }
+
+    /* Align the box with the item name rather than the middle of the row */
+    :global(.ant-checkbox) {
+        align-self: flex-start;
+        margin-top: 3px;
+    }
+
+    > span:last-child {
+        display: grid;
+        flex: 1;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        padding-inline-end: 0;
+    }
+}
+
+.ItemText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ItemName {
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.ItemDescription {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.ItemSize {
+    color: var(--axelix-grey-500);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    white-space: nowrap;
+}
+
+.Warning {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 14px 12px 40px;
+    padding: 10px 12px;
+    border: 1px solid var(--axelix-orange-200);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-orange-50);
+    color: var(--axelix-grey-700);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.WarningTitle {
+    color: var(--axelix-orange-700);
+    font-weight: var(--axelix-font-weight-semibold);
+}
