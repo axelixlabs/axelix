@@ -326,7 +326,7 @@ class ScheduledTaskServiceTest {
                 ScheduledTasksRegistry registry,
                 List<TaskRescheduler> taskReschedulers,
                 TaskSchedulerProvider taskSchedulerProvider) {
-            return new ScheduledTaskService(registry, taskReschedulers, taskSchedulerProvider);
+            return new ScheduledTaskService(registry, taskReschedulers, taskSchedulerProvider, null);
         }
 
         // Cron

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,6 +65,19 @@ class ScheduledTaskExecutionObservationHandlerTest {
         assertThat(execution.getErrorType()).isEqualTo("IllegalStateException");
         assertThat(execution.getErrorMessage()).isEqualTo("reactive boom");
         assertThat(execution.getDurationMillis()).isGreaterThanOrEqualTo(SLEEP_MILLIS);
+        assertThat(execution.getLaunchType()).isEqualTo(ScheduledTaskLaunchType.SCHEDULED);
+    }
+
+    @Test
+    void shouldRecordTheManualLaunchOfReactiveTask() {
+        Observation.Context context = new Observation.Context();
+        reactive(() -> handler.onStart(context)).manual().run();
+
+        handler.onStop(context);
+
+        assertThat(history.getExecutions())
+                .extracting(ScheduledTaskExecution::getLaunchType)
+                .containsExactly(ScheduledTaskLaunchType.MANUAL);
     }
 
     @Test

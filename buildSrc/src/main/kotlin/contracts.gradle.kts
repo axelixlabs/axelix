@@ -68,7 +68,7 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
                 importMappings.set(contracts.modelBasePackage.map { basePackage ->
                     listOf(
                         "BasicRegistrationMetadata", "SoftwareVersions", "MemoryDetails", "HealthStatus", "InstanceFeature", "GarbageCollector",
-                        "Insights", "HotSpotInsights", "InsightFeature", "ScheduledTaskExecution", "PersistenceInsights",
+                        "Insights", "HotSpotInsights", "InsightFeature", "ScheduledTaskExecution", "ScheduledTaskLaunchType", "PersistenceInsights",
                         "TransactionAggregatedProfile", "TransactionOrigin", "TransactionalKey", "ExecutionStats",
                         "CountedLazyLoadingTarget", "LazyLoadingTarget", "ExternalCallInsight", "TypeExternalCall",
                         "JpaEntities", "MappedEntity", "FlaggedAssociation", "Association", "AssociationProblem",

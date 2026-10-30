@@ -22,6 +22,7 @@ import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
 /**
  * Creates the {@link ScheduledTaskExecution} records reported to master.
@@ -39,9 +40,14 @@ public final class ScheduledTaskExecutions {
      * @param error the error the execution has failed with, or {@code null} if it has succeeded.
      */
     public static ScheduledTaskExecution of(
-            String taskId, Instant startedAt, long durationMillis, @Nullable Throwable error) {
+            String taskId,
+            ScheduledTaskLaunchType launchType,
+            Instant startedAt,
+            long durationMillis,
+            @Nullable Throwable error) {
         return new ScheduledTaskExecution()
                 .taskId(taskId)
+                .launchType(launchType)
                 .startedAt(startedAt.toString())
                 .durationMillis(durationMillis)
                 .success(error == null)
