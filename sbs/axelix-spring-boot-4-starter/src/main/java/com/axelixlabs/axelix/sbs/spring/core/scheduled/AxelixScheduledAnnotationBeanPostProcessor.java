@@ -19,13 +19,19 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.lang.reflect.Method;
 
+import org.jspecify.annotations.NonNull;
+
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.KotlinDetector;
+import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.Schedules;
+import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.common.utils.Lazy;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotationContext;
 
 /**
  * {@link ScheduledAnnotationBeanPostProcessor} that gives the task of every {@code @Scheduled} annotation its own id,
@@ -34,6 +40,9 @@ import com.axelixlabs.axelix.common.utils.Lazy;
  * @author Nikita Kirillov
  */
 public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotationBeanPostProcessor {
+
+    static final boolean REACTIVE_SUPPORT_PRESENT = ClassUtils.isPresent(
+            "org.reactivestreams.Publisher", AxelixScheduledAnnotationBeanPostProcessor.class.getClassLoader());
 
     private final AxelixScheduledTaskRegistrar registrar;
 
@@ -47,7 +56,7 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
     }
 
     @Override
-    public void setBeanFactory(BeanFactory beanFactory) {
+    public void setBeanFactory(@NonNull BeanFactory beanFactory) {
         super.setBeanFactory(beanFactory);
         // looked up lazily, since this processor is created before the regular beans
         registrar.setHistory(Lazy.of(() -> beanFactory.getBean(ScheduledTaskExecutionHistory.class)));
@@ -55,7 +64,9 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
 
     @Override
     protected void processScheduled(Scheduled scheduled, Method method, Object bean) {
-        registrar.process(suffix(scheduled, method), () -> super.processScheduled(scheduled, method, bean));
+        ScheduledAnnotationContext annotation =
+                new ScheduledAnnotationContext(suffix(scheduled, method), isReactive(method));
+        registrar.process(annotation, () -> super.processScheduled(scheduled, method, bean));
     }
 
     /**
@@ -88,5 +99,16 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
             return "fixedRate";
         }
         return "oneTime";
+    }
+
+    // the same check as Spring Framework does
+    private static boolean isReactive(Method method) {
+        if (!REACTIVE_SUPPORT_PRESENT) {
+            return false;
+        }
+        if (KotlinDetector.isSuspendingFunction(method)) {
+            return true;
+        }
+        return ReactiveAdapterRegistry.getSharedInstance().getAdapter(method.getReturnType()) != null;
     }
 }

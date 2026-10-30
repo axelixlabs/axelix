@@ -26,11 +26,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
 
 import org.springframework.boot.LazyInitializationBeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration;
+import org.springframework.boot.micrometer.observation.autoconfigure.ObservationAutoConfiguration;
+import org.springframework.boot.micrometer.observation.autoconfigure.ScheduledTasksObservationAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -374,6 +377,22 @@ class ScheduledTaskManagementAutoConfigurationTest {
     }
 
     @Test
+    void shouldRecordTheExecutionsOfReactiveScheduledTasksWhenTheirPublishersComplete() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(
+                        ObservationAutoConfiguration.class, ScheduledTasksObservationAutoConfiguration.class))
+                .withUserConfiguration(ReactiveSchedulingConfig.class)
+                .run(ScheduledTaskManagementAutoConfigurationTest::assertRecordsTheReactiveExecutions);
+    }
+
+    @Test
+    void shouldRecordTheExecutionsOfReactiveScheduledTasksWithoutTheObservationRegistryOfTheApplication() {
+        contextRunner
+                .withUserConfiguration(ReactiveSchedulingConfig.class)
+                .run(ScheduledTaskManagementAutoConfigurationTest::assertRecordsTheReactiveExecutions);
+    }
+
+    @Test
     void shouldRecordTheExecutionOfOneTimeTask() {
         contextRunner.withUserConfiguration(RecordedSchedulingConfig.class).run(context -> {
             String jobs = RecordedSchedulingConfig.class.getName();
@@ -520,6 +539,31 @@ class ScheduledTaskManagementAutoConfigurationTest {
         assertThat(executions.poll(5, TimeUnit.SECONDS)).startsWith(threadNamePrefix);
     }
 
+    private static void assertRecordsTheReactiveExecutions(AssertableApplicationContext context)
+            throws InterruptedException {
+        String jobs = ReactiveSchedulingConfig.class.getName();
+
+        // when: the tasks run right after the start
+
+        // then
+        assertThat(awaitExecutions(context, jobs + ".succeeding#fixedRate0", 1))
+                .singleElement()
+                .satisfies(execution -> {
+                    assertThat(execution.getSuccess()).isTrue();
+                    assertThat(execution.getDurationMillis())
+                            .isGreaterThanOrEqualTo(ReactiveSchedulingConfig.DELAY_MILLIS);
+                });
+        assertThat(awaitExecutions(context, jobs + ".failing#fixedRate0", 1))
+                .singleElement()
+                .satisfies(execution -> {
+                    assertThat(execution.getSuccess()).isFalse();
+                    assertThat(execution.getErrorType()).isEqualTo("IllegalStateException");
+                    assertThat(execution.getErrorMessage()).isEqualTo("reactive boom");
+                    assertThat(execution.getDurationMillis())
+                            .isGreaterThanOrEqualTo(ReactiveSchedulingConfig.DELAY_MILLIS);
+                });
+    }
+
     private static List<ScheduledTaskExecution> awaitExecutions(
             AssertableApplicationContext context, String taskId, int count) throws InterruptedException {
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
@@ -578,6 +622,23 @@ class ScheduledTaskManagementAutoConfigurationTest {
 
         @Scheduled(initialDelay = 0)
         public void once() {}
+    }
+
+    @TestConfiguration
+    static class ReactiveSchedulingConfig {
+
+        static final long DELAY_MILLIS = 200;
+
+        @Scheduled(fixedRate = 100000)
+        public Mono<Void> succeeding() {
+            return Mono.delay(Duration.ofMillis(DELAY_MILLIS)).then();
+        }
+
+        @Scheduled(fixedRate = 100000)
+        public Mono<Void> failing() {
+            return Mono.delay(Duration.ofMillis(DELAY_MILLIS))
+                    .then(Mono.error(new IllegalStateException("reactive boom")));
+        }
     }
 
     @TestConfiguration

@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ public class AxelixScheduledAnnotationProcessorRegistrar implements BeanDefiniti
     }
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {}
+    public void postProcessBeanFactory(@NonNull ConfigurableListableBeanFactory beanFactory) {}
 
     @Override
     public int getOrder() {
