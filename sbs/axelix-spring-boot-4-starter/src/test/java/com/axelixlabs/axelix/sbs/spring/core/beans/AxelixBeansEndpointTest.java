@@ -23,6 +23,7 @@ import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -46,6 +47,9 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
     @Autowired
     private TestRestTemplateBuilder testRestTemplate;
 
+    @Autowired
+    private ConfigurableListableBeanFactory beanFactory;
+
     @Test
     void shouldReturnEnrichedBeansFeed() {
 
@@ -62,6 +66,23 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
         assertBeanMetaInfoExtractor(beanNameToBeanProfile);
         assertCustomBeanSupplier(beanNameToBeanProfile);
         assertConfigPropsBeanName(beanNameToBeanProfile);
+    }
+
+    @Test // GH-1810
+    void shouldNotCreateFactoryBeanProductWhenBuildingBeansFeed() {
+        // given.
+        CommonConfiguration.FACTORY_BEAN_PRODUCT_CREATED.set(false);
+        assertThat(beanFactory.getBean("&" + CommonConfiguration.FACTORY_BEAN)).isNotNull();
+
+        // when.
+        ResponseEntity<BeansFeed> response =
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-beans", BeansFeed.class);
+
+        // then.
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(CommonConfiguration.FACTORY_BEAN_PRODUCT_CREATED).isFalse();
+        assertThat(getBean(response.getBody(), CommonConfiguration.FACTORY_BEAN).getProxyType())
+                .isEqualTo(ProxyType.UNKNOWN);
     }
 
     @Test

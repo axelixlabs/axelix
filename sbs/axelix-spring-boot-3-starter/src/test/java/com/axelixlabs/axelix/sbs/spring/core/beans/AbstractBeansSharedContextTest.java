@@ -22,6 +22,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import javax.sql.DataSource;
@@ -34,6 +35,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -118,6 +120,8 @@ abstract class AbstractBeansSharedContextTest {
         static final String QUALIFIERS_PERSISTENCE_POST_PROCESSOR = "qualifiersPersistencePostProcessor";
         static final String BEAN_META_INFO_EXTRACTOR = "beanMetaInfoExtractor";
         static final String CUSTOM_SUPPLIER = "customSupplier";
+        static final String FACTORY_BEAN = "countingFactoryBean";
+        static final AtomicBoolean FACTORY_BEAN_PRODUCT_CREATED = new AtomicBoolean();
 
         @Bean
         public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
@@ -146,6 +150,33 @@ abstract class AbstractBeansSharedContextTest {
         @Bean(CUSTOM_SUPPLIER)
         public Supplier<String> customSupplier() {
             return () -> "value";
+        }
+
+        @Bean(FACTORY_BEAN)
+        public FactoryBean<FactoryBeanProduct> countingFactoryBean() {
+            return new CountingFactoryBean(FACTORY_BEAN_PRODUCT_CREATED);
+        }
+
+        static class FactoryBeanProduct {}
+
+        static class CountingFactoryBean implements FactoryBean<FactoryBeanProduct> {
+
+            private final AtomicBoolean productCreated;
+
+            CountingFactoryBean(AtomicBoolean productCreated) {
+                this.productCreated = productCreated;
+            }
+
+            @Override
+            public FactoryBeanProduct getObject() {
+                productCreated.set(true);
+                return new FactoryBeanProduct();
+            }
+
+            @Override
+            public Class<?> getObjectType() {
+                return FactoryBeanProduct.class;
+            }
         }
     }
 

@@ -53,6 +53,7 @@ import static org.mockito.Mockito.when;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Andrey Kotov
+ * @author Vyacheslav Yanin
  */
 class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
 
@@ -121,7 +122,7 @@ class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isTrue();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.getProxyType()).isEqualTo(ProxyType.NO_PROXYING);
+            assertThat(it.getProxyType()).isEqualTo(ProxyType.UNKNOWN);
             assertThat(it.getQualifiers()).isEmpty();
             assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
             assertThat(it.getAutoConfigurationRef()).isNull();
@@ -166,7 +167,7 @@ class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isTrue();
             assertThat(it.isPrimary()).isTrue();
-            assertThat(it.getProxyType()).isEqualTo(ProxyType.NO_PROXYING);
+            assertThat(it.getProxyType()).isEqualTo(ProxyType.UNKNOWN);
             assertThat(it.getQualifiers()).isEmpty();
             assertThat(it.getBeanSource()).isInstanceOf(BeanMethod.class);
             assertThat(it.getAutoConfigurationRef()).isNull();
@@ -206,7 +207,7 @@ class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.getProxyType()).isEqualTo(ProxyType.JDK_PROXY);
+            assertThat(it.getProxyType()).isEqualTo(ProxyType.UNKNOWN);
             assertThat(it.getQualifiers()).isEmpty();
             assertThat(it.getBeanSource()).isInstanceOf(FactoryBean.class);
             assertThat(it.getAutoConfigurationRef()).isNull();
@@ -402,5 +403,44 @@ class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
         verifyNoInteractions(factoryBean);
     }
 
+    @Test // GH-1810
+    void shouldNotInstantiateFactoryBeanProductWhenFactoryIsAlreadyInitialized() {
+        // given.
+        DefaultListableBeanFactory isolatedBeanFactory = new DefaultListableBeanFactory();
+        AtomicBoolean productCreated = new AtomicBoolean();
+
+        RootBeanDefinition beanDefinition = new RootBeanDefinition(CountingFactoryBean.class);
+        beanDefinition.setInstanceSupplier(() -> new CountingFactoryBean(productCreated));
+        isolatedBeanFactory.registerBeanDefinition("factoryBean", beanDefinition);
+        isolatedBeanFactory.getBean("&factoryBean");
+
+        // when.
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract("factoryBean", isolatedBeanFactory);
+
+        // then.
+        assertThat(beanMetaInfo.getProxyType()).isEqualTo(ProxyType.UNKNOWN);
+        assertThat(productCreated.get()).isFalse();
+    }
+
     private static class NonInstantiatedBean {}
+
+    private static class CountingFactoryBean implements org.springframework.beans.factory.FactoryBean<Object> {
+
+        private final AtomicBoolean productCreated;
+
+        private CountingFactoryBean(AtomicBoolean productCreated) {
+            this.productCreated = productCreated;
+        }
+
+        @Override
+        public Object getObject() {
+            productCreated.set(true);
+            return new Object();
+        }
+
+        @Override
+        public Class<?> getObjectType() {
+            return Object.class;
+        }
+    }
 }

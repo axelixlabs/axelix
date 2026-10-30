@@ -17,12 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.beans;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -65,6 +68,9 @@ class AxelixBeansEndpointTest {
     @Autowired
     private TestRestTemplateBuilder testRestTemplate;
 
+    @Autowired
+    private ConfigurableListableBeanFactory beanFactory;
+
     @TestConfiguration(value = "testCurrentConfiguration")
     @EnableConfigurationProperties(AxelixPropTest.class)
     static class CurrentConfiguration {
@@ -72,6 +78,8 @@ class AxelixBeansEndpointTest {
         static final String QUALIFIERS_PERSISTENCE_POST_PROCESSOR = "qualifiersPersistencePostProcessor";
         static final String BEAN_META_INFO_EXTRACTOR = "beanMetaInfoExtractor";
         static final String CUSTOM_SUPPLIER = "customSupplier";
+        static final String FACTORY_BEAN = "countingFactoryBean";
+        static final AtomicBoolean FACTORY_BEAN_PRODUCT_CREATED = new AtomicBoolean();
 
         @Bean
         public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
@@ -100,6 +108,33 @@ class AxelixBeansEndpointTest {
         @Bean(CUSTOM_SUPPLIER)
         public Supplier<String> customSupplier() {
             return () -> "value";
+        }
+
+        @Bean(FACTORY_BEAN)
+        public FactoryBean<FactoryBeanProduct> countingFactoryBean() {
+            return new CountingFactoryBean(FACTORY_BEAN_PRODUCT_CREATED);
+        }
+
+        static class FactoryBeanProduct {}
+
+        static class CountingFactoryBean implements FactoryBean<FactoryBeanProduct> {
+
+            private final AtomicBoolean productCreated;
+
+            CountingFactoryBean(AtomicBoolean productCreated) {
+                this.productCreated = productCreated;
+            }
+
+            @Override
+            public FactoryBeanProduct getObject() {
+                productCreated.set(true);
+                return new FactoryBeanProduct();
+            }
+
+            @Override
+            public Class<?> getObjectType() {
+                return FactoryBeanProduct.class;
+            }
         }
     }
 
@@ -133,6 +168,24 @@ class AxelixBeansEndpointTest {
         assertBeanMetaInfoExtractor(beanNameToBeanProfile);
         assertCustomBeanSupplier(beanNameToBeanProfile);
         assertConfigPropsBeanName(beanNameToBeanProfile);
+    }
+
+    @Test // GH-1810
+    void shouldNotCreateFactoryBeanProductWhenBuildingBeansFeed() {
+        // given.
+        CurrentConfiguration.FACTORY_BEAN_PRODUCT_CREATED.set(false);
+        assertThat(beanFactory.getBean("&" + CurrentConfiguration.FACTORY_BEAN)).isNotNull();
+
+        // when.
+        ResponseEntity<BeansFeed> response =
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-beans", BeansFeed.class);
+
+        // then.
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(CurrentConfiguration.FACTORY_BEAN_PRODUCT_CREATED).isFalse();
+        assertThat(getBean(response.getBody(), CurrentConfiguration.FACTORY_BEAN)
+                        .getProxyType())
+                .isEqualTo(ProxyType.UNKNOWN);
     }
 
     @Test
