@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,6 +47,30 @@ class ScheduledAnnotationRunnableTest {
         assertThat(history.getExecutions())
                 .extracting(ScheduledTaskExecution::getTaskId)
                 .containsExactly(TASK_ID);
+    }
+
+    @Test
+    void run_shouldRecordTheScheduledLaunch() {
+        new ScheduledAnnotationRunnable(() -> {}, TASK_ID, history).run();
+
+        assertThat(history.getExecutions())
+                .extracting(ScheduledTaskExecution::getLaunchType)
+                .containsExactly(ScheduledTaskLaunchType.SCHEDULED);
+    }
+
+    @Test
+    void manual_shouldRunTheSameTaskAndRecordTheManualLaunch() {
+        AtomicBoolean ran = new AtomicBoolean();
+        ScheduledAnnotationRunnable manual =
+                new ScheduledAnnotationRunnable(() -> ran.set(true), TASK_ID, history).manual();
+
+        manual.run();
+
+        assertThat(ran).isTrue();
+        assertThat(manual).hasToString(TASK_ID);
+        assertThat(history.getExecutions())
+                .extracting(ScheduledTaskExecution::getLaunchType)
+                .containsExactly(ScheduledTaskLaunchType.MANUAL);
     }
 
     @Test

@@ -170,9 +170,14 @@ public final class ScheduledTaskService implements AutoCloseable {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
+            Runnable runnable = task.getRunnable();
+            if (runnable instanceof ScheduledAnnotationRunnable) {
+                runnable = ((ScheduledAnnotationRunnable) runnable).manual();
+            }
+
             // The errors are handled by the error handler of the scheduler.
             TaskScheduler scheduler = taskSchedulerProvider.getTaskScheduler();
-            scheduler.schedule(task.getRunnable(), scheduler.getClock().instant());
+            scheduler.schedule(runnable, scheduler.getClock().instant());
         } catch (ScheduledTaskNotFoundException e) {
             log.warn("Task '{}' not found, cannot run now", taskId, e);
             throw e;

@@ -32,17 +32,30 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
     private final Runnable delegate;
     private final String id;
     private final ScheduledTaskExecutionHistory history;
+    private final ScheduledTaskLaunchType launchType;
 
     public ScheduledAnnotationRunnable(Runnable delegate, String id, ScheduledTaskExecutionHistory history) {
+        this(delegate, id, history, ScheduledTaskLaunchType.SCHEDULED);
+    }
+
+    private ScheduledAnnotationRunnable(
+            Runnable delegate, String id, ScheduledTaskExecutionHistory history, ScheduledTaskLaunchType launchType) {
         this.delegate = delegate;
         this.id = id;
         this.history = history;
+        this.launchType = launchType;
+    }
+
+    /**
+     * @return the runnable of the same task, whose executions are recorded as the manually launched ones.
+     */
+    public ScheduledAnnotationRunnable manual() {
+        return new ScheduledAnnotationRunnable(delegate, id, history, ScheduledTaskLaunchType.MANUAL);
     }
 
     @Override
     public void run() {
-        // TODO: the manual launches are recorded as the scheduled ones too, until they are told apart as in SB3
-        history.recordExecution(id, ScheduledTaskLaunchType.SCHEDULED, delegate);
+        history.recordExecution(id, launchType, delegate);
     }
 
     @Override
