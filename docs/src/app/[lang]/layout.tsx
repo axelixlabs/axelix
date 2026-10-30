@@ -9,6 +9,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 
 import { DocsHeader } from "@/components/DocsHeader";
 import { LanguageSelectSlot, ThemeSwitchSlot } from "@/components/LayoutControlSlots";
+import { SidebarBanner } from "@/components/SidebarBanner";
 import { baseOptions, translations } from "@/lib/layout.shared";
 import { BASE_PATH } from "@/lib/shared";
 import { source } from "@/lib/source";
@@ -36,7 +37,10 @@ export default async function Layout({ params, children }: LayoutProps<"/[lang]"
                         tabs={getLayoutTabs(tree)}
                         // the design has no collapse control, so the sidebar must not
                         // offer a collapsed state at all
-                        sidebar={{ collapsible: false }}
+                        sidebar={{
+                            collapsible: false,
+                            banner: <SidebarBanner key="sidebar-banner" />,
+                        }}
                         slots={{
                             header: DocsHeader,
                             // desktop styling lives in `HeaderControls` and always wins (explicit

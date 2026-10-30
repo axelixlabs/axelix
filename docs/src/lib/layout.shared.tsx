@@ -14,7 +14,14 @@ const headerTranslations = {
 } satisfies { keys: string[] };
 
 const pageActionsTranslations = {
-    keys: ["Report an issue(page)"],
+    keys: [
+        "Report an issue(page)",
+        "Copy prompt(ai prompt)",
+        "Copied!(ai prompt)",
+        "Prompt copied(ai prompt)",
+        "Install Axelix with AI(ai prompt)",
+        "Copy prompt for your AI agent(ai prompt)(aria-label)",
+    ],
 } satisfies { keys: string[] };
 
 export const translations = i18n
@@ -31,6 +38,13 @@ export const translations = i18n
 
             // page actions
             "Report an issue(page)": "Report an issue",
+
+            // AI install prompt
+            "Copy prompt(ai prompt)": "Copy prompt",
+            "Copied!(ai prompt)": "Copied!",
+            "Prompt copied(ai prompt)": "Prompt copied",
+            "Install Axelix with AI(ai prompt)": "Install Axelix with AI",
+            "Copy prompt for your AI agent(ai prompt)(aria-label)": "Copy prompt for your AI agent",
         },
         ru: {
             displayName: "Русский",
@@ -88,6 +102,13 @@ export const translations = i18n
             "Open in Scira AI(page actions)": "Открыть в Scira AI",
             "Read {url}, I want to ask questions about it.(page actions)":
                 "Прочитай {url}, я хочу задать по нему вопросы.",
+
+            // AI install prompt
+            "Copy prompt(ai prompt)": "Скопировать",
+            "Copied!(ai prompt)": "Скопировано!",
+            "Prompt copied(ai prompt)": "Промпт скопирован",
+            "Install Axelix with AI(ai prompt)": "Установить Axelix с ИИ",
+            "Copy prompt for your AI agent(ai prompt)(aria-label)": "Скопировать промпт для ИИ-агента",
 
             // code block & headings
             "Copy Text(code block)(aria-label)": "Скопировать",
