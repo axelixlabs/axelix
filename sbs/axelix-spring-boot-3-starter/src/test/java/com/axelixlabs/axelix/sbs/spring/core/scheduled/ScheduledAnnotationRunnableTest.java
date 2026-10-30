@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,25 +60,52 @@ class ScheduledAnnotationRunnableTest {
     }
 
     @Test
-    void run_shouldExposeTheIdOfReactiveTaskWhileSubscribingOnly() {
-        AtomicReference<String> taskIdWhileSubscribing = new AtomicReference<>();
+    void run_shouldExposeTheReactiveTaskWhileSubscribingOnly() {
+        AtomicReference<ScheduledAnnotationRunnable> taskWhileSubscribing = new AtomicReference<>();
+        ScheduledAnnotationRunnable reactive =
+                reactive(() -> taskWhileSubscribing.set(ScheduledAnnotationRunnable.currentReactiveTask()));
 
-        reactive(() -> taskIdWhileSubscribing.set(ScheduledAnnotationRunnable.currentReactiveTaskId()))
-                .run();
+        reactive.run();
 
-        assertThat(taskIdWhileSubscribing).hasValue(TASK_ID);
-        assertThat(ScheduledAnnotationRunnable.currentReactiveTaskId()).isNull();
+        assertThat(taskWhileSubscribing).hasValue(reactive);
+        assertThat(ScheduledAnnotationRunnable.currentReactiveTask()).isNull();
         assertThat(history.getExecutions()).isEmpty();
     }
 
     @Test
-    void run_shouldNotExposeTheIdOfRegularTask() {
-        AtomicReference<String> taskIdWhileRunning = new AtomicReference<>("not set");
+    void run_shouldNotExposeTheRegularTask() {
+        AtomicReference<ScheduledAnnotationRunnable> taskWhileRunning = new AtomicReference<>(regular(() -> {}));
 
-        regular(() -> taskIdWhileRunning.set(ScheduledAnnotationRunnable.currentReactiveTaskId()))
+        regular(() -> taskWhileRunning.set(ScheduledAnnotationRunnable.currentReactiveTask()))
                 .run();
 
-        assertThat(taskIdWhileRunning.get()).isNull();
+        assertThat(taskWhileRunning.get()).isNull();
+    }
+
+    @Test
+    void run_shouldRecordTheScheduledLaunch() {
+        regular(() -> {}).run();
+
+        assertThat(history.getExecutions())
+                .extracting(ScheduledTaskExecution::getLaunchType)
+                .containsExactly(ScheduledTaskLaunchType.SCHEDULED);
+    }
+
+    @Test
+    void manual_shouldRunTheSameTaskAndRecordTheManualLaunch() {
+        AtomicBoolean ran = new AtomicBoolean();
+        ScheduledAnnotationRunnable manual = new ScheduledAnnotationRunnable(
+                        () -> ran.set(true), TASK_ID, "otherScheduler", false, history)
+                .manual();
+
+        manual.run();
+
+        assertThat(ran).isTrue();
+        assertThat(manual).hasToString(TASK_ID);
+        assertThat(manual.getQualifier()).isEqualTo("otherScheduler");
+        assertThat(history.getExecutions())
+                .extracting(ScheduledTaskExecution::getLaunchType)
+                .containsExactly(ScheduledTaskLaunchType.MANUAL);
     }
 
     private ScheduledAnnotationRunnable regular(Runnable delegate) {

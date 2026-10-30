@@ -22,6 +22,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,7 +38,8 @@ class ScheduledTaskExecutionsTest {
 
     @Test
     void of_shouldCreateTheSuccessfulExecution() {
-        ScheduledTaskExecution execution = ScheduledTaskExecutions.of(TASK_ID, STARTED_AT, 42, null);
+        ScheduledTaskExecution execution =
+                ScheduledTaskExecutions.of(TASK_ID, ScheduledTaskLaunchType.SCHEDULED, STARTED_AT, 42, null);
 
         assertThat(execution.getTaskId()).isEqualTo(TASK_ID);
         assertThat(execution.getStartedAt()).isEqualTo("2026-10-28T10:15:30Z");
@@ -48,9 +50,17 @@ class ScheduledTaskExecutionsTest {
     }
 
     @Test
-    void of_shouldCreateTheFailedExecution() {
+    void of_shouldKeepTheLaunchType() {
         ScheduledTaskExecution execution =
-                ScheduledTaskExecutions.of(TASK_ID, STARTED_AT, 42, new IllegalStateException("boom"));
+                ScheduledTaskExecutions.of(TASK_ID, ScheduledTaskLaunchType.MANUAL, STARTED_AT, 42, null);
+
+        assertThat(execution.getLaunchType()).isEqualTo(ScheduledTaskLaunchType.MANUAL);
+    }
+
+    @Test
+    void of_shouldCreateTheFailedExecution() {
+        ScheduledTaskExecution execution = ScheduledTaskExecutions.of(
+                TASK_ID, ScheduledTaskLaunchType.SCHEDULED, STARTED_AT, 42, new IllegalStateException("boom"));
 
         assertThat(execution.getSuccess()).isFalse();
         assertThat(execution.getErrorType()).isEqualTo("IllegalStateException");
@@ -59,16 +69,20 @@ class ScheduledTaskExecutionsTest {
 
     @Test
     void of_shouldTruncateTheLongErrorMessage() {
-        ScheduledTaskExecution execution =
-                ScheduledTaskExecutions.of(TASK_ID, STARTED_AT, 42, new IllegalStateException("x".repeat(1001)));
+        ScheduledTaskExecution execution = ScheduledTaskExecutions.of(
+                TASK_ID,
+                ScheduledTaskLaunchType.SCHEDULED,
+                STARTED_AT,
+                42,
+                new IllegalStateException("x".repeat(1001)));
 
         assertThat(execution.getErrorMessage()).isEqualTo("x".repeat(1000));
     }
 
     @Test
     void of_shouldKeepTheAbsentErrorMessage() {
-        ScheduledTaskExecution execution =
-                ScheduledTaskExecutions.of(TASK_ID, STARTED_AT, 42, new IllegalStateException());
+        ScheduledTaskExecution execution = ScheduledTaskExecutions.of(
+                TASK_ID, ScheduledTaskLaunchType.SCHEDULED, STARTED_AT, 42, new IllegalStateException());
 
         assertThat(execution.getSuccess()).isFalse();
         assertThat(execution.getErrorType()).isEqualTo("IllegalStateException");

@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
 /**
  * Bounded in-memory history of the latest scheduled task executions, kept per task. The history is reported to master
@@ -51,7 +52,7 @@ public class ScheduledTaskExecutionHistory {
     /**
      * Runs the given task and records its execution, whether it succeeds or fails.
      */
-    public void recordExecution(String taskId, Runnable task) {
+    public void recordExecution(String taskId, ScheduledTaskLaunchType launchType, Runnable task) {
         Instant startedAt = Instant.now();
         long startNanos = System.nanoTime();
         Throwable error = null;
@@ -62,7 +63,7 @@ public class ScheduledTaskExecutionHistory {
             throw e;
         } finally {
             long durationMillis = (System.nanoTime() - startNanos) / 1_000_000;
-            record(ScheduledTaskExecutions.of(taskId, startedAt, durationMillis, error));
+            record(ScheduledTaskExecutions.of(taskId, launchType, startedAt, durationMillis, error));
         }
     }
 

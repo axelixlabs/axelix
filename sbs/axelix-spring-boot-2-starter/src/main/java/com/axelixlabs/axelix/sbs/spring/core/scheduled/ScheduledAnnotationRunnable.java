@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import org.springframework.scheduling.SchedulingAwareRunnable;
 
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
+
 /**
  * The runnable of the task declared by a single {@code @Scheduled} annotation. Its string representation is the id of
  * the task, which tells apart the tasks of the repeatable {@code @Scheduled} annotations of the same method.
@@ -39,7 +41,8 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
 
     @Override
     public void run() {
-        history.recordExecution(id, delegate);
+        // TODO: the manual launches are recorded as the scheduled ones too, until they are told apart as in SB3
+        history.recordExecution(id, ScheduledTaskLaunchType.SCHEDULED, delegate);
     }
 
     @Override

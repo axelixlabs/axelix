@@ -24,6 +24,8 @@ import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
+
 /**
  * Records the executions of the reactive {@code @Scheduled} tasks out of the observations that Spring Framework 6.1+
  * makes for them. Only the tasks wrapped into the {@link ScheduledAnnotationRunnable} are recorded.
@@ -54,8 +56,7 @@ public class ScheduledTaskExecutionObservationHandler implements ObservationHand
             recording = ObservationRegistry.create();
             recording
                     .observationConfig()
-                    .observationPredicate(
-                            (name, context) -> ScheduledAnnotationRunnable.currentReactiveTaskId() != null);
+                    .observationPredicate((name, context) -> ScheduledAnnotationRunnable.currentReactiveTask() != null);
         }
         recording.observationConfig().observationHandler(new ScheduledTaskExecutionObservationHandler(history));
         return recording;
@@ -78,9 +79,11 @@ public class ScheduledTaskExecutionObservationHandler implements ObservationHand
 
     @Override
     public void onStart(Observation.Context context) {
-        String taskId = ScheduledAnnotationRunnable.currentReactiveTaskId();
-        if (taskId != null) {
-            context.put(ReactiveExecution.class, new ReactiveExecution(taskId, Instant.now(), System.nanoTime()));
+        ScheduledAnnotationRunnable task = ScheduledAnnotationRunnable.currentReactiveTask();
+        if (task != null) {
+            context.put(
+                    ReactiveExecution.class,
+                    new ReactiveExecution(task.toString(), task.getLaunchType(), Instant.now(), System.nanoTime()));
         }
     }
 
@@ -89,9 +92,14 @@ public class ScheduledTaskExecutionObservationHandler implements ObservationHand
         if (context.remove(ReactiveExecution.class) instanceof ReactiveExecution execution) {
             long durationMillis = (System.nanoTime() - execution.startNanos()) / 1_000_000;
             history.record(ScheduledTaskExecutions.of(
-                    execution.taskId(), execution.startedAt(), durationMillis, context.getError()));
+                    execution.taskId(),
+                    execution.launchType(),
+                    execution.startedAt(),
+                    durationMillis,
+                    context.getError()));
         }
     }
 
-    private record ReactiveExecution(String taskId, Instant startedAt, long startNanos) {}
+    private record ReactiveExecution(
+            String taskId, ScheduledTaskLaunchType launchType, Instant startedAt, long startNanos) {}
 }

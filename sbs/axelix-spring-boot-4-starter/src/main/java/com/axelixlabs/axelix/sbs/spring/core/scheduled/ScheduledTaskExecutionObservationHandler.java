@@ -26,6 +26,8 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.support.ScheduledTaskObservationContext;
 
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
+
 /**
  * Records the executions of the reactive {@code @Scheduled} tasks out of the observations that Spring Framework makes
  * for them. Only the tasks wrapped into the {@link ScheduledAnnotationRunnable} are recorded.
@@ -90,8 +92,13 @@ public class ScheduledTaskExecutionObservationHandler implements ObservationHand
         }
         if (context.remove(ReactiveExecution.class) instanceof ReactiveExecution execution) {
             long durationMillis = (System.nanoTime() - execution.startNanos()) / 1_000_000;
+            // TODO: the manual launches are recorded as the scheduled ones too, until they are told apart as in SB3
             history.record(ScheduledTaskExecutions.of(
-                    execution.taskId(), execution.startedAt(), durationMillis, context.getError()));
+                    execution.taskId(),
+                    ScheduledTaskLaunchType.SCHEDULED,
+                    execution.startedAt(),
+                    durationMillis,
+                    context.getError()));
         }
     }
 

@@ -295,6 +295,10 @@ components:
           type: boolean
           description: Whether the task execution succeeded.
           x-axelix-introduced-in: 1.2.0
+        launchType:
+          description: Whether the task execution was launched by its schedule or manually.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/ScheduledTaskLaunchType'
         errorType:
           type: string
           description: The name of the exception thrown by the task execution, or absent when it succeeded.
@@ -303,6 +307,12 @@ components:
           type: string
           description: The message of the exception thrown by the task execution, or absent when it succeeded.
           x-axelix-introduced-in: 1.2.0
+    ScheduledTaskLaunchType:
+      type: string
+      description: How the scheduled task execution was launched.
+      enum:
+        - SCHEDULED
+        - MANUAL
     PersistenceInsights:
       type: object
       description: Insights of a particular instance related to persistence.

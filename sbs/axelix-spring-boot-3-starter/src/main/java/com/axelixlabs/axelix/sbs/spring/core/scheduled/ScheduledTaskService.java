@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,14 +58,21 @@ public final class ScheduledTaskService implements AutoCloseable {
     private final ScheduledTasksRegistry registry;
     private final List<TaskRescheduler> taskReschedulers;
     private final TaskSchedulerProvider taskSchedulerProvider;
+    private final @Nullable AxelixScheduledTaskRegistrar scheduledTaskRegistrar;
 
+    /**
+     * @param scheduledTaskRegistrar the registrar of the {@code @Scheduled} tasks, or {@code null} if their processor
+     *        is not the Axelix one, e.g. when the user declares their own.
+     */
     public ScheduledTaskService(
             ScheduledTasksRegistry registry,
             List<TaskRescheduler> taskReschedulers,
-            TaskSchedulerProvider taskSchedulerProvider) {
+            TaskSchedulerProvider taskSchedulerProvider,
+            @Nullable AxelixScheduledTaskRegistrar scheduledTaskRegistrar) {
         this.registry = registry;
         this.taskReschedulers = taskReschedulers;
         this.taskSchedulerProvider = taskSchedulerProvider;
+        this.scheduledTaskRegistrar = scheduledTaskRegistrar;
     }
 
     /**
@@ -173,10 +181,15 @@ public final class ScheduledTaskService implements AutoCloseable {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
-            // The runnable is passed as is: on Spring 6.1+ it carries the qualifier of @Scheduled, by which
-            // the scheduler routes the task. The errors are handled by the error handler of the scheduler.
+            ScheduledAnnotationRunnable runnable =
+                    scheduledTaskRegistrar != null ? scheduledTaskRegistrar.findRunnable(taskId) : null;
+
+            // On Spring 6.1+ the runnable carries the qualifier of @Scheduled, by which the scheduler routes the
+            // task. The errors are handled by the error handler of the scheduler.
             TaskScheduler scheduler = taskSchedulerProvider.getTaskScheduler();
-            scheduler.schedule(task.getRunnable(), scheduler.getClock().instant());
+            scheduler.schedule(
+                    runnable != null ? runnable.manual() : task.getRunnable(),
+                    scheduler.getClock().instant());
         } catch (ScheduledTaskNotFoundException e) {
             log.warn("Task '{}' not found, cannot run now", taskId, e);
             throw e;

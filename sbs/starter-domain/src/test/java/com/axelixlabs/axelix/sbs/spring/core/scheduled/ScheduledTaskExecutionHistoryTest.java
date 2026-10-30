@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -83,7 +84,7 @@ class ScheduledTaskExecutionHistoryTest {
     void recordExecution_shouldRecordSuccessfulExecution() {
         Instant before = Instant.now();
 
-        history.recordExecution(TASK_ID, () -> {});
+        history.recordExecution(TASK_ID, ScheduledTaskLaunchType.SCHEDULED, () -> {});
 
         Instant after = Instant.now();
         ScheduledTaskExecution execution = recordedExecution();
@@ -95,8 +96,15 @@ class ScheduledTaskExecutionHistoryTest {
     }
 
     @Test
+    void recordExecution_shouldRecordTheLaunchType() {
+        history.recordExecution(TASK_ID, ScheduledTaskLaunchType.MANUAL, () -> {});
+
+        assertThat(recordedExecution().getLaunchType()).isEqualTo(ScheduledTaskLaunchType.MANUAL);
+    }
+
+    @Test
     void recordExecution_shouldMeasureDurationOfTheTask() {
-        history.recordExecution(TASK_ID, () -> sleep(SLEEP_MILLIS));
+        history.recordExecution(TASK_ID, ScheduledTaskLaunchType.SCHEDULED, () -> sleep(SLEEP_MILLIS));
 
         assertThat(recordedExecution().getDurationMillis()).isGreaterThanOrEqualTo(SLEEP_MILLIS);
     }
@@ -105,7 +113,7 @@ class ScheduledTaskExecutionHistoryTest {
     void recordExecution_shouldRecordFailedExecutionAndRethrowTheFailure() {
         RuntimeException failure = new IllegalStateException("boom");
 
-        assertThatThrownBy(() -> history.recordExecution(TASK_ID, () -> {
+        assertThatThrownBy(() -> history.recordExecution(TASK_ID, ScheduledTaskLaunchType.SCHEDULED, () -> {
                     throw failure;
                 }))
                 .isSameAs(failure);
@@ -120,7 +128,7 @@ class ScheduledTaskExecutionHistoryTest {
     void recordExecution_shouldRecordFailedExecutionAndRethrowTheError() {
         Error failure = new StackOverflowError();
 
-        assertThatThrownBy(() -> history.recordExecution(TASK_ID, () -> {
+        assertThatThrownBy(() -> history.recordExecution(TASK_ID, ScheduledTaskLaunchType.SCHEDULED, () -> {
                     throw failure;
                 }))
                 .isSameAs(failure);
