@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTas
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskEnableRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskResetRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ServiceScheduledTasks;
 
 /**
@@ -41,6 +42,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ServiceSched
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Dmitry Mazurov
  */
 @RestControllerEndpoint(id = "axelix-scheduled-tasks")
 public class AxelixScheduledTasksEndpoint {
@@ -76,6 +78,17 @@ public class AxelixScheduledTasksEndpoint {
             @RequestParam(value = "force", defaultValue = "false") boolean force) {
         try {
             taskService.disableTask(request.getTrigger(), force);
+            return ResponseEntity.noContent().build();
+            // TODO: We need to revisit exception handling here
+        } catch (ScheduledTaskNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/reset")
+    public ResponseEntity<Void> resetTask(@RequestBody ScheduledTaskResetRequest request) {
+        try {
+            taskService.resetTask(request.getTrigger());
             return ResponseEntity.noContent().build();
             // TODO: We need to revisit exception handling here
         } catch (ScheduledTaskNotFoundException e) {

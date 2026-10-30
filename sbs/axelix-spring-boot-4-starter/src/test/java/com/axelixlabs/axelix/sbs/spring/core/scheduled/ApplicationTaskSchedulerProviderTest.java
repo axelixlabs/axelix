@@ -17,11 +17,18 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.time.Duration;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.config.FixedDelayTask;
+import org.springframework.scheduling.config.FixedRateTask;
+import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.scheduling.config.TriggerTask;
+import org.springframework.scheduling.support.CronTrigger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Dmitry Mazurov
  */
 class ApplicationTaskSchedulerProviderTest {
+
+    private static final String ENABLE_SCHEDULING_ANNOTATION = "@EnableScheduling";
 
     private final ApplicationTaskSchedulerProvider provider = new ApplicationTaskSchedulerProvider();
 
@@ -58,7 +67,7 @@ class ApplicationTaskSchedulerProviderTest {
         // when, then
         assertThatThrownBy(provider::getTaskScheduler)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("@EnableScheduling");
+                .hasMessageContaining(ENABLE_SCHEDULING_ANNOTATION);
     }
 
     @Test // GH-1726
@@ -69,6 +78,56 @@ class ApplicationTaskSchedulerProviderTest {
         // when, then
         assertThatThrownBy(provider::getTaskScheduler)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("@EnableScheduling");
+                .hasMessageContaining(ENABLE_SCHEDULING_ANNOTATION);
+    }
+
+    @Test // GH-1835
+    void shouldScheduleTasksOnTheRegistrar_whenRegistrarHasScheduler() {
+        // given
+        ThreadPoolTaskScheduler applicationScheduler = new ThreadPoolTaskScheduler();
+        applicationScheduler.initialize();
+        ScheduledTaskRegistrar registrar = new ScheduledTaskRegistrar();
+        registrar.setTaskScheduler(applicationScheduler);
+        provider.configureTasks(registrar);
+
+        FixedDelayTask fixedDelayTask = new FixedDelayTask(() -> {}, Duration.ofHours(1), Duration.ofHours(1));
+        FixedRateTask fixedRateTask = new FixedRateTask(() -> {}, Duration.ofHours(1), Duration.ofHours(1));
+        TriggerTask triggerTask = new TriggerTask(() -> {}, new CronTrigger("0 0 0 * * *"));
+
+        // when
+        ScheduledTask scheduledFixedDelay = provider.scheduleFixedDelayTask(fixedDelayTask);
+        ScheduledTask scheduledFixedRate = provider.scheduleFixedRateTask(fixedRateTask);
+        ScheduledTask scheduledTrigger = provider.scheduleTriggerTask(triggerTask);
+
+        // then
+        try {
+            assertThat(scheduledFixedDelay).isNotNull();
+            assertThat(scheduledFixedDelay.getTask()).isSameAs(fixedDelayTask);
+            assertThat(scheduledFixedRate).isNotNull();
+            assertThat(scheduledFixedRate.getTask()).isSameAs(fixedRateTask);
+            assertThat(scheduledTrigger).isNotNull();
+            assertThat(scheduledTrigger.getTask()).isSameAs(triggerTask);
+        } finally {
+            applicationScheduler.shutdown();
+        }
+    }
+
+    @Test // GH-1835
+    void shouldThrow_whenSchedulingAndThereIsNoRegistrar() {
+        // given: configureTasks was never called, e.g. @EnableScheduling is absent
+        FixedDelayTask fixedDelayTask = new FixedDelayTask(() -> {}, Duration.ofHours(1), Duration.ZERO);
+        FixedRateTask fixedRateTask = new FixedRateTask(() -> {}, Duration.ofHours(1), Duration.ZERO);
+        TriggerTask triggerTask = new TriggerTask(() -> {}, new CronTrigger("0 0 0 * * *"));
+
+        // when, then
+        assertThatThrownBy(() -> provider.scheduleFixedDelayTask(fixedDelayTask))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ENABLE_SCHEDULING_ANNOTATION);
+        assertThatThrownBy(() -> provider.scheduleFixedRateTask(fixedRateTask))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ENABLE_SCHEDULING_ANNOTATION);
+        assertThatThrownBy(() -> provider.scheduleTriggerTask(triggerTask))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ENABLE_SCHEDULING_ANNOTATION);
     }
 }

@@ -1,0 +1,39 @@
+openapi: 3.1.0
+info:
+  title: scheduled-task-reset
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'scheduled-task-reset' operation.
+    This operation restores the original schedule of a scheduled task of the Spring Boot app,
+    i.e. the one the task was registered with, undoing the cron expression or interval changes.
+    Nothing happens if the task is disabled or its schedule was not modified.
+  x-axelix-introduced-in: 1.3.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-scheduled-tasks/reset:
+    post:
+      operationId: resetScheduledTask
+      summary: Restores the original schedule of a scheduled task of the service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledTaskResetRequest'
+      responses:
+        '204':
+          description: The task was reset.
+        '400':
+          description: No scheduled task with the given trigger exists.
+components:
+  schemas:
+    ScheduledTaskResetRequest:
+      type: object
+      description: A request to restore the original schedule of a scheduled task.
+      required:
+        - trigger
+      properties:
+        trigger:
+          type: string
+          description: The identifier of the scheduled task to reset.
+          x-axelix-introduced-in: 1.3.0
