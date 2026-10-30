@@ -1,6 +1,7 @@
 plugins {
     id("shared")
     id("com.axelixlabs.axelix-internal")
+    id("com.axelixlabs.autoconfig")
 }
 
 val springBootVersion = "2.7.18"
