@@ -1,0 +1,11 @@
+.Title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.Subtitle {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-regular);
+}

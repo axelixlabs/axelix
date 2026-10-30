@@ -38,8 +38,6 @@
     },
     "Details": {
         "downloadState": "Download state",
-        "exportConfigurationOptions": "List of state export components",
-        "exportConfigurationLoading": "Hang tight... We're exporting state...",
         "Components": {
             "HEAP_DUMP": "Heap Dump",
             "THREAD_DUMP": "Thread Dump",
@@ -49,6 +47,50 @@
             "CONFIG_PROPS": "Configuration Properties",
             "ENV": "Environment",
             "SCHEDULED_TASKS": "Scheduled Tasks"
+        },
+        "DownloadState": {
+            "title": "Download state",
+            "subtitle": {
+                "pick": "Choose what to include. Everything is packed into one .zip file.",
+                "run": "Collecting from the running instance.",
+                "done": "Your download is ready."
+            },
+            "groups": {
+                "jvm": "JVM",
+                "spring": "Spring"
+            },
+            "count": "{{selected}} of {{total}}",
+            "descriptions": {
+                "HEAP_DUMP": "Every object in memory, as an .hprof file. For memory leaks.",
+                "THREAD_DUMP": "Stack traces of all threads. For hangs and contention.",
+                "BEANS": "All beans with their scope, type and dependencies.",
+                "CONDITIONS": "Why each auto-configuration did or did not apply.",
+                "CONFIG_PROPS": "@ConfigurationProperties beans and their bound values. Sensitive values are masked.",
+                "ENV": "Property sources in order of precedence. Sensitive values are masked.",
+                "CACHES": "Cache managers and caches.",
+                "SCHEDULED_TASKS": "Cron, fixed-rate and fixed-delay tasks."
+            },
+            "itemSize": {
+                "heap": "Up to heap size",
+                "small": "< 1 MB"
+            },
+            "heapWarning": {
+                "title": "The application pauses while the heap dump is written",
+                "body": "The file is about as large as the used heap, often hundreds of MB or more, and the app stops responding while it is written. It holds everything in memory, including passwords and tokens; store it like a credential."
+            },
+            "collecting": "Collecting {{count}} items",
+            "collectingItem": "collecting…",
+            "writingHeap": "writing… app paused",
+            "saved": "Saved to your downloads",
+            "selected": "Selected",
+            "sizeZipped": "Size, zipped",
+            "size": {
+                "heap": "Heap size",
+                "heapPlus": "Heap size + < {{mb}} MB",
+                "small": "< {{mb}} MB"
+            },
+            "download": "Download .zip",
+            "close": "Close"
         },
         "spring": {
             "springBootVersion": "Spring Boot",

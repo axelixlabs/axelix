@@ -15,16 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button, Switch } from "antd";
+import { Button } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
 
 import { DownloadIcon } from "@/assets";
-import { Loader, UniversalModal } from "@/components";
-import { downloadFile, resolveInitials } from "@/helpers";
-import { EExportableComponent } from "@/models";
-import { exportStateData } from "@/services";
+import { resolveInitials } from "@/helpers";
+
+import { DownloadStateModal } from "../DownloadStateModal";
 
 import styles from "./styles.module.css";
 
@@ -40,49 +38,10 @@ interface IProps {
     groupId: string;
 }
 
-const allComponents = Object.values(EExportableComponent);
-
 export const DetailsHeader = ({ instanceName, groupId }: IProps) => {
-    const { instanceId } = useParams();
     const { t } = useTranslation();
 
-    const [isLoading, setLoading] = useState<boolean>(false);
-
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [stateComponents, setStateComponents] = useState<EExportableComponent[]>([]);
-
-    const handleOk = async (): Promise<void> => {
-        setLoading(true);
-
-        exportStateData({
-            instanceId: instanceId!,
-            body: {
-                components: stateComponents.map((value) => ({
-                    component: value,
-                })),
-            },
-        })
-            .then((value) => {
-                setIsModalOpen(false);
-                // We have to manually download the file here since the request to the server is a POST http
-                // request and therefore the browser might not catch up the possible Content-Disposition header
-                downloadFile(value.data);
-                setLoading(false);
-            })
-            .finally(() => {
-                setStateComponents([]);
-            });
-    };
-
-    const handleChange = (stateComponent: EExportableComponent): void => {
-        setStateComponents((prev) =>
-            prev.includes(stateComponent)
-                ? prev.filter((component) => component !== stateComponent)
-                : [...prev, stateComponent],
-        );
-    };
-
-    const modalTitle = isLoading ? t("Details.exportConfigurationLoading") : t("Details.exportConfigurationOptions");
 
     return (
         <>
@@ -101,28 +60,7 @@ export const DetailsHeader = ({ instanceName, groupId }: IProps) => {
                 <Button icon={<DownloadIcon />} onClick={() => setIsModalOpen(true)} className={styles.Download}>
                     {t("Details.downloadState")}
                 </Button>
-                <UniversalModal
-                    title={modalTitle}
-                    open={isModalOpen}
-                    onOk={handleOk}
-                    onClose={() => setIsModalOpen(false)}
-                    loading={isLoading}
-                >
-                    {isLoading ? (
-                        <div className={styles.LoaderWrapper}>
-                            <Loader />
-                        </div>
-                    ) : (
-                        <div className={styles.List}>
-                            {allComponents.map((component) => (
-                                <div key={component} className={styles.ListItem}>
-                                    <div>{t(`Details.Components.${component}`)}</div>
-                                    <Switch onChange={() => handleChange(component)} />
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </UniversalModal>
+                <DownloadStateModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
             </div>
         </>
     );

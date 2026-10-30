@@ -43,6 +43,7 @@ export * from "./interfaces/mcp";
 export * from "./interfaces/gc";
 
 export * from "./types/dependencies";
+export * from "./types/details";
 export * from "./types/conditions";
 export * from "./types/wallboard";
 export * from "./types/globals";
