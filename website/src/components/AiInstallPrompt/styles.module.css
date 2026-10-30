@@ -5,10 +5,11 @@
     gap: 12px;
     padding: 6px 6px 6px 10px;
     border-radius: 12px;
-    cursor: default;
+    cursor: pointer;
     box-shadow:
         0 1px 2px var(--axelix-line),
         0 0 18px color-mix(in srgb, var(--axelix-green-400) 35%, transparent);
+    transition: box-shadow 0.3s;
 }
 
 /* Width of VISIBLE_AGENTS badges (32px, overlapping by 8px), so the sliding queue never moves the caption. */
@@ -36,6 +37,7 @@
 
     & + & {
         margin-left: -8px;
+        transition: margin-left 0.3s ease;
     }
 }
 
@@ -51,16 +53,21 @@
 }
 
 .Caption {
+    flex: 1;
     font-size: 14px;
+    text-align: center;
     color: var(--axelix-ink-3);
     white-space: nowrap;
 }
 
 .CopyButton {
+    position: relative;
+    isolation: isolate;
     display: inline-grid;
     place-items: center;
     margin-left: auto;
     padding: 10px 18px;
+    overflow: hidden;
     border-radius: 8px;
     background-color: var(--axelix-ink);
     color: #fff;
@@ -80,28 +87,72 @@
     }
 }
 
+.CopyButton::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--axelix-green-600);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.Copied::before {
+    transform: none;
+}
+
+.Labels,
+.Icons {
+    display: inline-grid;
+    place-items: center;
+    overflow-x: clip;
+    transition:
+        max-width 0.3s ease,
+        width 0.3s ease,
+        opacity 0.3s ease;
+}
+
+.Labels {
+    max-width: 120px;
+}
+
+.Icons {
+    width: 0;
+    opacity: 0;
+
+    & svg {
+        width: 1em;
+        height: 1em;
+    }
+}
+
 .CopyLabel,
 .CopiedLabel {
     grid-area: 1 / 1;
     transition:
-        opacity 0.25s ease,
-        transform 0.25s ease;
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        filter 0.3s ease;
 }
 
 .CopiedLabel {
     opacity: 0;
-    transform: translateY(4px);
-    color: var(--axelix-green-300);
+    transform: translateY(100%);
+    filter: blur(4px);
 }
 
 .Copied .CopyLabel {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-100%);
+    filter: blur(4px);
 }
 
 .Copied .CopiedLabel {
     opacity: 1;
     transform: none;
+    filter: none;
+    transition-delay: 0.1s;
 }
 
 .Status {
@@ -119,8 +170,59 @@
 }
 
 .Compact .CopyButton {
+    display: inline-flex;
+    align-items: center;
     padding: 8px 12px;
     font-size: 13px;
+}
+
+.Compact .Caption {
+    position: absolute;
+    top: 50%;
+    right: 45px;
+    left: 61px;
+    display: block;
+    font-size: 12px;
+    text-align: center;
+    white-space: normal;
+    opacity: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+@media (hover: hover) {
+    .MainWrapper:is(:hover, :has(:focus-visible)) {
+        --shimmer-width: 2px;
+
+        box-shadow:
+            0 1px 2px var(--axelix-line),
+            0 0 28px color-mix(in srgb, var(--axelix-green-400) 70%, transparent);
+    }
+
+    .Compact:is(:hover, :has(:focus-visible)) {
+        & .Agent + .Agent:not(.Leaving + .Agent) {
+            margin-left: -28px;
+        }
+
+        & .CopyButton {
+            padding: 8px;
+        }
+
+        & .Labels {
+            max-width: 0;
+            opacity: 0;
+        }
+
+        & .Icons {
+            width: 16px;
+            opacity: 1;
+        }
+
+        & .Caption {
+            opacity: 1;
+        }
+    }
 }
 
 .Leaving {
@@ -158,12 +260,18 @@
         width: 80px;
     }
 
-    .Agent {
-        transition: opacity 0.5s ease-in-out;
+    .Agent + .Agent {
+        transition:
+            opacity 0.5s ease-in-out,
+            margin-left 0.3s ease;
     }
 
     .Agent:nth-last-child(-n + 2) {
         opacity: 0;
+    }
+
+    .Compact .Caption {
+        left: 53px;
     }
 }
 
@@ -174,6 +282,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .MainWrapper,
+    .Agent + .Agent,
+    .CopyButton::before,
+    .Labels,
+    .Icons,
+    .Compact .Caption,
     .CopyLabel,
     .CopiedLabel {
         transition: none;
