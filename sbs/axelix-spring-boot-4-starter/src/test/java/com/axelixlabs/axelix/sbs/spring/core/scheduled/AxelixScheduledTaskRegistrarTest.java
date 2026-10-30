@@ -163,6 +163,18 @@ class AxelixScheduledTaskRegistrarTest {
         assertThat(registrar.getObservationRegistry().isNoop()).isFalse();
     }
 
+    @Test
+    void findRunnable_shouldFindTheRunnableOfTheTaskScheduledForScheduledAnnotation() {
+        scheduleFor(
+                "fixedRate0",
+                () -> registrar.scheduleFixedRateTask(
+                        new FixedRateTask(new MethodRunnable(), INTERVAL, INITIAL_DELAY)));
+
+        registrar.afterPropertiesSet();
+
+        assertThat(registrar.findRunnable(METHOD + "#fixedRate0")).hasToString(METHOD + "#fixedRate0");
+    }
+
     private ScheduledTask scheduleFor(String suffix, Supplier<ScheduledTask> scheduling) {
         AtomicReference<ScheduledTask> scheduledTask = new AtomicReference<>();
         registrar.process(new ScheduledAnnotationContext(suffix, false), () -> scheduledTask.set(scheduling.get()));

@@ -55,8 +55,7 @@ public class ScheduledTaskExecutionObservationHandler implements ObservationHand
             recording = ObservationRegistry.create();
             recording
                     .observationConfig()
-                    .observationPredicate(
-                            (name, context) -> ScheduledAnnotationRunnable.currentReactiveTaskId() != null);
+                    .observationPredicate((name, context) -> ScheduledAnnotationRunnable.currentReactiveTask() != null);
         }
         recording.observationConfig().observationHandler(new ScheduledTaskExecutionObservationHandler(history));
         return recording;
@@ -79,9 +78,11 @@ public class ScheduledTaskExecutionObservationHandler implements ObservationHand
 
     @Override
     public void onStart(ScheduledTaskObservationContext context) {
-        String taskId = ScheduledAnnotationRunnable.currentReactiveTaskId();
-        if (taskId != null) {
-            context.put(ReactiveExecution.class, new ReactiveExecution(taskId, Instant.now(), System.nanoTime()));
+        ScheduledAnnotationRunnable task = ScheduledAnnotationRunnable.currentReactiveTask();
+        if (task != null) {
+            context.put(
+                    ReactiveExecution.class,
+                    new ReactiveExecution(task.toString(), task.getLaunchType(), Instant.now(), System.nanoTime()));
         }
     }
 
@@ -92,15 +93,15 @@ public class ScheduledTaskExecutionObservationHandler implements ObservationHand
         }
         if (context.remove(ReactiveExecution.class) instanceof ReactiveExecution execution) {
             long durationMillis = (System.nanoTime() - execution.startNanos()) / 1_000_000;
-            // TODO: the manual launches are recorded as the scheduled ones too, until they are told apart as in SB3
             history.record(ScheduledTaskExecutions.of(
                     execution.taskId(),
-                    ScheduledTaskLaunchType.SCHEDULED,
+                    execution.launchType(),
                     execution.startedAt(),
                     durationMillis,
                     context.getError()));
         }
     }
 
-    private record ReactiveExecution(String taskId, Instant startedAt, long startNanos) {}
+    private record ReactiveExecution(
+            String taskId, ScheduledTaskLaunchType launchType, Instant startedAt, long startNanos) {}
 }

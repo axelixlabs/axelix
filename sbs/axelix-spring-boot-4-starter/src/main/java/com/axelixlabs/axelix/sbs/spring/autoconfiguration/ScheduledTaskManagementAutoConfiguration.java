@@ -27,6 +27,7 @@ import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ApplicationTaskSchedulerProvider;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledAnnotationBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledAnnotationProcessorRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
@@ -79,8 +80,14 @@ public class ScheduledTaskManagementAutoConfiguration {
     public ScheduledTaskService scheduledTaskService(
             ScheduledTasksRegistry scheduledTasksRegistry,
             List<TaskRescheduler> taskReschedulers,
-            TaskSchedulerProvider taskSchedulerProvider) {
-        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, taskSchedulerProvider);
+            TaskSchedulerProvider taskSchedulerProvider,
+            ObjectProvider<AxelixScheduledAnnotationBeanPostProcessor> scheduledAnnotationProcessor) {
+        AxelixScheduledAnnotationBeanPostProcessor processor = scheduledAnnotationProcessor.getIfAvailable();
+        return new ScheduledTaskService(
+                scheduledTasksRegistry,
+                taskReschedulers,
+                taskSchedulerProvider,
+                processor != null ? processor.getRegistrar() : null);
     }
 
     @Bean

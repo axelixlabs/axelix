@@ -60,10 +60,6 @@ public final class ScheduledTaskService implements AutoCloseable {
     private final TaskSchedulerProvider taskSchedulerProvider;
     private final @Nullable AxelixScheduledTaskRegistrar scheduledTaskRegistrar;
 
-    /**
-     * @param scheduledTaskRegistrar the registrar of the {@code @Scheduled} tasks, or {@code null} if their processor
-     *        is not the Axelix one, e.g. when the user declares their own.
-     */
     public ScheduledTaskService(
             ScheduledTasksRegistry registry,
             List<TaskRescheduler> taskReschedulers,
