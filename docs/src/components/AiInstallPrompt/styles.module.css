@@ -1,0 +1,232 @@
+/* TODO: custom — based on website/src/components/AiInstallPrompt/styles.module.css. */
+
+.Prompt {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px;
+    border: 1px solid var(--color-fd-border);
+    border-radius: 12px;
+    background-color: var(--docs-article-surface);
+    box-shadow: 0 1px 2px var(--color-fd-border);
+    cursor: pointer;
+}
+
+.Agents {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.Agent {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    overflow: hidden;
+    border: 1px solid rgb(0 0 0 / 12%);
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+    transition:
+        transform 0.2s ease,
+        margin-left 0.3s ease;
+
+    & + & {
+        margin-left: -8px;
+    }
+
+    &:hover {
+        z-index: 1;
+        transform: scale(1.15);
+    }
+}
+
+.Agent.Dark {
+    border-color: #fff;
+    background-color: #141414;
+}
+
+.Agent svg {
+    width: 20px;
+    height: 16px;
+}
+
+.CopyButton {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    padding: 8px 12px;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: var(--color-fd-foreground);
+    color: var(--color-fd-background);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        padding 0.3s ease;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+    }
+
+    &:active {
+        transform: scale(0.96);
+        transition-duration: 0.1s;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-fd-ring);
+        outline-offset: 2px;
+    }
+}
+
+.CopyButton::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--color-fd-primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.Copied::before {
+    transform: none;
+}
+
+.Labels,
+.Icons {
+    display: inline-grid;
+    place-items: center;
+    overflow-x: clip;
+    transition:
+        max-width 0.3s ease,
+        width 0.3s ease,
+        opacity 0.3s ease;
+}
+
+.Labels {
+    max-width: 120px;
+}
+
+.Icons {
+    width: 0;
+    opacity: 0;
+
+    & svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.CopyLabel,
+.CopiedLabel {
+    grid-area: 1 / 1;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        filter 0.3s ease;
+}
+
+.CopiedLabel {
+    opacity: 0;
+    transform: translateY(100%);
+    color: var(--color-fd-primary-foreground);
+    filter: blur(4px);
+}
+
+.Copied .CopyLabel {
+    opacity: 0;
+    transform: translateY(-100%);
+    filter: blur(4px);
+}
+
+.Copied .CopiedLabel {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition-delay: 0.1s;
+}
+
+.Caption {
+    position: absolute;
+    top: 50%;
+    right: 45px;
+    left: 53px;
+    color: var(--color-fd-foreground);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    text-wrap: balance;
+    opacity: 0;
+    transform: translate(-4px, -50%);
+    pointer-events: none;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+@media (hover: hover) {
+    .Prompt:is(:hover, :has(:focus-visible)) {
+        & .Agent + .Agent {
+            margin-left: -28px;
+        }
+
+        & .CopyButton {
+            padding: 8px;
+        }
+
+        & .Labels {
+            max-width: 0;
+            opacity: 0;
+        }
+
+        & .Icons {
+            width: 16px;
+            opacity: 1;
+        }
+
+        & .Caption {
+            opacity: 1;
+            transform: translate(0, -50%);
+            transition-delay: 0.1s;
+        }
+    }
+}
+
+@media (hover: none) and (width < 768px) {
+    .Caption {
+        position: static;
+        flex: 1;
+        min-width: 0;
+        font-size: 11px;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Agent,
+    .CopyButton,
+    .CopyButton::before,
+    .Labels,
+    .Icons,
+    .CopyLabel,
+    .CopiedLabel,
+    .Caption {
+        transition: none;
+    }
+}

@@ -5,6 +5,8 @@ import { useTranslations } from "@fuma-translate/react";
 import { EditOnGitHub } from "fumadocs-ui/layouts/notebook/page";
 import { Flag } from "lucide-react";
 
+import { AiInstallPrompt } from "@/components/AiInstallPrompt";
+
 const ACTION_LINK =
     "flex items-center gap-1.5 text-sm text-fd-muted-foreground transition-colors hover:text-fd-foreground";
 
@@ -29,6 +31,10 @@ export const TocPageActions = ({ editUrl, reportUrl }: TocPageActionsProps) => {
                 <Flag className="size-3.5" />
                 {t("Report an issue", { note: "page" })}
             </a>
+
+            <div className="me-[21px] mt-2">
+                <AiInstallPrompt />
+            </div>
         </div>
     );
 };
