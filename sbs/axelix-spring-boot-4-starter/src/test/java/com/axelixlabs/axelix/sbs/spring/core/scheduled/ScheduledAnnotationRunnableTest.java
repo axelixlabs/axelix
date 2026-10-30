@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class ScheduledAnnotationRunnableTest {
     void run_shouldRunTheDelegateAndRecordTheExecutionUnderTheIdOfTheTask() {
         AtomicBoolean ran = new AtomicBoolean();
 
-        new ScheduledAnnotationRunnable(() -> ran.set(true), TASK_ID, history).run();
+        regular(() -> ran.set(true)).run();
 
         assertThat(ran).isTrue();
         assertThat(history.getExecutions())
@@ -53,8 +54,7 @@ class ScheduledAnnotationRunnableTest {
 
     @Test
     void shouldExposeTheIdAndTheQualifierOfTheDelegate() {
-        ScheduledAnnotationRunnable runnable =
-                new ScheduledAnnotationRunnable(new QualifiedRunnable("otherScheduler"), TASK_ID, history);
+        ScheduledAnnotationRunnable runnable = regular(new QualifiedRunnable("otherScheduler"));
 
         assertThat(runnable).hasToString(TASK_ID);
         assertThat(runnable.getQualifier()).isEqualTo("otherScheduler");
@@ -62,8 +62,37 @@ class ScheduledAnnotationRunnableTest {
 
     @Test
     void shouldHaveNoQualifierWhenTheDelegateIsPlainRunnable() {
-        assertThat(new ScheduledAnnotationRunnable(() -> {}, TASK_ID, history).getQualifier())
-                .isNull();
+        assertThat(regular(() -> {}).getQualifier()).isNull();
+    }
+
+    @Test
+    void run_shouldExposeTheIdOfReactiveTaskWhileSubscribingOnly() {
+        AtomicReference<String> taskIdWhileSubscribing = new AtomicReference<>();
+
+        reactive(() -> taskIdWhileSubscribing.set(ScheduledAnnotationRunnable.currentReactiveTaskId()))
+                .run();
+
+        assertThat(taskIdWhileSubscribing).hasValue(TASK_ID);
+        assertThat(ScheduledAnnotationRunnable.currentReactiveTaskId()).isNull();
+        assertThat(history.getExecutions()).isEmpty();
+    }
+
+    @Test
+    void run_shouldNotExposeTheIdOfRegularTask() {
+        AtomicReference<String> taskIdWhileRunning = new AtomicReference<>("not set");
+
+        regular(() -> taskIdWhileRunning.set(ScheduledAnnotationRunnable.currentReactiveTaskId()))
+                .run();
+
+        assertThat(taskIdWhileRunning.get()).isNull();
+    }
+
+    private ScheduledAnnotationRunnable regular(Runnable delegate) {
+        return new ScheduledAnnotationRunnable(delegate, TASK_ID, false, history);
+    }
+
+    private ScheduledAnnotationRunnable reactive(Runnable delegate) {
+        return new ScheduledAnnotationRunnable(delegate, TASK_ID, true, history);
     }
 
     private record QualifiedRunnable(@Nullable String qualifier) implements SchedulingAwareRunnable {

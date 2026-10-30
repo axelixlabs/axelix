@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ import org.springframework.scheduling.config.Task;
 
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -142,9 +144,28 @@ class AxelixScheduledTaskRegistrarTest {
         assertThat(history.getExecutions()).isEmpty();
     }
 
+    @Test
+    void afterPropertiesSet_shouldAddTheRecordingHandlerToTheRegistryOfTheApplication() {
+        ObservationRegistry applicationRegistry = ObservationRegistry.create();
+        registrar.setObservationRegistry(applicationRegistry);
+
+        registrar.afterPropertiesSet();
+
+        assertThat(registrar.getObservationRegistry()).isSameAs(applicationRegistry);
+        assertThat(applicationRegistry.isNoop()).isFalse();
+    }
+
+    @Test
+    void afterPropertiesSet_shouldUseOwnRecordingRegistryWhenTheApplicationHasNone() {
+        registrar.afterPropertiesSet();
+
+        assertThat(registrar.getObservationRegistry()).isNotNull();
+        assertThat(registrar.getObservationRegistry().isNoop()).isFalse();
+    }
+
     private ScheduledTask scheduleFor(String suffix, Supplier<ScheduledTask> scheduling) {
         AtomicReference<ScheduledTask> scheduledTask = new AtomicReference<>();
-        registrar.process(suffix, () -> scheduledTask.set(scheduling.get()));
+        registrar.process(new ScheduledAnnotationContext(suffix, false), () -> scheduledTask.set(scheduling.get()));
         assertThat(scheduledTask.get()).isNotNull();
         return scheduledTask.get();
     }
