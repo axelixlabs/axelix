@@ -68,5 +68,9 @@ export { default as TerminalIcon } from "../assets/icons/terminal.svg?react";
 export { default as LeafIcon } from "../assets/icons/leaf.svg?react";
 export { default as ChipIcon } from "../assets/icons/chip.svg?react";
 export { default as PackageIcon } from "../assets/icons/package.svg?react";
+export { default as SpringPortfolioIcon } from "../assets/icons/springPortfolio.svg?react";
+export { default as LanguagesUsageIcon } from "../assets/icons/languagesUsage.svg?react";
+export { default as PersistenceIcon } from "../assets/icons/persistence.svg?react";
+export { default as DependencyHealthIcon } from "../assets/icons/dependencyHealth.svg?react";
 
 export { default as LoginLeftImage } from "../assets/images/loginLeftImage.png";

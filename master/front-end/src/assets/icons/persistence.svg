@@ -1,0 +1,18 @@
+<svg
+	width="16"
+	height="16"
+	viewBox="0 0 16 16"
+	fill="none"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<g
+		stroke="currentColor"
+		strokeWidth="1.5"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+	>
+		<ellipse cx="8" cy="3.8" rx="5" ry="1.9" />
+		<path d="M3 3.8v8.4c0 1 2.2 1.9 5 1.9s5-.9 5-1.9V3.8" />
+		<path d="M3 8c0 1 2.2 1.9 5 1.9S13 9 13 8" />
+	</g>
+</svg>

@@ -18,53 +18,46 @@
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router";
 
+import { DependencyHealthIcon, LanguagesUsageIcon, PersistenceIcon, SpringPortfolioIcon } from "@/assets";
 import type { ISiderMenuItem, TMenuItem } from "@/models";
 
 const createMenuItems = (items: ISiderMenuItem[]): TMenuItem[] => {
-    return items.map(({ path, label }) => ({
+    return items.map(({ path, icon, label }) => ({
         key: path,
+        icon: icon,
         label: <Link to={path}>{label}</Link>,
     }));
 };
 
-// TODO: Add icons in future
 const getDashboardItems = (): TMenuItem[] => {
-    const topLevelItems: ISiderMenuItem[] = [
+    const items: ISiderMenuItem[] = [
         {
             path: "/dashboard/spring-portfolio",
+            icon: <SpringPortfolioIcon />,
             label: "Spring Portfolio",
         },
         {
             path: "/dashboard/languages",
+            icon: <LanguagesUsageIcon />,
             label: "Languages Usage",
         },
-    ];
-
-    const technologiesItems: ISiderMenuItem[] = [
         {
             path: "/dashboard/persistence",
+            icon: <PersistenceIcon />,
             label: "Persistence",
         },
         {
             path: "/dashboard/dependencies",
+            icon: <DependencyHealthIcon />,
             label: "Dependency Health",
         },
     ];
 
-    return [
-        ...createMenuItems(topLevelItems),
-        {
-            key: "technologies",
-            label: "Technologies",
-            children: createMenuItems(technologiesItems),
-        },
-    ];
+    return createMenuItems(items);
 };
 
 export const DashboardSiderMenu = () => {
     const { pathname } = useLocation();
 
-    return (
-        <Menu defaultOpenKeys={["technologies"]} selectedKeys={[pathname]} mode="inline" items={getDashboardItems()} />
-    );
+    return <Menu selectedKeys={[pathname]} mode="inline" items={getDashboardItems()} />;
 };
