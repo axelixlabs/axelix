@@ -117,6 +117,15 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
         }
     }
 
+    /**
+     * @return the runnable of the task with the given id, or {@code null} if the task is not declared by a
+     *         {@code @Scheduled} annotation. On Spring Framework 6.2+, the task itself exposes the runnable wrapped.
+     */
+    @Nullable
+    ScheduledAnnotationRunnable findRunnable(String taskId) {
+        return runnables.get(taskId);
+    }
+
     @Override
     public @Nullable ScheduledTask scheduleCronTask(CronTask task) {
         Runnable runnable = wrap(task.getRunnable());
@@ -163,15 +172,6 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
                 history.require());
         runnables.put(wrapped.toString(), wrapped);
         return wrapped;
-    }
-
-    /**
-     * @return the runnable of the task with the given id, or {@code null} if the task is not declared by a
-     *         {@code @Scheduled} annotation. On Spring Framework 6.2+, the task itself exposes the runnable wrapped.
-     */
-    @Nullable
-    ScheduledAnnotationRunnable findRunnable(String taskId) {
-        return runnables.get(taskId);
     }
 
     /**

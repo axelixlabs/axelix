@@ -34,19 +34,37 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaun
  */
 public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnable {
 
-    private static final ThreadLocal<@Nullable String> CURRENT_REACTIVE_TASK_ID = new ThreadLocal<>();
+    private static final ThreadLocal<@Nullable ScheduledAnnotationRunnable> CURRENT_REACTIVE_TASK = new ThreadLocal<>();
 
     private final Runnable delegate;
     private final String id;
     private final boolean reactive;
     private final ScheduledTaskExecutionHistory history;
+    private final ScheduledTaskLaunchType launchType;
 
     public ScheduledAnnotationRunnable(
             Runnable delegate, String id, boolean reactive, ScheduledTaskExecutionHistory history) {
+        this(delegate, id, reactive, history, ScheduledTaskLaunchType.SCHEDULED);
+    }
+
+    private ScheduledAnnotationRunnable(
+            Runnable delegate,
+            String id,
+            boolean reactive,
+            ScheduledTaskExecutionHistory history,
+            ScheduledTaskLaunchType launchType) {
         this.delegate = delegate;
         this.id = id;
         this.reactive = reactive;
         this.history = history;
+        this.launchType = launchType;
+    }
+
+    /**
+     * @return the runnable of the same task, whose executions are recorded as the manually launched ones.
+     */
+    public ScheduledAnnotationRunnable manual() {
+        return new ScheduledAnnotationRunnable(delegate, id, reactive, history, ScheduledTaskLaunchType.MANUAL);
     }
 
     @Override
@@ -54,25 +72,28 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
         if (reactive) {
             runReactive();
         } else {
-            // TODO: the manual launches are recorded as the scheduled ones too, until they are told apart as in SB3
-            history.recordExecution(id, ScheduledTaskLaunchType.SCHEDULED, delegate);
+            history.recordExecution(id, launchType, delegate);
         }
     }
 
     private void runReactive() {
-        CURRENT_REACTIVE_TASK_ID.set(id);
+        CURRENT_REACTIVE_TASK.set(this);
         try {
             delegate.run();
         } finally {
-            CURRENT_REACTIVE_TASK_ID.remove();
+            CURRENT_REACTIVE_TASK.remove();
         }
     }
 
     /**
-     * @return the id of the reactive task that the current thread is subscribing to, if any.
+     * @return the reactive task that the current thread is subscribing to, if any.
      */
-    static @Nullable String currentReactiveTaskId() {
-        return CURRENT_REACTIVE_TASK_ID.get();
+    static @Nullable ScheduledAnnotationRunnable currentReactiveTask() {
+        return CURRENT_REACTIVE_TASK.get();
+    }
+
+    ScheduledTaskLaunchType getLaunchType() {
+        return launchType;
     }
 
     @Override

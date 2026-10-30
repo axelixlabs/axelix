@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import io.micrometer.observation.ObservationRegistry;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -48,6 +51,8 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
     private static final Logger log = LoggerFactory.getLogger(AxelixScheduledTaskRegistrar.class);
 
     private final ThreadLocal<@Nullable ScheduledAnnotationContext> processingContext = new ThreadLocal<>();
+
+    private final Map<String, ScheduledAnnotationRunnable> runnables = new ConcurrentHashMap<>();
 
     @SuppressWarnings("NullAway.Init")
     private Lazy<ScheduledTaskExecutionHistory> history;
@@ -107,6 +112,15 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
         }
     }
 
+    /**
+     * @return the runnable of the task with the given id, or {@code null} if the task is not declared by a
+     *         {@code @Scheduled} annotation. The task itself exposes the runnable wrapped by Spring.
+     */
+    @Nullable
+    ScheduledAnnotationRunnable findRunnable(String taskId) {
+        return runnables.get(taskId);
+    }
+
     @Override
     public @Nullable ScheduledTask scheduleCronTask(CronTask task) {
         Runnable runnable = wrap(task.getRunnable());
@@ -152,8 +166,10 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
         if (annotation.reactive()) {
             reactiveTaskScheduled = true;
         }
-        return new ScheduledAnnotationRunnable(
+        ScheduledAnnotationRunnable wrapped = new ScheduledAnnotationRunnable(
                 runnable, runnable + "#" + annotation.suffix(), annotation.reactive(), history.require());
+        runnables.put(wrapped.toString(), wrapped);
+        return wrapped;
     }
 
     /**

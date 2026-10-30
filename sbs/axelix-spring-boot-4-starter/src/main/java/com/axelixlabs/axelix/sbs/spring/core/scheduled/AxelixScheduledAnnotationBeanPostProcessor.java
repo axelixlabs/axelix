@@ -62,8 +62,12 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
         registrar.setHistory(Lazy.of(() -> beanFactory.getBean(ScheduledTaskExecutionHistory.class)));
     }
 
+    public AxelixScheduledTaskRegistrar getRegistrar() {
+        return registrar;
+    }
+
     @Override
-    protected void processScheduled(Scheduled scheduled, Method method, Object bean) {
+    protected void processScheduled(@NonNull Scheduled scheduled, @NonNull Method method, @NonNull Object bean) {
         ScheduledAnnotationContext annotation =
                 new ScheduledAnnotationContext(suffix(scheduled, method), isReactive(method));
         registrar.process(annotation, () -> super.processScheduled(scheduled, method, bean));

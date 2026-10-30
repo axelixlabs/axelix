@@ -51,6 +51,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.config.TaskManagementConfigUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledAnnotationBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
@@ -433,7 +434,9 @@ class ScheduledTaskManagementAutoConfigurationTest {
             service.executeScheduledTask(taskId);
 
             // then
-            assertThat(awaitExecutions(context, taskId, 2)).hasSize(2);
+            assertThat(awaitExecutions(context, taskId, 2))
+                    .extracting(ScheduledTaskExecution::getLaunchType)
+                    .containsExactly(ScheduledTaskLaunchType.SCHEDULED, ScheduledTaskLaunchType.MANUAL);
         });
     }
 
