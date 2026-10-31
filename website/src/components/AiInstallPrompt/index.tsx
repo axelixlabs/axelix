@@ -17,9 +17,11 @@
  */
 "use client";
 import {
+    CheckIcon,
     ClaudeCodeIcon,
     CodexIcon,
     CopilotIcon,
+    CopyIcon,
     CursorIcon,
     GeminiCliIcon,
     OpenCodeIcon,
@@ -111,6 +113,7 @@ export const AiInstallPrompt = ({ compact = false }: IProps) => {
             onMouseLeave={handleMouseLeave}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onClick={handleCopy}
         >
             <ul className={styles.Agents} aria-hidden="true">
                 {positions.map((position, index) => {
@@ -136,10 +139,17 @@ export const AiInstallPrompt = ({ compact = false }: IProps) => {
                 type="button"
                 title={AI_INSTALL_PROMPT}
                 aria-label="Copy prompt for your AI agent"
-                onClick={handleCopy}
             >
-                <span className={styles.CopyLabel}>Copy prompt</span>
-                <span className={styles.CopiedLabel}>Copied!</span>
+                <span className={styles.Labels}>
+                    <span className={styles.CopyLabel}>Copy prompt</span>
+                    <span className={styles.CopiedLabel}>Copied!</span>
+                </span>
+                {compact && (
+                    <span className={styles.Icons}>
+                        <CopyIcon className={styles.CopyLabel} />
+                        <CheckIcon className={styles.CopiedLabel} />
+                    </span>
+                )}
             </button>
             <span className={styles.Status} aria-live="polite">
                 {copied ? "Prompt copied" : ""}
