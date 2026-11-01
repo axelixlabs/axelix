@@ -183,7 +183,7 @@ public class OAuth2CallbackController {
                     () -> Objects.equals(bySubject.userOrigin(), UserOrigin.OIDC),
                     "OIDC user with username '" + username
                             + "' originally came nor from OIDC source, but from the source: "
-                            + bySubject.userOrigin().getDisplayName());
+                            + bySubject.userOrigin().name());
 
             return bySubject;
         } else {

@@ -773,6 +773,40 @@
         "userEdited": "Данные пользователя успешно обновлены",
         "userDeleted": "Пользователь успешно удалён",
         "userNotFound": "Пользователь не найден",
+        "title": "Пользователи",
+        "subtitle": "Учётные записи с доступом к Axelix, их роли и недавняя активность",
+        "searchPlaceholder": "Имя, имя пользователя или email…",
+        "user": "Пользователь",
+        "status": "Статус",
+        "lastActivity": "Последняя активность",
+        "never": "Никогда",
+        "originOidc": "OIDC-провайдер",
+        "originLocal": "Локальный",
+        "originSplit": "OIDC: {{oidc}} · локальных: {{local}}",
+        "rangeOf": "{{from}}–{{to}} из {{total}}",
+        "rowsPerPage": "Строк на странице: {{count}}",
+        "selectAll": "Выбрать всех пользователей на странице",
+        "selectUser": "Выбрать {{username}}",
+        "Statuses": {
+            "ACTIVE": "Активен",
+            "DORMANT": "Неактивен",
+            "SUSPENDED": "Заблокирован"
+        },
+        "Metrics": {
+            "totalUsers": "Всего пользователей",
+            "admins": "Администраторы",
+            "adminsHint": "полное администрирование",
+            "suspended": "Заблокированы",
+            "suspendedHint": "вход запрещён",
+            "dormant": "Неактивны 90+ дней",
+            "dormantHint": "не входили 90+ дней"
+        },
+        "Selection": {
+            "selected": "Выбрано пользователей: {{count}}",
+            "suspend": "Заблокировать",
+            "delete": "Удалить",
+            "clear": "Сбросить"
+        },
         "ValidationErrors": {
             "username": "Пожалуйста, введите имя пользователя!",
             "emailFormat": "Неверный формат email!",

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ERoles, EUserOrigin } from "../enums/users";
+import type { ERoles, EUserDisplayStatus, EUserOrigin, EUserStatus } from "../enums/users";
 
 export interface IUser {
     /**
@@ -24,9 +24,24 @@ export interface IUser {
     id: string;
 
     /**
+     * First name of the user, which may be null, e.g. when the OIDC provider does not return the claim
+     */
+    firstName: string | null;
+
+    /**
+     * Last name of the user, which may be null, e.g. when the OIDC provider does not return the claim
+     */
+    lastName: string | null;
+
+    /**
      * Email address of the user, which may be null
      */
     email: string | null;
+
+    /**
+     * Status that controls whether the user can log in
+     */
+    status: EUserStatus;
 
     /**
      * Last login data of the most recent successful login. null if the user has never logged in
@@ -106,6 +121,11 @@ export interface IEditUserRequestData {
 }
 
 export interface IUsersFilters {
+    /**
+     * Statuses of the user, as shown in the users list.
+     */
+    statuses: EUserDisplayStatus[];
+
     /**
      * The roles granted to this user.
      */

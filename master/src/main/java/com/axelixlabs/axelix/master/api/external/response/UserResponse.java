@@ -69,7 +69,7 @@ public record UserResponse(
                 user.jobTitle(),
                 user.organizationalUnit(),
                 roleNames,
-                user.userOrigin().getDisplayName(),
+                user.userOrigin().name(),
                 user.status().name(),
                 user.lastLoginAt());
     }

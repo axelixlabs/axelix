@@ -21,17 +21,23 @@ import { useTranslation } from "react-i18next";
 
 import { PageSearch } from "@/components";
 import { useAppSelector } from "@/hooks";
-import { ERoles, EUserOrigin, type IUsersFilters } from "@/models";
+import { ERoles, EUserDisplayStatus, EUserOrigin, type IUser, type IUsersFilters } from "@/models";
 import { LOCAL_AUTH_OPTION_TYPE_NAME, roleOptions } from "@/utils";
 
 import { CreateUser } from "./CreateUser";
+import { UsersMetrics } from "./UsersMetrics";
 import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * Text to display after the search field
+     * All users, regardless of the applied search and filters
      */
-    addonAfter: string;
+    users: IUser[];
+
+    /**
+     * Range of the currently shown users, e.g. "1–10 of 42"
+     */
+    rangeLabel: string;
 
     /**
      * Setter to update the search
@@ -54,59 +60,79 @@ interface IProps {
     fetchUsers: () => void;
 }
 
-export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, fetchUsers }: IProps) => {
+export const UsersFirstSection = ({ users, rangeLabel, setSearch, filters, setFilters, fetchUsers }: IProps) => {
     const { t } = useTranslation();
     const settings = useAppSelector((state) => state.settings);
 
-    const userOriginOptions = Object.values(EUserOrigin).map((origin) => ({
-        value: origin,
+    const isLocalAuthEnabled = settings.authenticationOptions.some(
+        (value) => value.type === LOCAL_AUTH_OPTION_TYPE_NAME,
+    );
+
+    const statusOptions = Object.values(EUserDisplayStatus).map((status) => ({
+        value: status,
+        label: t(`Users.Statuses.${status}`),
     }));
 
-    const rolesHandleChange = (value: ERoles[]): void => {
-        setFilters((prev) => ({
-            ...prev,
-            roles: value,
-        }));
-    };
+    const userOriginOptions = [
+        { value: EUserOrigin.OIDC, label: t("Users.originOidc") },
+        { value: EUserOrigin.LOCAL, label: t("Users.originLocal") },
+    ];
 
-    const userOriginsHandleChange = (value: EUserOrigin[]): void => {
+    const updateFilter = <K extends keyof IUsersFilters>(key: K, value: IUsersFilters[K]): void => {
         setFilters((prev) => ({
             ...prev,
-            userOrigins: value,
+            [key]: value,
         }));
     };
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.FiltersSection}>
-                <PageSearch addonAfter={addonAfter} setSearch={setSearch} removeBottomGutter />
+        <>
+            <div className={styles.Header}>
+                <div>
+                    <div className="TextLarge">{t("Users.title")}</div>
+                    <p className={`TextSmall ${styles.Subtitle}`}>{t("Users.subtitle")}</p>
+                </div>
+                {isLocalAuthEnabled && <CreateUser fetchUsers={fetchUsers} />}
+            </div>
+
+            <UsersMetrics users={users} />
+
+            <div className={styles.Toolbar}>
+                <PageSearch setSearch={setSearch} placeholder={t("Users.searchPlaceholder")} removeBottomGutter />
                 <div className={styles.FiltersWrapper}>
                     <Select
                         mode="multiple"
                         showSearch={false}
+                        placeholder={t("Users.status")}
+                        maxTagCount={1}
+                        value={filters.statuses}
+                        onChange={(value: EUserDisplayStatus[]) => updateFilter("statuses", value)}
+                        options={statusOptions}
+                        className={styles.Filter}
+                    />
+                    <Select
+                        mode="multiple"
+                        showSearch={false}
                         placeholder={t("Users.roles")}
-                        size="small"
                         maxTagCount={1}
                         value={filters.roles}
-                        onChange={rolesHandleChange}
+                        onChange={(value: ERoles[]) => updateFilter("roles", value)}
                         options={roleOptions}
+                        className={styles.Filter}
                     />
                     <Select
                         mode="multiple"
                         showSearch={false}
                         placeholder={t("Users.origin")}
-                        size="small"
                         maxTagCount={1}
                         value={filters.userOrigins}
-                        onChange={userOriginsHandleChange}
+                        onChange={(value: EUserOrigin[]) => updateFilter("userOrigins", value)}
                         options={userOriginOptions}
+                        className={styles.Filter}
                     />
                 </div>
+                <span className={`TextSmall ${styles.Range}`}>{rangeLabel}</span>
             </div>
-
-            {settings.authenticationOptions.find((value) => {
-                return value.type === LOCAL_AUTH_OPTION_TYPE_NAME;
-            }) && <CreateUser fetchUsers={fetchUsers} />}
-        </div>
+        </>
     );
 };

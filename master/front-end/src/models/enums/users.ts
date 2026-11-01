@@ -26,6 +26,21 @@ export enum EUserOrigin {
     OIDC = "OIDC",
 }
 
+export enum EUserStatus {
+    ACTIVE = "ACTIVE",
+    SUSPENDED = "SUSPENDED",
+}
+
+/**
+ * Status shown in the users list. Unlike {@link EUserStatus} it also includes DORMANT,
+ * which is derived from the last login rather than stored.
+ */
+export enum EUserDisplayStatus {
+    ACTIVE = "ACTIVE",
+    DORMANT = "DORMANT",
+    SUSPENDED = "SUSPENDED",
+}
+
 export enum EUserProfileEditableValueField {
     USERNAME = "username",
     EMAIL = "email",

@@ -1,0 +1,28 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-3);
+    min-height: 44px;
+    padding: var(--axelix-space-2) var(--axelix-space-2) var(--axelix-space-2) var(--axelix-space-4);
+    background-color: var(--axelix-grey-900);
+    color: var(--axelix-white);
+}
+
+.Count {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Split {
+    color: var(--axelix-grey-400);
+}
+
+.Actions {
+    display: flex;
+    gap: var(--axelix-space-2);
+    margin-left: auto;
+}
+
+.Clear,
+.Clear:not(:disabled):hover {
+    color: var(--axelix-grey-300);
+}

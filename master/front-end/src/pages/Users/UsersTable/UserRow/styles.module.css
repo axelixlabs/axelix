@@ -1,0 +1,111 @@
+.Row {
+    min-height: 56px;
+    border-bottom: 1px solid var(--axelix-grey-100);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.Row:hover {
+    background-color: var(--axelix-grey-50);
+}
+
+.Selected,
+.Selected:hover {
+    background-color: var(--axelix-green-50);
+}
+
+.Person {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-3);
+    min-width: 0;
+}
+
+.Avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.AvatarAnonymous {
+    background-color: var(--axelix-grey-100);
+    color: var(--axelix-grey-500);
+}
+
+.PersonText {
+    min-width: 0;
+}
+
+.Name,
+.Email,
+.Username {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.Name {
+    display: block;
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Email {
+    color: var(--axelix-grey-500);
+}
+
+.Name.Missing,
+.Email.Missing {
+    color: var(--axelix-grey-400);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Username,
+.LocalOrigin {
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-700);
+}
+
+.LocalOrigin {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.Status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--axelix-space-2);
+    font-weight: var(--axelix-font-weight-medium);
+}
+
+.StatusDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentcolor;
+}
+
+.StatusActive {
+    color: var(--axelix-green-600);
+}
+
+.StatusDormant {
+    color: var(--axelix-orange-700);
+}
+
+.StatusSuspended {
+    color: var(--axelix-red-700);
+}
+
+.LastActivity {
+    color: var(--axelix-grey-700);
+    font-variant-numeric: tabular-nums;
+}

@@ -1,12 +1,28 @@
 .Table {
-    box-shadow: var(--axelix-box-shadow-light);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    overflow: hidden;
 }
 
-.TableHeader,
-.TableRow {
-    grid-template-columns: repeat(5, 1fr);
+.Grid {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1.6fr) minmax(0, 1fr) 120px minmax(0, 1.1fr) 130px 140px;
+    align-items: center;
+    column-gap: var(--axelix-space-3);
+    padding: 0 var(--axelix-space-4);
 }
 
-.TableHeader:hover {
-    background-color: var(--axelix-green-50);
+.TableHeader {
+    min-height: 40px;
+    color: var(--axelix-grey-500);
+    border-bottom: 1px solid var(--axelix-grey-200);
 }
+
+.Footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--axelix-space-2) var(--axelix-space-4);
+    color: var(--axelix-grey-500);
+}
+

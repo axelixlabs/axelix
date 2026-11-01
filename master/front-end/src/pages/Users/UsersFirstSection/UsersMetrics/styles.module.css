@@ -1,0 +1,32 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    margin-bottom: var(--axelix-space-5);
+}
+
+.Metric {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-1);
+    padding: var(--axelix-space-3) var(--axelix-space-4);
+    border-right: 1px solid var(--axelix-grey-200);
+}
+
+.Metric:last-child {
+    border-right: none;
+}
+
+.Label,
+.Hint {
+    color: var(--axelix-grey-500);
+}
+
+.Suspended {
+    color: var(--axelix-red-700);
+}
+
+.Dormant {
+    color: var(--axelix-orange-700);
+}
