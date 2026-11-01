@@ -78,7 +78,10 @@ class DefaultRoleServiceTest {
     @BeforeEach
     @AfterEach
     void cleanCustomRolesAndUsers() {
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
         jdbcClient.sql("DELETE FROM roles_parents").update();
         jdbcClient
                 .sql("DELETE FROM roles_authorities WHERE role_id IN (SELECT id FROM roles WHERE role_origin <> ?)")
