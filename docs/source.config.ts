@@ -2,6 +2,8 @@ import { remarkDirectiveAdmonition } from "fumadocs-core/mdx-plugins";
 import { defineConfig } from "fumadocs-mdx/config";
 import remarkDirective from "remark-directive";
 
+import remarkDockerImage from "./src/lib/remark-docker-image";
+
 /**
  * Collections live in `src/lib/source.ts` via the `defineDocs` macro — this file only carries
  * the global MDX options, which the macro has no place for.
@@ -10,6 +12,7 @@ export default defineConfig({
     mdxOptions: {
         // A function extends the `fumadocs` preset; an array would replace it.
         remarkPlugins: (plugins) => [
+            remarkDockerImage,
             remarkDirective,
             [
                 remarkDirectiveAdmonition,

@@ -4,6 +4,8 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import NextImage, { type ImageProps } from "next/image";
 
+import { DockerImageCode } from "@/components/DockerImageCode";
+import { DockerImageVersion } from "@/components/DockerImageVersion";
 import { LegacyNotice, ReleasedInNotice, ScreenshotsNotice, UpcomingReleaseNotice } from "@/components/ReleaseNotices";
 import { BASE_PATH } from "@/lib/constants.mjs";
 
@@ -31,6 +33,8 @@ export function getMDXComponents(components?: MDXComponents) {
         ...defaultMdxComponents,
         Tabs,
         Tab,
+        DockerImageVersion,
+        DockerImageCode,
         Image,
         ReleasedInNotice,
         UpcomingReleaseNotice,
