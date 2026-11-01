@@ -440,6 +440,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
             assertThat(dashboard.inMemoryPagination())
                     .extracting(TreemapEntry::appName, TreemapEntry::size)
                     .containsExactlyInAnyOrder(tuple("service-both", 2), tuple("service-pagination", 1));
+            assertThat(dashboard.computedAt()).isNotNull();
         }
 
         @Test
@@ -477,6 +478,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
             // then.
             assertThat(dashboard.nPlusOne()).isEmpty();
             assertThat(dashboard.inMemoryPagination()).isEmpty();
+            assertThat(dashboard.computedAt()).isNotNull();
         }
     }
 

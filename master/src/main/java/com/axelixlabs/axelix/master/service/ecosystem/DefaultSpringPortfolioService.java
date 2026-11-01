@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.ecosystem;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -95,7 +96,8 @@ public class DefaultSpringPortfolioService implements SpringPortfolioService {
                 fullyOssSupported,
                 springBootPlatformDistribution,
                 springFrameworkPlatformDistribution,
-                linesInUse);
+                linesInUse,
+                Instant.now());
     }
 
     private boolean isFullyOssSupported(

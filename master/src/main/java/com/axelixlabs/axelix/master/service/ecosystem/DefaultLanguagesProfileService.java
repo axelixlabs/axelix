@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.ecosystem;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +91,7 @@ public class DefaultLanguagesProfileService implements LanguagesProfileService {
             kotlinReleases = buildKotlinReleaseUsage(kotlinReleasesPerApplication, kotlinApplicationsCount);
         }
 
-        LocalDate lastScannedAt = LocalDate.now();
+        Instant computedAt = Instant.now();
 
         return new LanguagesProfileResponse(
                 applicationsOnLts,
@@ -100,7 +100,7 @@ public class DefaultLanguagesProfileService implements LanguagesProfileService {
                 jdkVendors,
                 languageMix,
                 kotlinReleases,
-                lastScannedAt);
+                computedAt);
     }
 
     private static List<KotlinReleaseUsage> buildKotlinReleaseUsage(

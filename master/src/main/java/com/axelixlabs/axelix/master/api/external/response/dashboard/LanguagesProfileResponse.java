@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.dashboard;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
@@ -38,9 +38,10 @@ import org.jspecify.annotations.Nullable;
  *                             Kotlin is detected
  * @param kotlinReleases       the Kotlin release distribution, per application, newest release first; empty when no
  *                             Kotlin is detected
- * @param lastScannedAt        the date of the most recent snapshot any application reported, or {@code null} if unknown
+ * @param computedAt           when the dashboard was computed
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public record LanguagesProfileResponse(
         int applicationsOnLts,
@@ -49,7 +50,8 @@ public record LanguagesProfileResponse(
         List<JdkVendorUsage> jdkVendors,
         @Nullable LanguageMix languageMix,
         List<KotlinReleaseUsage> kotlinReleases,
-        @Nullable LocalDate lastScannedAt) {
+        Instant computedAt)
+        implements DashboardResponse {
 
     /**
      * How many applications run a given Java release.

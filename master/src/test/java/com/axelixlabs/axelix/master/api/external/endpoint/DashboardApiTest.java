@@ -163,6 +163,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 .when(IGNORING_ARRAY_ORDER)
                 .node("inMemoryPagination")
                 .isEqualTo("[{\"appName\":\"service-b\",\"size\":1}]");
+        assertThatJson(response.getBody()).node("computedAt").isPresent();
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_PERSISTENCE, viewer.getActor());
     }
 
@@ -186,6 +187,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         assertThatJson(response.getBody())
                 .node("springFramework.platform")
                 .isEqualTo(PlatformName.SPRING_FRAMEWORK.name());
+        assertThatJson(response.getBody()).node("computedAt").isPresent();
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_SPRING_PORTFOLIO, viewer.getActor());
     }
 
@@ -211,6 +213,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 .node("languageMix.kotlinApplications")
                 .isEqualTo(1);
         assertThatJson(response.getBody()).node("kotlinReleases").isArray().hasSize(1);
+        assertThatJson(response.getBody()).node("computedAt").isPresent();
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_LANGUAGES, viewer.getActor());
     }
 
@@ -261,7 +264,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         assertThatJson(response.getBody()).node("riskyLibrariesByEcosystem").isEqualTo("""
                 { "OBSERVABILITY": { "SUNSET": 1, "DORMANT": 1, "MAINTENANCE": 2 } }
                 """);
-        assertThatJson(response.getBody()).node("lastScannedAt").isPresent();
+        assertThatJson(response.getBody()).node("computedAt").isPresent();
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_DEPENDENCIES, viewer.getActor());
     }
 
@@ -281,6 +284,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         assertThatJson(response.getBody()).node("totalLibraries").isEqualTo(0);
         assertThatJson(response.getBody()).node("librariesByStatus").isEqualTo("{}");
         assertThatJson(response.getBody()).node("riskyLibrariesByEcosystem").isEqualTo("{}");
+        assertThatJson(response.getBody()).node("computedAt").isPresent();
     }
 
     @Test

@@ -205,6 +205,7 @@ class DefaultDependencyAnalysisServiceTest {
         assertThat(dashboard.totalLibraries()).isZero();
         assertThat(dashboard.librariesByStatus()).isEmpty();
         assertThat(dashboard.riskyLibrariesByEcosystem()).isEmpty();
+        assertThat(dashboard.computedAt()).isNotNull();
     }
 
     @Test
@@ -227,6 +228,7 @@ class DefaultDependencyAnalysisServiceTest {
         // then. the dashboard is built from the remaining SBOMs only.
         assertThat(dashboard.totalApplications()).isEqualTo(1);
         assertThat(dashboard.applicationsWithRiskyDependencies()).isEqualTo(1);
+        assertThat(dashboard.computedAt()).isNotNull();
         assertThat(libraries.libraries()).singleElement().satisfies(library -> {
             assertThat(library.applicationCount()).isEqualTo(1);
             assertThat(library.share()).isEqualTo(100.0);
