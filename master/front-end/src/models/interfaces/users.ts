@@ -66,6 +66,16 @@ export interface IUser {
 
 export interface ICreateUserFormFields {
     /**
+     * First name of the user
+     */
+    firstName: string | undefined;
+
+    /**
+     * Last name of the user
+     */
+    lastName: string | undefined;
+
+    /**
      * Login name of the user
      */
     username: string;
@@ -81,16 +91,46 @@ export interface ICreateUserFormFields {
     password: string;
 
     /**
+     * Repeated password, must match the password
+     */
+    confirmPassword: string;
+
+    /**
      * The roles granted to this user
      */
-    role: ERoles;
+    roles: ERoles[];
 }
 
-export interface ICreateUserRequestData extends Omit<ICreateUserFormFields, "email"> {
+export interface ICreateUserRequestData {
+    /**
+     * Login name of the user
+     */
+    username: string;
+
+    /**
+     * First name of the user, which may be null
+     */
+    firstName: string | null;
+
+    /**
+     * Last name of the user, which may be null
+     */
+    lastName: string | null;
+
     /**
      * Email address of the user, which may be null
      */
     email: string | null;
+
+    /**
+     * Password of the user
+     */
+    password: string;
+
+    /**
+     * The roles granted to this user
+     */
+    roles: ERoles[];
 }
 
 export interface IEditUserRequestData {

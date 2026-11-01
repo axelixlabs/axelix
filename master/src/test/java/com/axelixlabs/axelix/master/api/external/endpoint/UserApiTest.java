@@ -162,7 +162,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         String username = "db-user";
         String password = "db-password";
 
-        userService.createLocal(username, null, null, "db-user@example.com", null, null, password, "VIEWER");
+        userService.createLocal(username, null, null, "db-user@example.com", null, null, password, Set.of("VIEWER"));
         UserEntity user = userRepository.findByUsername(username).orElseThrow();
 
         LoginRequest loginRequest = new LoginRequest(username, password);
@@ -183,7 +183,14 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldNotAuthenticateUserFromDatabaseWithInvalidCredentials() {
         userService.createLocal(
-                "db-user", null, null, "db-user@example.com", null, null, "db-password", TestRoles.VIEWER.getName());
+                "db-user",
+                null,
+                null,
+                "db-user@example.com",
+                null,
+                null,
+                "db-password",
+                Set.of(TestRoles.VIEWER.getName()));
 
         LoginRequest loginRequest = new LoginRequest("db-user", "wrong-password");
 
@@ -200,7 +207,8 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnForbiddenForSuspendedDatabaseUser() {
         // given.
-        userService.createLocal("db-user", null, null, "db-user@example.com", null, null, "db-password", "VIEWER");
+        userService.createLocal(
+                "db-user", null, null, "db-user@example.com", null, null, "db-password", Set.of("VIEWER"));
         UserEntity user = userRepository.findByUsername("db-user").orElseThrow();
         userService.updateStatusByIds(List.of(user.id()), UserStatus.SUSPENDED);
         LoginRequest loginRequest = new LoginRequest("db-user", "db-password");
@@ -225,7 +233,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         String password = "db-password";
 
         // and.
-        userService.createLocal(username, null, null, "db-user@example.com", null, null, password, "VIEWER");
+        userService.createLocal(username, null, null, "db-user@example.com", null, null, password, Set.of("VIEWER"));
         UserEntity user = userRepository.findByUsername(username).orElseThrow();
         userService.updateStatusByIds(List.of(user.id()), UserStatus.SUSPENDED);
         userService.updateStatusByIds(List.of(user.id()), UserStatus.ACTIVE);
@@ -314,7 +322,8 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnAllManagedUsers() {
         // given.
-        userService.createLocal("alice", "Alice", "Smith", "alice@example.com", null, null, "aliceSecret", "ADMIN");
+        userService.createLocal(
+                "alice", "Alice", "Smith", "alice@example.com", null, null, "aliceSecret", Set.of("ADMIN"));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
 
         userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "hash-bob", "VIEWER");
@@ -375,7 +384,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 "Engineering Manager",
                 "Engineering",
                 "aliceSecret",
-                "ADMIN");
+                Set.of("ADMIN"));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
         userService.updateStatusByIds(List.of(alice.id()), UserStatus.SUSPENDED);
 

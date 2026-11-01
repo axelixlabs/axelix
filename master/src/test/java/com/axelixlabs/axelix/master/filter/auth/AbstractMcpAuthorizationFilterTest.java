@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -222,7 +223,14 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String password = "test-password";
 
             userService.createLocal(
-                    username, null, null, "test-email@example.com", null, null, password, TestRoles.VIEWER.getName());
+                    username,
+                    null,
+                    null,
+                    "test-email@example.com",
+                    null,
+                    null,
+                    password,
+                    Set.of(TestRoles.VIEWER.getName()));
             String userId =
                     userService.findUserByUsername(username).orElseThrow().id();
 
@@ -281,7 +289,14 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "viewer-user";
             String password = "viewer-password";
             userService.createLocal(
-                    username, null, null, username + "@example.com", null, null, password, TestRoles.VIEWER.getName());
+                    username,
+                    null,
+                    null,
+                    username + "@example.com",
+                    null,
+                    null,
+                    password,
+                    Set.of(TestRoles.VIEWER.getName()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -302,7 +317,14 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "viewer-user";
             String password = "viewer-password";
             userService.createLocal(
-                    username, null, null, username + "@example.com", null, null, password, TestRoles.VIEWER.getName());
+                    username,
+                    null,
+                    null,
+                    username + "@example.com",
+                    null,
+                    null,
+                    password,
+                    Set.of(TestRoles.VIEWER.getName()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));

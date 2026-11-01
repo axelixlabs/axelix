@@ -96,7 +96,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "jobTitle": "Software Engineer",
                   "organizationalUnit": "Engineering",
                   "password": "plainPassword",
-                  "role": "EDITOR"
+                  "roles": ["EDITOR", "VIEWER"]
                 }
                 """;
 
@@ -120,7 +120,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         assertThat(saved.email()).isEqualTo("newUser@example.com");
         assertThat(saved.jobTitle()).isEqualTo("Software Engineer");
         assertThat(saved.organizationalUnit()).isEqualTo("Engineering");
-        assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactly("EDITOR");
+        assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactlyInAnyOrder("EDITOR", "VIEWER");
         assertThat(saved.userOrigin()).isEqualTo(UserOrigin.LOCAL);
         assertThat(saved.status()).isEqualTo(UserStatus.ACTIVE);
         assertThat(saved.lastLoginAt()).isNull();
@@ -142,7 +142,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "jobTitle": null,
                   "organizationalUnit": null,
                   "password": "plainPassword",
-                  "role": "EDITOR"
+                  "roles": ["EDITOR"]
                 }
                 """;
 
@@ -168,7 +168,29 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "u",
                   "email": "u@example.com",
                   "password": "p",
-                  "role": null
+                  "roles": null
+                }
+                """;
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(userRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenCreateRequest_RolesAreEmpty() {
+        // language=json
+        String request = """
+                {
+                  "username": "u",
+                  "email": "u@example.com",
+                  "password": "p",
+                  "roles": []
                 }
                 """;
 
@@ -190,7 +212,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "u",
                   "email": "u@example.com",
                   "password": "p",
-                  "role": "   "
+                  "roles": ["   "]
                 }
                 """;
 
@@ -212,7 +234,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "u",
                   "email": "u@example.com",
                   "password": "p",
-                  "role": "  super_admin  "
+                  "roles": ["  super_admin  "]
                 }
                 """;
 
@@ -234,7 +256,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "u",
                   "email": "u@example.com",
                   "password": "p",
-                  "role": "NOT_A_REAL_ROLE"
+                  "roles": ["NOT_A_REAL_ROLE"]
                 }
                 """;
 
@@ -258,7 +280,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "existingUser",
                   "email": "other@example.com",
                   "password": "p",
-                  "role": "VIEWER"
+                  "roles": ["VIEWER"]
                 }
                 """;
 
@@ -283,7 +305,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "existingUser",
                   "email": "user_test@example.com",
                   "password": "p",
-                  "role": "VIEWER"
+                  "roles": ["VIEWER"]
                 }
                 """;
 
@@ -911,7 +933,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     private UserEntity createUser(String username, String email, String password) {
-        userService.createLocal(username, null, null, email, null, null, password, "VIEWER");
+        userService.createLocal(username, null, null, email, null, null, password, Set.of("VIEWER"));
         return userRepository.findByUsername(username).orElseThrow();
     }
 
