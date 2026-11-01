@@ -43,6 +43,11 @@ interface IProps {
     autocompleteOptions?: AutoCompleteProps["options"];
 
     searchWrapperClassName?: string;
+
+    /**
+     * Placeholder of the search field, defaults to the generic "Search"
+     */
+    placeholder?: string;
 }
 
 export const PageSearch = ({
@@ -51,6 +56,7 @@ export const PageSearch = ({
     autocompleteOptions,
     removeBottomGutter,
     searchWrapperClassName,
+    placeholder,
 }: IProps) => {
     // TODO: Make the search a block element during polishing
     const { t } = useTranslation();
@@ -87,7 +93,7 @@ export const PageSearch = ({
                         onSelect={(value) => setSearch(value)}
                         className={`${styles.Search}`}
                     >
-                        <Input placeholder={t("search")} />
+                        <Input placeholder={placeholder ?? t("search")} />
                     </AutoComplete>
                     {addonAfter && <Space.Addon className={styles.AddonAfter}>{addonAfter}</Space.Addon>}
                 </Space.Compact>
@@ -100,7 +106,7 @@ export const PageSearch = ({
             <Space.Compact
                 className={`${styles.SearchWrapper} ${searchWrapperClassName} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
             >
-                <Input placeholder={t("search")} onChange={(e) => scheduleSetSearch(e.target.value)} />
+                <Input placeholder={placeholder ?? t("search")} onChange={(e) => scheduleSetSearch(e.target.value)} />
                 {addonAfter && <Space.Addon className={styles.AddonAfter}>{addonAfter}</Space.Addon>}
             </Space.Compact>
         </>

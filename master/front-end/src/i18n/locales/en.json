@@ -761,6 +761,40 @@
         "userEdited": "User data updated successfully",
         "userDeleted": "User deleted successfully",
         "userNotFound": "User not found",
+        "title": "Users",
+        "subtitle": "Accounts that can sign in to Axelix, their roles and recent activity",
+        "searchPlaceholder": "Name, username or email…",
+        "user": "User",
+        "status": "Status",
+        "lastActivity": "Last activity",
+        "never": "Never",
+        "originOidc": "OIDC Provider",
+        "originLocal": "Local",
+        "originSplit": "{{oidc}} OIDC · {{local}} local",
+        "rangeOf": "{{from}}–{{to}} of {{total}}",
+        "rowsPerPage": "Rows per page",
+        "selectAll": "Select all users on this page",
+        "selectUser": "Select {{username}}",
+        "Statuses": {
+            "ACTIVE": "Active",
+            "DORMANT": "Dormant",
+            "SUSPENDED": "Suspended"
+        },
+        "Metrics": {
+            "totalUsers": "Total users",
+            "admins": "Admins",
+            "adminsHint": "full administration",
+            "suspended": "Suspended",
+            "suspendedHint": "sign-in blocked",
+            "dormant": "Dormant 90d+",
+            "dormantHint": "no sign-in for 90+ days"
+        },
+        "Selection": {
+            "selected": "{{count}} users selected",
+            "suspend": "Suspend",
+            "delete": "Delete",
+            "clear": "Clear"
+        },
         "ValidationErrors": {
             "username": "Please input username!",
             "emailFormat": "Invalid email format!",

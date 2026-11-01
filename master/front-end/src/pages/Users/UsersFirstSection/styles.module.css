@@ -1,17 +1,35 @@
-.MainWrapper {
+.Header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 30px;
-    gap: 20px;
+    align-items: flex-start;
+    gap: var(--axelix-space-5);
+    margin-bottom: var(--axelix-space-4);
 }
 
-.FiltersSection {
-    flex: 1;
-    min-width: 0;
+.Subtitle {
+    margin-top: var(--axelix-space-1);
+    color: var(--axelix-grey-500);
+}
+
+.Toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-2);
+    margin-bottom: var(--axelix-space-3);
 }
 
 .FiltersWrapper {
     display: flex;
-    column-gap: 8px;
-    margin-top: 8px;
+    column-gap: var(--axelix-space-2);
+}
+
+.Filter {
+    min-width: 140px;
+}
+
+.Range {
+    margin-left: auto;
+    color: var(--axelix-grey-500);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }

@@ -15,31 +15,81 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IUser, IUsersFilters } from "@/models";
+import dayjs from "dayjs";
+
+import { EUserDisplayStatus, EUserOrigin, EUserStatus, type IUser, type IUsersFilters } from "@/models";
+
+const DORMANT_AFTER_DAYS = 90;
+
+/**
+ * The backend reports the origin by its display name (e.g. "OAUTH2/OIDC"), so anything that
+ * is not a local account is treated as an OIDC one.
+ */
+export const getUserOrigin = (user: IUser): EUserOrigin => {
+    return user.userOrigin === EUserOrigin.LOCAL ? EUserOrigin.LOCAL : EUserOrigin.OIDC;
+};
+
+/**
+ * An active user is dormant once their last login is older than {@link DORMANT_AFTER_DAYS} days.
+ * Users who have never logged in are not considered dormant.
+ */
+export const getUserDisplayStatus = (user: IUser): EUserDisplayStatus => {
+    if (user.status === EUserStatus.SUSPENDED) {
+        return EUserDisplayStatus.SUSPENDED;
+    }
+
+    if (user.lastLoginAt && dayjs().diff(dayjs(user.lastLoginAt), "day") >= DORMANT_AFTER_DAYS) {
+        return EUserDisplayStatus.DORMANT;
+    }
+
+    return EUserDisplayStatus.ACTIVE;
+};
+
+/**
+ * Returns null when neither the first nor the last name is known.
+ */
+export const getUserFullName = ({ firstName, lastName }: IUser): string | null => {
+    const fullName = [firstName, lastName].filter(Boolean).join(" ");
+
+    return fullName || null;
+};
+
+export const getUserInitials = (user: IUser): string => {
+    const { firstName, lastName, username } = user;
+
+    if (firstName || lastName) {
+        return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
+    }
+
+    return username[0].toUpperCase();
+};
+
+const matchesSearch = (user: IUser, search: string): boolean => {
+    if (!search) {
+        return true;
+    }
+
+    const searchable = [user.username, user.email, getUserFullName(user)];
+
+    return searchable.some((value) => value?.toLowerCase().includes(search));
+};
+
+const matchesFilters = (user: IUser, { statuses, roles, userOrigins }: IUsersFilters): boolean => {
+    if (statuses.length > 0 && !statuses.includes(getUserDisplayStatus(user))) {
+        return false;
+    }
+
+    if (roles.length > 0 && !user.roles.some((role) => roles.includes(role))) {
+        return false;
+    }
+
+    return userOrigins.length === 0 || userOrigins.includes(getUserOrigin(user));
+};
 
 export const filterUsers = (users: IUser[], search: string, filters: IUsersFilters): IUser[] => {
     const formattedSearch = search.toLowerCase().trim();
-    const hasRolesFilters = filters.roles.length > 0;
-    const hasOriginFilters = filters.userOrigins.length > 0;
 
-    return users.filter(({ username, email, roles, userOrigin }) => {
-        if (hasRolesFilters && !roles.some((role) => filters.roles.includes(role))) {
-            return false;
-        }
-
-        if (hasOriginFilters && !filters.userOrigins.includes(userOrigin)) {
-            return false;
-        }
-
-        if (!formattedSearch) {
-            return true;
-        }
-
-        const lowerUsername = username.toLowerCase();
-        const lowerEmail = (email ?? "").toLowerCase();
-
-        return lowerUsername.includes(formattedSearch) || lowerEmail.includes(formattedSearch);
-    });
+    return users.filter((user) => matchesFilters(user, filters) && matchesSearch(user, formattedSearch));
 };
 
 export const emptyStringToNull = (value: string): string | null => {
