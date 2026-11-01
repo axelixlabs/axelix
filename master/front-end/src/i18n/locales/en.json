@@ -772,7 +772,7 @@
         "originLocal": "Local",
         "originSplit": "{{oidc}} OIDC · {{local}} local",
         "rangeOf": "{{from}}–{{to}} of {{total}}",
-        "rowsPerPage": "Rows per page",
+        "rowsPerPage": "Rows per page {{count}}",
         "selectAll": "Select all users on this page",
         "selectUser": "Select {{username}}",
         "Statuses": {

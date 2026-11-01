@@ -784,7 +784,7 @@
         "originLocal": "Локальный",
         "originSplit": "OIDC: {{oidc}} · локальных: {{local}}",
         "rangeOf": "{{from}}–{{to}} из {{total}}",
-        "rowsPerPage": "Строк на странице",
+        "rowsPerPage": "Строк на странице: {{count}}",
         "selectAll": "Выбрать всех пользователей на странице",
         "selectUser": "Выбрать {{username}}",
         "Statuses": {

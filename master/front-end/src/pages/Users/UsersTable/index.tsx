@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Checkbox, Pagination, Select } from "antd";
+import { Checkbox, Pagination } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler } from "@/components";
@@ -24,8 +24,6 @@ import type { IUser } from "@/models";
 import { SelectionBar } from "./SelectionBar";
 import { UserRow } from "./UserRow";
 import styles from "./styles.module.css";
-
-const PAGE_SIZE_OPTIONS = [10, 20, 50].map((value) => ({ value }));
 
 interface IProps {
     /**
@@ -49,9 +47,9 @@ interface IProps {
     pageSize: number;
 
     /**
-     * Called when the page or the page size changes
+     * Called when the page changes
      */
-    onPageChange: (page: number, pageSize: number) => void;
+    onPageChange: (page: number) => void;
 
     /**
      * Currently selected users, possibly from other pages
@@ -141,15 +139,7 @@ export const UsersTable = ({
                 </EmptyHandler>
 
                 <div className={`TextSmall ${styles.Footer}`}>
-                    <span className={styles.RowsPerPage}>
-                        {t("Users.rowsPerPage")}
-                        <Select
-                            size="small"
-                            value={pageSize}
-                            options={PAGE_SIZE_OPTIONS}
-                            onChange={(value: number) => onPageChange(1, value)}
-                        />
-                    </span>
+                    <span>{t("Users.rowsPerPage", { count: pageSize })}</span>
                     <Pagination
                         size="small"
                         current={page}

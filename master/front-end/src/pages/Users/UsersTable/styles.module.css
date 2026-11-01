@@ -26,9 +26,3 @@
     color: var(--axelix-grey-500);
 }
 
-.RowsPerPage {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--axelix-space-2);
-}
-

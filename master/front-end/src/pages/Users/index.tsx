@@ -26,6 +26,8 @@ import { getUsers } from "@/services";
 import { UsersFirstSection } from "./UsersFirstSection";
 import { UsersTable } from "./UsersTable";
 
+const PAGE_SIZE = 10;
+
 const Users = () => {
     const { t } = useTranslation();
 
@@ -33,7 +35,6 @@ const Users = () => {
     const [search, setSearch] = useState<string>("");
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [page, setPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
 
     const [filters, setFilters] = useState<IUsersFilters>({
         statuses: [],
@@ -64,8 +65,8 @@ const Users = () => {
 
     const usersFeed = usersData.response!;
     const effectiveUsers = filterUsers(usersFeed, search, filters);
-    const pageStart = (page - 1) * pageSize;
-    const pageUsers = effectiveUsers.slice(pageStart, pageStart + pageSize);
+    const pageStart = (page - 1) * PAGE_SIZE;
+    const pageUsers = effectiveUsers.slice(pageStart, pageStart + PAGE_SIZE);
     const selectedUsers = usersFeed.filter((user) => selectedIds.has(user.id));
 
     const rangeLabel = t("Users.rangeOf", {
@@ -73,11 +74,6 @@ const Users = () => {
         to: pageStart + pageUsers.length,
         total: effectiveUsers.length,
     });
-
-    const onPageChange = (nextPage: number, nextPageSize: number): void => {
-        setPage(nextPage);
-        setPageSize(nextPageSize);
-    };
 
     return (
         <>
@@ -93,8 +89,8 @@ const Users = () => {
                 users={pageUsers}
                 total={effectiveUsers.length}
                 page={page}
-                pageSize={pageSize}
-                onPageChange={onPageChange}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
                 selectedUsers={selectedUsers}
                 setSelectedIds={setSelectedIds}
             />
