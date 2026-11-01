@@ -3,20 +3,21 @@
 }
 
 .RulerTick {
-    position: relative;
     flex: 1;
+    min-width: 0;
+    text-align: center;
 }
 
 .TickLabel {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-400);
 }
 
 .TickWhiteLabel {
-    color: var(--axelix-primary-white);
+    color: var(--axelix-white);
 }
 
 .TickAnnotation {
     display: block;
     margin-top: 2px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-400);
 }

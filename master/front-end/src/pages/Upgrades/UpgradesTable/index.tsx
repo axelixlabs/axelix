@@ -15,10 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Table } from "antd";
-import type { ColumnsType } from "antd/es/table";
+import dayjs from "dayjs";
 import type { TFunction } from "i18next";
-import type { JSX } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { ICeilingBlocker } from "@/models";
@@ -29,63 +27,56 @@ interface IProps {
     ceilingBlockers: ICeilingBlocker[];
 }
 
-// TODO: Improve this component in the future
+const formatLastSeen = (lastSeen: string, t: TFunction): string => {
+    const seen = dayjs(lastSeen);
 
-const renderFootNoteSummary = (t: TFunction) => (): JSX.Element => (
-    <Table.Summary.Row>
-        <Table.Summary.Cell index={0} colSpan={3}>
-            <p className={`TextUltraSmall ${styles.FootNote}`}>{t("Upgrades.ArtifactsTable.footNote")}</p>
-        </Table.Summary.Cell>
-    </Table.Summary.Row>
-);
+    if (!seen.isValid()) {
+        return lastSeen;
+    }
+
+    const daysAgo = dayjs().startOf("day").diff(seen.startOf("day"), "day");
+
+    if (daysAgo <= 0) {
+        return t("Upgrades.ArtifactsTable.today");
+    }
+
+    if (daysAgo === 1) {
+        return t("Upgrades.ArtifactsTable.yesterday");
+    }
+
+    return t("Upgrades.ArtifactsTable.daysAgo", { count: daysAgo });
+};
 
 export const UpgradesTable = ({ ceilingBlockers }: IProps) => {
     const { t } = useTranslation();
 
-    const columns: ColumnsType<ICeilingBlocker> = [
-        {
-            title: t("Upgrades.ArtifactsTable.artifact"),
-            dataIndex: "artifactId",
-            key: "artifactId",
-            render: (artifactId: string, { groupId }) => (
-                <div className={styles.ArtifactCell}>
-                    <span className={styles.ArtifactId}>{artifactId}</span>
-                    <span className={styles.GroupId}>{groupId}</span>
-                </div>
-            ),
-        },
-        {
-            title: t("Upgrades.ArtifactsTable.starter"),
-            dataIndex: "starterVersion",
-            key: "starterVersion",
-            width: 120,
-            render: (version: string) => <span className={styles.VersionBadge}>{version}</span>,
-        },
-        {
-            title: t("Upgrades.ArtifactsTable.lastSeen"),
-            dataIndex: "lastSeen",
-            key: "lastSeen",
-            width: 150,
-            render: (lastSeen: string) => <span className={styles.LastSeen}>{lastSeen}</span>,
-        },
-    ];
-
     return (
-        <>
+        <section className={styles.Section}>
             <div className={styles.SectionRow}>
                 <div className={styles.SectionTitle}>{t("Upgrades.ArtifactsTable.sectionTitle")}</div>
                 <p className={styles.SectionNote}>{t("Upgrades.ArtifactsTable.sectionNote")}</p>
             </div>
 
-            <Table<ICeilingBlocker>
-                columns={columns}
-                dataSource={ceilingBlockers}
-                rowKey={(r) => r.artifactId}
-                pagination={false}
-                size="small"
-                summary={renderFootNoteSummary(t)}
-                className={styles.Table}
-            />
-        </>
+            <div className={styles.Table}>
+                <div className={`TextCaps ${styles.HeaderRow}`}>
+                    <span>{t("Upgrades.ArtifactsTable.artifact")}</span>
+                    <span>{t("Upgrades.ArtifactsTable.starter")}</span>
+                    <span>{t("Upgrades.ArtifactsTable.lastSeen")}</span>
+                </div>
+
+                {ceilingBlockers.map(({ artifactId, groupId, starterVersion, lastSeen }) => (
+                    <div className={styles.Row} key={`${groupId}:${artifactId}`}>
+                        <div className={styles.ArtifactCell}>
+                            <span className={styles.ArtifactId}>{artifactId}</span>
+                            <span className={styles.GroupId}>{groupId}</span>
+                        </div>
+                        <span className={styles.VersionBadge}>{starterVersion}</span>
+                        <span className={styles.LastSeen}>{formatLastSeen(lastSeen, t)}</span>
+                    </div>
+                ))}
+            </div>
+
+            <p className={`TextUltraSmall ${styles.FootNote}`}>{t("Upgrades.ArtifactsTable.footNote")}</p>
+        </section>
     );
 };

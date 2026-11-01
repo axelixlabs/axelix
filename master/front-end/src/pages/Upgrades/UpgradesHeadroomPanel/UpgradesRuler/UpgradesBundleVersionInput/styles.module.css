@@ -1,42 +1,46 @@
 .MainWrapper {
     display: flex;
+    flex-wrap: wrap;
+    gap: var(--axelix-space-2) var(--axelix-space-3);
     align-items: center;
-    column-gap: 8px;
-    background-color: #232f45;
-    border: 1px solid #3a4660;
+    padding: 10px 14px;
+    border: 1px solid rgb(255 255 255 / 8%);
     border-radius: var(--axelix-border-radius-large);
-    padding: 8px 12px;
-    width: fit-content;
+    background-color: rgb(255 255 255 / 4%);
 }
 
 .Label {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-400);
 }
 
 .Input {
-    width: 120px;
-    background-color: #1a2233 !important;
-    border-color: #3a4660 !important;
-    color: var(--axelix-primary-white);
+    width: 88px;
+    background-color: var(--axelix-grey-800) !important;
+    border-color: var(--axelix-grey-700) !important;
+    color: var(--axelix-white);
 
     &::placeholder {
-        color: var(--axelix-bold-grey);
+        color: var(--axelix-grey-400);
     }
 
     & input {
-        color: #e8ecf0 !important;
+        color: var(--axelix-white) !important;
         background-color: transparent !important;
     }
 }
 
-.BundleInputHint {
-    color: var(--axelix-primary-green);
+.BundleInputHintSafe {
+    color: var(--axelix-green-500);
+}
+
+.BundleInputHintDropped {
+    color: var(--axelix-orange-300);
 }
 
 .Note {
-    color: var(--axelix-bold-grey);
-    background-color: #232f45;
-    border: 1px solid #3a4660;
+    padding: var(--axelix-space-3) var(--axelix-space-4);
+    border: 1px solid rgb(255 255 255 / 8%);
     border-radius: var(--axelix-border-radius-large);
-    padding: 12px 16px;
+    background-color: rgb(255 255 255 / 4%);
+    color: var(--axelix-grey-400);
 }

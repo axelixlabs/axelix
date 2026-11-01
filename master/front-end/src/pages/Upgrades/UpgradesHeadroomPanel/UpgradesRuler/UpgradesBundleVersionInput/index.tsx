@@ -30,6 +30,7 @@ interface IProps {
     dropVersion: string;
     oldestStarterVersion: string;
     oldestStarterServiceCount: number;
+    totalServiceCount: number;
 }
 
 export const UpgradesBundleVersionInput = ({
@@ -37,6 +38,7 @@ export const UpgradesBundleVersionInput = ({
     dropVersion,
     oldestStarterVersion,
     oldestStarterServiceCount,
+    totalServiceCount,
 }: IProps) => {
     const { t } = useTranslation();
 
@@ -77,10 +79,18 @@ export const UpgradesBundleVersionInput = ({
                     (upgradesLostApplications.loading ? (
                         <Skeleton.Input active size="small" className={styles.HintSkeleton} />
                     ) : upgradesLostApplications.response ? (
-                        <span className={styles.BundleInputHint}>
+                        <span
+                            className={
+                                upgradesLostApplications.response.lostApplications === 0
+                                    ? styles.BundleInputHintSafe
+                                    : styles.BundleInputHintDropped
+                            }
+                        >
                             {upgradesLostApplications.response.lostApplications === 0
-                                ? t("Upgrades.BundleVersionInput.noServicesFound")
-                                : t("Upgrades.BundleVersionInput.allServicesSupported", {
+                                ? t("Upgrades.BundleVersionInput.allServicesSupported", {
+                                      count: totalServiceCount,
+                                  })
+                                : t("Upgrades.BundleVersionInput.servicesDropped", {
                                       count: upgradesLostApplications.response.lostApplications,
                                   })}
                         </span>

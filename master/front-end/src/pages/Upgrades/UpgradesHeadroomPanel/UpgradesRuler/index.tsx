@@ -17,7 +17,12 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { buildRulerTicks, getOldestStarterServiceCount, getOldestStarterVersion } from "@/helpers";
+import {
+    buildRulerTicks,
+    getOldestStarterServiceCount,
+    getOldestStarterVersion,
+    getTotalServiceCount,
+} from "@/helpers";
 import type { IUpgradesData } from "@/models";
 
 import { UpgradesBundleVersionInput } from "./UpgradesBundleVersionInput";
@@ -39,6 +44,7 @@ export const UpgradesRuler = ({ data }: IProps) => {
     }
 
     const oldestStarterServiceCount = getOldestStarterServiceCount(starterVersions);
+    const totalServiceCount = getTotalServiceCount(starterVersions);
 
     const { ticks, dropVersion } = buildRulerTicks({
         masterVersion: masterVersion,
@@ -61,6 +67,7 @@ export const UpgradesRuler = ({ data }: IProps) => {
                 dropVersion={dropVersion}
                 oldestStarterVersion={oldestStarterVersion}
                 oldestStarterServiceCount={oldestStarterServiceCount}
+                totalServiceCount={totalServiceCount}
             />
         </>
     );

@@ -1,26 +1,27 @@
 .EmptyStateCard {
-    border: 1px solid var(--axelix-medium-grey);
-    border-radius: var(--axelix-border-radius-large);
-    padding: 50px;
     display: flex;
     flex-direction: column;
+    gap: var(--axelix-space-4);
     align-items: center;
+    padding: var(--axelix-space-12) var(--axelix-space-6);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-white);
     text-align: center;
-    gap: 16px;
 }
 
 .EmptyStateLabel {
-    font-weight: 600;
-    letter-spacing: 1px;
+    color: var(--axelix-grey-500);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--axelix-bold-grey);
 }
 
 .EmptyStateDescription {
-    color: var(--axelix-bold-grey);
-    max-width: 500px;
+    max-width: 36rem;
+    color: var(--axelix-grey-600);
 }
 
 .ReadDocumentation {
-    margin-top: 8px;
+    margin-top: var(--axelix-space-2);
 }

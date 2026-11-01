@@ -24,13 +24,21 @@ interface IProps {
 }
 
 export const UpgradesRulerTrack = ({ ticks }: IProps) => {
+    const supportedStart = ticks.findIndex(({ isSupported }) => isSupported);
+    const supportedCount = ticks.filter(({ isSupported }) => isSupported).length;
+    const hasSupportedRange = supportedStart >= 0 && supportedCount > 0 && ticks.length > 0;
+
     return (
-        <>
-            <div className={styles.MainWrapper}>
-                {ticks.map(({ version, isSupported }) => (
-                    <div key={version} className={`${styles.RulerSegment} ${isSupported ? styles.InWindow : ""}`} />
-                ))}
-            </div>
-        </>
+        <div className={styles.Track}>
+            {hasSupportedRange && (
+                <div
+                    className={styles.Supported}
+                    style={{
+                        left: `${(supportedStart / ticks.length) * 100}%`,
+                        width: `${(supportedCount / ticks.length) * 100}%`,
+                    }}
+                />
+            )}
+        </div>
     );
 };
