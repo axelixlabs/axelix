@@ -345,7 +345,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                     "jobTitle": null,
                     "organizationalUnit": null,
                     "roles": ["VIEWER"],
-                    "userOrigin": "OAUTH2/OIDC",
+                    "userOrigin": "OIDC",
                     "status": "ACTIVE",
                     "lastLoginAt": "${json-unit.any-string}"
                   }

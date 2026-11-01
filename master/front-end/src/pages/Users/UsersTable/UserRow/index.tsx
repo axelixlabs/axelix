@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 
 import { UserRoleTags } from "@/components";
-import { getUserDisplayStatus, getUserFullName, getUserInitials, getUserOrigin } from "@/helpers";
+import { getUserDisplayStatus, getUserFullName, getUserInitials } from "@/helpers";
 import { EUserDisplayStatus, EUserOrigin, type IUser } from "@/models";
 
 import tableStyles from "../styles.module.css";
@@ -61,7 +61,7 @@ export const UserRow = ({ user, selected, onToggle }: IProps) => {
     const profilePath = `/administration/users/${id}`;
     const fullName = getUserFullName(user);
     const status = getUserDisplayStatus(user);
-    const isLocal = getUserOrigin(user) === EUserOrigin.LOCAL;
+    const isLocal = user.userOrigin === EUserOrigin.LOCAL;
 
     return (
         <>

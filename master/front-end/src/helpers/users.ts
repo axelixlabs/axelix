@@ -17,17 +17,9 @@
  */
 import dayjs from "dayjs";
 
-import { EUserDisplayStatus, EUserOrigin, EUserStatus, type IUser, type IUsersFilters } from "@/models";
+import { EUserDisplayStatus, EUserStatus, type IUser, type IUsersFilters } from "@/models";
 
 const DORMANT_AFTER_DAYS = 90;
-
-/**
- * The backend reports the origin by its display name (e.g. "OAUTH2/OIDC"), so anything that
- * is not a local account is treated as an OIDC one.
- */
-export const getUserOrigin = (user: IUser): EUserOrigin => {
-    return user.userOrigin === EUserOrigin.LOCAL ? EUserOrigin.LOCAL : EUserOrigin.OIDC;
-};
 
 /**
  * An active user is dormant once their last login is older than {@link DORMANT_AFTER_DAYS} days.
@@ -83,7 +75,7 @@ const matchesFilters = (user: IUser, { statuses, roles, userOrigins }: IUsersFil
         return false;
     }
 
-    return userOrigins.length === 0 || userOrigins.includes(getUserOrigin(user));
+    return userOrigins.length === 0 || userOrigins.includes(user.userOrigin);
 };
 
 export const filterUsers = (users: IUser[], search: string, filters: IUsersFilters): IUser[] => {

@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { getUserDisplayStatus, getUserOrigin } from "@/helpers";
+import { getUserDisplayStatus } from "@/helpers";
 import { ERoles, EUserDisplayStatus, EUserOrigin, type IUser } from "@/models";
 
 import styles from "./styles.module.css";
@@ -32,7 +32,7 @@ interface IProps {
 export const UsersMetrics = ({ users }: IProps) => {
     const { t } = useTranslation();
 
-    const localCount = users.filter((user) => getUserOrigin(user) === EUserOrigin.LOCAL).length;
+    const localCount = users.filter((user) => user.userOrigin === EUserOrigin.LOCAL).length;
     const adminsCount = users.filter((user) => user.roles.includes(ERoles.ADMIN)).length;
     const countByStatus = (status: EUserDisplayStatus): number => {
         return users.filter((user) => getUserDisplayStatus(user) === status).length;

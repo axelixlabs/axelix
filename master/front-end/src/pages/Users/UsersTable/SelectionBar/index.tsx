@@ -18,7 +18,6 @@
 import { Button } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { getUserOrigin } from "@/helpers";
 import { EUserOrigin, type IUser } from "@/models";
 
 import styles from "./styles.module.css";
@@ -48,7 +47,7 @@ interface IProps {
 export const SelectionBar = ({ selectedUsers, onSuspend, onDelete, onClear }: IProps) => {
     const { t } = useTranslation();
 
-    const localCount = selectedUsers.filter((user) => getUserOrigin(user) === EUserOrigin.LOCAL).length;
+    const localCount = selectedUsers.filter((user) => user.userOrigin === EUserOrigin.LOCAL).length;
 
     return (
         <>

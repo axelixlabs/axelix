@@ -21,28 +21,16 @@ package com.axelixlabs.axelix.master.domain.iam;
  * Origin of a managed user account.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public enum UserOrigin {
     /**
      * Account originated from an external OIDC/OAuth2 identity origin.
      */
-    OIDC("OAUTH2/OIDC"),
+    OIDC,
 
     /**
      * Account created and managed locally within Axelix (e.g. via the Users Management API).
      */
-    LOCAL("LOCAL");
-
-    /**
-     * Human-readable label of this origin, suitable for display in the UI.
-     */
-    private final String displayName;
-
-    UserOrigin(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
+    LOCAL
 }
