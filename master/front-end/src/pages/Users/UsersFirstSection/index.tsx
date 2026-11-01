@@ -92,7 +92,7 @@ export const UsersFirstSection = ({ users, rangeLabel, setSearch, filters, setFi
                     <div className="TextLarge">{t("Users.title")}</div>
                     <p className={`TextSmall ${styles.Subtitle}`}>{t("Users.subtitle")}</p>
                 </div>
-                {isLocalAuthEnabled && <CreateUser fetchUsers={fetchUsers} />}
+                {isLocalAuthEnabled && <CreateUser usersCount={users.length} fetchUsers={fetchUsers} />}
             </div>
 
             <UsersMetrics users={users} />

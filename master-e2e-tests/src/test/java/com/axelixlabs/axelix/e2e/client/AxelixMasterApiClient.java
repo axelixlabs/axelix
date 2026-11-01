@@ -84,7 +84,7 @@ public class AxelixMasterApiClient {
         body.put("username", username);
         body.put("email", email);
         body.put("password", password);
-        body.put("role", role);
+        body.put("roles", List.of(role));
 
         requestSpec()
                 .body(body)

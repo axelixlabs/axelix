@@ -17,37 +17,40 @@
  */
 package com.axelixlabs.axelix.master.api.external.request.user;
 
+import java.util.Set;
+
 import org.jspecify.annotations.Nullable;
 
 /**
  * Request payload to create a new managed user via the Users Management API.
  *
  * @param username   Login name of the user to create.
- * @param firstName  The user's first name.
- * @param lastName   The user's last name.
+ * @param firstName  The user's first name, which may be {@code null}.
+ * @param lastName   The user's last name, which may be {@code null}.
  * @param email      The user email address, which may be {@code null}.
  * @param jobTitle   The user's job title, which may be {@code null}.
  * @param organizationalUnit The user's organizational unit, which may be {@code null}.
  * @param password   Plain-text password.
- * @param role       Name of the role to grant to the user.
+ * @param roles      Names of the roles to grant to the user. Must not be empty.
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
 public record UserCreateRequest(
         String username,
-        String firstName,
-        String lastName,
+        @Nullable String firstName,
+        @Nullable String lastName,
         @Nullable String email,
         @Nullable String jobTitle,
         @Nullable String organizationalUnit,
         String password,
-        String role) {
+        Set<String> roles) {
 
     @Override
     public String toString() {
-        return "UserCreateRequest[username=[%s], firstName=[REDACTED], lastName=[REDACTED],"
-                + " email=[REDACTED], jobTitle=[REDACTED], organizationalUnit=[REDACTED],"
-                + " password=[REDACTED], role=%s]".formatted(username, role);
+        return ("UserCreateRequest[username=[%s], firstName=[REDACTED], lastName=[REDACTED],"
+                        + " email=[REDACTED], jobTitle=[REDACTED], organizationalUnit=[REDACTED],"
+                        + " password=[REDACTED], roles=%s]")
+                .formatted(username, roles);
     }
 }

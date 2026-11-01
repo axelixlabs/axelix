@@ -807,10 +807,30 @@
             "delete": "Удалить",
             "clear": "Сбросить"
         },
+        "Create": {
+            "title": "Создать пользователя",
+            "usersCount_one": "{{count}} пользователь",
+            "usersCount_few": "{{count}} пользователя",
+            "usersCount_many": "{{count}} пользователей",
+            "usersCount_other": "{{count}} пользователей",
+            "firstName": "Имя",
+            "lastName": "Фамилия",
+            "email": "Рабочий email",
+            "optional": "необязательно",
+            "usernameHint": "Используется для входа по локальному паролю. Должно быть уникальным.",
+            "confirmPassword": "Подтверждение пароля",
+            "generate": "Сгенерировать",
+            "RoleDescriptions": {
+                "VIEWER": "Доступ только на чтение к приложениям и их дашбордам",
+                "EDITOR": "Управление запланированными задачами, кэшами и логированием сборщика мусора",
+                "ADMIN": "Всё, что может редактор, а также просмотр значений Environment и Configuration Properties"
+            }
+        },
         "ValidationErrors": {
             "username": "Пожалуйста, введите имя пользователя!",
             "emailFormat": "Неверный формат email!",
             "password": "Пожалуйста, введите пароль!",
+            "passwordsMismatch": "Пароли не совпадают!",
             "roles": "Пожалуйста, выберите роли!"
         }
     }

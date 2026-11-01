@@ -795,10 +795,28 @@
             "delete": "Delete",
             "clear": "Clear"
         },
+        "Create": {
+            "title": "Create user",
+            "usersCount_one": "{{count}} user",
+            "usersCount_other": "{{count}} users",
+            "firstName": "First name",
+            "lastName": "Last name",
+            "email": "Work email",
+            "optional": "optional",
+            "usernameHint": "Used to sign in with a local password. Must be unique.",
+            "confirmPassword": "Confirm password",
+            "generate": "Generate",
+            "RoleDescriptions": {
+                "VIEWER": "Read-only access to applications and their dashboards",
+                "EDITOR": "Manage scheduled tasks, caches and garbage collector logging",
+                "ADMIN": "Everything an editor can do, plus reading Environment and Configuration Properties values"
+            }
+        },
         "ValidationErrors": {
             "username": "Please input username!",
             "emailFormat": "Invalid email format!",
             "password": "Please input password!",
+            "passwordsMismatch": "Passwords do not match!",
             "roles": "Please select roles!"
         }
     }

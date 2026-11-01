@@ -1,0 +1,98 @@
+.Title {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-1);
+}
+
+.Subtitle {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Form {
+    margin-top: var(--axelix-space-4);
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--axelix-space-3);
+}
+
+.Optional {
+    margin-left: var(--axelix-space-1);
+    color: var(--axelix-grey-500);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Username {
+    font-family: var(--axelix-font-family-code);
+}
+
+.Roles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-2);
+    width: 100%;
+}
+
+.Role.Role {
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    transition:
+        border-color 0.15s,
+        background-color 0.15s;
+
+    /* Align the box with the role name rather than the middle of the row */
+    :global(.ant-checkbox) {
+        align-self: flex-start;
+        margin-top: 2px;
+    }
+}
+
+.RoleChecked.RoleChecked {
+    border-color: var(--axelix-green-200);
+    background-color: var(--axelix-green-50);
+}
+
+.RoleText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.RoleName {
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.04em;
+}
+
+.RoleDescription {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+/* Keeps the hint close to the row above it, unless a validation message takes that space */
+.HintedRow :global(.ant-form-item:not(.ant-form-item-with-help)) {
+    margin-bottom: var(--axelix-space-2);
+}
+
+/* Spans both columns of the username and email row */
+.Hint {
+    margin-bottom: var(--axelix-space-4);
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Generate.Generate {
+    height: auto;
+    margin-top: var(--axelix-space-1);
+    padding: 0;
+    font-weight: var(--axelix-font-weight-semibold);
+}

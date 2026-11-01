@@ -159,13 +159,8 @@ class DefaultRoleServiceTest {
         }
 
         private String createUserWithRoles(String... roles) {
-            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", roles[0]);
-            UserEntity user = userRepository.findByUsername("alice").orElseThrow();
-            if (roles.length > 1) {
-                userService.updateUserPatch(
-                        user.id(), "alice", null, null, "alice@example.com", null, null, null, Set.of(roles), null);
-            }
-            return user.id();
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", Set.of(roles));
+            return userRepository.findByUsername("alice").orElseThrow().id();
         }
 
         private static Role roleNamed(Set<Role> roles, String name) {
@@ -279,7 +274,7 @@ class DefaultRoleServiceTest {
             String childId = customRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
             createBond(childId, parentId);
 
-            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "CHILD");
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", Set.of("CHILD"));
             String userId = userRepository.findByUsername("alice").orElseThrow().id();
 
             // when.
@@ -396,7 +391,7 @@ class DefaultRoleServiceTest {
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
-            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "ROLE A");
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", Set.of("ROLE A"));
             String userId = userRepository.findByUsername("alice").orElseThrow().id();
 
             // when.

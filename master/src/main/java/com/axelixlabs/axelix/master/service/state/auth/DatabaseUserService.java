@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.master.service.state.auth;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -88,8 +87,12 @@ public class DatabaseUserService implements UserService {
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
             String password,
-            String role)
+            Set<String> roles)
             throws UserRoleNotFoundException, UserInvalidValueException {
+
+        if (CollectionUtils.isEmpty(roles)) {
+            throw new UserInvalidValueException(null);
+        }
 
         UserEntity userEntity = new UserEntity(
                 UUID.randomUUID().toString(),
@@ -116,7 +119,7 @@ public class DatabaseUserService implements UserService {
         }
 
         jdbcAggregateTemplate.insert(userEntity);
-        grantRoles(userEntity.id(), Collections.singleton(role));
+        grantRoles(userEntity.id(), roles);
     }
 
     @Override

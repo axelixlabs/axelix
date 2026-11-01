@@ -330,7 +330,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     void shouldReturn400WhenOidcUserConflictsWithExistingLocalAccount() {
         // given.
         String username = "test-user";
-        userService.createLocal(username, null, null, null, null, null, "test-password", "ADMIN");
+        userService.createLocal(username, null, null, null, null, null, "test-password", Set.of("ADMIN"));
 
         // and.
         String userInfoJson = "someJson";
