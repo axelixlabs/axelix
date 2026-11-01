@@ -1,42 +1,35 @@
 .MainWrapper {
-    border-radius: var(--axelix-border-radius-large);
-    padding: 20px;
-    background-color: #1a2233;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin-bottom: 30px;
+    gap: var(--axelix-space-6);
+    margin-bottom: var(--axelix-space-8);
+    padding: var(--axelix-space-6);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-grey-900);
 }
 
-/* TODO: Improve in the future */
-.TagRow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* TODO: Improve in the future */
-.Tag {
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--axelix-bold-grey);
+.Eyebrow {
+    color: var(--axelix-green-500);
 }
 
 .Title {
-    color: var(--axelix-primary-white);
-    margin-bottom: 20px;
+    max-width: 40rem;
+    margin-bottom: var(--axelix-space-3);
+    color: var(--axelix-white);
 }
 
 .Description {
-    color: var(--axelix-bold-grey);
+    max-width: 46rem;
+    color: var(--axelix-grey-400);
 }
 
 .FirstSectionWrapper {
     display: flex;
-    column-gap: 20px;
+    gap: var(--axelix-space-8);
+    align-items: flex-start;
 }
 
 .Divider {
-    height: 2px;
-    background-color: #2e3d55;
+    height: 1px;
+    background-color: rgb(255 255 255 / 10%);
 }

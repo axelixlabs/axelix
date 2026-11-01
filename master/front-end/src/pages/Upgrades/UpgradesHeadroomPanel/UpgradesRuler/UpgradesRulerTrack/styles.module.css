@@ -1,16 +1,14 @@
-.MainWrapper {
-    display: flex;
-    gap: 4px;
-    height: 7px;
+.Track {
+    position: relative;
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-grey-700);
 }
 
-.RulerSegment {
-    flex: 1;
-    height: 100%;
-    border-radius: var(--axelix-border-radius-small);
-    background-color: #33363a;
-}
-
-.InWindow {
-    background-color: var(--axelix-primary-green);
+.Supported {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: var(--axelix-green-500);
 }

@@ -69,7 +69,9 @@ export const UpgradesFleetBars = ({ data, isFleetUpToDate }: IProps) => {
                                     <div>
                                         {isCurrentVersion && (
                                             <div className={`TextUltraSmall ${styles.CurrentTag}`}>
-                                                {t("Upgrades.FleetBars.currentRelease")}
+                                                {isFleetUpToDate
+                                                    ? t("Upgrades.FleetBars.sameAsMaster")
+                                                    : t("Upgrades.FleetBars.currentRelease")}
                                             </div>
                                         )}
 

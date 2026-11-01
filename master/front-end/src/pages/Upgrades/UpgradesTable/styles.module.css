@@ -1,66 +1,88 @@
+.Section {
+    margin-bottom: var(--axelix-space-8);
+}
+
+.SectionRow {
+    display: flex;
+    gap: var(--axelix-space-5);
+    justify-content: space-between;
+    margin-bottom: var(--axelix-space-3);
+}
+
+.SectionTitle {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.SectionNote {
+    margin: 0;
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+    text-align: right;
+}
+
 .Table {
-    border: 1px solid var(--axelix-medium-grey);
-    border-radius: var(--axelix-border-radius-large);
     overflow: hidden;
-    margin-bottom: 30px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-white);
+}
+
+.HeaderRow,
+.Row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 120px 160px;
+    gap: var(--axelix-space-4);
+    align-items: center;
+    padding: 12px var(--axelix-space-5);
+}
+
+.HeaderRow {
+    color: var(--axelix-grey-500);
+    border-bottom: 1px solid var(--axelix-grey-200);
+}
+
+.Row {
+    border-bottom: 1px solid var(--axelix-grey-100);
+}
+
+.Row:last-child {
+    border-bottom: none;
 }
 
 .ArtifactCell {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-width: 0;
 }
 
 .ArtifactId {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--axelix-primary-green);
+    color: var(--axelix-green-600);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
 }
 
 .GroupId {
-    font-size: 11px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
 }
 
 .VersionBadge {
-    font-size: 12px;
-    font-weight: 600;
-    background-color: transparent;
-    color: var(--axelix-primary-black);
-    border: 1px solid var(--axelix-medium-grey);
+    justify-self: start;
+    padding: 2px var(--axelix-space-2);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-small);
-    padding: 2px 8px;
-    display: inline-block;
-}
-
-.PluginVersion {
-    font-size: 13px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-900);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
 }
 
 .LastSeen {
-    font-size: 13px;
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-green-600);
+    font-size: var(--axelix-font-size-caption);
 }
 
 .FootNote {
-    color: var(--axelix-bold-grey);
-}
-
-.SectionRow {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 10px;
-}
-
-.SectionTitle {
-    font-weight: 600;
-}
-
-.SectionNote {
-    font-size: 13px;
-    color: var(--axelix-bold-grey);
-    margin: 0;
-    text-align: right;
+    margin-top: var(--axelix-space-3);
+    color: var(--axelix-grey-500);
 }

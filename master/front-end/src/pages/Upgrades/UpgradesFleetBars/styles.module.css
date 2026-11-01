@@ -1,81 +1,76 @@
 .MainWrapper {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--axelix-space-4);
 }
 
 .Header {
     display: flex;
-    gap: 8px;
+    gap: var(--axelix-space-2);
+    align-items: baseline;
 }
 
 .Title {
-    font-weight: 600;
+    font-weight: var(--axelix-font-weight-semibold);
 }
 
 .Meta,
 .FootNote {
-    color: var(--axelix-bold-grey);
+    color: var(--axelix-grey-500);
 }
 
 .Card {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px 24px;
-    border: 1px solid var(--axelix-medium-grey);
+    gap: var(--axelix-space-4);
+    padding: var(--axelix-space-4) var(--axelix-space-6);
+    border: 1px solid var(--axelix-grey-200);
     border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-white);
 }
 
 .BarsContainer {
     display: flex;
     flex-direction: column;
-    row-gap: 8px;
+    row-gap: var(--axelix-space-2);
 }
 
 .BarRow {
     display: grid;
-    grid-template-columns: 30px 1fr 90px 140px;
+    grid-template-columns: 40px minmax(0, 1fr) 110px 160px;
+    gap: var(--axelix-space-3);
     align-items: center;
-    gap: 8px;
 }
 
 .VersionLabel {
-    min-width: 32px;
-    flex-shrink: 0;
+    color: var(--axelix-grey-900);
 }
 
 .BarTrack {
-    flex: 1;
-    height: 15px;
-    background-color: var(--axelix-light-grey);
-    border-radius: var(--axelix-border-radius-small);
+    height: 8px;
     overflow: hidden;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-grey-200);
 }
 
 .BarFill {
     height: 100%;
-    background-color: var(--axelix-bold-grey);
-    border-radius: var(--axelix-border-radius-small);
-    transition: width 0.3s ease;
+    border-radius: var(--axelix-border-radius-pill);
+    background-color: var(--axelix-grey-400);
 }
 
 .BarFillCurrent {
-    background-color: var(--axelix-primary-green);
+    background-color: var(--axelix-green-500);
 }
 
 .ServiceCount {
-    font-weight: 500;
-    min-width: 80px;
-    flex-shrink: 0;
+    font-weight: var(--axelix-font-weight-medium);
 }
 
 .CurrentTag {
-    color: var(--axelix-primary-green);
-    flex-shrink: 0;
+    color: var(--axelix-green-600);
 }
 
 .CappingTag {
-    color: var(--axelix-bold-grey);
-    flex-shrink: 0;
+    color: var(--axelix-grey-500);
 }

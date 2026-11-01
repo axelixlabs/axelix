@@ -48,10 +48,7 @@ export const UpgradesHeadroomPanel = ({ data }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
-                <div className={`TextUltraSmall ${styles.TagRow}`}>
-                    <div className={styles.Tag}>{t("Upgrades.HeadroomPanel.tagUpgrade")}</div>
-                    <div className={styles.Tag}>{t("Upgrades.HeadroomPanel.tagHeadroom")}</div>
-                </div>
+                <div className={`TextCaps ${styles.Eyebrow}`}>{t("Upgrades.HeadroomPanel.eyebrow")}</div>
 
                 <div className={styles.FirstSectionWrapper}>
                     <div>
