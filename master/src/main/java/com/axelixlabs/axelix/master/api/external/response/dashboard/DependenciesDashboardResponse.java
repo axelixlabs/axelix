@@ -40,10 +40,11 @@ import com.axelixlabs.axelix.master.domain.ecosystem.projects.SupportStatus;
  * @param riskyLibrariesByEcosystem         the number of libraries in use per ecosystem, broken down by every status
  *                                          other than {@link SupportStatus#ACTIVE}. Ecosystems without such libraries
  *                                          are absent.
- * @param lastScannedAt                     when the dashboard was scanned.
+ * @param computedAt                        when the dashboard was computed.
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public record DependenciesDashboardResponse(
         long totalApplications,
@@ -52,4 +53,5 @@ public record DependenciesDashboardResponse(
         long totalLibraries,
         Map<SupportStatus, Long> librariesByStatus,
         Map<Ecosystem, Map<SupportStatus, Long>> riskyLibrariesByEcosystem,
-        Instant lastScannedAt) {}
+        Instant computedAt)
+        implements DashboardResponse {}

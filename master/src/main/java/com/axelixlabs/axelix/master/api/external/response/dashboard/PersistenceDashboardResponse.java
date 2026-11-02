@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.dashboard;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -25,10 +26,14 @@ import java.util.List;
  *
  * @param nPlusOne per-service number of N + 1 occasions across the ecosystem.
  * @param inMemoryPagination per-service number of in-memory pagination occasions across the ecosystem.
+ * @param computedAt when the dashboard was computed.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
-public record PersistenceDashboardResponse(List<TreemapEntry> nPlusOne, List<TreemapEntry> inMemoryPagination) {
+public record PersistenceDashboardResponse(
+        List<TreemapEntry> nPlusOne, List<TreemapEntry> inMemoryPagination, Instant computedAt)
+        implements DashboardResponse {
 
     /**
      * A single treemap cell: how many distinct occasions of a given problem a single service has.

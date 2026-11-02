@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class DatabaseHistoricalApplicationSnapshotService {
             }
         }
 
-        return new PersistenceDashboardResponse(nPlusOne, inMemoryPagination);
+        return new PersistenceDashboardResponse(nPlusOne, inMemoryPagination, Instant.now());
     }
 
     @Transactional(readOnly = true)

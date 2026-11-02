@@ -117,6 +117,7 @@ class DefaultSpringPortfolioServiceTest {
         // then.
         assertThat(response.applicationsTotal()).isEqualTo(5);
         assertThat(response.applicationsFullyOssSupported()).isEqualTo(2);
+        assertThat(response.computedAt()).isNotNull();
 
         PlatformDistribution boot = response.springBoot();
         assertThat(boot.platform()).isEqualTo(PlatformName.SPRING_BOOT);
@@ -183,6 +184,7 @@ class DefaultSpringPortfolioServiceTest {
 
         // then only the latest snapshot is counted, exactly once.
         assertThat(response.applicationsTotal()).isEqualTo(1);
+        assertThat(response.computedAt()).isNotNull();
         assertThat(response.springBoot().majors())
                 .flatExtracting(PlatformMajorGroup::lines)
                 .extracting(PlatformLineUsage::line, PlatformLineUsage::applicationCount)

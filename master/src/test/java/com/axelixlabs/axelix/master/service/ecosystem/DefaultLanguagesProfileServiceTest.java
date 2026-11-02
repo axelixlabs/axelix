@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.ecosystem;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -80,6 +81,7 @@ class DefaultLanguagesProfileServiceTest {
                 snapshot("c", TODAY, 17, JdkVendor.ADOPTIUM, "2.2.10")));
 
         // when.
+        Instant before = Instant.now();
         LanguagesProfileResponse profile = subject.getLanguagesProfile();
 
         // then.
@@ -112,7 +114,7 @@ class DefaultLanguagesProfileServiceTest {
         assertThat(profile.kotlinReleases().getFirst().applicationCount()).isEqualTo(2);
         assertThat(profile.kotlinReleases().getFirst().applicationPercentage()).isEqualTo(100);
 
-        assertThat(profile.lastScannedAt()).isEqualTo(TODAY);
+        assertThat(profile.computedAt()).isBetween(before, Instant.now());
     }
 
     @Test
@@ -152,7 +154,7 @@ class DefaultLanguagesProfileServiceTest {
         assertThat(profile.jdkVendors())
                 .extracting(JdkVendorUsage::vendor)
                 .containsExactly(JdkVendor.AMAZON_CORRETTO.getDisplayName());
-        assertThat(profile.lastScannedAt()).isEqualTo(TODAY);
+        assertThat(profile.computedAt()).isNotNull();
     }
 
     @Test
@@ -166,7 +168,7 @@ class DefaultLanguagesProfileServiceTest {
         assertThat(profile.javaReleases()).isEmpty();
         assertThat(profile.jdkVendors()).isEmpty();
         assertThat(profile.kotlinReleases()).isEmpty();
-        assertThat(profile.lastScannedAt()).isNotNull();
+        assertThat(profile.computedAt()).isNotNull();
     }
 
     private static HistoricalApplicationSnapshot snapshot(

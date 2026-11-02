@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.dashboard;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -33,15 +34,19 @@ import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
  * @param springFramework                the Spring Framework distribution
  * @param linesInUse                     every release line (of either platform) currently in use, for the
  *                                       maintenance window timeline
+ * @param computedAt                     when the dashboard was computed
  *
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 public record SpringPortfolioResponse(
         int applicationsTotal,
         int applicationsFullyOssSupported,
         PlatformDistribution springBoot,
         PlatformDistribution springFramework,
-        List<MaintenanceWindowEntry> linesInUse) {
+        List<MaintenanceWindowEntry> linesInUse,
+        Instant computedAt)
+        implements DashboardResponse {
 
     /**
      * How the fleet's applications are spread across a platform's release lines.
