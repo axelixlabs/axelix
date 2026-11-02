@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
+import { AiInstallPrompt } from "../AiInstallPrompt";
 import { Logo } from "../Logo";
 import { GITHUB_URL } from "@/lib/blog-metadata";
 import styles from "./styles.module.css";
@@ -162,6 +163,8 @@ const BurgerMenu = () => {
 
       {isOpen && (
         <div className={styles.MobileMenu}>
+          <AiInstallPrompt />
+          <div className={styles.Divider} />
           <nav className={styles.MobileLinks}>
             {MENUS.map(({ key, label, links }) => (
               <div key={key} className={styles.Group}>

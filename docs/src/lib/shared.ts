@@ -67,7 +67,8 @@ export function getPageImageUrl(page: { slugs: string[]; locale?: string }) {
 
 /**
  * Prompt copied by the "Install with your AI agent" widget. Keep in sync with
- * `AI_INSTALL_PROMPT` in website/src/utils/index.ts and the root README.md.
+ * `AI_INSTALL_PROMPT` in website/src/utils/index.ts, blog/src/components/AiInstallPrompt/index.tsx
+ * and the root README.md.
  */
 export const AI_INSTALL_PROMPT =
     "Install Axelix in my app: run `curl -s https://axelix.io/docs/start/SKILL.md` and use it as a guide";

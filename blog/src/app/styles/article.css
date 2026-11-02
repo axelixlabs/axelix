@@ -102,6 +102,7 @@
    inside its own fumadocs viewport once the column is constrained. */
 .art-layout > .prose {
   min-width: 0;
+  overflow-wrap: break-word;
 }
 /* Body links. The global `a` reset (base.css: color: inherit) leaves fumadocs'
    bare <a> uncolored, so without this the article body renders links as plain
@@ -137,6 +138,7 @@
 .toc {
   position: sticky;
   top: 104px;
+  max-height: calc(100dvh - 128px);
   display: flex;
   flex-direction: column;
   gap: 14px;

@@ -16,3 +16,4 @@ export { DateMeta } from "./DateMeta";
 export { Authors } from "./Authors";
 export { AuthorCard } from "./AuthorCard";
 export { AuthorPosts } from "./AuthorPosts";
+export { AiInstallPrompt } from "./AiInstallPrompt";
