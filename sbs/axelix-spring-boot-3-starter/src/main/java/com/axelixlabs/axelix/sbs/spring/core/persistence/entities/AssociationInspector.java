@@ -50,13 +50,11 @@ class AssociationInspector {
     private final Attribute<?, ?> attribute;
     private final AnnotatedElement member;
     private final PersistentAttributeType type;
-    private final boolean readByToString;
 
-    AssociationInspector(Attribute<?, ?> attribute, AnnotatedElement member, boolean readByToString) {
+    AssociationInspector(Attribute<?, ?> attribute, AnnotatedElement member) {
         this.attribute = attribute;
         this.member = member;
         this.type = attribute.getPersistentAttributeType();
-        this.readByToString = readByToString;
     }
 
     Set<AssociationProblem> detectProblems() {
@@ -73,9 +71,6 @@ class AssociationInspector {
         }
         if (type == PersistentAttributeType.ONE_TO_MANY && mappedBy().isEmpty()) {
             problems.add(AssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY);
-        }
-        if (readByToString) {
-            problems.add(AssociationProblem.TO_STRING);
         }
 
         return problems;

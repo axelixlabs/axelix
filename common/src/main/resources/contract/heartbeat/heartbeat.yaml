@@ -526,6 +526,7 @@ components:
             A human-readable rendering of the offending mapping (e.g.
             '@ManyToOne(fetch = FetchType.EAGER)').
           x-axelix-introduced-in: 1.2.0
+          x-axelix-deprecated-in: 1.3.0
         problems:
           type: array
           description: The categories of the detected problem.

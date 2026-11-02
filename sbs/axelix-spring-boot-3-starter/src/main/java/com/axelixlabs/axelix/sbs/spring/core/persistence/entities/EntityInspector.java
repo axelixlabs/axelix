@@ -27,6 +27,7 @@ import java.util.Set;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,25 +47,23 @@ class EntityInspector {
 
     EntityInspection inspect(EntityType<?> entityType) {
         String entityName = entityType.getName();
-        Set<String> associationsReadByToString = detectAssociationsReadByToString(entityType, entityName);
-        int associationsCount = 0;
+        List<? extends Attribute<?, ?>> associations = findEntityAssociations(entityType);
+        Set<String> associationsReadByToString = detectAssociationsReadByToString(entityType.getJavaType(), associations, entityName);
         List<AssociationInspection> flaggedAssociations = new ArrayList<>();
 
-        for (Attribute<?, ?> attribute : entityType.getAttributes()) {
-            if (!attribute.isAssociation()) {
-                continue;
-            }
-
-            associationsCount++;
-
+        for (Attribute<?, ?> attribute : associations) {
             Member member = attribute.getJavaMember();
+
             if (!(member instanceof AnnotatedElement annotated)) {
                 continue;
             }
 
-            AssociationInspector inspector = new AssociationInspector(
-                    attribute, annotated, associationsReadByToString.contains(attribute.getName()));
+            AssociationInspector inspector = new AssociationInspector(attribute, annotated);
             Set<AssociationProblem> problems = inspector.detectProblems();
+
+            if (associationsReadByToString.contains(attribute.getName())) {
+                problems.add(AssociationProblem.TO_STRING);
+            }
 
             if (!problems.isEmpty()) {
                 flaggedAssociations.add(
@@ -72,14 +71,18 @@ class EntityInspector {
             }
         }
 
-        return new EntityInspection(associationsCount, flaggedAssociations);
+        return new EntityInspection(associations.size(), flaggedAssociations);
     }
 
-    private static Set<String> detectAssociationsReadByToString(EntityType<?> entityType, String entityName) {
+    private static @NonNull List<? extends Attribute<?, ?>> findEntityAssociations(EntityType<?> entityType) {
+        return entityType.getAttributes().stream().filter(Attribute::isAssociation).toList();
+    }
+
+    private static Set<String> detectAssociationsReadByToString(
+            Class<?> entityClass, List<? extends Attribute<?, ?>> associations, String entityName) {
         try {
-            Set<AssociationMember> associations = collectAssociationMembers(entityType, entityName);
-            return new EntityMethodsInspector(entityType.getJavaType(), associations)
-                    .detectAssociationsReadByToString();
+            Set<AssociationMember> associationMembers = collectAssociationMembers(associations, entityName);
+            return new EntityMethodsInspector(entityClass, associationMembers).detectAssociationsReadByToString();
         } catch (RuntimeException e) {
             log.warn(
                     "Could not detect associations read by toString() for {}, toString inspection is skipped",
@@ -89,28 +92,24 @@ class EntityInspector {
         }
     }
 
-    private static Set<AssociationMember> collectAssociationMembers(EntityType<?> entityType, String entityName) {
-        Set<AssociationMember> associations = new HashSet<>();
+    private static Set<AssociationMember> collectAssociationMembers(
+            List<? extends Attribute<?, ?>> associations, String entityName) {
+        Set<AssociationMember> associationMembers = new HashSet<>();
 
-        entityType
-            .getAttributes()
-            .stream()
-            .filter(Attribute::isAssociation)
-            .forEach(attribute -> {
-                try {
-                    associations.add(new AssociationMember(attribute.getName(), attribute.getJavaMember()));
-                } catch (RuntimeException e) {
-                    log.warn(
+        for (Attribute<?, ?> attribute : associations) {
+            try {
+                associationMembers.add(new AssociationMember(attribute.getName(), attribute.getJavaMember()));
+            } catch (RuntimeException e) {
+                log.warn(
                         "Could not resolve association member {}.{}, it is skipped",
                         entityName,
                         attribute.getName(),
                         e);
-                }
-        });
+            }
+        }
 
-        return associations;
+        return associationMembers;
     }
-
 
     record EntityInspection(int associationsCount, List<AssociationInspection> flaggedAssociations) {
 
