@@ -7,7 +7,7 @@ import { TOCProvider, TOCScrollArea } from "fumadocs-ui/components/toc";
 import { TOCItems, TOCItem } from "fumadocs-ui/components/toc/default";
 import { blog, getCardImageSrc } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
-import { Authors, PlainTag, ReadingTime, ReadProgress, BlogShare } from "@/components";
+import { Authors, PlainTag, ReadingTime, ReadProgress, BlogShare, AiInstallPrompt } from "@/components";
 import { formatDate } from "@/lib/format";
 import { computeReadingTime } from "@/lib/reading-time";
 import { getBaseUrl, withBlogBasePath } from "@/lib/url";
@@ -155,6 +155,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 ))}
               </TOCItems>
             </TOCScrollArea>
+            <AiInstallPrompt />
           </aside>
           </div>
         </TOCProvider>

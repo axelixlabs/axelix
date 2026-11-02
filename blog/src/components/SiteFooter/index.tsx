@@ -72,9 +72,6 @@ export const SiteFooter = () => {
             </div>
           </div>
         </div>
-        <div className={styles.FooterWatermark} aria-hidden="true">
-          <span>AXELIX</span>
-        </div>
         <div className={styles.FooterBottom}>
           <span className="copy">© 2026 Axelix Labs</span>
           <div className={styles.Meta}>
