@@ -133,7 +133,7 @@ java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-1.
 docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
-  ghcr.io/axelixlabs/axelix
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -143,7 +143,7 @@ docker run --rm -p 2935:2935 \
 docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
-  docker.io/axelixlabs/axelix
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -795,28 +795,28 @@ java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-1.
 ## Запуск с Docker
 
 Если у вас есть поддержка контейнеризации, то рекомендуемый способ установки Axelix Master — через Docker-образ.
-Мы публикуем образ в GitHub Container Registry и Docker Hub и ставим на последний релиз тег `latest`, поэтому скачать его можно
-без указания версии:
+Мы публикуем образ в GitHub Container Registry и Docker Hub. Примеры на этой странице используют последний релиз —
+`AXELIX_VERSION_PLACEHOLDER`:
 
 <Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
   <Tab value="Docker GHCR">
 
 ```bash
-docker pull ghcr.io/axelixlabs/axelix
+docker pull ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
   <Tab value="Docker Hub">
 
 ```bash
-docker pull docker.io/axelixlabs/axelix
+docker pull docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
 </Tabs>
 
 :::note
-Чтобы запустить конкретную версию, допишите её тег к имени образа, например:
+Чтобы запустить другую версию, замените тег в имени образа, например:
 
 <Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
   <Tab value="Docker GHCR">
@@ -868,7 +868,7 @@ docker.io/axelixlabs/axelix@sha256:<digest>
   <Tab value="Встроенный ключ (локально)">
 
 ```bash
-docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
 Если JWT-свойства не заданы, Master использует встроенный ключ подписи. Подходит только для локального знакомства, см.
@@ -881,7 +881,7 @@ docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix
 docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -894,7 +894,7 @@ docker run --rm -p 2935:2935 \
   <Tab value="Встроенный ключ (локально)">
 
 ```bash
-docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix
+docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
 Если JWT-свойства не заданы, Master использует встроенный ключ подписи. Подходит только для локального знакомства, см.
@@ -907,7 +907,7 @@ docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix
 docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  docker.io/axelixlabs/axelix
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -944,7 +944,7 @@ docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_DATABASE_PASSWORD=... \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -957,7 +957,7 @@ docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_DATABASE_PASSWORD=... \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  docker.io/axelixlabs/axelix
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -984,7 +984,7 @@ docker run --rm -p 2935:2935 \
   -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -995,7 +995,7 @@ docker run --rm -p 2935:2935 \
   -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  docker.io/axelixlabs/axelix
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -1026,7 +1026,7 @@ docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -1038,7 +1038,7 @@ docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  docker.io/axelixlabs/axelix
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -1049,8 +1049,8 @@ docker run --rm -p 2935:2935 \
 По сути, Axelix Master вполне можно запустить и в развёртывании через Docker Compose.
 
 Приведённый ниже пример представляет собой готовый стек, который можно положить в новый `docker-compose.yaml`,
-отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь использует образ `latest` —
-зафиксируйте конкретный тег (см. [Запуск с Docker](#запуск-с-docker)) перед отправкой в продакшен.
+отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь использует последний релиз —
+перед отправкой в продакшен зафиксируйте образ по дайджесту (см. [Запуск с Docker](#запуск-с-docker)).
 
 <Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
   <Tab value="Docker GHCR">
@@ -1072,7 +1072,7 @@ services:
       retries: 10
 
   master:
-    image: ghcr.io/axelixlabs/axelix
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
     depends_on:
       postgres:
         condition: service_healthy
@@ -1112,7 +1112,7 @@ services:
       retries: 10
 
   master:
-    image: docker.io/axelixlabs/axelix
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
     depends_on:
       postgres:
         condition: service_healthy
@@ -1180,7 +1180,7 @@ axelix:
 
 ```yaml title="docker-compose.yaml"
   master:
-    image: ghcr.io/axelixlabs/axelix
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
     volumes:
       - ./master.yaml:/etc/axelix/master.yaml:ro
     environment:
@@ -1194,7 +1194,7 @@ axelix:
 
 ```yaml title="docker-compose.yaml"
   master:
-    image: docker.io/axelixlabs/axelix
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
     volumes:
       - ./master.yaml:/etc/axelix/master.yaml:ro
     environment:
@@ -1326,7 +1326,7 @@ spec:
       serviceAccountName: axelix-master
       containers:
         - name: axelix-master
-          image: ghcr.io/axelixlabs/axelix
+          image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
 В Kubernetes Role — это объект, привязанный к пространству имён, поэтому повторите Role и RoleBinding по одному разу на
