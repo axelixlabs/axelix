@@ -45,6 +45,7 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.contract.metadata.InstanceFeature;
+import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
@@ -63,6 +64,7 @@ import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 /**
  * Integration tests for {@link InstanceSelfRegistrationInternalApi}
@@ -159,6 +161,7 @@ public class InstanceSelfRegistrationInternalApiTest {
                    "startedAt" : "2026-09-27T10:00:00.123Z",
                    "durationMillis" : 1500,
                    "success" : false,
+                   "launchType" : "SCHEDULED",
                    "errorType" : "NullPointerException",
                    "errorMessage" : "boom"
                  }
@@ -180,6 +183,24 @@ public class InstanceSelfRegistrationInternalApiTest {
            "memoryDetails" : {
              "heap" : 34000
            },
+           "scheduledTaskExecutions" : [
+             {
+               "taskId" : "com.example.OwnerJob#run()",
+               "startedAt" : "2026-09-27T10:00:00.123Z",
+               "durationMillis" : 1500,
+               "success" : false,
+               "launchType" : "SCHEDULED",
+               "errorType" : "NullPointerException",
+               "errorMessage" : "boom"
+             },
+             {
+               "taskId" : "com.example.OwnerJob#run()",
+               "startedAt" : "2026-09-27T10:01:00.456Z",
+               "durationMillis" : 700,
+               "success" : true,
+               "launchType" : "MANUAL"
+             }
+           ],
            "transactions" : [
              {
                "transactionOrigin" : "APPLICATION_DECLARATIVE",
@@ -284,9 +305,20 @@ public class InstanceSelfRegistrationInternalApiTest {
                 });
 
         // and then.
-        // the executions are not stored until master deduplicates them (GH-1617)
         assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
-                .isEmpty();
+                .singleElement()
+                .satisfies(execution -> {
+                    assertThat(execution.groupId()).isEqualTo("org.springframework.samples");
+                    assertThat(execution.artifactId()).isEqualTo("petclinic");
+                    assertThat(execution.instanceId()).isEqualTo(TEST_INSTANCE_ID);
+                    assertThat(execution.taskId()).isEqualTo("com.example.OwnerJob#run()");
+                    assertThat(execution.startedAt()).isEqualTo(Instant.parse("2026-09-27T10:00:00.123Z"));
+                    assertThat(execution.durationMillis()).isEqualTo(1500L);
+                    assertThat(execution.success()).isFalse();
+                    assertThat(execution.launchType()).isEqualTo(ScheduledTaskLaunchType.SCHEDULED);
+                    assertThat(execution.errorType()).isEqualTo("NullPointerException");
+                    assertThat(execution.errorMessage()).isEqualTo("boom");
+                });
 
         assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
@@ -442,6 +474,13 @@ public class InstanceSelfRegistrationInternalApiTest {
                     assertThat(profile.getTransactionOverallStats().getAverageMs())
                             .isEqualTo(12);
                 });
+
+        // and then: the execution reported on the registration again is stored once
+        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
+                .extracting(ScheduledTaskExecutionResult::startedAt, ScheduledTaskExecutionResult::launchType)
+                .containsExactlyInAnyOrder(
+                        tuple(Instant.parse("2026-09-27T10:00:00.123Z"), ScheduledTaskLaunchType.SCHEDULED),
+                        tuple(Instant.parse("2026-09-27T10:01:00.456Z"), ScheduledTaskLaunchType.MANUAL));
     }
 
     @ParameterizedTest(name = "{0}")

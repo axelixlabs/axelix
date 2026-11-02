@@ -121,12 +121,10 @@ public class ShortPollingInstanceDiscoveryScheduler {
         Set<BasicRegistrationMetadata> collectiveMetadata =
                 registrations.stream().map(Registration::metadata).collect(Collectors.toSet());
 
-        // TODO: Once the scheduled task execution history is enabled (GH-1617), report the executions of the
-        //  known instances via the master ping as well, with a delivery acknowledgement for the starter's history
-        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = registrations.stream()
-                .map(scheduledTaskExecutionResultConverter::convert)
-                .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+        List<Set<ScheduledTaskExecutionResult>> scheduledTaskExecutionResultsOfInstances = Stream.concat(
+                        registrations.stream().map(scheduledTaskExecutionResultConverter::convert),
+                        refreshes.stream().map(scheduledTaskExecutionResultConverter::convert))
+                .toList();
 
         List<InstanceId> discoveredNow = Stream.concat(
                         registrations.stream().map(Registration::instance),
@@ -136,7 +134,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
         transactionTemplate.executeWithoutResult(_ -> {
             databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
-            scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
+            scheduledTaskExecutionResultsOfInstances.forEach(scheduledTaskExecutionHistoryService::append);
             instanceRegistry.truncateAllExcept(discoveredNow);
             processRegistrations(registrations);
             processRefreshes(refreshes);

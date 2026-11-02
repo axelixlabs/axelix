@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.3-005-mysql-add-launch-type-to-scheduled-task-execution-results" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="scheduled_task_execution_results" columnName="launch_type"/>
+      </not>
+    </preConditions>
+
+    <comment>
+      Adds the launch type of the execution. The column is mandatory, so the rows stored before are dropped.
+    </comment>
+
+    <delete tableName="scheduled_task_execution_results"/>
+
+    <addColumn tableName="scheduled_task_execution_results">
+      <column name="launch_type" type="VARCHAR(32)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

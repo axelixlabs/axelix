@@ -17,7 +17,11 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.Collection;
+import java.util.Set;
+
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
@@ -26,6 +30,15 @@ import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
  * Repository for the {@link ScheduledTaskExecutionResult} aggregate.
  *
  * @author Vyacheslav Yanin
+ * @author Nikita Kirillov
  */
 @Repository
-public interface ScheduledTaskExecutionResultRepository extends CrudRepository<ScheduledTaskExecutionResult, String> {}
+public interface ScheduledTaskExecutionResultRepository
+        extends ListCrudRepository<ScheduledTaskExecutionResult, String> {
+
+    /**
+     * @return the ids out of the given ones that are already stored.
+     */
+    @Query("SELECT id FROM scheduled_task_execution_results WHERE id IN (:ids)")
+    Set<String> findStoredIds(Collection<String> ids);
+}
