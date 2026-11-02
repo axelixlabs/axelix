@@ -17,29 +17,20 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.EntityInspector.AssociationInspection;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.EntityInspector.EntityInspection;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Table;
-import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Association;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.AssociationProblem;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.FlaggedAssociation;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.AssociationMember;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.EntityMethodsInspector;
 
 /**
  * Scans the JPA metamodel of an {@link EntityManagerFactory} to build the {@link JpaEntities}: every
@@ -53,12 +44,12 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.E
  */
 public class EntityMappingScanner {
 
-    private static final Logger log = LoggerFactory.getLogger(EntityMappingScanner.class);
-
     private final EntityManagerFactory entityManagerFactory;
+    private final EntityInspector entityInspector;
 
     public EntityMappingScanner(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
+        this.entityInspector = new EntityInspector();
     }
 
     /**
@@ -78,72 +69,22 @@ public class EntityMappingScanner {
 
     private MappedEntity scanEntity(EntityType<?> entityType) {
         String entityName = entityType.getName();
-        int associationsCount = 0;
+        EntityInspection inspection = entityInspector.inspect(entityType);
         List<FlaggedAssociation> flagged = new ArrayList<>();
-        Set<String> associationsReadByToString = new HashSet<>();
 
-        try {
-            EntityMethodsInspector methodsInspector = createMethodsInspector(entityType, entityName);
-            associationsReadByToString.addAll(methodsInspector.detectAssociationsReadByToString());
-        } catch (RuntimeException e) {
-            log.warn("Could not detect associations of {}, association inspection is skipped for it", entityName, e);
-        }
-
-        for (Attribute<?, ?> attribute : entityType.getAttributes()) {
-            if (!attribute.isAssociation()) {
-                continue;
-            }
-
-            associationsCount++;
-
-            Member member = attribute.getJavaMember();
-            if (!(member instanceof AnnotatedElement annotated)) {
-                continue;
-            }
-
-            AssociationInspector inspector = new AssociationInspector(attribute, annotated);
-            Set<AssociationProblem> problems = inspector.detectProblems();
-            if (associationsReadByToString.contains(attribute.getName())) {
-                problems.add(AssociationProblem.TO_STRING);
-            }
-
-            if (!problems.isEmpty()) {
-                Association association = new Association().entity(entityName).field(attribute.getName());
-                String mapping = inspector.renderMapping();
-                flagged.add(new FlaggedAssociation()
-                        .association(association)
-                        .mapping(mapping)
-                        .problems(List.copyOf(problems)));
-            }
+        for (AssociationInspection associationInspection : inspection.flaggedAssociations()) {
+            Association association = new Association().entity(entityName).field(associationInspection.name());
+            flagged.add(new FlaggedAssociation()
+                    .association(association)
+                    .mapping(associationInspection.mapping())
+                    .problems(List.copyOf(associationInspection.problems())));
         }
 
         return new MappedEntity()
                 .name(entityName)
                 .table(resolveTable(entityType.getJavaType(), entityName))
-                .associationsCount(associationsCount)
+                .associationsCount(inspection.associationsCount())
                 .flaggedAssociations(flagged);
-    }
-
-    private static EntityMethodsInspector createMethodsInspector(EntityType<?> entityType, String entityName) {
-        Set<AssociationMember> associations = new HashSet<>();
-
-        for (Attribute<?, ?> attribute : entityType.getAttributes()) {
-            if (!attribute.isAssociation()) {
-                continue;
-            }
-
-            try {
-                associations.add(new AssociationMember(attribute.getName(), attribute.getJavaMember()));
-            } catch (RuntimeException e) {
-                log.warn(
-                        "Could not resolve association member {}.{}, it is skipped",
-                        entityName,
-                        attribute.getName(),
-                        e);
-            }
-        }
-
-        return new EntityMethodsInspector(entityType.getJavaType(), associations);
     }
 
     private static String resolveTable(Class<?> javaType, String entityName) {

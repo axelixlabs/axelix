@@ -70,6 +70,18 @@ class AssociationInspectorTest {
             .withUserConfiguration(JpaTestConfiguration.class);
 
     @Nested
+    class DetectProblems {
+
+        @Test
+        void shouldDetectAssociationReadByToString() {
+            // given / when / then.
+            jpaContextRunner.run(context -> assertThat(
+                            inspect(context, Order.class, "tagSet", true).detectProblems())
+                    .containsExactly(AssociationProblem.TO_STRING));
+        }
+    }
+
+    @Nested
     class RenderMapping {
 
         @Test
@@ -165,10 +177,15 @@ class AssociationInspectorTest {
     }
 
     private static AssociationInspector inspect(ApplicationContext context, Class<?> entityType, String attribute) {
+        return inspect(context, entityType, attribute, false);
+    }
+
+    private static AssociationInspector inspect(
+            ApplicationContext context, Class<?> entityType, String attribute, boolean readByToString) {
         EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
         Attribute<?, ?> jpaAttribute =
                 entityManagerFactory.getMetamodel().entity(entityType).getAttribute(attribute);
-        return new AssociationInspector(jpaAttribute, (AnnotatedElement) jpaAttribute.getJavaMember());
+        return new AssociationInspector(jpaAttribute, (AnnotatedElement) jpaAttribute.getJavaMember(), readByToString);
     }
 
     @Configuration(proxyBeanMethods = false)
