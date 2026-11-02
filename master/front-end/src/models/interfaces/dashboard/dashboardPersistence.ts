@@ -44,4 +44,9 @@ export interface IDashboardPersistenceResponse {
      * The state of the In memory pagination in the ecosystem.
      */
     inMemoryPagination: IDashboardTreemapEntity[];
+
+    /**
+     * When the dashboard was computed.
+     */
+    computedAt: string;
 }

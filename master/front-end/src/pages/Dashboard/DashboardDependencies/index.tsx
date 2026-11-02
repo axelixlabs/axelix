@@ -56,7 +56,7 @@ const DashboardDependencies = () => {
         totalLibraries,
         librariesByStatus,
         riskyLibrariesByEcosystem,
-        lastScannedAt,
+        computedAt,
     } = dashboard.response!;
 
     const firstSection = (
@@ -73,8 +73,8 @@ const DashboardDependencies = () => {
         );
     }
 
-    const lastScan = t("Dashboard.Dependencies.lastScan", {
-        date: dayjs(lastScannedAt).format(DEPENDENCY_DATE_FORMAT),
+    const computedAtLabel = t("Dashboard.Dependencies.computedAt", {
+        date: dayjs(computedAt).format(DEPENDENCY_DATE_FORMAT),
     });
 
     const toggleEcosystem = (ecosystem: EDependencyEcosystem): void => {
@@ -95,7 +95,7 @@ const DashboardDependencies = () => {
                         totalApplications={totalApplications}
                         applicationsWithRiskyDependencies={applicationsWithRiskyDependencies}
                         applicationsByStatus={applicationsByStatus}
-                        lastScan={lastScan}
+                        computedAtLabel={computedAtLabel}
                     />
 
                     <CategoriesHealthCard
@@ -105,7 +105,7 @@ const DashboardDependencies = () => {
                         activeEcosystems={activeEcosystems}
                         onToggle={toggleEcosystem}
                         onShowAll={() => setActiveEcosystems([])}
-                        lastScan={lastScan}
+                        computedAtLabel={computedAtLabel}
                     />
                 </div>
 

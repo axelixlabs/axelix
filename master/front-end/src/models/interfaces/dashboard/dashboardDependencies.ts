@@ -35,7 +35,7 @@ export interface IDependenciesDashboardResponseBody {
     totalLibraries: number;
     librariesByStatus: TSupportStatusCounts;
     riskyLibrariesByEcosystem: TEcosystemSupportStatusCounts;
-    lastScannedAt: string;
+    computedAt: string;
 }
 
 export interface IVersionUsage {

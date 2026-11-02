@@ -27,10 +27,10 @@ interface IProps {
     applicationsTotal: number;
     languageMix: ILanguageMix;
     kotlinReleases: IKotlinReleaseUsage[];
-    lastScan?: string;
+    computedAtLabel: string;
 }
 
-export const KotlinCards = ({ applicationsTotal, languageMix, kotlinReleases, lastScan }: IProps) => {
+export const KotlinCards = ({ applicationsTotal, languageMix, kotlinReleases, computedAtLabel }: IProps) => {
     const { t } = useTranslation();
     const { kotlinApplications } = languageMix;
 
@@ -75,7 +75,7 @@ export const KotlinCards = ({ applicationsTotal, languageMix, kotlinReleases, la
                     },
                 ]}
                 footerLeft={detectedFooter(applicationsTotal)}
-                footerRight={lastScan}
+                footerRight={computedAtLabel}
             />
 
             <LanguageProfileCard
@@ -101,7 +101,7 @@ export const KotlinCards = ({ applicationsTotal, languageMix, kotlinReleases, la
                     cells: [`${release.applicationCount}`, `${release.applicationPercentage}%`],
                 }))}
                 footerLeft={detectedFooter(kotlinApplications)}
-                footerRight={lastScan}
+                footerRight={computedAtLabel}
             />
         </>
     );

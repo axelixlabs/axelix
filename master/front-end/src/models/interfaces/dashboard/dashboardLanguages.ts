@@ -48,7 +48,7 @@ export interface ILanguagesProfileResponseBody {
     jdkVendors: IJdkVendorUsage[];
     languageMix: ILanguageMix | null;
     kotlinReleases: IKotlinReleaseUsage[];
-    lastScannedAt: string | null;
+    computedAt: string;
 }
 
 export interface ILanguagesLegendRow {

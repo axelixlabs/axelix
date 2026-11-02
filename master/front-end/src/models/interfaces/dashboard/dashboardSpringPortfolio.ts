@@ -70,4 +70,5 @@ export interface IDashboardSpringPortfolioResponseBody {
     springBoot: IPlatformDistribution;
     springFramework: IPlatformDistribution;
     linesInUse: IMaintenanceWindowEntry[];
+    computedAt: string;
 }

@@ -28,14 +28,20 @@ interface IProps {
     applicationsOnLts: number;
     javaReleases: IJavaReleaseUsage[];
     jdkVendors: IJdkVendorUsage[];
-    lastScan?: string;
+    computedAtLabel: string;
 }
 
 const percentageOf = (count: number, total: number) => (total === 0 ? 0 : Math.round((count * 100) / total));
 
 const centreTop = (usage?: { applicationPercentage: number }) => (usage ? `${usage.applicationPercentage}%` : "—");
 
-export const JavaCards = ({ applicationsTotal, applicationsOnLts, javaReleases, jdkVendors, lastScan }: IProps) => {
+export const JavaCards = ({
+    applicationsTotal,
+    applicationsOnLts,
+    javaReleases,
+    jdkVendors,
+    computedAtLabel,
+}: IProps) => {
     const { t } = useTranslation();
 
     const newestJavaRelease = javaReleases[0];
@@ -81,7 +87,7 @@ export const JavaCards = ({ applicationsTotal, applicationsOnLts, javaReleases, 
                     cells: [`${release.applicationCount}`, `${release.applicationPercentage}%`],
                 }))}
                 footerLeft={detectedFooter(applicationsTotal)}
-                footerRight={lastScan}
+                footerRight={computedAtLabel}
             />
 
             <LanguageProfileCard
@@ -107,7 +113,7 @@ export const JavaCards = ({ applicationsTotal, applicationsOnLts, javaReleases, 
                     cells: [`${vendor.applicationCount}`, `${vendor.applicationPercentage}%`],
                 }))}
                 footerLeft={detectedFooter(applicationsTotal)}
-                footerRight={lastScan}
+                footerRight={computedAtLabel}
             />
         </>
     );

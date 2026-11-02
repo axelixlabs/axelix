@@ -33,7 +33,7 @@ interface IProps {
     activeEcosystems: EDependencyEcosystem[];
     onToggle: (ecosystem: EDependencyEcosystem) => void;
     onShowAll: () => void;
-    lastScan: string;
+    computedAtLabel: string;
 }
 
 const TOP_CATEGORIES = 5;
@@ -45,7 +45,7 @@ export const CategoriesHealthCard = ({
     activeEcosystems,
     onToggle,
     onShowAll,
-    lastScan,
+    computedAtLabel,
 }: IProps) => {
     const { t } = useTranslation();
 
@@ -68,7 +68,7 @@ export const CategoriesHealthCard = ({
                     />
                 }
                 footerLeft={t("Dashboard.Dependencies.categoriesFooter")}
-                footerRight={lastScan}
+                footerRight={computedAtLabel}
             >
                 <div className={styles.Body}>
                     <StatusLegend />

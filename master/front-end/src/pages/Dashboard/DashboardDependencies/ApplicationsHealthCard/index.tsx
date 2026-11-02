@@ -31,14 +31,14 @@ interface IProps {
     totalApplications: number;
     applicationsWithRiskyDependencies: number;
     applicationsByStatus: TSupportStatusCounts;
-    lastScan: string;
+    computedAtLabel: string;
 }
 
 export const ApplicationsHealthCard = ({
     totalApplications,
     applicationsWithRiskyDependencies,
     applicationsByStatus,
-    lastScan,
+    computedAtLabel,
 }: IProps) => {
     const { t } = useTranslation();
 
@@ -87,7 +87,7 @@ export const ApplicationsHealthCard = ({
                         components={[<b key="0" />]}
                     />
                 }
-                footerRight={lastScan}
+                footerRight={computedAtLabel}
             >
                 <div className={styles.Body}>
                     <ApplicationsDonut rings={rings} />

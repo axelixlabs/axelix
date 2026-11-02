@@ -30,18 +30,14 @@ import { LanguagesSummaryCard } from "./LanguagesSummaryCard";
 import { NoKotlinBanner } from "./NoKotlinBanner";
 import styles from "./styles.module.css";
 
-const formatLastScan = (t: TFunction, lastScannedAt: string | null) => {
-    if (!lastScannedAt) {
-        return undefined;
-    }
-
-    const date = new Date(lastScannedAt).toLocaleDateString(undefined, {
+const formatComputedAt = (t: TFunction, computedAt: string) => {
+    const date = new Date(computedAt).toLocaleDateString(undefined, {
         day: "numeric",
         month: "short",
         year: "numeric",
     });
 
-    return t("Dashboard.Languages.lastScan", { date });
+    return t("Dashboard.Languages.computedAt", { date });
 };
 
 const DashboardLanguages = () => {
@@ -67,7 +63,7 @@ const DashboardLanguages = () => {
         jdkVendors,
         languageMix,
         kotlinReleases,
-        lastScannedAt,
+        computedAt,
     } = languagesProfile.response!;
 
     const applicationsTotal = applicationsOnLts + applicationsOnNonLts;
@@ -87,7 +83,7 @@ const DashboardLanguages = () => {
 
     const kotlinDetected = kotlinReleases.length > 0;
 
-    const lastScan = formatLastScan(t, lastScannedAt);
+    const computedAtLabel = formatComputedAt(t, computedAt);
 
     return (
         <>
@@ -110,7 +106,7 @@ const DashboardLanguages = () => {
                     applicationsOnLts={applicationsOnLts}
                     javaReleases={javaReleases}
                     jdkVendors={jdkVendors}
-                    lastScan={lastScan}
+                    computedAtLabel={computedAtLabel}
                 />
 
                 {kotlinDetected && languageMix ? (
@@ -118,11 +114,11 @@ const DashboardLanguages = () => {
                         applicationsTotal={applicationsTotal}
                         languageMix={languageMix}
                         kotlinReleases={kotlinReleases}
-                        lastScan={lastScan}
+                        computedAtLabel={computedAtLabel}
                     />
                 ) : (
                     <div className={styles.NoKotlinBannerWrapper}>
-                        <NoKotlinBanner applicationsTotal={applicationsTotal} footerRight={lastScan} />
+                        <NoKotlinBanner applicationsTotal={applicationsTotal} footerRight={computedAtLabel} />
                     </div>
                 )}
             </div>
