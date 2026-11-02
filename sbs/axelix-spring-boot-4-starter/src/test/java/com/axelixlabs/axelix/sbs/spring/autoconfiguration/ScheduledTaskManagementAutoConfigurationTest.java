@@ -441,6 +441,22 @@ class ScheduledTaskManagementAutoConfigurationTest {
     }
 
     @Test
+    void shouldRecordTheManualExecutionOfReactiveScheduledTask() {
+        contextRunner.withUserConfiguration(ReactiveSchedulingConfig.class).run(context -> {
+            String taskId = ReactiveSchedulingConfig.class.getName() + ".succeeding#fixedRate0";
+            assertThat(awaitExecutions(context, taskId, 1)).hasSize(1);
+
+            // when
+            context.getBean(ScheduledTaskService.class).executeScheduledTask(taskId);
+
+            // then
+            assertThat(awaitExecutions(context, taskId, 2))
+                    .extracting(ScheduledTaskExecution::getLaunchType)
+                    .containsExactly(ScheduledTaskLaunchType.SCHEDULED, ScheduledTaskLaunchType.MANUAL);
+        });
+    }
+
+    @Test
     void shouldNotRecordTheExecutionsOfTasksRegisteredViaSchedulingConfigurer() {
         contextRunner.withUserConfiguration(SchedulingConfigurerConfig.class).run(context -> {
             BlockingQueue<String> executions = context.getBean(SchedulingConfigurerConfig.class).executions;
