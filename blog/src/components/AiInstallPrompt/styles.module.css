@@ -178,14 +178,24 @@
     transition-delay: 0.1s;
   }
 }
-@media (hover: none) and (width < 768px) {
-  .Caption {
-    position: static;
-    flex: 1;
-    min-width: 0;
-    font-size: 11px;
+@media (hover: none) {
+  .Agent + .Agent {
+    margin-left: -28px;
+  }
+  .CopyButton {
+    padding: 8px;
+  }
+  .Labels {
+    max-width: 0;
+    opacity: 0;
+  }
+  .Icons {
+    width: 16px;
     opacity: 1;
-    transform: none;
+  }
+  .Caption {
+    opacity: 1;
+    transform: translate(0, -50%);
   }
 }
 @media (prefers-reduced-motion: reduce) {

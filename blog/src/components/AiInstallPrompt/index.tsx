@@ -41,7 +41,7 @@ export const AiInstallPrompt = () => {
         className={copied ? `${styles.CopyButton} ${styles.Copied}` : styles.CopyButton}
         type="button"
         title={AI_INSTALL_PROMPT}
-        aria-label="Copy prompt for your AI agent"
+        aria-label="Copy the prompt to install Axelix with your AI agent"
       >
         <span className={styles.Labels}>
           <span className={styles.CopyLabel}>Copy prompt</span>
