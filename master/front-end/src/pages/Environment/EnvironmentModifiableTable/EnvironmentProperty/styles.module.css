@@ -1,6 +1,6 @@
 .MainWrapper {
     display: grid;
-    grid-template-columns: 25px minmax(0, 1fr) minmax(0, auto) 105px;
+    grid-template-columns: 25px minmax(0, 1fr) minmax(0, 1fr) 105px;
     align-items: center;
     column-gap: 20px;
     min-height: 45px;
