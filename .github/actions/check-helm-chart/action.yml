@@ -37,10 +37,10 @@ runs:
     - name: Setup Helm
       uses: azure/setup-helm@v5.0.1
       with:
-        version: v3.14.0
+        version: v4.3.1
 
     - name: Generate values.schema.json
-      uses: losisin/helm-values-schema-json-action@v2
+      uses: losisin/helm-values-schema-json-action@v3
       with:
         useHelmDocs: true
         # Working around bug https://github.com/losisin/helm-values-schema-json-action/pull/408

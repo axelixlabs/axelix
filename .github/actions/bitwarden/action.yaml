@@ -7,7 +7,7 @@ runs:
   using: composite
   steps:
     - name: Fetch Secrets from Bitwarden
-      uses: bitwarden/sm-action@v3.0.0
+      uses: bitwarden/sm-action@v3.0.1
       with:
         access_token: ${{ inputs.bw-access-token }}
         secrets: |

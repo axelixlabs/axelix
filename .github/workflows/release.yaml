@@ -61,7 +61,7 @@ jobs:
           Stop-Service -name Docker
 
       - name: Set up starter test JDK and Gradle JDK 25
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v6.1.0
         with:
           distribution: 'liberica'
           java-version: |
@@ -107,21 +107,21 @@ jobs:
           fetch-depth: 0
 
       - name: Set up JDK 25
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v6.1.0
         id: setup-java-25
         with:
           distribution: 'liberica'
           java-version: '25'
 
       - name: Set up JDK 17 for Playgrounds
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v6.1.0
         id: setup-java-17
         with:
           java-version: '17'
           distribution: 'liberica'
 
       - name: Set up JDK 21 for Playgrounds
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v6.1.0
         id: setup-java-21
         with:
           java-version: '21'
@@ -199,7 +199,7 @@ jobs:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
       - name: Set up JDK 25
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v6.1.0
         with:
           distribution: 'liberica'
           java-version: '25'
@@ -273,7 +273,7 @@ jobs:
 
       # Generate complete README from README.md template
       - name: Generate Helm chart README via helm-docs
-        uses: losisin/helm-docs-github-action@v1.7.1
+        uses: losisin/helm-docs-github-action@v2.0.1
         with:
           chart-search-root: charts
           template-files: README.md
@@ -283,11 +283,11 @@ jobs:
       - name: Setup Helm
         uses: azure/setup-helm@v5.0.1
         with:
-          version: v3.14.0
+          version: v4.3.1
 
       # The schema has already been validated her
       - name: Generate values.schema.json
-        uses: losisin/helm-values-schema-json-action@v2
+        uses: losisin/helm-values-schema-json-action@v3
         with:
           useHelmDocs: true
           # Working around bug https://github.com/losisin/helm-values-schema-json-action/pull/408
