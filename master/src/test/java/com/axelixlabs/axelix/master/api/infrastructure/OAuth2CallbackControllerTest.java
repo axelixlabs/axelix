@@ -87,9 +87,7 @@ import static org.mockito.Mockito.when;
             "axelix.master.auth.options.oauth2.client-id=test-client",
             "axelix.master.auth.options.oauth2.client-secret=test-secret",
             "axelix.master.auth.options.oauth2.base-url=http://localhost:3000",
-            "axelix.master.auth.options.oauth2.role-attribute-path=roles[0]",
-            "axelix.master.auth.options.oauth2.job-title-attribute-path=employment.jobTitle",
-            "axelix.master.auth.options.oauth2.organizational-unit-attribute-path=employment.organizationalUnit"
+            "axelix.master.auth.options.oauth2.role-attribute-path=roles[0]"
         })
 class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
@@ -154,10 +152,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         String firstName = "John";
         String lastName = "Doe";
         String email = "example@gmail.com";
-        String jobTitle = "Software Engineer";
-        String organizationalUnit = "Engineering";
-        Map<String, Object> identityClaims =
-                Map.of("employment", Map.of("jobTitle", jobTitle, "organizationalUnit", organizationalUnit));
+        Map<String, Object> identityClaims = Map.of();
         // language=json
         String userInfoJson = """
                 {
@@ -176,10 +171,6 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "given_name")).thenReturn(firstName);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "family_name")).thenReturn(lastName);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "email")).thenReturn(email);
-        when(userInfoJsonAccessor.extractTextField(userInfoJson, "employment.jobTitle"))
-                .thenReturn(jobTitle);
-        when(userInfoJsonAccessor.extractTextField(userInfoJson, "employment.organizationalUnit"))
-                .thenReturn(organizationalUnit);
         Instant beforeLogin = Instant.now();
 
         // when.
@@ -234,8 +225,6 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         assertThat(userEntity.firstName()).isEqualTo(firstName);
         assertThat(userEntity.lastName()).isEqualTo(lastName);
         assertThat(userEntity.email()).isEqualTo(email);
-        assertThat(userEntity.jobTitle()).isEqualTo(jobTitle);
-        assertThat(userEntity.organizationalUnit()).isEqualTo(organizationalUnit);
         assertThat(userEntity.password()).isNull();
         assertThat(userEntity.oidcSubject()).isEqualTo(expectedOidcSubject(SUBJECT));
         assertThat(userService.findRoleNamesByUserId(userEntity.id()))
@@ -257,8 +246,6 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 "Original",
                 "Name",
                 "original@gmail.com",
-                null,
-                null,
                 expectedOidcSubject(SUBJECT),
                 TestRoles.VIEWER.getName());
 
@@ -298,8 +285,6 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 "John",
                 "Doe",
                 "john@example.com",
-                null,
-                null,
                 expectedOidcSubject(SUBJECT),
                 TestRoles.VIEWER.getName());
         UserEntity original = userRepository.findByUsername(originalUsername).orElseThrow();
@@ -330,7 +315,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     void shouldReturn400WhenOidcUserConflictsWithExistingLocalAccount() {
         // given.
         String username = "test-user";
-        userService.createLocal(username, null, null, null, null, null, "test-password", Set.of("ADMIN"));
+        userService.createLocal(username, null, null, null, "test-password", Set.of("ADMIN"));
 
         // and.
         String userInfoJson = "someJson";

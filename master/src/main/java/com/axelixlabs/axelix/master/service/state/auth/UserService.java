@@ -58,8 +58,6 @@ public interface UserService {
      * @param firstName First name of the new user, or {@code null} if not provided.
      * @param lastName  Last name of the new user, or {@code null} if not provided.
      * @param email    Email address of the new user, or {@code null} if not provided. If supplied, must be unique.
-     * @param jobTitle Job title of the new user, or {@code null} if not provided.
-     * @param organizationalUnit Organizational unit of the new user, or {@code null} if not provided.
      * @param password Plain-text password (must be hashed server-side before persistence).
      * @param roles    Role names to assign to the new user. Must not be empty, and no role name may be blank.
      *
@@ -73,8 +71,6 @@ public interface UserService {
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
-            @Nullable String jobTitle,
-            @Nullable String organizationalUnit,
             String password,
             Set<String> roles);
 
@@ -85,8 +81,6 @@ public interface UserService {
      * @param firstName First name of the new user, or {@code null} if not provided.
      * @param lastName  Last name of the new user, or {@code null} if not provided.
      * @param email    Email address of the new user, or {@code null} if not provided. If supplied, must be unique.
-     * @param jobTitle Job title of the new user, or {@code null} if not provided.
-     * @param organizationalUnit Organizational unit of the new user, or {@code null} if not provided.
      * @param oidcSubject Stable OIDC identity of the user ({@code hash(iss + sub)}). Must be unique.
      * @param role     Role name to assign to the new user. Must not be blank or {@code null}.
      *
@@ -101,8 +95,6 @@ public interface UserService {
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
-            @Nullable String jobTitle,
-            @Nullable String organizationalUnit,
             String oidcSubject,
             String role);
 
@@ -201,8 +193,7 @@ public interface UserService {
      * <p>Field semantics:
      * <ul>
      *   <li>{@code username} and {@code roles} are required and must not be {@code null}.</li>
-     *   <li>{@code firstName}, {@code lastName}, {@code email}, {@code jobTitle}, and
-     *       {@code organizationalUnit} are nullable: passing {@code null} clears them.</li>
+     *   <li>{@code firstName}, {@code lastName}, and {@code email} are nullable: passing {@code null} clears them.</li>
      *   <li>{@code password} is nullable: passing {@code null} <b>preserves</b> the previously stored password.</li>
      *   <li>{@code lastLoginAt} is nullable: passing {@code null} preserves the existing timestamp.</li>
      * </ul>
@@ -212,8 +203,6 @@ public interface UserService {
      * @param firstName New first name, or {@code null} to clear the stored first name.
      * @param lastName New last name, or {@code null} to clear the stored last name.
      * @param email    New email address, or {@code null} to clear the stored email. Must be unique and not blank.
-     * @param jobTitle New job title, or {@code null} to clear the stored job title.
-     * @param organizationalUnit New organizational unit, or {@code null} to clear the stored organizational unit.
      * @param password New plain-text password (hashed server-side), or {@code null} to keep the existing password.
      *                 Must not be blank when.
      * @param roles    New set of role names. Replaces any roles previously assigned. Each role must not be blank or {@code null}.
@@ -229,8 +218,6 @@ public interface UserService {
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
-            @Nullable String jobTitle,
-            @Nullable String organizationalUnit,
             @Nullable String password,
             Set<String> roles,
             @Nullable Instant lastLoginAt)

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.3-006-mysql-drop-job-title-and-organizational-unit-from-users" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <and>
+        <columnExists tableName="users" columnName="job_title"/>
+        <columnExists tableName="users" columnName="organizational_unit"/>
+      </and>
+    </preConditions>
+
+    <comment>
+      Drops users.job_title and users.organizational_unit. They were stored since 1.1 but never exposed for
+      configuration, and Axelix no longer keeps them.
+    </comment>
+
+    <dropColumn tableName="users" columnName="job_title"/>
+    <dropColumn tableName="users" columnName="organizational_unit"/>
+  </changeSet>
+</databaseChangeLog>

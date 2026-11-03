@@ -65,8 +65,6 @@ public class UserManagementApi {
                     request.firstName(),
                     request.lastName(),
                     request.email(),
-                    request.jobTitle(),
-                    request.organizationalUnit(),
                     request.password(),
                     request.roles());
             return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -99,8 +97,6 @@ public class UserManagementApi {
                     request.firstName(),
                     request.lastName(),
                     request.email(),
-                    request.jobTitle(),
-                    request.organizationalUnit(),
                     request.password(),
                     request.roles(),
                     null);

@@ -84,8 +84,6 @@ public class DatabaseUserService implements UserService {
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
-            @Nullable String jobTitle,
-            @Nullable String organizationalUnit,
             String password,
             Set<String> roles)
             throws UserRoleNotFoundException, UserInvalidValueException {
@@ -100,8 +98,6 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(firstName),
                 normalizeOptional(lastName),
                 normalizeOptional(email),
-                normalizeOptional(jobTitle),
-                normalizeOptional(organizationalUnit),
                 passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 null,
                 UserOrigin.LOCAL,
@@ -128,8 +124,6 @@ public class DatabaseUserService implements UserService {
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
-            @Nullable String jobTitle,
-            @Nullable String organizationalUnit,
             String oidcSubject,
             String role) {
 
@@ -139,8 +133,6 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(firstName),
                 normalizeOptional(lastName),
                 normalizeOptional(email),
-                normalizeOptional(jobTitle),
-                normalizeOptional(organizationalUnit),
                 null,
                 requireNonBlankTrimmed(oidcSubject),
                 UserOrigin.OIDC,
@@ -251,8 +243,6 @@ public class DatabaseUserService implements UserService {
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
-            @Nullable String jobTitle,
-            @Nullable String organizationalUnit,
             @Nullable String password,
             Set<String> roles,
             @Nullable Instant lastLoginAt)
@@ -266,8 +256,6 @@ public class DatabaseUserService implements UserService {
         String normalizedFirstName = normalizeOptional(firstName);
         String normalizedLastName = normalizeOptional(lastName);
         String normalizedEmail = normalizeOptional(email);
-        String normalizedJobTitle = normalizeOptional(jobTitle);
-        String normalizedOrganizationalUnit = normalizeOptional(organizationalUnit);
 
         if (isUsernameReservedForSuperAdmin(normalizedUsername)
                 || userWithSuchUsernameAlreadyExists(id, normalizedUsername)) {
@@ -286,8 +274,6 @@ public class DatabaseUserService implements UserService {
                 normalizedFirstName,
                 normalizedLastName,
                 normalizedEmail,
-                normalizedJobTitle,
-                normalizedOrganizationalUnit,
                 password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 lastLoginAt);
 

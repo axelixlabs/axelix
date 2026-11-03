@@ -32,8 +32,6 @@ import com.axelixlabs.axelix.master.domain.iam.UserEntity;
  * @param firstName   First name of the user, which may be {@code null}.
  * @param lastName    Last name of the user, which may be {@code null}.
  * @param email       Email address of the user, which may be {@code null}.
- * @param jobTitle    Job title of the user, which may be {@code null}.
- * @param organizationalUnit Organizational unit of the user, which may be {@code null}.
  * @param roles       The names of roles granted to this user.
  * @param userOrigin  Origin of the user account.
  * @param status      Status that controls whether the user can log in.
@@ -48,8 +46,6 @@ public record UserResponse(
         @Nullable String firstName,
         @Nullable String lastName,
         @Nullable String email,
-        @Nullable String jobTitle,
-        @Nullable String organizationalUnit,
         Set<String> roles,
         String userOrigin,
         String status,
@@ -66,8 +62,6 @@ public record UserResponse(
                 user.firstName(),
                 user.lastName(),
                 user.email(),
-                user.jobTitle(),
-                user.organizationalUnit(),
                 roleNames,
                 user.userOrigin().name(),
                 user.status().name(),

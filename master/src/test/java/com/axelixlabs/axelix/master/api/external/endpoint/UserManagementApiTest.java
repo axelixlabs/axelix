@@ -93,8 +93,6 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "firstName": "New",
                   "lastName": "User",
                   "email": "newUser@example.com",
-                  "jobTitle": "Software Engineer",
-                  "organizationalUnit": "Engineering",
                   "password": "plainPassword",
                   "roles": ["EDITOR", "VIEWER"]
                 }
@@ -118,45 +116,12 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         assertThat(saved.firstName()).isEqualTo("New");
         assertThat(saved.lastName()).isEqualTo("User");
         assertThat(saved.email()).isEqualTo("newUser@example.com");
-        assertThat(saved.jobTitle()).isEqualTo("Software Engineer");
-        assertThat(saved.organizationalUnit()).isEqualTo("Engineering");
         assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactlyInAnyOrder("EDITOR", "VIEWER");
         assertThat(saved.userOrigin()).isEqualTo(UserOrigin.LOCAL);
         assertThat(saved.status()).isEqualTo(UserStatus.ACTIVE);
         assertThat(saved.lastLoginAt()).isNull();
         assertThat(saved.password()).isNotEqualTo("plainPassword"); // Hash password
         assertThat(passwordEncoder.matches("plainPassword", saved.password())).isTrue();
-        assertSuccessfulCallback(MasterWebEndpoints.USER_CREATE, superAdmin.getActor());
-    }
-
-    @Test
-    void shouldCreateUserWithNullJobTitleAndOrganizationalUnit() {
-        // given.
-        // language=json
-        String request = """
-                {
-                  "username": "newUser",
-                  "firstName": "New",
-                  "lastName": "User",
-                  "email": "newUser@example.com",
-                  "jobTitle": null,
-                  "organizationalUnit": null,
-                  "password": "plainPassword",
-                  "roles": ["EDITOR"]
-                }
-                """;
-
-        // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
-
-        ResponseEntity<Void> response =
-                superAdmin.exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        UserEntity saved = userRepository.findByUsername("newUser").orElseThrow();
-        assertThat(saved.jobTitle()).isNull();
-        assertThat(saved.organizationalUnit()).isNull();
         assertSuccessfulCallback(MasterWebEndpoints.USER_CREATE, superAdmin.getActor());
     }
 
@@ -445,8 +410,6 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "firstName": "New",
                   "lastName": "Name",
                   "email": "new@example.com",
-                  "jobTitle": "Engineering Manager",
-                  "organizationalUnit": "Engineering",
                   "roles": ["ADMIN", "EDITOR"],
                   "password": "newPass"
                 }
@@ -466,8 +429,6 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         assertThat(updated.firstName()).isEqualTo("New");
         assertThat(updated.lastName()).isEqualTo("Name");
         assertThat(updated.email()).isEqualTo("new@example.com");
-        assertThat(updated.jobTitle()).isEqualTo("Engineering Manager");
-        assertThat(updated.organizationalUnit()).isEqualTo("Engineering");
         assertThat(userService.findRoleNamesByUserId(user.id())).containsExactlyInAnyOrder("ADMIN", "EDITOR");
         assertThat(passwordEncoder.matches("newPass", updated.password())).isTrue();
         assertSuccessfulCallback(MasterWebEndpoints.USER_UPDATE, superAdmin.getActor());
@@ -933,12 +894,12 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     private UserEntity createUser(String username, String email, String password) {
-        userService.createLocal(username, null, null, email, null, null, password, Set.of("VIEWER"));
+        userService.createLocal(username, null, null, email, password, Set.of("VIEWER"));
         return userRepository.findByUsername(username).orElseThrow();
     }
 
     private UserEntity createOidcUser(String username, String email, String oidcSubject) {
-        userService.createFromOidc(username, null, null, email, null, null, oidcSubject, "VIEWER");
+        userService.createFromOidc(username, null, null, email, oidcSubject, "VIEWER");
         return userRepository.findByUsername(username).orElseThrow();
     }
 }

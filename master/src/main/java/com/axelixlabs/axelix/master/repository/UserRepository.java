@@ -111,8 +111,6 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
                 first_name = :firstName,
                 last_name = :lastName,
                 email = :email,
-                job_title = :jobTitle,
-                organizational_unit = :organizationalUnit,
                 password = COALESCE(:password, password),
                 last_login_at = COALESCE(:lastLoginAt, last_login_at)
         WHERE id = :id
@@ -123,8 +121,6 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
             @Param("firstName") @Nullable String firstName,
             @Param("lastName") @Nullable String lastName,
             @Param("email") @Nullable String email,
-            @Param("jobTitle") @Nullable String jobTitle,
-            @Param("organizationalUnit") @Nullable String organizationalUnit,
             @Param("password") @Nullable String password,
             @Param("lastLoginAt") @Nullable Instant lastLoginAt);
 

@@ -155,22 +155,13 @@ public class OAuth2CallbackController {
                     metadata.firstName() == null ? entity.firstName() : metadata.firstName(),
                     metadata.lastName() == null ? entity.lastName() : metadata.lastName(),
                     metadata.email(),
-                    metadata.jobTitle() == null ? entity.jobTitle() : metadata.jobTitle(),
-                    metadata.organizationalUnit() == null ? entity.organizationalUnit() : metadata.organizationalUnit(),
                     null,
                     Set.of(role.getName()),
                     Instant.now());
             return entity.id();
         } else {
             return userService.createFromOidc(
-                    username,
-                    metadata.firstName(),
-                    metadata.lastName(),
-                    metadata.email(),
-                    metadata.jobTitle(),
-                    metadata.organizationalUnit(),
-                    oidcSubject,
-                    role.getName());
+                    username, metadata.firstName(), metadata.lastName(), metadata.email(), oidcSubject, role.getName());
         }
     }
 
@@ -204,23 +195,14 @@ public class OAuth2CallbackController {
             return new OidcUserMetadata(
                     userInfoJsonAccessor.extractTextField(userInfoJson, "given_name"),
                     userInfoJsonAccessor.extractTextField(userInfoJson, "family_name"),
-                    userInfoJsonAccessor.extractTextField(userInfoJson, "email"),
-                    extractTextField(userInfoJson, oAuth2Properties.jobTitleAttributePath()),
-                    extractTextField(userInfoJson, oAuth2Properties.organizationalUnitAttributePath()));
+                    userInfoJsonAccessor.extractTextField(userInfoJson, "email"));
         } catch (Exception e) {
-            return new OidcUserMetadata(null, null, null, null, null);
+            return new OidcUserMetadata(null, null, null);
         }
-    }
-
-    @Nullable
-    private String extractTextField(String userInfoJson, @Nullable String jmesPath) {
-        return jmesPath == null ? null : userInfoJsonAccessor.extractTextField(userInfoJson, jmesPath);
     }
 
     private record OidcUserMetadata(
             @Nullable String firstName,
             @Nullable String lastName,
-            @Nullable String email,
-            @Nullable String jobTitle,
-            @Nullable String organizationalUnit) {}
+            @Nullable String email) {}
 }
