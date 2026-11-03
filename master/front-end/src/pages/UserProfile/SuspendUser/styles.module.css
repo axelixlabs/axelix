@@ -1,0 +1,13 @@
+.SuspendNotes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-2);
+    margin-top: var(--axelix-space-4);
+}
+
+.SuspendNotes p {
+    padding: 10px 12px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    color: var(--axelix-grey-700);
+}

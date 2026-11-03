@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App, Form, Input, Modal } from "antd";
+import { App, Form, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -25,21 +25,27 @@ import { editUser } from "@/services";
 
 import { userUpdateFrom } from "../userUpdate";
 
-import styles from "./styles.module.css";
-
-interface IFields {
-    firstName: string;
-    lastName: string;
-    username: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-}
+import { EditUserForm, type IEditUserFields } from "./EditUserForm";
 
 interface IProps {
+    /**
+     * User being edited
+     */
     user: IUser;
+
+    /**
+     * Whether the dialog is open
+     */
     open: boolean;
+
+    /**
+     * Closes the dialog without saving
+     */
     onClose: () => void;
+
+    /**
+     * Reloads the profile after the user is saved
+     */
     onSaved: () => void;
 }
 
@@ -48,7 +54,7 @@ const toNullable = (value: string | undefined): string | null => emptyStringToNu
 export const EditUser = ({ user, open, onClose, onSaved }: IProps) => {
     const { t } = useTranslation();
     const { message } = App.useApp();
-    const [form] = Form.useForm<IFields>();
+    const [form] = Form.useForm<IEditUserFields>();
     const [requestData, setRequestData] = useState(StatelessRequest.inactive());
     const isLocal = user.userOrigin === EUserOrigin.LOCAL;
 
@@ -65,20 +71,13 @@ export const EditUser = ({ user, open, onClose, onSaved }: IProps) => {
         }
     }, [open, user, form]);
 
-    const optionalLabel = (label: string) => (
-        <>
-            {label}
-            <span className={styles.Optional}>{t("Users.Create.optional")}</span>
-        </>
-    );
-
     const close = (): void => {
         form.resetFields();
         onClose();
     };
 
     const save = async (): Promise<void> => {
-        let data: IFields;
+        let data: IEditUserFields;
 
         try {
             data = await form.validateFields();
@@ -121,77 +120,7 @@ export const EditUser = ({ user, open, onClose, onSaved }: IProps) => {
             confirmLoading={requestData.loading}
             title={<span className="TextMedium">{t("Users.Profile.editTitle")}</span>}
         >
-            <Form
-                form={form}
-                layout="vertical"
-                requiredMark={false}
-                className={styles.Form}
-                initialValues={{
-                    firstName: user.firstName ?? "",
-                    lastName: user.lastName ?? "",
-                    username: user.username,
-                    email: user.email ?? "",
-                    password: "",
-                    confirmPassword: "",
-                }}
-            >
-                <div className={styles.Row}>
-                    <Form.Item name="firstName" label={optionalLabel(t("Users.Create.firstName"))}>
-                        <Input autoComplete="off" />
-                    </Form.Item>
-                    <Form.Item name="lastName" label={optionalLabel(t("Users.Create.lastName"))}>
-                        <Input autoComplete="off" />
-                    </Form.Item>
-                </div>
-
-                <div className={styles.Row}>
-                    <Form.Item
-                        name="username"
-                        label={t("username")}
-                        rules={[{ required: true, whitespace: true, message: t("Users.ValidationErrors.username") }]}
-                    >
-                        <Input autoComplete="off" className={styles.Username} />
-                    </Form.Item>
-                    <Form.Item
-                        name="email"
-                        label={optionalLabel(t("Users.Profile.email"))}
-                        rules={[{ type: "email", message: t("Users.ValidationErrors.emailFormat") }]}
-                    >
-                        <Input autoComplete="off" />
-                    </Form.Item>
-                </div>
-
-                {isLocal && (
-                    <div className={styles.Row}>
-                        <Form.Item
-                            name="password"
-                            label={optionalLabel(t("password"))}
-                            extra={t("Users.Profile.passwordKeep")}
-                        >
-                            <Input.Password autoComplete="new-password" />
-                        </Form.Item>
-                        <Form.Item
-                            name="confirmPassword"
-                            label={optionalLabel(t("Users.Create.confirmPassword"))}
-                            dependencies={["password"]}
-                            rules={[
-                                ({ getFieldValue }) => ({
-                                    validator: (_, value: string | undefined) =>
-                                        !value && !getFieldValue("password")
-                                            ? Promise.resolve()
-                                            : getFieldValue("password") === value
-                                              ? Promise.resolve()
-                                              : Promise.reject(
-                                                    new Error(t("Users.ValidationErrors.passwordsMismatch")),
-                                                ),
-                                }),
-                            ]}
-                        >
-                            <Input.Password autoComplete="new-password" />
-                        </Form.Item>
-                    </div>
-                )}
-            </Form>
+            <EditUserForm user={user} form={form} isLocal={isLocal} />
         </Modal>
     );
 };

@@ -1,0 +1,13 @@
+.Group.Group {
+    padding: 2px 0 4px;
+    color: var(--axelix-grey-400);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.14em;
+    line-height: var(--axelix-line-height-tight);
+}
+
+.GroupBlock + .GroupBlock .Group {
+    padding: 12px 0 4px;
+    border-top: 1px solid var(--axelix-grey-100);
+}

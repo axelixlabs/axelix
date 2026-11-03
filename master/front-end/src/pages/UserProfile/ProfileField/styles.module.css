@@ -1,0 +1,21 @@
+.Field {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: var(--axelix-space-4);
+    padding: 9px 0;
+    border-top: 1px solid var(--axelix-grey-100);
+    font-size: var(--axelix-font-size-body);
+}
+
+.Field span:first-child {
+    color: var(--axelix-grey-500);
+}
+
+.Field b {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Mono {
+    font-family: var(--axelix-font-family-code);
+    font-weight: var(--axelix-font-weight-medium);
+}
