@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.common.auth.service;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Set;
 
@@ -48,6 +49,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 
 /**
  * Integration tests for {@link JwtEncoderService}, verifying correct JWT generation logic.
@@ -98,7 +100,9 @@ class DefaultJwtEncoderServiceTest {
         assertThat(claims.getPayload().getSubject()).isEqualTo(USER_NAME);
         assertThat(claims.getPayload().get(TokenClaim.USER_ID.getEncoding(), String.class))
                 .isEqualTo(user.getId());
-        assertThat(claims.getPayload().getIssuedAt()).isCloseTo(Instant.now(), 1000);
+        // iat is a JWT NumericDate (whole seconds), so the parsed value can trail Instant.now() by almost 2s.
+        assertThat(claims.getPayload().getIssuedAt().toInstant())
+                .isCloseTo(Instant.now(), within(2, ChronoUnit.SECONDS));
         assertThat(claims.getPayload().getExpiration())
                 .isEqualTo(claims.getPayload().getIssuedAt().toInstant().plus(lifespan));
 

@@ -150,9 +150,10 @@ public class ScheduledTaskExecutionResultConverter {
 
     /**
      * @return the id of the execution, which is the same every time the starter reports the execution again.
+     *     Epoch milliseconds keep two runs of the same task in one second distinct.
      */
     private static String id(String instanceId, String taskId, Instant startedAt) {
-        String execution = instanceId + taskId + startedAt.getEpochSecond();
+        String execution = instanceId + taskId + startedAt.toEpochMilli();
         return UUID.nameUUIDFromBytes(execution.getBytes(StandardCharsets.UTF_8))
                 .toString();
     }
