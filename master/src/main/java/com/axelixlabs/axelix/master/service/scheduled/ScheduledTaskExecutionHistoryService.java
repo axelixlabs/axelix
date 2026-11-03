@@ -19,6 +19,10 @@ package com.axelixlabs.axelix.master.service.scheduled;
 
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 
 /**
@@ -38,4 +42,21 @@ public interface ScheduledTaskExecutionHistoryService {
      * @param scheduledTaskExecutionResults the execution results of a single instance to persist.
      */
     void append(Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults);
+
+    /**
+     * @return the share of the succeeded executions of the task on all the instances of the application in percent,
+     *         absent when there are no executions.
+     */
+    @Nullable
+    Double findSuccessRate(ApplicationId applicationId, String taskId);
+
+    /**
+     * @param applicationId the application the task belongs to.
+     * @param taskId        the id of the task.
+     * @param page          the zero-based number of the page.
+     * @param size          the maximum number of executions on a page.
+     * @return the execution history of the task on all the instances of the application with the requested page of
+     *         its executions, the most recent first.
+     */
+    ScheduledTaskExecutionHistoryResponse findHistory(ApplicationId applicationId, String taskId, int page, int size);
 }

@@ -117,6 +117,11 @@ public final class MasterWebEndpoints {
     // Scheduled tasks
     public static final MasterWebEndpoint SCHEDULED_TASKS_READ =
             register("scheduled-tasks:read", HttpMethod.GET, ApiPaths.ScheduledTasksApi.INSTANCE_ID, null);
+    public static final MasterWebEndpoint SCHEDULED_TASK_EXECUTION_HISTORY_READ = register(
+            "scheduled-task:read-execution-history",
+            HttpMethod.GET,
+            ApiPaths.ScheduledTasksApi.EXECUTION_HISTORY,
+            null);
     public static final MasterWebEndpoint SCHEDULED_TASK_ENABLE = register(
             "scheduled-task:enable",
             HttpMethod.POST,

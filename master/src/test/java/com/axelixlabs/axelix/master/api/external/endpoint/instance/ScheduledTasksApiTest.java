@@ -18,15 +18,19 @@
 package com.axelixlabs.axelix.master.api.external.endpoint.instance;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,6 +39,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +54,9 @@ import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskInterval
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.repository.ScheduledTaskExecutionResultRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
@@ -59,6 +66,7 @@ import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_EXTRA_FIELDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -78,21 +86,24 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
               },
               "expression": "*/2 * * * * *",
-              "enabled": true
+              "enabled": true,
+              "successRate": null
             },
             {
               "runnable": {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
               },
               "expression": "*/5 * * * * *",
-              "enabled": true
+              "enabled": true,
+              "successRate": null
             },
             {
               "runnable": {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
               },
               "expression": "*/2 * * * * *",
-              "enabled": true
+              "enabled": true,
+              "successRate": null
             }
           ],
           "fixedDelay": [
@@ -102,7 +113,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
               },
               "interval": 2000,
               "initialDelay": 0,
-              "enabled": true
+              "enabled": true,
+              "successRate": null
             }
           ],
           "fixedRate": [
@@ -112,7 +124,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
               },
               "interval": 2000,
               "initialDelay": 100,
-              "enabled": false
+              "enabled": false,
+              "successRate": null
             }
           ],
           "custom": [
@@ -121,7 +134,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
               },
               "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
-              "enabled": false
+              "enabled": false,
+              "successRate": null
             }
           ]
         }
@@ -136,6 +150,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
     @Autowired
     private InstanceRegistry registry;
+
+    @Autowired
+    private ScheduledTaskExecutionResultRepository executionResultRepository;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -242,6 +259,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @AfterEach
     void cleanup() {
         registry.deRegister(InstanceId.of(activeInstanceId));
+        executionResultRepository.deleteAll();
     }
 
     @Test
@@ -256,6 +274,264 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_MASTER_RESPONSE);
         assertSuccessfulCallback(MasterWebEndpoints.SCHEDULED_TASKS_READ, viewer.getActor());
+    }
+
+    @Test
+    void shouldReturnTheSummaryOfTheExecutionHistoryOfTheTaskOnAllTheInstancesOfTheApplication() {
+        // given.
+        String taskId = "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask";
+        Instant startedAt = Instant.parse("2026-11-01T10:00:00Z");
+        executionResultRepository.saveAll(List.of(
+                execution(
+                        "test-object-factory-app",
+                        activeInstanceId,
+                        taskId,
+                        startedAt,
+                        400,
+                        "SQLTransientConnectionException",
+                        "timeout"),
+                execution(
+                        "test-object-factory-app",
+                        activeInstanceId,
+                        taskId,
+                        startedAt.plusSeconds(1),
+                        200,
+                        "IllegalStateException",
+                        "boom 1"),
+                new ScheduledTaskExecutionResult(
+                        UUID.randomUUID().toString(),
+                        "com.axelixlabs",
+                        "test-object-factory-app",
+                        "restarted-instance",
+                        "restarted-instance-name",
+                        taskId,
+                        startedAt.plusSeconds(2),
+                        100,
+                        false,
+                        ScheduledTaskLaunchType.MANUAL,
+                        "IllegalStateException",
+                        "boom 2"),
+                execution(
+                        "test-object-factory-app", activeInstanceId, taskId, startedAt.plusSeconds(3), 300, null, null),
+                execution("other-app", activeInstanceId, taskId, startedAt.plusSeconds(4), 500, null, null)));
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity(
+                        "/api/external/scheduled-tasks/{instanceId}/history?taskId={taskId}",
+                        String.class,
+                        activeInstanceId,
+                        taskId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // language=json
+        assertThatJson(response.getBody()).when(IGNORING_EXTRA_FIELDS).isEqualTo("""
+            {
+              "summary": {
+                "lastRunAt": "2026-11-01T10:00:03Z",
+                "totalRuns": 4,
+                "failedRuns": 3,
+                "successRate": 25.0,
+                "averageDurationMillis": 250,
+                "p95DurationMillis": 400,
+                "maxDurationMillis": 400
+              },
+              "failuresByErrorType": [
+                {
+                  "errorType": "IllegalStateException",
+                  "count": 2,
+                  "lastErrorMessage": "boom 2",
+                  "lastOccurredAt": "2026-11-01T10:00:02Z"
+                },
+                {
+                  "errorType": "SQLTransientConnectionException",
+                  "count": 1,
+                  "lastErrorMessage": "timeout",
+                  "lastOccurredAt": "2026-11-01T10:00:00Z"
+                }
+              ]
+            }
+            """);
+    }
+
+    @Test
+    void shouldReturnTheSuccessRateOfEachTaskOnAllTheInstancesOfTheApplication() {
+        // given.
+        String taskId = "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask";
+        Instant startedAt = Instant.parse("2026-11-01T10:00:00Z");
+        executionResultRepository.saveAll(List.of(
+                execution(
+                        "test-object-factory-app",
+                        activeInstanceId,
+                        taskId,
+                        startedAt,
+                        100,
+                        "IllegalStateException",
+                        "boom"),
+                execution(
+                        "test-object-factory-app", activeInstanceId, taskId, startedAt.plusSeconds(1), 100, null, null),
+                execution(
+                        "other-app",
+                        activeInstanceId,
+                        taskId,
+                        startedAt.plusSeconds(2),
+                        100,
+                        "IllegalStateException",
+                        "boom")));
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThatJson(response.getBody()).inPath("fixedRate[0].successRate").isEqualTo(50.0);
+        assertThatJson(response.getBody()).inPath("fixedDelay[0].successRate").isNull();
+    }
+
+    @Test
+    void shouldReturnThePageOfTheExecutionsOfTheTaskOnAllTheInstancesOfTheApplication() {
+        // given.
+        String taskId = "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask";
+        Instant startedAt = Instant.parse("2026-11-01T10:00:00Z");
+        executionResultRepository.saveAll(List.of(
+                new ScheduledTaskExecutionResult(
+                        UUID.randomUUID().toString(),
+                        "com.axelixlabs",
+                        "test-object-factory-app",
+                        "restarted-instance",
+                        "restarted-instance-name",
+                        taskId,
+                        startedAt,
+                        100,
+                        false,
+                        ScheduledTaskLaunchType.MANUAL,
+                        "IllegalStateException",
+                        "boom"),
+                execution(
+                        "test-object-factory-app", activeInstanceId, taskId, startedAt.plusSeconds(1), 200, null, null),
+                execution(
+                        "test-object-factory-app", activeInstanceId, taskId, startedAt.plusSeconds(2), 300, null, null),
+                execution(
+                        "test-object-factory-app", activeInstanceId, taskId, startedAt.plusSeconds(3), 400, null, null),
+                execution("other-app", activeInstanceId, taskId, startedAt.plusSeconds(4), 500, null, null)));
+
+        // when.
+        var viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity(
+                "/api/external/scheduled-tasks/{instanceId}/history?taskId={taskId}&page=1&size=2",
+                String.class,
+                activeInstanceId,
+                taskId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // language=json
+        assertThatJson(response.getBody()).isEqualTo("""
+            {
+              "summary": {
+                "lastRunAt": "2026-11-01T10:00:03Z",
+                "totalRuns": 4,
+                "failedRuns": 1,
+                "successRate": 75.0,
+                "averageDurationMillis": 250,
+                "p95DurationMillis": 400,
+                "maxDurationMillis": 400
+              },
+              "failuresByErrorType": [
+                {
+                  "errorType": "IllegalStateException",
+                  "count": 1,
+                  "lastErrorMessage": "boom",
+                  "lastOccurredAt": "2026-11-01T10:00:00Z"
+                }
+              ],
+              "executions": [
+                {
+                  "startedAt": "2026-11-01T10:00:01Z",
+                  "instanceId": "%1$s",
+                  "instanceName": "test-object-factory-instance",
+                  "durationMillis": 200,
+                  "success": true,
+                  "launchType": "SCHEDULED",
+                  "errorType": null,
+                  "errorMessage": null
+                },
+                {
+                  "startedAt": "2026-11-01T10:00:00Z",
+                  "instanceId": "restarted-instance",
+                  "instanceName": "restarted-instance-name",
+                  "durationMillis": 100,
+                  "success": false,
+                  "launchType": "MANUAL",
+                  "errorType": "IllegalStateException",
+                  "errorMessage": "boom"
+                }
+              ],
+              "totalExecutions": 4,
+              "page": 1,
+              "size": 2
+            }
+            """.formatted(activeInstanceId));
+        assertSuccessfulCallback(MasterWebEndpoints.SCHEDULED_TASK_EXECUTION_HISTORY_READ, viewer.getActor());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"-1, 30", "0, 0"})
+    void shouldReturnBadRequestForOutOfBoundsPageOnGetExecutionHistory(int page, int size) {
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity(
+                        "/api/external/scheduled-tasks/{instanceId}/history?taskId=task&page={page}&size={size}",
+                        String.class,
+                        activeInstanceId,
+                        page,
+                        size);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldReturnBadRequestForUnregisteredInstanceOnGetExecutionHistory() {
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity(
+                        "/api/external/scheduled-tasks/{instanceId}/history?taskId=task",
+                        String.class,
+                        "unregistered-axelix-scheduled-tasks-instance");
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    // the execution succeeded when it has no error type
+    private static ScheduledTaskExecutionResult execution(
+            String artifactId,
+            String instanceId,
+            String taskId,
+            Instant startedAt,
+            long durationMillis,
+            @Nullable String errorType,
+            @Nullable String errorMessage) {
+        return new ScheduledTaskExecutionResult(
+                UUID.randomUUID().toString(),
+                "com.axelixlabs",
+                artifactId,
+                instanceId,
+                "test-object-factory-instance",
+                taskId,
+                startedAt,
+                durationMillis,
+                errorType == null,
+                ScheduledTaskLaunchType.SCHEDULED,
+                errorType,
+                errorMessage);
     }
 
     @ParameterizedTest
@@ -627,6 +903,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 new TestableMasterWebEndpoint(
                         MasterWebEndpoints.SCHEDULED_TASKS_READ,
                         "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001"),
+                new TestableMasterWebEndpoint(
+                        MasterWebEndpoints.SCHEDULED_TASK_EXECUTION_HISTORY_READ,
+                        "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001/history?taskId=task"),
                 new TestableMasterWebEndpoint(
                         MasterWebEndpoints.SCHEDULED_TASK_ENABLE,
                         "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001/enable"),

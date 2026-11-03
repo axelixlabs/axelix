@@ -14,8 +14,8 @@
     </preConditions>
 
     <comment>
-      Adds the launch type of the execution. The column is mandatory, so the rows stored before are dropped.
-      SQLite cannot add a NOT NULL column without a DEFAULT.
+      Adds the launch type of the execution and the name of the instance that ran it. The columns are mandatory,
+      so the rows stored before are dropped.
     </comment>
 
     <delete tableName="scheduled_task_execution_results"/>
@@ -24,6 +24,24 @@
       <column name="launch_type" type="TEXT" defaultValue="">
         <constraints nullable="false"/>
       </column>
+      <column name="instance_name" type="TEXT" defaultValue="">
+        <constraints nullable="false"/>
+      </column>
     </addColumn>
+  </changeSet>
+
+  <changeSet id="1.3-005-2-sqlite-add-task-index-to-scheduled-task-execution-results" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <indexExists tableName="scheduled_task_execution_results" indexName="idx_scheduled_task_execution_results_task"/>
+      </not>
+    </preConditions>
+
+    <createIndex tableName="scheduled_task_execution_results" indexName="idx_scheduled_task_execution_results_task">
+      <column name="group_id"/>
+      <column name="artifact_id"/>
+      <column name="task_id"/>
+      <column name="started_at"/>
+    </createIndex>
   </changeSet>
 </databaseChangeLog>

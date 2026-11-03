@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint.instance;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronExpression;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskDisableRequest;
@@ -33,13 +33,15 @@ import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskExecuteR
 import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
-import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
+import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
+import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTasksResponse;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCronExpressionException;
+import com.axelixlabs.axelix.master.service.scheduled.ScheduledTasksService;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -48,24 +50,41 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @ExternalApiRestController
 public class ScheduledTasksApi {
 
     private final EndpointInvoker endpointInvoker;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
+    private final ScheduledTasksService scheduledTasksService;
 
     public ScheduledTasksApi(
-            EndpointInvoker endpointInvoker, JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
+            EndpointInvoker endpointInvoker,
+            JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy,
+            ScheduledTasksService scheduledTasksService) {
         this.endpointInvoker = endpointInvoker;
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
+        this.scheduledTasksService = scheduledTasksService;
     }
 
     @GetMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID)
-    public ResponseEntity<byte[]> getAllScheduledTasks(@PathVariable("instanceId") String instanceId) {
-        byte[] body = endpointInvoker.invoke(
-                InstanceId.of(instanceId), ActuatorEndpoints.GET_SCHEDULED_TASKS, NoHttpPayload.INSTANCE);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
+    public ScheduledTasksResponse getAllScheduledTasks(@PathVariable("instanceId") String instanceId) {
+        return scheduledTasksService.getScheduledTasks(InstanceId.of(instanceId));
+    }
+
+    /**
+     * @param taskId the id of the task.
+     * @param page   the zero-based number of the page.
+     * @param size   the maximum number of executions on a page, at least 1.
+     */
+    @GetMapping(path = ApiPaths.ScheduledTasksApi.EXECUTION_HISTORY)
+    public ScheduledTaskExecutionHistoryResponse getExecutionHistory(
+            @PathVariable("instanceId") String instanceId,
+            @RequestParam("taskId") String taskId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "30") int size) {
+        return scheduledTasksService.getExecutionHistory(InstanceId.of(instanceId), taskId, page, size);
     }
 
     @PostMapping(path = ApiPaths.ScheduledTasksApi.ENABLE_TASK)

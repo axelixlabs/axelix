@@ -299,6 +299,11 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/scheduled-tasks/{instanceId}";
 
         /**
+         * Endpoint returns a page of the execution history of a scheduled task.
+         */
+        public static final String EXECUTION_HISTORY = "/scheduled-tasks/{instanceId}/history";
+
+        /**
          * Endpoint allows enabling a scheduled task.
          */
         public static final String ENABLE_TASK = "/scheduled-tasks/{instanceId}/enable";
