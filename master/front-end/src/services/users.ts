@@ -22,6 +22,10 @@ export const getUsers = () => {
     return apiFetch.get("users/feed");
 };
 
+export const getRoleUserCounts = () => {
+    return apiFetch.get("users/role-counts");
+};
+
 export const getUserById = (userId: string) => {
     return apiFetch.get(`users/feed/${userId}`);
 };

@@ -231,6 +231,11 @@ public final class MasterWebEndpoints {
     // Users
     public static final MasterWebEndpoint USERS_READ =
             register("users:read", HttpMethod.GET, ApiPaths.UsersApi.USERS_FEED, OssAuthority.USERS_VIEW);
+    public static final MasterWebEndpoint USERS_READ_ROLE_COUNTS = register(
+            "users:read-role-counts",
+            HttpMethod.GET,
+            ApiPaths.UsersApi.ROLE_USER_COUNTS,
+            OssAuthority.USERS_VIEW);
     public static final MasterWebEndpoint USER_READ_ONE =
             register("users:read-one", HttpMethod.GET, ApiPaths.UsersApi.GET_USER_BY_ID, null);
     public static final MasterWebEndpoint LOCAL_LOGIN =

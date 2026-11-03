@@ -38,6 +38,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
+import com.axelixlabs.axelix.master.api.external.response.RoleUsersCountResponse;
 import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
@@ -87,6 +88,15 @@ public class UserApi {
                 .toList();
 
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping(path = ApiPaths.UsersApi.ROLE_USER_COUNTS)
+    public ResponseEntity<List<RoleUsersCountResponse>> getRoleUserCounts() {
+        List<RoleUsersCountResponse> counts = userService.countUsersByRole().stream()
+                .map(count -> new RoleUsersCountResponse(count.role(), count.usersCount()))
+                .toList();
+
+        return ResponseEntity.ok(counts);
     }
 
     @GetMapping(path = ApiPaths.UsersApi.GET_USER_BY_ID)

@@ -56,6 +56,7 @@ class MasterWebEndpointResolverTest {
                 // Non-templated paths.
                 Arguments.of("/applications/grid", HttpMethod.GET, MasterWebEndpoints.INSTANCES_READ),
                 Arguments.of("/users/login", HttpMethod.POST, MasterWebEndpoints.LOCAL_LOGIN),
+                Arguments.of("/users/role-counts", HttpMethod.GET, MasterWebEndpoints.USERS_READ_ROLE_COUNTS),
                 Arguments.of("/loggers/logger/reset", HttpMethod.POST, MasterWebEndpoints.LOGGERS_BULK_RESET),
                 Arguments.of("/caches/clear", HttpMethod.DELETE, MasterWebEndpoints.CACHES_CLEAR_ALL),
                 Arguments.of("/caches/cache/clear", HttpMethod.DELETE, MasterWebEndpoints.CACHE_CLEAR_ONE),

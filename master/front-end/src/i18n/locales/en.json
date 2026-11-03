@@ -180,6 +180,7 @@
         "wallboard": "Wallboard",
         "administration": "Administration",
         "users": "Users",
+        "roles": "Roles & permissions",
         "Help": {
             "title": "Help",
             "about": "About",
@@ -818,6 +819,29 @@
             "password": "Please input password!",
             "passwordsMismatch": "Passwords do not match!",
             "roles": "Please select roles!"
+        }
+    },
+    "Roles": {
+        "title": "Roles & permissions",
+        "subtitle": "Community edition · three built-in roles, assignable on the Users page",
+        "Builtin": {
+            "ADMIN": {
+                "description": "Everything an editor can do, plus reading Environment and Configuration Properties values.",
+                "grants": "Scheduled tasks, caches, garbage collection, and sensitive property values"
+            },
+            "EDITOR": {
+                "description": "Manage scheduled tasks, caches and garbage collector logging.",
+                "grants": "Enable, disable and run scheduled tasks; clear and toggle caches; trigger garbage collection"
+            },
+            "VIEWER": {
+                "description": "Read-only view of applications, dashboards and wallboards.",
+                "grants": "No modifying authorities"
+            }
+        },
+        "Enterprise": {
+            "title": "Custom roles are an Enterprise feature",
+            "body": "Define your own roles from individual permissions, compose roles from other roles, and manage them as code in a YAML file.",
+            "compare": "Compare editions"
         }
     }
 }

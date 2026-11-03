@@ -160,6 +160,18 @@ export interface IEditUserRequestData {
     roles: ERoles[];
 }
 
+export interface IRoleUsersCount {
+    /**
+     * Name of the role
+     */
+    role: string;
+
+    /**
+     * Number of users who hold this role. A user who holds several roles is counted once for each of them.
+     */
+    usersCount: number;
+}
+
 export interface IUsersFilters {
     /**
      * Statuses of the user, as shown in the users list.

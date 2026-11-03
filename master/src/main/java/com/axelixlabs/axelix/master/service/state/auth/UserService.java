@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserStatusChangeNotAllowedException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
+import com.axelixlabs.axelix.master.repository.UserRepository;
 
 /**
  * Service that manages the lifecycle of users persisted by the Users Management API.
@@ -162,6 +163,14 @@ public interface UserService {
      * @return Role names per user id. Users without roles are absent from the map.
      */
     Map<String, Set<String>> findAllRoleNamesByUserId();
+
+    /**
+     * Counts users per persisted role. A role that nobody holds is included with a count of zero, and a user who
+     * holds several roles is counted once for each of them.
+     *
+     * @return Counts ordered by role name.
+     */
+    List<UserRepository.RoleUsersCount> countUsersByRole();
 
     /**
      * Sets the user's {@code lastLoginAt} timestamp to {@link Instant#now()}.
