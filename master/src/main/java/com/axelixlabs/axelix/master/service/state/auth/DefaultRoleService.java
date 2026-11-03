@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.state.auth;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
@@ -38,6 +40,7 @@ import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
+import com.axelixlabs.axelix.master.domain.RoleEntity;
 import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleParentBond;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityName;
@@ -75,6 +78,22 @@ public class DefaultRoleService implements RoleService {
                 .map(graph::composeRole)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<GrantedRole> findGrantedRolesOfUser(String userId) throws IllegalStateException {
+        Map<String, String> descriptionsByName =
+                roleRepository.findAll().stream().collect(Collectors.toMap(RoleEntity::name, RoleEntity::description));
+
+        return findRolesOfUser(userId).stream()
+                .map(role -> new GrantedRole(
+                        role.getName(),
+                        Objects.requireNonNull(descriptionsByName.get(role.getName())),
+                        role.getEffectiveAuthorities().stream()
+                                .map(Authority::getName)
+                                .collect(Collectors.toCollection(TreeSet::new))))
+                .sorted(Comparator.comparing(GrantedRole::name))
+                .toList();
     }
 
     private RoleGraph getGraph() {
