@@ -60,6 +60,14 @@ public final class ApiPaths {
         public static final String ROLE_USER_COUNTS = "/users/role-counts";
     }
 
+    public static final class RolesApi {
+
+        /**
+         * Endpoint to retrieve the feed of the roles.
+         */
+        public static final String ROLES_FEED = "/roles/feed";
+    }
+
     public static final class UsersManagementApi {
 
         /**

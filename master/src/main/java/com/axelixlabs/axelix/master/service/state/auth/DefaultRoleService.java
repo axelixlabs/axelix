@@ -77,6 +77,12 @@ public class DefaultRoleService implements RoleService {
                 .collect(Collectors.toSet());
     }
 
+    // That is okay for now (since we just have 3 roles by default)
+    @Override
+    public List<RoleRepository.RoleProfile> getRolesFeed() {
+        return roleRepository.findRolesFeed();
+    }
+
     private RoleGraph getGraph() {
         Map<String, String> names = new HashMap<>();
         Map<String, Set<Authority>> authorities = new HashMap<>();
