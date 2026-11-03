@@ -177,6 +177,11 @@ abstract class AbstractBeansSharedContextTest {
             public Class<?> getObjectType() {
                 return FactoryBeanProduct.class;
             }
+
+            @Override
+            public boolean isSingleton() {
+                return false;
+            }
         }
     }
 

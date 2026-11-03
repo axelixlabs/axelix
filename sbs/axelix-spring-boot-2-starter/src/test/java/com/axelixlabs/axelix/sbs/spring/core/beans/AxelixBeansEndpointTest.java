@@ -56,6 +56,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
  * Integration tests for {@link AxelixBeansEndpoint}.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(
         classes = AxelixBeansEndpointTest.CurrentConfiguration.class,
@@ -134,6 +135,11 @@ class AxelixBeansEndpointTest {
             @Override
             public Class<?> getObjectType() {
                 return FactoryBeanProduct.class;
+            }
+
+            @Override
+            public boolean isSingleton() {
+                return false;
             }
         }
     }
