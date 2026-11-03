@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.convert;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -31,17 +32,20 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.master.contract.heartbeatv2.HeartBeatMetadataV2;
 import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
+import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.discovery.DiscoveredInstanceProfile;
 
 /**
- * Converter that is capable to conver the {@link BasicRegistrationMetadata} and {@link DiscoveredInstanceProfile}
- * into {@link java.util.Set} of {@link ScheduledTaskExecutionResult}.
+ * Converter that is capable to conver the scheduled task executions reported by the instances into {@link java.util.Set}
+ * of {@link ScheduledTaskExecutionResult}.
  *
  * @author Vyacheslav Yanin
+ * @author Nikita Kirillov
  */
 @Component
 public class ScheduledTaskExecutionResultConverter {
@@ -58,12 +62,36 @@ public class ScheduledTaskExecutionResultConverter {
         return convert(heartBeatMetadata.getBasicRegistrationMetadata(), heartBeatMetadata.getInstanceId());
     }
 
-    private Set<ScheduledTaskExecutionResult> convert(BasicRegistrationMetadata metadata, String instanceId) {
-        String groupId = metadata.getGroupId();
-        String artifactId = metadata.getArtifactId();
-        List<ScheduledTaskExecution> scheduledTaskExecutions =
-                metadata.getInsights().getScheduledTaskExecutions();
+    public Set<ScheduledTaskExecutionResult> convert(DiscoveredInstanceProfile.Refresh refresh) {
+        return convert(refresh.instance(), refresh.masterPing().getScheduledTaskExecutions());
+    }
 
+    public Set<ScheduledTaskExecutionResult> convert(Instance instance, HeartBeatMetadataV2 heartBeat) {
+        return convert(instance, heartBeat.getScheduledTaskExecutions());
+    }
+
+    private Set<ScheduledTaskExecutionResult> convert(BasicRegistrationMetadata metadata, String instanceId) {
+        return convert(
+                metadata.getInsights().getScheduledTaskExecutions(),
+                metadata.getGroupId(),
+                metadata.getArtifactId(),
+                instanceId);
+    }
+
+    private Set<ScheduledTaskExecutionResult> convert(
+            Instance instance, @Nullable List<ScheduledTaskExecution> scheduledTaskExecutions) {
+        return convert(
+                scheduledTaskExecutions,
+                instance.applicationId().groupId(),
+                instance.applicationId().artifactId(),
+                instance.id().instanceId());
+    }
+
+    private Set<ScheduledTaskExecutionResult> convert(
+            @Nullable List<ScheduledTaskExecution> scheduledTaskExecutions,
+            String groupId,
+            String artifactId,
+            String instanceId) {
         if (scheduledTaskExecutions == null) {
             return Set.of();
         }
@@ -77,6 +105,14 @@ public class ScheduledTaskExecutionResultConverter {
     @Nullable
     private ScheduledTaskExecutionResult convert(
             ScheduledTaskExecution scheduledTaskExecution, String groupId, String artifactId, String instanceId) {
+        if (!hasRequiredFields(scheduledTaskExecution)) {
+            logger.warn(
+                    "The scheduled task {} reported by the instance {} misses required fields. Skipping this execution result.",
+                    scheduledTaskExecution.getTaskId(),
+                    instanceId);
+            return null;
+        }
+
         Instant startedAt;
         try {
             startedAt = Instant.parse(scheduledTaskExecution.getStartedAt());
@@ -91,7 +127,7 @@ public class ScheduledTaskExecutionResultConverter {
         }
 
         return new ScheduledTaskExecutionResult(
-                UUID.randomUUID().toString(),
+                id(instanceId, scheduledTaskExecution.getTaskId(), startedAt),
                 groupId,
                 artifactId,
                 instanceId,
@@ -99,7 +135,25 @@ public class ScheduledTaskExecutionResultConverter {
                 startedAt,
                 scheduledTaskExecution.getDurationMillis(),
                 scheduledTaskExecution.getSuccess(),
+                Objects.requireNonNull(scheduledTaskExecution.getLaunchType()),
                 scheduledTaskExecution.getErrorType(),
                 scheduledTaskExecution.getErrorMessage());
+    }
+
+    private static boolean hasRequiredFields(ScheduledTaskExecution execution) {
+        return execution.getTaskId() != null
+                && execution.getStartedAt() != null
+                && execution.getDurationMillis() != null
+                && execution.getSuccess() != null
+                && execution.getLaunchType() != null;
+    }
+
+    /**
+     * @return the id of the execution, which is the same every time the starter reports the execution again.
+     */
+    private static String id(String instanceId, String taskId, Instant startedAt) {
+        String execution = instanceId + taskId + startedAt;
+        return UUID.nameUUIDFromBytes(execution.getBytes(StandardCharsets.UTF_8))
+                .toString();
     }
 }

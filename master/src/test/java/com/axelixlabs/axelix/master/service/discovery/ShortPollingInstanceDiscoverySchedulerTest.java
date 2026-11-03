@@ -29,7 +29,6 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -52,6 +51,7 @@ import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.master.contract.metadata.InstanceFeature;
 import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -166,7 +166,6 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    @Disabled("GH-1617: the executions are not stored until master deduplicates them")
     void shouldSaveScheduledTaskExecutionsWhenInstancesAreDiscovered() {
         String serviceWithFailedExecution = "service-with-failed-execution";
         String serviceWithSuccessfulExecution = "service-with-successful-execution";
@@ -185,6 +184,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                         .startedAt("2026-09-27T10:00:00.123Z")
                         .durationMillis(1500L)
                         .success(false)
+                        .launchType(ScheduledTaskLaunchType.SCHEDULED)
                         .errorType("NullPointerException")
                         .errorMessage("boom")));
 
@@ -195,7 +195,8 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                         .taskId(successfulTaskId)
                         .startedAt("2026-09-27T10:05:00.500Z")
                         .durationMillis(42L)
-                        .success(true)));
+                        .success(true)
+                        .launchType(ScheduledTaskLaunchType.MANUAL)));
 
         stubs.enqueueResponses(
                 TestMetadataFactory.toJson(failedMetadata), TestMetadataFactory.toJson(successfulMetadata));
@@ -218,6 +219,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                         ScheduledTaskExecutionResult::startedAt,
                         ScheduledTaskExecutionResult::durationMillis,
                         ScheduledTaskExecutionResult::success,
+                        ScheduledTaskExecutionResult::launchType,
                         ScheduledTaskExecutionResult::errorType,
                         ScheduledTaskExecutionResult::errorMessage)
                 .containsExactlyInAnyOrder(
@@ -227,6 +229,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                                 Instant.parse("2026-09-27T10:00:00.123Z"),
                                 1500L,
                                 false,
+                                ScheduledTaskLaunchType.SCHEDULED,
                                 "NullPointerException",
                                 "boom"),
                         tuple(
@@ -235,6 +238,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                                 Instant.parse("2026-09-27T10:05:00.500Z"),
                                 42L,
                                 true,
+                                ScheduledTaskLaunchType.MANUAL,
                                 null,
                                 null));
 
@@ -273,6 +277,65 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             assertThat(instance.commitShaShort()).isEqualTo("910230");
             assertThat(instance.springBootVersion()).isEqualTo("3.5.2");
         });
+    }
+
+    @Test
+    void shouldSaveScheduledTaskExecutionsReportedViaMasterPing() {
+        String instanceId = UUID.randomUUID().toString();
+        ScheduledTaskExecution reportedOnRegistration = new ScheduledTaskExecution()
+                .taskId("com.example.OwnerJob#run()")
+                .startedAt("2026-09-27T10:00:00.123Z")
+                .durationMillis(1500L)
+                .success(true)
+                .launchType(ScheduledTaskLaunchType.SCHEDULED);
+
+        BasicRegistrationMetadata metadata = TestMetadataFactory.create("org.springframework.samples", "petclinic")
+                .version("1.3.0");
+        metadata.getInsights().scheduledTaskExecutions(List.of(reportedOnRegistration));
+
+        // language=json
+        String masterPingResponse = """
+            {
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 500
+              },
+              "transactions" : [ ],
+              "scheduledTaskExecutions" : [
+                {
+                  "taskId" : "com.example.OwnerJob#run()",
+                  "startedAt" : "2026-09-27T10:00:00.123Z",
+                  "durationMillis" : 1500,
+                  "success" : true,
+                  "launchType" : "SCHEDULED"
+                },
+                {
+                  "taskId" : "com.example.OwnerJob#run()",
+                  "startedAt" : "2026-09-27T10:01:00.456Z",
+                  "durationMillis" : 700,
+                  "success" : true,
+                  "launchType" : "MANUAL"
+                }
+              ]
+            }
+            """;
+
+        stubs.enqueueResponses(TestMetadataFactory.toJson(metadata), masterPingResponse);
+        stubs.stubDiscovery(stubs.k8sInstance("service-with-master-ping", instanceId));
+        subject.performDiscovery();
+
+        // when.
+        subject.performDiscovery();
+
+        // then.
+        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
+                .extracting(
+                        ScheduledTaskExecutionResult::instanceId,
+                        ScheduledTaskExecutionResult::startedAt,
+                        ScheduledTaskExecutionResult::launchType)
+                .containsExactlyInAnyOrder(
+                        tuple(instanceId, Instant.parse("2026-09-27T10:00:00.123Z"), ScheduledTaskLaunchType.SCHEDULED),
+                        tuple(instanceId, Instant.parse("2026-09-27T10:01:00.456Z"), ScheduledTaskLaunchType.MANUAL));
     }
 
     @Test

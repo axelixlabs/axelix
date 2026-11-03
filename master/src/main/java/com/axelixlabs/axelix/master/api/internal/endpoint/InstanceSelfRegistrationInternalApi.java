@@ -54,6 +54,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @author Sergey Cherkasov
  * @author Vyacheslav Yanin
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @InternalApiRestController
 @ConditionalOnProperty(
@@ -164,6 +165,8 @@ public class InstanceSelfRegistrationInternalApi {
 
         Instance.InstanceStatus status =
                 Instance.InstanceStatus.fromHealthStatus(heartBeatMetadataV2.getHealthStatus());
+        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults =
+                scheduledTaskExecutionResultConverter.convert(instance.get(), heartBeatMetadataV2);
 
         transactionTemplate.executeWithoutResult(_ -> {
             instanceRegistry.refreshFromHeartbeat(
@@ -172,6 +175,7 @@ public class InstanceSelfRegistrationInternalApi {
                     new MemoryUsage(heartBeatMetadataV2.getMemoryDetails().getHeap()));
             databaseHistoricalApplicationSnapshotService.reloadTransactions(
                     instance.get().applicationId(), heartBeatMetadataV2.getTransactions());
+            scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
         });
 
         return ResponseEntity.noContent().build();

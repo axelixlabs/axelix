@@ -17,22 +17,41 @@
  */
 package com.axelixlabs.axelix.master.service.scheduled;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
+import com.axelixlabs.axelix.master.repository.ScheduledTaskExecutionResultRepository;
 
 /**
  * Default implementation for interface {@code ScheduledTaskExecutionHistoryService}
  *
  * @author Vyacheslav Yanin
+ * @author Nikita Kirillov
  */
 @Service
 public class DefaultScheduledTaskExecutionHistoryService implements ScheduledTaskExecutionHistoryService {
 
-    // TODO (GH-1617): the executions are not stored until master deduplicates them, since the starters report the
-    //  whole history every time
+    private final ScheduledTaskExecutionResultRepository executionResultRepository;
+
+    public DefaultScheduledTaskExecutionHistoryService(
+            ScheduledTaskExecutionResultRepository executionResultRepository) {
+        this.executionResultRepository = executionResultRepository;
+    }
+
     @Override
-    public void append(Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults) {}
+    public void append(Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults) {
+        if (scheduledTaskExecutionResults.isEmpty()) {
+            return;
+        }
+        List<String> ids = scheduledTaskExecutionResults.stream()
+                .map(ScheduledTaskExecutionResult::id)
+                .toList();
+        Set<String> alreadyStoredIds = executionResultRepository.findStoredIds(ids);
+        executionResultRepository.saveAll(scheduledTaskExecutionResults.stream()
+                .filter(execution -> !alreadyStoredIds.contains(execution.id()))
+                .toList());
+    }
 }

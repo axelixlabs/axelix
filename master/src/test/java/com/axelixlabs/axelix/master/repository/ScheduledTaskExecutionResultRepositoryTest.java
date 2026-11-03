@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
@@ -36,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Liquibase migration and the entity mapping on every supported {@code OssRdbms}.
  *
  * @author Vyacheslav Yanin
+ * @author Nikita Kirillov
  */
 @DatabaseMatrixTest
 class ScheduledTaskExecutionResultRepositoryTest {
@@ -62,6 +64,7 @@ class ScheduledTaskExecutionResultRepositoryTest {
                 startedAt,
                 1500L,
                 false,
+                ScheduledTaskLaunchType.SCHEDULED,
                 "NullPointerException",
                 "boom");
         // A second execution of the same instance and task within the same second must be
@@ -75,6 +78,7 @@ class ScheduledTaskExecutionResultRepositoryTest {
                 startedAt.plusMillis(1),
                 2000L,
                 true,
+                ScheduledTaskLaunchType.MANUAL,
                 null,
                 null);
 

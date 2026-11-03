@@ -26,6 +26,8 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
+
 /**
  * The append-only record of a single {@code @Scheduled} method invocation delivered by a managed instance.
  * Rows are never updated nor merged.
@@ -34,7 +36,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * ({@link Persistable#isNew()} is {@code true}): therefore {@code save()} always issues an INSERT
  * and never an UPDATE.
  *
- * @param id              the surrogate identifier of this execution result.
+ * @param id              the identifier of this execution result, derived from the instance, the task and the
+ *                        start of the execution, so that the same execution reported again has the same one.
  * @param groupId         the group id of the application (the G inside the GAV coordinate).
  * @param artifactId      the artifact id of the application (the A inside the GAV coordinate).
  * @param instanceId      the id of the instance that ran the task.
@@ -42,10 +45,12 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param startedAt       the timestamp when the task started its execution.
  * @param durationMillis  the duration of the task execution in milliseconds.
  * @param success         whether the task completed without throwing an exception.
+ * @param launchType      whether the execution was launched by the schedule or manually.
  * @param errorType       the simple class name of the exception thrown by the task, if any.
  * @param errorMessage    the message of the exception thrown by the task, if any.
  *
  * @author Vyacheslav Yanin
+ * @author Nikita Kirillov
  */
 @Table("scheduled_task_execution_results")
 public record ScheduledTaskExecutionResult(
@@ -57,6 +62,7 @@ public record ScheduledTaskExecutionResult(
         @Column("started_at") Instant startedAt,
         @Column("duration_millis") long durationMillis,
         boolean success,
+        @Column("launch_type") ScheduledTaskLaunchType launchType,
         @Column("error_type") @Nullable String errorType,
         @Column("error_message") @Nullable String errorMessage)
         implements Persistable<String> {

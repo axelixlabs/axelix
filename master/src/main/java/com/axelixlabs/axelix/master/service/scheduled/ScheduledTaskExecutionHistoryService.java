@@ -26,15 +26,16 @@ import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
  * managed instances.
  *
  * @author Vyacheslav Yanin
+ * @author Nikita Kirillov
  * @see ScheduledTaskExecutionResult
  * @see DefaultScheduledTaskExecutionHistoryService
  */
 public interface ScheduledTaskExecutionHistoryService {
 
     /**
-     * Appends the given execution results to the history.
+     * Appends the given execution results to the history, except the ones already appended.
      *
-     * @param scheduledTaskExecutionResults the execution results to persist.
+     * @param scheduledTaskExecutionResults the execution results of a single instance to persist.
      */
     void append(Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults);
 }
