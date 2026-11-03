@@ -83,7 +83,8 @@ class AssociationInspectorTest {
 
                 // then. tagSet is read by Order.toString() and has no other mapping problem.
                 assertThat(entity(profile, "Order").getFlaggedAssociations())
-                        .filteredOn(flagged -> flagged.getAssociation().getField().equals("tagSet"))
+                        .filteredOn(
+                                flagged -> flagged.getAssociation().getField().equals("tagSet"))
                         .singleElement()
                         .extracting(flagged -> Set.copyOf(flagged.getProblems()))
                         .isEqualTo(Set.of(AssociationProblem.TO_STRING));

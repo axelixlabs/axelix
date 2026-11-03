@@ -46,167 +46,165 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EntityMethodsInspectorTest {
 
     @Nested
-    class FieldAccess {
+    class DirectFieldAccess {
 
         @Test // GH-1633
         void shouldReportAssociationReadDirectlyByToString() {
-            assertThat(inspectFieldAssociation(DirectToString.class, "items")).containsExactly("items");
-        }
-
-        @Test // GH-1633
-        void shouldReportAssociationReadViaGetter() {
-            assertThat(inspectFieldAssociation(GetterToString.class, "items")).containsExactly("items");
+            assertThat(isFieldAccessedInToString(DirectToString.class, "items")).isTrue();
         }
 
         @Test // GH-1633
         void shouldNotReportAssociationNotUsedByToString() {
-            assertThat(inspectFieldAssociation(SafeEntity.class, "items")).isEmpty();
-        }
-
-        @Test // GH-1633
-        void shouldReportAssociationReadByPrivateHelper() {
-            assertThat(inspectFieldAssociation(PrivateHelperToString.class, "items"))
-                    .containsExactly("items");
+            assertThat(isFieldAccessedInToString(SafeEntity.class, "items")).isFalse();
         }
 
         @Test // GH-1633
         void shouldReportAssociationReadBySuperclassToString() {
-            assertThat(inspectFieldAssociation(ChildWithSuperToString.class, "items"))
-                    .containsExactly("items");
+            assertThat(isFieldAccessedInToString(ChildWithSuperToString.class, "items"))
+                    .isTrue();
         }
 
         @Test // GH-1633
-        void shouldReportInheritedAssociationReadByOverriddenHelper() {
-            assertThat(inspectFieldAssociation(ChildOverridingHelper.class, "items"))
-                    .containsExactly("items");
+        void shouldReportAssociationReadByLombokToString() {
+            assertThat(isFieldAccessedInToString(LombokToStringEntity.class, "items"))
+                    .isTrue();
         }
 
         @Test // GH-1633
-        void shouldResolveStaticHelperFromDeclaringClass() {
-            assertThat(inspectFieldAssociation(ChildHidingStaticHelper.class, "items"))
-                    .containsExactly("items");
+        void shouldNotReportAssociationExcludedFromLombokToString() {
+            assertThat(isFieldAccessedInToString(LombokExcludedEntity.class, "items"))
+                    .isFalse();
         }
 
         @Test // GH-1633
-        void shouldNotReplacePrivateSuperclassHelperWithChildMethod() {
-            assertThat(inspectFieldAssociation(ChildWithSamePrivateHelper.class, "items"))
-                    .containsExactly("items");
+        void shouldNotReportAssociationWithoutExplicitInclude() {
+            assertThat(isFieldAccessedInToString(LombokOnlyExplicitEntity.class, "items"))
+                    .isFalse();
         }
 
         @Test // GH-1633
-        void shouldNotTreatSameSignatureMethodInDifferentPackageAsOverride() {
-            assertThat(inspectFieldAssociation(ChildInDifferentPackageWithUnrelatedHelper.class, "customer"))
-                    .containsExactly("customer");
-        }
-    }
-
-    @Nested
-    class PropertyAccess {
-
-        @Test // GH-1633
-        void shouldReportAssociationReadViaPropertyGetter() {
-            assertThat(inspectPropertyAssociation(PropertyGetterToString.class, "customer", "getCustomer"))
-                    .containsExactly("customer");
+        void shouldReportAssociationReadByLombokData() {
+            assertThat(isFieldAccessedInToString(LombokDataEntity.class, "items"))
+                    .isTrue();
         }
 
         @Test // GH-1633
-        void shouldReportInheritedAssociationReadViaSuperGetter() {
-            assertThat(inspectPropertyAssociation(PropertyChildWithSuperGetter.class, "customer", "getCustomer"))
-                    .containsExactly("customer");
+        void shouldReportInheritedAssociationViaCallSuper() {
+            assertThat(isFieldAccessedInToString(LombokChildEntity.class, "items"))
+                    .isTrue();
         }
 
         @Test // GH-1633
         void shouldReportPropertyAssociationWhenToStringReadsBackingFieldDirectly() {
             assertThat(inspectPropertyAssociation(PropertyDirectBackingFieldToString.class, "customer", "getCustomer"))
-                    .containsExactly("customer");
+                    .isTrue();
         }
 
         @Test // GH-1633
         void shouldInferBackingFieldWhenGetterReadsAnotherNonAssociationField() {
             assertThat(inspectPropertyAssociation(PropertyGetterWithAdditionalField.class, "customer", "getCustomer"))
-                    .containsExactly("customer");
+                    .isTrue();
         }
 
         @Test // GH-1633
         void shouldNotGuessBackingFieldWhenGetterReadsSeveralAssociationTypedFields() {
             assertThat(inspectPropertyAssociation(PropertyAmbiguousGetter.class, "customer", "getCustomer"))
-                    .isEmpty();
+                    .isFalse();
         }
 
         @Test // GH-1633
         void shouldNotConfuseForeignKeyFieldWithBackingField() {
             assertThat(inspectPropertyAssociation(PropertyLookupByIdToString.class, "customer", "getCustomer"))
-                    .isEmpty();
+                    .isFalse();
         }
 
         @Test // GH-1633
         void shouldResolvePropertyAssociationThroughHelper() {
             assertThat(inspectPropertyAssociation(PropertyGetterDelegatingToHelper.class, "customer", "getCustomer"))
-                    .containsExactly("customer");
+                    .isTrue();
         }
 
         @Test // GH-1633
         void shouldNotGuessBackingFieldWhenHelpersReadSeveralCompatibleFields() {
             assertThat(inspectPropertyAssociation(PropertyGetterWithAmbiguousHelpers.class, "customer", "getCustomer"))
-                    .isEmpty();
+                    .isFalse();
         }
     }
 
     @Nested
-    class LombokGeneratedToString {
+    class MethodAccess {
 
         @Test // GH-1633
-        void shouldReportAssociationReadByLombokToString() {
-            assertThat(inspectFieldAssociation(LombokToStringEntity.class, "items"))
-                    .containsExactly("items");
+        void shouldReportAssociationReadViaGetter() {
+            assertThat(isFieldAccessedInToString(GetterToString.class, "items")).isTrue();
         }
 
         @Test // GH-1633
-        void shouldNotReportAssociationExcludedFromLombokToString() {
-            assertThat(inspectFieldAssociation(LombokExcludedEntity.class, "items"))
-                    .isEmpty();
+        void shouldReportAssociationReadByPrivateHelper() {
+            assertThat(isFieldAccessedInToString(PrivateHelperToString.class, "items"))
+                    .isTrue();
         }
 
         @Test // GH-1633
-        void shouldNotReportAssociationWithoutExplicitInclude() {
-            assertThat(inspectFieldAssociation(LombokOnlyExplicitEntity.class, "items"))
-                    .isEmpty();
+        void shouldReportInheritedAssociationReadByOverriddenHelper() {
+            assertThat(isFieldAccessedInToString(ChildOverridingHelper.class, "items"))
+                    .isTrue();
         }
 
         @Test // GH-1633
-        void shouldReportAssociationReadByLombokData() {
-            assertThat(inspectFieldAssociation(LombokDataEntity.class, "items")).containsExactly("items");
+        void shouldResolveStaticHelperFromDeclaringClass() {
+            assertThat(isFieldAccessedInToString(ChildHidingStaticHelper.class, "items"))
+                    .isTrue();
         }
 
         @Test // GH-1633
-        void shouldReportInheritedAssociationViaCallSuper() {
-            assertThat(inspectFieldAssociation(LombokChildEntity.class, "items"))
-                    .containsExactly("items");
+        void shouldNotReplacePrivateSuperclassHelperWithChildMethod() {
+            assertThat(isFieldAccessedInToString(ChildWithSamePrivateHelper.class, "items"))
+                    .isTrue();
+        }
+
+        @Test // GH-1633
+        void shouldNotTreatSameSignatureMethodInDifferentPackageAsOverride() {
+            assertThat(isFieldAccessedInToString(ChildInDifferentPackageWithUnrelatedHelper.class, "customer"))
+                    .isTrue();
+        }
+
+        @Test // GH-1633
+        void shouldReportAssociationReadViaPropertyGetter() {
+            assertThat(inspectPropertyAssociation(PropertyGetterToString.class, "customer", "getCustomer"))
+                    .isTrue();
+        }
+
+        @Test // GH-1633
+        void shouldReportInheritedAssociationReadViaSuperGetter() {
+            assertThat(inspectPropertyAssociation(PropertyChildWithSuperGetter.class, "customer", "getCustomer"))
+                    .isTrue();
         }
     }
 
-    private static Set<String> inspectFieldAssociation(Class<?> entityClass, String fieldName) {
+    private static boolean isFieldAccessedInToString(Class<?> entityClass, String fieldName) {
         Field field = findField(entityClass, fieldName);
 
         assertThat(field.isAnnotationPresent(OneToMany.class) || field.isAnnotationPresent(ManyToOne.class))
                 .as("%s must be a real JPA association", field)
                 .isTrue();
 
-        return inspect(entityClass, new AssociationMember(fieldName, field));
+        return findToStringAssociations(entityClass, new AssociationMember(fieldName, field))
+                .contains(fieldName);
     }
 
-    private static Set<String> inspectPropertyAssociation(
-            Class<?> entityClass, String associationName, String getterName) {
+    private static boolean inspectPropertyAssociation(Class<?> entityClass, String associationName, String getterName) {
         Method method = findMethod(entityClass, getterName);
 
         assertThat(method.isAnnotationPresent(ManyToOne.class) || method.isAnnotationPresent(OneToMany.class))
                 .as("%s must be a real JPA association", method)
                 .isTrue();
 
-        return inspect(entityClass, new AssociationMember(associationName, method));
+        return findToStringAssociations(entityClass, new AssociationMember(associationName, method))
+                .contains(associationName);
     }
 
-    private static Set<String> inspect(Class<?> entityClass, AssociationMember association) {
+    private static Set<String> findToStringAssociations(Class<?> entityClass, AssociationMember association) {
         return new EntityMethodsInspector(entityClass, Set.of(association)).detectAssociationsReadByToString();
     }
 
