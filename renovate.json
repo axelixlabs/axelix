@@ -1,0 +1,77 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Same update policy as the former Dependabot config: grouped pull requests, minors and patches only for npm and Gradle, majors still allowed for Docker and GitHub Actions. The Renovate workflow decides when a run happens. Submodules stay uninitialized because axelix-enterprise has no URL in .gitmodules.",
+  "cloneSubmodules": false,
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "3 days",
+  "prCreation": "not-pending",
+  "internalChecksFilter": "strict",
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "enabledManagers": ["npm", "gradle", "github-actions", "dockerfile", "docker-compose"],
+  "ignorePaths": [
+    "blog/**",
+    "playgrounds/**",
+    "axelix-enterprise/**",
+    "master-oss/Dockerfile"
+  ],
+  "packageRules": [
+    {
+      "description": "npm and Gradle ignore major updates",
+      "matchManagers": ["npm", "gradle"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Bump npm ranges the way Dependabot did",
+      "matchManagers": ["npm"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchFileNames": ["website/**"],
+      "groupName": "npm dependencies in /website",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchFileNames": ["master/front-end/**"],
+      "groupName": "npm dependencies in /master/front-end",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchFileNames": ["docs/**"],
+      "groupName": "npm dependencies in /docs",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["gradle"],
+      "groupName": "gradle dependencies",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions dependencies",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchFileNames": ["docker-compose.yml", "Dockerfile"],
+      "groupName": "docker dependencies in /",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchFileNames": ["website/**"],
+      "groupName": "docker dependencies in /website",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchFileNames": ["docs/**"],
+      "groupName": "docker dependencies in /docs",
+      "separateMajorMinor": false
+    }
+  ]
+}
