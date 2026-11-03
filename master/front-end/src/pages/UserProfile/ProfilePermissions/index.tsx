@@ -41,9 +41,11 @@ export const ProfilePermissions = ({ user }: IProps) => {
             {PERMISSION_GROUPS.map((group) => (
                 <div key={group.id} className={styles.GroupBlock}>
                     <div className={`TextCaps ${styles.Group}`}>{t(`Users.Profile.Groups.${group.id}`)}</div>
-                    {group.authorities.map((authority) => (
-                        <PermissionRow key={authority} authority={authority} source={granted.get(authority)} />
-                    ))}
+                    <div className={styles.Grid}>
+                        {group.authorities.map((authority) => (
+                            <PermissionRow key={authority} authority={authority} granted={granted.has(authority)} />
+                        ))}
+                    </div>
                 </div>
             ))}
         </ProfileCard>

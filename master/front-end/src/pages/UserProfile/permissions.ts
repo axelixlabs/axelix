@@ -49,14 +49,14 @@ export const PROFILE_ROLES = [ERoles.VIEWER, ERoles.EDITOR, ERoles.ADMIN];
 export const compareRoles = (left: ERoles, right: ERoles): number => ROLE_RANK[left] - ROLE_RANK[right];
 
 /**
- * Authorities granted by the given roles. When several roles grant the same authority, the most privileged one is
- * reported as the source.
+ * Authorities granted by the given roles. A permission can come from more than one role, so this does not attribute it
+ * to a single role.
  */
-export const effectiveAuthorities = (roles: readonly ERoles[]): Map<TProfileAuthority, ERoles> => {
-    const granted = new Map<TProfileAuthority, ERoles>();
+export const effectiveAuthorities = (roles: readonly ERoles[]): Set<TProfileAuthority> => {
+    const granted = new Set<TProfileAuthority>();
 
-    [...roles].sort(compareRoles).forEach((role) => {
-        GRANTS[role].forEach((authority) => granted.set(authority, role));
+    roles.forEach((role) => {
+        GRANTS[role].forEach((authority) => granted.add(authority));
     });
 
     return granted;

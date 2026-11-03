@@ -11,3 +11,15 @@
     padding: 12px 0 4px;
     border-top: 1px solid var(--axelix-grey-100);
 }
+
+.Grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--axelix-space-5);
+}
+
+@media (width <= 640px) {
+    .Grid {
+        grid-template-columns: 1fr;
+    }
+}
