@@ -17,7 +17,7 @@
  */
 import dayjs from "dayjs";
 
-import { EUserDisplayStatus, EUserStatus, type IUser, type IUsersFilters } from "@/models";
+import { ERoles, EUserDisplayStatus, EUserStatus, type IUser, type IUsersFilters } from "@/models";
 
 const DORMANT_AFTER_DAYS = 90;
 
@@ -76,6 +76,13 @@ const matchesFilters = (user: IUser, { statuses, roles, userOrigins }: IUsersFil
     }
 
     return userOrigins.length === 0 || userOrigins.includes(user.userOrigin);
+};
+
+/**
+ * A user who holds several roles is counted once for each of them.
+ */
+export const countUsersWithRole = (users: IUser[], role: ERoles): number => {
+    return users.filter((user) => user.roles.includes(role)).length;
 };
 
 export const filterUsers = (users: IUser[], search: string, filters: IUsersFilters): IUser[] => {

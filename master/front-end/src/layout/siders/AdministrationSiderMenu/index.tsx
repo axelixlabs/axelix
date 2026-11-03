@@ -19,10 +19,12 @@ import { Menu } from "antd";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 
+import { ShieldIcon, UsersIcon } from "@/assets";
 import { useAuthority } from "@/hooks";
 import { EAuthorities, type TMenuItem } from "@/models";
 
 const USERS_PATH = "/administration/users";
+const ROLES_PATH = "/administration/roles";
 
 export const AdministrationSiderMenu = () => {
     const { t } = useTranslation();
@@ -32,10 +34,18 @@ export const AdministrationSiderMenu = () => {
     const items: TMenuItem[] = [];
 
     if (hasUsersViewAccess) {
-        items.push({
-            key: USERS_PATH,
-            label: <Link to={USERS_PATH}>{t("Header.users")}</Link>,
-        });
+        items.push(
+            {
+                key: USERS_PATH,
+                icon: <UsersIcon width={16} height={16} />,
+                label: <Link to={USERS_PATH}>{t("Header.users")}</Link>,
+            },
+            {
+                key: ROLES_PATH,
+                icon: <ShieldIcon width={16} height={16} />,
+                label: <Link to={ROLES_PATH}>{t("Header.roles")}</Link>,
+            },
+        );
     }
 
     // The user profile page (/administration/users/:userId) still belongs to the "Users" entry

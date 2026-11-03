@@ -46,6 +46,7 @@ const Metrics = Loadable(lazy(() => import("@/pages/Metrics")));
 const Caches = Loadable(lazy(() => import("@/pages/Caches")));
 const Beans = Loadable(lazy(() => import("@/pages/Beans")));
 const Users = Loadable(lazy(() => import("@/pages/Users")));
+const Roles = Loadable(lazy(() => import("@/pages/Roles")));
 const MCP = Loadable(lazy(() => import("@/pages/MCP")));
 
 export const MainRoutes = () => {
@@ -79,6 +80,7 @@ export const MainRoutes = () => {
                     <Route index element={<Navigate to="users" replace />} />
                     <Route path="users" element={<Users />} />
                     <Route path="users/:userId" element={<UserProfile />} />
+                    <Route path="roles" element={<Roles />} />
                 </Route>
 
                 <Route element={<MainLayout siderContent={<InstanceSiderMenu />} />}>
