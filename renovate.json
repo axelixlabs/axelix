@@ -4,6 +4,9 @@
   "cloneSubmodules": false,
   "labels": ["dependencies"],
   "minimumReleaseAge": "3 days",
+  "constraints": {
+    "npm": ">=11.18.0 <12"
+  },
   "prCreation": "not-pending",
   "internalChecksFilter": "strict",
   "prHourlyLimit": 0,
@@ -24,6 +27,13 @@
       "description": "Bump npm ranges the way Dependabot did",
       "matchManagers": ["npm"],
       "rangeStrategy": "bump"
+    },
+    {
+      "description": "Hold @rolldown/plugin-babel below 0.3 until @vitejs/plugin-react 6.2.0 is past minimumReleaseAge (published 2026-11-02, eligible 2026-11-05). plugin-react 6.1.2 only accepts plugin-babel ^0.1.7 || ^0.2.0, so 0.3.0 cannot be locked yet. Remove this rule after 2026-11-05.",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["master/front-end/**"],
+      "matchPackageNames": ["@rolldown/plugin-babel"],
+      "allowedVersions": "<0.3.0"
     },
     {
       "matchManagers": ["npm"],
