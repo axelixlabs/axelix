@@ -87,7 +87,7 @@ class AssociationInspectorTest {
                                 flagged -> flagged.getAssociation().getField().equals("tagSet"))
                         .singleElement()
                         .extracting(flagged -> Set.copyOf(flagged.getProblems()))
-                        .isEqualTo(Set.of(AssociationProblem.TO_STRING));
+                        .isEqualTo(Set.of(AssociationProblem.ACCESSED_IN_TO_STRING));
             });
         }
     }
@@ -153,7 +153,11 @@ class AssociationInspectorTest {
                             flagged -> flagged.getAssociation().getField(),
                             flagged -> Set.copyOf(flagged.getProblems()))
                     .containsExactlyInAnyOrder(
-                            tuple("customer", Set.of(AssociationProblem.EAGER_FETCHING, AssociationProblem.TO_STRING)),
+                            tuple(
+                                    "customer",
+                                    Set.of(
+                                            AssociationProblem.EAGER_FETCHING,
+                                            AssociationProblem.ACCESSED_IN_TO_STRING)),
                             tuple("coCustomer", Set.of(AssociationProblem.EAGER_FETCHING)),
                             tuple(
                                     "items",
@@ -162,14 +166,14 @@ class AssociationInspectorTest {
                                             AssociationProblem.EAGER_FETCHING)),
                             tuple("tags", Set.of(AssociationProblem.LIST_BACKED_MANY_TO_MANY)),
                             tuple("shipments", Set.of(AssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY)),
-                            tuple("tagSet", Set.of(AssociationProblem.TO_STRING)));
+                            tuple("tagSet", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
 
             // the association read by a Lombok-generated toString() is flagged too, through the same path.
             assertThat(entity(profile, "LombokOrder").getFlaggedAssociations())
                     .extracting(
                             flagged -> flagged.getAssociation().getField(),
                             flagged -> Set.copyOf(flagged.getProblems()))
-                    .containsExactly(tuple("customer", Set.of(AssociationProblem.TO_STRING)));
+                    .containsExactly(tuple("customer", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
 
             // every other entity is clean.
             assertThat(entity(profile, "Customer").getFlaggedAssociations()).isEmpty();

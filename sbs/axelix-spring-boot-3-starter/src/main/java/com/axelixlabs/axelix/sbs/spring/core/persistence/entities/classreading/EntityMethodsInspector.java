@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
@@ -69,10 +70,12 @@ public class EntityMethodsInspector {
     private final Map<String, Class<?>> hierarchyByInternalName = new HashMap<>();
     private final Map<MethodRef, MethodInfo> methods = new HashMap<>();
 
-    private boolean initialized;
+    private final AtomicBoolean initialized = new AtomicBoolean();
 
     public EntityMethodsInspector(Class<?> entityClass, Set<AssociationMember> associations) {
-        this.entityClass = Objects.requireNonNull(entityClass, "entityClass");
+        this.entityClass = Objects.requireNonNull(
+                entityClass,
+                "entityClass is required to locate the entity bytecode; a null entity type is not expected");
         this.entityInternalName = Type.getInternalName(entityClass);
         this.associations = Set.copyOf(associations);
     }
@@ -94,11 +97,10 @@ public class EntityMethodsInspector {
     }
 
     private void initialize() {
-        if (initialized) {
+        if (!initialized.compareAndSet(false, true)) {
             return;
         }
 
-        initialized = true;
         collectHierarchy();
 
         for (String internalName : hierarchyInternalNames) {

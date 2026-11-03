@@ -63,7 +63,7 @@ class EntityInspector {
             Set<AssociationProblem> problems = inspector.detectProblems();
 
             if (associationsReadByToString.contains(attribute.getName())) {
-                problems.add(AssociationProblem.TO_STRING);
+                problems.add(AssociationProblem.ACCESSED_IN_TO_STRING);
             }
 
             if (!problems.isEmpty()) {
