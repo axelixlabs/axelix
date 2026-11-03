@@ -74,10 +74,20 @@ class AssociationInspectorTest {
 
         @Test
         void shouldDetectAssociationReadByToString() {
-            // given / when / then.
-            jpaContextRunner.run(context -> assertThat(
-                            inspect(context, Order.class, "tagSet", true).detectProblems())
-                    .containsExactly(AssociationProblem.TO_STRING));
+            jpaContextRunner.run(context -> {
+                // given.
+                EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
+
+                // when.
+                JpaEntities profile = new EntityMappingScanner(entityManagerFactory).scan();
+
+                // then. tagSet is read by Order.toString() and has no other mapping problem.
+                assertThat(entity(profile, "Order").getFlaggedAssociations())
+                        .filteredOn(flagged -> flagged.getAssociation().getField().equals("tagSet"))
+                        .singleElement()
+                        .extracting(flagged -> Set.copyOf(flagged.getProblems()))
+                        .isEqualTo(Set.of(AssociationProblem.TO_STRING));
+            });
         }
     }
 
@@ -177,15 +187,10 @@ class AssociationInspectorTest {
     }
 
     private static AssociationInspector inspect(ApplicationContext context, Class<?> entityType, String attribute) {
-        return inspect(context, entityType, attribute, false);
-    }
-
-    private static AssociationInspector inspect(
-            ApplicationContext context, Class<?> entityType, String attribute, boolean readByToString) {
         EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
         Attribute<?, ?> jpaAttribute =
                 entityManagerFactory.getMetamodel().entity(entityType).getAttribute(attribute);
-        return new AssociationInspector(jpaAttribute, (AnnotatedElement) jpaAttribute.getJavaMember(), readByToString);
+        return new AssociationInspector(jpaAttribute, (AnnotatedElement) jpaAttribute.getJavaMember());
     }
 
     @Configuration(proxyBeanMethods = false)

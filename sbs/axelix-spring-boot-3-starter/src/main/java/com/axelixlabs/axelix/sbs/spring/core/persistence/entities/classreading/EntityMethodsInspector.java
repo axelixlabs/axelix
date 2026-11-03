@@ -114,8 +114,11 @@ public class EntityMethodsInspector {
         }
     }
 
+    // Traverse the fields/acessors via BFS algorithm
     private Set<String> detectAssociations(MethodInfo toString) {
         Set<String> result = new HashSet<>();
+
+        // visited wavefront
         Set<MethodRef> visited = new HashSet<>();
         Deque<MethodInfo> queue = new ArrayDeque<>();
         queue.add(toString);
