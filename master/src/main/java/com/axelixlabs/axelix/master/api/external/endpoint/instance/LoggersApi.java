@@ -1,0 +1,155 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.master.api.external.endpoint.instance;
+
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
+import com.axelixlabs.axelix.common.domain.http.HttpPayload;
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.api.error.SimpleApiError;
+import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
+import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelGroupBulkChangeRequest;
+import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
+import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkResetRequest;
+import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
+import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
+import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.service.BulkInstancesValidator;
+import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
+import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
+
+/**
+ * The API for managing loggers.
+ *
+ * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
+ */
+@ExternalApiRestController
+public class LoggersApi {
+
+    private final EndpointInvoker endpointInvoker;
+    private final BulkInstancesValidator bulkInstancesValidator;
+    private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
+
+    public LoggersApi(
+            EndpointInvoker endpointInvoker,
+            BulkInstancesValidator bulkInstancesValidator,
+            JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
+        this.endpointInvoker = endpointInvoker;
+        this.bulkInstancesValidator = bulkInstancesValidator;
+        this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
+    }
+
+    @GetMapping(path = ApiPaths.LoggersApi.INSTANCE_ID)
+    public ResponseEntity<byte[]> getAllLoggers(@PathVariable("instanceId") String instanceId) {
+        byte[] body = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_LOGGERS, NoHttpPayload.INSTANCE);
+
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
+    }
+
+    @GetMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
+    public ResponseEntity<byte[]> getGroupByName(
+            @PathVariable("instanceId") String instanceId, @PathVariable("groupName") String groupName) {
+        HttpPayload payload = new DefaultHttpPayload(Map.of("name", groupName));
+        byte[] body = endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOGGER_GROUP, payload);
+
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
+    }
+
+    @GetMapping(path = ApiPaths.LoggersApi.LOGGER_NAME)
+    public ResponseEntity<byte[]> getLoggerByName(
+            @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
+        HttpPayload payload = new DefaultHttpPayload(Map.of("name", loggerName));
+        byte[] body = endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_ONE_LOGGER, payload);
+
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
+    }
+
+    @PostMapping(path = ApiPaths.LoggersApi.LOGGER_BULK_CHANGE)
+    public ResponseEntity<?> setLoggingLevelByLoggerName(@RequestBody LogLevelLoggerBulkChangeRequest request) {
+
+        HttpPayload payload = HttpPayload.json(
+                Map.of("name", request.loggerName()),
+                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest()
+                        .configuredLevel(request.configuredLevel())
+                        .ttlSeconds(request.ttlSeconds())));
+
+        try {
+            bulkInstancesValidator.validate(request.instanceIds());
+            endpointInvoker.invokeNoValueForInstances(request.instanceIds(), ActuatorEndpoints.SET_ONE_LOGGER, payload);
+            return ResponseEntity.noContent().build();
+        } catch (PartiallyUpdatedException e) {
+            return ResponseEntity.badRequest()
+                    .body(new SimpleApiError(
+                            ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
+        }
+    }
+
+    @PostMapping(path = ApiPaths.LoggersApi.LOGGER_GROUP_BULK_CHANGE)
+    public ResponseEntity<?> setLoggingLevelByGroupName(@RequestBody LogLevelGroupBulkChangeRequest request) {
+
+        HttpPayload payload = HttpPayload.json(
+                Map.of("name", request.groupName()),
+                jacksonMessageSerializationStrategy.serialize(
+                        new GroupLogLevelChangeRequest().configuredLevel(request.configuredLevel())));
+
+        try {
+            bulkInstancesValidator.validate(request.instanceIds());
+            endpointInvoker.invokeNoValueForInstances(
+                    request.instanceIds(), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
+            return ResponseEntity.noContent().build();
+        } catch (PartiallyUpdatedException e) {
+            return ResponseEntity.badRequest()
+                    .body(new SimpleApiError(
+                            ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
+        }
+    }
+
+    @PostMapping(path = ApiPaths.LoggersApi.LOGGER_BULK_RESET)
+    public ResponseEntity<?> resetLoggingLevelByLoggerName(@RequestBody LogLevelLoggerBulkResetRequest request) {
+        HttpPayload payload = new DefaultHttpPayload(Map.of("name", request.loggerName()));
+
+        try {
+            bulkInstancesValidator.validate(request.instanceIds());
+            endpointInvoker.invokeNoValueForInstances(
+                    request.instanceIds(), ActuatorEndpoints.RESET_FOR_LOGGER, payload);
+            return ResponseEntity.noContent().build();
+        } catch (PartiallyUpdatedException e) {
+            // TODO: A partial update is generally not the client's fault, so 400 Bad Request is not
+            //  really the right status here. We keep it for now since it is a minor issue that should
+            //  rarely happen in practice, but this should be revisited in the future.
+            return ResponseEntity.badRequest()
+                    .body(new SimpleApiError(
+                            ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
+        }
+    }
+}

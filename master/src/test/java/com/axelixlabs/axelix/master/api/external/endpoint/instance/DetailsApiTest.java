@@ -1,0 +1,352 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.master.api.external.endpoint.instance;
+
+import java.io.IOException;
+import java.util.Set;
+import java.util.UUID;
+
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.GarbageCollector;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
+import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
+import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
+
+import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Integration tests for {@link DetailsApi}.
+ *
+ * @author Sergey Cherkasov
+ */
+public class DetailsApiTest extends AbstractProtectedEndpointTest {
+
+    private static final String EXPECTED_DETAILS_JSON =
+            // language=json
+            """
+         {
+           "serviceName": "test-object-factory-instance",
+           "git": {
+             "commitShaShort": "7a663cb",
+             "branch": "local/local-test",
+             "authorName": "NikitaKirilloff",
+             "authorEmail": "NikitaKirilloff@github.com",
+             "commitTimestamp": "2025-11-23T02:25:22Z"
+           },
+           "runtime": {
+             "javaVersion": "17.0.16",
+             "kotlinVersion": "1.9.0",
+             "jdkVendor": "Corretto-17.0.16.8.1",
+             "garbageCollector": "G1"
+           },
+           "spring": {
+             "springBootVersion": "3.5.0",
+             "springFrameworkVersion": "7.0",
+             "springCloudVersion": "4.1.4"
+           },
+           "build": {
+             "artifact": "spring-petclinic",
+             "version": "3.5.0-SNAPSHOT",
+             "group": "org.springframework.samples",
+             "time": "2025-10-29T15:10:54.770Z"
+           },
+           "os": {
+             "name": "Windows 10",
+             "version": "10.0",
+             "arch": "amd64",
+             "pid": 4821,
+             "processUser": "spring"
+           }
+         }
+        """;
+
+    private static final String EXPECTED_DETAILS_JSON_WITHOUT_PLUGIN =
+            // language=json
+            """
+     {
+       "serviceName": "test-object-factory-instance",
+       "git": {
+             "commitShaShort": "",
+             "branch": "",
+             "authorName": "",
+             "authorEmail": "",
+             "commitTimestamp": ""
+       },
+       "runtime": {
+         "javaVersion": "17.0.16",
+         "kotlinVersion": "1.9.0",
+         "jdkVendor": "Corretto-17.0.16.8.1",
+         "garbageCollector": "ZGC"
+       },
+       "spring": {
+         "springBootVersion": "3.5.0",
+         "springFrameworkVersion": "7.0",
+         "springCloudVersion": "4.1.4"
+       },
+       "build": {
+             "artifact": "",
+             "version": "",
+             "group": "",
+             "time": ""
+       },
+       "os": {
+         "name": "Windows 10",
+         "version": "10.0",
+         "arch": "amd64"
+       }
+     }
+    """;
+
+    private static final String activeInstanceId = UUID.randomUUID().toString();
+    private static final String instanceWithoutPluginId = UUID.randomUUID().toString();
+
+    private static MockWebServer mockWebServer;
+
+    @Autowired
+    private TestRestTemplateBuilder restTemplate;
+
+    @Autowired
+    private InstanceRegistry registry;
+
+    @Autowired
+    private DatabaseHistoricalApplicationSnapshotService historicalApplicationSnapshotService;
+
+    @Autowired
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
+
+    @BeforeAll
+    static void startServer() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
+    }
+
+    @AfterAll
+    static void shutdownServer() throws IOException {
+        mockWebServer.shutdown();
+    }
+
+    @BeforeEach
+    void prepare() {
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
+
+        // language=json
+        String jsonResponse = """
+        {
+             "git": {
+                 "commitShaShort": "7a663cb",
+                 "branch": "local/local-test",
+                 "commitAuthor": {
+                     "name": "NikitaKirilloff",
+                     "email": "NikitaKirilloff@github.com"
+                 },
+                 "commitTimestamp": "2025-11-23T02:25:22Z"
+             },
+             "spring": {
+                 "springBootVersion": "3.5.0",
+                 "springFrameworkVersion": "7.0",
+                 "springCloudVersion": "4.1.4"
+             },
+             "runtime": {
+                 "javaVersion": "17.0.16",
+                 "jdkVendor": "Corretto-17.0.16.8.1",
+                 "kotlinVersion": "1.9.0"
+             },
+             "build": {
+                 "artifact": "spring-petclinic",
+                 "version": "3.5.0-SNAPSHOT",
+                 "group": "org.springframework.samples",
+                 "time": "2025-10-29T15:10:54.770Z"
+             },
+             "os": {
+                 "name": "Windows 10",
+                 "version": "10.0",
+                 "arch": "amd64",
+                 "pid": 4821,
+                 "processUser": "spring"
+             }
+         }
+        """;
+
+        // language=json
+        String jsonResponseWithoutPlugin = """
+            {
+              "git": {
+                 "commitShaShort": "",
+                 "branch": "",
+                 "commitAuthor": {
+                     "name": "",
+                     "email": ""
+                 },
+                 "commitTimestamp": ""
+             },
+              "spring": {
+                "springBootVersion": "3.5.0",
+                "springFrameworkVersion": "7.0",
+                "springCloudVersion": "4.1.4"
+              },
+              "runtime": {
+                "javaVersion": "17.0.16",
+                "jdkVendor": "Corretto-17.0.16.8.1",
+                "kotlinVersion": "1.9.0"
+              },
+              "build": {
+                 "artifact": "",
+                 "version": "",
+                 "group": "",
+                 "time": ""
+             },
+              "os": {
+                "name": "Windows 10",
+                "version": "10.0",
+                "arch": "amd64"
+              }
+            }
+            """;
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert path != null;
+
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-details")) {
+                    return new MockResponse()
+                            .setBody(jsonResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + instanceWithoutPluginId + "/actuator/axelix-details")) {
+                    return new MockResponse()
+                            .setBody(jsonResponseWithoutPlugin)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else {
+                    return new MockResponse().setResponseCode(404);
+                }
+            }
+        });
+
+        registry.register(
+                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+
+        registry.register(TestInstanceFactory.create(
+                instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
+
+        historicalApplicationSnapshotService.reloadCurrentState(
+                metadata("org.springframework.samples", "spring-petclinic", GarbageCollector.G1));
+        historicalApplicationSnapshotService.reloadCurrentState(metadata("", "", GarbageCollector.ZGC));
+    }
+
+    @AfterEach
+    void cleanup() {
+        registry.deRegister(InstanceId.of(activeInstanceId));
+        registry.deRegister(InstanceId.of(instanceWithoutPluginId));
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
+    }
+
+    @Test
+    void shouldReturnJSONDetailsResponse() {
+        // when.
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response =
+                viewer.getForEntity("/api/external/details/{instanceId}", String.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_DETAILS_JSON);
+        assertSuccessfulCallback(MasterWebEndpoints.DETAILS_READ, viewer.getActor());
+    }
+
+    @Test
+    void shouldReturnJSONDetailsResponseWithoutPlugin() {
+        // when.
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response =
+                viewer.getForEntity("/api/external/details/{instanceId}", String.class, instanceWithoutPluginId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_DETAILS_JSON_WITHOUT_PLUGIN);
+        assertSuccessfulCallback(MasterWebEndpoints.DETAILS_READ, viewer.getActor());
+    }
+
+    @Test
+    @DisplayName("Should return 500 on EndpointInvocationError")
+    void shouldReturnInternalServerError() {
+        String instanceId = UUID.randomUUID().toString();
+
+        // when.
+        registry.register(TestInstanceFactory.create(instanceId));
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void shouldReturnBadRequestForUnregisteredInstance() {
+        String instanceId = UUID.randomUUID().toString();
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
+        return Set.of(new TestableMasterWebEndpoint(
+                MasterWebEndpoints.DETAILS_READ, "/api/external/details/00000000-0000-0000-0000-000000000001"));
+    }
+
+    private static BasicRegistrationMetadata metadata(
+            String groupId, String artifactId, GarbageCollector garbageCollector) {
+        return TestMetadataFactory.withFeatures(
+                groupId, artifactId, false, false, false, false, false, garbageCollector);
+    }
+}

@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.api.external.request.state;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.api.external.endpoint.StateExportApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.instance.StateExportApi;
 
 /**
  * The possible exportable state component.
