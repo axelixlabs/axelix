@@ -82,7 +82,7 @@ class RolesApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnTheFeedOfTheBuiltInRoles() {
         // given.
         userService.createLocal(
-                "alice", null, null, "alice@example.com", null, null, "aliceSecret", TestRoles.EDITOR.getName());
+                "alice", null, null, "alice@example.com", "aliceSecret", Set.of(TestRoles.EDITOR.getName()));
 
         // language=json
         String expectedFeed = """

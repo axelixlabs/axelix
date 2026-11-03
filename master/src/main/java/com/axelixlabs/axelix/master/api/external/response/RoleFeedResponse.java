@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.response;
 
-import com.axelixlabs.axelix.master.domain.RoleFeed;
+import com.axelixlabs.axelix.master.repository.RoleRepository;
 
 /**
  * Public view of a single role.
@@ -31,7 +31,7 @@ import com.axelixlabs.axelix.master.domain.RoleFeed;
  */
 public record RoleFeedResponse(String id, String name, int membersCount, String description) {
 
-    public static RoleFeedResponse from(RoleFeed role) {
+    public static RoleFeedResponse from(RoleRepository.RoleFeed role) {
         return new RoleFeedResponse(role.id(), role.name(), role.membersCount(), role.description());
     }
 }

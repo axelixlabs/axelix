@@ -48,8 +48,17 @@ public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
     @Query("SELECT role_id FROM users_roles WHERE user_id = :userId")
     List<String> findRoleIdsOfUser(@Param("userId") String userId);
 
-    @Query("SELECT role_id AS role_id, COUNT(*) AS members FROM users_roles GROUP BY role_id")
-    List<RoleMembers> findAllMembersCounts();
+    /**
+     * Returns every role together with how many users it is assigned to. A role that nobody holds is returned
+     * with a members count of zero.
+     */
+    @Query("""
+            SELECT r.id AS id, r.name AS name, COUNT(ur.user_id) AS members_count, r.description AS description
+            FROM roles r
+            LEFT JOIN users_roles ur ON ur.role_id = r.id
+            GROUP BY r.id, r.name, r.description
+            """)
+    List<RoleFeed> findRolesFeed();
 
     record RoleWithAuthorityName(
             String roleId, String roleName, @Nullable String authorityName) {}
@@ -57,10 +66,12 @@ public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
     record RoleParentBond(String roleId, String parentRoleId) {}
 
     /**
-     * Number of users a role is assigned to.
+     * One role as returned for the roles feed.
      *
-     * @param roleId  Identifier of the role.
-     * @param members Number of users the role is assigned to.
+     * @param id           Unique identifier of the role.
+     * @param name         Unique name of the role.
+     * @param membersCount Number of users the role is assigned to.
+     * @param description  Human-readable description of what the role allows.
      */
-    record RoleMembers(String roleId, int members) {}
+    record RoleFeed(String id, String name, int membersCount, String description) {}
 }

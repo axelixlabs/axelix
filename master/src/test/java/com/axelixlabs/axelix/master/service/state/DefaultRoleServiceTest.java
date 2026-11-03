@@ -36,10 +36,10 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
-import com.axelixlabs.axelix.master.domain.RoleFeed;
 import com.axelixlabs.axelix.master.domain.iam.RoleEntity;
 import com.axelixlabs.axelix.master.domain.iam.RoleOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.repository.RoleRepository.RoleFeed;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.auth.DefaultRoleService;
@@ -307,11 +307,9 @@ class DefaultRoleServiceTest {
         @Test
         void shouldCountTheUsersEachRoleIsAssignedTo() {
             // given.
-            userService.createLocal(
-                    "alice", null, null, "alice@example.com", null, null, "p", TestRoles.EDITOR.getName());
-            userService.createLocal("bob", null, null, "bob@example.com", null, null, "p", TestRoles.EDITOR.getName());
-            userService.createLocal(
-                    "carol", null, null, "carol@example.com", null, null, "p", TestRoles.VIEWER.getName());
+            userService.createLocal("alice", null, null, "alice@example.com", "p", Set.of(TestRoles.EDITOR.getName()));
+            userService.createLocal("bob", null, null, "bob@example.com", "p", Set.of(TestRoles.EDITOR.getName()));
+            userService.createLocal("carol", null, null, "carol@example.com", "p", Set.of(TestRoles.VIEWER.getName()));
 
             // when.
             List<RoleFeed> feed = roleService.getRolesFeed();

@@ -38,9 +38,7 @@ import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
-import com.axelixlabs.axelix.master.domain.RoleFeed;
 import com.axelixlabs.axelix.master.repository.RoleRepository;
-import com.axelixlabs.axelix.master.repository.RoleRepository.RoleMembers;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleParentBond;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityName;
 
@@ -80,14 +78,8 @@ public class DefaultRoleService implements RoleService {
     }
 
     @Override
-    public List<RoleFeed> getRolesFeed() {
-        Map<String, Integer> membersByRoleId = roleRepository.findAllMembersCounts().stream()
-                .collect(Collectors.toMap(RoleMembers::roleId, RoleMembers::members));
-
-        return roleRepository.findAll().stream()
-                .map(role -> new RoleFeed(
-                        role.id(), role.name(), membersByRoleId.getOrDefault(role.id(), 0), role.description()))
-                .toList();
+    public List<RoleRepository.RoleFeed> getRolesFeed() {
+        return roleRepository.findRolesFeed();
     }
 
     private RoleGraph getGraph() {

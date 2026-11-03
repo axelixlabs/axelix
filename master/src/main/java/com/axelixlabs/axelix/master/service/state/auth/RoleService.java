@@ -24,7 +24,7 @@ import java.util.Set;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.master.domain.RoleFeed;
+import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 
 /**
@@ -70,5 +70,5 @@ public interface RoleService {
      *
      * @return An entry per role, in no particular order.
      */
-    List<RoleFeed> getRolesFeed();
+    List<RoleRepository.RoleFeed> getRolesFeed();
 }
