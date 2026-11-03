@@ -61,28 +61,3 @@ export const effectiveAuthorities = (roles: readonly ERoles[]): Map<TProfileAuth
 
     return granted;
 };
-
-export interface IAuthorityDelta {
-    gained: TProfileAuthority[];
-    lost: TProfileAuthority[];
-
-    /**
-     * Role that still grants the runtime operations after the change, when some other authority was lost.
-     */
-    retainedThrough: ERoles | null;
-}
-
-export const authorityDelta = (current: readonly ERoles[], next: readonly ERoles[]): IAuthorityDelta => {
-    const before = effectiveAuthorities(current);
-    const after = effectiveAuthorities(next);
-
-    const gained = PROFILE_AUTHORITIES.filter((authority) => !before.has(authority) && after.has(authority));
-    const lost = PROFILE_AUTHORITIES.filter((authority) => before.has(authority) && !after.has(authority));
-    const runtimeRemains = RUNTIME_AUTHORITIES.some((authority) => after.has(authority));
-
-    return {
-        gained,
-        lost,
-        retainedThrough: lost.length > 0 && runtimeRemains ? (after.get("SCHEDULED_TASKS_MODIFY") ?? null) : null,
-    };
-};

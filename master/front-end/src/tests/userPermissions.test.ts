@@ -18,7 +18,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ERoles } from "@/models";
-import { authorityDelta, effectiveAuthorities } from "@/pages/UserProfile/permissions";
+import { effectiveAuthorities } from "@/pages/UserProfile/permissions";
 
 describe("effectiveAuthorities", () => {
     it("grants an editor the runtime operations and nothing sensitive", () => {
@@ -37,23 +37,5 @@ describe("effectiveAuthorities", () => {
 
     it("grants nothing to a viewer", () => {
         expect(effectiveAuthorities([ERoles.VIEWER]).size).toBe(0);
-    });
-});
-
-describe("authorityDelta", () => {
-    it("reports the sensitive values gained by adding ADMIN", () => {
-        const delta = authorityDelta([ERoles.EDITOR], [ERoles.EDITOR, ERoles.ADMIN]);
-
-        expect(delta.gained).toEqual(["ENV_VALUES_READ", "CONFIG_PROPS_VALUES_READ"]);
-        expect(delta.lost).toEqual([]);
-        expect(delta.retainedThrough).toBeNull();
-    });
-
-    it("keeps the editor operations when ADMIN is revoked", () => {
-        const delta = authorityDelta([ERoles.EDITOR, ERoles.ADMIN], [ERoles.EDITOR]);
-
-        expect(delta.lost).toEqual(["ENV_VALUES_READ", "CONFIG_PROPS_VALUES_READ"]);
-        expect(delta.gained).toEqual([]);
-        expect(delta.retainedThrough).toBe(ERoles.EDITOR);
     });
 });
