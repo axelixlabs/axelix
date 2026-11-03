@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { App, Button, Modal } from "antd";
-import type { TFunction } from "i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -25,10 +24,9 @@ import { extractErrorCode, showErrorNotification } from "@/helpers";
 import { type ERoles, type IUser, StatelessRequest } from "@/models";
 import { editUser } from "@/services";
 
-import { PROFILE_ROLES, authorityDelta } from "../permissions";
+import { PROFILE_ROLES } from "../permissions";
 import { userUpdateFrom } from "../userUpdate";
 
-import { AuthorityDelta } from "./AuthorityDelta";
 import { RoleOption } from "./RoleOption";
 import styles from "./styles.module.css";
 
@@ -64,18 +62,6 @@ interface IProps {
     onSaved: () => void;
 }
 
-const confirmLabel = (added: ERoles[], removed: ERoles[], t: TFunction): string => {
-    if (added.length === 1 && removed.length === 0) {
-        return t("Users.Profile.addRole", { role: added[0] });
-    }
-
-    if (added.length === 0 && removed.length === 1) {
-        return t("Users.Profile.revokeRole", { role: removed[0] });
-    }
-
-    return t("confirm");
-};
-
 export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSaved }: IProps) => {
     const { t } = useTranslation();
     const { message } = App.useApp();
@@ -91,7 +77,6 @@ export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSav
     const added = PROFILE_ROLES.filter((role) => selected.includes(role) && !user.roles.includes(role));
     const removed = PROFILE_ROLES.filter((role) => !selected.includes(role) && user.roles.includes(role));
     const unchanged = added.length === 0 && removed.length === 0;
-    const isRevoke = added.length === 0 && removed.length === 1;
 
     const toggle = (role: ERoles): void => {
         setSelected((current) =>
@@ -143,12 +128,11 @@ export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSav
                         <Button onClick={onClose}>{t("cancel")}</Button>
                         <Button
                             type="primary"
-                            danger={isRevoke}
                             disabled={unchanged || selected.length === 0}
                             loading={requestData.loading}
                             onClick={save}
                         >
-                            {confirmLabel(added, removed, t)}
+                            {t("confirm")}
                         </Button>
                     </span>
                 </div>
@@ -167,8 +151,6 @@ export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSav
             </div>
 
             {selected.length === 0 && <p className={styles.RolesRequired}>{t("Users.ValidationErrors.roles")}</p>}
-
-            <AuthorityDelta givenName={givenName} delta={authorityDelta(user.roles, selected)} />
         </Modal>
     );
 };
