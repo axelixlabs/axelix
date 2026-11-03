@@ -1,0 +1,48 @@
+.Permission {
+    display: grid;
+    grid-template-columns: 18px 1fr auto;
+    gap: var(--axelix-space-3);
+    align-items: center;
+    padding: 7px 0;
+    font-size: var(--axelix-font-size-body);
+}
+
+.Off {
+    color: var(--axelix-grey-500);
+}
+
+.Code {
+    margin-left: var(--axelix-space-2);
+    color: var(--axelix-grey-500);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Off .Code {
+    color: var(--axelix-grey-400);
+}
+
+.Source {
+    color: var(--axelix-grey-500);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.03em;
+}
+
+.Granted {
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+}
+
+.Denied {
+    width: 16px;
+    height: 16px;
+    border: 1.5px dashed var(--axelix-grey-300);
+    border-radius: 50%;
+}

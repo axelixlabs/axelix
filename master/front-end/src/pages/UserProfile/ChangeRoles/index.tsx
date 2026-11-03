@@ -15,28 +15,66 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App, Button, Checkbox, Modal } from "antd";
+import { App, Button, Modal } from "antd";
+import type { TFunction } from "i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { InfoIcon } from "@/assets";
 import { extractErrorCode, showErrorNotification } from "@/helpers";
-import { ERoles, type IUser, StatelessRequest } from "@/models";
+import { type ERoles, type IUser, StatelessRequest } from "@/models";
 import { editUser } from "@/services";
 
 import { PROFILE_ROLES, authorityDelta } from "../permissions";
 import { userUpdateFrom } from "../userUpdate";
 
+import { AuthorityDelta } from "./AuthorityDelta";
+import { RoleOption } from "./RoleOption";
 import styles from "./styles.module.css";
 
 interface IProps {
+    /**
+     * User whose roles are being edited
+     */
     user: IUser;
+
+    /**
+     * Name used in the dialog title
+     */
     displayName: string;
+
+    /**
+     * Given name used in the dialog copy
+     */
     givenName: string;
+
+    /**
+     * Whether the dialog is open
+     */
     open: boolean;
+
+    /**
+     * Closes the dialog without saving
+     */
     onClose: () => void;
+
+    /**
+     * Reloads the profile after the roles are saved
+     */
     onSaved: () => void;
 }
+
+const confirmLabel = (added: ERoles[], removed: ERoles[], t: TFunction): string => {
+    if (added.length === 1 && removed.length === 0) {
+        return t("Users.Profile.addRole", { role: added[0] });
+    }
+
+    if (added.length === 0 && removed.length === 1) {
+        return t("Users.Profile.revokeRole", { role: removed[0] });
+    }
+
+    return t("confirm");
+};
 
 export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSaved }: IProps) => {
     const { t } = useTranslation();
@@ -52,21 +90,8 @@ export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSav
 
     const added = PROFILE_ROLES.filter((role) => selected.includes(role) && !user.roles.includes(role));
     const removed = PROFILE_ROLES.filter((role) => !selected.includes(role) && user.roles.includes(role));
-    const delta = authorityDelta(user.roles, selected);
     const unchanged = added.length === 0 && removed.length === 0;
     const isRevoke = added.length === 0 && removed.length === 1;
-
-    const confirmLabel = (() => {
-        if (added.length === 1 && removed.length === 0) {
-            return t("Users.Profile.addRole", { role: added[0] });
-        }
-
-        if (isRevoke) {
-            return t("Users.Profile.revokeRole", { role: removed[0] });
-        }
-
-        return t("confirm");
-    })();
 
     const toggle = (role: ERoles): void => {
         setSelected((current) =>
@@ -123,102 +148,27 @@ export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSav
                             loading={requestData.loading}
                             onClick={save}
                         >
-                            {confirmLabel}
+                            {confirmLabel(added, removed, t)}
                         </Button>
                     </span>
                 </div>
             }
         >
             <div className={styles.Roles}>
-                {PROFILE_ROLES.map((role) => {
-                    const held = user.roles.includes(role);
-                    const checked = selected.includes(role);
-                    let state: "current" | "adding" | "revoking" | "plain" = "plain";
-
-                    if (checked && held) {
-                        state = "current";
-                    } else if (checked) {
-                        state = "adding";
-                    } else if (held) {
-                        state = "revoking";
-                    }
-
-                    return (
-                        <div
-                            key={role}
-                            className={`${styles.Role} ${state === "adding" ? styles.Adding : ""} ${
-                                state === "revoking" ? styles.Revoking : ""
-                            }`}
-                            onClick={() => toggle(role)}
-                        >
-                            <span onClick={(event) => event.stopPropagation()}>
-                                <Checkbox checked={checked} onChange={() => toggle(role)} />
-                            </span>
-                            <span className={styles.RoleText}>
-                                <span className={styles.RoleHeader}>
-                                    <span className={styles.RoleName}>{role}</span>
-                                    {state === "current" && (
-                                        <span className={styles.Current}>{t("Users.Profile.current")}</span>
-                                    )}
-                                    {state === "adding" && (
-                                        <span className={styles.AddingLabel}>{t("Users.Profile.adding")}</span>
-                                    )}
-                                    {state === "revoking" && (
-                                        <span className={styles.RevokingLabel}>{t("Users.Profile.revoking")}</span>
-                                    )}
-                                </span>
-                                <span className={styles.RoleDescription}>
-                                    {t(`Users.Profile.RoleDescriptions.${role}`)}
-                                </span>
-                            </span>
-                        </div>
-                    );
-                })}
+                {PROFILE_ROLES.map((role) => (
+                    <RoleOption
+                        key={role}
+                        role={role}
+                        held={user.roles.includes(role)}
+                        checked={selected.includes(role)}
+                        onToggle={toggle}
+                    />
+                ))}
             </div>
 
             {selected.length === 0 && <p className={styles.RolesRequired}>{t("Users.ValidationErrors.roles")}</p>}
 
-            {(delta.gained.length > 0 || delta.lost.length > 0) && (
-                <div className={styles.Delta}>
-                    {delta.gained.length > 0 && (
-                        <div>
-                            <div className={styles.GainTitle}>
-                                {t("Users.Profile.gain", { name: givenName, count: delta.gained.length })}
-                            </div>
-                            {delta.gained.map((authority) => (
-                                <div key={authority} className={styles.GainRow}>
-                                    <span>+</span>
-                                    <span>
-                                        {t(`Users.Profile.Authorities.${authority}`)}
-                                        <span className={styles.Code}>{authority}</span>
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    {delta.lost.length > 0 && (
-                        <div>
-                            <div className={styles.LoseTitle}>
-                                {t("Users.Profile.lose", { name: givenName, count: delta.lost.length })}
-                            </div>
-                            {delta.lost.map((authority) => (
-                                <div key={authority} className={styles.LoseRow}>
-                                    <span>−</span>
-                                    <span>
-                                        {t(`Users.Profile.Authorities.${authority}`)}
-                                        <span className={styles.Code}>{authority}</span>
-                                    </span>
-                                </div>
-                            ))}
-                            {delta.retainedThrough && (
-                                <p className={styles.Retained}>
-                                    {t("Users.Profile.staysGranted", { role: delta.retainedThrough })}
-                                </p>
-                            )}
-                        </div>
-                    )}
-                </div>
-            )}
+            <AuthorityDelta givenName={givenName} delta={authorityDelta(user.roles, selected)} />
         </Modal>
     );
 };

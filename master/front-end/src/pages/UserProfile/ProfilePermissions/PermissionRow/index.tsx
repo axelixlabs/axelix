@@ -1,0 +1,67 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+import { useTranslation } from "react-i18next";
+
+import type { ERoles } from "@/models";
+
+import type { TProfileAuthority } from "../../permissions";
+
+import styles from "./styles.module.css";
+
+const MISSING_VALUE = "—";
+
+interface IProps {
+    /**
+     * Authority rendered on this row
+     */
+    authority: TProfileAuthority;
+
+    /**
+     * Role that grants the authority. Absent when the user does not hold it.
+     */
+    source?: ERoles;
+}
+
+export const PermissionRow = ({ authority, source }: IProps) => {
+    const { t } = useTranslation();
+
+    return (
+        <div className={`${styles.Permission} ${source ? "" : styles.Off}`}>
+            {source ? (
+                <span className={styles.Granted} aria-hidden>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M20 6 9 17l-5-5"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+                </span>
+            ) : (
+                <span className={styles.Denied} />
+            )}
+            <span>
+                {t(`Users.Profile.Authorities.${authority}`)}
+                <span className={styles.Code}>{authority}</span>
+            </span>
+            <span className={styles.Source}>{source ?? MISSING_VALUE}</span>
+        </div>
+    );
+};
