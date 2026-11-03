@@ -33,20 +33,20 @@ import org.springframework.asm.SpringAsmInfo;
  */
 final class MethodBodyReadingClassVisitor extends ClassVisitor {
 
-    private final String owner;
+    private final String owningEntityType;
     private final Set<String> hierarchy;
     private final Map<MethodRef, MethodInfo> methods = new HashMap<>();
 
-    MethodBodyReadingClassVisitor(String owner, Set<String> hierarchy) {
+    MethodBodyReadingClassVisitor(String owningEntityType, Set<String> hierarchy) {
         super(SpringAsmInfo.ASM_VERSION);
-        this.owner = owner;
+        this.owningEntityType = owningEntityType;
         this.hierarchy = hierarchy;
     }
 
     @Override
     public MethodVisitor visitMethod(
             int access, String name, String descriptor, String signature, String[] exceptions) {
-        MethodRef ref = MethodRef.of(owner, name, descriptor);
+        MethodRef ref = MethodRef.of(owningEntityType, name, descriptor);
         return new MethodBodyReadingMethodVisitor(ref, access, hierarchy, methods);
     }
 

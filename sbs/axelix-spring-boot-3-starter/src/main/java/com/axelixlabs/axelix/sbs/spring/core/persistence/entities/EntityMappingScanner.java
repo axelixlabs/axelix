@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.EntityInspector.AssociationInspection;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.EntityInspector.EntityInspection;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.EntityType;
@@ -31,6 +29,8 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Association;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.FlaggedAssociation;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.EntityInspector.AssociationInspection;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.EntityInspector.EntityInspection;
 
 /**
  * Scans the JPA metamodel of an {@link EntityManagerFactory} to build the {@link JpaEntities}: every

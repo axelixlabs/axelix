@@ -25,7 +25,9 @@ import org.springframework.asm.Opcodes;
  * @param ref the method's owner and ASM name+descriptor
  * @param access the method's ASM access flags (see {@link Opcodes})
  * @param body the fields read and methods called by the method
+ *
  * @author Dmitry Mazurov
+ * @author Mikhail Polivakha
  */
 record MethodInfo(MethodRef ref, int access, MethodBody body) {
 
@@ -39,6 +41,10 @@ record MethodInfo(MethodRef ref, int access, MethodBody body) {
 
     boolean isFinal() {
         return (access & Opcodes.ACC_FINAL) != 0;
+    }
+
+    public boolean cannotBeOverridden() {
+        return isPrivate() || isFinal() || isStatic();
     }
 
     boolean isPackagePrivate() {

@@ -52,11 +52,13 @@ import org.springframework.asm.Type;
  * interface's default method are not detected.
  *
  * @author Dmitry Mazurov
+ * @author Mikhail Polivakha
  */
 public class EntityMethodsInspector {
 
     private static final Logger log = LoggerFactory.getLogger(EntityMethodsInspector.class);
 
+    // method key, combined from name and method descriptor, see MethodRef
     private static final String TO_STRING_METHOD = "toString()Ljava/lang/String;";
 
     private final Class<?> entityClass;
@@ -82,12 +84,13 @@ public class EntityMethodsInspector {
 
         initialize();
 
-        MethodInfo root = resolveVirtual(new MethodRef(entityInternalName, TO_STRING_METHOD));
-        if (root == null) {
+        MethodInfo effectiveToStringMethod = resolveVirtual(new MethodRef(entityInternalName, TO_STRING_METHOD));
+
+        if (effectiveToStringMethod == null) {
             return Set.of();
         }
 
-        return detectAssociations(root);
+        return detectAssociations(effectiveToStringMethod);
     }
 
     private void initialize() {
@@ -111,14 +114,15 @@ public class EntityMethodsInspector {
         }
     }
 
-    private Set<String> detectAssociations(MethodInfo root) {
+    private Set<String> detectAssociations(MethodInfo toString) {
         Set<String> result = new HashSet<>();
         Set<MethodRef> visited = new HashSet<>();
         Deque<MethodInfo> queue = new ArrayDeque<>();
-        queue.add(root);
+        queue.add(toString);
 
         while (!queue.isEmpty()) {
             MethodInfo method = queue.removeFirst();
+            // is already visited?
             if (!visited.add(method.ref())) {
                 continue;
             }
@@ -289,7 +293,8 @@ public class EntityMethodsInspector {
 
     /*
      * Mirrors JVM symbolic method resolution (JVMS 5.4.3.3): the search starts at ref.owner() and
-     * walks up towards Object, not down from the concrete entity type.
+     * walks up towards Object, not down from the concrete entity type. That is why we need the
+     * hierarchyInternalNames - it preserves the hierarchy.
      */
     private @Nullable MethodInfo resolveMethod(MethodRef ref) {
         int ownerIndex = hierarchyInternalNames.indexOf(ref.owner());
@@ -311,33 +316,29 @@ public class EntityMethodsInspector {
      * declaring class towards the concrete entity.
      */
     private @Nullable MethodInfo resolveVirtual(MethodRef ref) {
-        MethodInfo resolved = resolveMethod(ref);
-        if (resolved == null) {
+        MethodInfo method = resolveMethod(ref);
+        if (method == null) {
             return null;
         }
 
-        if (resolved.isPrivate() || resolved.isStatic() || resolved.isFinal()) {
-            return resolved;
+        if (method.cannotBeOverridden()) {
+            return method;
         }
 
-        MethodInfo selected = resolved;
-        int resolvedIndex = hierarchyInternalNames.indexOf(resolved.ref().owner());
+        MethodInfo resolved = method;
+        int resolvedIndex = hierarchyInternalNames.indexOf(method.ref().owner());
 
         for (int i = resolvedIndex - 1; i >= 0; i--) {
             MethodInfo candidate = methods.get(new MethodRef(hierarchyInternalNames.get(i), ref.key()));
-            if (candidate != null && overrides(candidate, selected)) {
-                selected = candidate;
+            if (candidate != null && overrides(candidate, resolved)) {
+                resolved = candidate;
             }
         }
-        return selected;
+        return resolved;
     }
 
     private static boolean overrides(MethodInfo candidate, MethodInfo overridden) {
         if (candidate.isPrivate() || candidate.isStatic()) {
-            return false;
-        }
-
-        if (overridden.isPrivate() || overridden.isStatic() || overridden.isFinal()) {
             return false;
         }
 

@@ -48,7 +48,8 @@ class EntityInspector {
     EntityInspection inspect(EntityType<?> entityType) {
         String entityName = entityType.getName();
         List<? extends Attribute<?, ?>> associations = findEntityAssociations(entityType);
-        Set<String> associationsReadByToString = detectAssociationsReadByToString(entityType.getJavaType(), associations, entityName);
+        Set<String> associationsReadByToString =
+                detectAssociationsReadByToString(entityType.getJavaType(), associations, entityName);
         List<AssociationInspection> flaggedAssociations = new ArrayList<>();
 
         for (Attribute<?, ?> attribute : associations) {
@@ -75,7 +76,9 @@ class EntityInspector {
     }
 
     private static @NonNull List<? extends Attribute<?, ?>> findEntityAssociations(EntityType<?> entityType) {
-        return entityType.getAttributes().stream().filter(Attribute::isAssociation).toList();
+        return entityType.getAttributes().stream()
+                .filter(Attribute::isAssociation)
+                .toList();
     }
 
     private static Set<String> detectAssociationsReadByToString(
