@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -893,5 +894,19 @@ class DatabaseUserServiceTest {
         assertThat(roleNamesByUserId).containsOnlyKeys(aliceId, bobId);
         assertThat(roleNamesByUserId.get(aliceId)).containsExactly("ADMIN");
         assertThat(roleNamesByUserId.get(bobId)).containsExactly("VIEWER");
+    }
+
+    @Test
+    void countUsersByRole_shouldCountEachGrantAndIncludeRolesHeldByNobody() {
+        // given.
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", Set.of("ADMIN", "EDITOR"));
+        userService.createLocal("bob", null, null, "bob@example.com", null, null, "p", Set.of("ADMIN"));
+
+        // when.
+        Map<String, Integer> counts = userService.countUsersByRole().stream()
+                .collect(Collectors.toMap(count -> count.role(), count -> count.usersCount()));
+
+        // then.
+        assertThat(counts).containsEntry("ADMIN", 2).containsEntry("EDITOR", 1).containsEntry("VIEWER", 0);
     }
 }

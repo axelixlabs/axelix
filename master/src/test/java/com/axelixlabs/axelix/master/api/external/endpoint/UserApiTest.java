@@ -78,6 +78,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
     private static final String USERS_FEED_PATH = "/api/external/users/feed";
     private static final String USER_BY_ID_PATH = "/api/external/users/feed/{userId}";
+    private static final String ROLE_USER_COUNTS_PATH = "/api/external/users/role-counts";
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -443,9 +444,38 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         assertSuccessfulCallback(MasterWebEndpoints.USERS_READ, superAdmin.getActor());
     }
 
+    @Test
+    void shouldReturnUserCountsByRole() {
+        // given.
+        userService.createLocal(
+                "alice", "Alice", "Smith", "alice@example.com", null, null, "aliceSecret", Set.of("ADMIN", "EDITOR"));
+        userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "hash-bob", "VIEWER");
+
+        // language=json
+        String expectedCounts = """
+                [
+                  { "role": "ADMIN", "usersCount": 1 },
+                  { "role": "EDITOR", "usersCount": 1 },
+                  { "role": "VIEWER", "usersCount": 1 }
+                ]
+                """;
+
+        // when.
+        IdentityAwareTestRestTemplate viewer = restTemplateBuilder.asUsersFeedViewer();
+        ResponseEntity<String> response = viewer.getForEntity(ROLE_USER_COUNTS_PATH, String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).isEqualTo(expectedCounts);
+        assertSuccessfulCallback(MasterWebEndpoints.USERS_READ_ROLE_COUNTS, viewer.getActor());
+    }
+
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
-        return Set.of(new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ, USERS_FEED_PATH));
+        return Set.of(
+                new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ, USERS_FEED_PATH),
+                new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ_ROLE_COUNTS, ROLE_USER_COUNTS_PATH));
     }
 
     private HttpEntity<String> defaultEntity(LoginRequest loginRequest) {

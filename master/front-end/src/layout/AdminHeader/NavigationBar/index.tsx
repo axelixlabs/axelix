@@ -27,7 +27,7 @@ export const NavigationBar = () => {
     const { t } = useTranslation();
 
     const settings = useAppSelector((state) => state.settings);
-    // Users and Roles both read the users feed, so the tab is shown only with access to it
+    // Users and Roles both require USERS_VIEW, so the tab is shown only with access to it
     const hasUsersViewAccess = useAuthority(EAuthorities.USERS_VIEW);
 
     return (

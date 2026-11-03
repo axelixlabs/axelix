@@ -54,6 +54,19 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
     List<UserRoleName> findAllUserRoleNames();
 
     /**
+     * Counts users per persisted role. A role that nobody holds is returned with a count of zero, and a user who
+     * holds several roles is counted once for each of them.
+     */
+    @Query("""
+        SELECT r.name AS role, COUNT(ur.user_id) AS users_count
+        FROM roles r
+        LEFT JOIN users_roles ur ON ur.role_id = r.id
+        GROUP BY r.id, r.name
+        ORDER BY r.name
+        """)
+    List<RoleUsersCount> countUsersByRole();
+
+    /**
      * @return the amount of rows affected
      */
     @Modifying
@@ -124,4 +137,12 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
      * @author Sergey Cherkasov
      */
     record UserRoleName(String userId, String roleName) {}
+
+    /**
+     * How many users hold a single role.
+     *
+     * @param role       Name of the role.
+     * @param usersCount Number of users who hold it.
+     */
+    record RoleUsersCount(String role, int usersCount) {}
 }

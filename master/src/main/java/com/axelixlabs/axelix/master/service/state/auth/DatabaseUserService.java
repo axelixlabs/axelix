@@ -204,6 +204,11 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
+    public List<UserRepository.RoleUsersCount> countUsersByRole() {
+        return userRepository.countUsersByRole();
+    }
+
+    @Override
     public void updateLastLoginAt(String username) {
         userRepository.updateLastLoginAt(username, Instant.now());
     }

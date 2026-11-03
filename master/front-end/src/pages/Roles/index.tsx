@@ -20,9 +20,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler, Loader, StyledTag } from "@/components";
-import { countUsersWithRole, fetchData } from "@/helpers";
-import { ERoles, type IUser, StatefulRequest } from "@/models";
-import { getUsers } from "@/services";
+import { fetchData } from "@/helpers";
+import { ERoles, type IRoleUsersCount, StatefulRequest } from "@/models";
+import { getRoleUserCounts } from "@/services";
 import { ENTERPRISE_URL } from "@/utils";
 
 import styles from "./styles.module.css";
@@ -32,21 +32,21 @@ const BUILTIN_ROLES = [ERoles.ADMIN, ERoles.EDITOR, ERoles.VIEWER];
 
 const Roles = () => {
     const { t } = useTranslation();
-    const [usersData, setUsersData] = useState(StatefulRequest.loading<IUser[]>());
+    const [countsData, setCountsData] = useState(StatefulRequest.loading<IRoleUsersCount[]>());
 
     useEffect(() => {
-        fetchData(setUsersData, () => getUsers());
+        fetchData(setCountsData, () => getRoleUserCounts());
     }, []);
 
-    if (usersData.loading) {
+    if (countsData.loading) {
         return <Loader />;
     }
 
-    if (usersData.error) {
+    if (countsData.error) {
         return <EmptyHandler isEmpty />;
     }
 
-    const users = usersData.response!;
+    const countsByRole = new Map(countsData.response!.map((entry) => [entry.role, entry.usersCount]));
 
     return (
         <>
@@ -61,7 +61,7 @@ const Roles = () => {
                         <div>
                             <StyledTag>{role}</StyledTag>
                             <div className={styles.Count}>
-                                {t("Users.Create.usersCount", { count: countUsersWithRole(users, role) })}
+                                {t("Users.Create.usersCount", { count: countsByRole.get(role) ?? 0 })}
                             </div>
                         </div>
                         <div>

@@ -53,6 +53,11 @@ public final class ApiPaths {
          * Endpoint to retrieve the feed of managed users.
          */
         public static final String GET_USER_BY_ID = "/users/feed/{userId}";
+
+        /**
+         * Endpoint to retrieve how many users hold each persisted role.
+         */
+        public static final String ROLE_USER_COUNTS = "/users/role-counts";
     }
 
     public static final class UsersManagementApi {
