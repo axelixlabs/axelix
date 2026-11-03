@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { apiFetch } from "@/api";
-import type { ICreateUserRequestData, IEditUserRequestData } from "@/models";
+import type { EUserStatus, ICreateUserRequestData, IEditUserRequestData } from "@/models";
 
 export const getUsers = () => {
     return apiFetch.get("users/feed");
@@ -44,4 +44,8 @@ export const deleteUser = (userId: string) => {
 
 export const editUser = (data: IEditUserRequestData) => {
     return apiFetch.put("users-management/update", data);
+};
+
+export const updateUsersStatus = (ids: string[], status: EUserStatus) => {
+    return apiFetch.put("users-management/status", { ids, status });
 };

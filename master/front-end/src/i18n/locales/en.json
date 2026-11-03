@@ -346,6 +346,7 @@
             "INVALID_CREDENTIALS" : "Invalid username or password",
             "USERNAME_ALREADY_EXISTS": "A user with this username already exists. Please choose a different username.",
             "EMAIL_ALREADY_EXISTS": "A user with this email already exists. Please choose a different email.",
+            "USER_STATUS_CHANGE_NOT_ALLOWED": "Only a local user can be suspended or reactivated.",
             "SBOM_NOT_AVAILABLE": "SBOM data is not available for this project."
         }
     },
@@ -858,6 +859,64 @@
             "password": "Please input password!",
             "passwordsMismatch": "Passwords do not match!",
             "roles": "Please select roles!"
+        },
+        "Profile": {
+            "editUser": "Edit user",
+            "editTitle": "Edit user",
+            "suspend": "Suspend",
+            "reactivate": "Reactivate",
+            "changeRoles": "Change roles",
+            "profile": "Profile",
+            "account": "Account",
+            "email": "Email",
+            "lastSignIn": "Last sign-in",
+            "originLocalDetail": "created in Axelix",
+            "originOidcDetail": "provisioned by an identity provider",
+            "canSignIn": "can sign in",
+            "signInBlocked": "sign-in blocked",
+            "permissions": "Permissions",
+            "permissionsHint": "Granted through the roles above",
+            "passwordKeep": "Leave blank to keep the current password.",
+            "changeRolesTitle": "Change roles for {{name}}",
+            "changeRolesSubtitle": "{{name}} gets every permission granted by the roles you select.",
+            "current": "Current",
+            "adding": "Adding",
+            "revoking": "Revoking",
+            "gain_one": "{{name}} will gain {{count}} permission",
+            "gain_other": "{{name}} will gain {{count}} permissions",
+            "lose_one": "{{name}} will lose {{count}} permission",
+            "lose_other": "{{name}} will lose {{count}} permissions",
+            "staysGranted": "Scheduled tasks, caches and GC logging stay granted through {{role}}.",
+            "takesEffect": "Takes effect the next time {{name}} signs in.",
+            "addRole": "Add {{role}}",
+            "revokeRole": "Revoke {{role}}",
+            "suspendTitle": "Suspend {{name}}?",
+            "suspendBody": "{{name}} will not be able to sign in to Axelix.",
+            "suspendKept": "The account, roles and recorded activity history are kept as they are. Activity history is only recorded in Axelix Enterprise, so there is none to retain here.",
+            "suspendLater": "A suspended user can be reactivated at any time, or deleted later.",
+            "suspendConfirm": "Suspend user",
+            "reactivateTitle": "Reactivate {{name}}?",
+            "reactivateBody": "{{name}} will be able to sign in again.",
+            "reactivateConfirm": "Reactivate",
+            "userSuspended": "User suspended",
+            "userReactivated": "User reactivated",
+            "RoleDescriptions": {
+                "VIEWER": "Read-only access to the monitored applications.",
+                "EDITOR": "Performs runtime operations on the monitored applications, including destructive ones such as clearing caches.",
+                "ADMIN": "Everything an editor can do, plus reading sensitive configuration values."
+            },
+            "Groups": {
+                "runtime": "Runtime operations",
+                "sensitive": "Sensitive values"
+            },
+            "Authorities": {
+                "SCHEDULED_TASKS_MODIFY": "Modify scheduled tasks",
+                "CACHES_CLEAR": "Clear caches",
+                "CACHES_TOGGLE": "Enable and disable caches",
+                "GARBAGE_COLLECTOR": "Garbage collector logging",
+                "ENV_VALUES_READ": "Read environment values",
+                "CONFIG_PROPS_VALUES_READ": "Read configuration property values"
+            }
         }
     },
     "Roles": {

@@ -89,19 +89,9 @@ export const UserProfileActions = ({ userId, userOrigin }: IProps) => {
                 )}
             </Modal>
 
-            <Button
-                style={{
-                    boxShadow: "0 4px 12px rgba(255, 0, 10, 0.1)",
-                }}
-                type="primary"
-                icon={<TrashIcon />}
-                onClick={showModal}
-                className={styles.DeleteUser}
-            >
+            <Button type="link" danger icon={<TrashIcon />} onClick={showModal} className={styles.DeleteUser}>
                 {t("Users.deleteUser")}
             </Button>
-
-            <Button disabled>{t("Users.accessLog")}</Button>
         </div>
     );
 };
