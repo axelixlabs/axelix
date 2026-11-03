@@ -14,6 +14,7 @@ val springCloudVersion = "2022.0.4"
 
 val jsonUnitAssertJVersion = "2.40.1"
 val lombokVersion = "1.18.48"
+val shedLockVersion = "5.16.0"
 
 dependencies {
     // Self
@@ -59,6 +60,10 @@ dependencies {
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
     testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    testImplementation("net.javacrumbs.shedlock:shedlock-spring:${shedLockVersion}") {
+        exclude(group = "org.springframework")
+    }
+    testImplementation("org.awaitility:awaitility")
 }
 
 tasks.withType<JavaCompile>().configureEach {

@@ -8,6 +8,7 @@ val springCloudVersion = "2025.1.0"
 
 val jsonUnitAssertJVersion = "2.40.1"
 val archUnitVersion = "1.4.2"
+val shedLockVersion = "7.10.1"
 
 dependencies {
     // Self
@@ -59,6 +60,7 @@ dependencies {
 
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
     testImplementation("com.tngtech.archunit:archunit:${archUnitVersion}")
+    testImplementation("net.javacrumbs.shedlock:shedlock-spring:${shedLockVersion}")
 }
 
 tasks.withType<JavaCompile>().configureEach {

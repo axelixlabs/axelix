@@ -17,9 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.util.ReflectionUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
@@ -34,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ScheduledAnnotationRunnableTest {
 
     private static final String TASK_ID = "com.example.Job.run#cron0";
+    private static final Method METHOD_RUN = ReflectionUtils.findMethod(Runnable.class, "run");
 
     private final ScheduledTaskExecutionHistory history = new ScheduledTaskExecutionHistory();
 
@@ -41,7 +45,7 @@ class ScheduledAnnotationRunnableTest {
     void run_shouldRunTheDelegateAndRecordTheExecutionUnderTheIdOfTheTask() {
         AtomicBoolean ran = new AtomicBoolean();
 
-        new ScheduledAnnotationRunnable(() -> ran.set(true), TASK_ID, history).run();
+        new ScheduledAnnotationRunnable(() -> ran.set(true), TASK_ID, this, METHOD_RUN, history).run();
 
         assertThat(ran).isTrue();
         assertThat(history.getExecutions())
@@ -51,7 +55,7 @@ class ScheduledAnnotationRunnableTest {
 
     @Test
     void run_shouldRecordTheScheduledLaunch() {
-        new ScheduledAnnotationRunnable(() -> {}, TASK_ID, history).run();
+        new ScheduledAnnotationRunnable(() -> {}, TASK_ID, this, METHOD_RUN, history).run();
 
         assertThat(history.getExecutions())
                 .extracting(ScheduledTaskExecution::getLaunchType)
@@ -62,7 +66,7 @@ class ScheduledAnnotationRunnableTest {
     void manual_shouldRunTheSameTaskAndRecordTheManualLaunch() {
         AtomicBoolean ran = new AtomicBoolean();
         ScheduledAnnotationRunnable manual =
-                new ScheduledAnnotationRunnable(() -> ran.set(true), TASK_ID, history).manual();
+                new ScheduledAnnotationRunnable(() -> ran.set(true), TASK_ID, this, METHOD_RUN, history).manual();
 
         manual.run();
 
@@ -75,6 +79,16 @@ class ScheduledAnnotationRunnableTest {
 
     @Test
     void shouldExposeTheId() {
-        assertThat(new ScheduledAnnotationRunnable(() -> {}, TASK_ID, history)).hasToString(TASK_ID);
+        assertThat(new ScheduledAnnotationRunnable(() -> {}, TASK_ID, this, METHOD_RUN, history))
+                .hasToString(TASK_ID);
+    }
+
+    @Test
+    void manual_shouldKeepTheTargetAndTheMethod() {
+        ScheduledAnnotationRunnable manual =
+                new ScheduledAnnotationRunnable(() -> {}, TASK_ID, this, METHOD_RUN, history).manual();
+
+        assertThat(manual.getTarget()).isSameAs(this);
+        assertThat(manual.getMethod()).isEqualTo(METHOD_RUN);
     }
 }

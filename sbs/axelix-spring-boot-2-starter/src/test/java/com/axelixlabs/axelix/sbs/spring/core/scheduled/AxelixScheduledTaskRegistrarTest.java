@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -31,6 +32,7 @@ import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
+import org.springframework.util.ReflectionUtils;
 
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
@@ -45,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AxelixScheduledTaskRegistrarTest {
 
     private static final String METHOD = "com.example.Job.run";
+    private static final Method METHOD_RUN = ReflectionUtils.findMethod(Runnable.class, "run");
     private static final long INTERVAL = 3_600_000;
     private static final long INITIAL_DELAY = 7_200_000;
 
@@ -129,7 +132,7 @@ class AxelixScheduledTaskRegistrarTest {
 
     private ScheduledTask scheduleFor(String suffix, Supplier<ScheduledTask> scheduling) {
         AtomicReference<ScheduledTask> scheduledTask = new AtomicReference<>();
-        registrar.process(suffix, () -> scheduledTask.set(scheduling.get()));
+        registrar.process(suffix, this, METHOD_RUN, () -> scheduledTask.set(scheduling.get()));
         assertThat(scheduledTask.get()).isNotNull();
         return scheduledTask.get();
     }

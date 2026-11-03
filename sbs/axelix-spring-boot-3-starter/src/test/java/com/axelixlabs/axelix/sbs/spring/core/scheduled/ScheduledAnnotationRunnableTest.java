@@ -17,10 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.scheduling.support.ScheduledMethodRunnable;
+import org.springframework.util.ReflectionUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
@@ -35,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ScheduledAnnotationRunnableTest {
 
     private static final String TASK_ID = "com.example.Job.run#cron0";
+    private static final Method METHOD_RUN = ReflectionUtils.findMethod(Runnable.class, "run");
 
     private final ScheduledTaskExecutionHistory history = new ScheduledTaskExecutionHistory();
 
@@ -53,7 +58,7 @@ class ScheduledAnnotationRunnableTest {
     @Test
     void shouldExposeTheIdAndTheQualifier() {
         ScheduledAnnotationRunnable runnable =
-                new ScheduledAnnotationRunnable(() -> {}, TASK_ID, "otherScheduler", false, history);
+                new ScheduledAnnotationRunnable(() -> {}, TASK_ID, "otherScheduler", false, this, METHOD_RUN, history);
 
         assertThat(runnable).hasToString(TASK_ID);
         assertThat(runnable.getQualifier()).isEqualTo("otherScheduler");
@@ -95,7 +100,7 @@ class ScheduledAnnotationRunnableTest {
     void manual_shouldRunTheSameTaskAndRecordTheManualLaunch() {
         AtomicBoolean ran = new AtomicBoolean();
         ScheduledAnnotationRunnable manual = new ScheduledAnnotationRunnable(
-                        () -> ran.set(true), TASK_ID, "otherScheduler", false, history)
+                        () -> ran.set(true), TASK_ID, "otherScheduler", false, this, METHOD_RUN, history)
                 .manual();
 
         manual.run();
@@ -108,11 +113,41 @@ class ScheduledAnnotationRunnableTest {
                 .containsExactly(ScheduledTaskLaunchType.MANUAL);
     }
 
+    @Test
+    void schedulable_shouldBeTheScheduledMethodRunnableOfTheRegularTask() {
+        Runnable schedulable = regular(() -> {}).schedulable();
+
+        assertThat(schedulable).isInstanceOfSatisfying(ScheduledMethodRunnable.class, methodRunnable -> {
+            assertThat(methodRunnable.getTarget()).isSameAs(this);
+            assertThat(methodRunnable.getMethod()).isEqualTo(METHOD_RUN);
+        });
+        assertThat(schedulable).hasToString(TASK_ID);
+    }
+
+    @Test
+    void schedulable_shouldRunTheRegularTaskAndRecordTheScheduledLaunch() {
+        AtomicBoolean ran = new AtomicBoolean();
+
+        regular(() -> ran.set(true)).schedulable().run();
+
+        assertThat(ran).isTrue();
+        assertThat(history.getExecutions())
+                .extracting(ScheduledTaskExecution::getLaunchType)
+                .containsExactly(ScheduledTaskLaunchType.SCHEDULED);
+    }
+
+    @Test
+    void schedulable_shouldBeTheReactiveTaskItself() {
+        ScheduledAnnotationRunnable reactive = reactive(() -> {});
+
+        assertThat(reactive.schedulable()).isSameAs(reactive);
+    }
+
     private ScheduledAnnotationRunnable regular(Runnable delegate) {
-        return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, false, history);
+        return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, false, this, METHOD_RUN, history);
     }
 
     private ScheduledAnnotationRunnable reactive(Runnable delegate) {
-        return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, true, history);
+        return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, true, this, METHOD_RUN, history);
     }
 }

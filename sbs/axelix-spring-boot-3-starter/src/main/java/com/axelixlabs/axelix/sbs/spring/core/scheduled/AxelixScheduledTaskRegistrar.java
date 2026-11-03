@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -169,16 +170,20 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
                 runnable + "#" + annotation.suffix(),
                 annotation.qualifier(),
                 annotation.reactive(),
+                annotation.target(),
+                annotation.method(),
                 history.require());
         runnables.put(wrapped.toString(), wrapped);
-        return wrapped;
+        return wrapped.schedulable();
     }
 
     /**
      * @param suffix the suffix of the task id, see {@link AxelixScheduledAnnotationBeanPostProcessor}.
      * @param qualifier the qualifier of the scheduler declared by the annotation, if any.
      * @param reactive whether the annotated method is the reactive one.
+     * @param target the bean declaring the annotated method.
+     * @param method the annotated method.
      */
     record ScheduledAnnotationContext(
-            String suffix, @Nullable String qualifier, boolean reactive) {}
+            String suffix, @Nullable String qualifier, boolean reactive, Object target, Method method) {}
 }

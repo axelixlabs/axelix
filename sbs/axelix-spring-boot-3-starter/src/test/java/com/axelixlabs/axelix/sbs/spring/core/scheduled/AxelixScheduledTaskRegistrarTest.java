@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,6 +33,7 @@ import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
+import org.springframework.util.ReflectionUtils;
 
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
@@ -47,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AxelixScheduledTaskRegistrarTest {
 
     private static final String METHOD = "com.example.Job.run";
+    private static final Method METHOD_RUN = ReflectionUtils.findMethod(Runnable.class, "run");
     private static final Duration INTERVAL = Duration.ofHours(1);
     private static final Duration INITIAL_DELAY = Duration.ofHours(2);
 
@@ -69,7 +72,7 @@ class AxelixScheduledTaskRegistrarTest {
     void shouldWrapTheTaskScheduledForScheduledAnnotation() {
         // given: the task is registered before the scheduler is resolved, as Spring does on the startup
         ScheduledTask scheduledTask = scheduleFor(
-                new ScheduledAnnotationContext("cron0", null, false),
+                new ScheduledAnnotationContext("cron0", null, false, this, METHOD_RUN),
                 () -> registrar.scheduleCronTask(new CronTask(new MethodRunnable(), "0 0 1 * * *")));
 
         // when: the scheduler is resolved and the task is scheduled again
@@ -92,11 +95,11 @@ class AxelixScheduledTaskRegistrarTest {
     @Test
     void shouldKeepTheIntervalsOfTheWrappedTasks() {
         ScheduledTask fixedDelayTask = scheduleFor(
-                new ScheduledAnnotationContext("fixedDelay0", null, false),
+                new ScheduledAnnotationContext("fixedDelay0", null, false, this, METHOD_RUN),
                 () -> registrar.scheduleFixedDelayTask(
                         new FixedDelayTask(new MethodRunnable(), INTERVAL, INITIAL_DELAY)));
         ScheduledTask fixedRateTask = scheduleFor(
-                new ScheduledAnnotationContext("fixedRate0", null, false),
+                new ScheduledAnnotationContext("fixedRate0", null, false, this, METHOD_RUN),
                 () -> registrar.scheduleFixedRateTask(
                         new FixedRateTask(new MethodRunnable(), INTERVAL, INITIAL_DELAY)));
 
@@ -139,15 +142,14 @@ class AxelixScheduledTaskRegistrarTest {
 
     @Test
     void findRunnable_shouldFindTheRunnableOfTheTaskScheduledForScheduledAnnotation() {
-        ScheduledTask task = scheduleFor(
-                new ScheduledAnnotationContext("fixedRate0", null, false),
+        scheduleFor(
+                new ScheduledAnnotationContext("fixedRate0", null, false, this, METHOD_RUN),
                 () -> registrar.scheduleFixedRateTask(
                         new FixedRateTask(new MethodRunnable(), INTERVAL, INITIAL_DELAY)));
 
         registrar.afterPropertiesSet();
 
-        assertThat(registrar.findRunnable(METHOD + "#fixedRate0"))
-                .isSameAs(task.getTask().getRunnable());
+        assertThat(registrar.findRunnable(METHOD + "#fixedRate0")).hasToString(METHOD + "#fixedRate0");
     }
 
     private ScheduledTask scheduleFor(ScheduledAnnotationContext annotation, Supplier<ScheduledTask> scheduling) {

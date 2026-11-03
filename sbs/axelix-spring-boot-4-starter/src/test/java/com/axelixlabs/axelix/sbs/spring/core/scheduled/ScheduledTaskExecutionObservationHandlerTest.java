@@ -41,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ScheduledTaskExecutionObservationHandlerTest {
 
     private static final String TASK_ID = "com.example.Job.run#cron0";
+    private static final Method METHOD_RUN = ReflectionUtils.findMethod(Runnable.class, "run");
     private static final long SLEEP_MILLIS = 30L;
     private static final String OBSERVATION = "tasks.scheduled.execution";
 
@@ -200,7 +201,7 @@ class ScheduledTaskExecutionObservationHandlerTest {
     }
 
     private ScheduledAnnotationRunnable reactive(Runnable delegate) {
-        return new ScheduledAnnotationRunnable(delegate, TASK_ID, true, history);
+        return new ScheduledAnnotationRunnable(delegate, TASK_ID, true, delegate, METHOD_RUN, history);
     }
 
     private static ScheduledTaskObservationContext scheduledTaskContext() {

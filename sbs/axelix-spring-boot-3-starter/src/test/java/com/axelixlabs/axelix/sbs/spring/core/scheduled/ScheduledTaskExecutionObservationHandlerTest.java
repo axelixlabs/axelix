@@ -17,12 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.util.ReflectionUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
@@ -37,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ScheduledTaskExecutionObservationHandlerTest {
 
     private static final String TASK_ID = "com.example.Job.run#cron0";
+    private static final Method METHOD_RUN = ReflectionUtils.findMethod(Runnable.class, "run");
     private static final long SLEEP_MILLIS = 30L;
     private static final String OBSERVATION = "tasks.scheduled.execution";
 
@@ -169,6 +173,6 @@ class ScheduledTaskExecutionObservationHandlerTest {
     }
 
     private ScheduledAnnotationRunnable reactive(Runnable delegate) {
-        return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, true, history);
+        return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, true, delegate, METHOD_RUN, history);
     }
 }

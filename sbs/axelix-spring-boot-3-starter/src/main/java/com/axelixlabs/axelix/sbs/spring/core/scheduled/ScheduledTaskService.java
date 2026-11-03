@@ -131,7 +131,7 @@ public final class ScheduledTaskService implements AutoCloseable {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
             CronTask cronTask =
-                    new CronTask(task.getRunnable(), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
+                    new CronTask(runnable(task), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
@@ -154,7 +154,7 @@ public final class ScheduledTaskService implements AutoCloseable {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
-            IntervalTask updatedTask = recreateIntervalTask(task.getTask(), newInterval);
+            IntervalTask updatedTask = recreateIntervalTask(task.getTask(), runnable(task), newInterval);
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
@@ -184,7 +184,7 @@ public final class ScheduledTaskService implements AutoCloseable {
             // task. The errors are handled by the error handler of the scheduler.
             TaskScheduler scheduler = taskSchedulerProvider.getTaskScheduler();
             scheduler.schedule(
-                    runnable != null ? runnable.manual() : task.getRunnable(),
+                    runnable != null ? runnable.manual().schedulable() : task.getRunnable(),
                     scheduler.getClock().instant());
         } catch (ScheduledTaskNotFoundException e) {
             log.warn("Task '{}' not found, cannot run now", taskId, e);
@@ -192,12 +192,23 @@ public final class ScheduledTaskService implements AutoCloseable {
         }
     }
 
-    private IntervalTask recreateIntervalTask(Task task, Duration interval) {
+    /**
+     * @return the runnable to schedule the task with anew. The runnable of the {@link Task} is wrapped by Spring, so
+     *         scheduling it would wrap it once more, and the tools looking the runnable up, e.g. ShedLock, would not
+     *         recognize it.
+     */
+    private Runnable runnable(ManagedScheduledTask task) {
+        ScheduledAnnotationRunnable runnable =
+                scheduledTaskRegistrar != null ? scheduledTaskRegistrar.findRunnable(task.getId()) : null;
+        return runnable != null ? runnable.schedulable() : task.getRunnable();
+    }
+
+    private IntervalTask recreateIntervalTask(Task task, Runnable runnable, Duration interval) {
         if (task instanceof FixedDelayTask t) {
-            return new FixedDelayTask(t.getRunnable(), interval, t.getInitialDelayDuration());
+            return new FixedDelayTask(runnable, interval, t.getInitialDelayDuration());
         }
         if (task instanceof FixedRateTask t) {
-            return new FixedRateTask(t.getRunnable(), interval, t.getInitialDelayDuration());
+            return new FixedRateTask(runnable, interval, t.getInitialDelayDuration());
         }
         throw new IllegalArgumentException("Unsupported IntervalTask type: " + task.getClass());
     }
