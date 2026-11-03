@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Same update policy as the former Dependabot config: grouped pull requests, minors and patches only for npm and Gradle, majors still allowed for Docker and GitHub Actions. The Renovate workflow decides when a run happens. Submodules stay uninitialized because axelix-enterprise has no URL in .gitmodules.",
+  "description": "Grouped pull requests for npm, Gradle, GitHub Actions, and product Dockerfiles. Majors are ignored for npm and Gradle. The Renovate workflow decides when a run happens. Submodules stay uninitialized because axelix-enterprise has no URL in .gitmodules.",
   "cloneSubmodules": false,
   "labels": ["dependencies"],
   "minimumReleaseAge": "3 days",
@@ -10,10 +10,8 @@
   "prConcurrentLimit": 0,
   "enabledManagers": ["npm", "gradle", "github-actions", "dockerfile", "docker-compose"],
   "ignorePaths": [
-    "blog/**",
     "playgrounds/**",
-    "axelix-enterprise/**",
-    "master-oss/Dockerfile"
+    "axelix-enterprise/**"
   ],
   "packageRules": [
     {
@@ -46,6 +44,12 @@
       "separateMajorMinor": false
     },
     {
+      "matchManagers": ["npm"],
+      "matchFileNames": ["blog/**"],
+      "groupName": "npm dependencies in /blog",
+      "separateMajorMinor": false
+    },
+    {
       "matchManagers": ["gradle"],
       "groupName": "gradle dependencies",
       "separateMajorMinor": false
@@ -71,6 +75,18 @@
       "matchManagers": ["dockerfile", "docker-compose"],
       "matchFileNames": ["docs/**"],
       "groupName": "docker dependencies in /docs",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchFileNames": ["blog/**"],
+      "groupName": "docker dependencies in /blog",
+      "separateMajorMinor": false
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "matchFileNames": ["master-oss/**"],
+      "groupName": "docker dependencies in /master-oss",
       "separateMajorMinor": false
     }
   ]
