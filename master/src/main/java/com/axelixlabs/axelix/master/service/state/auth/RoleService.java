@@ -70,5 +70,5 @@ public interface RoleService {
      *
      * @return An entry per role, in no particular order.
      */
-    List<RoleRepository.RoleFeed> getRolesFeed();
+    List<RoleRepository.RoleProfile> getRolesFeed();
 }

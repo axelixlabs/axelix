@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.RoleFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.RoleProfileResponse;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 
 /**
@@ -42,9 +42,10 @@ public class RolesApi {
     }
 
     @GetMapping(path = ApiPaths.RolesApi.ROLES_FEED)
-    public ResponseEntity<List<RoleFeedResponse>> getRolesFeed() {
-        List<RoleFeedResponse> roles =
-                roleService.getRolesFeed().stream().map(RoleFeedResponse::from).toList();
+    public ResponseEntity<List<RoleProfileResponse>> getRolesFeed() {
+        List<RoleProfileResponse> roles = roleService.getRolesFeed().stream()
+                .map(RoleProfileResponse::from)
+                .toList();
 
         return ResponseEntity.ok(roles);
     }

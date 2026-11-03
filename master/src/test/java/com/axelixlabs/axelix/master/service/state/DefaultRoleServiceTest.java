@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.iam.RoleEntity;
 import com.axelixlabs.axelix.master.domain.iam.RoleOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
-import com.axelixlabs.axelix.master.repository.RoleRepository.RoleFeed;
+import com.axelixlabs.axelix.master.repository.RoleRepository.RoleProfile;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.auth.DefaultRoleService;
@@ -283,11 +283,11 @@ class DefaultRoleServiceTest {
         @Test
         void shouldSeedTheSameThreeBuiltInRolesInEveryDialect() {
             // when.
-            List<RoleFeed> feed = roleService.getRolesFeed();
+            List<RoleProfile> feed = roleService.getRolesFeed();
 
             // then.
             assertThat(feed)
-                    .extracting(RoleFeed::id, RoleFeed::name, RoleFeed::description)
+                    .extracting(RoleProfile::id, RoleProfile::name, RoleProfile::description)
                     .containsExactlyInAnyOrder(
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b1",
@@ -312,7 +312,7 @@ class DefaultRoleServiceTest {
             userService.createLocal("carol", null, null, "carol@example.com", "p", Set.of(TestRoles.VIEWER.getName()));
 
             // when.
-            List<RoleFeed> feed = roleService.getRolesFeed();
+            List<RoleProfile> feed = roleService.getRolesFeed();
 
             // then.
             assertThat(entryNamed(feed, TestRoles.EDITOR.getName()).membersCount())
@@ -329,16 +329,16 @@ class DefaultRoleServiceTest {
             String derivedId = createCustomRole("DERIVED", OssAuthority.ENV_VALUES_READ);
 
             // when.
-            List<RoleFeed> feed = roleService.getRolesFeed();
+            List<RoleProfile> feed = roleService.getRolesFeed();
 
             // then.
-            RoleFeed derived = entryNamed(feed, "DERIVED");
+            RoleProfile derived = entryNamed(feed, "DERIVED");
             assertThat(derived.id()).isEqualTo(derivedId);
             assertThat(derived.description()).isEqualTo("Description");
             assertThat(derived.membersCount()).isZero();
         }
 
-        private static RoleFeed entryNamed(List<RoleFeed> feed, String name) {
+        private static RoleProfile entryNamed(List<RoleProfile> feed, String name) {
             return feed.stream()
                     .filter(role -> role.name().equals(name))
                     .findFirst()

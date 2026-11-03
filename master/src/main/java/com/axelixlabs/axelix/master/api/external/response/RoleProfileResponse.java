@@ -29,9 +29,9 @@ import com.axelixlabs.axelix.master.repository.RoleRepository;
  *
  * @author Sergey Cherkasov
  */
-public record RoleFeedResponse(String id, String name, int membersCount, String description) {
+public record RoleProfileResponse(String id, String name, int membersCount, String description) {
 
-    public static RoleFeedResponse from(RoleRepository.RoleFeed role) {
-        return new RoleFeedResponse(role.id(), role.name(), role.membersCount(), role.description());
+    public static RoleProfileResponse from(RoleRepository.RoleProfile role) {
+        return new RoleProfileResponse(role.id(), role.name(), role.membersCount(), role.description());
     }
 }

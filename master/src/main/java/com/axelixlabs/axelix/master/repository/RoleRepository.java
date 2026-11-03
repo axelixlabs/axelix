@@ -58,7 +58,7 @@ public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
             LEFT JOIN users_roles ur ON ur.role_id = r.id
             GROUP BY r.id, r.name, r.description
             """)
-    List<RoleFeed> findRolesFeed();
+    List<RoleProfile> findRolesFeed();
 
     record RoleWithAuthorityName(
             String roleId, String roleName, @Nullable String authorityName) {}
@@ -73,5 +73,5 @@ public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
      * @param membersCount Number of users the role is assigned to.
      * @param description  Human-readable description of what the role allows.
      */
-    record RoleFeed(String id, String name, int membersCount, String description) {}
+    record RoleProfile(String id, String name, int membersCount, String description) {}
 }
