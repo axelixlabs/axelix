@@ -1,0 +1,55 @@
+.Card {
+    display: flex;
+    column-gap: var(--axelix-space-6);
+    margin-bottom: var(--axelix-space-8);
+    padding: var(--axelix-space-6);
+    border: 1px solid var(--axelix-green-200);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-white);
+}
+
+.CardLeftPart {
+    flex: 1;
+    min-width: 0;
+}
+
+.Subtitle {
+    margin-bottom: var(--axelix-space-2);
+    color: var(--axelix-green-600);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.Title {
+    margin-bottom: var(--axelix-space-2);
+}
+
+.Description {
+    color: var(--axelix-grey-600);
+}
+
+.CardRightPart {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: var(--axelix-space-4);
+    width: 200px;
+    padding-left: var(--axelix-space-6);
+    border-left: 1px solid var(--axelix-grey-200);
+}
+
+.MetaBlock {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-1);
+}
+
+.MetaLabel {
+    color: var(--axelix-grey-500);
+}
+
+.MetaValueGreen {
+    color: var(--axelix-green-600);
+    font-weight: var(--axelix-font-weight-semibold);
+}

@@ -1,0 +1,88 @@
+.Section {
+    margin-bottom: var(--axelix-space-8);
+}
+
+.SectionRow {
+    display: flex;
+    gap: var(--axelix-space-5);
+    justify-content: space-between;
+    margin-bottom: var(--axelix-space-3);
+}
+
+.SectionTitle {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.SectionNote {
+    margin: 0;
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+    text-align: right;
+}
+
+.Table {
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-white);
+}
+
+.HeaderRow,
+.Row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 120px 160px;
+    gap: var(--axelix-space-4);
+    align-items: center;
+    padding: 12px var(--axelix-space-5);
+}
+
+.HeaderRow {
+    color: var(--axelix-grey-500);
+    border-bottom: 1px solid var(--axelix-grey-200);
+}
+
+.Row {
+    border-bottom: 1px solid var(--axelix-grey-100);
+}
+
+.Row:last-child {
+    border-bottom: none;
+}
+
+.ArtifactCell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ArtifactId {
+    color: var(--axelix-green-600);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.GroupId {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.VersionBadge {
+    justify-self: start;
+    padding: 2px var(--axelix-space-2);
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-small);
+    color: var(--axelix-grey-900);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.LastSeen {
+    color: var(--axelix-green-600);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.FootNote {
+    margin-top: var(--axelix-space-3);
+    color: var(--axelix-grey-500);
+}

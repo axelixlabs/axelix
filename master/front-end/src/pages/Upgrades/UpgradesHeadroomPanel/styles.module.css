@@ -1,0 +1,35 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-6);
+    margin-bottom: var(--axelix-space-8);
+    padding: var(--axelix-space-6);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-grey-900);
+}
+
+.Eyebrow {
+    color: var(--axelix-green-500);
+}
+
+.Title {
+    max-width: 40rem;
+    margin-bottom: var(--axelix-space-3);
+    color: var(--axelix-white);
+}
+
+.Description {
+    max-width: 46rem;
+    color: var(--axelix-grey-400);
+}
+
+.FirstSectionWrapper {
+    display: flex;
+    gap: var(--axelix-space-8);
+    align-items: flex-start;
+}
+
+.Divider {
+    height: 1px;
+    background-color: rgb(255 255 255 / 10%);
+}

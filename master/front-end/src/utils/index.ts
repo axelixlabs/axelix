@@ -25,6 +25,7 @@ export * from "./entitiesMap";
 export * from "./threadDump";
 export * from "./siderMenu";
 export * from "./wallboard";
+export * from "./upgrades";
 export * from "./loggers";
 export * from "./details";
 export * from "./metrics";
