@@ -15,15 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { InputProps } from "antd";
-
-import { ERoles, EUserProfileEditableValueField } from "@/models";
-
-export const userProfileInputTypeMap: Record<EUserProfileEditableValueField, InputProps["type"]> = {
-    [EUserProfileEditableValueField.USERNAME]: "text",
-    [EUserProfileEditableValueField.EMAIL]: "email",
-    [EUserProfileEditableValueField.PASSWORD]: "password",
-};
+import { ERoles } from "@/models";
 
 export const roleOptions = Object.values(ERoles).map((role) => {
     return {

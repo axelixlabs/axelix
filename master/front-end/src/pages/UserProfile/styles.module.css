@@ -1,15 +1,309 @@
-.BackwardWrapper {
+.Crumb {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-2);
+    margin-bottom: var(--axelix-space-3);
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Crumb b {
+    color: var(--axelix-grey-900);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Identity {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-4);
+    padding-bottom: var(--axelix-space-5);
+    border-bottom: 1px solid var(--axelix-grey-200);
+}
+
+.Avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.AvatarAnonymous {
+    background-color: var(--axelix-grey-100);
+    color: var(--axelix-grey-500);
+}
+
+.IdentityText {
+    min-width: 0;
+}
+
+.NameRow {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-3);
+}
+
+.Name {
+    font-size: var(--axelix-font-size-page-title);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: -0.03em;
+    line-height: var(--axelix-line-height-tight);
+}
+
+.Status {
     display: inline-flex;
     align-items: center;
-    column-gap: 8px;
-    font-weight: 500;
-    transition: color 0.3s;
+    gap: 6px;
+    padding: 2px 9px 2px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--axelix-border-radius-pill);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
 }
 
-.BackwardWrapper:hover {
-    color: var(--axelix-green-600);
+.Status i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentcolor;
 }
 
-.FirstSectionUsername {
-    margin-block: 10px 30px;
+.StatusActive {
+    border-color: var(--axelix-green-200);
+    background-color: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+}
+
+.StatusDormant {
+    border-color: var(--axelix-orange-200);
+    background-color: var(--axelix-orange-50);
+    color: var(--axelix-orange-700);
+}
+
+.StatusSuspended {
+    border-color: var(--axelix-red-200);
+    background-color: var(--axelix-red-50);
+    color: var(--axelix-red-700);
+}
+
+.Meta {
+    margin-top: 6px;
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-body);
+    line-height: var(--axelix-line-height-tight);
+}
+
+.Mono {
+    font-family: var(--axelix-font-family-code);
+    font-weight: var(--axelix-font-weight-medium);
+}
+
+.Meta .Mono {
+    color: var(--axelix-grey-700);
+    font-size: inherit;
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Actions {
+    display: flex;
+    flex: none;
+    gap: var(--axelix-space-2);
+    margin-left: auto;
+}
+
+.Columns {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: var(--axelix-space-4);
+    align-items: start;
+    margin-top: var(--axelix-space-5);
+}
+
+.Card {
+    padding: 14px 16px 6px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.Card + .Card {
+    margin-top: var(--axelix-space-3);
+}
+
+.CardHead {
+    margin-bottom: var(--axelix-space-2);
+}
+
+.CardHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--axelix-space-3);
+}
+
+.CardTitle {
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: -0.01em;
+    line-height: var(--axelix-line-height-tight);
+}
+
+.CardHint {
+    margin-top: 2px;
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+    line-height: var(--axelix-line-height-tight);
+}
+
+.ChangeRoles:global(.ant-btn) {
+    height: auto;
+    padding: 0;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    line-height: var(--axelix-line-height-tight);
+}
+
+.Field {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: var(--axelix-space-4);
+    padding: 9px 0;
+    border-top: 1px solid var(--axelix-grey-100);
+    font-size: var(--axelix-font-size-body);
+}
+
+.Field span:first-child {
+    color: var(--axelix-grey-500);
+}
+
+.Field b {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Muted {
+    color: var(--axelix-grey-400);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Role {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--axelix-space-3);
+    align-items: start;
+    padding: 10px 0;
+    border-top: 1px solid var(--axelix-grey-100);
+}
+
+.Role :global(.ant-tag) {
+    justify-self: start;
+    width: fit-content;
+    margin: 0;
+    padding: 2px 6px;
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.03em;
+    line-height: var(--axelix-line-height-tight);
+}
+
+.Role p {
+    color: var(--axelix-grey-700);
+    font-size: var(--axelix-font-size-body);
+    line-height: 1.4;
+}
+
+.Group.Group {
+    padding: 2px 0 4px;
+    color: var(--axelix-grey-400);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.14em;
+    line-height: var(--axelix-line-height-tight);
+}
+
+.GroupBlock + .GroupBlock .Group {
+    padding: 12px 0 4px;
+    border-top: 1px solid var(--axelix-grey-100);
+}
+
+.Permission {
+    display: grid;
+    grid-template-columns: 18px 1fr auto;
+    gap: var(--axelix-space-3);
+    align-items: center;
+    padding: 7px 0;
+    font-size: var(--axelix-font-size-body);
+}
+
+.Off {
+    color: var(--axelix-grey-500);
+}
+
+.Code {
+    margin-left: var(--axelix-space-2);
+    color: var(--axelix-grey-500);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Off .Code {
+    color: var(--axelix-grey-400);
+}
+
+.Source {
+    color: var(--axelix-grey-500);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.03em;
+}
+
+.Granted {
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+}
+
+.Denied {
+    width: 16px;
+    height: 16px;
+    border: 1.5px dashed var(--axelix-grey-300);
+    border-radius: 50%;
+}
+
+.SuspendNotes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-2);
+    margin-top: var(--axelix-space-4);
+}
+
+.SuspendNotes p {
+    padding: 10px 12px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    color: var(--axelix-grey-700);
+}
+
+@media (width <= 960px) {
+    .Columns {
+        grid-template-columns: 1fr;
+    }
+
+    .Identity {
+        flex-wrap: wrap;
+    }
+
+    .Actions {
+        margin-left: 0;
+    }
 }
