@@ -44,7 +44,9 @@ export const UsedLibraryRow = ({ usedLibrary }: IProps) => {
         <>
             <div className={`${styles.MainWrapper} ${open ? styles.Open : ""}`}>
                 <div className={styles.Row} onClick={() => setOpen((prev) => !prev)}>
-                    <span className={`TextUltraSmall ${styles.Caret}`}>{open ? "▴" : "▾"}</span>
+                    <span className={`TextUltraSmall ${styles.Caret}`} aria-hidden="true">
+                        ▾
+                    </span>
                     <span className={`TextSmall ${styles.Library}`}>{`${library.groupId}:${library.artifactId}`}</span>
                     <span>
                         {riskyStatus && (
@@ -59,7 +61,11 @@ export const UsedLibraryRow = ({ usedLibrary }: IProps) => {
                     <ShareCell share={share} color={riskyStatus ? dependencyHealthColor[riskyStatus] : undefined} />
                 </div>
 
-                {open && <UsedLibraryDetail usedLibrary={usedLibrary} riskyStatus={riskyStatus} />}
+                <div className={`${styles.Detail} ${open ? styles.DetailOpen : ""}`}>
+                    <div className={styles.DetailInner}>
+                        <UsedLibraryDetail usedLibrary={usedLibrary} riskyStatus={riskyStatus} />
+                    </div>
+                </div>
             </div>
         </>
     );

@@ -1,10 +1,36 @@
 .MainWrapper {
     min-width: 860px;
     border-bottom: 1px solid var(--axelix-grey-200);
+    transition: background-color 0.3s ease;
 }
 
 .Open {
     background-color: var(--axelix-grey-25);
+}
+
+.Detail {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+}
+
+.DetailOpen {
+    grid-template-rows: 1fr;
+}
+
+.DetailInner {
+    min-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.3s ease;
+}
+
+.DetailOpen .DetailInner {
+    opacity: 1;
+    visibility: visible;
 }
 
 .Row {
@@ -25,6 +51,18 @@
     color: var(--axelix-grey-500);
 }
 
+.Caret {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.Open .Caret {
+    transform: rotate(180deg);
+}
+
 .Library {
     font-family: var(--axelix-font-family-code);
     overflow: hidden;
@@ -42,4 +80,13 @@
     justify-self: end;
     font-weight: var(--axelix-font-weight-semibold);
     font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .MainWrapper,
+    .Caret,
+    .Detail,
+    .DetailInner {
+        transition: none;
+    }
 }
