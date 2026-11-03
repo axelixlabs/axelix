@@ -15,7 +15,7 @@ import kotlin.io.path.readText
 plugins {
     id("java")
     id("maven-publish")
-    id("com.diffplug.spotless") version "8.9.0"
+    id("com.diffplug.spotless") version "8.10.4"
     id("pmd")
     id("signing")
     id("net.ltgt.errorprone") version "4.4.0"
@@ -67,8 +67,8 @@ subprojects {
     apply(plugin = "net.ltgt.errorprone")
 
     dependencies {
-        errorprone("com.google.errorprone:error_prone_core:2.50.0")
-        errorprone("com.uber.nullaway:nullaway:0.13.8")
+        errorprone("com.google.errorprone:error_prone_core:2.51.0")
+        errorprone("com.uber.nullaway:nullaway:0.14.3")
     }
 
     val customLicenseHeader = projectDir.resolve("../LICENSE_HEADER").toPath()
@@ -129,7 +129,7 @@ subprojects {
     pmd {
         isIgnoreFailures = false
         isConsoleOutput = true
-        toolVersion = "7.16.0"
+        toolVersion = "7.29.0"
         ruleSetFiles = files("${rootDir}/pmd.ruleset.xml")
     }
 

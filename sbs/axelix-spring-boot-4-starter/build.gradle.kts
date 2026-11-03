@@ -3,11 +3,11 @@ plugins {
     id("com.axelixlabs.axelix-internal")
 }
 
-val springBootVersion = "4.0.6"
-val springCloudVersion = "2025.1.0"
+val springBootVersion = "4.1.2"
+val springCloudVersion = "2025.1.4"
 
 val jsonUnitAssertJVersion = "2.40.1"
-val archUnitVersion = "1.4.2"
+val archUnitVersion = "1.5.1"
 
 dependencies {
     // Self

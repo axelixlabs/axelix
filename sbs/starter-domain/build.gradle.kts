@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 plugins {
     id("shared")
     id("java-test-fixtures")
-    kotlin("jvm") version "2.4.10"
+    kotlin("jvm") version "2.4.21"
     id("contracts")
 }
 
@@ -21,7 +21,7 @@ dependencies {
     // of Jackson we allow in this module: the annotations are honored by both Jackson 2 (Spring
     // Boot 2/3 starters) and Jackson 3 (Spring Boot 4 starter), and the compileOnly scope leaks
     // nothing onto the user's classpath.
-    compileOnly("com.fasterxml.jackson.core:jackson-annotations:2.13.5")
+    compileOnly("com.fasterxml.jackson.core:jackson-annotations:2.22")
 
     // Test
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
@@ -29,7 +29,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework:spring-web")
     testImplementation("com.squareup.okhttp3:mockwebserver")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.2.3")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.4.0")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
     testImplementation(testFixtures(project(":common")))
 

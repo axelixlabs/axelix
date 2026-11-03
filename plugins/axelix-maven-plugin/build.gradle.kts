@@ -13,8 +13,8 @@ tasks.compileJava {
 
 // pinned to the same version the gradle plugin uses, for consistency across the two.
 val jgitVersion = "6.10.1.202505221210-r"
-val mavenPluginVersion = "3.9.16"
-val mavenPluginAnnotationsVersion = "3.15.2"
+val mavenPluginVersion = "3.10.0"
+val mavenPluginAnnotationsVersion = "3.16.0"
 val junitBomVersion = "5.14.4"
 val mavenVerifierVersion = "1.8.0"
 val assertjVersion = "3.27.7"
@@ -22,7 +22,7 @@ val jsonUnitVersion = "4.1.1"
 
 dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}")
-    implementation("org.cyclonedx:cyclonedx-core-java:13.2.0")
+    implementation("org.cyclonedx:cyclonedx-core-java:13.4.0")
 
     compileOnly("org.apache.maven:maven-plugin-api:${mavenPluginVersion}")
     compileOnly("org.apache.maven:maven-core:${mavenPluginVersion}")

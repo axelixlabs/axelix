@@ -7,9 +7,9 @@ plugins {
 val restAssuredVersion = "5.5.7"
 val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.7"
-val junitVersion = "6.1.2"
-val jsoupVersion = "1.22.2"
-val playwrightVersion = "1.61.0"
+val junitVersion = "6.1.3"
+val jsoupVersion = "1.23.2"
+val playwrightVersion = "1.64.0"
 
 dependencies {
     testImplementation("io.rest-assured:rest-assured:${restAssuredVersion}")

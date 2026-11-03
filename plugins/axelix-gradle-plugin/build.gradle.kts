@@ -37,7 +37,7 @@ val assertjVersion = "3.27.7"
 val jsonUnitVersion = "4.1.1"
 dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}")
-    implementation("org.cyclonedx:cyclonedx-core-java:13.2.0")
+    implementation("org.cyclonedx:cyclonedx-core-java:13.4.0")
 
     testImplementation(platform("org.junit:junit-bom:${junitBomVersion}"))
     testImplementation("org.junit.jupiter:junit-jupiter")

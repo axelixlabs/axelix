@@ -6,7 +6,7 @@ plugins {
     id("shared")
     id("com.axelixlabs.axelix-internal")
     // What version of Kotlin are we going to use here...?
-    kotlin("jvm") version "2.4.10"
+    kotlin("jvm") version "2.4.21"
 }
 
 val springBootVersion = "3.0.13"
@@ -54,8 +54,8 @@ dependencies {
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.2.3")
-    testImplementation("com.tngtech.archunit:archunit:1.4.2")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.4.0")
+    testImplementation("com.tngtech.archunit:archunit:1.5.1")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
     testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")

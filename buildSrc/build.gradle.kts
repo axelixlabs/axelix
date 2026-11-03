@@ -1,6 +1,6 @@
 plugins {
     `kotlin-dsl`
-    id("com.diffplug.spotless") version "8.9.0"
+    id("com.diffplug.spotless") version "8.10.4"
 }
 
 repositories {
@@ -10,14 +10,14 @@ repositories {
 
 dependencies {
     // Used by the contract document validation, see contract/ContractDocuments.kt
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.22.4")
 
     // Used by the stateful contract validation to read the contracts as of the latest release
     // tag, see contract/ReleaseBaseline.kt
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r")
 
     // Applied by the 'contracts' convention plugin, see contracts.gradle.kts
-    implementation("org.openapitools:openapi-generator-gradle-plugin:7.25.0")
+    implementation("org.openapitools:openapi-generator-gradle-plugin:7.26.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

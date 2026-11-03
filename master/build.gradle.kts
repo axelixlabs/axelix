@@ -10,28 +10,28 @@ plugins {
     id("contracts")
 }
 
-val springBootVersion = "4.1.1"
-val springCloudVersion = "2025.1.2"
-val springAiVersion = "2.0.0"
+val springBootVersion = "4.1.2"
+val springCloudVersion = "2025.1.4"
+val springAiVersion = "2.0.2"
 
 // Not Managed by Spring BOM
-val sqliteVersion = "3.53.2.1"
-val nimbusJoseJwt = "10.9.1"
+val sqliteVersion = "3.54.1.0"
+val nimbusJoseJwt = "10.10"
 val jmesPathVersion = "0.6.0"
 val instancioVersion = "5.6.0"
 val jsonUnitAssertJVersion = "2.40.1"
-val prometheusMetricsVersion = "1.7.0"
+val prometheusMetricsVersion = "1.10.0"
 
 // Explicitly specified versions for security reasons (i.e. using some specific patch versions)
-val postgresqlVersion = "42.7.13"
-val nettyVersion = "4.2.17.Final"
-val tomcatVersion = "11.0.25"
+val postgresqlVersion = "42.7.14"
+val nettyVersion = "4.2.19.Final"
+val tomcatVersion = "11.0.27"
 val vertxVersion = "4.5.31"
-val httpcore5Version = "5.4.3"
-val httpclient5Version = "5.6.3"
-val bcprovVersion = "1.85"
-val jacksonVersion = "3.1.7"
-val jackson2Version = "2.21.7"
+val httpcore5Version = "5.4.4"
+val httpclient5Version = "5.6.5"
+val bcprovVersion = "1.86"
+val jacksonVersion = "3.2.4"
+val jackson2Version = "2.22.4"
 
 dependencies {
     // Self
@@ -113,7 +113,7 @@ dependencies {
     testFixturesApi("org.testcontainers:testcontainers-junit-jupiter")
     testFixturesApi("com.squareup.okhttp3:mockwebserver")
     testFixturesApi("com.squareup.okhttp3:okhttp")
-    testFixturesApi("digital.pragmatech.testing:spring-test-profiler:0.1.2")
+    testFixturesApi("digital.pragmatech.testing:spring-test-profiler:0.4.0")
     testFixturesApi("org.instancio:instancio-core:${instancioVersion}")
     testFixturesApi("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
     testFixturesApi("org.awaitility:awaitility")

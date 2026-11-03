@@ -8,7 +8,7 @@ group = 'com.example'
 repositories { mavenCentral() }
 
 dependencies {
-    testRuntimeOnly 'digital.pragmatech.testing:spring-test-profiler:0.1.1'
+    testRuntimeOnly 'digital.pragmatech.testing:spring-test-profiler:0.4.0'
 }
 
 // Prints the *declared* modules (not resolved files) of the test runtime classpath, so tests can

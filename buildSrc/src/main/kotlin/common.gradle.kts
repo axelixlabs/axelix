@@ -23,7 +23,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.release = 11
 }
 
-val jacksonDatabindVersion = "2.13.5"
+val jacksonDatabindVersion = "2.22.4"
 val springBootTestPlatformVersion = "2.7.18"
 
 dependencies {
