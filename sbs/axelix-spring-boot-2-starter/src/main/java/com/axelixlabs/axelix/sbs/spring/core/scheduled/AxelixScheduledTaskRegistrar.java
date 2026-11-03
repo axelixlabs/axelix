@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
+
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.config.CronTask;
@@ -37,7 +39,7 @@ import com.axelixlabs.axelix.common.utils.Lazy;
  */
 public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
 
-    private final ThreadLocal<@Nullable String> processingContext = new ThreadLocal<>();
+    private final ThreadLocal<@Nullable ScheduledAnnotationContext> processingContext = new ThreadLocal<>();
 
     @SuppressWarnings("NullAway.Init")
     private Lazy<ScheduledTaskExecutionHistory> history;
@@ -50,9 +52,11 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
      * Runs the processing of a {@code @Scheduled} annotation, during which the tasks are scheduled.
      *
      * @param suffix the suffix of the task id, see {@link AxelixScheduledAnnotationBeanPostProcessor}.
+     * @param target the bean declaring the annotated method.
+     * @param method the annotated method.
      */
-    void process(String suffix, Runnable processing) {
-        processingContext.set(suffix);
+    void process(String suffix, Object target, Method method, Runnable processing) {
+        processingContext.set(new ScheduledAnnotationContext(suffix, target, method));
         try {
             processing.run();
         } finally {
@@ -87,10 +91,29 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
      *         before the scheduler was resolved.
      */
     private @Nullable Runnable wrap(Runnable runnable) {
-        String suffix = processingContext.get();
-        if (suffix == null) {
+        ScheduledAnnotationContext annotation = processingContext.get();
+        if (annotation == null) {
             return null;
         }
-        return new ScheduledAnnotationRunnable(runnable, runnable + "#" + suffix, history.require());
+        return new ScheduledAnnotationRunnable(
+                runnable, runnable + "#" + annotation.suffix, annotation.target, annotation.method, history.require());
+    }
+
+    private static final class ScheduledAnnotationContext {
+
+        private final String suffix;
+        private final Object target;
+        private final Method method;
+
+        /**
+         * @param suffix the suffix of the task id, see {@link AxelixScheduledAnnotationBeanPostProcessor}.
+         * @param target the bean declaring the annotated method.
+         * @param method the annotated method.
+         */
+        private ScheduledAnnotationContext(String suffix, Object target, Method method) {
+            this.suffix = suffix;
+            this.target = target;
+            this.method = method;
+        }
     }
 }

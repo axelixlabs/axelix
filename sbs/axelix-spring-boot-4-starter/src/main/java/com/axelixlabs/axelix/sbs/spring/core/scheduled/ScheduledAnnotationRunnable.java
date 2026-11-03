@@ -17,9 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
+
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.SchedulingAwareRunnable;
+import org.springframework.scheduling.support.ScheduledMethodRunnable;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
@@ -39,23 +42,38 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
     private final Runnable delegate;
     private final String id;
     private final boolean reactive;
+    private final Object target;
+    private final Method method;
     private final ScheduledTaskExecutionHistory history;
     private final ScheduledTaskLaunchType launchType;
 
+    /**
+     * @param target the bean declaring the annotated method.
+     * @param method the annotated method.
+     */
     public ScheduledAnnotationRunnable(
-            Runnable delegate, String id, boolean reactive, ScheduledTaskExecutionHistory history) {
-        this(delegate, id, reactive, history, ScheduledTaskLaunchType.SCHEDULED);
+            Runnable delegate,
+            String id,
+            boolean reactive,
+            Object target,
+            Method method,
+            ScheduledTaskExecutionHistory history) {
+        this(delegate, id, reactive, target, method, history, ScheduledTaskLaunchType.SCHEDULED);
     }
 
     private ScheduledAnnotationRunnable(
             Runnable delegate,
             String id,
             boolean reactive,
+            Object target,
+            Method method,
             ScheduledTaskExecutionHistory history,
             ScheduledTaskLaunchType launchType) {
         this.delegate = delegate;
         this.id = id;
         this.reactive = reactive;
+        this.target = target;
+        this.method = method;
         this.history = history;
         this.launchType = launchType;
     }
@@ -64,7 +82,8 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
      * @return the runnable of the same task, whose executions are recorded as the manually launched ones.
      */
     public ScheduledAnnotationRunnable manual() {
-        return new ScheduledAnnotationRunnable(delegate, id, reactive, history, ScheduledTaskLaunchType.MANUAL);
+        return new ScheduledAnnotationRunnable(
+                delegate, id, reactive, target, method, history, ScheduledTaskLaunchType.MANUAL);
     }
 
     @Override
@@ -92,6 +111,14 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
         return CURRENT_REACTIVE_TASK.get();
     }
 
+    /**
+     * @return the runnable to schedule the task with: the {@link ScheduledMethodView} for a regular task,
+     * this runnable for a reactive one.
+     */
+    public Runnable schedulable() {
+        return reactive ? this : new ScheduledMethodView(this);
+    }
+
     ScheduledTaskLaunchType getLaunchType() {
         return launchType;
     }
@@ -112,5 +139,39 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
     @Override
     public String toString() {
         return id;
+    }
+
+    /**
+     * A simple {@link ScheduledMethodRunnable} that delegates to the regular task, for the libraries expecting the
+     * runnable of a {@code @Scheduled} method to be the {@link ScheduledMethodRunnable}, e.g. ShedLock.
+     */
+    private static final class ScheduledMethodView extends ScheduledMethodRunnable {
+
+        private final ScheduledAnnotationRunnable task;
+
+        private ScheduledMethodView(ScheduledAnnotationRunnable task) {
+            super(task.target, task.method);
+            this.task = task;
+        }
+
+        @Override
+        public void run() {
+            task.run();
+        }
+
+        @Override
+        public boolean isLongLived() {
+            return task.isLongLived();
+        }
+
+        @Override
+        public @Nullable String getQualifier() {
+            return task.getQualifier();
+        }
+
+        @Override
+        public String toString() {
+            return task.toString();
+        }
     }
 }

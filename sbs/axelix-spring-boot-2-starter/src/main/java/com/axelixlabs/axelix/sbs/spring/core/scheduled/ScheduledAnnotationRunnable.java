@@ -17,7 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Method;
+
 import org.springframework.scheduling.SchedulingAwareRunnable;
+import org.springframework.scheduling.support.ScheduledMethodRunnable;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
 
@@ -25,21 +28,35 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaun
  * The runnable of the task declared by a single {@code @Scheduled} annotation. Its string representation is the id of
  * the task, which tells apart the tasks of the repeatable {@code @Scheduled} annotations of the same method.
  *
+ * <p>It is the {@link ScheduledMethodRunnable} of the annotated method, as without Axelix, for the libraries expecting
+ * the runnable of a {@code @Scheduled} method to be the {@link ScheduledMethodRunnable}, e.g. ShedLock.
+ *
  * @author Nikita Kirillov
  */
-public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnable {
+public final class ScheduledAnnotationRunnable extends ScheduledMethodRunnable implements SchedulingAwareRunnable {
 
     private final Runnable delegate;
     private final String id;
     private final ScheduledTaskExecutionHistory history;
     private final ScheduledTaskLaunchType launchType;
 
-    public ScheduledAnnotationRunnable(Runnable delegate, String id, ScheduledTaskExecutionHistory history) {
-        this(delegate, id, history, ScheduledTaskLaunchType.SCHEDULED);
+    /**
+     * @param target the bean declaring the annotated method.
+     * @param method the annotated method.
+     */
+    public ScheduledAnnotationRunnable(
+            Runnable delegate, String id, Object target, Method method, ScheduledTaskExecutionHistory history) {
+        this(delegate, id, target, method, history, ScheduledTaskLaunchType.SCHEDULED);
     }
 
     private ScheduledAnnotationRunnable(
-            Runnable delegate, String id, ScheduledTaskExecutionHistory history, ScheduledTaskLaunchType launchType) {
+            Runnable delegate,
+            String id,
+            Object target,
+            Method method,
+            ScheduledTaskExecutionHistory history,
+            ScheduledTaskLaunchType launchType) {
+        super(target, method);
         this.delegate = delegate;
         this.id = id;
         this.history = history;
@@ -50,7 +67,8 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
      * @return the runnable of the same task, whose executions are recorded as the manually launched ones.
      */
     public ScheduledAnnotationRunnable manual() {
-        return new ScheduledAnnotationRunnable(delegate, id, history, ScheduledTaskLaunchType.MANUAL);
+        return new ScheduledAnnotationRunnable(
+                delegate, id, getTarget(), getMethod(), history, ScheduledTaskLaunchType.MANUAL);
     }
 
     @Override

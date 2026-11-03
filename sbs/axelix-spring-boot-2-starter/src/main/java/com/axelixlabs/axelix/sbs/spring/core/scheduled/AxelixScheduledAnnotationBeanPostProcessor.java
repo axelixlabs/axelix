@@ -57,7 +57,8 @@ public class AxelixScheduledAnnotationBeanPostProcessor extends ScheduledAnnotat
 
     @Override
     protected void processScheduled(@NonNull Scheduled scheduled, @NonNull Method method, @NonNull Object bean) {
-        registrar.process(suffix(scheduled, method), () -> super.processScheduled(scheduled, method, bean));
+        registrar.process(
+                suffix(scheduled, method), bean, method, () -> super.processScheduled(scheduled, method, bean));
     }
 
     /**

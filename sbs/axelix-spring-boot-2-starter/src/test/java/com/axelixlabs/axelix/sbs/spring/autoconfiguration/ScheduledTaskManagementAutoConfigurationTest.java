@@ -17,14 +17,21 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.LazyInitializationBeanFactoryPostProcessor;
@@ -61,9 +68,12 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskRescheduler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskSchedulerProvider;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskRescheduler;
 
+import static net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock.InterceptMode.PROXY_METHOD;
+import static net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock.InterceptMode.PROXY_SCHEDULER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.awaitility.Awaitility.await;
 
 /**
  * Integration tests for {@link ScheduledTaskManagementAutoConfiguration}
@@ -81,6 +91,10 @@ class ScheduledTaskManagementAutoConfigurationTest {
     private static final String TASK_SCHEDULER_BEAN_NAME = "taskScheduler";
     private static final String SPRING_BOOT_SCHEDULER_THREAD_PREFIX = "scheduling-";
     private static final String USER_TASK_SCHEDULER_BEAN_NAME = "userTaskScheduler";
+
+    private static final String[] LOCKED_TASK_NOT_SCHEDULED_SOON = {
+        "locked-task.rate=PT1H", "locked-task.initial-delay=PT1H"
+    };
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues(ENDPOINT_EXPOSURE_PROPERTY)
@@ -471,6 +485,86 @@ class ScheduledTaskManagementAutoConfigurationTest {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Tests that the {@code @Scheduled} tasks locked by ShedLock stay locked with Axelix.
+     */
+    @Nested
+    class ShedLock {
+
+        private final ApplicationContextRunner lockedTaskContextRunner =
+                contextRunner.withUserConfiguration(LockedTaskConfig.class);
+
+        @Test
+        void shouldNotRunTheTaskLockedByAnotherInstance_withMethodProxy() {
+            lockedTaskContextRunner
+                    .withUserConfiguration(ShedLockMethodProxyConfig.class)
+                    .run(context -> {
+                        LockCounters counters = context.getBean(LockCounters.class);
+
+                        await().atMost(Duration.ofSeconds(5)).until(() -> counters.lockAttempts.get() >= 2);
+
+                        assertThat(counters.executions).hasValue(0);
+                    });
+        }
+
+        @Test
+        void shouldNotRunTheTaskLockedByAnotherInstance_withSchedulerProxy() {
+            lockedTaskContextRunner
+                    .withUserConfiguration(ShedLockSchedulerProxyConfig.class)
+                    .run(context -> {
+                        LockCounters counters = context.getBean(LockCounters.class);
+
+                        await().atMost(Duration.ofSeconds(5))
+                                .until(() -> counters.lockAttempts.get() >= 2 || counters.executions.get() >= 2);
+
+                        assertThat(counters.executions).hasValue(0);
+                    });
+        }
+
+        @Test
+        void shouldNotRunTheRescheduledTaskLockedByAnotherInstance_withSchedulerProxy() {
+            lockedTaskContextRunner
+                    .withUserConfiguration(ShedLockSchedulerProxyConfig.class)
+                    .withPropertyValues("locked-task.rate=PT1H")
+                    .run(context -> {
+                        LockCounters counters = context.getBean(LockCounters.class);
+                        await().atMost(Duration.ofSeconds(5)).until(() -> counters.lockAttempts.get() >= 1);
+
+                        context.getBean(ScheduledTaskService.class).modifyInterval(taskId(context), 50);
+
+                        await().atMost(Duration.ofSeconds(5))
+                                .until(() -> counters.lockAttempts.get() >= 3 || counters.executions.get() >= 2);
+
+                        assertThat(counters.executions).hasValue(0);
+                    });
+        }
+
+        @Test
+        void shouldNotRunTheManuallyLaunchedTaskLockedByAnotherInstance_withSchedulerProxy() {
+            lockedTaskContextRunner
+                    .withUserConfiguration(ShedLockSchedulerProxyConfig.class)
+                    .withPropertyValues(LOCKED_TASK_NOT_SCHEDULED_SOON)
+                    .run(context -> {
+                        LockCounters counters = context.getBean(LockCounters.class);
+
+                        context.getBean(ScheduledTaskService.class).executeScheduledTask(taskId(context));
+
+                        await().atMost(Duration.ofSeconds(5))
+                                .until(() -> counters.lockAttempts.get() >= 1 || counters.executions.get() >= 1);
+
+                        assertThat(counters.executions).hasValue(0);
+                    });
+        }
+
+        private String taskId(AssertableApplicationContext context) {
+            return context.getBean(ScheduledTasksRegistry.class).getAll().stream()
+                    .filter(task -> task.getId().contains(LockedTask.class.getName()))
+                    .findFirst()
+                    .orElseThrow()
+                    .getId();
+        }
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class EnableSchedulingConfig {
@@ -544,6 +638,61 @@ class ScheduledTaskManagementAutoConfigurationTest {
         @Bean
         public ThreadPoolTaskScheduler userTaskScheduler() {
             return new ThreadPoolTaskScheduler();
+        }
+    }
+
+    @TestConfiguration
+    @EnableScheduling
+    @EnableSchedulerLock(interceptMode = PROXY_METHOD, defaultLockAtMostFor = "PT1M")
+    static class ShedLockMethodProxyConfig {}
+
+    @TestConfiguration
+    @EnableScheduling
+    @EnableSchedulerLock(interceptMode = PROXY_SCHEDULER, defaultLockAtMostFor = "PT1M")
+    static class ShedLockSchedulerProxyConfig {}
+
+    @TestConfiguration
+    static class LockedTaskConfig {
+
+        @Bean
+        LockCounters counters() {
+            return new LockCounters();
+        }
+
+        @Bean
+        LockProvider lockProvider(LockCounters counters) {
+            return lockConfiguration -> {
+                counters.lockAttempts.incrementAndGet();
+                return Optional.empty();
+            };
+        }
+
+        @Bean
+        LockedTask lockedTask(LockCounters counters) {
+            return new LockedTask(counters);
+        }
+    }
+
+    static class LockCounters {
+
+        final AtomicInteger lockAttempts = new AtomicInteger();
+        final AtomicInteger executions = new AtomicInteger();
+    }
+
+    static class LockedTask {
+
+        private final LockCounters counters;
+
+        LockedTask(LockCounters counters) {
+            this.counters = counters;
+        }
+
+        @Scheduled(
+                fixedRateString = "${locked-task.rate:PT0.05S}",
+                initialDelayString = "${locked-task.initial-delay:PT0S}")
+        @SchedulerLock(name = "lockedTask")
+        public void run() {
+            counters.executions.incrementAndGet();
         }
     }
 }
