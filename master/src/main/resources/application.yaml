@@ -83,6 +83,12 @@ axelix:
     migrations:
       username: ${axelix.master.database.username:}
       password: ${axelix.master.database.password:}
+    scheduled-tasks:
+      history:
+        retention: 30d
+        max-executions-per-task: 50
+        cleanup:
+          schedule: "0 */10 * * * *"
     discovery:
       self-registration:
         enabled: true

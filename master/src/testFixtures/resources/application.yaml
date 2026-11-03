@@ -69,6 +69,12 @@ axelix:
         enabled: false
     mcp-server:
       enabled: false
+    scheduled-tasks:
+      history:
+        retention: 30d
+        max-executions-per-task: 50
+        cleanup:
+          schedule: "-"
     discovery:
       auto:
         broadcast:

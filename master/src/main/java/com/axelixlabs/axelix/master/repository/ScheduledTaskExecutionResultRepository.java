@@ -17,11 +17,14 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Set;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
@@ -41,4 +44,32 @@ public interface ScheduledTaskExecutionResultRepository
      */
     @Query("SELECT id FROM scheduled_task_execution_results WHERE id IN (:ids)")
     Set<String> findStoredIds(Collection<String> ids);
+
+    /**
+     * @return the number of the deleted executions.
+     */
+    @Modifying
+    @Query("DELETE FROM scheduled_task_execution_results WHERE started_at < :threshold")
+    int deleteStartedBefore(@Param("threshold") Instant threshold);
+
+    /**
+     * Deletes all the executions of every task of every application except the latest ones.
+     *
+     * @param maxExecutionsPerTask the number of the latest executions of each task to keep.
+     * @return the number of the deleted executions.
+     */
+    @Modifying
+    @Query("""
+        DELETE FROM scheduled_task_execution_results
+        WHERE id IN (
+            SELECT id FROM (
+                SELECT id,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY group_id, artifact_id, task_id ORDER BY started_at DESC, id DESC) AS position
+                FROM scheduled_task_execution_results
+            ) ranked
+            WHERE position > :maxExecutionsPerTask
+        )
+        """)
+    int deleteAllButLatest(@Param("maxExecutionsPerTask") int maxExecutionsPerTask);
 }
