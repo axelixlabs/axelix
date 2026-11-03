@@ -1,38 +1,20 @@
 .Permission {
-    display: grid;
-    grid-template-columns: 18px 1fr auto;
-    gap: var(--axelix-space-3);
+    display: flex;
     align-items: center;
-    padding: 7px 0;
+    gap: var(--axelix-space-2);
+    padding: 9px 0;
     font-size: var(--axelix-font-size-body);
+    line-height: var(--axelix-line-height-tight);
 }
 
 .Off {
     color: var(--axelix-grey-500);
 }
 
-.Code {
-    margin-left: var(--axelix-space-2);
-    color: var(--axelix-grey-500);
-    font-family: var(--axelix-font-family-code);
-    font-size: var(--axelix-font-size-caption);
-}
-
-.Off .Code {
-    color: var(--axelix-grey-400);
-}
-
-.Source {
-    color: var(--axelix-grey-500);
-    font-family: var(--axelix-font-family-code);
-    font-size: var(--axelix-font-size-caption);
-    font-weight: var(--axelix-font-weight-semibold);
-    letter-spacing: 0.03em;
-}
-
 .Granted {
     display: grid;
     place-items: center;
+    flex: none;
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -45,4 +27,5 @@
     height: 16px;
     border: 1.5px dashed var(--axelix-grey-300);
     border-radius: 50%;
+    flex: none;
 }

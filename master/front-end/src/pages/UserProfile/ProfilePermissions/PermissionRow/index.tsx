@@ -17,13 +17,9 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { ERoles } from "@/models";
-
 import type { TProfileAuthority } from "../../permissions";
 
 import styles from "./styles.module.css";
-
-const MISSING_VALUE = "—";
 
 interface IProps {
     /**
@@ -32,17 +28,17 @@ interface IProps {
     authority: TProfileAuthority;
 
     /**
-     * Role that grants the authority. Absent when the user does not hold it.
+     * Whether the user's roles grant this authority
      */
-    source?: ERoles;
+    granted: boolean;
 }
 
-export const PermissionRow = ({ authority, source }: IProps) => {
+export const PermissionRow = ({ authority, granted }: IProps) => {
     const { t } = useTranslation();
 
     return (
-        <div className={`${styles.Permission} ${source ? "" : styles.Off}`}>
-            {source ? (
+        <div className={`${styles.Permission} ${granted ? "" : styles.Off}`}>
+            {granted ? (
                 <span className={styles.Granted} aria-hidden>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                         <path
@@ -57,11 +53,7 @@ export const PermissionRow = ({ authority, source }: IProps) => {
             ) : (
                 <span className={styles.Denied} />
             )}
-            <span>
-                {t(`Users.Profile.Authorities.${authority}`)}
-                <span className={styles.Code}>{authority}</span>
-            </span>
-            <span className={styles.Source}>{source ?? MISSING_VALUE}</span>
+            <span>{t(`Users.Profile.Authorities.${authority}`)}</span>
         </div>
     );
 };

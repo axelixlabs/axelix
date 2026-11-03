@@ -24,15 +24,15 @@ describe("effectiveAuthorities", () => {
     it("grants an editor the runtime operations and nothing sensitive", () => {
         const granted = effectiveAuthorities([ERoles.EDITOR]);
 
-        expect(granted.get("CACHES_CLEAR")).toBe(ERoles.EDITOR);
+        expect(granted.has("CACHES_CLEAR")).toBe(true);
         expect(granted.has("ENV_VALUES_READ")).toBe(false);
     });
 
-    it("attributes a shared authority to ADMIN when both roles are held", () => {
+    it("grants every authority held by any of the user's roles", () => {
         const granted = effectiveAuthorities([ERoles.EDITOR, ERoles.ADMIN]);
 
-        expect(granted.get("SCHEDULED_TASKS_MODIFY")).toBe(ERoles.ADMIN);
-        expect(granted.get("CONFIG_PROPS_VALUES_READ")).toBe(ERoles.ADMIN);
+        expect(granted.has("SCHEDULED_TASKS_MODIFY")).toBe(true);
+        expect(granted.has("CONFIG_PROPS_VALUES_READ")).toBe(true);
     });
 
     it("grants nothing to a viewer", () => {
