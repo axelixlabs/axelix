@@ -12,18 +12,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-thread-dump:
-    get:
-      operationId: getThreadDump
-      summary: Returns the dump of all the live threads of the service.
-      responses:
-        '200':
-          description: The thread dump of the service.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ThreadDumpFeed'
 components:
   schemas:
     ThreadDumpFeed:

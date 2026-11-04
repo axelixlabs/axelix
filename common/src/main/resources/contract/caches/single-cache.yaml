@@ -13,31 +13,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-caches/{cacheManagerName}/{cacheName}:
-    get:
-      operationId: getSingleCache
-      summary: Returns the detailed information of a single cache, addressed by cache manager and cache name.
-      parameters:
-        - name: cacheManagerName
-          in: path
-          required: true
-          description: The name of the cache manager.
-          schema:
-            type: string
-        - name: cacheName
-          in: path
-          required: true
-          description: The name of the cache.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The single cache information.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SingleCache'
 components:
   schemas:
     SingleCache:

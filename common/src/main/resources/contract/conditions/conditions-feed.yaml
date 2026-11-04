@@ -13,18 +13,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-conditions:
-    get:
-      operationId: getConditions
-      summary: Returns the conditions report of the service.
-      responses:
-        '200':
-          description: The feed of positively and negatively matched conditions.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConditionsFeed'
 components:
   schemas:
     ConditionsFeed:

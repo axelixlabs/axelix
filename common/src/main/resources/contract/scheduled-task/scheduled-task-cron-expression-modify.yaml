@@ -11,25 +11,7 @@ info:
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-scheduled-tasks/modify/cron-expression:
-    post:
-      operationId: modifyScheduledTaskCronExpression
-      summary: Changes the cron expression of a scheduled task of the service.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ScheduledTaskCronExpressionModifyRequest'
-      responses:
-        '204':
-          description: The cron expression was changed.
-        '400':
-          description: >-
-            No scheduled task with the given trigger exists, it is not a cron-based task, or the
-            cron expression is invalid.
+  x-axelix-server: master
 components:
   schemas:
     ScheduledTaskCronExpressionModifyRequest:

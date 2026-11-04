@@ -11,33 +11,7 @@ info:
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-scheduled-tasks/disable:
-    post:
-      operationId: disableScheduledTask
-      summary: Disables a scheduled task of the service.
-      parameters:
-        - name: force
-          in: query
-          required: false
-          description: >-
-            When true, the currently running execution of the task is interrupted; otherwise the
-            task finishes its current execution and is only excluded from the future schedule.
-          schema:
-            type: boolean
-            default: false
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ScheduledTaskDisableRequest'
-      responses:
-        '204':
-          description: The task was disabled.
-        '400':
-          description: No scheduled task with the given trigger exists.
+  x-axelix-server: master
 components:
   schemas:
     ScheduledTaskDisableRequest:

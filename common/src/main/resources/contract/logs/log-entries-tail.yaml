@@ -9,29 +9,6 @@ info:
     i.e. the last entry of the response is the most recent one.
   x-axelix-introduced-in: 1.3.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-logs:
-    get:
-      operationId: getLogEntriesTail
-      summary: Returns the most recent log entries of the service.
-      parameters:
-        - name: limit
-          in: query
-          required: false
-          description: >-
-            The maximum amount of the most recent log entries to return. Fewer entries are returned
-            if the starter has buffered less than that. If absent, all the buffered entries are returned. 
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-      responses:
-        '200':
-          description: The most recent log entries.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LogEntriesTail'
 components:
   schemas:
     LogEntriesTail:

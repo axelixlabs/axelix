@@ -7,23 +7,7 @@ info:
     does not include all the information needed in order for the service to register itself. Version 2
     includes minimal information so the Master can assume the other peer is alive.
   x-axelix-introduced-in: 1.3.0
-  x-axelix-server: master
-paths:
-  /service/heartbeat/v2:
-    post:
-      operationId: heartbeatV2
-      summary: Accepts the heartbeat of a service instance.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HeartBeatMetadataV2'
-      responses:
-        '204':
-          description: The heartbeat was accepted.
-        '409':
-          description: The instance is not known to this Axelix Master and has to register itself first.
+  x-axelix-server: starter
 components:
   schemas:
     HeartBeatMetadataV2:

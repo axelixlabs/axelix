@@ -11,21 +11,7 @@ info:
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-gc/log/enable:
-    post:
-      operationId: enableGcLogging
-      summary: Enables the garbage collection logging of the service.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GcLogEnableRequest'
-      responses:
-        '200':
-          description: The garbage collection logging was enabled.
+  x-axelix-server: master
 components:
   schemas:
     GcLogEnableRequest:

@@ -4,5 +4,5 @@ info:
   version: 1.0.0
   x-axelix-introduced-in: 1.0.0
   x-axelix-server: starter
-# INVALID: the document describes no operation at all.
+# A payload-only document describes no operation, and that is valid.
 paths: {}

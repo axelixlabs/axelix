@@ -141,15 +141,29 @@ class ContractDocumentsValidatorTest {
     fun `a document with two operations fails`() {
         expectProblem(
             "stateless/DocumentDescribesOneOperation/two-operations.yaml",
-            "the document must describe exactly one operation, but describes 2: "
+            "the document must describe at most one operation, but describes 2: "
                 + "GET /actuator/axelix-loggers, POST /actuator/axelix-loggers/logger/{name}/reset")
     }
 
     @Test
-    fun `a document without operations fails`() {
+    fun `a document without operations passes`() {
+        ContractDocumentsValidator.validate(
+            document("stateless/DocumentDescribesOneOperation/no-operations.yaml"), CURRENT_VERSION)
+    }
+
+    @Test
+    fun `a late required property of a payload-only starter document fails within the window`() {
         expectProblem(
-            "stateless/DocumentDescribesOneOperation/no-operations.yaml",
-            "the document must describe exactly one operation, but describes none")
+            "stateless/RequiredHonoursTheWindow/payload-only-premature-required.yaml",
+            "the property 'LoggersReply.effectiveLevel' cannot be 'required' yet: starters older "
+                + "than 1.2.0 do not send it and only leave the compatibility window in 1.5")
+    }
+
+    @Test
+    fun `a late required property of a payload-only master document passes right away`() {
+        ContractDocumentsValidator.validate(
+            document("stateless/RequiredHonoursTheWindow/payload-only-master-produced-late-required.yaml"),
+            CURRENT_VERSION)
     }
 
     private fun expectProblem(

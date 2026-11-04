@@ -12,18 +12,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-metadata:
-    get:
-      operationId: getMetadata
-      summary: Returns the basic registration metadata of the service.
-      responses:
-        '200':
-          description: The basic registration metadata of the service.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BasicRegistrationMetadata'
 components:
   schemas:
     # BasicRegistrationMetadata and everything below it is duplicated verbatim in

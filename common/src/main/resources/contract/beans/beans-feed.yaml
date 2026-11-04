@@ -11,18 +11,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-beans:
-    get:
-      operationId: getBeans
-      summary: Returns the beans of the service.
-      responses:
-        '200':
-          description: The feed of the beans of the service.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BeansFeed'
 components:
   schemas:
     BeansFeed:

@@ -11,27 +11,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers/logger/{name}:
-    get:
-      operationId: getSingleLogger
-      summary: Returns the profile of a single logger of the service.
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: The name of the logger to read.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The profile of the requested logger.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SingleLoggerProfile'
-        '400':
-          description: No logger with the given name exists.
 components:
   schemas:
     SingleLoggerProfile:

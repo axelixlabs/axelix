@@ -23,7 +23,7 @@ import java.io.File
 import org.gradle.api.GradleException
 
 /**
- * A parsed contract of the single operation between Axelix Master & starters.
+ * A parsed contract between Axelix Master and the starters. The document defines one payload.
  *
  * @param axelixVersion version of Axelix, when the given document was actaul
  * @param root the [JsonNode] that represents the root of the YAML document to be inspected
@@ -34,6 +34,13 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
 
     val info: JsonNode = root.path("info")
 
+    /**
+     * The side named by [SERVER].
+     *
+     * On a payload-only document this is who produces the payload. On a document that still
+     * describes an HTTP operation (released baselines do) this is who answers the call, and the
+     * producer is derived from the request body versus the response.
+     */
     val server: String = info.path(SERVER).asText("")
 
     /**
@@ -60,8 +67,8 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
     }
 
     /**
-     * Every operation the document describes, e.g. "POST /actuator/axelix-loggers", regardless
-     * of the one-operation rule the invariants enforce on top of this list.
+     * Every operation the document describes, e.g. "POST /actuator/axelix-loggers". Empty for a
+     * payload-only document, which declares no `paths`.
      */
     val operations: List<String> = root.path("paths").properties().flatMap { (path, pathItem) ->
         pathItem.properties()
@@ -72,14 +79,24 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
     /**
      * The names of the schemas that **travel in a payload produced by the starter**.
      *
+     * A document without operations is the payload itself, so every schema it declares is
+     * produced by [server]. A document that still describes an operation derives the producer
+     * from that operation:
+     *
      * 1. Responses when the starter answers the call
-     * 2. Request bodies when starter queries Axelix Master does
+     * 2. Request bodies when the starter calls Axelix Master
      */
     val starterProducedSchemas: Set<String> by lazy {
         if (server !in SERVER_SIDES) {
             return@lazy emptySet()
         }
         val produced = mutableSetOf<String>()
+        if (operations.isEmpty()) {
+            if (server == "starter") {
+                produced += root.path("components").path("schemas").properties().map { (name, _) -> name }
+            }
+            return@lazy produced
+        }
         root.path("paths").properties().forEach { (_, path) ->
             path.properties().forEach { (_, operation) ->
                 val starterSide =

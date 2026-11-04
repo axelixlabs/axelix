@@ -12,25 +12,7 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-deprecated-in: 1.3.0
-  x-axelix-server: master
-paths:
-  /service/register:
-    post:
-      operationId: registerService
-      summary: Accepts the heartbeat of a service instance.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HeartBeatMetadata'
-      responses:
-        '204':
-          description: The heartbeat was accepted.
-        '400':
-          description: The heartbeat request could not be processed.
-        '409':
-          description: The starter version of the instance is not supported by this Axelix Master.
+  x-axelix-server: starter
 components:
   schemas:
     HeartBeatMetadata:

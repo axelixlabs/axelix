@@ -12,18 +12,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-metrics:
-    get:
-      operationId: getMetricsGroups
-      summary: Lists all metrics of the service, grouped by the metric name prefix.
-      responses:
-        '200':
-          description: The feed of metrics groups.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MetricsGroupsFeed'
 components:
   schemas:
     MetricsGroupsFeed:

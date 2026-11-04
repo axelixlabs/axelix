@@ -13,18 +13,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-configprops:
-    get:
-      operationId: getConfigurationProperties
-      summary: Lists all @ConfigurationProperties beans of the service.
-      responses:
-        '200':
-          description: The feed of @ConfigurationProperties beans.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConfigurationPropertiesFeed'
 components:
   schemas:
     ConfigurationPropertiesFeed:

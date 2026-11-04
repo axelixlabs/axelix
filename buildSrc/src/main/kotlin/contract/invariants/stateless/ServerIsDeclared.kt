@@ -22,8 +22,9 @@ import contract.ContractDocument.Companion.SERVER
 import contract.ContractDocument.Companion.SERVER_SIDES
 
 /**
- * The document must declare which side answers the call: the producer of every payload — and
- * with it the applicable evolution rules — is derived from it.
+ * The document must declare which side produces the payload: the evolution rules are derived
+ * from it. Documents that still describe an HTTP operation use the same marker for the side
+ * that answers the call, and derive the producer from the request body versus the response.
  *
  * @author Mikhail Polivakha
  */

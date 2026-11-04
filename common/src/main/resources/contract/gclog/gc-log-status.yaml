@@ -12,18 +12,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-gc/log/status:
-    get:
-      operationId: getGcLogStatus
-      summary: Returns the status of the garbage collection logging of the service.
-      responses:
-        '200':
-          description: The status of the garbage collection logging.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GcLogStatus'
 components:
   schemas:
     GcLogStatus:

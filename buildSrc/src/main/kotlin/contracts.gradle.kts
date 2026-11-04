@@ -24,7 +24,7 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 /**
  * Generates the wire classes of the Axelix Master <-> starter contracts from the OpenAPI
  * documents in :common, so that the yaml document stays the single source of truth of every
- * contract. Every document is supposed to describe exactly one operation.
+ * contract. Every document defines one payload; the generated classes are its schemas.
  */
 
 plugins {

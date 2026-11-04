@@ -12,18 +12,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-details:
-    get:
-      operationId: getInstanceDetails
-      summary: Returns the details of the service instance.
-      responses:
-        '200':
-          description: The details of the service instance.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InstanceDetails'
 components:
   schemas:
     InstanceDetails:

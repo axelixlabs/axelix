@@ -12,18 +12,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-caches:
-    get:
-      operationId: getAllCaches
-      summary: Lists all cache managers of the service together with their caches.
-      responses:
-        '200':
-          description: The feed of cache managers and their caches.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CachesFeed'
 components:
   schemas:
     CachesFeed:

@@ -14,25 +14,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-env:
-    get:
-      operationId: getEnvironment
-      summary: Returns the enriched environment feed of the service.
-      parameters:
-        - name: pattern
-          in: query
-          required: false
-          description: An optional regular expression used to filter the returned property names.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The enriched environment feed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnvironmentFeed'
 components:
   schemas:
     EnvironmentFeed:

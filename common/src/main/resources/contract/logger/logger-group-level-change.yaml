@@ -11,30 +11,7 @@ info:
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers/group/{name}/change-level:
-    post:
-      operationId: changeLogLevelByGroupName
-      summary: Changes the logging level of a logger group of the service.
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: The name of the logger group to change the level of.
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GroupLogLevelChangeRequest'
-      responses:
-        '204':
-          description: The logging level was changed.
-        '400':
-          description: No logger group with the given name exists, or the level is unknown.
+  x-axelix-server: master
 components:
   schemas:
     GroupLogLevelChangeRequest:

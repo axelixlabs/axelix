@@ -13,18 +13,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-scheduled-tasks:
-    get:
-      operationId: getScheduledTasks
-      summary: Lists all scheduled tasks of the service, grouped by their trigger kind.
-      responses:
-        '200':
-          description: The feed of the service's scheduled tasks.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceScheduledTasks'
 components:
   schemas:
     ServiceScheduledTasks:

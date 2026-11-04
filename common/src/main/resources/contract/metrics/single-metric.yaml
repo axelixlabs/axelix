@@ -12,34 +12,6 @@ info:
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-metrics/{metricName}:
-    get:
-      operationId: getSingleMetric
-      summary: Returns the profile of a single metric of the service.
-      parameters:
-        - name: metricName
-          in: path
-          required: true
-          description: The name of the metric to read.
-          schema:
-            type: string
-        - name: tag
-          in: query
-          required: false
-          description: >-
-            An optional tag filter in the 'key:value' form. May be repeated to filter by several tags.
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: The profile of the requested metric.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MetricProfile'
 components:
   schemas:
     MetricProfile:

@@ -8,18 +8,6 @@ info:
     so that the Master does not have to fetch the full registration metadata on every poll.
   x-axelix-introduced-in: 1.3.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-ping:
-    get:
-      operationId: getMasterPing
-      summary: Returns the lightweight metadata of the service instance.
-      responses:
-        '200':
-          description: The lightweight metadata of the service instance.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MasterPing'
 components:
   schemas:
     MasterPing:
