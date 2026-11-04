@@ -4,11 +4,11 @@ info:
   version: 1.0.0
   # INVALID: the released baseline knows this operation as introduced in 1.0.0, and the
   # introduction marker of an already released part may never be rewritten
-  x-axelix-introduced-in: 1.1.0
-  x-axelix-server: master
 components:
   schemas:
     LogLevelChangeRequest:
+      x-axelix-server: master
+      x-axelix-introduced-in: 1.1.0
       type: object
       required:
         - configuredLevel

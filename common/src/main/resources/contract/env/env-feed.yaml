@@ -12,11 +12,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
 components:
   schemas:
     EnvironmentFeed:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The enriched environment overview of the service.
       required:
@@ -43,6 +43,8 @@ components:
             $ref: '#/components/schemas/PropertySource'
           x-axelix-introduced-in: 1.2.0
     PropertySource:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A single property source of the environment together with its properties.
       required:
@@ -64,6 +66,8 @@ components:
             $ref: '#/components/schemas/Property'
           x-axelix-introduced-in: 1.2.0
     Property:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A single property contributed by a property source.
       required:
@@ -103,6 +107,8 @@ components:
             $ref: '#/components/schemas/InjectionPoint'
           x-axelix-introduced-in: 1.2.0
     Deprecation:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The deprecation information of a property.
       required:
@@ -121,12 +127,16 @@ components:
           description: The name of the property that supersedes the deprecated one, when any.
           x-axelix-introduced-in: 1.2.0
     DeprecationLevel:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: The severity with which a property deprecation is reported.
       enum:
         - WARNING
         - ERROR
     InjectionPoint:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A point in the code where a property is injected via @Value.
       required:
@@ -152,6 +162,8 @@ components:
           description: The @Value expression used at the injection point (e.g. "${some.property:default}").
           x-axelix-introduced-in: 1.2.0
     InjectionType:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: The kind of injection point where a @Value annotation is applied.
       enum:

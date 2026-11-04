@@ -11,11 +11,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
 components:
   schemas:
     ServiceScheduledTasks:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The overview of all scheduled tasks of the service, grouped by trigger kind.
       required:
@@ -49,6 +49,8 @@ components:
             $ref: '#/components/schemas/ScheduledCustomTask'
           x-axelix-introduced-in: 1.2.0
     ScheduledCronTask:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A scheduled task driven by a cron expression.
       required:
@@ -69,6 +71,8 @@ components:
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
     ScheduledFixedDelayTask:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A scheduled task re-scheduled a fixed delay after the previous execution finishes.
       required:
@@ -96,6 +100,8 @@ components:
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
     ScheduledFixedRateTask:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A scheduled task re-scheduled at a fixed rate measured from the previous execution start.
       required:
@@ -123,6 +129,8 @@ components:
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
     ScheduledCustomTask:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A scheduled task driven by a custom user-supplied trigger.
       required:
@@ -143,6 +151,8 @@ components:
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
     ScheduledTaskRunnable:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The target that a scheduled task executes.
       required:

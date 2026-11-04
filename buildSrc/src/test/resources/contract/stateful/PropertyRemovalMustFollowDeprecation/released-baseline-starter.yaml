@@ -2,12 +2,12 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.0.0
-  x-axelix-introduced-in: 1.0.0
-  x-axelix-server: starter
 components:
   schemas:
     # The starter produces this reply.
     LogLevelChangeReply:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.0.0
       type: object
       required:
         - effectiveLevel

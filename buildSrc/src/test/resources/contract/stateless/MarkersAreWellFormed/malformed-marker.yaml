@@ -3,11 +3,11 @@ info:
   title: logger-level-change
   version: 1.0.0
   # INVALID: not of the x.y.z form.
-  x-axelix-introduced-in: '1.0'
-  x-axelix-server: master
 components:
   schemas:
     LogLevelChangeRequest:
+      x-axelix-server: master
+      x-axelix-introduced-in: '1.0'
       type: object
       required:
         - configuredLevel

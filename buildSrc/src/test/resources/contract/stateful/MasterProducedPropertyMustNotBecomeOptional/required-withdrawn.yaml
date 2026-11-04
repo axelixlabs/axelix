@@ -2,14 +2,14 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.0.0
-  x-axelix-introduced-in: 1.0.0
-  x-axelix-server: master
 components:
   schemas:
     # INVALID: the released baseline lists configuredLevel as required in this master-produced
     # request; withdrawing 'required' is a hidden removal — the property must be deprecated and
     # stay required until the window passes
     LogLevelChangeRequest:
+      x-axelix-server: master
+      x-axelix-introduced-in: 1.0.0
       type: object
       properties:
         configuredLevel:
@@ -17,6 +17,8 @@ components:
           x-axelix-introduced-in: 1.0.0
     # The starter produces this reply.
     LogLevelChangeReply:
+      x-axelix-server: master
+      x-axelix-introduced-in: 1.0.0
       type: object
       required:
         - effectiveLevel

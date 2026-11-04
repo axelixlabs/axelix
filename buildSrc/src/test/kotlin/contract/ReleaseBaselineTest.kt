@@ -81,7 +81,7 @@ class ReleaseBaselineTest {
         val released = ReleaseBaseline
             .find(repoRoot)!!
             .contract(repoRoot.resolve(CONTRACT_PATH))!!
-        assertEquals("starter", released.server)
+        assertEquals("starter", released.schemas.single().server)
         assertEquals(Version(1, 1, 0), released.axelixVersion)
     }
 
@@ -103,18 +103,16 @@ class ReleaseBaselineTest {
         document.parentFile.mkdirs()
         document.writeText(
             """
-            openapi: 3.0.3
+            openapi: 3.1.0
             info:
               title: Log level change
               version: 1.0.0
-              x-axelix-server: $server
-              x-axelix-introduced-in: 1.0.0
-            paths:
-              /actuator/axelix-loggers/{name}:
-                post:
-                  responses:
-                    '200':
-                      description: Changed
+            components:
+              schemas:
+                LogLevelChangeRequest:
+                  type: object
+                  x-axelix-server: $server
+                  x-axelix-introduced-in: 1.0.0
             """.trimIndent())
     }
 

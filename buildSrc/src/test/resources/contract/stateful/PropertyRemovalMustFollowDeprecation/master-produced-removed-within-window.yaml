@@ -2,13 +2,13 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.0.0
-  x-axelix-introduced-in: 1.0.0
-  x-axelix-server: master
 components:
   schemas:
     # INVALID: deprecatedMaster was deprecated in 1.1.0; at 1.2.0 its compatibility window has not
     # passed yet, so this master-produced property must stay in the contract until the window closes
     LogLevelChangeRequest:
+      x-axelix-server: master
+      x-axelix-introduced-in: 1.0.0
       type: object
       required:
         - configuredLevel

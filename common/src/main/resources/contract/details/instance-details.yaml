@@ -10,11 +10,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
 components:
   schemas:
     InstanceDetails:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The response returned by the custom details endpoint.
       required:
@@ -45,6 +45,8 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/OsDetails'
     GitDetails:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The git information of the given artifact.
       required:
@@ -70,6 +72,8 @@ components:
           description: The timestamp of the commit.
           x-axelix-introduced-in: 1.2.0
     CommitAuthor:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Author of the commit information.
       required:
@@ -85,6 +89,8 @@ components:
           description: The commit author email.
           x-axelix-introduced-in: 1.2.0
     SpringDetails:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The spring information of the given artifact.
       required:
@@ -104,6 +110,8 @@ components:
           description: The version of the Spring Cloud, if any.
           x-axelix-introduced-in: 1.2.0
     RuntimeDetails:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The Runtime information of the given artifact.
       required:
@@ -123,6 +131,8 @@ components:
           description: The version of the kotlin, if any.
           x-axelix-introduced-in: 1.2.0
     BuildDetails:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The build information of the given artifact.
       required:
@@ -148,6 +158,8 @@ components:
           description: The time the application was built.
           x-axelix-introduced-in: 1.2.0
     OsDetails:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The OS information of the given artifact.
       required:

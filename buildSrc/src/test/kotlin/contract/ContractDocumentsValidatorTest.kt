@@ -55,14 +55,14 @@ class ContractDocumentsValidatorTest {
     fun `a missing server marker fails`() {
         expectProblem(
             "stateless/ServerIsDeclared/missing-server.yaml",
-            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+            "the schema 'LogLevelChangeRequest' must declare 'x-axelix-server' as one of [starter, master]")
     }
 
     @Test
     fun `an unknown server side fails`() {
         expectProblem(
             "stateless/ServerIsDeclared/unknown-server.yaml",
-            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+            "the schema 'LogLevelChangeRequest' must declare 'x-axelix-server' as one of [starter, master]")
     }
 
     @Test
@@ -83,7 +83,7 @@ class ContractDocumentsValidatorTest {
     fun `a malformed version marker fails`() {
         expectProblem(
             "stateless/MarkersAreWellFormed/malformed-marker.yaml",
-            "the 'info' block has 'x-axelix-introduced-in: 1.0' that is not of the x.y.z form")
+            "the schema 'LogLevelChangeRequest' has 'x-axelix-introduced-in: 1.0' that is not of the x.y.z form")
     }
 
     @Test

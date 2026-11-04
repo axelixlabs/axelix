@@ -3,10 +3,10 @@ info:
   title: logger-level-change
   version: 1.0.0
   # INVALID: the mandatory 'x-axelix-server' marker is absent.
-  x-axelix-introduced-in: 1.0.0
 components:
   schemas:
     LogLevelChangeRequest:
+      x-axelix-introduced-in: 1.0.0
       type: object
       required:
         - configuredLevel

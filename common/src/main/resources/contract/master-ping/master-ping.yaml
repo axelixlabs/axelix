@@ -6,11 +6,11 @@ info:
     The Axelix Master <-> starter contract of the 'master-ping' operation.
     This operation returns the lightweight metadata of an already known auto-discovered instance,
     so that the Master does not have to fetch the full registration metadata on every poll.
-  x-axelix-introduced-in: 1.3.0
-  x-axelix-server: starter
 components:
   schemas:
     MasterPing:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: Represents the lightweight metadata of a service instance.
       required:
@@ -46,6 +46,8 @@ components:
           items:
             $ref: '#/components/schemas/ScheduledTaskExecution'
     ScheduledTaskExecution:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The result of a single execution of a scheduled task.
       required:
@@ -85,12 +87,16 @@ components:
           description: The message of the exception thrown by the task execution, or absent when it succeeded.
           x-axelix-introduced-in: 1.3.0
     ScheduledTaskLaunchType:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: How the scheduled task execution was launched.
       enum:
         - SCHEDULED
         - MANUAL
     HealthStatus:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: The health status of the given instance during registration.
       enum:
@@ -98,6 +104,8 @@ components:
         - DOWN
         - UNKNOWN
     MemoryDetails:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: Memory details of the given Instance.
       required:
@@ -109,6 +117,8 @@ components:
           description: The estimated heap size of the given instance.
           x-axelix-introduced-in: 1.3.0
     TransactionAggregatedProfile:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: Aggregated information about a particular transactional method in the instance.
       required:
@@ -175,6 +185,8 @@ components:
             (e.g. an older agent that did not report it).
           x-axelix-introduced-in: 1.3.0
     TransactionOrigin:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: The origin of the transaction, i.e. how exactly the transaction was created.
       enum:
@@ -182,6 +194,8 @@ components:
         - APPLICATION_DECLARATIVE
         - APPLICATION_IMPERATIVE
     TransactionalKey:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The key that identifies the transactional method.
       required:
@@ -197,6 +211,8 @@ components:
           description: The name of the transactional method.
           x-axelix-introduced-in: 1.3.0
     ExecutionStats:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The min/max/avg duration statistics of repeated executions.
       required:
@@ -220,6 +236,8 @@ components:
           description: The average observed duration, in milliseconds.
           x-axelix-introduced-in: 1.3.0
     CountedLazyLoadingTarget:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The aggregated count of lazy-loading (N+1) occasions for a particular association.
       required:
@@ -236,6 +254,8 @@ components:
           description: The number of lazy-loading occasions observed.
           x-axelix-introduced-in: 1.3.0
     LazyLoadingTarget:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The particular association that presumably was lazy loaded.
       required:
@@ -251,6 +271,8 @@ components:
           description: The name of the lazy-loaded association property.
           x-axelix-introduced-in: 1.3.0
     ExternalCallInsight:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: >-
         Aggregated timing of the blocking calls made to a single external endpoint from within a
@@ -276,6 +298,8 @@ components:
           x-axelix-introduced-in: 1.3.0
           $ref: '#/components/schemas/ExecutionStats'
     TypeExternalCall:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: The client that performed a blocking call to an external system.
       enum:

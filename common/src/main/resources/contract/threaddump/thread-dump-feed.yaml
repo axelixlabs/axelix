@@ -10,11 +10,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
 components:
   schemas:
     ThreadDumpFeed:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The response to thread dump endpoint.
       required:
@@ -32,6 +32,8 @@ components:
             $ref: '#/components/schemas/ThreadInfo'
           x-axelix-introduced-in: 1.2.0
     ThreadInfo:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Thread information. ThreadInfo contains the information about a thread.
       required:
@@ -141,6 +143,8 @@ components:
             $ref: '#/components/schemas/LockInfo'
           x-axelix-introduced-in: 1.2.0
     LockInfo:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Object for which the thread is blocked waiting.
       required:
@@ -157,6 +161,8 @@ components:
           description: The identity hash code of the lock object.
           x-axelix-introduced-in: 1.2.0
     MonitorInfo:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Monitors locked by this thread.
       required:
@@ -188,6 +194,8 @@ components:
             - $ref: '#/components/schemas/StackTraceElement'
             - type: 'null'
     StackTraceElement:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Stack trace of the thread.
       required:
@@ -230,6 +238,8 @@ components:
           description: Whether the execution point is a native method.
           x-axelix-introduced-in: 1.2.0
     ThreadState:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: State of the thread.
       enum:

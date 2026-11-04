@@ -2,12 +2,12 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.0.0
-  x-axelix-introduced-in: 1.0.0
-  x-axelix-server: master
 components:
   schemas:
     # The Master produces this request, so every starter within the window parses it.
     LogLevelChangeRequest:
+      x-axelix-server: master
+      x-axelix-introduced-in: 1.0.0
       type: object
       required:
         - configuredLevel

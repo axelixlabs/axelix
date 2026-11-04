@@ -22,15 +22,16 @@ import contract.ContractDocument.Companion.SERVER
 import contract.ContractDocument.Companion.SERVER_SIDES
 
 /**
- * The document must declare which side produces the payload: the evolution rules are derived
- * from it. Documents that still describe an HTTP operation use the same marker for the side
- * that answers the call, and derive the producer from the request body versus the response.
+ * Every schema must declare which side produces it: the evolution rules of its properties
+ * are derived from that.
  *
  * @author Mikhail Polivakha
  */
 object ServerIsDeclared : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> =
-        if (document.server in SERVER_SIDES) emptyList()
-        else listOf("the 'info' block must declare '$SERVER' as one of $SERVER_SIDES")
+        document.schemas.mapNotNull { schema ->
+            if (schema.server in SERVER_SIDES) null
+            else "${schema.location} must declare '$SERVER' as one of $SERVER_SIDES"
+        }
 }

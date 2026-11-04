@@ -11,11 +11,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
 components:
   schemas:
     ConfigurationPropertiesFeed:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The feed of @ConfigurationProperties beans used in the application.
       required:
@@ -28,6 +28,8 @@ components:
             $ref: '#/components/schemas/ConfigurationPropertiesFeedBean'
           x-axelix-introduced-in: 1.2.0
     ConfigurationPropertiesFeedBean:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The profile of a given @ConfigurationProperties bean.
       required:
@@ -59,6 +61,8 @@ components:
             $ref: '#/components/schemas/ConfigurationPropertiesEntry'
           x-axelix-introduced-in: 1.2.0
     ConfigurationPropertiesEntry:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: An abstract key-value pair.
       required:

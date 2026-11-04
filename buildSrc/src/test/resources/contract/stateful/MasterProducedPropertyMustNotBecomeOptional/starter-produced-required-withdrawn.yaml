@@ -2,12 +2,12 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.0.0
-  x-axelix-introduced-in: 1.0.0
-  x-axelix-server: starter
 components:
   schemas:
     # The Master produces this request, so every starter within the window parses it.
     LogLevelChangeRequest:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.0.0
       type: object
       required:
         - configuredLevel
@@ -18,6 +18,8 @@ components:
     # The starter produces this reply, and weakening 'required' here is legal: the Master is
     # never older than the starter it talks to, so its model already tolerates the absence.
     LogLevelChangeReply:
+      x-axelix-server: starter
+      x-axelix-introduced-in: 1.0.0
       type: object
       properties:
         effectiveLevel:
