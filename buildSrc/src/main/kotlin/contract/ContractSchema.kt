@@ -34,6 +34,7 @@ import org.gradle.api.GradleException
  */
 class ContractSchema private constructor(val name: String, val node: JsonNode, val axelixVersion: Version) {
 
+    /** Human-readable label identifying this schema in validation error messages. */
     val location: String = "the schema '$name'"
 
     /** The side that produces this schema, or empty when the marker is absent. */
@@ -73,11 +74,15 @@ class ContractSchema private constructor(val name: String, val node: JsonNode, v
             || (axelixVersion.major == marker.major
                 && axelixVersion.minor - marker.minor >= WINDOW_MINORS)
 
+    /**
+     * @param location Human-readable label identifying this property in validation error messages.
+     */
     data class MarkedPart(val location: String, val node: JsonNode)
 
     data class Property(
         val schemaName: String, val name: String, val node: JsonNode, val required: Boolean) {
 
+        /** Human-readable label identifying this property in validation error messages. */
         val location: String = "the property '$schemaName.$name'"
     }
 

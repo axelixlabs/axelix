@@ -33,27 +33,26 @@ import contract.ContractSchema.Companion.INTRODUCED_IN
  */
 object NewPartsMustBeMarkedAsIntroducedInTheCurrentRelease : StatefulContractInvariant {
 
-    override fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (current == null) {
+            return emptyList()
+        }
+
         val unreleasedMarkers = if (baseline == null) {
-            // nothing was released, so every schema and every property is new
-            current.flatMap { schema -> schema.markedParts }
+            current.markedParts
         } else {
-            val releasedSchemas = baseline.map { schema -> schema.name }.toSet()
-            val releasedProperties = baseline.flatMap { schema -> schema.properties }
-                .map { property -> property.schemaName to property.name }.toSet()
-            current.filter { schema -> schema.name !in releasedSchemas }
-                .map { schema -> ContractSchema.MarkedPart(schema.location, schema.node) } +
-                current.flatMap { schema -> schema.properties }
-                    .filter { property -> (property.schemaName to property.name) !in releasedProperties }
-                    .map { property -> ContractSchema.MarkedPart(property.location, property.node) }
+            val releasedProperties = baseline.properties.map { property -> property.name }.toSet()
+            current.properties
+                .filter { property -> property.name !in releasedProperties }
+                .map { property -> ContractSchema.MarkedPart(property.location, property.node) }
         }
 
         return unreleasedMarkers.mapNotNull { part ->
-            val introduced = current.first().markerVersion(part.node, INTRODUCED_IN) ?: return@mapNotNull null
+            val introduced = current.markerVersion(part.node, INTRODUCED_IN) ?: return@mapNotNull null
 
-            if (introduced != current.first().axelixVersion) {
+            if (introduced != current.axelixVersion) {
                 ("${part.location} is born in this release but has '$INTRODUCED_IN: $introduced' "
-                    + "instead of the version currently being built (${current.first().axelixVersion})")
+                    + "instead of the version currently being built (${current.axelixVersion})")
             } else {
                 null
             }

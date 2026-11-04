@@ -34,25 +34,20 @@ import contract.ContractSchema
  */
 object MasterProducedPropertyMustNotBecomeOptional : StatefulContractInvariant {
 
-    override fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
-        if (baseline == null) {
-            // a document born now promised nothing: no released starter relies on its properties
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
             return emptyList()
         }
 
-        val baselineProperties = baseline.flatMap { schema -> schema.properties }
-            .associateBy { property -> property.schemaName to property.name }
-        val starterProducedSchemas = current.filter { schema -> schema.producedBy == "starter" }
-            .map { schema -> schema.name }.toSet()
+        val baselineProperties = baseline.properties.associateBy { property -> property.name }
 
-        return current.flatMap { schema -> schema.properties }.mapNotNull { currentProperty ->
-            val released = baselineProperties[currentProperty.schemaName to currentProperty.name]
+        return current.properties.mapNotNull { currentProperty ->
+            val released = baselineProperties[currentProperty.name]
                 ?: return@mapNotNull null
 
-            if (released.required && !currentProperty.required
-                && currentProperty.schemaName !in starterProducedSchemas) {
+            if (released.required && !currentProperty.required && current.producedBy != "starter") {
                 ("${currentProperty.location} is produced by the Master and is 'required' in the released "
-                    + "contract (${baseline.first().axelixVersion}): withdrawing 'required' is a hidden removal, "
+                    + "contract (${baseline.axelixVersion}): withdrawing 'required' is a hidden removal, "
                     + "deprecate the property instead and keep it required until the window passes")
             } else {
                 null

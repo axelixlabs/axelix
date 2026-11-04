@@ -89,11 +89,11 @@ class PropertyTypeAndFormatMustNeverChangeTest {
             problems)
     }
 
-    private fun baseline(): List<ContractSchema> =
-        ContractSchema.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+    private fun baseline(): ContractSchema =
+        ContractSchema.parse(document("released-baseline.yaml"), RELEASED_VERSION).single()
 
-    private fun current(name: String): List<ContractSchema> =
-        ContractSchema.parse(document(name), CURRENT_VERSION)
+    private fun current(name: String): ContractSchema =
+        ContractSchema.parse(document(name), CURRENT_VERSION).single()
 
     private fun document(name: String): File =
         File(javaClass.getResource(

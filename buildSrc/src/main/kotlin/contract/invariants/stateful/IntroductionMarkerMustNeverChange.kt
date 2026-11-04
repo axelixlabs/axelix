@@ -34,34 +34,30 @@ import contract.ContractSchema.Companion.INTRODUCED_IN
  */
 object IntroductionMarkerMustNeverChange : StatefulContractInvariant {
 
-    override fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
-        if (baseline == null) {
-            // no contract in previous version means that x-axelix-introduced-in cannot possibly be
-            // mutated - there is nothing to mutate, there were no previous version
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
+            // A schema born or removed in this release has no released introduction marker to rewrite.
             return emptyList()
         }
 
-        val baselineSchemas = baseline.associateBy { schema -> schema.name }
-        val baselineProperties = baseline.flatMap { schema -> schema.properties }
-            .associateBy { property -> property.schemaName to property.name }
+        val baselineProperties = baseline.properties.associateBy { property -> property.name }
 
-        // Removed schemas and properties are a different check. This one only rejects a marker
-        // that changed on a part the release already knows.
+        // Removed properties are a different check. This one only rejects a marker that changed
+        // on a part the release already knows.
         val survivingParts: List<Triple<String, JsonNode, JsonNode>> =
-            current.mapNotNull { schema ->
-                baselineSchemas[schema.name]?.let { released -> Triple(schema.location, released.node, schema.node) }
-            } + current.flatMap { schema -> schema.properties }.mapNotNull { property ->
-                baselineProperties[property.schemaName to property.name]
-                    ?.let { released -> Triple(property.location, released.node, property.node) }
-            }
+            listOf(Triple(current.location, baseline.node, current.node)) +
+                current.properties.mapNotNull { property ->
+                    baselineProperties[property.name]
+                        ?.let { released -> Triple(property.location, released.node, property.node) }
+                }
 
         return survivingParts.mapNotNull { (location, baselineNode, currentNode) ->
-            val baselineIntroduction = baseline.first().markerVersion(baselineNode, INTRODUCED_IN) ?: return@mapNotNull null
-            val currentIntroduction = current.first().markerVersion(currentNode, INTRODUCED_IN) ?: return@mapNotNull null
+            val baselineIntroduction = baseline.markerVersion(baselineNode, INTRODUCED_IN) ?: return@mapNotNull null
+            val currentIntroduction = current.markerVersion(currentNode, INTRODUCED_IN) ?: return@mapNotNull null
 
             if (currentIntroduction != baselineIntroduction) {
                 ("$location has '$INTRODUCED_IN: $currentIntroduction' but the released contract "
-                    + "(${baseline.first().axelixVersion}) knows it as introduced in $baselineIntroduction: "
+                    + "(${baseline.axelixVersion}) knows it as introduced in $baselineIntroduction: "
                     + "the introduction marker may never change")
             } else {
                 null

@@ -17,12 +17,17 @@
  */
 package contract
 
+import contract.invariants.stateful.ReleaseBaseline
 import java.io.File
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.lib.PersonIdent
 import org.gradle.api.GradleException
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
 /**
  * Unit tests for {@link ContractDocumentsValidator}.
@@ -33,7 +38,62 @@ class ContractDocumentsValidatorTest {
 
     companion object {
         private const val CURRENT_VERSION = "1.2.0-SNAPSHOT"
+
+        private val COMMITTER = PersonIdent("test", "test@axelix.io")
+
+        private val RELEASED_BUNDLE = """
+            openapi: 3.1.0
+            info:
+              title: bundle
+              version: ""
+            components:
+              schemas:
+                Gone:
+                  x-axelix-produced-by: master
+                  x-axelix-introduced-in: 1.0.0
+                  type: object
+                  properties:
+                    kept:
+                      type: string
+                      x-axelix-introduced-in: 1.0.0
+                Shared:
+                  x-axelix-produced-by: master
+                  x-axelix-introduced-in: 1.0.0
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                      x-axelix-introduced-in: 1.0.0
+            """.trimIndent()
+
+        private val CURRENT_BUNDLE = """
+            openapi: 3.1.0
+            info:
+              title: bundle
+              version: ""
+            components:
+              schemas:
+                Shared:
+                  x-axelix-produced-by: master
+                  x-axelix-introduced-in: 1.0.0
+                  type: object
+                  properties:
+                    value:
+                      type: integer
+                      x-axelix-introduced-in: 1.0.0
+                Born:
+                  x-axelix-produced-by: master
+                  x-axelix-introduced-in: 1.0.0
+                  type: object
+                  properties:
+                    fresh:
+                      type: string
+                      x-axelix-introduced-in: 1.2.0
+            """.trimIndent()
     }
+
+    @TempDir
+    lateinit var repoRoot: File
 
     @Test
     fun `a compliant document passes`() {
@@ -144,6 +204,31 @@ class ContractDocumentsValidatorTest {
     }
 
     @Test
+    fun `stateful checks pair schemas by name even when their order differs`() {
+        Git.init().setDirectory(repoRoot).call().use { git ->
+            writeBundle(RELEASED_BUNDLE)
+            commit(git, "released")
+            git.tag().setName("v1.1.0").setTagger(COMMITTER).call()
+            writeBundle(CURRENT_BUNDLE)
+        }
+
+        val failure = assertThrows(GradleException::class.java) {
+            ContractDocumentsValidator.validate(
+                repoRoot.resolve("bundle.yaml"), CURRENT_VERSION, ReleaseBaseline.find(repoRoot))
+        }
+
+        // Shared stays paired with Shared after the reorder, and Born is judged as a schema born now.
+        assertEquals(
+            "The contract document bundle.yaml is invalid:\n"
+                + "  - the property 'Shared.value' changed its 'type' from 'string' to 'integer' "
+                + "against the released contract (1.1.0): a released property must never "
+                + "be redefined in place, introduce a new property and deprecate the old one instead\n"
+                + "  - the schema 'Born' is born in this release but has 'x-axelix-introduced-in: 1.0.0' "
+                + "instead of the version currently being built (1.2.0)",
+            failure.message)
+    }
+
+    @Test
     fun `a deprecated property that outlived the compatibility window fails`() {
         expectProblem(
             "stateless/DeprecatedIsRemovedAfterTheWindow/overdue-deprecation.yaml",
@@ -166,4 +251,16 @@ class ContractDocumentsValidatorTest {
 
     private fun document(name: String): File =
         File(javaClass.getResource("/contract/$name")!!.toURI())
+
+    private fun writeBundle(content: String) {
+        repoRoot.resolve("bundle.yaml").writeText(content)
+    }
+
+    private fun commit(git: Git, message: String) {
+        git.add().addFilepattern(".").call()
+        git.commit()
+            .setMessage(message).setAuthor(COMMITTER).setCommitter(COMMITTER)
+            .setAllowEmpty(true).setSign(false)
+            .call()
+    }
 }

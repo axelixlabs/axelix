@@ -20,21 +20,18 @@ package contract.invariants.stateful
 import contract.ContractSchema
 
 /**
- * A single micro-invariant on the evolution of a contract document between the latest release
- * and the working tree, as opposed to a [contract.invariants.stateless.StatelessContractInvariant] that judges the working tree
- * document alone.
- *
- * Called statefull, because it performs the check of invaraints between two versions of [contract.ContractSchema], so
- * it needs the baseline for comaparison.
+ * A single micro-invariant on the evolution of a schema between the latest release and the
+ * working tree, as opposed to a [contract.invariants.stateless.StatelessContractInvariant] that
+ * judges the working tree schema alone.
  *
  * @author Mikhail Polivakha
  */
 fun interface StatefulContractInvariant {
 
     /**
-     * Returns the violations of this invariant in the given pair of documents, empty when the
-     * invariant holds. The [baseline] is null when the document did not exist at the latest
-     * release, i.e. the operation is being born in the release currently being developed.
+     * Returns the violations of this invariant for the given schema pair, empty when the
+     * invariant holds. [baseline] is null for a schema introduced after the latest release;
+     * [current] is null for a schema removed from the working tree. At least one is non-null.
      */
-    fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String>
+    fun check(baseline: ContractSchema?, current: ContractSchema?): List<String>
 }

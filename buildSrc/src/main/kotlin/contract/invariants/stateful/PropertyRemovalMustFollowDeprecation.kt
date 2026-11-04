@@ -42,44 +42,37 @@ import contract.ContractSchema.Companion.DEPRECATED_IN
  */
 object PropertyRemovalMustFollowDeprecation : StatefulContractInvariant {
 
-    override fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
-        if (baseline == null) {
-            // a document born now removed nothing: no released peer has ever seen it
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
             return emptyList()
         }
 
-        val survivingProperties = current.flatMap { schema -> schema.properties }
-            .map { property -> property.schemaName to property.name }
-            .toSet()
-        val starterProducedSchemas = baseline.filter { schema -> schema.producedBy == "starter" }
-            .map { schema -> schema.name }.toSet()
+        val survivingProperties = current.properties.map { property -> property.name }.toSet()
 
-        return baseline.flatMap { schema -> schema.properties }.mapNotNull { removed ->
-            if (removed.schemaName to removed.name in survivingProperties) {
-                // proeprty was not removed in the current version of contract - no action for this check
+        return baseline.properties.mapNotNull { removed ->
+            if (removed.name in survivingProperties) {
                 return@mapNotNull null
             }
 
-            val deprecated = baseline.first().markerVersion(removed.node, DEPRECATED_IN)
-            val starterProduced = removed.schemaName in starterProducedSchemas
+            val deprecated = baseline.markerVersion(removed.node, DEPRECATED_IN)
 
             if (deprecated == null) {
-                if (starterProduced) {
+                if (baseline.producedBy == "starter") {
                     // a pure removal of a starter-produced property is immediate
-                    return@mapNotNull null;
+                    return@mapNotNull null
                 } else {
                     return@mapNotNull ("${removed.location} is produced by the Master and was removed without prior "
-                            + "deprecation against the released contract (${baseline.first().axelixVersion}): "
+                            + "deprecation against the released contract (${baseline.axelixVersion}): "
                             + "deprecate the property and keep producing it until the window passes before "
                             + "removing it")
                 }
             } else {
-                if (!current.first().windowPassed(deprecated)) {
+                if (!current.windowPassed(deprecated)) {
                     return@mapNotNull ("${removed.location} was removed while its deprecation window (deprecated in "
                             + "$deprecated) has not passed yet: keep it in the contract until the window "
                             + "closes")
                 } else {
-                    return@mapNotNull null;
+                    return@mapNotNull null
                 }
             }
         }

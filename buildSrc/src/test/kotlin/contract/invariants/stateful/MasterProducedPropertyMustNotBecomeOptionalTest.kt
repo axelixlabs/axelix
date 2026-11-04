@@ -36,32 +36,28 @@ class MasterProducedPropertyMustNotBecomeOptionalTest {
 
     @Test
     fun `unchanged required properties pass`() {
-        val problems = MasterProducedPropertyMustNotBecomeOptional
-            .check(baseline(), current("unchanged.yaml"))
+        val problems = check(baseline(), current("unchanged.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
 
     @Test
     fun `a born document is not judged`() {
-        val problems = MasterProducedPropertyMustNotBecomeOptional
-            .check(null, current("born-document.yaml"))
+        val problems = check(null, current("born-document.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
 
     @Test
     fun `a withdrawn required of a starter-produced property passes`() {
-        val problems = MasterProducedPropertyMustNotBecomeOptional
-            .check(baseline(), current("starter-produced-required-withdrawn.yaml"))
+        val problems = check(baseline(), current("starter-produced-required-withdrawn.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
 
     @Test
     fun `a withdrawn required of a master-produced property fails`() {
-        val problems = MasterProducedPropertyMustNotBecomeOptional
-            .check(baseline(), current("required-withdrawn.yaml"))
+        val problems = check(baseline(), current("required-withdrawn.yaml"))
 
         assertEquals(
             listOf(
@@ -69,6 +65,18 @@ class MasterProducedPropertyMustNotBecomeOptionalTest {
                     + "'required' in the released contract (1.1.0): withdrawing 'required' is a hidden "
                     + "removal, deprecate the property instead and keep it required until the window passes"),
             problems)
+    }
+
+    /**
+     * The fixture bundles several schemas. Pair them the way the validator does: by name.
+     */
+    private fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
+        val baselineByName = baseline.orEmpty().associateBy { schema -> schema.name }
+        val currentByName = current.associateBy { schema -> schema.name }
+        val names = (current.map { schema -> schema.name } + baseline.orEmpty().map { schema -> schema.name }).distinct()
+        return names.flatMap { name ->
+            MasterProducedPropertyMustNotBecomeOptional.check(baselineByName[name], currentByName[name])
+        }
     }
 
     private fun baseline(): List<ContractSchema> =

@@ -36,45 +36,39 @@ import contract.ContractSchema.Companion.DEPRECATED_IN
  */
 object DeprecationMarkerMustOnlyAppearInTheCurrentRelease : StatefulContractInvariant {
 
-    override fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
-        if (baseline == null) {
-            // a deprecation cannot appear, change or vanish against a document that did not
-            // exist; a deprecation born together with the document is rejected statelessly,
-            // because it cannot be strictly later than the introduction
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
+            // A deprecation born together with the schema is rejected statelessly because it
+            // cannot be strictly later than the introduction.
             return emptyList()
         }
 
-        val baselineSchemas = baseline.associateBy { schema -> schema.name }
-        val baselineProperties = baseline.flatMap { schema -> schema.properties }
-            .associateBy { property -> property.schemaName to property.name }
+        val baselineProperties = baseline.properties.associateBy { property -> property.name }
 
         val survivingParts: List<Triple<String, JsonNode, JsonNode>> =
-            current.mapNotNull { schema ->
-                baselineSchemas[schema.name]
-                    ?.let { released -> Triple(schema.location, released.node, schema.node) }
-            } +
-                current.flatMap { schema -> schema.properties }.mapNotNull { property ->
-                    baselineProperties[property.schemaName to property.name]
+            listOf(Triple(current.location, baseline.node, current.node)) +
+                current.properties.mapNotNull { property ->
+                    baselineProperties[property.name]
                         ?.let { released -> Triple(property.location, released.node, property.node) }
                 }
 
         return survivingParts.mapNotNull { (location, baselineNode, currentNode) ->
-            val baselineDeprecation = baseline.first().markerVersion(baselineNode, DEPRECATED_IN)
-            val currentDeprecation = current.first().markerVersion(currentNode, DEPRECATED_IN)
+            val baselineDeprecation = baseline.markerVersion(baselineNode, DEPRECATED_IN)
+            val currentDeprecation = current.markerVersion(currentNode, DEPRECATED_IN)
 
             when {
 
                 // property is supposed to be deprecated the upcoming release, but the wrong version was specified
-                baselineDeprecation == null && currentDeprecation != null && currentDeprecation != current.first().axelixVersion ->
+                baselineDeprecation == null && currentDeprecation != null && currentDeprecation != current.axelixVersion ->
 
                     ("$location has '$DEPRECATED_IN: $currentDeprecation' that the released contract "
-                        + "(${baseline.first().axelixVersion}) does not: a deprecation that is supposed to appear in the upcoming release must "
-                        + "specify the version currently being built (${current.first().axelixVersion})")
+                        + "(${baseline.axelixVersion}) does not: a deprecation that is supposed to appear in the upcoming release must "
+                        + "specify the version currently being built (${current.axelixVersion})")
 
                 // property was deprecated already, but the changed the version in which it was depreacted - it is forbidden
                 baselineDeprecation != null && currentDeprecation != null && currentDeprecation != baselineDeprecation ->
                     ("$location has '$DEPRECATED_IN: $currentDeprecation' but the released contract "
-                        + "(${baseline.first().axelixVersion}) already deprecates it in $baselineDeprecation: "
+                        + "(${baseline.axelixVersion}) already deprecates it in $baselineDeprecation: "
                         + "the deprecation marker must never change")
 
                 else -> null

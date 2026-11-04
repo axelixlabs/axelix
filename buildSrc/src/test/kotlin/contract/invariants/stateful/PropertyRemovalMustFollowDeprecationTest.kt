@@ -45,8 +45,8 @@ class PropertyRemovalMustFollowDeprecationTest {
 
     @Test
     fun `a born document is not judged`() {
-        val problems = PropertyRemovalMustFollowDeprecation
-            .check(null, current("born-document.yaml"))
+        val problems = ContractSchema.parse(document("born-document.yaml"), WITHIN_WINDOW_VERSION)
+            .flatMap { schema -> PropertyRemovalMustFollowDeprecation.check(null, schema) }
 
         assertEquals(emptyList<String>(), problems)
     }
@@ -115,14 +115,14 @@ class PropertyRemovalMustFollowDeprecationTest {
         assertEquals(emptyList<String>(), problems)
     }
 
-    private fun baseline(): List<ContractSchema> =
-        ContractSchema.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+    private fun baseline(): ContractSchema =
+        ContractSchema.parse(document("released-baseline.yaml"), RELEASED_VERSION).single()
 
-    private fun starterBaseline(): List<ContractSchema> =
-        ContractSchema.parse(document("released-baseline-starter.yaml"), RELEASED_VERSION)
+    private fun starterBaseline(): ContractSchema =
+        ContractSchema.parse(document("released-baseline-starter.yaml"), RELEASED_VERSION).single()
 
-    private fun current(name: String, version: String = WITHIN_WINDOW_VERSION): List<ContractSchema> =
-        ContractSchema.parse(document(name), version)
+    private fun current(name: String, version: String = WITHIN_WINDOW_VERSION): ContractSchema =
+        ContractSchema.parse(document(name), version).single()
 
     private fun document(name: String): File =
         File(javaClass.getResource(

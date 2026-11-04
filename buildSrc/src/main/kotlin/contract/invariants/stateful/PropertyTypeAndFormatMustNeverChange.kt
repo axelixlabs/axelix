@@ -31,22 +31,20 @@ import contract.ContractSchema
  */
 object PropertyTypeAndFormatMustNeverChange : StatefulContractInvariant {
 
-    override fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
-        if (baseline == null) {
-            // a document born now redefines nothing: no released consumer has ever seen it
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
             return emptyList()
         }
 
-        val baselineProperties = baseline.flatMap { schema -> schema.properties }
-            .associateBy { property -> property.schemaName to property.name }
+        val baselineProperties = baseline.properties.associateBy { property -> property.name }
 
-        return current.flatMap { schema -> schema.properties }.flatMap { property ->
-            val released = baselineProperties[property.schemaName to property.name]
+        return current.properties.flatMap { property ->
+            val released = baselineProperties[property.name]
                 ?: return@flatMap emptyList<String>()
 
             listOfNotNull(
-                redefinition(property.location, "type", released.node, property.node, baseline.first()),
-                redefinition(property.location, "format", released.node, property.node, baseline.first()))
+                redefinition(property.location, "type", released.node, property.node, baseline),
+                redefinition(property.location, "format", released.node, property.node, baseline))
         }
     }
 
