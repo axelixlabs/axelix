@@ -17,7 +17,7 @@ components:
           x-axelix-introduced-in: 1.0.0
     # The starter produces this reply.
     LogLevelChangeReply:
-      x-axelix-produced-by: master
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.0.0
       type: object
       required:

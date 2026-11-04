@@ -2,8 +2,6 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.0.0
-  # INVALID: the released baseline knows this operation as introduced in 1.0.0, and the
-  # introduction marker of an already released part may never be rewritten
 components:
   schemas:
     LogLevelChangeRequest:
