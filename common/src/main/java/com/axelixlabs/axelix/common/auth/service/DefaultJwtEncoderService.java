@@ -19,27 +19,27 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.NullMarked;
 
+import com.axelixlabs.axelix.common.auth.contract.token.AccessToken;
+import com.axelixlabs.axelix.common.auth.contract.token.TokenRole;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
-import com.axelixlabs.axelix.common.auth.core.JwtRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 
 /**
  * Service responsible for generating JWT tokens from {@link User} instances.
  *
- * @see JwtRole
+ * <p>The payload is the generated {@link AccessToken} contract, written with Jackson and then
+ * signed. The same bytes are what a starter deserializes.
+ *
  * @since 22.07.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
@@ -70,15 +70,14 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
 
         try {
             Instant now = Instant.now();
-            List<JwtRole> roleClaims = buildRoleClaims(user);
+            AccessToken payload = new AccessToken()
+                    .sub(user.getUsername())
+                    .iat(now.getEpochSecond())
+                    .exp(now.plus(lifespan).getEpochSecond())
+                    .uid(user.getId())
+                    .roles(buildRoleClaims(user));
 
-            JwtBuilder builder = Jwts.builder()
-                    .subject(user.getUsername())
-                    .issuedAt(Date.from(now))
-                    .expiration(Date.from(now.plus(lifespan)))
-                    .claim(TokenClaim.USER_ID.getEncoding(), user.getId())
-                    .claim(TokenClaim.ROLES.getEncoding(), roleClaims);
-
+            JwtBuilder builder = Jwts.builder().content(AccessTokenJson.write(payload));
             return signingStrategy.signToken(builder, signingKey).compact();
         } catch (JwtTokenGenerationException e) {
             throw e;
@@ -97,17 +96,17 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
         }
     }
 
-    private List<JwtRole> buildRoleClaims(User user) {
-        return user.getRoles().stream().map(this::toJwtRole).collect(Collectors.toList());
+    private List<TokenRole> buildRoleClaims(User user) {
+        return user.getRoles().stream().map(this::toTokenRole).collect(Collectors.toList());
     }
 
-    private JwtRole toJwtRole(Role role) {
-        Set<String> authorities =
-                role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+    private TokenRole toTokenRole(Role role) {
+        List<String> authorities =
+                role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList());
 
-        List<JwtRole> components =
-                role.getComponents().stream().map(this::toJwtRole).collect(Collectors.toList());
+        List<TokenRole> components =
+                role.getComponents().stream().map(this::toTokenRole).collect(Collectors.toList());
 
-        return new JwtRole(role.getName(), authorities, components);
+        return new TokenRole().name(role.getName()).authorities(authorities).components(components);
     }
 }

@@ -18,6 +18,7 @@
 package contract.invariants.stateless
 
 import contract.ContractDocument
+import contract.ContractDocument.Companion.BOTH
 import contract.ContractDocument.Companion.SERVER
 import contract.ContractDocument.Companion.SERVER_SIDES
 
@@ -29,7 +30,14 @@ import contract.ContractDocument.Companion.SERVER_SIDES
  */
 object ServerIsDeclared : StatelessContractInvariant {
 
-    override fun check(document: ContractDocument): List<String> =
-        if (document.server in SERVER_SIDES) emptyList()
-        else listOf("the 'info' block must declare '$SERVER' as one of $SERVER_SIDES")
+    override fun check(document: ContractDocument): List<String> {
+        if (document.server !in SERVER_SIDES) {
+            return listOf("the 'info' block must declare '$SERVER' as one of $SERVER_SIDES")
+        }
+        if (document.server == BOTH && !document.schemaOnly) {
+            return listOf(
+                "'$SERVER: $BOTH' is only valid for a schema-only document that omits 'paths'")
+        }
+        return emptyList()
+    }
 }

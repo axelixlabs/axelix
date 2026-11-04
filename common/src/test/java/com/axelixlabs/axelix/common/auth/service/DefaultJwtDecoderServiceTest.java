@@ -37,13 +37,13 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.common.auth.contract.token.AccessToken;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
@@ -287,7 +287,7 @@ class DefaultJwtDecoderServiceTest {
         // given a token issued with no uid claim.
         String tokenWithNoUserId = Jwts.builder()
                 .subject(USER_NAME)
-                .claim(TokenClaim.ROLES.getEncoding(), List.of())
+                .claim(AccessToken.JSON_PROPERTY_ROLES, List.of())
                 .signWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
                 .compact();
 

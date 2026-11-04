@@ -55,14 +55,35 @@ class ContractDocumentsValidatorTest {
     fun `a missing server marker fails`() {
         expectProblem(
             "stateless/ServerIsDeclared/missing-server.yaml",
-            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+            "the 'info' block must declare 'x-axelix-server' as one of [starter, master, both]")
     }
 
     @Test
     fun `an unknown server side fails`() {
         expectProblem(
             "stateless/ServerIsDeclared/unknown-server.yaml",
-            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+            "the 'info' block must declare 'x-axelix-server' as one of [starter, master, both]")
+    }
+
+    @Test
+    fun `a schema-only document passes`() {
+        ContractDocumentsValidator.validate(
+            document("stateless/DocumentDescribesOneOperation/schema-only.yaml"), CURRENT_VERSION)
+    }
+
+    @Test
+    fun `a both-sided server on an operation document fails`() {
+        expectProblem(
+            "stateless/ServerIsDeclared/both-with-paths.yaml",
+            "'x-axelix-server: both' is only valid for a schema-only document that omits 'paths'")
+    }
+
+    @Test
+    fun `a late required property of a payload produced by both sides fails within the window`() {
+        expectProblem(
+            "stateless/RequiredHonoursTheWindow/both-produced-late-required.yaml",
+            "the property 'AccessToken.scope' cannot be 'required' yet: starters older "
+                + "than 1.2.0 do not send it and only leave the compatibility window in 1.5")
     }
 
     @Test

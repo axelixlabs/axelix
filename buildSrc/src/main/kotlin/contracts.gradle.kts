@@ -24,7 +24,11 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 /**
  * Generates the wire classes of the Axelix Master <-> starter contracts from the OpenAPI
  * documents in :common, so that the yaml document stays the single source of truth of every
- * contract. Every document is supposed to describe exactly one operation.
+ * contract. Every document describes exactly one operation, or omits `paths` and describes
+ * a single payload (OpenAPI 3.1). A project may generate a subset of the documents by setting
+ * the `axelix.contracts.includes` project property to a comma-separated list of paths relative
+ * to the contract root, e.g. `token/token.yaml`. The property is read while this plugin is
+ * applied, which is before a `contracts {}` block runs.
  */
 
 plugins {
@@ -34,7 +38,19 @@ plugins {
 
 val contracts = extensions.create<ContractsExtension>("contracts")
 
-val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { include("**/*.yaml") }
+val contractRoot = file("$rootDir/common/src/main/resources/contract")
+val includeSuffixes = (project.findProperty("axelix.contracts.includes") as? String)
+    ?.split(',')
+    ?.map { suffix -> suffix.trim() }
+    ?.filter { suffix -> suffix.isNotEmpty() }
+    .orEmpty()
+
+val contractSources = fileTree(contractRoot) { include("**/*.yaml") }
+    .filter { document ->
+        includeSuffixes.isEmpty() || includeSuffixes.any { suffix ->
+            document.relativeTo(contractRoot).invariantSeparatorsPath == suffix
+        }
+    }
     .sortedBy { it.absolutePath }
     .map { document ->
         // We re-define some local variables here, so that the doFirst closure below captures plain values instead of a
@@ -78,14 +94,19 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
                 globalProperties.set(mapOf("models" to "", "modelDocs" to "false", "modelTests" to "false"))
             }
 
-            configOptions.set(mapOf(
+            val options = mutableMapOf(
                 "hideGenerationTimestamp" to "true",
                 "openApiNullable" to "false",
                 "serializationLibrary" to "jackson",
                 "useBeanValidation" to "false",
                 "annotationLibrary" to "none",
                 "useJspecify" to "true",
-            ))
+            )
+            // A free-form leftover map would show up in the JSON next to the declared claims.
+            if (featurePackage == "token") {
+                options["disallowAdditionalPropertiesIfNotPresent"] = "true"
+            }
+            configOptions.set(options)
 
             doFirst {
                 val baseline = ReleaseBaseline.find(repoRoot)

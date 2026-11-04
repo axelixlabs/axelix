@@ -24,12 +24,23 @@ import contract.ContractDocument
  * versioning, and a version of a document holding several operations cannot honestly represent
  * a change to just one of them.
  *
+ * A document may instead omit `paths` entirely. OpenAPI 3.1 does not require the key, and a
+ * payload that is not an HTTP call — the access token — has nothing honest to put there.
+ * An empty `paths` object is still an operation document that describes nothing.
+ *
  * @author Mikhail Polivakha
  */
 object DocumentDescribesOneOperation : StatelessContractInvariant {
 
-    override fun check(document: ContractDocument): List<String> =
-        when {
+    override fun check(document: ContractDocument): List<String> {
+        if (document.schemaOnly) {
+            return if (document.schemaNames.isEmpty()) {
+                listOf("the document omits 'paths' but declares no schemas")
+            } else {
+                emptyList()
+            }
+        }
+        return when {
             document.operations.isEmpty() ->
                 listOf("the document must describe exactly one operation, but describes none")
             document.operations.size > 1 ->
@@ -37,4 +48,5 @@ object DocumentDescribesOneOperation : StatelessContractInvariant {
                     + "${document.operations.size}: ${document.operations.joinToString(", ")}")
             else -> emptyList()
         }
+    }
 }

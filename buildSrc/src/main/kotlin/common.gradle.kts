@@ -35,6 +35,9 @@ dependencies {
     // This would lead to over complication that we do not need at least know. Because now we support
     // Only Spring Boot 2 and Spring Boot 3, we do not need to worry about Jackson 3 incompatibility.
     compileOnly("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
+    // The generated token model imports these directly. compileOnly is not transitive, so the
+    // databind jar above does not put them on the compile classpath.
+    compileOnly("com.fasterxml.jackson.core:jackson-annotations:${jacksonDatabindVersion}")
 
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
 

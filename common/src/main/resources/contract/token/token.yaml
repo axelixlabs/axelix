@@ -1,0 +1,73 @@
+openapi: 3.1.0
+info:
+  title: token
+  version: 1.0.0
+  description: |
+    Payload of the Axelix access token. Axelix Master mints it for the UI and proxies it to
+    the starters. Starters mint the same payload for the technical user that calls back into
+    the Master (registration and heartbeat). The token is not an HTTP operation, and OpenAPI 3.1
+    does not require 'paths', so the key is omitted.
+  x-axelix-introduced-in: 1.3.0
+  x-axelix-server: both
+components:
+  schemas:
+    AccessToken:
+      type: object
+      additionalProperties: false
+      description: Claims of the Axelix access token.
+      required:
+        - sub
+        - iat
+        - exp
+        - uid
+        - roles
+      properties:
+        sub:
+          type: string
+          description: Username of the subject. Registered JWT claim.
+          x-axelix-introduced-in: 1.3.0
+        iat:
+          type: integer
+          format: int64
+          description: Issued-at time, seconds since the epoch. Registered JWT claim.
+          x-axelix-introduced-in: 1.3.0
+        exp:
+          type: integer
+          format: int64
+          description: Expiration time, seconds since the epoch. Registered JWT claim.
+          x-axelix-introduced-in: 1.3.0
+        uid:
+          type: string
+          description: Stable identifier of the subject.
+          x-axelix-introduced-in: 1.3.0
+        roles:
+          type: array
+          description: Roles granted to the subject. Empty when the subject has none.
+          x-axelix-introduced-in: 1.3.0
+          items:
+            $ref: '#/components/schemas/TokenRole'
+    TokenRole:
+      type: object
+      additionalProperties: false
+      description: A role carried inside the access token, including the roles nested in it.
+      required:
+        - name
+        - authorities
+        - components
+      properties:
+        name:
+          type: string
+          description: Name of the role.
+          x-axelix-introduced-in: 1.3.0
+        authorities:
+          type: array
+          description: Authority names this role grants on its own.
+          x-axelix-introduced-in: 1.3.0
+          items:
+            type: string
+        components:
+          type: array
+          description: Roles included in this role.
+          x-axelix-introduced-in: 1.3.0
+          items:
+            $ref: '#/components/schemas/TokenRole'

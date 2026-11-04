@@ -1,0 +1,22 @@
+openapi: 3.1.0
+info:
+  title: token
+  version: 1.0.0
+  x-axelix-introduced-in: 1.0.0
+  # INVALID: 'both' is a payload producer, not a side that answers an HTTP call.
+  x-axelix-server: both
+paths:
+  /token:
+    get:
+      operationId: getToken
+      responses:
+        '204':
+          description: No payload.
+components:
+  schemas:
+    AccessToken:
+      type: object
+      properties:
+        sub:
+          type: string
+          x-axelix-introduced-in: 1.0.0

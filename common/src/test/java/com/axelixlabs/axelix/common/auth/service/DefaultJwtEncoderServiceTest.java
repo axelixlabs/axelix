@@ -37,9 +37,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
+import com.axelixlabs.axelix.common.auth.contract.token.AccessToken;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
@@ -98,7 +98,7 @@ class DefaultJwtEncoderServiceTest {
 
         // payload
         assertThat(claims.getPayload().getSubject()).isEqualTo(USER_NAME);
-        assertThat(claims.getPayload().get(TokenClaim.USER_ID.getEncoding(), String.class))
+        assertThat(claims.getPayload().get(AccessToken.JSON_PROPERTY_UID, String.class))
                 .isEqualTo(user.getId());
         // iat is a JWT NumericDate (whole seconds), so the parsed value can trail Instant.now() by almost 2s.
         assertThat(claims.getPayload().getIssuedAt().toInstant())

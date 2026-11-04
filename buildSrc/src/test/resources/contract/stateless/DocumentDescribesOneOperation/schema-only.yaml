@@ -1,0 +1,16 @@
+openapi: 3.1.0
+info:
+  title: token
+  version: 1.0.0
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: both
+components:
+  schemas:
+    AccessToken:
+      type: object
+      required:
+        - sub
+      properties:
+        sub:
+          type: string
+          x-axelix-introduced-in: 1.2.0

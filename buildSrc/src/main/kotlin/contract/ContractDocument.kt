@@ -37,6 +37,15 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
     val server: String = info.path(SERVER).asText("")
 
     /**
+     * OpenAPI 3.1 does not require `paths`. A document that omits the key entirely describes a
+     * payload rather than an HTTP operation — the access token is such a document.
+     */
+    val schemaOnly: Boolean = !root.has("paths")
+
+    val schemaNames: Set<String> =
+        root.path("components").path("schemas").properties().map { (name, _) -> name }.toSet()
+
+    /**
      * Every part of the document that carries lifecycle markers.
      */
     val markedParts: List<MarkedPart>
@@ -79,6 +88,10 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
         if (server !in SERVER_SIDES) {
             return@lazy emptySet()
         }
+        // A payload minted by both sides is starter-produced and master-produced at once.
+        if (server == BOTH) {
+            return@lazy schemaNames
+        }
         val produced = mutableSetOf<String>()
         root.path("paths").properties().forEach { (_, path) ->
             path.properties().forEach { (_, operation) ->
@@ -108,6 +121,19 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
         }
         return@lazy produced
     }
+
+    /**
+     * Whether withdrawing `required` or removing the property is gated on the Master rules.
+     * A payload produced by both sides is: an older starter still has to read what the Master
+     * sends, and an older starter still sends the payload the Master reads.
+     */
+    fun masterProduced(schemaName: String): Boolean =
+        server == BOTH || schemaName !in starterProducedSchemas
+
+    /**
+     * Who the strict evolution rules name in their failure message.
+     */
+    fun masterProducerLabel(): String = if (server == BOTH) "both sides" else "the Master"
 
     /**
      * The raw value of the marker, or null when it is absent.
@@ -147,7 +173,9 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
         const val DEPRECATED_IN = "x-axelix-deprecated-in"
         const val SERVER = "x-axelix-server"
 
-        val SERVER_SIDES = setOf("starter", "master")
+        const val BOTH = "both"
+
+        val SERVER_SIDES = setOf("starter", "master", BOTH)
 
         private val HTTP_METHODS =
             setOf("get", "put", "post", "delete", "options", "head", "patch", "trace")

@@ -1,0 +1,21 @@
+openapi: 3.1.0
+info:
+  title: token
+  version: 1.0.0
+  x-axelix-introduced-in: 1.0.0
+  x-axelix-server: both
+components:
+  schemas:
+    AccessToken:
+      type: object
+      required:
+        - sub
+        - scope
+      properties:
+        sub:
+          type: string
+          x-axelix-introduced-in: 1.0.0
+        scope:
+          type: string
+          # INVALID: both sides emit this payload, so a starter older than 1.2.0 does not send it.
+          x-axelix-introduced-in: 1.2.0

@@ -17,27 +17,27 @@
  */
 package com.axelixlabs.axelix.common.auth.service;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.lang.Assert;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.auth.contract.token.AccessToken;
+import com.axelixlabs.axelix.common.auth.contract.token.TokenRole;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.InternalAuthorities;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
@@ -69,8 +69,12 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
             throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtParsingException {
 
         try {
-            Claims claims = parseClaims(token).getPayload();
-            return new PasswordlessUser(extractUserId(claims), claims.getSubject(), extractRoles(claims));
+            // Signature and expiry are checked by the JWT library. The claim object itself is the
+            // generated contract, read back with Jackson from the same JSON bytes that were signed.
+            verificationStrategy.verifyAndParse(token, signingKey);
+            AccessToken payload = AccessTokenJson.read(payloadJson(token));
+            return new PasswordlessUser(
+                    extractUserId(payload), extractSubject(payload), extractRoles(payload.getRoles()));
         } catch (JwtParsingException e) {
             throw new JwtParsingException(e);
         } catch (ExpiredJwtException e) {
@@ -82,44 +86,50 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
         }
     }
 
-    private Jws<Claims> parseClaims(String token) {
-        return verificationStrategy.verifyAndParse(token, signingKey);
+    private static String payloadJson(String token) {
+        String[] parts = token.split("\\.");
+        if (parts.length < 2) {
+            throw new JwtParsingException("JWT token is invalid or tampered");
+        }
+        try {
+            return new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            throw new JwtParsingException("JWT token is invalid or tampered", e);
+        }
     }
 
-    private String extractUserId(Claims claims) {
-        return Optional.ofNullable(claims.get(TokenClaim.USER_ID.getEncoding(), String.class))
-                .orElseThrow(() -> new JwtParsingException(String.format(
-                        "'%s' claim is required in the incoming JWT token", TokenClaim.USER_ID.getEncoding())));
+    private String extractUserId(AccessToken payload) {
+        return Optional.ofNullable(payload.getUid())
+                .orElseThrow(() -> new JwtParsingException("'uid' claim is required in the incoming JWT token"));
     }
 
-    private Set<Role> extractRoles(Claims claims) {
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> rolesClaim = claims.get(TokenClaim.ROLES.getEncoding(), List.class);
+    private String extractSubject(AccessToken payload) {
+        return Optional.ofNullable(payload.getSub())
+                .orElseThrow(() -> new JwtParsingException("'sub' claim is required in the incoming JWT token"));
+    }
 
-        return Optional.ofNullable(rolesClaim).orElse(List.of()).stream()
+    private Set<Role> extractRoles(@Nullable List<TokenRole> roles) {
+        return Optional.ofNullable(roles).orElse(List.of()).stream()
                 .map(this::mapToRole)
                 .collect(Collectors.toSet());
     }
 
-    private Role mapToRole(Map<String, Object> roleMap) {
-        String roleName = (String) roleMap.get(TokenClaim.ROLE_NAME.getEncoding());
+    private Role mapToRole(TokenRole tokenRole) {
+        String roleName = tokenRole.getName();
 
         if (roleName == null) {
             throw new JwtParsingException("Role name is null in JWT token");
         }
 
-        @SuppressWarnings("unchecked")
         List<String> authoritiesList =
-                (List<String>) roleMap.getOrDefault(TokenClaim.AUTHORITIES.getEncoding(), List.of());
+                Optional.ofNullable(tokenRole.getAuthorities()).orElse(List.of());
 
         Set<Authority> authorities = authoritiesList.stream()
                 .map(this::parseAuthority)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> components =
-                (List<Map<String, Object>>) roleMap.getOrDefault("components", List.of());
+        List<TokenRole> components = Optional.ofNullable(tokenRole.getComponents()).orElse(List.of());
 
         Set<Role> componentRoles = components.stream().map(this::mapToRole).collect(Collectors.toSet());
 
