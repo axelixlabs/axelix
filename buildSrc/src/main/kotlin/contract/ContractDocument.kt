@@ -65,51 +65,10 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
     }
 
     /**
-     * The names of the schemas produced by the starter.
-     *
-     * Each schema names its producer with [PRODUCED_BY]. A released baseline that still predates
-     * that marker is read the old way: the info-level [LEGACY_ANSWERING_SIDE] says who answers
-     * the call, and the producer is the response when the starter answers or the request body
-     * when the starter calls.
+     * The names of the schemas produced by the starter, taken from [PRODUCED_BY] on each schema.
      */
     val starterProducedSchemas: Set<String> by lazy {
-        if (schemas.any { schema -> schema.producedBy.isNotEmpty() }) {
-            return@lazy schemas.filter { schema -> schema.producedBy == "starter" }.map { schema -> schema.name }.toSet()
-        }
-        val answering = info.path(LEGACY_ANSWERING_SIDE).asText("")
-        if (answering !in PRODUCERS) {
-            return@lazy emptySet()
-        }
-        val produced = mutableSetOf<String>()
-        root.path("paths").properties().forEach { (_, path) ->
-            path.properties()
-                .filter { (key, _) -> key in HTTP_METHODS }
-                .forEach { (_, operation) ->
-                    val starterSide =
-                        if (answering == "starter") operation.path("responses") else operation.path("requestBody")
-                    starterSide.findValues("\$ref").forEach { reference ->
-                        produced += reference.asText().substringAfterLast('/')
-                    }
-                }
-        }
-
-        val schemaNodes = root.path("components").path("schemas")
-        val queue = ArrayDeque(produced)
-        while (queue.isNotEmpty()) {
-            val schema = schemaNodes.path(queue.removeFirst())
-
-            // Discriminator mapping holds the subtype references as plain values, not as '$ref'.
-            val references =
-                schema.findValues("\$ref") + schema.path("discriminator").path("mapping").toList()
-
-            references.forEach { reference ->
-                val name = reference.asText().substringAfterLast('/')
-                if (produced.add(name)) {
-                    queue += name
-                }
-            }
-        }
-        return@lazy produced
+        schemas.filter { schema -> schema.producedBy == "starter" }.map { schema -> schema.name }.toSet()
     }
 
     /**
@@ -159,12 +118,6 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
         const val PRODUCED_BY = "x-axelix-produced-by"
 
         val PRODUCERS = setOf("starter", "master")
-
-        /** Info-level marker on released baselines that predate [PRODUCED_BY]. Names who answers the call. */
-        private const val LEGACY_ANSWERING_SIDE = "x-axelix-server"
-
-        private val HTTP_METHODS =
-            setOf("get", "put", "post", "delete", "options", "head", "patch", "trace")
 
         /**
          * The compatibility window is 4 minors including the current one, so an action gated on
