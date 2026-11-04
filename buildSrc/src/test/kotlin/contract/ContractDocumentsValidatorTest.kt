@@ -52,17 +52,17 @@ class ContractDocumentsValidatorTest {
     }
 
     @Test
-    fun `a missing server marker fails`() {
+    fun `a missing produced-by marker fails`() {
         expectProblem(
-            "stateless/ServerIsDeclared/missing-server.yaml",
-            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+            "stateless/ProducedByIsDeclared/missing-produced-by.yaml",
+            "the schema 'LogLevelChangeRequest' must declare 'x-axelix-produced-by' as one of [starter, master]")
     }
 
     @Test
-    fun `an unknown server side fails`() {
+    fun `an unknown producer fails`() {
         expectProblem(
-            "stateless/ServerIsDeclared/unknown-server.yaml",
-            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+            "stateless/ProducedByIsDeclared/unknown-produced-by.yaml",
+            "the schema 'LogLevelChangeRequest' must declare 'x-axelix-produced-by' as one of [starter, master]")
     }
 
     @Test
@@ -83,7 +83,7 @@ class ContractDocumentsValidatorTest {
     fun `a malformed version marker fails`() {
         expectProblem(
             "stateless/MarkersAreWellFormed/malformed-marker.yaml",
-            "the 'info' block has 'x-axelix-introduced-in: 1.0' that is not of the x.y.z form")
+            "the schema 'LogLevelChangeRequest' has 'x-axelix-introduced-in: 1.0' that is not of the x.y.z form")
     }
 
     @Test
@@ -135,21 +135,6 @@ class ContractDocumentsValidatorTest {
             "the property 'LogLevelChangeRequest.ttlSeconds' was deprecated in 1.1.0 and the "
                 + "compatibility window has passed: remove it from the contract",
             currentVersion = "1.4.0-SNAPSHOT")
-    }
-
-    @Test
-    fun `a document with two operations fails`() {
-        expectProblem(
-            "stateless/DocumentDescribesOneOperation/two-operations.yaml",
-            "the document must describe exactly one operation, but describes 2: "
-                + "GET /actuator/axelix-loggers, POST /actuator/axelix-loggers/logger/{name}/reset")
-    }
-
-    @Test
-    fun `a document without operations fails`() {
-        expectProblem(
-            "stateless/DocumentDescribesOneOperation/no-operations.yaml",
-            "the document must describe exactly one operation, but describes none")
     }
 
     private fun expectProblem(

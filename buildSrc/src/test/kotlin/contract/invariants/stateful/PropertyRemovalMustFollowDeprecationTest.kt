@@ -89,7 +89,7 @@ class PropertyRemovalMustFollowDeprecationTest {
     @Test
     fun `a pure removal of a starter-produced property passes`() {
         val problems = PropertyRemovalMustFollowDeprecation
-            .check(baseline(), current("starter-produced-pure-removal.yaml"))
+            .check(starterBaseline(), current("starter-produced-pure-removal.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
@@ -97,7 +97,7 @@ class PropertyRemovalMustFollowDeprecationTest {
     @Test
     fun `a starter-produced property removed within its deprecation window fails`() {
         val problems = PropertyRemovalMustFollowDeprecation
-            .check(baseline(), current("starter-produced-removed-within-window.yaml"))
+            .check(starterBaseline(), current("starter-produced-removed-within-window.yaml"))
 
         assertEquals(
             listOf(
@@ -110,13 +110,16 @@ class PropertyRemovalMustFollowDeprecationTest {
     @Test
     fun `a starter-produced property removed after its deprecation window passes`() {
         val problems = PropertyRemovalMustFollowDeprecation
-            .check(baseline(), current("starter-produced-removed-after-window.yaml", AFTER_WINDOW_VERSION))
+            .check(starterBaseline(), current("starter-produced-removed-after-window.yaml", AFTER_WINDOW_VERSION))
 
         assertEquals(emptyList<String>(), problems)
     }
 
     private fun baseline(): ContractDocument =
         ContractDocument.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+
+    private fun starterBaseline(): ContractDocument =
+        ContractDocument.parse(document("released-baseline-starter.yaml"), RELEASED_VERSION)
 
     private fun current(name: String, version: String = WITHIN_WINDOW_VERSION): ContractDocument =
         ContractDocument.parse(document(name), version)

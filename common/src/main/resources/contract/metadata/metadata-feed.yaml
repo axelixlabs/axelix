@@ -10,25 +10,13 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-metadata:
-    get:
-      operationId: getMetadata
-      summary: Returns the basic registration metadata of the service.
-      responses:
-        '200':
-          description: The basic registration metadata of the service.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BasicRegistrationMetadata'
 components:
   schemas:
     # BasicRegistrationMetadata and everything below it is duplicated verbatim in
     # heartbeat/heartbeat.yaml (no cross-document schema reuse yet, see GH-1666). Keep both in sync.
     BasicRegistrationMetadata:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
         Represents the basic metadata that is always required in order to register the service,
@@ -122,6 +110,8 @@ components:
             or the initial auto-discovery scan), since the dependencies cannot change while the instance runs.
           x-axelix-introduced-in: 1.3.0
     SoftwareVersions:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Software versions information.
       required:
@@ -157,6 +147,8 @@ components:
             service is not using kotlin.
           x-axelix-introduced-in: 1.2.0
     MemoryDetails:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Memory details of the given Instance.
       required:
@@ -168,6 +160,8 @@ components:
           description: The estimated heap size of the given instance.
           x-axelix-introduced-in: 1.2.0
     HealthStatus:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: The health status of the given instance during registration.
       enum:
@@ -175,6 +169,8 @@ components:
         - DOWN
         - UNKNOWN
     InstanceFeature:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: >-
         A feature of a managed instance that the Axelix UI renders only when the instance has it.
@@ -188,6 +184,8 @@ components:
         - transactions
         - dependency-analysis
     GarbageCollector:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: Garbage collector used by a managed JVM service instance.
       enum:
@@ -201,6 +199,8 @@ components:
         - CMS
         - UNKNOWN
     Insights:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The insight information discovered for the given service instance.
       required:
@@ -229,6 +229,8 @@ components:
           items:
             $ref: '#/components/schemas/ScheduledTaskExecution'
     HotSpotInsights:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: HotSpot-specific insight groups.
       required:
@@ -255,6 +257,8 @@ components:
           items:
             $ref: '#/components/schemas/InsightFeature'
     InsightFeature:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A specific insight feature discovered for the given service instance.
       required:
@@ -270,6 +274,8 @@ components:
           description: The enabled state of the insight feature.
           x-axelix-introduced-in: 1.2.0
     ScheduledTaskExecution:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The result of a single execution of a scheduled task.
       required:
@@ -308,12 +314,16 @@ components:
           description: The message of the exception thrown by the task execution, or absent when it succeeded.
           x-axelix-introduced-in: 1.2.0
     ScheduledTaskLaunchType:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: How the scheduled task execution was launched.
       enum:
         - SCHEDULED
         - MANUAL
     PersistenceInsights:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Insights of a particular instance related to persistence.
       required:
@@ -333,6 +343,8 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/JpaEntities'
     TransactionAggregatedProfile:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: Aggregated information about a particular transactional method in the instance.
       required:
@@ -399,6 +411,8 @@ components:
             (e.g. an older agent that did not report it).
           x-axelix-introduced-in: 1.2.0
     TransactionOrigin:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: The origin of the transaction, i.e. how exactly the transaction was created.
       enum:
@@ -406,6 +420,8 @@ components:
         - APPLICATION_DECLARATIVE
         - APPLICATION_IMPERATIVE
     TransactionalKey:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The key that identifies the transactional method.
       required:
@@ -421,6 +437,8 @@ components:
           description: The name of the transactional method.
           x-axelix-introduced-in: 1.2.0
     ExecutionStats:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The min/max/avg duration statistics of repeated executions.
       required:
@@ -444,6 +462,8 @@ components:
           description: The average observed duration, in milliseconds.
           x-axelix-introduced-in: 1.2.0
     CountedLazyLoadingTarget:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The aggregated count of lazy-loading (N+1) occasions for a particular association.
       required:
@@ -460,6 +480,8 @@ components:
           description: The number of lazy-loading occasions observed.
           x-axelix-introduced-in: 1.2.0
     LazyLoadingTarget:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The particular association that presumably was lazy loaded.
       required:
@@ -475,6 +497,8 @@ components:
           description: The name of the lazy-loaded association property.
           x-axelix-introduced-in: 1.2.0
     ExternalCallInsight:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
         Aggregated timing of the blocking calls made to a single external endpoint from within a
@@ -501,6 +525,8 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/ExecutionStats'
     TypeExternalCall:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: The client that performed a blocking call to an external system.
       enum:
@@ -508,6 +534,8 @@ components:
         - KAFKA
         - RABBIT
     JpaEntities:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
         The scan-first registry of every JPA entity Axelix mapped in an instance, together with the
@@ -522,6 +550,8 @@ components:
           items:
             $ref: '#/components/schemas/MappedEntity'
     MappedEntity:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
         A single JPA entity that Axelix mapped while scanning an instance, together with the
@@ -553,6 +583,8 @@ components:
           items:
             $ref: '#/components/schemas/FlaggedAssociation'
     FlaggedAssociation:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A single association of a mapped entity in which Axelix detected a problem.
       required:
@@ -577,6 +609,8 @@ components:
           items:
             $ref: '#/components/schemas/AssociationProblem'
     Association:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
         A single JPA association, identified by the entity that declares it and the field that maps
@@ -594,6 +628,8 @@ components:
           description: The field that maps the association (e.g. 'customer').
           x-axelix-introduced-in: 1.2.0
     AssociationProblem:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: >-
         A neutral category of a problem detected in a JPA association mapping while Axelix scanned

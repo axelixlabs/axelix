@@ -9,32 +9,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers/group/{name}:
-    get:
-      operationId: getLoggerGroup
-      summary: Returns the profile of a single logger group of the service.
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: The name of the logger group to read.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The profile of the requested logger group.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggersGroupProfile'
-        '400':
-          description: No logger group with the given name exists.
 components:
   schemas:
     LoggersGroupProfile:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The logging level information of a single logger group.
       required:

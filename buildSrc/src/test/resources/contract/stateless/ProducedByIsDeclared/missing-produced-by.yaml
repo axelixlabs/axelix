@@ -1,0 +1,16 @@
+openapi: 3.1.0
+info:
+  title: logger-level-change
+  version: 1.0.0
+  # INVALID: the mandatory 'x-axelix-produced-by' marker is absent.
+components:
+  schemas:
+    LogLevelChangeRequest:
+      x-axelix-introduced-in: 1.0.0
+      type: object
+      required:
+        - configuredLevel
+      properties:
+        configuredLevel:
+          type: string
+          x-axelix-introduced-in: 1.0.0

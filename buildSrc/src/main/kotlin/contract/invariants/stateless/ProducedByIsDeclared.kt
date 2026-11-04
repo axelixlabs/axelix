@@ -18,18 +18,20 @@
 package contract.invariants.stateless
 
 import contract.ContractDocument
-import contract.ContractDocument.Companion.SERVER
-import contract.ContractDocument.Companion.SERVER_SIDES
+import contract.ContractDocument.Companion.PRODUCED_BY
+import contract.ContractDocument.Companion.PRODUCERS
 
 /**
- * The document must declare which side answers the call: the producer of every payload — and
- * with it the applicable evolution rules — is derived from it.
+ * Every schema must declare which side produces it: the evolution rules of its properties
+ * are derived from that.
  *
  * @author Mikhail Polivakha
  */
-object ServerIsDeclared : StatelessContractInvariant {
+object ProducedByIsDeclared : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> =
-        if (document.server in SERVER_SIDES) emptyList()
-        else listOf("the 'info' block must declare '$SERVER' as one of $SERVER_SIDES")
+        document.schemas.mapNotNull { schema ->
+            if (schema.producedBy in PRODUCERS) null
+            else "${schema.location} must declare '$PRODUCED_BY' as one of $PRODUCERS"
+        }
 }

@@ -2,28 +2,11 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.2.0
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers/logger/{name}/change-level:
-    post:
-      operationId: changeLogLevelByLoggerName
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LogLevelChangeRequest'
-      responses:
-        '200':
-          description: The logging level was changed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LogLevelChangeReply'
 components:
   schemas:
     LogLevelChangeRequest:
+      x-axelix-produced-by: master
+      x-axelix-introduced-in: 1.2.0
       type: object
       required:
         - configuredLevel
@@ -32,6 +15,8 @@ components:
           type: string
           x-axelix-introduced-in: 1.2.0
     LogLevelChangeReply:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       required:
         - effectiveLevel

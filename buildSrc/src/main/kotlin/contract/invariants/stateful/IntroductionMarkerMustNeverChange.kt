@@ -41,17 +41,19 @@ object IntroductionMarkerMustNeverChange : StatefulContractInvariant {
             return emptyList()
         }
 
+        val baselineSchemas = baseline.schemas.associateBy { schema -> schema.name }
         val baselineProperties = baseline.properties
             .associateBy { property -> property.schemaName to property.name }
 
-        // note that this does not incldue the removed properties or removed operation - that is
-        // a whole different story. This invaraint just ensures that introduciton marker never CHANGES
+        // Removed schemas and properties are a different check. This one only rejects a marker
+        // that changed on a part the release already knows.
         val survivingParts: List<Triple<String, JsonNode, JsonNode>> =
-            listOf(Triple("the 'info' block", baseline.info, current.info)) +
-                current.properties.mapNotNull { property ->
-                    baselineProperties[property.schemaName to property.name]
-                        ?.let { baseline -> Triple(property.location, baseline.node, property.node) }
-                }
+            current.schemas.mapNotNull { schema ->
+                baselineSchemas[schema.name]?.let { released -> Triple(schema.location, released.node, schema.node) }
+            } + current.properties.mapNotNull { property ->
+                baselineProperties[property.schemaName to property.name]
+                    ?.let { released -> Triple(property.location, released.node, property.node) }
+            }
 
         return survivingParts.mapNotNull { (location, baselineNode, currentNode) ->
             val baselineIntroduction = baseline.markerVersion(baselineNode, INTRODUCED_IN) ?: return@mapNotNull null

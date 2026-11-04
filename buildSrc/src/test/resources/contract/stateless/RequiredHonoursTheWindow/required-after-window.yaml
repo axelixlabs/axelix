@@ -2,22 +2,11 @@ openapi: 3.1.0
 info:
   title: loggers-list
   version: 1.0.0
-  x-axelix-introduced-in: 1.0.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers:
-    get:
-      operationId: getLoggers
-      responses:
-        '200':
-          description: The loggers of the service.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggersReply'
 components:
   schemas:
     LoggersReply:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.0.0
       type: object
       required:
         - loggers

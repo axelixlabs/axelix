@@ -64,13 +64,13 @@ class IntroductionMarkerMustNeverChangeTest {
     }
 
     @Test
-    fun `a rewritten introduction marker of a released operation fails`() {
+    fun `a rewritten introduction marker of a released schema fails`() {
         val problems = IntroductionMarkerMustNeverChange
             .check(baseline(), current("introduction-rewritten-on-info.yaml"))
 
         assertEquals(
             listOf(
-                "the 'info' block has 'x-axelix-introduced-in: 1.1.0' "
+                "the schema 'LogLevelChangeRequest' has 'x-axelix-introduced-in: 1.1.0' "
                     + "but the released contract (1.1.0) knows it as introduced in 1.0.0: "
                     + "the introduction marker may never change"),
             problems)

@@ -69,7 +69,7 @@ class NewPartsMustBeMarkedAsIntroducedInTheCurrentReleaseTest {
 
         assertEquals(
             listOf(
-                "the 'info' block is born in this release but has "
+                "the schema 'LogLevelChangeRequest' is born in this release but has "
                     + "'x-axelix-introduced-in: 1.1.0' instead of the version currently being built (1.2.0)",
                 "the property 'LogLevelChangeRequest.configuredLevel' is born in this release but has "
                     + "'x-axelix-introduced-in: 1.0.0' instead of the version currently being built (1.2.0)"),

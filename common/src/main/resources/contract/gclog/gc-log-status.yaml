@@ -10,23 +10,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-gc/log/status:
-    get:
-      operationId: getGcLogStatus
-      summary: Returns the status of the garbage collection logging of the service.
-      responses:
-        '200':
-          description: The status of the garbage collection logging.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GcLogStatus'
 components:
   schemas:
     GcLogStatus:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The current status of the garbage collection logging.
       required:

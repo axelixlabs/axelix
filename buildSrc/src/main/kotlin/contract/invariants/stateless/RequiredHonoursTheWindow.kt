@@ -22,30 +22,28 @@ import contract.ContractDocument.Companion.INTRODUCED_IN
 import contract.ContractDocument.Companion.WINDOW_MINORS
 
 /**
- * A property added to a starter-produced payload after the birth of the feature is not sent by
- * the older starters within the compatibility window, so the Master cannot rely on its presence
+ * A property added to a starter-produced schema after the schema was born is not sent by the
+ * older starters within the compatibility window, so the Master cannot rely on its presence
  * — the property cannot be 'required' — until the window has passed. Properties born with the
- * feature are obviously exempt, since such property will be in every starter that is aware about
- * the given opertaion at all.
+ * schema are exempt, since a starter that knows the schema at all sends them.
  *
  * @author Mikhail Polivakha
  */
 object RequiredHonoursTheWindow : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> {
-        val featureIntroduced = document.markerVersion(document.info, INTRODUCED_IN)
-            ?: return emptyList()
+        val schemaIntroduced = document.schemas.associate { schema ->
+            schema.name to document.markerVersion(schema.node, INTRODUCED_IN)
+        }
 
         return document.properties.mapNotNull { property ->
             val introduced = document.markerVersion(property.node, INTRODUCED_IN)
+            val bornWith = schemaIntroduced[property.schemaName]
 
             if (
                 property.required &&
-                // property is produced by the starter
                 property.schemaName in document.starterProducedSchemas &&
-                // was introduced later, after the operatio nexisted at all
-                introduced != null && introduced > featureIntroduced &&
-                // the slidning compatiblility window did not yet pass
+                introduced != null && bornWith != null && introduced > bornWith &&
                 !document.windowPassed(introduced)
             ) {
                 ("${property.location} cannot be 'required' yet: starters older than $introduced "

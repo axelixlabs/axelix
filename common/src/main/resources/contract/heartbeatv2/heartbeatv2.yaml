@@ -6,27 +6,11 @@ info:
     Version 2 of the heartbeat. This version is a more lightweight version of the heartbeat that 
     does not include all the information needed in order for the service to register itself. Version 2
     includes minimal information so the Master can assume the other peer is alive.
-  x-axelix-introduced-in: 1.3.0
-  x-axelix-server: master
-paths:
-  /service/heartbeat/v2:
-    post:
-      operationId: heartbeatV2
-      summary: Accepts the heartbeat of a service instance.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HeartBeatMetadataV2'
-      responses:
-        '204':
-          description: The heartbeat was accepted.
-        '409':
-          description: The instance is not known to this Axelix Master and has to register itself first.
 components:
   schemas:
     HeartBeatMetadataV2:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: Represents lightweight service instance metadata supplied as part of the continuous heartbeat process.
       required:
@@ -67,6 +51,8 @@ components:
           items:
             $ref: '#/components/schemas/ScheduledTaskExecution'
     ScheduledTaskExecution:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The result of a single execution of a scheduled task.
       required:
@@ -106,12 +92,16 @@ components:
           description: The message of the exception thrown by the task execution, or absent when it succeeded.
           x-axelix-introduced-in: 1.3.0
     ScheduledTaskLaunchType:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: How the scheduled task execution was launched.
       enum:
         - SCHEDULED
         - MANUAL
     HealthStatus:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: The health status of the given instance during registration.
       enum:
@@ -119,6 +109,8 @@ components:
         - DOWN
         - UNKNOWN
     MemoryDetails:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: Memory details of the given Instance.
       required:
@@ -130,6 +122,8 @@ components:
           description: The estimated heap size of the given instance.
           x-axelix-introduced-in: 1.3.0
     TransactionAggregatedProfile:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: Aggregated information about a particular transactional method in the instance.
       required:
@@ -196,6 +190,8 @@ components:
             (e.g. an older agent that did not report it).
           x-axelix-introduced-in: 1.3.0
     TransactionOrigin:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: The origin of the transaction, i.e. how exactly the transaction was created.
       enum:
@@ -203,6 +199,8 @@ components:
         - APPLICATION_DECLARATIVE
         - APPLICATION_IMPERATIVE
     TransactionalKey:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The key that identifies the transactional method.
       required:
@@ -218,6 +216,8 @@ components:
           description: The name of the transactional method.
           x-axelix-introduced-in: 1.3.0
     ExecutionStats:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The min/max/avg duration statistics of repeated executions.
       required:
@@ -241,6 +241,8 @@ components:
           description: The average observed duration, in milliseconds.
           x-axelix-introduced-in: 1.3.0
     CountedLazyLoadingTarget:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The aggregated count of lazy-loading (N+1) occasions for a particular association.
       required:
@@ -257,6 +259,8 @@ components:
           description: The number of lazy-loading occasions observed.
           x-axelix-introduced-in: 1.3.0
     LazyLoadingTarget:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: The particular association that presumably was lazy loaded.
       required:
@@ -272,6 +276,8 @@ components:
           description: The name of the lazy-loaded association property.
           x-axelix-introduced-in: 1.3.0
     ExternalCallInsight:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: object
       description: >-
         Aggregated timing of the blocking calls made to a single external endpoint from within a
@@ -298,6 +304,8 @@ components:
           x-axelix-introduced-in: 1.3.0
           $ref: '#/components/schemas/ExecutionStats'
     TypeExternalCall:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.3.0
       type: string
       description: The client that performed a blocking call to an external system.
       enum:

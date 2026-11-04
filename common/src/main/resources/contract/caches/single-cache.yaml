@@ -11,36 +11,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-caches/{cacheManagerName}/{cacheName}:
-    get:
-      operationId: getSingleCache
-      summary: Returns the detailed information of a single cache, addressed by cache manager and cache name.
-      parameters:
-        - name: cacheManagerName
-          in: path
-          required: true
-          description: The name of the cache manager.
-          schema:
-            type: string
-        - name: cacheName
-          in: path
-          required: true
-          description: The name of the cache.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The single cache information.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SingleCache'
 components:
   schemas:
     SingleCache:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The details of the requested cache.
       required:
@@ -78,6 +53,8 @@ components:
           description: Whether the cache is enabled (true) or disabled (false).
           x-axelix-introduced-in: 1.2.0
     CacheLookup:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A recorded cache lookup.
       required:
@@ -94,6 +71,8 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/LookupOutcome'
     LookupOutcome:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: string
       description: The outcome of a cache lookup.
       enum:

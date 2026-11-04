@@ -23,7 +23,8 @@ import java.io.File
 import org.gradle.api.GradleException
 
 /**
- * A parsed contract of the single operation between Axelix Master & starters.
+ * A parsed contract between Axelix Master and the starters. The document defines payload schemas.
+ * Each schema declares who produces it and when it was introduced.
  *
  * @param axelixVersion version of Axelix, when the given document was actaul
  * @param root the [JsonNode] that represents the root of the YAML document to be inspected
@@ -34,79 +35,40 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
 
     val info: JsonNode = root.path("info")
 
-    val server: String = info.path(SERVER).asText("")
-
     /**
      * Every part of the document that carries lifecycle markers.
      */
     val markedParts: List<MarkedPart>
 
+    val schemas: List<Schema>
+
     val properties: List<Property>
 
     init {
-        properties = root.path("components").path("schemas").properties().flatMap { (schemaName, schema) ->
+        schemas = root.path("components").path("schemas").properties().map { (schemaName, schema) ->
+            Schema(schemaName, schema)
+        }
+        properties = schemas.flatMap { schema ->
 
             // The inline 'allOf' parts (e.g. subtypes) declare their own properties.
-            (listOf(schema) + schema.path("allOf").toList()).flatMap { part ->
+            (listOf(schema.node) + schema.node.path("allOf").toList()).flatMap { part ->
                 val requiredProperties = part.path("required").map { name -> name.asText() }.toSet()
 
                 part.path("properties").properties().map { (propertyName, propertyNode) ->
-                    Property(schemaName, propertyName, propertyNode, propertyName in requiredProperties)
+                    Property(schema.name, propertyName, propertyNode, propertyName in requiredProperties)
                 }
             }
         }
         markedParts = listOf(MarkedPart("the 'info' block", info)) +
+            schemas.map { schema -> MarkedPart(schema.location, schema.node) } +
             properties.map { property -> MarkedPart(property.location, property.node) }
     }
 
     /**
-     * Every operation the document describes, e.g. "POST /actuator/axelix-loggers", regardless
-     * of the one-operation rule the invariants enforce on top of this list.
-     */
-    val operations: List<String> = root.path("paths").properties().flatMap { (path, pathItem) ->
-        pathItem.properties()
-            .filter { (key, _) -> key in HTTP_METHODS }
-            .map { (method, _) -> "${method.uppercase()} $path" }
-    }
-
-    /**
-     * The names of the schemas that **travel in a payload produced by the starter**.
-     *
-     * 1. Responses when the starter answers the call
-     * 2. Request bodies when starter queries Axelix Master does
+     * The names of the schemas produced by the starter, taken from [PRODUCED_BY] on each schema.
      */
     val starterProducedSchemas: Set<String> by lazy {
-        if (server !in SERVER_SIDES) {
-            return@lazy emptySet()
-        }
-        val produced = mutableSetOf<String>()
-        root.path("paths").properties().forEach { (_, path) ->
-            path.properties().forEach { (_, operation) ->
-                val starterSide =
-                    if (server == "starter") operation.path("responses") else operation.path("requestBody")
-                starterSide.findValues("\$ref").forEach { reference ->
-                    produced += reference.asText().substringAfterLast('/')
-                }
-            }
-        }
-
-        val schemas = root.path("components").path("schemas")
-        val queue = ArrayDeque(produced)
-        while (queue.isNotEmpty()) {
-            val schema = schemas.path(queue.removeFirst())
-
-            // Discriminator mapping holds the subtype references as plain values, not as '$ref'.
-            val references =
-                schema.findValues("\$ref") + schema.path("discriminator").path("mapping").toList()
-
-            references.forEach { reference ->
-                val name = reference.asText().substringAfterLast('/')
-                if (produced.add(name)) {
-                    queue += name
-                }
-            }
-        }
-        return@lazy produced
+        schemas.filter { schema -> schema.producedBy == "starter" }.map { schema -> schema.name }.toSet()
     }
 
     /**
@@ -135,6 +97,14 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
 
     data class MarkedPart(val location: String, val node: JsonNode)
 
+    class Schema(val name: String, val node: JsonNode) {
+
+        val location: String = "the schema '$name'"
+
+        /** The side that produces this schema, or empty when the marker is absent. */
+        val producedBy: String = node.path(PRODUCED_BY).asText("")
+    }
+
     data class Property(
         val schemaName: String, val name: String, val node: JsonNode, val required: Boolean) {
 
@@ -145,12 +115,9 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
 
         const val INTRODUCED_IN = "x-axelix-introduced-in"
         const val DEPRECATED_IN = "x-axelix-deprecated-in"
-        const val SERVER = "x-axelix-server"
+        const val PRODUCED_BY = "x-axelix-produced-by"
 
-        val SERVER_SIDES = setOf("starter", "master")
-
-        private val HTTP_METHODS =
-            setOf("get", "put", "post", "delete", "options", "head", "patch", "trace")
+        val PRODUCERS = setOf("starter", "master")
 
         /**
          * The compatibility window is 4 minors including the current one, so an action gated on

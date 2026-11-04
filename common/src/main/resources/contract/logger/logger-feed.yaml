@@ -10,23 +10,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers:
-    get:
-      operationId: getAllLoggers
-      summary: Lists all loggers, logger groups and supported logging levels of the service.
-      responses:
-        '200':
-          description: The feed of loggers, logger groups and supported logging levels.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggersFeed'
 components:
   schemas:
     LoggersFeed:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The overview of all loggers and logger groups of the service.
       required:
@@ -53,6 +41,8 @@ components:
             $ref: '#/components/schemas/LoggersFeedGroup'
           x-axelix-introduced-in: 1.2.0
     LoggersFeedLogger:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A single logger as it appears in the loggers feed.
       required:
@@ -90,6 +80,8 @@ components:
             there is no expiration.
           x-axelix-introduced-in: 1.2.0
     LoggersFeedGroup:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A single logger group as it appears in the loggers feed.
       required:

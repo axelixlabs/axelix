@@ -11,23 +11,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-conditions:
-    get:
-      operationId: getConditions
-      summary: Returns the conditions report of the service.
-      responses:
-        '200':
-          description: The feed of positively and negatively matched conditions.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConditionsFeed'
 components:
   schemas:
     ConditionsFeed:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The flattened version of the conditions response from the actuator endpoint.
       required:
@@ -47,6 +35,8 @@ components:
             $ref: '#/components/schemas/NegativeCondition'
           x-axelix-introduced-in: 1.2.0
     PositiveCondition:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A configuration class where all conditions matched successfully.
       required:
@@ -70,6 +60,8 @@ components:
             $ref: '#/components/schemas/ConditionMatch'
           x-axelix-introduced-in: 1.2.0
     NegativeCondition:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A configuration class where some conditions did not match.
       required:
@@ -100,6 +92,8 @@ components:
             $ref: '#/components/schemas/ConditionMatch'
           x-axelix-introduced-in: 1.2.0
     ConditionMatch:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The result of evaluating a single condition.
       required:

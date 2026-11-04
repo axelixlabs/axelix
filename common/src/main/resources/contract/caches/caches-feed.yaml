@@ -10,23 +10,11 @@ info:
   # which this contract document was born and the compatibility checks started guarding it.
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
-  x-axelix-introduced-in: 1.2.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-caches:
-    get:
-      operationId: getAllCaches
-      summary: Lists all cache managers of the service together with their caches.
-      responses:
-        '200':
-          description: The feed of cache managers and their caches.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CachesFeed'
 components:
   schemas:
     CachesFeed:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: The response of the caches actuator endpoint that contains all cache managers of the application.
       required:
@@ -39,6 +27,8 @@ components:
             $ref: '#/components/schemas/CacheManagerDto'
           x-axelix-introduced-in: 1.2.0
     CacheManagerDto:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A cache manager together with all the caches inside it.
       required:
@@ -56,6 +46,8 @@ components:
             $ref: '#/components/schemas/CacheDto'
           x-axelix-introduced-in: 1.2.0
     CacheDto:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.2.0
       type: object
       description: A cache inside the cache manager.
       required:
