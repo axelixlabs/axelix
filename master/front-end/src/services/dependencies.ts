@@ -20,3 +20,9 @@ import { apiFetch } from "@/api";
 export const getDependenciesAnalysis = (instanceId: string) => {
     return apiFetch.get(`dependencies/${instanceId}`);
 };
+
+export const downloadDependenciesSbom = (instanceId: string) => {
+    return apiFetch.get(`dependencies/${instanceId}/download`, {
+        responseType: "blob",
+    });
+};

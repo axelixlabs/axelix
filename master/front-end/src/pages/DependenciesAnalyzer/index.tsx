@@ -25,6 +25,7 @@ import { type EDependencyEcosystem, type ESupportStatus, type IDependenciesAnaly
 import { getDependenciesAnalysis } from "@/services";
 
 import { DependenciesTable } from "./DependenciesTable";
+import { DownloadSbom } from "./DownloadSbom";
 import { EcosystemTabs } from "./EcosystemTabs";
 import { FrameworkWindow } from "./FrameworkWindow";
 import { SupportSignalFilter } from "./SupportSignalFilter";
@@ -79,15 +80,20 @@ const DependenciesAnalyzer = () => {
                 <FrameworkWindow framework={framework} analyzedAt={analyzedAt} />
 
                 <div className={styles.Feed}>
-                    <span className={`TextUltraSmall ${styles.Caption}`}>{t("DependenciesAnalyzer.feed.caption")}</span>
-                    <div className={styles.Toolbar}>
+                    <div className={styles.FeedIntro}>
+                        <span className={`TextUltraSmall ${styles.Caption}`}>
+                            {t("DependenciesAnalyzer.feed.caption")}
+                        </span>
+                        <DownloadSbom />
                         <PageSearch
                             setSearch={setSearch}
                             addonAfter={addonAfter}
                             autocompleteOptions={autocompleteOptions}
                             removeBottomGutter
+                            searchWrapperClassName={styles.Search}
                         />
-
+                    </div>
+                    <div className={styles.Toolbar}>
                         <EcosystemTabs
                             dependencies={dependencies}
                             search={search}

@@ -1,0 +1,35 @@
+.Action {
+    display: contents;
+}
+
+.Button {
+    grid-area: button;
+    justify-self: end;
+}
+
+.FileMeta {
+    grid-area: meta;
+    justify-self: end;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-500);
+    white-space: nowrap;
+}
+
+.FileMeta strong {
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-700);
+}
+
+.Busy:global(.ant-btn.ant-btn-loading),
+.Busy:global(.ant-btn.ant-btn-loading):hover,
+.Busy:global(.ant-btn.ant-btn-loading):focus,
+.Busy:global(.ant-btn.ant-btn-loading):active {
+    color: var(--axelix-grey-500);
+    background: var(--axelix-white);
+    border-color: var(--axelix-grey-300);
+    cursor: default;
+}
+
+.Busy :global(.ant-btn-loading-icon) {
+    color: var(--axelix-green-600);
+}

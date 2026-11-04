@@ -704,6 +704,13 @@
             "caption": "Resolved dependencies",
             "clear": "Clear"
         },
+        "sbom": {
+            "format": "CycloneDX",
+            "fileName": "dependencies.cdx.json",
+            "download": "Download SBOM",
+            "downloading": "Downloading",
+            "tooltip": "Saves dependencies.cdx.json. The full CycloneDX SBOM for this instance, not the filtered rows."
+        },
         "ecosystems": {
             "ALL": "All",
             "PERSISTENCE": "Persistence",

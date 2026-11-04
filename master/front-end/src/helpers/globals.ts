@@ -98,7 +98,7 @@ export const extractFileName = (contentDisposition?: string): string | undefined
 };
 
 export const downloadFile = (data: Blob | string, fileName: string = ""): void => {
-    const mimeType = typeof data === "string" ? EMimeTypes.TEXT_PLAIN : EMimeTypes.ZIP;
+    const mimeType = typeof data === "string" ? EMimeTypes.TEXT_PLAIN : data.type || EMimeTypes.ZIP;
 
     const blob = new Blob([data], { type: mimeType });
 

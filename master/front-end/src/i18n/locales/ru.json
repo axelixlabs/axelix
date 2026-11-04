@@ -714,6 +714,13 @@
             "caption": "Обнаруженные зависимости",
             "clear": "Сбросить"
         },
+        "sbom": {
+            "format": "CycloneDX",
+            "fileName": "dependencies.cdx.json",
+            "download": "Скачать SBOM",
+            "downloading": "Скачивание",
+            "tooltip": "Сохраняет dependencies.cdx.json. Полный CycloneDX SBOM этого экземпляра, а не отфильтрованные строки."
+        },
         "ecosystems": {
             "ALL": "Все",
             "PERSISTENCE": "Хранение данных",

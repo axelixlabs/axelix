@@ -20,9 +20,26 @@
     gap: 16px;
 }
 
+.FeedIntro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "caption button"
+        "search meta";
+    gap: 4px 16px;
+    align-items: center;
+}
+
+.Search {
+    grid-area: search;
+    justify-self: start;
+}
+
 .Caption {
+    grid-area: caption;
     font-weight: 600;
     letter-spacing: 1px;
+    line-height: 32px;
     text-transform: uppercase;
     color: var(--axelix-grey-500);
 }

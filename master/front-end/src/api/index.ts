@@ -34,10 +34,29 @@ export const apiFetch = axios.create({
     },
 });
 
+/**
+ * Blob downloads still carry a JSON error body. Read it so the notification can name the real code.
+ */
+const parseErrorBody = async (data: unknown): Promise<unknown> => {
+    if (!(data instanceof Blob) || (data.type !== "" && !data.type.includes("json"))) {
+        return data;
+    }
+
+    try {
+        return JSON.parse(await data.text());
+    } catch {
+        return data;
+    }
+};
+
 apiFetch.interceptors.response.use(
     (response) => response,
 
-    (error: AxiosError<IErrorResponse>) => {
+    async (error: AxiosError<IErrorResponse>) => {
+        if (error.response) {
+            error.response.data = (await parseErrorBody(error.response.data)) as IErrorResponse;
+        }
+
         const errorCode: string | undefined = extractErrorCode(error?.response?.data);
 
         const IGNORED_ERRORS = Object.values(EIgnoredErrors);
