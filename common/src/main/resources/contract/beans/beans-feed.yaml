@@ -12,7 +12,7 @@ info:
 components:
   schemas:
     BeansFeed:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The response to beans actuator endpoint.
@@ -26,7 +26,7 @@ components:
             $ref: '#/components/schemas/Bean'
           x-axelix-introduced-in: 1.2.0
     Bean:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The profile of a given bean.
@@ -101,7 +101,7 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/BeanSource'
     BeanDependency:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The profile of a given bean dependency.
@@ -118,7 +118,7 @@ components:
           description: Whether the dependency is a configuration properties dependency.
           x-axelix-introduced-in: 1.2.0
     ProxyType:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: >-
@@ -130,7 +130,7 @@ components:
         - NO_PROXYING
         - UNKNOWN
     BeanOrigin:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: >-
@@ -150,7 +150,7 @@ components:
         - SYNTHETIC_BEAN
         - UNKNOWN
     BeanSource:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Represents bean source information.
@@ -170,7 +170,7 @@ components:
           SYNTHETIC_BEAN: '#/components/schemas/SyntheticBean'
           UNKNOWN: '#/components/schemas/UnknownBean'
     ComponentVariant:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       description: >-
         The BeanSource for the COMPONENT_ANNOTATION origin. Does not have any additional fields
@@ -179,7 +179,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/BeanSource'
     BeanMethod:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       description: >-
         The BeanSource for the BEAN_METHOD origin. Has an additional String fields for name of the
@@ -203,7 +203,7 @@ components:
               description: The method name that creates a bean.
               x-axelix-introduced-in: 1.2.0
     FactoryBean:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       description: >-
         The BeanSource for the FACTORY_BEAN origin. Holds the reference to the factory bean that
@@ -219,7 +219,7 @@ components:
               description: The reference to the factory bean.
               x-axelix-introduced-in: 1.2.0
     SyntheticBean:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       description: >-
         The "synthetic" bean. It means that, most likely, this Bean was created programmatically
@@ -228,7 +228,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/BeanSource'
     UnknownBean:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       description: >-
         The BeanSource for the UNKNOWN origin. Does not hold any fields since the actual origin

@@ -2,11 +2,10 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.0.0
-  # INVALID: only 'starter' and 'master' answer calls.
+  # INVALID: the mandatory 'x-axelix-produced-by' marker is absent.
 components:
   schemas:
     LogLevelChangeRequest:
-      x-axelix-server: gateway
       x-axelix-introduced-in: 1.0.0
       type: object
       required:

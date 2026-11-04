@@ -70,18 +70,18 @@ class ReleaseBaselineTest {
     @Test
     fun `the released contract is read from the tag and not from the working tree`() {
         Git.init().setDirectory(repoRoot).call().use { git ->
-            contract(server = "starter")
+            contract(producedBy = "starter")
             commit(git, "released")
             git.tag().setName("v1.1.0").setTagger(COMMITTER).call()
 
-            contract(server = "master")
+            contract(producedBy = "master")
             commit(git, "developed")
         }
 
         val released = ReleaseBaseline
             .find(repoRoot)!!
             .contract(repoRoot.resolve(CONTRACT_PATH))!!
-        assertEquals("starter", released.schemas.single().server)
+        assertEquals("starter", released.schemas.single().producedBy)
         assertEquals(Version(1, 1, 0), released.axelixVersion)
     }
 
@@ -91,14 +91,14 @@ class ReleaseBaselineTest {
             commit(git, "released")
             git.tag().setName("v1.1.0").setTagger(COMMITTER).call()
 
-            contract(server = "starter")
+            contract(producedBy = "starter")
         }
 
         val baseline = ReleaseBaseline.find(repoRoot)!!
         assertNull(baseline.contract(repoRoot.resolve(CONTRACT_PATH)))
     }
 
-    private fun contract(server: String) {
+    private fun contract(producedBy: String) {
         val document = repoRoot.resolve(CONTRACT_PATH)
         document.parentFile.mkdirs()
         document.writeText(
@@ -111,7 +111,7 @@ class ReleaseBaselineTest {
               schemas:
                 LogLevelChangeRequest:
                   type: object
-                  x-axelix-server: $server
+                  x-axelix-produced-by: $producedBy
                   x-axelix-introduced-in: 1.0.0
             """.trimIndent())
     }

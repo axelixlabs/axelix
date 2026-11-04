@@ -13,7 +13,7 @@ info:
 components:
   schemas:
     InstanceDetails:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The response returned by the custom details endpoint.
@@ -45,7 +45,7 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/OsDetails'
     GitDetails:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The git information of the given artifact.
@@ -72,7 +72,7 @@ components:
           description: The timestamp of the commit.
           x-axelix-introduced-in: 1.2.0
     CommitAuthor:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Author of the commit information.
@@ -89,7 +89,7 @@ components:
           description: The commit author email.
           x-axelix-introduced-in: 1.2.0
     SpringDetails:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The spring information of the given artifact.
@@ -110,7 +110,7 @@ components:
           description: The version of the Spring Cloud, if any.
           x-axelix-introduced-in: 1.2.0
     RuntimeDetails:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The Runtime information of the given artifact.
@@ -131,7 +131,7 @@ components:
           description: The version of the kotlin, if any.
           x-axelix-introduced-in: 1.2.0
     BuildDetails:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The build information of the given artifact.
@@ -158,7 +158,7 @@ components:
           description: The time the application was built.
           x-axelix-introduced-in: 1.2.0
     OsDetails:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The OS information of the given artifact.

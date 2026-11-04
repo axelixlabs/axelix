@@ -7,7 +7,7 @@ components:
     # INVALID: undeprecatedMaster is a master-produced property in the released baseline; dropping
     # it without a prior deprecation is a hidden removal that breaks starters still expecting it
     LogLevelChangeRequest:
-      x-axelix-server: master
+      x-axelix-produced-by: master
       x-axelix-introduced-in: 1.0.0
       type: object
       required:

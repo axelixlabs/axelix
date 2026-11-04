@@ -14,7 +14,7 @@ info:
 components:
   schemas:
     ConfigurationPropertiesFeed:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The feed of @ConfigurationProperties beans used in the application.
@@ -28,7 +28,7 @@ components:
             $ref: '#/components/schemas/ConfigurationPropertiesFeedBean'
           x-axelix-introduced-in: 1.2.0
     ConfigurationPropertiesFeedBean:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The profile of a given @ConfigurationProperties bean.
@@ -61,7 +61,7 @@ components:
             $ref: '#/components/schemas/ConfigurationPropertiesEntry'
           x-axelix-introduced-in: 1.2.0
     ConfigurationPropertiesEntry:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: An abstract key-value pair.

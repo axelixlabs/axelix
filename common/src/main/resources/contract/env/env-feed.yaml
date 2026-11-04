@@ -15,7 +15,7 @@ info:
 components:
   schemas:
     EnvironmentFeed:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The enriched environment overview of the service.
@@ -43,7 +43,7 @@ components:
             $ref: '#/components/schemas/PropertySource'
           x-axelix-introduced-in: 1.2.0
     PropertySource:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A single property source of the environment together with its properties.
@@ -66,7 +66,7 @@ components:
             $ref: '#/components/schemas/Property'
           x-axelix-introduced-in: 1.2.0
     Property:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A single property contributed by a property source.
@@ -107,7 +107,7 @@ components:
             $ref: '#/components/schemas/InjectionPoint'
           x-axelix-introduced-in: 1.2.0
     Deprecation:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The deprecation information of a property.
@@ -127,7 +127,7 @@ components:
           description: The name of the property that supersedes the deprecated one, when any.
           x-axelix-introduced-in: 1.2.0
     DeprecationLevel:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: The severity with which a property deprecation is reported.
@@ -135,7 +135,7 @@ components:
         - WARNING
         - ERROR
     InjectionPoint:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A point in the code where a property is injected via @Value.
@@ -162,7 +162,7 @@ components:
           description: The @Value expression used at the injection point (e.g. "${some.property:default}").
           x-axelix-introduced-in: 1.2.0
     InjectionType:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: The kind of injection point where a @Value annotation is applied.

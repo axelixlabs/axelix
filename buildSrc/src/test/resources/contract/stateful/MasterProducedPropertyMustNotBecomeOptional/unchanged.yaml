@@ -6,7 +6,7 @@ components:
   schemas:
     # The Master produces this request, so every starter within the window parses it.
     LogLevelChangeRequest:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.0.0
       type: object
       required:
@@ -17,7 +17,7 @@ components:
           x-axelix-introduced-in: 1.0.0
     # The starter produces this reply.
     LogLevelChangeReply:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.0.0
       type: object
       required:

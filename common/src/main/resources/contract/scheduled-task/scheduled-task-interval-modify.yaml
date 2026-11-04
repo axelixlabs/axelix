@@ -13,7 +13,7 @@ info:
 components:
   schemas:
     ScheduledTaskIntervalModifyRequest:
-      x-axelix-server: master
+      x-axelix-produced-by: master
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A request to change the execution interval of a scheduled task.

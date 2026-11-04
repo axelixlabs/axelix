@@ -5,7 +5,7 @@ info:
 components:
   schemas:
     Pet:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.0.0
       type: object
       required:
@@ -22,7 +22,7 @@ components:
     # 'Pet', and the starter produces it, so the Master receives it from the whole compatibility
     # window of starter versions.
     Dog:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.0.0
       allOf:
         - $ref: '#/components/schemas/Pet'

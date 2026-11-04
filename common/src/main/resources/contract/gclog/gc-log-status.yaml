@@ -13,7 +13,7 @@ info:
 components:
   schemas:
     GcLogStatus:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The current status of the garbage collection logging.

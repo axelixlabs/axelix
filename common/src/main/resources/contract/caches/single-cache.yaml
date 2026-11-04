@@ -14,7 +14,7 @@ info:
 components:
   schemas:
     SingleCache:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The details of the requested cache.
@@ -53,7 +53,7 @@ components:
           description: Whether the cache is enabled (true) or disabled (false).
           x-axelix-introduced-in: 1.2.0
     CacheLookup:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A recorded cache lookup.
@@ -71,7 +71,7 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/LookupOutcome'
     LookupOutcome:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: The outcome of a cache lookup.

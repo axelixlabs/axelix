@@ -2,10 +2,11 @@ openapi: 3.1.0
 info:
   title: logger-level-change
   version: 1.0.0
-  # INVALID: the mandatory 'x-axelix-server' marker is absent.
+  # INVALID: only 'starter' and 'master' produce a payload.
 components:
   schemas:
     LogLevelChangeRequest:
+      x-axelix-produced-by: gateway
       x-axelix-introduced-in: 1.0.0
       type: object
       required:

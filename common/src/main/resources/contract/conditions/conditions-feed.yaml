@@ -14,7 +14,7 @@ info:
 components:
   schemas:
     ConditionsFeed:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The flattened version of the conditions response from the actuator endpoint.
@@ -35,7 +35,7 @@ components:
             $ref: '#/components/schemas/NegativeCondition'
           x-axelix-introduced-in: 1.2.0
     PositiveCondition:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A configuration class where all conditions matched successfully.
@@ -60,7 +60,7 @@ components:
             $ref: '#/components/schemas/ConditionMatch'
           x-axelix-introduced-in: 1.2.0
     NegativeCondition:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A configuration class where some conditions did not match.
@@ -92,7 +92,7 @@ components:
             $ref: '#/components/schemas/ConditionMatch'
           x-axelix-introduced-in: 1.2.0
     ConditionMatch:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The result of evaluating a single condition.

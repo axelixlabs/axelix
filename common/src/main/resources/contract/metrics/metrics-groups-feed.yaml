@@ -13,7 +13,7 @@ info:
 components:
   schemas:
     MetricsGroupsFeed:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The response returned by the metric groups list endpoint.
@@ -27,7 +27,7 @@ components:
             $ref: '#/components/schemas/MetricsGroup'
           x-axelix-introduced-in: 1.2.0
     MetricsGroup:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Information about a metrics group.
@@ -46,7 +46,7 @@ components:
             $ref: '#/components/schemas/MetricDescription'
           x-axelix-introduced-in: 1.2.0
     MetricDescription:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Information about a metric.

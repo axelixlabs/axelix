@@ -8,7 +8,7 @@ components:
     # request; withdrawing 'required' is a hidden removal — the property must be deprecated and
     # stay required until the window passes
     LogLevelChangeRequest:
-      x-axelix-server: master
+      x-axelix-produced-by: master
       x-axelix-introduced-in: 1.0.0
       type: object
       properties:
@@ -17,7 +17,7 @@ components:
           x-axelix-introduced-in: 1.0.0
     # The starter produces this reply.
     LogLevelChangeReply:
-      x-axelix-server: master
+      x-axelix-produced-by: master
       x-axelix-introduced-in: 1.0.0
       type: object
       required:

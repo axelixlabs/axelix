@@ -13,7 +13,7 @@ info:
 components:
   schemas:
     LoggersFeed:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The overview of all loggers and logger groups of the service.
@@ -41,7 +41,7 @@ components:
             $ref: '#/components/schemas/LoggersFeedGroup'
           x-axelix-introduced-in: 1.2.0
     LoggersFeedLogger:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A single logger as it appears in the loggers feed.
@@ -80,7 +80,7 @@ components:
             there is no expiration.
           x-axelix-introduced-in: 1.2.0
     LoggersFeedGroup:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A single logger group as it appears in the loggers feed.

@@ -14,7 +14,7 @@ info:
 components:
   schemas:
     HeartBeatMetadata:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Represents extended service instance metadata supplied as part of the heartbeat process.
@@ -50,7 +50,7 @@ components:
     # BasicRegistrationMetadata and everything below it is duplicated verbatim in
     # metadata/metadata-feed.yaml (no cross-document schema reuse yet, see GH-1666). Keep both in sync.
     BasicRegistrationMetadata:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
@@ -125,7 +125,7 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/Insights'
     SoftwareVersions:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Software versions information.
@@ -162,7 +162,7 @@ components:
             service is not using kotlin.
           x-axelix-introduced-in: 1.2.0
     MemoryDetails:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Memory details of the given Instance.
@@ -175,7 +175,7 @@ components:
           description: The estimated heap size of the given instance.
           x-axelix-introduced-in: 1.2.0
     HealthStatus:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: The health status of the given instance during registration.
@@ -184,7 +184,7 @@ components:
         - DOWN
         - UNKNOWN
     GarbageCollector:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: Garbage collector used by a managed JVM service instance.
@@ -199,7 +199,7 @@ components:
         - CMS
         - UNKNOWN
     Insights:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The insight information discovered for the given service instance.
@@ -223,7 +223,7 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/PersistenceInsights'
     HotSpotInsights:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: HotSpot-specific insight groups.
@@ -251,7 +251,7 @@ components:
           items:
             $ref: '#/components/schemas/InsightFeature'
     InsightFeature:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A specific insight feature discovered for the given service instance.
@@ -268,7 +268,7 @@ components:
           description: The enabled state of the insight feature.
           x-axelix-introduced-in: 1.2.0
     PersistenceInsights:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Insights of a particular instance related to persistence.
@@ -289,7 +289,7 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/JpaEntities'
     TransactionAggregatedProfile:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: Aggregated information about a particular transactional method in the instance.
@@ -357,7 +357,7 @@ components:
             (e.g. an older agent that did not report it).
           x-axelix-introduced-in: 1.2.0
     TransactionOrigin:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: The origin of the transaction, i.e. how exactly the transaction was created.
@@ -366,7 +366,7 @@ components:
         - APPLICATION_DECLARATIVE
         - APPLICATION_IMPERATIVE
     TransactionalKey:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The key that identifies the transactional method.
@@ -383,7 +383,7 @@ components:
           description: The name of the transactional method.
           x-axelix-introduced-in: 1.2.0
     ExecutionStats:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The min/max/avg duration statistics of repeated executions.
@@ -408,7 +408,7 @@ components:
           description: The average observed duration, in milliseconds.
           x-axelix-introduced-in: 1.2.0
     CountedLazyLoadingTarget:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The aggregated count of lazy-loading (N+1) occasions for a particular association.
@@ -426,7 +426,7 @@ components:
           description: The number of lazy-loading occasions observed.
           x-axelix-introduced-in: 1.2.0
     LazyLoadingTarget:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The particular association that presumably was lazy loaded.
@@ -443,7 +443,7 @@ components:
           description: The name of the lazy-loaded association property.
           x-axelix-introduced-in: 1.2.0
     ExternalCallInsight:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
@@ -471,7 +471,7 @@ components:
           x-axelix-introduced-in: 1.2.0
           $ref: '#/components/schemas/ExecutionStats'
     TypeExternalCall:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: The client that performed a blocking call to an external system.
@@ -480,7 +480,7 @@ components:
         - KAFKA
         - RABBIT
     JpaEntities:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
@@ -496,7 +496,7 @@ components:
           items:
             $ref: '#/components/schemas/MappedEntity'
     MappedEntity:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
@@ -529,7 +529,7 @@ components:
           items:
             $ref: '#/components/schemas/FlaggedAssociation'
     FlaggedAssociation:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A single association of a mapped entity in which Axelix detected a problem.
@@ -555,7 +555,7 @@ components:
           items:
             $ref: '#/components/schemas/AssociationProblem'
     Association:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
@@ -574,7 +574,7 @@ components:
           description: The field that maps the association (e.g. 'customer').
           x-axelix-introduced-in: 1.2.0
     AssociationProblem:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: string
       description: >-

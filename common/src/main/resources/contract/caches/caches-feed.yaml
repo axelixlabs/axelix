@@ -13,7 +13,7 @@ info:
 components:
   schemas:
     CachesFeed:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The response of the caches actuator endpoint that contains all cache managers of the application.
@@ -27,7 +27,7 @@ components:
             $ref: '#/components/schemas/CacheManagerDto'
           x-axelix-introduced-in: 1.2.0
     CacheManagerDto:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A cache manager together with all the caches inside it.
@@ -46,7 +46,7 @@ components:
             $ref: '#/components/schemas/CacheDto'
           x-axelix-introduced-in: 1.2.0
     CacheDto:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A cache inside the cache manager.

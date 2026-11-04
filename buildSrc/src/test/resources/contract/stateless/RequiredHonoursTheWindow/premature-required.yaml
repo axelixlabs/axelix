@@ -8,7 +8,7 @@ components:
     # compatibility window of starter versions.
     LoggersReply:
       x-axelix-introduced-in: 1.0.0
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       type: object
       required:
         - loggers

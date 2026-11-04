@@ -52,17 +52,17 @@ class ContractDocumentsValidatorTest {
     }
 
     @Test
-    fun `a missing server marker fails`() {
+    fun `a missing produced-by marker fails`() {
         expectProblem(
-            "stateless/ServerIsDeclared/missing-server.yaml",
-            "the schema 'LogLevelChangeRequest' must declare 'x-axelix-server' as one of [starter, master]")
+            "stateless/ProducedByIsDeclared/missing-produced-by.yaml",
+            "the schema 'LogLevelChangeRequest' must declare 'x-axelix-produced-by' as one of [starter, master]")
     }
 
     @Test
-    fun `an unknown server side fails`() {
+    fun `an unknown producer fails`() {
         expectProblem(
-            "stateless/ServerIsDeclared/unknown-server.yaml",
-            "the schema 'LogLevelChangeRequest' must declare 'x-axelix-server' as one of [starter, master]")
+            "stateless/ProducedByIsDeclared/unknown-produced-by.yaml",
+            "the schema 'LogLevelChangeRequest' must declare 'x-axelix-produced-by' as one of [starter, master]")
     }
 
     @Test

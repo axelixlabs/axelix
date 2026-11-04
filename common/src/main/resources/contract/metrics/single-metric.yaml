@@ -13,7 +13,7 @@ info:
 components:
   schemas:
     MetricProfile:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: >-
@@ -55,7 +55,7 @@ components:
               type: string
           x-axelix-introduced-in: 1.2.0
     MetricProfileMeasurement:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A single metric value, measured at a particular point in time.

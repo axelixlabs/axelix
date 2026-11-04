@@ -7,7 +7,7 @@ components:
     # INVALID: deprecatedMaster was deprecated in 1.1.0; at 1.2.0 its compatibility window has not
     # passed yet, so this master-produced property must stay in the contract until the window closes
     LogLevelChangeRequest:
-      x-axelix-server: master
+      x-axelix-produced-by: master
       x-axelix-introduced-in: 1.0.0
       type: object
       required:

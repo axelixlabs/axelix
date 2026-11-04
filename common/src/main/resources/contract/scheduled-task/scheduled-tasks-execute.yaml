@@ -12,7 +12,7 @@ info:
 components:
   schemas:
     ScheduledTaskExecuteRequest:
-      x-axelix-server: master
+      x-axelix-produced-by: master
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A request to forcibly execute a scheduled task.

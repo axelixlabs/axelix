@@ -14,7 +14,7 @@ info:
 components:
   schemas:
     ServiceScheduledTasks:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The overview of all scheduled tasks of the service, grouped by trigger kind.
@@ -49,7 +49,7 @@ components:
             $ref: '#/components/schemas/ScheduledCustomTask'
           x-axelix-introduced-in: 1.2.0
     ScheduledCronTask:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A scheduled task driven by a cron expression.
@@ -71,7 +71,7 @@ components:
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
     ScheduledFixedDelayTask:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A scheduled task re-scheduled a fixed delay after the previous execution finishes.
@@ -100,7 +100,7 @@ components:
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
     ScheduledFixedRateTask:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A scheduled task re-scheduled at a fixed rate measured from the previous execution start.
@@ -129,7 +129,7 @@ components:
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
     ScheduledCustomTask:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: A scheduled task driven by a custom user-supplied trigger.
@@ -151,7 +151,7 @@ components:
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
     ScheduledTaskRunnable:
-      x-axelix-server: starter
+      x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
       type: object
       description: The target that a scheduled task executes.

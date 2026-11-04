@@ -30,7 +30,7 @@ import contract.invariants.stateless.DeprecationFollowsIntroduction
 import contract.invariants.stateless.IntroductionIsDeclared
 import contract.invariants.stateless.MarkersAreWellFormed
 import contract.invariants.stateless.RequiredHonoursTheWindow
-import contract.invariants.stateless.ServerIsDeclared
+import contract.invariants.stateless.ProducedByIsDeclared
 import contract.invariants.stateless.StatelessContractInvariant
 import java.io.File
 import org.gradle.api.GradleException
@@ -43,7 +43,7 @@ import org.gradle.api.GradleException
 object ContractDocumentsValidator {
 
     private val INVARIANTS: List<StatelessContractInvariant> = listOf(
-        ServerIsDeclared,
+        ProducedByIsDeclared,
         IntroductionIsDeclared,
         MarkersAreWellFormed,
         DeprecationFollowsIntroduction,

@@ -67,16 +67,17 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
     /**
      * The names of the schemas produced by the starter.
      *
-     * Each schema names its producer with [SERVER]. A released baseline that still predates that
-     * marker is read the old way: the info-level marker says who answers the call, and the
-     * producer is the response when the starter answers or the request body when the starter calls.
+     * Each schema names its producer with [PRODUCED_BY]. A released baseline that still predates
+     * that marker is read the old way: the info-level [LEGACY_ANSWERING_SIDE] says who answers
+     * the call, and the producer is the response when the starter answers or the request body
+     * when the starter calls.
      */
     val starterProducedSchemas: Set<String> by lazy {
-        if (schemas.any { schema -> schema.server.isNotEmpty() }) {
-            return@lazy schemas.filter { schema -> schema.server == "starter" }.map { schema -> schema.name }.toSet()
+        if (schemas.any { schema -> schema.producedBy.isNotEmpty() }) {
+            return@lazy schemas.filter { schema -> schema.producedBy == "starter" }.map { schema -> schema.name }.toSet()
         }
-        val answering = info.path(SERVER).asText("")
-        if (answering !in SERVER_SIDES) {
+        val answering = info.path(LEGACY_ANSWERING_SIDE).asText("")
+        if (answering !in PRODUCERS) {
             return@lazy emptySet()
         }
         val produced = mutableSetOf<String>()
@@ -142,7 +143,7 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
         val location: String = "the schema '$name'"
 
         /** The side that produces this schema, or empty when the marker is absent. */
-        val server: String = node.path(SERVER).asText("")
+        val producedBy: String = node.path(PRODUCED_BY).asText("")
     }
 
     data class Property(
@@ -155,9 +156,12 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
 
         const val INTRODUCED_IN = "x-axelix-introduced-in"
         const val DEPRECATED_IN = "x-axelix-deprecated-in"
-        const val SERVER = "x-axelix-server"
+        const val PRODUCED_BY = "x-axelix-produced-by"
 
-        val SERVER_SIDES = setOf("starter", "master")
+        val PRODUCERS = setOf("starter", "master")
+
+        /** Info-level marker on released baselines that predate [PRODUCED_BY]. Names who answers the call. */
+        private const val LEGACY_ANSWERING_SIDE = "x-axelix-server"
 
         private val HTTP_METHODS =
             setOf("get", "put", "post", "delete", "options", "head", "patch", "trace")
