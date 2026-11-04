@@ -44,11 +44,15 @@ object DeprecationMarkerMustOnlyAppearInTheCurrentRelease : StatefulContractInva
             return emptyList()
         }
 
+        val baselineSchemas = baseline.schemas.associateBy { schema -> schema.name }
         val baselineProperties = baseline.properties
             .associateBy { property -> property.schemaName to property.name }
 
         val survivingParts: List<Triple<String, JsonNode, JsonNode>> =
-            listOf(Triple("the 'info' block", baseline.info, current.info)) +
+            current.schemas.mapNotNull { schema ->
+                baselineSchemas[schema.name]
+                    ?.let { released -> Triple(schema.location, released.node, schema.node) }
+            } +
                 current.properties.mapNotNull { property ->
                     baselineProperties[property.schemaName to property.name]
                         ?.let { released -> Triple(property.location, released.node, property.node) }

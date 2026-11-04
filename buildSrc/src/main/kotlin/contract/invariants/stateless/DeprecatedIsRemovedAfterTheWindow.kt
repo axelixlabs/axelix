@@ -32,10 +32,12 @@ object DeprecatedIsRemovedAfterTheWindow : StatelessContractInvariant {
     override fun check(document: ContractDocument): List<String> {
         val problems = mutableListOf<String>()
 
-        val operationDeprecated = document.markerVersion(document.info, DEPRECATED_IN)
-        if (operationDeprecated != null && document.windowPassed(operationDeprecated)) {
-            problems += ("the operation was deprecated in $operationDeprecated and the "
-                + "compatibility window has passed: remove the document")
+        document.schemas.forEach { schema ->
+            val deprecated = document.markerVersion(schema.node, DEPRECATED_IN)
+            if (deprecated != null && document.windowPassed(deprecated)) {
+                problems += ("${schema.location} was deprecated in $deprecated and the "
+                    + "compatibility window has passed: remove it from the contract")
+            }
         }
 
         document.properties.forEach { property ->
