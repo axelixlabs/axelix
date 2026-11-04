@@ -42,7 +42,7 @@ import org.gradle.api.GradleException
  */
 object ContractDocumentsValidator {
 
-    private val INVARIANTS: List<StatelessContractInvariant> = listOf(
+    private val STATELESS_INVARIANTS: List<StatelessContractInvariant> = listOf(
         ProducedByIsDeclared,
         IntroductionIsDeclared,
         MarkersAreWellFormed,
@@ -67,7 +67,7 @@ object ContractDocumentsValidator {
         val currentContract = ContractDocument.parse(document, currentAxelixVersion)
 
         // stateless checks for the current contract
-        val problems = INVARIANTS.flatMap { invariant -> invariant.check(currentContract) }.toMutableList()
+        val problems = STATELESS_INVARIANTS.flatMap { invariant -> invariant.check(currentContract) }.toMutableList()
 
         if (baseline != null) {
             val releasedContract = baseline.contract(document)
