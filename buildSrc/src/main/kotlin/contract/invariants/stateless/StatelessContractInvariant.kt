@@ -17,12 +17,12 @@
  */
 package contract.invariants.stateless
 
-import contract.ContractDocument
+import contract.ContractSchema
 
 /**
- * A single micro-invariant of a contract document that must be true.
+ * A single micro-invariant of a contract schema that must be true.
  * It is called "stateless" because it checks the invariants within the current version
- * of the contract as it is in isolation. It's execution is, by nature, idempotent.
+ * of the schema as it is in isolation. Its execution is, by nature, idempotent.
  *
  * @see contract.invariants.stateful.StatefulContractInvariant
  * @author Mikhail Polivakha
@@ -30,7 +30,7 @@ import contract.ContractDocument
 fun interface StatelessContractInvariant {
 
     /**
-     * Returns the violations of this invariant in the given document, empty when invariant holds.
+     * Returns the violations of this invariant in the given schema, empty when invariant holds.
      */
-    fun check(document: ContractDocument): List<String>
+    fun check(schema: ContractSchema): List<String>
 }

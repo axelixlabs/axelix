@@ -17,7 +17,7 @@
  */
 package contract.invariants.stateful
 
-import contract.ContractDocument
+import contract.ContractSchema
 import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -36,32 +36,28 @@ class MasterProducedPropertyMustNotBecomeOptionalTest {
 
     @Test
     fun `unchanged required properties pass`() {
-        val problems = MasterProducedPropertyMustNotBecomeOptional
-            .check(baseline(), current("unchanged.yaml"))
+        val problems = check(baseline(), current("unchanged.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
 
     @Test
     fun `a born document is not judged`() {
-        val problems = MasterProducedPropertyMustNotBecomeOptional
-            .check(null, current("born-document.yaml"))
+        val problems = check(null, current("born-document.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
 
     @Test
     fun `a withdrawn required of a starter-produced property passes`() {
-        val problems = MasterProducedPropertyMustNotBecomeOptional
-            .check(baseline(), current("starter-produced-required-withdrawn.yaml"))
+        val problems = check(baseline(), current("starter-produced-required-withdrawn.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
 
     @Test
     fun `a withdrawn required of a master-produced property fails`() {
-        val problems = MasterProducedPropertyMustNotBecomeOptional
-            .check(baseline(), current("required-withdrawn.yaml"))
+        val problems = check(baseline(), current("required-withdrawn.yaml"))
 
         assertEquals(
             listOf(
@@ -71,11 +67,23 @@ class MasterProducedPropertyMustNotBecomeOptionalTest {
             problems)
     }
 
-    private fun baseline(): ContractDocument =
-        ContractDocument.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+    /**
+     * The fixture bundles several schemas. Pair them the way the validator does: by name.
+     */
+    private fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
+        val baselineByName = baseline.orEmpty().associateBy { schema -> schema.name }
+        val currentByName = current.associateBy { schema -> schema.name }
+        val names = (current.map { schema -> schema.name } + baseline.orEmpty().map { schema -> schema.name }).distinct()
+        return names.flatMap { name ->
+            MasterProducedPropertyMustNotBecomeOptional.check(baselineByName[name], currentByName[name])
+        }
+    }
 
-    private fun current(name: String): ContractDocument =
-        ContractDocument.parse(document(name), CURRENT_VERSION)
+    private fun baseline(): List<ContractSchema> =
+        ContractSchema.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+
+    private fun current(name: String): List<ContractSchema> =
+        ContractSchema.parse(document(name), CURRENT_VERSION)
 
     private fun document(name: String): File =
         File(javaClass.getResource(

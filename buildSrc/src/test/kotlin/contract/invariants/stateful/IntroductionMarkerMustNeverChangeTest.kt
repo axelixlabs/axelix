@@ -17,7 +17,7 @@
  */
 package contract.invariants.stateful
 
-import contract.ContractDocument
+import contract.ContractSchema
 import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -76,11 +76,11 @@ class IntroductionMarkerMustNeverChangeTest {
             problems)
     }
 
-    private fun baseline(): ContractDocument =
-        ContractDocument.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+    private fun baseline(): ContractSchema =
+        ContractSchema.parse(document("released-baseline.yaml"), RELEASED_VERSION).single()
 
-    private fun current(name: String): ContractDocument =
-        ContractDocument.parse(document(name), CURRENT_VERSION)
+    private fun current(name: String): ContractSchema =
+        ContractSchema.parse(document(name), CURRENT_VERSION).single()
 
     private fun document(name: String): File =
         File(javaClass.getResource(

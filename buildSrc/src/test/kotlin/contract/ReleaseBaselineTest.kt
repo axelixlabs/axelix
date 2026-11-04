@@ -81,8 +81,8 @@ class ReleaseBaselineTest {
         val released = ReleaseBaseline
             .find(repoRoot)!!
             .contract(repoRoot.resolve(CONTRACT_PATH))!!
-        assertEquals("starter", released.schemas.single().producedBy)
-        assertEquals(Version(1, 1, 0), released.axelixVersion)
+        assertEquals("starter", released.single().producedBy)
+        assertEquals(Version(1, 1, 0), released.single().axelixVersion)
     }
 
     @Test
@@ -106,7 +106,7 @@ class ReleaseBaselineTest {
             openapi: 3.1.0
             info:
               title: Log level change
-              version: 1.0.0
+              version: ""
             components:
               schemas:
                 LogLevelChangeRequest:

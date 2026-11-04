@@ -17,7 +17,7 @@
  */
 package contract.invariants.stateful
 
-import contract.ContractDocument
+import contract.ContractSchema
 
 /**
  * A 'required' property of a master-produced payload is a promise every released starter builds
@@ -34,21 +34,18 @@ import contract.ContractDocument
  */
 object MasterProducedPropertyMustNotBecomeOptional : StatefulContractInvariant {
 
-    override fun check(baseline: ContractDocument?, current: ContractDocument): List<String> {
-        if (baseline == null) {
-            // a document born now promised nothing: no released starter relies on its properties
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
             return emptyList()
         }
 
-        val baselineProperties = baseline.properties
-            .associateBy { property -> property.schemaName to property.name }
+        val baselineProperties = baseline.properties.associateBy { property -> property.name }
 
         return current.properties.mapNotNull { currentProperty ->
-            val released = baselineProperties[currentProperty.schemaName to currentProperty.name]
+            val released = baselineProperties[currentProperty.name]
                 ?: return@mapNotNull null
 
-            if (released.required && !currentProperty.required
-                && currentProperty.schemaName !in current.starterProducedSchemas) {
+            if (released.required && !currentProperty.required && current.producedBy != "starter") {
                 ("${currentProperty.location} is produced by the Master and is 'required' in the released "
                     + "contract (${baseline.axelixVersion}): withdrawing 'required' is a hidden removal, "
                     + "deprecate the property instead and keep it required until the window passes")

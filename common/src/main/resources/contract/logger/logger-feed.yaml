@@ -1,15 +1,9 @@
 openapi: 3.1.0
 info:
   title: logger-feed
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'logger-feed' operation.
-    This operation lists every logger and logger group of the Spring Boot app together with the
-    logging levels the app supports, so that Axelix Master can render the loggers overview.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for the loggers and logger groups of a Spring Boot app and its supported logging levels.
 components:
   schemas:
     LoggersFeed:

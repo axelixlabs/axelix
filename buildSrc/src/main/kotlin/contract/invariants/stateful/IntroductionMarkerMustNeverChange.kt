@@ -18,8 +18,8 @@
 package contract.invariants.stateful
 
 import com.fasterxml.jackson.databind.JsonNode
-import contract.ContractDocument
-import contract.ContractDocument.Companion.INTRODUCED_IN
+import contract.ContractSchema
+import contract.ContractSchema.Companion.INTRODUCED_IN
 
 /**
  * The 'x-axelix-introduced-in' of a part the latest release already knows of is history: it
@@ -34,26 +34,22 @@ import contract.ContractDocument.Companion.INTRODUCED_IN
  */
 object IntroductionMarkerMustNeverChange : StatefulContractInvariant {
 
-    override fun check(baseline: ContractDocument?, current: ContractDocument): List<String> {
-        if (baseline == null) {
-            // no contract in previous version means that x-axelix-introduced-in cannot possibly be
-            // mutated - there is nothing to mutate, there were no previous version
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
+            // A schema born or removed in this release has no released introduction marker to rewrite.
             return emptyList()
         }
 
-        val baselineSchemas = baseline.schemas.associateBy { schema -> schema.name }
-        val baselineProperties = baseline.properties
-            .associateBy { property -> property.schemaName to property.name }
+        val baselineProperties = baseline.properties.associateBy { property -> property.name }
 
-        // Removed schemas and properties are a different check. This one only rejects a marker
-        // that changed on a part the release already knows.
+        // Removed properties are a different check. This one only rejects a marker that changed
+        // on a part the release already knows.
         val survivingParts: List<Triple<String, JsonNode, JsonNode>> =
-            current.schemas.mapNotNull { schema ->
-                baselineSchemas[schema.name]?.let { released -> Triple(schema.location, released.node, schema.node) }
-            } + current.properties.mapNotNull { property ->
-                baselineProperties[property.schemaName to property.name]
-                    ?.let { released -> Triple(property.location, released.node, property.node) }
-            }
+            listOf(Triple(current.location, baseline.node, current.node)) +
+                current.properties.mapNotNull { property ->
+                    baselineProperties[property.name]
+                        ?.let { released -> Triple(property.location, released.node, property.node) }
+                }
 
         return survivingParts.mapNotNull { (location, baselineNode, currentNode) ->
             val baselineIntroduction = baseline.markerVersion(baselineNode, INTRODUCED_IN) ?: return@mapNotNull null

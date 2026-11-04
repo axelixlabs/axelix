@@ -18,8 +18,8 @@
 package contract.invariants.stateful
 
 import com.fasterxml.jackson.databind.JsonNode
-import contract.ContractDocument
-import contract.ContractDocument.Companion.DEPRECATED_IN
+import contract.ContractSchema
+import contract.ContractSchema.Companion.DEPRECATED_IN
 
 /**
  * Stateful checks for the deprecation marker changes.
@@ -36,25 +36,19 @@ import contract.ContractDocument.Companion.DEPRECATED_IN
  */
 object DeprecationMarkerMustOnlyAppearInTheCurrentRelease : StatefulContractInvariant {
 
-    override fun check(baseline: ContractDocument?, current: ContractDocument): List<String> {
-        if (baseline == null) {
-            // a deprecation cannot appear, change or vanish against a document that did not
-            // exist; a deprecation born together with the document is rejected statelessly,
-            // because it cannot be strictly later than the introduction
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
+            // A deprecation born together with the schema is rejected statelessly because it
+            // cannot be strictly later than the introduction.
             return emptyList()
         }
 
-        val baselineSchemas = baseline.schemas.associateBy { schema -> schema.name }
-        val baselineProperties = baseline.properties
-            .associateBy { property -> property.schemaName to property.name }
+        val baselineProperties = baseline.properties.associateBy { property -> property.name }
 
         val survivingParts: List<Triple<String, JsonNode, JsonNode>> =
-            current.schemas.mapNotNull { schema ->
-                baselineSchemas[schema.name]
-                    ?.let { released -> Triple(schema.location, released.node, schema.node) }
-            } +
+            listOf(Triple(current.location, baseline.node, current.node)) +
                 current.properties.mapNotNull { property ->
-                    baselineProperties[property.schemaName to property.name]
+                    baselineProperties[property.name]
                         ?.let { released -> Triple(property.location, released.node, property.node) }
                 }
 

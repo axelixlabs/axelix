@@ -17,9 +17,9 @@
  */
 package contract.invariants.stateless
 
-import contract.ContractDocument
-import contract.ContractDocument.Companion.DEPRECATED_IN
-import contract.ContractDocument.Companion.INTRODUCED_IN
+import contract.ContractSchema
+import contract.ContractSchema.Companion.DEPRECATED_IN
+import contract.ContractSchema.Companion.INTRODUCED_IN
 import contract.Version
 
 /**
@@ -32,24 +32,24 @@ import contract.Version
  */
 object MarkersAreWellFormed : StatelessContractInvariant {
 
-    override fun check(document: ContractDocument): List<String> =
-        document.markedParts.flatMap { part ->
+    override fun check(schema: ContractSchema): List<String> =
+        schema.markedParts.flatMap { part ->
             listOf(INTRODUCED_IN, DEPRECATED_IN).mapNotNull { marker ->
-                problemOf(document, part, marker)
+                problemOf(schema, part, marker)
             }
         }
 
     private fun problemOf(
-        document: ContractDocument, part: ContractDocument.MarkedPart, marker: String): String? {
+        schema: ContractSchema, part: ContractSchema.MarkedPart, marker: String): String? {
 
-        val raw = document.marker(part.node, marker) ?: return null
+        val raw = schema.marker(part.node, marker) ?: return null
         val version = Version.parse(raw)
             ?: return "${part.location} has '$marker: $raw' that is not of the x.y.z form"
 
         // Markers carry no patch-level meaning, so only major.minor is compared.
-        if (version.copy(patch = 0) > document.axelixVersion.copy(patch = 0)) {
+        if (version.copy(patch = 0) > schema.axelixVersion.copy(patch = 0)) {
             return ("${part.location} has '$marker: $version' that is ahead of the version "
-                + "currently being built (${document.axelixVersion})")
+                + "currently being built (${schema.axelixVersion})")
         }
         return null
     }

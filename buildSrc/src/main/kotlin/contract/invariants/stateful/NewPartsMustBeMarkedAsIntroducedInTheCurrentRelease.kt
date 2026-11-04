@@ -17,8 +17,8 @@
  */
 package contract.invariants.stateful
 
-import contract.ContractDocument
-import contract.ContractDocument.Companion.INTRODUCED_IN
+import contract.ContractSchema
+import contract.ContractSchema.Companion.INTRODUCED_IN
 
 /**
  * A schema or a property the latest release does not know of is being born right now, so its
@@ -33,20 +33,18 @@ import contract.ContractDocument.Companion.INTRODUCED_IN
  */
 object NewPartsMustBeMarkedAsIntroducedInTheCurrentRelease : StatefulContractInvariant {
 
-    override fun check(baseline: ContractDocument?, current: ContractDocument): List<String> {
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (current == null) {
+            return emptyList()
+        }
+
         val unreleasedMarkers = if (baseline == null) {
-            // nothing was released, so every schema and every property is new
-            current.schemas.map { schema -> ContractDocument.MarkedPart(schema.location, schema.node) } +
-                current.properties.map { property -> ContractDocument.MarkedPart(property.location, property.node) }
+            current.markedParts
         } else {
-            val releasedSchemas = baseline.schemas.map { schema -> schema.name }.toSet()
-            val releasedProperties = baseline.properties.map { property -> property.schemaName to property.name }.toSet()
-            current.schemas
-                .filter { schema -> schema.name !in releasedSchemas }
-                .map { schema -> ContractDocument.MarkedPart(schema.location, schema.node) } +
-                current.properties
-                    .filter { property -> (property.schemaName to property.name) !in releasedProperties }
-                    .map { property -> ContractDocument.MarkedPart(property.location, property.node) }
+            val releasedProperties = baseline.properties.map { property -> property.name }.toSet()
+            current.properties
+                .filter { property -> property.name !in releasedProperties }
+                .map { property -> ContractSchema.MarkedPart(property.location, property.node) }
         }
 
         return unreleasedMarkers.mapNotNull { part ->

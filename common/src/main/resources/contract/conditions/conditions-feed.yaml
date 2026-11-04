@@ -1,16 +1,10 @@
 openapi: 3.1.0
 info:
   title: conditions-feed
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'conditions-feed' operation.
-    This operation returns the flattened conditions report of the Spring Boot app: the configuration
-    classes where all conditions matched and those where some did not, so that Axelix Master can
-    render the conditions overview.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for the flattened conditions report of a Spring Boot app, covering configuration
+    classes whose conditions matched fully or partially.
 components:
   schemas:
     ConditionsFeed:

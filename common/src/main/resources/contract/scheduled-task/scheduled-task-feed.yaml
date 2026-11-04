@@ -1,16 +1,10 @@
 openapi: 3.1.0
 info:
   title: scheduled-task-feed
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'scheduled-task-feed' operation.
-    This operation lists every scheduled task of the Spring Boot app, grouped by the kind of
-    trigger that drives it (cron, fixed-delay, fixed-rate or a custom trigger), so that Axelix
-    Master can render the scheduled tasks overview.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for the scheduled tasks of a Spring Boot app, grouped by cron, fixed-delay, fixed-rate
+    or custom trigger.
 components:
   schemas:
     ServiceScheduledTasks:

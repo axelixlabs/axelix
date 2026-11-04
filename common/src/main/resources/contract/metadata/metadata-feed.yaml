@@ -1,15 +1,9 @@
 openapi: 3.1.0
 info:
   title: metadata-feed
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'metadata-feed' operation.
-    This operation returns the basic metadata that is always required in order to register the
-    service, regardless of the approach - either auto-discovery or self-registration.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for the basic service metadata required for both auto-discovery and self-registration.
 components:
   schemas:
     # BasicRegistrationMetadata and everything below it is duplicated verbatim in

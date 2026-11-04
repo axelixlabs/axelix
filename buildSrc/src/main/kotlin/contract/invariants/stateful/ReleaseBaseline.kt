@@ -17,7 +17,7 @@
  */
 package contract.invariants.stateful
 
-import contract.ContractDocument
+import contract.ContractSchema
 import contract.Version
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.Repository
@@ -42,13 +42,13 @@ class ReleaseBaseline private constructor(private val repoRoot: File, val versio
      * The released counterpart of the given working tree contract document, or null when the
      * document did not exist at the release, i.e. the operation was created after the latest known release.
      */
-    fun contract(document: File): ContractDocument? =
+    fun contract(document: File): List<ContractSchema>? =
         open(repoRoot).use { repository ->
             val path = document.relativeTo(repoRoot).invariantSeparatorsPath
             val baselineCommit = RevWalk(repository).use { walk -> walk.parseCommit(repository.resolve(tag)) }
 
             TreeWalk.forPath(repository, path, baselineCommit.tree)?.use { previousContract ->
-                ContractDocument.parse(repository.open(previousContract.getObjectId(0)).bytes, version)
+                ContractSchema.parse(repository.open(previousContract.getObjectId(0)).bytes, version)
             }
         }
 

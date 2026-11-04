@@ -1,15 +1,9 @@
 openapi: 3.1.0
 info:
   title: metrics-groups-feed
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'metrics-groups-feed' operation.
-    This operation lists the names and descriptions of all metrics of the Spring Boot app, grouped
-    by the metric name prefix, so that Axelix Master can render the metrics overview.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for the names and descriptions of a Spring Boot app's metrics, grouped by name prefix.
 components:
   schemas:
     MetricsGroupsFeed:

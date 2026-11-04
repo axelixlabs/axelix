@@ -17,6 +17,7 @@
  */
 package contract
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import contract.invariants.stateful.DeprecationMarkerMustOnlyAppearInTheCurrentRelease
 import contract.invariants.stateful.IntroductionMarkerMustNeverChange
 import contract.invariants.stateful.MasterProducedPropertyMustNotBecomeOptional
@@ -29,20 +30,20 @@ import contract.invariants.stateless.DeprecatedIsRemovedAfterTheWindow
 import contract.invariants.stateless.DeprecationFollowsIntroduction
 import contract.invariants.stateless.IntroductionIsDeclared
 import contract.invariants.stateless.MarkersAreWellFormed
-import contract.invariants.stateless.RequiredHonoursTheWindow
 import contract.invariants.stateless.ProducedByIsDeclared
+import contract.invariants.stateless.RequiredHonoursTheWindow
 import contract.invariants.stateless.StatelessContractInvariant
 import java.io.File
 import org.gradle.api.GradleException
 
 /**
- * Validation of the Axelix Master <-> starter OpenAPI contract documents.
+ * Validation of the schema bundles in the Axelix Master <-> starter OpenAPI documents.
  *
  * @author Mikhail Polivakha
  */
 object ContractDocumentsValidator {
 
-    private val INVARIANTS: List<StatelessContractInvariant> = listOf(
+    private val STATELESS_INVARIANTS: List<StatelessContractInvariant> = listOf(
         ProducedByIsDeclared,
         IntroductionIsDeclared,
         MarkersAreWellFormed,
@@ -61,17 +62,37 @@ object ContractDocumentsValidator {
     )
 
     /**
-     * Verifies that the contract document complies with the backward compatibility guarantees.
+     * Verifies that every schema in the document complies with the compatibility guarantees.
+     *
+     * When [baseline] is present, each schema is also compared with the released schema of the
+     * same name. The name is the schema's identity: a name only in the working tree is a schema
+     * born in this release, and a name only in the release is a schema that was removed.
      */
     fun validate(document: File, currentAxelixVersion: String, baseline: ReleaseBaseline? = null) {
-        val currentContract = ContractDocument.parse(document, currentAxelixVersion)
+        val root = YAMLMapper().readTree(document)
+        val currentSchemas = ContractSchema.parse(root, currentAxelixVersion)
+        val problems = mutableListOf<String>()
 
-        // stateless checks for the current contract
-        val problems = INVARIANTS.flatMap { invariant -> invariant.check(currentContract) }.toMutableList()
+        val bundleVersion = root.path("info").path("version")
+        if (!bundleVersion.isTextual || bundleVersion.textValue().isNotEmpty()) {
+            problems += "the 'info.version' must be an empty string because versions apply to schemas, not schema bundles"
+        }
+
+        problems += currentSchemas.flatMap { schema ->
+            STATELESS_INVARIANTS.flatMap { invariant -> invariant.check(schema) }
+        }
 
         if (baseline != null) {
-            val releasedContract = baseline.contract(document)
-            problems += STATEFUL_INVARIANTS.flatMap { invariant -> invariant.check(releasedContract, currentContract) }
+            val releasedByName = baseline.contract(document).orEmpty().associateBy { schema -> schema.name }
+            val currentByName = currentSchemas.associateBy { schema -> schema.name }
+            // Working-tree order first, then schemas the release still has and the working tree dropped.
+            val names = (currentSchemas.map { schema -> schema.name } + releasedByName.keys).distinct()
+
+            problems += names.flatMap { name ->
+                STATEFUL_INVARIANTS.flatMap { invariant ->
+                    invariant.check(releasedByName[name], currentByName[name])
+                }
+            }
         }
 
         if (problems.isNotEmpty()) {

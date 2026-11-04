@@ -1,11 +1,10 @@
 openapi: 3.1.0
 info:
   title: heartbeat-v2
-  version: 1.0.0
+  version: ""
   description: |
-    Version 2 of the heartbeat. This version is a more lightweight version of the heartbeat that 
-    does not include all the information needed in order for the service to register itself. Version 2
-    includes minimal information so the Master can assume the other peer is alive.
+    Schemas for version 2 of the heartbeat, containing the minimal information needed for the
+    Master to tell that the other peer is alive without carrying full registration metadata.
 components:
   schemas:
     HeartBeatMetadataV2:

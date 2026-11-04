@@ -18,7 +18,7 @@
 package contract.invariants.stateful
 
 import com.fasterxml.jackson.databind.JsonNode
-import contract.ContractDocument
+import contract.ContractSchema
 
 /**
  * A property the latest release already knows of must keep its wire shape: changing 'type' or
@@ -31,17 +31,15 @@ import contract.ContractDocument
  */
 object PropertyTypeAndFormatMustNeverChange : StatefulContractInvariant {
 
-    override fun check(baseline: ContractDocument?, current: ContractDocument): List<String> {
-        if (baseline == null) {
-            // a document born now redefines nothing: no released consumer has ever seen it
+    override fun check(baseline: ContractSchema?, current: ContractSchema?): List<String> {
+        if (baseline == null || current == null) {
             return emptyList()
         }
 
-        val baselineProperties = baseline.properties
-            .associateBy { property -> property.schemaName to property.name }
+        val baselineProperties = baseline.properties.associateBy { property -> property.name }
 
         return current.properties.flatMap { property ->
-            val released = baselineProperties[property.schemaName to property.name]
+            val released = baselineProperties[property.name]
                 ?: return@flatMap emptyList<String>()
 
             listOfNotNull(
@@ -55,7 +53,7 @@ object PropertyTypeAndFormatMustNeverChange : StatefulContractInvariant {
         field: String,
         baselineNode: JsonNode,
         currentNode: JsonNode,
-        baseline: ContractDocument): String? {
+        baseline: ContractSchema): String? {
 
         val releasedValue = declared(baselineNode, field)
         val currentValue = declared(currentNode, field)
