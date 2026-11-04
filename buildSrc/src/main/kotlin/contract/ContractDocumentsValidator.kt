@@ -73,7 +73,9 @@ object ContractDocumentsValidator {
         val currentSchemas = ContractSchema.parse(root, currentAxelixVersion)
 
         // stateless checks for the current contract
-        val problems = STATELESS_INVARIANTS.flatMap { invariant -> invariant.check(currentContract) }.toMutableList()
+        val problems = currentSchemas.flatMap { schema ->
+            STATELESS_INVARIANTS.map { invariant -> invariant.check(schema) }
+        }.toMutableList()
 
         if (baseline != null) {
             val releasedByName = baseline.contract(document).orEmpty().associateBy { schema -> schema.name }
