@@ -4,17 +4,6 @@ info:
   version: 1.0.0
   x-axelix-introduced-in: 1.0.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers:
-    get:
-      operationId: getLoggers
-      responses:
-        '200':
-          description: The loggers of the service.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggersReply'
 components:
   schemas:
     # The starter produces this reply, so the Master receives it from the whole

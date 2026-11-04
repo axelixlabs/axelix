@@ -27,7 +27,6 @@ import contract.invariants.stateful.ReleaseBaseline
 import contract.invariants.stateful.StatefulContractInvariant
 import contract.invariants.stateless.DeprecatedIsRemovedAfterTheWindow
 import contract.invariants.stateless.DeprecationFollowsIntroduction
-import contract.invariants.stateless.DocumentDescribesOneOperation
 import contract.invariants.stateless.IntroductionIsDeclared
 import contract.invariants.stateless.MarkersAreWellFormed
 import contract.invariants.stateless.RequiredHonoursTheWindow
@@ -44,7 +43,6 @@ import org.gradle.api.GradleException
 object ContractDocumentsValidator {
 
     private val INVARIANTS: List<StatelessContractInvariant> = listOf(
-        DocumentDescribesOneOperation,
         ServerIsDeclared,
         IntroductionIsDeclared,
         MarkersAreWellFormed,

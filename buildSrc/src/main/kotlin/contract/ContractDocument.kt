@@ -67,10 +67,10 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
     }
 
     /**
-     * Every operation the document describes, e.g. "POST /actuator/axelix-loggers". Empty for a
-     * payload-only document, which declares no `paths`.
+     * Operations of a released document that still declares `paths`. Every manifest in the
+     * working tree is operation-free, so this is empty there.
      */
-    val operations: List<String> = root.path("paths").properties().flatMap { (path, pathItem) ->
+    private val operations: List<String> = root.path("paths").properties().flatMap { (path, pathItem) ->
         pathItem.properties()
             .filter { (key, _) -> key in HTTP_METHODS }
             .map { (method, _) -> "${method.uppercase()} $path" }
@@ -79,8 +79,8 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
     /**
      * The names of the schemas that **travel in a payload produced by the starter**.
      *
-     * A document without operations is the payload itself, so every schema it declares is
-     * produced by [server]. A document that still describes an operation derives the producer
+     * A working-tree manifest declares no operation, so every schema it contains is produced
+     * by [server]. A released baseline may still describe an operation; its producer is derived
      * from that operation:
      *
      * 1. Responses when the starter answers the call

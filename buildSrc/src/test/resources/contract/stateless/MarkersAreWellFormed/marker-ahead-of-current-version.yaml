@@ -3,20 +3,7 @@ info:
   title: logger-level-change
   version: 1.0.0
   x-axelix-introduced-in: 1.0.0
-  x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers/logger/{name}/change-level:
-    post:
-      operationId: changeLogLevelByLoggerName
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LogLevelChangeRequest'
-      responses:
-        '204':
-          description: The logging level was changed.
+  x-axelix-server: master
 components:
   schemas:
     LogLevelChangeRequest:

@@ -4,23 +4,6 @@ info:
   version: 1.0.0
   x-axelix-introduced-in: 1.0.0
   x-axelix-server: starter
-paths:
-  /actuator/axelix-loggers/logger/{name}/change-level:
-    post:
-      operationId: changeLogLevelByLoggerName
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LogLevelChangeRequest'
-      responses:
-        '200':
-          description: The logging level was changed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LogLevelChangeReply'
 components:
   schemas:
     # The Master produces this request, so every starter within the window parses it.
