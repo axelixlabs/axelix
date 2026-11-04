@@ -1,11 +1,10 @@
 openapi: 3.1.0
 info:
   title: master-ping
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'master-ping' operation.
-    This operation returns the lightweight metadata of an already known auto-discovered instance,
-    so that the Master does not have to fetch the full registration metadata on every poll.
+    Schemas for the lightweight metadata of an already known auto-discovered instance, allowing
+    the Master to poll it without fetching the full registration metadata.
 components:
   schemas:
     MasterPing:

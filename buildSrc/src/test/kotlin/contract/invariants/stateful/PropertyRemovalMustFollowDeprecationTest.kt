@@ -17,7 +17,7 @@
  */
 package contract.invariants.stateful
 
-import contract.ContractDocument
+import contract.ContractSchema
 import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -115,14 +115,14 @@ class PropertyRemovalMustFollowDeprecationTest {
         assertEquals(emptyList<String>(), problems)
     }
 
-    private fun baseline(): ContractDocument =
-        ContractDocument.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+    private fun baseline(): List<ContractSchema> =
+        ContractSchema.parse(document("released-baseline.yaml"), RELEASED_VERSION)
 
-    private fun starterBaseline(): ContractDocument =
-        ContractDocument.parse(document("released-baseline-starter.yaml"), RELEASED_VERSION)
+    private fun starterBaseline(): List<ContractSchema> =
+        ContractSchema.parse(document("released-baseline-starter.yaml"), RELEASED_VERSION)
 
-    private fun current(name: String, version: String = WITHIN_WINDOW_VERSION): ContractDocument =
-        ContractDocument.parse(document(name), version)
+    private fun current(name: String, version: String = WITHIN_WINDOW_VERSION): List<ContractSchema> =
+        ContractSchema.parse(document(name), version)
 
     private fun document(name: String): File =
         File(javaClass.getResource(

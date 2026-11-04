@@ -1,12 +1,10 @@
 openapi: 3.1.0
 info:
   title: log-entries-tail
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'log-entries-tail' operation.
-    This operation returns the most recent log entries of the Spring Boot app, taken from the
-    bounded in-memory buffer the starter keeps. The entries are returned in chronological order,
-    i.e. the last entry of the response is the most recent one.
+    Schemas for the most recent log entries of a Spring Boot app, kept in the starter's bounded
+    in-memory buffer and ordered chronologically with the most recent entry last.
 components:
   schemas:
     LogEntriesTail:

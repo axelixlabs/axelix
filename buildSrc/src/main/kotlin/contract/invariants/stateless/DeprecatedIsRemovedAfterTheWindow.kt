@@ -17,8 +17,8 @@
  */
 package contract.invariants.stateless
 
-import contract.ContractDocument
-import contract.ContractDocument.Companion.DEPRECATED_IN
+import contract.ContractSchema
+import contract.ContractSchema.Companion.DEPRECATED_IN
 
 /**
  * Once the compatibility window of a deprecation has passed, keeping the deprecated part of the
@@ -29,24 +29,14 @@ import contract.ContractDocument.Companion.DEPRECATED_IN
  */
 object DeprecatedIsRemovedAfterTheWindow : StatelessContractInvariant {
 
-    override fun check(document: ContractDocument): List<String> {
-        val problems = mutableListOf<String>()
-
-        document.schemas.forEach { schema ->
-            val deprecated = document.markerVersion(schema.node, DEPRECATED_IN)
-            if (deprecated != null && document.windowPassed(deprecated)) {
-                problems += ("${schema.location} was deprecated in $deprecated and the "
+    override fun check(schema: ContractSchema): List<String> =
+        schema.markedParts.mapNotNull { part ->
+            val deprecated = schema.markerVersion(part.node, DEPRECATED_IN)
+            if (deprecated != null && schema.windowPassed(deprecated)) {
+                ("${part.location} was deprecated in $deprecated and the "
                     + "compatibility window has passed: remove it from the contract")
+            } else {
+                null
             }
         }
-
-        document.properties.forEach { property ->
-            val deprecated = document.markerVersion(property.node, DEPRECATED_IN)
-            if (deprecated != null && document.windowPassed(deprecated)) {
-                problems += ("${property.location} was deprecated in $deprecated and the "
-                    + "compatibility window has passed: remove it from the contract")
-            }
-        }
-        return problems
-    }
 }

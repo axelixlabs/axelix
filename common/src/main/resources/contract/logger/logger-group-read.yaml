@@ -1,14 +1,9 @@
 openapi: 3.1.0
 info:
   title: logger-group-read
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'logger-group-read' operation.
-    This operation returns the profile of a single logger group of the Spring Boot app, addressed by name.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for the profile of a single logger group of a Spring Boot app.
 components:
   schemas:
     LoggersGroupProfile:

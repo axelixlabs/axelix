@@ -1,17 +1,11 @@
 openapi: 3.1.0
 info:
   title: initial-registration-request
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the initial registration request operation.
-    This operation exists mainly as the successor for a single 'heartbeat' that we used 
-    to have in the past. The problem is that Axelix Master now needs to store a lot of data
-    about the Instances: SBOM (a bit cropped but still), the properties feed and so on. This information
-    is like a lot of data to be assembled and kept in memory of the Spring Boot application that
-    uses us, and apart from it, Axelix Master would become overwhelmed by the necessity to parse them.
-    So we decided to separate heartbeat from the initial registration request, where initial registration
-    request pushes all the data needed, and later heartbeats just send the data
-    that changes over time: the health status, the heap usage and the transactions.
+    Schemas for the initial registration of a service instance, carrying the complete metadata
+    that Axelix Master stores. Subsequent heartbeats carry only data that changes over time,
+    such as health status, heap usage and transactions.
 components:
   schemas:
     InitialSelfRegistrationRequest:

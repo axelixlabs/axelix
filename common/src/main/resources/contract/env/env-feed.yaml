@@ -1,17 +1,10 @@
 openapi: 3.1.0
 info:
   title: env-feed
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'env-feed' operation.
-    This operation returns an enriched view of the Spring Boot app's environment: the active and
-    default profiles and every property source with its properties (value, origin metadata,
-    deprecation and the injection points that consume each property), so that Axelix Master can
-    render the environment overview.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for a Spring Boot app's environment, including active and default profiles, property
+    sources, property values and origins, deprecations and consuming injection points.
 components:
   schemas:
     EnvironmentFeed:

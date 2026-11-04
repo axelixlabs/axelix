@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: pets-feed
-  version: 1.0.0
+  version: ""
 components:
   schemas:
     Pet:

@@ -18,7 +18,7 @@
 package contract.invariants.stateful
 
 import com.fasterxml.jackson.databind.JsonNode
-import contract.ContractDocument
+import contract.ContractSchema
 
 /**
  * A property the latest release already knows of must keep its wire shape: changing 'type' or
@@ -31,22 +31,22 @@ import contract.ContractDocument
  */
 object PropertyTypeAndFormatMustNeverChange : StatefulContractInvariant {
 
-    override fun check(baseline: ContractDocument?, current: ContractDocument): List<String> {
+    override fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
         if (baseline == null) {
             // a document born now redefines nothing: no released consumer has ever seen it
             return emptyList()
         }
 
-        val baselineProperties = baseline.properties
+        val baselineProperties = baseline.flatMap { schema -> schema.properties }
             .associateBy { property -> property.schemaName to property.name }
 
-        return current.properties.flatMap { property ->
+        return current.flatMap { schema -> schema.properties }.flatMap { property ->
             val released = baselineProperties[property.schemaName to property.name]
                 ?: return@flatMap emptyList<String>()
 
             listOfNotNull(
-                redefinition(property.location, "type", released.node, property.node, baseline),
-                redefinition(property.location, "format", released.node, property.node, baseline))
+                redefinition(property.location, "type", released.node, property.node, baseline.first()),
+                redefinition(property.location, "format", released.node, property.node, baseline.first()))
         }
     }
 
@@ -55,7 +55,7 @@ object PropertyTypeAndFormatMustNeverChange : StatefulContractInvariant {
         field: String,
         baselineNode: JsonNode,
         currentNode: JsonNode,
-        baseline: ContractDocument): String? {
+        baseline: ContractSchema): String? {
 
         val releasedValue = declared(baselineNode, field)
         val currentValue = declared(currentNode, field)

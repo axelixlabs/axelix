@@ -17,7 +17,7 @@
  */
 package contract.invariants.stateful
 
-import contract.ContractDocument
+import contract.ContractSchema
 
 /**
  * A 'required' property of a master-produced payload is a promise every released starter builds
@@ -34,23 +34,25 @@ import contract.ContractDocument
  */
 object MasterProducedPropertyMustNotBecomeOptional : StatefulContractInvariant {
 
-    override fun check(baseline: ContractDocument?, current: ContractDocument): List<String> {
+    override fun check(baseline: List<ContractSchema>?, current: List<ContractSchema>): List<String> {
         if (baseline == null) {
             // a document born now promised nothing: no released starter relies on its properties
             return emptyList()
         }
 
-        val baselineProperties = baseline.properties
+        val baselineProperties = baseline.flatMap { schema -> schema.properties }
             .associateBy { property -> property.schemaName to property.name }
+        val starterProducedSchemas = current.filter { schema -> schema.producedBy == "starter" }
+            .map { schema -> schema.name }.toSet()
 
-        return current.properties.mapNotNull { currentProperty ->
+        return current.flatMap { schema -> schema.properties }.mapNotNull { currentProperty ->
             val released = baselineProperties[currentProperty.schemaName to currentProperty.name]
                 ?: return@mapNotNull null
 
             if (released.required && !currentProperty.required
-                && currentProperty.schemaName !in current.starterProducedSchemas) {
+                && currentProperty.schemaName !in starterProducedSchemas) {
                 ("${currentProperty.location} is produced by the Master and is 'required' in the released "
-                    + "contract (${baseline.axelixVersion}): withdrawing 'required' is a hidden removal, "
+                    + "contract (${baseline.first().axelixVersion}): withdrawing 'required' is a hidden removal, "
                     + "deprecate the property instead and keep it required until the window passes")
             } else {
                 null

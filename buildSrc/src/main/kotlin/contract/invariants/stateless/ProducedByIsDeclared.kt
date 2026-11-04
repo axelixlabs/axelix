@@ -17,9 +17,9 @@
  */
 package contract.invariants.stateless
 
-import contract.ContractDocument
-import contract.ContractDocument.Companion.PRODUCED_BY
-import contract.ContractDocument.Companion.PRODUCERS
+import contract.ContractSchema
+import contract.ContractSchema.Companion.PRODUCED_BY
+import contract.ContractSchema.Companion.PRODUCERS
 
 /**
  * Every schema must declare which side produces it: the evolution rules of its properties
@@ -29,9 +29,7 @@ import contract.ContractDocument.Companion.PRODUCERS
  */
 object ProducedByIsDeclared : StatelessContractInvariant {
 
-    override fun check(document: ContractDocument): List<String> =
-        document.schemas.mapNotNull { schema ->
-            if (schema.producedBy in PRODUCERS) null
-            else "${schema.location} must declare '$PRODUCED_BY' as one of $PRODUCERS"
-        }
+    override fun check(schema: ContractSchema): List<String> =
+        if (schema.producedBy in PRODUCERS) emptyList()
+        else listOf("${schema.location} must declare '$PRODUCED_BY' as one of $PRODUCERS")
 }

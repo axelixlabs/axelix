@@ -1,15 +1,9 @@
 openapi: 3.1.0
 info:
   title: gc-log-enable
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'gc-log-enable' operation.
-    This operation enables the garbage collection logging of the Spring Boot app at the given
-    verbosity level.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for enabling garbage collection logging in a Spring Boot app at a given verbosity level.
 components:
   schemas:
     GcLogEnableRequest:

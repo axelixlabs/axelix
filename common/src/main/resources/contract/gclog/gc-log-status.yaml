@@ -1,15 +1,10 @@
 openapi: 3.1.0
 info:
   title: gc-log-status
-  version: 1.0.0
+  version: ""
   description: |
-    The Axelix Master <-> starter contract of the 'gc-log-status' operation.
-    This operation returns the current status of the garbage collection logging of the Spring Boot
-    app: whether it is enabled, at which verbosity level and which levels the JVM supports.
-  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
-  # which this contract document was born and the compatibility checks started guarding it.
-  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
-  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+    Schemas for the garbage collection logging status of a Spring Boot app, including its enabled
+    state, current verbosity and the levels supported by the JVM.
 components:
   schemas:
     GcLogStatus:

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: logger-level-change
-  version: 1.0.0
+  version: ""
 components:
   schemas:
     LogLevelChangeReply:

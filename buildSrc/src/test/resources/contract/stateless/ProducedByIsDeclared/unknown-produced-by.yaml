@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: logger-level-change
-  version: 1.0.0
+  version: ""
   # INVALID: only 'starter' and 'master' produce a payload.
 components:
   schemas:

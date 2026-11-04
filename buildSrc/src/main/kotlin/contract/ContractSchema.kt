@@ -23,63 +23,41 @@ import java.io.File
 import org.gradle.api.GradleException
 
 /**
- * A parsed contract between Axelix Master and the starters. The document defines payload schemas.
- * Each schema declares who produces it and when it was introduced.
+ * A model used in communication between Axelix Master and the starters. Each schema declares
+ * who produces it and when it was introduced.
  *
- * @param axelixVersion version of Axelix, when the given document was actaul
- * @param root the [JsonNode] that represents the root of the YAML document to be inspected
+ * @param name name of the schema in the OpenAPI components
+ * @param node the [JsonNode] that represents the schema
+ * @param axelixVersion version of Axelix in which the schema is being inspected
  *
  * @author Mikhail Polivakha
  */
-class ContractDocument private constructor(private val root: JsonNode, val axelixVersion: Version) {
+class ContractSchema private constructor(val name: String, val node: JsonNode, val axelixVersion: Version) {
 
-    val info: JsonNode = root.path("info")
+    val location: String = "the schema '$name'"
 
-    /**
-     * Every part of the document that carries lifecycle markers.
-     */
-    val markedParts: List<MarkedPart>
+    /** The side that produces this schema, or empty when the marker is absent. */
+    val producedBy: String = node.path(PRODUCED_BY).asText("")
 
-    val schemas: List<Schema>
+    val properties: List<Property> =
+        // The inline 'allOf' parts (e.g. subtypes) declare their own properties.
+        (listOf(node) + node.path("allOf").toList()).flatMap { part ->
+            val requiredProperties = part.path("required").map { property -> property.asText() }.toSet()
 
-    val properties: List<Property>
-
-    init {
-        schemas = root.path("components").path("schemas").properties().map { (schemaName, schema) ->
-            Schema(schemaName, schema)
-        }
-        properties = schemas.flatMap { schema ->
-
-            // The inline 'allOf' parts (e.g. subtypes) declare their own properties.
-            (listOf(schema.node) + schema.node.path("allOf").toList()).flatMap { part ->
-                val requiredProperties = part.path("required").map { name -> name.asText() }.toSet()
-
-                part.path("properties").properties().map { (propertyName, propertyNode) ->
-                    Property(schema.name, propertyName, propertyNode, propertyName in requiredProperties)
-                }
+            part.path("properties").properties().map { (propertyName, propertyNode) ->
+                Property(name, propertyName, propertyNode, propertyName in requiredProperties)
             }
         }
-        markedParts = listOf(MarkedPart("the 'info' block", info)) +
-            schemas.map { schema -> MarkedPart(schema.location, schema.node) } +
-            properties.map { property -> MarkedPart(property.location, property.node) }
-    }
 
-    /**
-     * The names of the schemas produced by the starter, taken from [PRODUCED_BY] on each schema.
-     */
-    val starterProducedSchemas: Set<String> by lazy {
-        schemas.filter { schema -> schema.producedBy == "starter" }.map { schema -> schema.name }.toSet()
-    }
+    /** Every part of the schema that carries lifecycle markers. */
+    val markedParts: List<MarkedPart> =
+        listOf(MarkedPart(location, node)) + properties.map { property -> MarkedPart(property.location, property.node) }
 
-    /**
-     * The raw value of the marker, or null when it is absent.
-     */
+    /** The raw value of the marker, or null when it is absent. */
     fun marker(node: JsonNode, marker: String): String? =
         node.path(marker).takeUnless { value -> value.isMissingNode }?.asText()
 
-    /**
-     * The parsed value of the custom marker, or null when it is absent or malformed.
-     */
+    /** The parsed value of the custom marker, or null when it is absent or malformed. */
     fun markerVersion(node: JsonNode, marker: String): Version? =
         marker(node, marker)?.let(Version::parse)
 
@@ -96,14 +74,6 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
                 && axelixVersion.minor - marker.minor >= WINDOW_MINORS)
 
     data class MarkedPart(val location: String, val node: JsonNode)
-
-    class Schema(val name: String, val node: JsonNode) {
-
-        val location: String = "the schema '$name'"
-
-        /** The side that produces this schema, or empty when the marker is absent. */
-        val producedBy: String = node.path(PRODUCED_BY).asText("")
-    }
 
     data class Property(
         val schemaName: String, val name: String, val node: JsonNode, val required: Boolean) {
@@ -125,17 +95,22 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
          */
         const val WINDOW_MINORS = 3
 
-        fun parse(document: File, currentAxelixVersion: String): ContractDocument =
-            of(YAMLMapper().readTree(document), currentAxelixVersion)
+        fun parse(document: File, currentAxelixVersion: String): List<ContractSchema> =
+            parse(YAMLMapper().readTree(document), currentAxelixVersion)
 
-        fun parse(document: ByteArray, currentAxelixVersion: Version): ContractDocument =
-            ContractDocument(YAMLMapper().readTree(document), currentAxelixVersion)
+        fun parse(document: ByteArray, currentAxelixVersion: Version): List<ContractSchema> =
+            parse(YAMLMapper().readTree(document), currentAxelixVersion)
 
-        private fun of(root: JsonNode, currentAxelixVersion: String): ContractDocument =
-            ContractDocument(
+        fun parse(root: JsonNode, currentAxelixVersion: String): List<ContractSchema> =
+            parse(
                 root,
                 Version.parse(currentAxelixVersion)
                     ?: throw GradleException(
                         "The project version '$currentAxelixVersion' is not of the expected x.y.z[-QUALIFIER] form"))
+
+        fun parse(root: JsonNode, currentAxelixVersion: Version): List<ContractSchema> =
+            root.path("components").path("schemas").properties().map { (name, schema) ->
+                ContractSchema(name, schema, currentAxelixVersion)
+            }
     }
 }

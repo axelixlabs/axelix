@@ -17,26 +17,19 @@
  */
 package contract
 
-import contract.invariants.stateful.DeprecationMarkerMustOnlyAppearInTheCurrentRelease
-import contract.invariants.stateful.IntroductionMarkerMustNeverChange
-import contract.invariants.stateful.MasterProducedPropertyMustNotBecomeOptional
-import contract.invariants.stateful.NewPartsMustBeMarkedAsIntroducedInTheCurrentRelease
-import contract.invariants.stateful.PropertyRemovalMustFollowDeprecation
-import contract.invariants.stateful.PropertyTypeAndFormatMustNeverChange
-import contract.invariants.stateful.ReleaseBaseline
-import contract.invariants.stateful.StatefulContractInvariant
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import contract.invariants.stateless.DeprecatedIsRemovedAfterTheWindow
 import contract.invariants.stateless.DeprecationFollowsIntroduction
 import contract.invariants.stateless.IntroductionIsDeclared
 import contract.invariants.stateless.MarkersAreWellFormed
-import contract.invariants.stateless.RequiredHonoursTheWindow
 import contract.invariants.stateless.ProducedByIsDeclared
+import contract.invariants.stateless.RequiredHonoursTheWindow
 import contract.invariants.stateless.StatelessContractInvariant
 import java.io.File
 import org.gradle.api.GradleException
 
 /**
- * Validation of the Axelix Master <-> starter OpenAPI contract documents.
+ * Validation of the schema bundles in the Axelix Master <-> starter OpenAPI documents.
  *
  * @author Mikhail Polivakha
  */
@@ -51,27 +44,19 @@ object ContractDocumentsValidator {
         DeprecatedIsRemovedAfterTheWindow,
     )
 
-    private val STATEFUL_INVARIANTS: List<StatefulContractInvariant> = listOf(
-        NewPartsMustBeMarkedAsIntroducedInTheCurrentRelease,
-        IntroductionMarkerMustNeverChange,
-        DeprecationMarkerMustOnlyAppearInTheCurrentRelease,
-        PropertyTypeAndFormatMustNeverChange,
-        MasterProducedPropertyMustNotBecomeOptional,
-        PropertyRemovalMustFollowDeprecation,
-    )
+    /** Verifies that every schema in the document complies with the compatibility guarantees. */
+    fun validate(document: File, currentAxelixVersion: String) {
+        val root = YAMLMapper().readTree(document)
+        val currentSchemas = ContractSchema.parse(root, currentAxelixVersion)
+        val problems = mutableListOf<String>()
 
-    /**
-     * Verifies that the contract document complies with the backward compatibility guarantees.
-     */
-    fun validate(document: File, currentAxelixVersion: String, baseline: ReleaseBaseline? = null) {
-        val currentContract = ContractDocument.parse(document, currentAxelixVersion)
+        val bundleVersion = root.path("info").path("version")
+        if (!bundleVersion.isTextual || bundleVersion.textValue().isNotEmpty()) {
+            problems += "the 'info.version' must be an empty string because versions apply to schemas, not schema bundles"
+        }
 
-        // stateless checks for the current contract
-        val problems = STATELESS_INVARIANTS.flatMap { invariant -> invariant.check(currentContract) }.toMutableList()
-
-        if (baseline != null) {
-            val releasedContract = baseline.contract(document)
-            problems += STATEFUL_INVARIANTS.flatMap { invariant -> invariant.check(releasedContract, currentContract) }
+        problems += currentSchemas.flatMap { schema ->
+            STATELESS_INVARIANTS.flatMap { invariant -> invariant.check(schema) }
         }
 
         if (problems.isNotEmpty()) {

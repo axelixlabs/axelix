@@ -19,6 +19,7 @@ package contract
 
 import java.io.File
 import org.gradle.api.GradleException
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
@@ -49,6 +50,20 @@ class ContractDocumentsValidatorTest {
     fun `a marker equal to the version being built passes`() {
         ContractDocumentsValidator.validate(
             document("stateless/MarkersAreWellFormed/marker-equal-to-current-version.yaml"), CURRENT_VERSION)
+    }
+
+    @Test
+    fun `a non-empty info version fails`() {
+        assertThrows(GradleException::class.java) {
+            ContractDocumentsValidator.validate(document("non-empty-info-version.yaml"), CURRENT_VERSION)
+        }
+    }
+
+    @Test
+    fun `a missing info version fails`() {
+        assertThrows(GradleException::class.java) {
+            ContractDocumentsValidator.validate(document("missing-info-version.yaml"), CURRENT_VERSION)
+        }
     }
 
     @Test

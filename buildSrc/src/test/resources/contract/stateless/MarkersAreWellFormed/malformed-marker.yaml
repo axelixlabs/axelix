@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: logger-level-change
-  version: 1.0.0
+  version: ""
   # INVALID: not of the x.y.z form.
 components:
   schemas:
