@@ -77,27 +77,30 @@ public class ReactiveJwtAuthorizationFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
-        SecurityContext securityContext;
-        try {
-            String token = resolveToken(request);
-            HttpMethod requestHttpMethod =
-                    HttpMethod.valueOf(request.getMethod().name());
-            String relativePath = normalizedPath(path).substring(baseActuatorPath.length());
-            User user = webIdentityAccessManager.verifyAccess(relativePath, requestHttpMethod, token);
-            securityContext = new DefaultSecurityContext(user, token);
-        } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
-            return respondWith(exchange.getResponse(), HttpStatus.UNAUTHORIZED, e.getMessage());
-        } catch (AuthorizationException e) {
-            return respondWith(exchange.getResponse(), HttpStatus.FORBIDDEN, e.getMessage());
-        }
+        return Mono.defer(() -> {
+                    ServerWebExchange axelixExchange;
+                    try {
+                        String token = resolveToken(request);
+                        HttpMethod requestHttpMethod =
+                                HttpMethod.valueOf(request.getMethod().name());
+                        String relativePath = normalizedPath(path).substring(baseActuatorPath.length());
+                        User user = webIdentityAccessManager.verifyAccess(relativePath, requestHttpMethod, token);
+                        SecurityContext securityContext = new DefaultSecurityContext(user, token);
 
-        AxelixPrincipal principal = new AxelixPrincipal(securityContext);
-        ServerWebExchange axelixExchange = exchange.mutate()
-                .request(new BoundedElasticBodyRequest(request))
-                .principal(Mono.just(principal))
-                .build();
+                        AxelixPrincipal principal = new AxelixPrincipal(securityContext);
+                        axelixExchange = exchange.mutate()
+                                .request(new BoundedElasticBodyRequest(request))
+                                .principal(Mono.just(principal))
+                                .build();
+                    } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
+                        return respondWith(exchange.getResponse(), HttpStatus.UNAUTHORIZED, e.getMessage());
+                    } catch (AuthorizationException e) {
+                        return respondWith(exchange.getResponse(), HttpStatus.FORBIDDEN, e.getMessage());
+                    }
 
-        return chain.filter(axelixExchange).subscribeOn(Schedulers.boundedElastic());
+                    return chain.filter(axelixExchange);
+                })
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     /**
