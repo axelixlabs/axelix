@@ -25,8 +25,8 @@ import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.context.ApplicationContext;
 
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 /**
  * Default implementation of {@link ConfigurationPropertiesService}.

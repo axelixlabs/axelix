@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 
 /**
  * Assembles the {@link BasicRegistrationMetadata} metadata about this particular Instance.

@@ -33,9 +33,9 @@ import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE;

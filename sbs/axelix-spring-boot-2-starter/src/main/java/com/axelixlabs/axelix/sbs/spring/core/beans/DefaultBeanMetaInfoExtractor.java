@@ -40,14 +40,14 @@ import org.springframework.core.type.StandardMethodMetadata;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
+import com.axelixlabs.axelix.common.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.common.contract.beans.BeanOrigin;
+import com.axelixlabs.axelix.common.contract.beans.BeanSource;
+import com.axelixlabs.axelix.common.contract.beans.ComponentVariant;
+import com.axelixlabs.axelix.common.contract.beans.ProxyType;
+import com.axelixlabs.axelix.common.contract.beans.SyntheticBean;
+import com.axelixlabs.axelix.common.contract.beans.UnknownBean;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanOrigin;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanSource;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ComponentVariant;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.SyntheticBean;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.UnknownBean;
 import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyUtils;
 
 /**
@@ -115,7 +115,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
         }
 
         if (beanDefinition.getBeanClassName() != null && isFactoryBeanClass(beanDefinition.getBeanClassName())) {
-            return new com.axelixlabs.axelix.sbs.spring.core.contract.beans.FactoryBean()
+            return new com.axelixlabs.axelix.common.contract.beans.FactoryBean()
                     .origin(BeanOrigin.FACTORY_BEAN)
                     .factoryBeanName(beanDefinition.getBeanClassName());
         }

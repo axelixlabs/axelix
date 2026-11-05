@@ -38,10 +38,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.GarbageCollector;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.GarbageCollector;
 import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -140,7 +140,7 @@ class ManagedServiceMetadataEndpointProberTest {
         assertThat(metadata.getSoftwareVersions().getJava()).isEqualTo("17.0.14u");
         assertThat(metadata.getSoftwareVersions().getSpringBoot()).isEqualTo("3.5.0");
         assertThat(metadata.getHealthStatus())
-                .isEqualTo(com.axelixlabs.axelix.master.contract.metadata.HealthStatus.UP);
+                .isEqualTo(com.axelixlabs.axelix.common.contract.metadata.HealthStatus.UP);
     }
 
     @Test

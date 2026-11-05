@@ -19,9 +19,9 @@ package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 
 /**
  * Provides insights discovered for the current service instance.

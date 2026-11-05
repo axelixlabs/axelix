@@ -22,8 +22,8 @@ import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanSource;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
+import com.axelixlabs.axelix.common.contract.beans.BeanSource;
+import com.axelixlabs.axelix.common.contract.beans.ProxyType;
 
 /**
  * Additional bean metadata.

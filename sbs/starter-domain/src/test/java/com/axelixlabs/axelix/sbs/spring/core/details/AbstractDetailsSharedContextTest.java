@@ -32,8 +32,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 
+import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.details.AbstractDetailsSharedContextTest.TestApplication;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoPropertiesLoader;

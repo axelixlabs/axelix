@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 
 /**
  * Default implementation {@link ConfigurationPropertiesFlattener}.

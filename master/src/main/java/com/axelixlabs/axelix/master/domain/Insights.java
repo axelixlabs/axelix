@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.domain;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
 
 /**
  * Insight information discovered for the given service instance.

@@ -26,9 +26,9 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescr
 import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
 
 /**
  * Default implementation of {@link EnvironmentService}

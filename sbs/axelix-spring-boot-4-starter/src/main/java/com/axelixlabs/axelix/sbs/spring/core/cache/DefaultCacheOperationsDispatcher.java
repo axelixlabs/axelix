@@ -28,11 +28,11 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.cache.CacheManager;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheDto;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheManagerDto;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.LookupOutcome;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.SingleCache;
+import com.axelixlabs.axelix.common.contract.caches.CacheDto;
+import com.axelixlabs.axelix.common.contract.caches.CacheManagerDto;
+import com.axelixlabs.axelix.common.contract.caches.CachesFeed;
+import com.axelixlabs.axelix.common.contract.caches.LookupOutcome;
+import com.axelixlabs.axelix.common.contract.caches.SingleCache;
 
 /**
  * Default implementation of {@link CacheOperationsDispatcher}.
@@ -81,10 +81,10 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
         });
     }
 
-    private static List<com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheLookup> toApiCacheLookups(
+    private static List<com.axelixlabs.axelix.common.contract.caches.CacheLookup> toApiCacheLookups(
             List<CacheLookup> cache) {
         return cache.stream()
-                .map(it -> new com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheLookup()
+                .map(it -> new com.axelixlabs.axelix.common.contract.caches.CacheLookup()
                         .timestamp(it.timestamp().toEpochMilli())
                         .outcome(LookupOutcome.valueOf(it.outcome().name())))
                 .toList();

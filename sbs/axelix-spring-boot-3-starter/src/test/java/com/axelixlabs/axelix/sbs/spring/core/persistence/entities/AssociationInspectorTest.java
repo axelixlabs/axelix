@@ -47,9 +47,9 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.AssociationProblem;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
+import com.axelixlabs.axelix.common.contract.metadata.AssociationProblem;
+import com.axelixlabs.axelix.common.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.common.contract.metadata.MappedEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 

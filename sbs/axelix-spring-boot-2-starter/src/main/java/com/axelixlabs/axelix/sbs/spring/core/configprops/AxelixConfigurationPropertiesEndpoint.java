@@ -25,8 +25,8 @@ import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEn
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AxelixPrincipal;
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 /**
  * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}

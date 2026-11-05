@@ -23,9 +23,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.contract.env.DeprecationLevel;
+import com.axelixlabs.axelix.common.contract.env.InjectionType;
 import com.axelixlabs.axelix.master.api.external.RequiredSince;
-import com.axelixlabs.axelix.master.contract.env.DeprecationLevel;
-import com.axelixlabs.axelix.master.contract.env.InjectionType;
 
 /**
  * The environment properties of a service.

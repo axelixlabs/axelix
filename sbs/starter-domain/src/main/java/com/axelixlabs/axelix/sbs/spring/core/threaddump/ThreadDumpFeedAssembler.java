@@ -23,12 +23,12 @@ import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.LockInfo;
-import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.MonitorInfo;
-import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.StackTraceElement;
-import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.ThreadDumpFeed;
-import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.ThreadInfo;
-import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.ThreadState;
+import com.axelixlabs.axelix.common.contract.threaddump.LockInfo;
+import com.axelixlabs.axelix.common.contract.threaddump.MonitorInfo;
+import com.axelixlabs.axelix.common.contract.threaddump.StackTraceElement;
+import com.axelixlabs.axelix.common.contract.threaddump.ThreadDumpFeed;
+import com.axelixlabs.axelix.common.contract.threaddump.ThreadInfo;
+import com.axelixlabs.axelix.common.contract.threaddump.ThreadState;
 
 /**
  * Assembles the {@link ThreadDumpFeed} out of the JMX {@link java.lang.management.ThreadInfo thread infos}.

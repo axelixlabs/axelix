@@ -1,4 +1,3 @@
-import net.ltgt.gradle.errorprone.errorprone
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.kotlin.dsl.axelix
 
@@ -7,7 +6,6 @@ plugins {
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
     id("java-test-fixtures")
-    id("contracts")
 }
 
 val springBootVersion = "4.1.1"
@@ -140,19 +138,6 @@ tasks.processResources {
     }
 
     exclude("application-local.yaml")
-}
-
-contracts {
-    modelBasePackage.set("com.axelixlabs.axelix.master.contract")
-}
-
-// The generated contract classes cannot pass NullAway: a required property is non-null under
-// JSpecify, yet the generator emits a Jackson-friendly no-arg constructor that leaves its field
-// uninitialized.
-tasks.named<JavaCompile>("compileJava") {
-    options.errorprone {
-        option("NullAway:UnannotatedSubPackages", "com.axelixlabs.axelix.master.contract(\\..*)?")
-    }
 }
 
 axelix {

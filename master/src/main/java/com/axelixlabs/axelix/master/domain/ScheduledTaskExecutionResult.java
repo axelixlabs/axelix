@@ -26,7 +26,7 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 /**
  * The append-only record of a single {@code @Scheduled} method invocation delivered by a managed instance.

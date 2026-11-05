@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.common.contract.metadata.JpaEntities;
 
 /**
  * {@link JpaEntitiesProfileProvider} used when no JPA persistence provider is available in the instance. It

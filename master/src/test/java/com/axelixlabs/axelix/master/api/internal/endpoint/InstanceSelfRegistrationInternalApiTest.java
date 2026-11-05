@@ -43,10 +43,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
-import com.axelixlabs.axelix.master.contract.metadata.InstanceFeature;
-import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;

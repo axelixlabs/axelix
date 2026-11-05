@@ -25,7 +25,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
-import com.axelixlabs.axelix.master.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;

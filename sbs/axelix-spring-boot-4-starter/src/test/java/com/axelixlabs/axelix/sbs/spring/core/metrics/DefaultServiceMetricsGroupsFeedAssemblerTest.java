@@ -21,9 +21,9 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricDescription;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroup;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
+import com.axelixlabs.axelix.common.contract.metrics.MetricDescription;
+import com.axelixlabs.axelix.common.contract.metrics.MetricsGroup;
+import com.axelixlabs.axelix.common.contract.metrics.MetricsGroupsFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

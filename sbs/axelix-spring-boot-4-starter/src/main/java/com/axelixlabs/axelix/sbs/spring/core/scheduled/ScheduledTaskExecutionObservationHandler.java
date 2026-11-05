@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.support.ScheduledTaskObservationContext;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 /**
  * Records the executions of the reactive {@code @Scheduled} tasks out of the observations that Spring Framework makes

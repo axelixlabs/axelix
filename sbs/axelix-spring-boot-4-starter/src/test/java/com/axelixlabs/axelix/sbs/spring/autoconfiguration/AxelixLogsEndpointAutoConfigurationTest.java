@@ -28,8 +28,8 @@ import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAut
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
+import com.axelixlabs.axelix.common.contract.logs.LogEntry;
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
-import com.axelixlabs.axelix.sbs.spring.core.contract.logs.LogEntry;
 import com.axelixlabs.axelix.sbs.spring.core.logs.AxelixLogsEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 

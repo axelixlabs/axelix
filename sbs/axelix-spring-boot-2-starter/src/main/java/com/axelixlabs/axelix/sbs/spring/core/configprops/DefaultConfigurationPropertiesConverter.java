@@ -24,8 +24,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ApplicationConfigurationProperties;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeedBean;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeedBean;
 import com.axelixlabs.axelix.sbs.spring.core.utils.BeanNameUtils;
 
 /**

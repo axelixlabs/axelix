@@ -27,7 +27,7 @@ import com.axelixlabs.axelix.master.api.external.response.InstancesGridResponse.
  * @param instance      the short profile of the instance, the same as the instances grid renders.
  * @param siblingsCount the number of the other instances of the same application, i.e. excluding this one.
  * @param features      the ids of the features the instance has, see
- *                      {@link com.axelixlabs.axelix.master.contract.metadata.InstanceFeature}. The front-end renders a
+ *                      {@link com.axelixlabs.axelix.common.contract.metadata.InstanceFeature}. The front-end renders a
  *                      feature's page only when its id is present here.
  *
  * @author Mikhail Polivakha

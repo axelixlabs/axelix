@@ -22,10 +22,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.contract.env.Property;
+import com.axelixlabs.axelix.common.contract.env.PropertySource;
 import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
-import com.axelixlabs.axelix.master.contract.env.Property;
-import com.axelixlabs.axelix.master.contract.env.PropertySource;
 import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
 import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
 

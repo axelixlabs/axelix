@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.axelixlabs.axelix.common.contract.logs.LogEntriesTail;
+import com.axelixlabs.axelix.common.contract.logs.LogEntry;
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
-import com.axelixlabs.axelix.sbs.spring.core.contract.logs.LogEntriesTail;
-import com.axelixlabs.axelix.sbs.spring.core.contract.logs.LogEntry;
 
 /**
  * Custom Actuator endpoint that returns the most recent log entries of the application.

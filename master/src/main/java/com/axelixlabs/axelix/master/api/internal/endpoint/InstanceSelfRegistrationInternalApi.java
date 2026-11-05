@@ -31,11 +31,11 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.axelixlabs.axelix.common.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
-import com.axelixlabs.axelix.master.contract.heartbeatv2.HeartBeatMetadataV2;
-import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.domain.instance.Instance;

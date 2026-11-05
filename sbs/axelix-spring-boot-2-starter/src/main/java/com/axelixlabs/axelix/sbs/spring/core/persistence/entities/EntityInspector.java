@@ -31,7 +31,7 @@ import javax.persistence.metamodel.EntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.AssociationProblem;
+import com.axelixlabs.axelix.common.contract.metadata.AssociationProblem;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.AssociationMember;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.EntityMethodsInspector;
 

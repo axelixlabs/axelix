@@ -24,16 +24,16 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.common.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.SoftwareVersions;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
-import com.axelixlabs.axelix.master.contract.metadata.HealthStatus;
-import com.axelixlabs.axelix.master.contract.metadata.MemoryDetails;
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
-import com.axelixlabs.axelix.master.contract.metadata.SoftwareVersions;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
@@ -147,7 +147,7 @@ class HistoricalApplicationSnapshotConverterTest {
                 .artifactId("petclinic")
                 .commitShortSha("a8b0929")
                 .jdkVendor("BellSoft")
-                .gcInUse(com.axelixlabs.axelix.master.contract.metadata.GarbageCollector.G1)
+                .gcInUse(com.axelixlabs.axelix.common.contract.metadata.GarbageCollector.G1)
                 .softwareVersions(
                         new SoftwareVersions().java("25").springBoot("3.5.0").springFramework("6.1.2"))
                 .healthStatus(HealthStatus.UP)

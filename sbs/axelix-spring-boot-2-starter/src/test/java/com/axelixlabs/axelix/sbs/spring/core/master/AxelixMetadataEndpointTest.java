@@ -34,11 +34,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InstanceFeature;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;

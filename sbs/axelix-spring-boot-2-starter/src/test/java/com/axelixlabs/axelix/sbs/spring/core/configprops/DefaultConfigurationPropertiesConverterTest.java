@@ -34,8 +34,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

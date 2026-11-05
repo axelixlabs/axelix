@@ -23,10 +23,10 @@ import java.time.Instant;
 import java.util.Random;
 import java.util.UUID;
 
+import com.axelixlabs.axelix.common.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
+import com.axelixlabs.axelix.common.contract.metadata.MemoryDetails;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
-import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MemoryDetails;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**

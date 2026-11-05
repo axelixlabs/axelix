@@ -41,12 +41,12 @@ import org.springframework.core.SpringVersion;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
-import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.NoOpJpaEntitiesProfileProvider;

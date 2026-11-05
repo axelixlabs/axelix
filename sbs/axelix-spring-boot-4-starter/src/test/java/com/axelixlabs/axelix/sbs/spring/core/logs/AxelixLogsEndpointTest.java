@@ -32,12 +32,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.contract.logs.LogEntriesTail;
+import com.axelixlabs.axelix.common.contract.logs.LogEntry;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.contract.logs.LogEntriesTail;
-import com.axelixlabs.axelix.sbs.spring.core.contract.logs.LogEntry;
 import com.axelixlabs.axelix.sbs.spring.core.logs.AxelixLogsEndpointTest.AxelixLogsEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;

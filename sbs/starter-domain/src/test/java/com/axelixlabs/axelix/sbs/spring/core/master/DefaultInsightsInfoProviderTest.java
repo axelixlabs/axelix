@@ -23,13 +23,13 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.axelixlabs.axelix.common.contract.gclog.GcLogStatus;
+import com.axelixlabs.axelix.common.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
-import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InsightFeature;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogException;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
@@ -351,7 +351,7 @@ class DefaultInsightsInfoProviderTest {
         assertThat(transactions).hasSize(1);
         assertThat(transactions.get(0).getExternalCalls()).singleElement().satisfies(call -> {
             assertThat(call.getType())
-                    .isEqualTo(com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TypeExternalCall.HTTP_CLIENT);
+                    .isEqualTo(com.axelixlabs.axelix.common.contract.metadata.TypeExternalCall.HTTP_CLIENT);
             assertThat(call.getTarget()).isEqualTo("GET https://payments/charge");
             assertThat(call.getStats().getMinMs()).isEqualTo(15L);
             assertThat(call.getStats().getMaxMs()).isEqualTo(15L);

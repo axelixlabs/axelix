@@ -25,8 +25,8 @@ import ch.qos.logback.core.AppenderBase;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
+import com.axelixlabs.axelix.common.contract.logs.LogEntry;
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
-import com.axelixlabs.axelix.sbs.spring.core.contract.logs.LogEntry;
 
 /**
  * Logback appender that keeps the most recent log entries of the application in memory.

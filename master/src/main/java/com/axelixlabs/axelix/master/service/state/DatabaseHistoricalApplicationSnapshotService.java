@@ -32,11 +32,11 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;

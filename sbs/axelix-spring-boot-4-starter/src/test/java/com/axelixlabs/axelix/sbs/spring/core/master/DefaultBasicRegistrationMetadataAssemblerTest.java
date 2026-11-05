@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider.TEST_INSIGHTS;
 import static org.assertj.core.api.Assertions.assertThat;

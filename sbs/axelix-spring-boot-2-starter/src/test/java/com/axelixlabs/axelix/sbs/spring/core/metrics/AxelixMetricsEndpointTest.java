@@ -42,11 +42,11 @@ import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.units.MegabytesMemoryBaseUnit;
+import com.axelixlabs.axelix.common.contract.metrics.MetricDescription;
+import com.axelixlabs.axelix.common.contract.metrics.MetricProfile;
+import com.axelixlabs.axelix.common.contract.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricDescription;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfile;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 

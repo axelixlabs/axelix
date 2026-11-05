@@ -25,7 +25,7 @@ import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEn
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.ThreadDumpFeed;
+import com.axelixlabs.axelix.common.contract.threaddump.ThreadDumpFeed;
 
 /**
  * Custom Spring Boot Actuator endpoint to enable or disable thread contention monitoring.

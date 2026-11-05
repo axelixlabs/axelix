@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import org.springframework.scheduling.SchedulingAwareRunnable;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 /**
  * The runnable of the task declared by a single {@code @Scheduled} annotation. Its string representation is the id of

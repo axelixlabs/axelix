@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-import com.axelixlabs.axelix.master.contract.masterping.MasterPing;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.AbstractInstancesDiscoverer;

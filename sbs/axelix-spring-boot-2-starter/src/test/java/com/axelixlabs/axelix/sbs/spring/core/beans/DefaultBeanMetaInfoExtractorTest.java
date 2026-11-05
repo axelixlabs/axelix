@@ -70,14 +70,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.axelixlabs.axelix.common.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.common.contract.beans.ComponentVariant;
+import com.axelixlabs.axelix.common.contract.beans.FactoryBean;
+import com.axelixlabs.axelix.common.contract.beans.ProxyType;
+import com.axelixlabs.axelix.common.contract.beans.SyntheticBean;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCoreNamingAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ComponentVariant;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.FactoryBean;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.SyntheticBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

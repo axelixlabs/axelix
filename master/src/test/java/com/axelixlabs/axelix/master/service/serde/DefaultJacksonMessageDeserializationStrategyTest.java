@@ -22,13 +22,13 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
-import com.axelixlabs.axelix.master.contract.details.BuildDetails;
-import com.axelixlabs.axelix.master.contract.details.GitDetails;
-import com.axelixlabs.axelix.master.contract.details.InstanceDetails;
-import com.axelixlabs.axelix.master.contract.details.OsDetails;
-import com.axelixlabs.axelix.master.contract.details.RuntimeDetails;
-import com.axelixlabs.axelix.master.contract.details.SpringDetails;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.details.BuildDetails;
+import com.axelixlabs.axelix.common.contract.details.GitDetails;
+import com.axelixlabs.axelix.common.contract.details.InstanceDetails;
+import com.axelixlabs.axelix.common.contract.details.OsDetails;
+import com.axelixlabs.axelix.common.contract.details.RuntimeDetails;
+import com.axelixlabs.axelix.common.contract.details.SpringDetails;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

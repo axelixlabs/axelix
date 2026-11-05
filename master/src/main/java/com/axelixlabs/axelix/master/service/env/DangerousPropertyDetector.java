@@ -19,8 +19,8 @@ package com.axelixlabs.axelix.master.service.env;
 
 import java.util.Map;
 
-import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
-import com.axelixlabs.axelix.master.contract.env.Property;
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.contract.env.Property;
 import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
 import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
 

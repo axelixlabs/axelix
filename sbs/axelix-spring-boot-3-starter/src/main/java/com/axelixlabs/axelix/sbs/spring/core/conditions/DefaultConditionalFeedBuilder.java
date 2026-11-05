@@ -29,10 +29,10 @@ import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReport
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint.MessageAndConditionDescriptor;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.ConditionMatch;
-import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.ConditionsFeed;
-import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.NegativeCondition;
-import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.PositiveCondition;
+import com.axelixlabs.axelix.common.contract.conditions.ConditionMatch;
+import com.axelixlabs.axelix.common.contract.conditions.ConditionsFeed;
+import com.axelixlabs.axelix.common.contract.conditions.NegativeCondition;
+import com.axelixlabs.axelix.common.contract.conditions.PositiveCondition;
 
 /**
  * Class that is capable to assemble the {@link ConditionsFeed}.

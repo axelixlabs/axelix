@@ -25,11 +25,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.contract.beans.BeanDependency;
+import com.axelixlabs.axelix.common.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.common.contract.beans.BeansFeed;
+import com.axelixlabs.axelix.common.contract.beans.ProxyType;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanDependency;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeansFeed;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -185,7 +185,7 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
         assertThat(bean.getProxyType()).isEqualTo(ProxyType.NO_PROXYING);
     }
 
-    private static com.axelixlabs.axelix.sbs.spring.core.contract.beans.Bean getBean(
+    private static com.axelixlabs.axelix.common.contract.beans.Bean getBean(
             BeansFeed beanNameToBeanFeed, String beanName) {
         return beanNameToBeanFeed.getBeans().stream()
                 .filter(bean -> bean.getBeanName().equals(beanName))

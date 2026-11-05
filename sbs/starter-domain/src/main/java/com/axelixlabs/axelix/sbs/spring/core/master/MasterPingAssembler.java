@@ -20,8 +20,8 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.masterping.MasterPing;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
+import com.axelixlabs.axelix.common.contract.metadata.MemoryDetails;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**

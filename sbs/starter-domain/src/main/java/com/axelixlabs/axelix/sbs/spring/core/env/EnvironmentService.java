@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 
 /**
  * Service for retrieving EnvironmentFeed.

@@ -26,11 +26,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.Insights;
-import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskExecution;
-import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 
 import static org.assertj.core.api.Assertions.assertThat;

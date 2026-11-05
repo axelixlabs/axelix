@@ -21,7 +21,7 @@ import java.lang.reflect.Proxy;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
+import com.axelixlabs.axelix.common.contract.beans.ProxyType;
 
 /**
  * Utilities to work with proxy.

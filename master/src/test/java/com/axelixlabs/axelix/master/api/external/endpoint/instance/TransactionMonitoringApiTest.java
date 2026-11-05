@@ -32,12 +32,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;

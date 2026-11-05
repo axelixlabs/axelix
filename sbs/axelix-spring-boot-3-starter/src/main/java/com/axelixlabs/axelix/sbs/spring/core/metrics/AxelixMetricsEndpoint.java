@@ -40,9 +40,9 @@ import org.springframework.lang.Nullable;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.units.BaseUnit;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfile;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfileMeasurement;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
+import com.axelixlabs.axelix.common.contract.metrics.MetricProfile;
+import com.axelixlabs.axelix.common.contract.metrics.MetricProfileMeasurement;
+import com.axelixlabs.axelix.common.contract.metrics.MetricsGroupsFeed;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
 

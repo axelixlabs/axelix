@@ -48,11 +48,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.contract.caches.CacheDto;
+import com.axelixlabs.axelix.common.contract.caches.CacheManagerDto;
+import com.axelixlabs.axelix.common.contract.caches.CachesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheDto;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheManagerDto;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;

@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.util.Set;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InstanceFeature;
+import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
 
 /**
  * Detects which {@link InstanceFeature features} the current instance has, so that Axelix Master can tell the UI

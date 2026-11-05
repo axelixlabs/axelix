@@ -26,12 +26,12 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
+import com.axelixlabs.axelix.common.contract.env.Deprecation;
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.contract.env.InjectionPoint;
+import com.axelixlabs.axelix.common.contract.env.Property;
+import com.axelixlabs.axelix.common.contract.env.PropertySource;
 import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedResponse;
-import com.axelixlabs.axelix.master.contract.env.Deprecation;
-import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
-import com.axelixlabs.axelix.master.contract.env.InjectionPoint;
-import com.axelixlabs.axelix.master.contract.env.Property;
-import com.axelixlabs.axelix.master.contract.env.PropertySource;
 import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.env.DangerousPropertyDetector;

@@ -32,10 +32,10 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.contract.heartbeatv2.HeartBeatMetadataV2;
-import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.common.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.discovery.DiscoveredInstanceProfile;

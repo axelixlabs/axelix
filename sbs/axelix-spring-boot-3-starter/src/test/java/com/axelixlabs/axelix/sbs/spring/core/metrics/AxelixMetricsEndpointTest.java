@@ -31,10 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.transform.units.MegabytesMemoryBaseUnit;
+import com.axelixlabs.axelix.common.contract.metrics.MetricDescription;
+import com.axelixlabs.axelix.common.contract.metrics.MetricProfile;
+import com.axelixlabs.axelix.common.contract.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricDescription;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfile;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 

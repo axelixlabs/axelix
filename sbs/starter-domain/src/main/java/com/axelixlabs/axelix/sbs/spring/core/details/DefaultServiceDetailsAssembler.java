@@ -17,13 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.details;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.details.BuildDetails;
-import com.axelixlabs.axelix.sbs.spring.core.contract.details.CommitAuthor;
-import com.axelixlabs.axelix.sbs.spring.core.contract.details.GitDetails;
-import com.axelixlabs.axelix.sbs.spring.core.contract.details.InstanceDetails;
-import com.axelixlabs.axelix.sbs.spring.core.contract.details.OsDetails;
-import com.axelixlabs.axelix.sbs.spring.core.contract.details.RuntimeDetails;
-import com.axelixlabs.axelix.sbs.spring.core.contract.details.SpringDetails;
+import com.axelixlabs.axelix.common.contract.details.BuildDetails;
+import com.axelixlabs.axelix.common.contract.details.CommitAuthor;
+import com.axelixlabs.axelix.common.contract.details.GitDetails;
+import com.axelixlabs.axelix.common.contract.details.InstanceDetails;
+import com.axelixlabs.axelix.common.contract.details.OsDetails;
+import com.axelixlabs.axelix.common.contract.details.RuntimeDetails;
+import com.axelixlabs.axelix.common.contract.details.SpringDetails;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 

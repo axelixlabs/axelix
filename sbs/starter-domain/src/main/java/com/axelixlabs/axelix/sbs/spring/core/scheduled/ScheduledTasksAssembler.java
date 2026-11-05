@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ServiceScheduledTasks;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ServiceScheduledTasks;
 
 /**
  * Assembles detailed information about scheduled tasks.

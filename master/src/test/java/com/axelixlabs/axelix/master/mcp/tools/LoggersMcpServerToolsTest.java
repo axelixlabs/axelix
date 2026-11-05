@@ -26,12 +26,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
-import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
-import com.axelixlabs.axelix.master.contract.logger.LoggersFeed;
-import com.axelixlabs.axelix.master.contract.logger.LoggersFeedGroup;
-import com.axelixlabs.axelix.master.contract.logger.LoggersFeedLogger;
-import com.axelixlabs.axelix.master.contract.logger.LoggersGroupProfile;
-import com.axelixlabs.axelix.master.contract.logger.SingleLoggerProfile;
+import com.axelixlabs.axelix.common.contract.logger.LogLevelChangeRequest;
+import com.axelixlabs.axelix.common.contract.logger.LoggersFeed;
+import com.axelixlabs.axelix.common.contract.logger.LoggersFeedGroup;
+import com.axelixlabs.axelix.common.contract.logger.LoggersFeedLogger;
+import com.axelixlabs.axelix.common.contract.logger.LoggersGroupProfile;
+import com.axelixlabs.axelix.common.contract.logger.SingleLoggerProfile;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;

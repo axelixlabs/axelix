@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricDescription;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroup;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
+import com.axelixlabs.axelix.common.contract.metrics.MetricDescription;
+import com.axelixlabs.axelix.common.contract.metrics.MetricsGroup;
+import com.axelixlabs.axelix.common.contract.metrics.MetricsGroupsFeed;
 
 /**
  * Default implementation of {@link ServiceMetricsGroupsAssembler}.

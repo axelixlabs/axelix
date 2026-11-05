@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.common.contract.metadata.JpaEntities;
 
 /**
  * Provides the registry of JPA entities mapped in the current service instance, together with the

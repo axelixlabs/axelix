@@ -25,11 +25,11 @@ import java.util.ArrayList;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.GarbageCollector;
+import com.axelixlabs.axelix.common.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.common.contract.metadata.SoftwareVersions;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.GarbageCollector;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MemoryDetails;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.SoftwareVersions;
 import com.axelixlabs.axelix.sbs.spring.core.details.GarbageCollectorInfoAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;

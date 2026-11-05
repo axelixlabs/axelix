@@ -23,8 +23,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.master.contract.logs.LogEntriesTail;
-import com.axelixlabs.axelix.master.contract.logs.LogEntry;
+import com.axelixlabs.axelix.common.contract.logs.LogEntriesTail;
+import com.axelixlabs.axelix.common.contract.logs.LogEntry;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

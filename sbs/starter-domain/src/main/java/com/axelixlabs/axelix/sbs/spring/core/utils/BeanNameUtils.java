@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.utils;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanSource;
+import com.axelixlabs.axelix.common.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.common.contract.beans.BeanSource;
 
 /**
  * Utilities to work with bean names.

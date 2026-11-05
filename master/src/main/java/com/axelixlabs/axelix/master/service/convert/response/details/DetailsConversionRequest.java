@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.convert.response.details;
 
-import com.axelixlabs.axelix.master.contract.details.InstanceDetails;
+import com.axelixlabs.axelix.common.contract.details.InstanceDetails;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 
 /**

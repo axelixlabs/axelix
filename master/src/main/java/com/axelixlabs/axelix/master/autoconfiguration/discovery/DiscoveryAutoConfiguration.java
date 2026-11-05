@@ -34,8 +34,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.master.contract.masterping.MasterPing;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
 import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;

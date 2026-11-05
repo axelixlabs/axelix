@@ -42,13 +42,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskEnableRequest;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskExecuteRequest;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
-import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
-import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskEnableRequest;
-import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskExecuteRequest;
-import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;

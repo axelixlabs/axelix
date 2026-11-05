@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.masterping.MasterPing;
+import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
 
 /**
  * Lightweight endpoint that Axelix Master polls to check that an already known instance is alive

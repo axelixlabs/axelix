@@ -32,11 +32,11 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.common.utils.SemanticVersion;
-import com.axelixlabs.axelix.master.contract.masterping.MasterPing;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.Instance.InstanceStatus;

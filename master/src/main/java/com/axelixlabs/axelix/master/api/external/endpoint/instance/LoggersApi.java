@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.axelixlabs.axelix.common.contract.logger.GroupLogLevelChangeRequest;
+import com.axelixlabs.axelix.common.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -38,8 +40,6 @@ import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelGroupBulkChangeRequest;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkResetRequest;
-import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
-import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.BulkInstancesValidator;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;

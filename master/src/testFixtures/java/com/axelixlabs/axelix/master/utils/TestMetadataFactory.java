@@ -21,16 +21,16 @@ import java.util.List;
 
 import tools.jackson.databind.json.JsonMapper;
 
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.GarbageCollector;
+import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.common.contract.metadata.HotSpotInsights;
+import com.axelixlabs.axelix.common.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.SoftwareVersions;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.GarbageCollector;
-import com.axelixlabs.axelix.master.contract.metadata.HealthStatus;
-import com.axelixlabs.axelix.master.contract.metadata.HotSpotInsights;
-import com.axelixlabs.axelix.master.contract.metadata.InsightFeature;
-import com.axelixlabs.axelix.master.contract.metadata.Insights;
-import com.axelixlabs.axelix.master.contract.metadata.MemoryDetails;
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
-import com.axelixlabs.axelix.master.contract.metadata.SoftwareVersions;
 
 /**
  * Test fixture factory for {@link BasicRegistrationMetadata}.

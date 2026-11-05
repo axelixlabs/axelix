@@ -24,7 +24,7 @@ import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 /**
  * Records the executions of the reactive {@code @Scheduled} tasks out of the observations that Spring Framework 6.1+

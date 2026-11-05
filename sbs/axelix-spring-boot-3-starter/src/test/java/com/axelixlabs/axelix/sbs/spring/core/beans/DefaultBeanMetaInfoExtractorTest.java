@@ -30,11 +30,11 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ComponentVariant;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.FactoryBean;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.SyntheticBean;
+import com.axelixlabs.axelix.common.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.common.contract.beans.ComponentVariant;
+import com.axelixlabs.axelix.common.contract.beans.FactoryBean;
+import com.axelixlabs.axelix.common.contract.beans.ProxyType;
+import com.axelixlabs.axelix.common.contract.beans.SyntheticBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

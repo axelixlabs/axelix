@@ -21,7 +21,7 @@ import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.DeprecationLevel;
+import com.axelixlabs.axelix.common.contract.env.DeprecationLevel;
 
 /**
  * Metadata for a Spring Boot property, including description and deprecation info.

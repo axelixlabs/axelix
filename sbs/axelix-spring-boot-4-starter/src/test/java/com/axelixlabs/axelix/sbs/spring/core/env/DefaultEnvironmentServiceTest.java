@@ -31,9 +31,9 @@ import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.contract.env.Property;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.Property;
 
 import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;

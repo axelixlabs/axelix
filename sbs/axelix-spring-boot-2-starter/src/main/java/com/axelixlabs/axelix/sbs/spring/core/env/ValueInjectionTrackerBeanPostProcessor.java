@@ -37,9 +37,9 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.util.ReflectionUtils;
 
+import com.axelixlabs.axelix.common.contract.env.InjectionPoint;
+import com.axelixlabs.axelix.common.contract.env.InjectionType;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionType;
 
 /**
  * Tracks all @Value injections in Spring beans.

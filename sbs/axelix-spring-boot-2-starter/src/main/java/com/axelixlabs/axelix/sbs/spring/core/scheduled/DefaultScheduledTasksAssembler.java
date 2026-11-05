@@ -26,12 +26,12 @@ import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledCronTask;
-import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledCustomTask;
-import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledFixedDelayTask;
-import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledFixedRateTask;
-import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskRunnable;
-import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ServiceScheduledTasks;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledCronTask;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledCustomTask;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledFixedDelayTask;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledFixedRateTask;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskRunnable;
+import com.axelixlabs.axelix.common.contract.scheduledtask.ServiceScheduledTasks;
 
 /**
  * Default implementation of {@link ScheduledTasksAssembler}.

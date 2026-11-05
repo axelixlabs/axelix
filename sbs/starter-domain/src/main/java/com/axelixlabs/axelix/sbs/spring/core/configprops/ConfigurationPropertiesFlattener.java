@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import java.util.List;
 import java.util.Map;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 
 /**
  * Flattens nested configuration properties into a linear list of key-value pairs.

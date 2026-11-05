@@ -21,7 +21,7 @@ import java.lang.management.MonitorInfo;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.StackTraceElement;
+import com.axelixlabs.axelix.common.contract.threaddump.StackTraceElement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

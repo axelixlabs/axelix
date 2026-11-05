@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.util.ReflectionUtils;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

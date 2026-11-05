@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.contract.metadata.InstanceFeature;
+import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
 
 /**
  * The {@link InstanceFeature features} the {@link Instance} itself reported to have. Starters older than 1.3 do not

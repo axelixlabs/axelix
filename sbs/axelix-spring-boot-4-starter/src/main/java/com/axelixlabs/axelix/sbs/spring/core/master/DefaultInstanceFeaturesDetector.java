@@ -26,8 +26,8 @@ import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.util.ClassUtils;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InstanceFeature;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
+import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
+import com.axelixlabs.axelix.common.contract.metadata.MappedEntity;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.JpaEntitiesProfileProvider;
 
 /**

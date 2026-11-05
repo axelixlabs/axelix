@@ -32,14 +32,14 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescr
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
 import org.springframework.core.env.Environment;
 
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.common.contract.env.Deprecation;
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.contract.env.InjectionPoint;
+import com.axelixlabs.axelix.common.contract.env.Property;
+import com.axelixlabs.axelix.common.contract.env.PropertySource;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
-import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.Deprecation;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.Property;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.PropertySource;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.PropertySourceDisplayData;
 
 /**

@@ -45,8 +45,8 @@ import org.springframework.data.jdbc.core.dialect.JdbcPostgresDialect;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
-import com.axelixlabs.axelix.master.contract.metadata.InstanceFeature;
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.OssRdbms;
 import com.axelixlabs.axelix.master.domain.instance.DetectedFeatures;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;

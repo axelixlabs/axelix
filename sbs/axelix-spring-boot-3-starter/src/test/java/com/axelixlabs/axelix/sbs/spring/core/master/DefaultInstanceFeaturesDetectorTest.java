@@ -28,9 +28,9 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InstanceFeature;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
+import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
+import com.axelixlabs.axelix.common.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.common.contract.metadata.MappedEntity;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.JpaEntitiesProfileProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.NoOpJpaEntitiesProfileProvider;
 

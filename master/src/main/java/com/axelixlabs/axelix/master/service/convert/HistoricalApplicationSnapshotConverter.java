@@ -24,14 +24,14 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.HotSpotInsights;
+import com.axelixlabs.axelix.common.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.SoftwareVersions;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.HotSpotInsights;
-import com.axelixlabs.axelix.master.contract.metadata.InsightFeature;
-import com.axelixlabs.axelix.master.contract.metadata.Insights;
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
-import com.axelixlabs.axelix.master.contract.metadata.SoftwareVersions;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.Versions;
@@ -85,7 +85,7 @@ public class HistoricalApplicationSnapshotConverter {
                 fromPersistenceInsights(insights.getPersistenceInsights()));
     }
 
-    private GarbageCollector resolveGcInUse(com.axelixlabs.axelix.master.contract.metadata.GarbageCollector gcInUse) {
+    private GarbageCollector resolveGcInUse(com.axelixlabs.axelix.common.contract.metadata.GarbageCollector gcInUse) {
         return gcInUse == null ? GarbageCollector.UNKNOWN : GarbageCollector.valueOf(gcInUse.name());
     }
 

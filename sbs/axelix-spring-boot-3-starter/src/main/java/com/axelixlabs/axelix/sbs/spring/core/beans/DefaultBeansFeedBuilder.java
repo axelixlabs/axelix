@@ -33,11 +33,11 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.Bean;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanDependency;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanSource;
-import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeansFeed;
+import com.axelixlabs.axelix.common.contract.beans.Bean;
+import com.axelixlabs.axelix.common.contract.beans.BeanDependency;
+import com.axelixlabs.axelix.common.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.common.contract.beans.BeanSource;
+import com.axelixlabs.axelix.common.contract.beans.BeansFeed;
 import com.axelixlabs.axelix.sbs.spring.core.utils.BeanNameUtils;
 import com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils;
 

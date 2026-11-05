@@ -21,8 +21,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.master.contract.logs.LogEntriesTail;
-import com.axelixlabs.axelix.master.contract.logs.LogEntry;
+import com.axelixlabs.axelix.common.contract.logs.LogEntriesTail;
+import com.axelixlabs.axelix.common.contract.logs.LogEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

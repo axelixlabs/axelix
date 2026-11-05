@@ -19,12 +19,12 @@ package com.axelixlabs.axelix.sbs.spring.core.utils;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HotSpotInsights;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InsightFeature;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.PersistenceInsights;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.common.contract.metadata.HotSpotInsights;
+import com.axelixlabs.axelix.common.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**

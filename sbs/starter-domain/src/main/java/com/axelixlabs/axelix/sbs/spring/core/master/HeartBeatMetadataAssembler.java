@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
-import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
+import com.axelixlabs.axelix.common.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 
 /**
  * Abstractions responsible for assembling the wire {@link InitialSelfRegistrationRequest}

@@ -28,10 +28,10 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheDto;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.LookupOutcome;
-import com.axelixlabs.axelix.sbs.spring.core.contract.caches.SingleCache;
+import com.axelixlabs.axelix.common.contract.caches.CacheDto;
+import com.axelixlabs.axelix.common.contract.caches.CachesFeed;
+import com.axelixlabs.axelix.common.contract.caches.LookupOutcome;
+import com.axelixlabs.axelix.common.contract.caches.SingleCache;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 

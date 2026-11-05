@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
+import com.axelixlabs.axelix.common.contract.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**

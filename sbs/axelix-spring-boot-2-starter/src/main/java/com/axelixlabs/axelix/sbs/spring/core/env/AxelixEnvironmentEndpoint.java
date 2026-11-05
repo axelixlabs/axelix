@@ -25,8 +25,8 @@ import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEn
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AxelixPrincipal;
-import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.

@@ -30,17 +30,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
+import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.contract.metadata.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.common.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.common.contract.metadata.LazyLoadingTarget;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.CountedLazyLoadingTarget;
-import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
-import com.axelixlabs.axelix.master.contract.metadata.LazyLoadingTarget;
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -555,6 +555,6 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                 true,
                 true,
                 false,
-                com.axelixlabs.axelix.master.contract.metadata.GarbageCollector.ZGC);
+                com.axelixlabs.axelix.common.contract.metadata.GarbageCollector.ZGC);
     }
 }

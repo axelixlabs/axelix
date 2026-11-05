@@ -35,8 +35,8 @@ import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.util.ReflectionUtils;
 
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.common.utils.Lazy;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
