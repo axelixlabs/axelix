@@ -21,11 +21,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The fields read and the methods called by a single method.
+ * The fields read and methods called by a single method.
  *
- * @author Nikita Kirillov
+ * @author Nikita Kirilloff
  */
-final class MethodBody {
+public final class MethodBody {
 
     /** Fields read via {@code GETFIELD} within the entity hierarchy. */
     private final Set<FieldRef> readFields = new HashSet<>();
@@ -36,27 +36,27 @@ final class MethodBody {
     /** Statically resolved calls, i.e. {@code invokespecial}/{@code invokestatic}. */
     private final Set<MethodRef> exactCalls = new HashSet<>();
 
-    void addReadField(FieldRef field) {
+    public void addReadField(FieldRef field) {
         readFields.add(field);
     }
 
-    void addVirtualCall(MethodRef call) {
+    public void addVirtualCall(MethodRef call) {
         virtualCalls.add(call);
     }
 
-    void addExactCall(MethodRef call) {
+    public void addExactCall(MethodRef call) {
         exactCalls.add(call);
     }
 
-    Set<FieldRef> getReadFields() {
+    public Set<FieldRef> getReadFields() {
         return readFields;
     }
 
-    Set<MethodRef> getVirtualCalls() {
+    public Set<MethodRef> getVirtualCalls() {
         return virtualCalls;
     }
 
-    Set<MethodRef> getExactCalls() {
+    public Set<MethodRef> getExactCalls() {
         return exactCalls;
     }
 }

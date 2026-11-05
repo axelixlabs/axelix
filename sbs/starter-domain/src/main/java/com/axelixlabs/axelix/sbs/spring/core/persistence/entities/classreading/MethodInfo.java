@@ -17,60 +17,62 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
-import org.springframework.asm.Opcodes;
+import java.lang.reflect.Modifier;
 
 /**
  * A method discovered in bytecode together with its access flags and body.
  *
  * @author Mikhail Polivakha
- * @author Nikita Kirillov
+ * @author Nikita Kirilloff
  */
-final class MethodInfo {
+public final class MethodInfo {
 
     private final MethodRef ref;
     private final int access;
     private final MethodBody body;
 
     /**
+     * Creates information about a bytecode method.
+     *
      * @param ref the method's owner, name and JVM descriptor
      * @param access the method's JVM access flags
      * @param body the method's recorded bytecode calls
      */
-    MethodInfo(MethodRef ref, int access, MethodBody body) {
+    public MethodInfo(MethodRef ref, int access, MethodBody body) {
         this.ref = ref;
         this.access = access;
         this.body = body;
     }
 
-    MethodRef ref() {
+    public MethodRef ref() {
         return ref;
     }
 
-    int access() {
+    public int access() {
         return access;
     }
 
-    MethodBody body() {
+    public MethodBody body() {
         return body;
     }
 
-    boolean isPrivate() {
-        return (access & Opcodes.ACC_PRIVATE) != 0;
+    public boolean isPrivate() {
+        return Modifier.isPrivate(access);
     }
 
-    boolean isStatic() {
-        return (access & Opcodes.ACC_STATIC) != 0;
+    public boolean isStatic() {
+        return Modifier.isStatic(access);
     }
 
-    boolean isFinal() {
-        return (access & Opcodes.ACC_FINAL) != 0;
+    public boolean isFinal() {
+        return Modifier.isFinal(access);
     }
 
-    boolean cannotBeOverridden() {
+    public boolean cannotBeOverridden() {
         return isPrivate() || isFinal() || isStatic();
     }
 
-    boolean isPackagePrivate() {
-        return (access & (Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED | Opcodes.ACC_PRIVATE)) == 0;
+    public boolean isPackagePrivate() {
+        return !Modifier.isPublic(access) && !Modifier.isProtected(access) && !Modifier.isPrivate(access);
     }
 }

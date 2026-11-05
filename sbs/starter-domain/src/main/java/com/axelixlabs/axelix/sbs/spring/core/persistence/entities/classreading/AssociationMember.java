@@ -21,20 +21,17 @@ import java.lang.reflect.Member;
 import java.util.Objects;
 
 /**
- * JPA association together with the Java member used to access it.
+ * An association identified by its name and the Java member used to access it.
  *
- * @author Nikita Kirillov
+ * @param name the association name
+ * @param member the field or accessor method associated with it
+ * @author Nikita Kirilloff
  */
 public final class AssociationMember {
 
     private final String name;
-
     private final Member member;
 
-    /**
-     * @param name the association's name in the JPA metamodel
-     * @param member the field or accessor method through which the association is read
-     */
     public AssociationMember(String name, Member member) {
         this.name = Objects.requireNonNull(name, "name");
         this.member = Objects.requireNonNull(member, "member");
@@ -46,5 +43,22 @@ public final class AssociationMember {
 
     public Member member() {
         return member;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof AssociationMember)) {
+            return false;
+        }
+        AssociationMember that = (AssociationMember) other;
+        return name.equals(that.name) && member.equals(that.member);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, member);
     }
 }

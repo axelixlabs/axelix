@@ -20,41 +20,45 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-import org.springframework.asm.Type;
-
 /**
- * A method identified by its owner and ASM name+descriptor.
+ * A method identified by its owner and JVM name+descriptor.
  *
- * @author Nikita Kirillov
+ * @author Nikita Kirilloff
  */
-final class MethodRef {
+public final class MethodRef {
 
     private final String owner;
     private final String key;
 
     /**
-     * @param owner the internal name of the class that declares the method
-     * @param key the method's name and JVM descriptor
+     * Creates a reference to a method.
+     *
+     * @param owner the declaring class' internal name
+     * @param key the method name and JVM descriptor, e.g. {@code toString()Ljava/lang/String;}
      */
-    MethodRef(String owner, String key) {
+    public MethodRef(String owner, String key) {
         this.owner = owner;
         this.key = key;
     }
 
-    static MethodRef from(Method method) {
-        return new MethodRef(
-                Type.getInternalName(method.getDeclaringClass()), method.getName() + Type.getMethodDescriptor(method));
+    public static MethodRef from(Method method) {
+        StringBuilder descriptor = new StringBuilder("(");
+        for (Class<?> parameterType : method.getParameterTypes()) {
+            descriptor.append(JvmType.getDescriptor(parameterType));
+        }
+        descriptor.append(')').append(JvmType.getDescriptor(method.getReturnType()));
+        return new MethodRef(JvmType.getInternalName(method.getDeclaringClass()), method.getName() + descriptor);
     }
 
-    static MethodRef of(String owner, String name, String descriptor) {
+    public static MethodRef of(String owner, String name, String descriptor) {
         return new MethodRef(owner, name + descriptor);
     }
 
-    String owner() {
+    public String owner() {
         return owner;
     }
 
-    String key() {
+    public String key() {
         return key;
     }
 

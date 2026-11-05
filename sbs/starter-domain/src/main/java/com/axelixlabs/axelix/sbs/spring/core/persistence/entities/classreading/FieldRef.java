@@ -20,45 +20,43 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import org.springframework.asm.Type;
-
 /**
  * A field identified by its owner, name and JVM descriptor.
  *
- * @author Nikita Kirillov
+ * @param owner the declaring class' internal name
+ * @param name the field's name
+ * @param descriptor the field's JVM type descriptor
+ * @author Nikita Kirilloff
  */
-final class FieldRef {
+public final class FieldRef {
 
     private final String owner;
     private final String name;
     private final String descriptor;
 
-    /**
-     * @param owner the internal name of the class that declares the field
-     * @param name the field's name
-     * @param descriptor the field's JVM descriptor
-     */
-    FieldRef(String owner, String name, String descriptor) {
+    public FieldRef(String owner, String name, String descriptor) {
         this.owner = owner;
         this.name = name;
         this.descriptor = descriptor;
     }
 
-    static FieldRef from(Field field) {
-        return new FieldRef(
-                Type.getInternalName(field.getDeclaringClass()), field.getName(), Type.getDescriptor(field.getType()));
-    }
-
-    String owner() {
+    public String owner() {
         return owner;
     }
 
-    String name() {
+    public String name() {
         return name;
     }
 
-    String descriptor() {
+    public String descriptor() {
         return descriptor;
+    }
+
+    public static FieldRef from(Field field) {
+        return new FieldRef(
+                JvmType.getInternalName(field.getDeclaringClass()),
+                field.getName(),
+                JvmType.getDescriptor(field.getType()));
     }
 
     @Override
@@ -69,8 +67,8 @@ final class FieldRef {
         if (!(other instanceof FieldRef)) {
             return false;
         }
-        FieldRef fieldRef = (FieldRef) other;
-        return owner.equals(fieldRef.owner) && name.equals(fieldRef.name) && descriptor.equals(fieldRef.descriptor);
+        FieldRef that = (FieldRef) other;
+        return owner.equals(that.owner) && name.equals(that.name) && descriptor.equals(that.descriptor);
     }
 
     @Override

@@ -162,7 +162,7 @@ public class EntityMethodsInspector {
 
         if (member instanceof Method accessor) {
             FieldRef backingField = resolveBackingField(accessor);
-            return field.equals(backingField);
+            return backingField != null && field.equals(backingField);
         }
 
         return false;
