@@ -74,7 +74,7 @@ object ContractDocumentsValidator {
 
         // stateless checks for the current contract
         val problems = currentSchemas.flatMap { schema ->
-            STATELESS_INVARIANTS.map { invariant -> invariant.check(schema) }
+            STATELESS_INVARIANTS.flatMap { invariant -> invariant.check(schema) }
         }.toMutableList()
 
         if (baseline != null) {

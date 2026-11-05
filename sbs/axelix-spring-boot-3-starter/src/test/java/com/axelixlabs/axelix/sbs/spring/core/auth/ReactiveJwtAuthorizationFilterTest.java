@@ -40,6 +40,7 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
@@ -47,6 +48,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfigurati
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link ReactiveJwtAuthorizationFilter}.
@@ -135,6 +137,25 @@ class ReactiveJwtAuthorizationFilterTest {
                 assertThat(axelixPrincipal.getName()).isEqualTo("testUser");
                 assertThat(axelixPrincipal.securityContext().token()).isEqualTo(token);
             });
+        });
+    }
+
+    @Test
+    void shouldPropagateJwtExceptionThrownByDownstreamChain() {
+        contextRunner.run(context -> {
+            // given.
+            ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
+            User user = UserUtils.withPassword("testUser", "testPassword", Set.of(TestRoles.ADMIN));
+            String token = context.getBean(JwtEncoderService.class).generateToken(user);
+            MockServerWebExchange exchange = MockServerWebExchange.from(
+                    MockServerHttpRequest.get("/actuator/axelix-env").header(HttpHeaders.AUTHORIZATION, bearer(token)));
+
+            // when / then.
+            assertThatThrownBy(() -> filter.filter(exchange, ignored -> {
+                                throw new InvalidJwtTokenException("downstream failure");
+                            })
+                            .block())
+                    .isInstanceOf(InvalidJwtTokenException.class);
         });
     }
 
