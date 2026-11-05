@@ -54,9 +54,24 @@ SBOM. Axelix Spring Boot Starter отдаёт этот файл в Master. Ко�
 Библиотека, проекта которой нет в каталоге, показывается без статуса. Это значит, что Axelix ничего о ней не
 утверждает, а не что с проектом всё в порядке.
 
-Для страницы нужны [стартер](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) и [build-плагин](../../setting-up-spring-boot-service/build-plugin/configuration.mdx) Axelix версии 1.2.0 или новее. Для сервисов на более старых версиях
-страница не показывается на боковой панели [Профиля сервиса](../../ui-guide/service-profile.mdx). Как их обновить, см. в разделе
-[Политика обновления Axelix](../../more/upgrading.mdx).
+Страница показывается для экземпляров со [стартером](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)
+Axelix 1.2.0 или новее. На более старых стартерах её нет на боковой панели [Профиля
+сервиса](../../ui-guide/service-profile.mdx). SBOM берётся из [build-плагина](../../setting-up-spring-boot-service/build-plugin/configuration.mdx)
+версии 1.2.0 или новее. Как обновить, см. в разделе [Политика обновления Axelix](../../more/upgrading.mdx).
+
+## Скачать SBOM
+
+<UpcomingReleaseNotice />
+
+Начиная с Master 1.3.0, вы можете скачать CycloneDX SBOM экземпляра в файл `dependencies.cdx.json`. Экземпляр должен
+использовать стартер Axelix 1.2.0 или новее, а приложение должно быть собрано с build-плагином Axelix 1.2.0 или новее.
+Обновлять стартер до 1.3.0 не требуется. Ваши собственные модули в сборке Maven или Gradle не попадают в граф.
+
+Обычная сборка Gradle или Maven автоматически упаковывает SBOM, поэтому дополнительная настройка не нужна.
+
+В документе пока нет данных о лицензиях, поэтому он не подходит для проверки лицензий или комплаенс-аудита. Что именно
+содержит документ, описано в разделе [SBOM
+зависимостей](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx#sbom-зависимостей-gradle).
 
 ## См. также
 
