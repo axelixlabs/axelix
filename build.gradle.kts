@@ -30,6 +30,13 @@ allprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal {
+            content {
+                includeModule("com.github.seregamorph", "spring-test-timeline")
+                includeModule("com.github.seregamorph", "spring-test-smart-context")
+                includeModule("com.github.seregamorph", "spring-test-smart-context-parent")
+            }
+        }
     }
 }
 

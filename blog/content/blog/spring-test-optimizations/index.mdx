@@ -1,0 +1,54 @@
+---
+title: "Spring Test Optimizations for the Axelix project"
+date: 2026-10-20
+authors: ["Sergey Chernov"]
+tags: ["Spring Boot", "Spring Test"]
+# heroImagePath: TODO /posts/spring-test-optimizations/preview.png
+description: "Let's check Spring integration test execution insights and address related problems"
+metaDescription: "TODO"
+---
+
+# Spring Test Optimizations
+
+Let's add [spring-test-timeline](https://github.com/seregamorph/spring-test-timeline), run integration tests suite
+and check insights. The initial report looks like:
+image: blog/content/blog/spring-test-optimizations/spring-test-timeline-initial.png
+
+Immediately we see several problems:
+* Too many separate spring contexts created. Each context is isolated space, but we may benefit a lot via reusing
+the test contexts
+* Almost all contexts are keeping alive till the JVM EoL (eventually exceeds 20 active contexts)
+* image: blog/content/blog/spring-test-optimizations/long_terminate.png
+few contexts shut down too slow
+* image: blog/content/blog/spring-test-optimizations/threads_leak.png
+Threads are leaking during the integration tests execution, eventually exceeding 2000 threads.
+Such insights should be always rechecked carefully as this may highlight possible production issues.
+
+Few positive factors worth to mention:
+* the heap memory stays inside reasonable boundaries
+* the number of Testcontainers is kept not more than 1
+
+## Fixing issues
+
+### Long context termination
+See the PR (both root cause and fix) https://github.com/axelixlabs/axelix/pull/1786
+
+### Threads leakage
+After the initial research it was found that this problem is not too critical for the production scope, but more
+affects the ITs at scale.
+See https://github.com/axelixlabs/axelix/issues/1791 and [fix](https://github.com/axelixlabs/axelix/commit/ae4803f24ac80f6c0f0ac9fa2fbc46c307181de0)
+(shared HttpClient bean)
+
+### Add Spring Test Smart Context
+
+TODO
+
+### Outcomes
+Image: blog/content/blog/spring-test-optimizations/spring-test-timeline-after.png
+
+What we see:
+* significantly better build time: instead of 2m21s now it's 1m36s
+* less contexts
+* contexts are actively reused (see hover panel listing all test classes sharing the context)
+* contexts are eagerly closed when are not needed anymore. Termination is fast
+* no thread leakage (still worth to recheck the increasing number of threads)
