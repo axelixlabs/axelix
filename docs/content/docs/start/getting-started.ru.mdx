@@ -6,9 +6,8 @@ description: "Эта страница описывает рекомендуем�
 ---
 
 :::note
-Сниппеты на этой странице используют версию `1.2.2` для наглядности. Проверьте [страницу
-релизов](https://github.com/axelixlabs/axelix/releases), чтобы узнать последний опубликованный тег, и подставьте его в
-свои команды.
+Сниппеты на этой странице используют последний релиз — `AXELIX_VERSION_PLACEHOLDER`. Все опубликованные версии есть на [странице
+релизов](https://github.com/axelixlabs/axelix/releases).
 :::
 
 ## Axelix и ваши окружения
@@ -157,7 +156,7 @@ Kubernetes](../setting-up-master-ui/configuring-master/configuring-master.mdx#з
   </Tab>
   <Tab value="JAR">
 
-Скачайте `axelix-1.2.2.jar` из раздела **Assets** релиза на [странице
+Скачайте `axelix-AXELIX_VERSION_PLACEHOLDER.jar` из раздела **Assets** релиза на [странице
 релизов](https://github.com/axelixlabs/axelix/releases). UI уже включён в JAR, а его имя следует
 [правилам именования артефактов](../more/compatibility-and-versioning.mdx#имена-артефактов) каждого релиза. Запустите
 его:
@@ -166,7 +165,7 @@ Kubernetes](../setting-up-master-ui/configuring-master/configuring-master.mdx#з
   <Tab value="Встроенный ключ (локально)">
 
 ```bash
-java -jar axelix-1.2.2.jar
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
 ```
 
 Если JWT-свойства не заданы, Master использует встроенный ключ подписи. Подходит только для локального знакомства, см.
@@ -179,7 +178,7 @@ java -jar axelix-1.2.2.jar
 export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
 export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
 
-java -jar axelix-1.2.2.jar
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
 ```
 
   </Tab>

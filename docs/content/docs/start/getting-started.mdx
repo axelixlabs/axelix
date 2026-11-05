@@ -6,9 +6,8 @@ description: "This page describes the recommended way to roll Axelix out across 
 ---
 
 :::note
-The snippets on this page pin version `1.2.2` for illustration. Check the [Releases
-page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and substitute it in your own
-commands.
+The snippets on this page use the latest release, `AXELIX_VERSION_PLACEHOLDER`. All published versions are on the [Releases
+page](https://github.com/axelixlabs/axelix/releases).
 :::
 
 ## Axelix and your environments
@@ -156,7 +155,7 @@ Kubernetes](./configuring-master.mdx#run-on-kubernetes).
   </Tab>
   <Tab value="JAR">
 
-Download `axelix-1.2.2.jar` from the **Assets** of the release on the [Releases
+Download `axelix-AXELIX_VERSION_PLACEHOLDER.jar` from the **Assets** of the release on the [Releases
 page](https://github.com/axelixlabs/axelix/releases). The JAR already bundles the UI, and its name follows the
 [artifact naming](../more/compatibility-and-versioning.mdx#artifact-names) of every release. Start it:
 
@@ -164,7 +163,7 @@ page](https://github.com/axelixlabs/axelix/releases). The JAR already bundles th
   <Tab value="Built-in key (local trial)">
 
 ```bash
-java -jar axelix-1.2.2.jar
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
 ```
 
 With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
@@ -177,7 +176,7 @@ a signing key](./configuring-master.mdx#running-without-a-signing-key).
 export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
 export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
 
-java -jar axelix-1.2.2.jar
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
 ```
 
   </Tab>
