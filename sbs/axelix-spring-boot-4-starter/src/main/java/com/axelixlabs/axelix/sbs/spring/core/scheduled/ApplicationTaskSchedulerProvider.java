@@ -21,15 +21,24 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.FixedDelayTask;
+import org.springframework.scheduling.config.FixedRateTask;
+import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.scheduling.config.TriggerTask;
 
 /**
- * {@link TaskSchedulerProvider} that takes the scheduler from the {@link ScheduledTaskRegistrar}.
+ * {@link TaskSchedulerProvider} that takes the scheduler from the {@link ScheduledTaskRegistrar},
+ * and schedules the tasks through it.
  *
  * @since 20.10.2026
  * @author Dmitry Mazurov
  */
 public final class ApplicationTaskSchedulerProvider implements TaskSchedulerProvider, SchedulingConfigurer {
+
+    private static final String SCHEDULER_NOT_AVAILABLE_MESSAGE =
+            "Could not obtain the application's TaskScheduler to re-schedule the task: "
+                    + "re-scheduling is supported only when scheduling is enabled with @EnableScheduling";
 
     private volatile @Nullable ScheduledTaskRegistrar registrar;
 
@@ -47,10 +56,34 @@ public final class ApplicationTaskSchedulerProvider implements TaskSchedulerProv
         TaskScheduler scheduler = currentRegistrar != null ? currentRegistrar.getScheduler() : null;
 
         if (scheduler == null) {
-            throw new IllegalStateException("Could not obtain the application's TaskScheduler to re-schedule the task: "
-                    + "re-scheduling is supported only when scheduling is enabled with @EnableScheduling");
+            throw new IllegalStateException(SCHEDULER_NOT_AVAILABLE_MESSAGE);
         }
 
         return scheduler;
+    }
+
+    @Override
+    public @Nullable ScheduledTask scheduleFixedDelayTask(FixedDelayTask task) {
+        return requireRegistrar().scheduleFixedDelayTask(task);
+    }
+
+    @Override
+    public @Nullable ScheduledTask scheduleFixedRateTask(FixedRateTask task) {
+        return requireRegistrar().scheduleFixedRateTask(task);
+    }
+
+    @Override
+    public @Nullable ScheduledTask scheduleTriggerTask(TriggerTask task) {
+        return requireRegistrar().scheduleTriggerTask(task);
+    }
+
+    private ScheduledTaskRegistrar requireRegistrar() {
+        ScheduledTaskRegistrar currentRegistrar = this.registrar;
+
+        if (currentRegistrar == null || currentRegistrar.getScheduler() == null) {
+            throw new IllegalStateException(SCHEDULER_NOT_AVAILABLE_MESSAGE);
+        }
+
+        return currentRegistrar;
     }
 }

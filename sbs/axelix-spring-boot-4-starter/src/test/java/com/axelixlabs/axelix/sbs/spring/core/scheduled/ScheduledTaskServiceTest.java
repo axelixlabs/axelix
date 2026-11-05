@@ -40,7 +40,9 @@ import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProc
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.IntervalTask;
+import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -48,6 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 
 import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Integration tests for {@link ScheduledTaskService}
@@ -68,6 +71,7 @@ class ScheduledTaskServiceTest {
     private static final String CRON_TASK_ID = ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTask";
     private static final String CRON_TASK_ID_FOR_MODIFY =
             ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTaskForModify";
+    private static final String ORIGINAL_CRON_EXPRESSION_FOR_MODIFY = "*/2 * * * * *";
 
     // FixedDelay
     private static final String FIXED_DELAY_TASK_ID =
@@ -260,6 +264,155 @@ class ScheduledTaskServiceTest {
         assertThat(((IntervalTask) task.getTask()).getIntervalDuration()).isEqualTo(newInterval);
     }
 
+    @Test // GH-1835
+    void shouldNotMarkTaskAsModified_whenCronExpressionModifiedBackToOriginal() {
+        Task originalTask =
+                taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow().getTask();
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, "*/5 * * * * *");
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, ORIGINAL_CRON_EXPRESSION_FOR_MODIFY);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.getOriginalTask()).isNull();
+        // the original task is put back as is, since its zone cannot be read to build an equal one
+        assertThat(task.getTask()).isSameAs(originalTask);
+    }
+
+    @Test // GH-1835
+    void shouldNotChangeTask_whenCronExpressionIsTheSameAsCurrent() {
+        Task originalTask =
+                taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow().getTask();
+
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, ORIGINAL_CRON_EXPRESSION_FOR_MODIFY);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.getOriginalTask()).isNull();
+        assertThat(task.getTask()).isSameAs(originalTask);
+    }
+
+    @Test // GH-1835
+    void shouldNotMarkTaskAsModified_whenIntervalModifiedBackToOriginal() {
+        Task originalTask =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow().getTask();
+        taskService.modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, Duration.ofMillis(555555L));
+        taskService.modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, Duration.ofMillis(200));
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.getOriginalTask()).isNull();
+        assertThat(task.getTask()).isSameAs(originalTask);
+    }
+
+    @Test // GH-1835
+    void shouldResetCronExpression_testCronTask() {
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, "*/5 * * * * *");
+
+        taskService.resetTask(CRON_TASK_ID_FOR_MODIFY);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(((CronTrigger) task.getTrigger()).getExpression()).isEqualTo(ORIGINAL_CRON_EXPRESSION_FOR_MODIFY);
+        assertThat(task.getOriginalTask()).isNull();
+        assertThat(task.isEnabled()).isTrue();
+    }
+
+    @Test // GH-1835
+    void shouldResetInterval_testFixedDelay() {
+        taskService.modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, Duration.ofMillis(555555L));
+
+        taskService.resetTask(FIXED_DELAY_TASK_ID_FOR_MODIFY);
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(((IntervalTask) task.getTask()).getIntervalDuration()).isEqualTo(Duration.ofMillis(200));
+        assertThat(task.getOriginalTask()).isNull();
+        assertThat(task.isEnabled()).isTrue();
+    }
+
+    @Test // GH-1835
+    void shouldResetInterval_testFixedRate() {
+        taskService.modifyInterval(FIXED_RATE_TASK_ID_FOR_MODIFY, Duration.ofMillis(777777L));
+
+        taskService.resetTask(FIXED_RATE_TASK_ID_FOR_MODIFY);
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_RATE_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(((IntervalTask) task.getTask()).getIntervalDuration()).isEqualTo(Duration.ofMillis(200));
+        assertThat(task.getOriginalTask()).isNull();
+        assertThat(task.isEnabled()).isTrue();
+    }
+
+    @Test // GH-1835
+    void shouldNotResetDisabledTask() {
+        String newCronExpression = "*/5 * * * * *";
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, newCronExpression);
+        taskService.disableTask(CRON_TASK_ID_FOR_MODIFY, false);
+
+        taskService.resetTask(CRON_TASK_ID_FOR_MODIFY);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getOriginalTask()).isNotNull();
+        assertThat(((CronTrigger) task.getTrigger()).getExpression()).isEqualTo(newCronExpression);
+    }
+
+    @Test // GH-1835
+    void shouldRestoreOriginalSchedule_whenModifiedTaskWasDisabledAndEnabledAgain() {
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, "*/5 * * * * *");
+        taskService.disableTask(CRON_TASK_ID_FOR_MODIFY, false);
+        taskService.enableTask(CRON_TASK_ID_FOR_MODIFY);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.isEnabled()).isTrue();
+        assertThat(task.getOriginalTask()).isNotNull();
+        assertThat(((CronTrigger) task.getTrigger()).getExpression()).isEqualTo("*/5 * * * * *");
+
+        taskService.resetTask(CRON_TASK_ID_FOR_MODIFY);
+
+        assertThat(((CronTrigger) task.getTrigger()).getExpression()).isEqualTo(ORIGINAL_CRON_EXPRESSION_FOR_MODIFY);
+        assertThat(task.getOriginalTask()).isNull();
+    }
+
+    @Test // GH-1835
+    void shouldThrow_whenModifyingCronExpressionOfCustomTriggerTask() {
+        ManagedScheduledTask task = taskRegistry.find(CUSTOM_TASK_ID).orElseThrow();
+        Trigger originalTrigger = task.getTrigger();
+
+        assertThatThrownBy(() -> taskService.modifyCronExpression(CUSTOM_TASK_ID, "*/5 * * * * *"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(task.getTrigger()).isSameAs(originalTrigger);
+        assertThat(task.getOriginalTask()).isNull();
+    }
+
+    @Test // GH-1835
+    void shouldThrow_whenModifyingCronExpressionOfIntervalTask() {
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow();
+        ScheduledTask scheduledTaskBefore = task.getScheduledTask();
+
+        assertThatThrownBy(() -> taskService.modifyCronExpression(FIXED_DELAY_TASK_ID_FOR_MODIFY, "*/5 * * * * *"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(task.getScheduledTask()).isSameAs(scheduledTaskBefore);
+        assertThat(task.getOriginalTask()).isNull();
+    }
+
+    @Test // GH-1835
+    void shouldDoNothing_whenResettingUnmodifiedTask() {
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        ScheduledTask scheduledTaskBefore = task.getScheduledTask();
+
+        taskService.resetTask(CRON_TASK_ID_FOR_MODIFY);
+
+        assertThat(task.getScheduledTask()).isSameAs(scheduledTaskBefore);
+        assertThat(task.getOriginalTask()).isNull();
+    }
+
+    @Test // GH-1835
+    void shouldThrow_whenResettingNonExistentTask() {
+        assertThatThrownBy(() -> taskService.resetTask("com.example.NonExistentTask.doWork"))
+                .isInstanceOf(ScheduledTaskNotFoundException.class);
+    }
+
     @Test
     void shouldExecuteScheduledTask_testFixedRate() {
         // when.
@@ -301,8 +454,8 @@ class ScheduledTaskServiceTest {
         }
 
         @Bean
-        TaskSchedulerProvider testTaskSchedulerProvider(TaskScheduler taskScheduler) {
-            return () -> taskScheduler;
+        TaskSchedulerProvider testTaskSchedulerProvider() {
+            return new ApplicationTaskSchedulerProvider();
         }
 
         @Bean

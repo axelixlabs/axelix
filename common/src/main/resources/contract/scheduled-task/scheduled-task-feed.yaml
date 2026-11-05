@@ -64,6 +64,10 @@ components:
           type: boolean
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
+        originalExpression:
+          type: string
+          description: The cron expression the task was registered with. Set only if the expression was changed.
+          x-axelix-introduced-in: 1.3.0
     ScheduledFixedDelayTask:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
@@ -93,6 +97,11 @@ components:
           type: boolean
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
+        originalInterval:
+          type: integer
+          format: int64
+          description: The interval, in milliseconds, the task was registered with. Set only if the interval was changed.
+          x-axelix-introduced-in: 1.3.0
     ScheduledFixedRateTask:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
@@ -122,6 +131,11 @@ components:
           type: boolean
           description: Whether the task is currently enabled.
           x-axelix-introduced-in: 1.2.0
+        originalInterval:
+          type: integer
+          format: int64
+          description: The interval, in milliseconds, the task was registered with. Set only if the interval was changed.
+          x-axelix-introduced-in: 1.3.0
     ScheduledCustomTask:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
