@@ -18,6 +18,9 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.security.Principal;
+import java.util.Objects;
+
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 
@@ -27,10 +30,41 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContext;
  * @since 20.10.2026
  * @author Nikita Kirillov
  */
-public record AxelixPrincipal(SecurityContext securityContext) implements Principal {
+public final class AxelixPrincipal implements Principal {
+
+    private final SecurityContext securityContext;
+
+    public AxelixPrincipal(SecurityContext securityContext) {
+        this.securityContext = securityContext;
+    }
+
+    public SecurityContext securityContext() {
+        return securityContext;
+    }
 
     @Override
     public String getName() {
         return securityContext.currentUser().getUsername();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof AxelixPrincipal)) {
+            return false;
+        }
+        return securityContext.equals(((AxelixPrincipal) other).securityContext);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(securityContext);
+    }
+
+    @Override
+    public String toString() {
+        return "AxelixPrincipal[securityContext=" + securityContext + "]";
     }
 }
