@@ -67,17 +67,27 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
     @Override
     public String generateToken(User user, Duration lifespan) throws JwtTokenGenerationException {
         validateUser(user);
+        return sign(user.getUsername(), user.getId(), buildRoleClaims(user), lifespan);
+    }
+
+    /**
+     * Signs a token whose subject, user id and roles were already taken from a JWT contract model.
+     * {@code roles} is written as the {@code roles} claim and serialized as-is.
+     */
+    public String sign(String subject, String userId, Object roles, Duration lifespan)
+            throws JwtTokenGenerationException {
+        if (subject == null || subject.isEmpty()) {
+            throw new JwtTokenGenerationException("Username cannot be null or empty");
+        }
 
         try {
             Instant now = Instant.now();
-            List<JwtRole> roleClaims = buildRoleClaims(user);
-
             JwtBuilder builder = Jwts.builder()
-                    .subject(user.getUsername())
+                    .subject(subject)
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(now.plus(lifespan)))
-                    .claim(TokenClaim.USER_ID.getEncoding(), user.getId())
-                    .claim(TokenClaim.ROLES.getEncoding(), roleClaims);
+                    .claim(TokenClaim.USER_ID.getEncoding(), userId)
+                    .claim(TokenClaim.ROLES.getEncoding(), roles);
 
             return signingStrategy.signToken(builder, signingKey).compact();
         } catch (JwtTokenGenerationException e) {

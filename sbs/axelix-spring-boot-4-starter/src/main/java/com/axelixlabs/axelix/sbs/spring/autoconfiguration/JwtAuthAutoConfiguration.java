@@ -34,13 +34,13 @@ import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ManagedServiceWebIdentityAccessManager;
+import com.axelixlabs.axelix.sbs.spring.core.auth.StarterJwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
@@ -78,7 +78,7 @@ public class JwtAuthAutoConfiguration {
         if (JwtDefaults.isDefaultSigningKey(authProperties.getJwt().getSigningKey())) {
             log.warn(JwtDefaults.STARTER_DEFAULT_SIGNING_KEY_IN_USE_WARNING_MESSAGE);
         }
-        return new DefaultJwtEncoderService(
+        return new StarterJwtEncoderService(
                 authProperties.getJwt().getAlgorithm(),
                 authProperties.getJwt().getSigningKey(),
                 authProperties.getJwt().getDuration());

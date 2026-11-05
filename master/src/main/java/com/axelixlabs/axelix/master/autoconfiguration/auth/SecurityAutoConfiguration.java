@@ -45,7 +45,6 @@ import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager.AuthoritiesContributor;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.utils.Lazy;
@@ -67,6 +66,7 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHand
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
+import com.axelixlabs.axelix.master.service.auth.MasterJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
@@ -168,7 +168,7 @@ public class SecurityAutoConfiguration {
             if (JwtDefaults.isDefaultSigningKey(jwtProperties.signingKey())) {
                 log.warn(JwtDefaults.MASTER_DEFAULT_SIGNING_KEY_IN_USE_WARNING_MESSAGE);
             }
-            return new DefaultJwtEncoderService(
+            return new MasterJwtEncoderService(
                     jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan());
         }
 
