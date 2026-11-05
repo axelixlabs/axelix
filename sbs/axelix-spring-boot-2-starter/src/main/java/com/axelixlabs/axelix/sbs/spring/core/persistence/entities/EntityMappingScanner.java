@@ -17,20 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Table;
-import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Association;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.AssociationProblem;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.FlaggedAssociation;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
@@ -43,6 +38,7 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
  * it works with any JPA provider and does not require Hibernate or Spring Data JPA.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public class EntityMappingScanner {
 
@@ -69,39 +65,20 @@ public class EntityMappingScanner {
 
     private MappedEntity scanEntity(EntityType<?> entityType) {
         String entityName = entityType.getName();
-        int associationsCount = 0;
+        EntityInspector.EntityInspection inspection = new EntityInspector().inspect(entityType);
         List<FlaggedAssociation> flagged = new ArrayList<>();
 
-        for (Attribute<?, ?> attribute : entityType.getAttributes()) {
-            if (!attribute.isAssociation()) {
-                continue;
-            }
-
-            associationsCount++;
-
-            Member member = attribute.getJavaMember();
-            if (!(member instanceof AnnotatedElement)) {
-                continue;
-            }
-            AnnotatedElement annotated = (AnnotatedElement) member;
-
-            AssociationInspector inspector = new AssociationInspector(attribute, annotated);
-            Set<AssociationProblem> problems = inspector.detectProblems();
-
-            if (!problems.isEmpty()) {
-                Association association = new Association().entity(entityName).field(attribute.getName());
-                String mapping = inspector.renderMapping();
-                flagged.add(new FlaggedAssociation()
-                        .association(association)
-                        .mapping(mapping)
-                        .problems(List.copyOf(problems)));
-            }
+        for (EntityInspector.AssociationInspection association : inspection.getFlaggedAssociations()) {
+            flagged.add(new FlaggedAssociation()
+                    .association(new Association().entity(entityName).field(association.getName()))
+                    .mapping(association.getMapping())
+                    .problems(List.copyOf(association.getProblems())));
         }
 
         return new MappedEntity()
                 .name(entityName)
                 .table(resolveTable(entityType.getJavaType(), entityName))
-                .associationsCount(associationsCount)
+                .associationsCount(inspection.getAssociationsCount())
                 .flaggedAssociations(flagged);
     }
 
