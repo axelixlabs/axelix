@@ -9,6 +9,7 @@ val springCloudVersion = "2025.1.0"
 val jsonUnitAssertJVersion = "2.40.1"
 val archUnitVersion = "1.4.2"
 val shedLockVersion = "7.10.1"
+val lombokVersion = "1.18.48"
 
 dependencies {
     // Self
@@ -57,6 +58,8 @@ dependencies {
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
+    testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
+    testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
     testImplementation("com.tngtech.archunit:archunit:${archUnitVersion}")

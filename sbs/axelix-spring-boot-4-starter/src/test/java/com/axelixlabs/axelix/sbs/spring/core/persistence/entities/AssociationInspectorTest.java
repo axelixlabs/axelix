@@ -35,6 +35,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.Attribute;
 
+import lombok.ToString;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -59,6 +60,7 @@ import static org.assertj.core.api.Assertions.tuple;
  * mapping members it produces — no mocks.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 class AssociationInspectorTest {
 
@@ -66,6 +68,29 @@ class AssociationInspectorTest {
             .withConfiguration(
                     AutoConfigurations.of(DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class))
             .withUserConfiguration(JpaTestConfiguration.class);
+
+    @Nested
+    class DetectProblems {
+
+        @Test
+        void shouldDetectAssociationReadByToString() {
+            jpaContextRunner.run(context -> {
+                // given.
+                EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
+
+                // when.
+                JpaEntities profile = new EntityMappingScanner(entityManagerFactory).scan();
+
+                // then. tagSet is read by Order.toString() and has no other mapping problem.
+                assertThat(entity(profile, "Order").getFlaggedAssociations())
+                        .filteredOn(
+                                flagged -> flagged.getAssociation().getField().equals("tagSet"))
+                        .singleElement()
+                        .extracting(flagged -> Set.copyOf(flagged.getProblems()))
+                        .isEqualTo(Set.of(AssociationProblem.ACCESSED_IN_TO_STRING));
+            });
+        }
+    }
 
     @Nested
     class RenderMapping {
@@ -117,7 +142,7 @@ class AssociationInspectorTest {
             assertThat(profile.getEntities())
                     .extracting(MappedEntity::getName)
                     .map(s -> s.substring("AssociationInspectorTest$".length())) // removing prefix
-                    .containsExactly("Customer", "Order", "OrderEvent", "OrderItem", "Shipment", "Tag");
+                    .containsExactly("Customer", "LombokOrder", "Order", "OrderEvent", "OrderItem", "Shipment", "Tag");
 
             // Order carries exactly the problems detected across its associations.
             MappedEntity order = entity(profile, "Order");
@@ -128,7 +153,11 @@ class AssociationInspectorTest {
                             flagged -> flagged.getAssociation().getField(),
                             flagged -> Set.copyOf(flagged.getProblems()))
                     .containsExactlyInAnyOrder(
-                            tuple("customer", Set.of(AssociationProblem.EAGER_FETCHING)),
+                            tuple(
+                                    "customer",
+                                    Set.of(
+                                            AssociationProblem.EAGER_FETCHING,
+                                            AssociationProblem.ACCESSED_IN_TO_STRING)),
                             tuple("coCustomer", Set.of(AssociationProblem.EAGER_FETCHING)),
                             tuple(
                                     "items",
@@ -136,7 +165,15 @@ class AssociationInspectorTest {
                                             AssociationProblem.CASCADE_REMOVE_OR_ALL,
                                             AssociationProblem.EAGER_FETCHING)),
                             tuple("tags", Set.of(AssociationProblem.LIST_BACKED_MANY_TO_MANY)),
-                            tuple("shipments", Set.of(AssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY)));
+                            tuple("shipments", Set.of(AssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY)),
+                            tuple("tagSet", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
+
+            // the association read by a Lombok-generated toString() is flagged too, through the same path.
+            assertThat(entity(profile, "LombokOrder").getFlaggedAssociations())
+                    .extracting(
+                            flagged -> flagged.getAssociation().getField(),
+                            flagged -> Set.copyOf(flagged.getProblems()))
+                    .containsExactly(tuple("customer", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
 
             // every other entity is clean.
             assertThat(entity(profile, "Customer").getFlaggedAssociations()).isEmpty();
@@ -198,6 +235,11 @@ class AssociationInspectorTest {
         @ManyToMany
         @JoinTable(name = "orders_tags_set")
         private Set<Tag> tagSet;
+
+        @Override
+        public String toString() {
+            return "Order{customer=" + customer + ", tagSet=" + tagSet + "}";
+        }
     }
 
     @Entity
@@ -244,5 +286,17 @@ class AssociationInspectorTest {
 
         @Id
         private Long id;
+    }
+
+    @Entity
+    @Table(name = "lombok_orders")
+    @ToString
+    static class LombokOrder {
+
+        @Id
+        private Long id;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        private Customer customer;
     }
 }
