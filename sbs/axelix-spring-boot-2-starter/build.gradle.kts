@@ -9,6 +9,7 @@ val springCloudVersion = "2021.0.9"
 val jsonUnitAssertJVersion = "2.40.1"
 val archUnitVersion = "0.23.1"
 val shedLockVersion = "4.48.0"
+val lombokVersion = "1.18.48"
 
 dependencies {
     // Self
@@ -47,6 +48,8 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka")
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("com.h2database:h2")
+    testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
+    testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
