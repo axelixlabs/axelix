@@ -109,8 +109,7 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
             }
         }
 
-        // builtBy carries the task dependency to every consumer of the source set, including the
-        // sourcesJar of the starters the :sbs:starter-domain module is shaded into.
+        // builtBy carries the task dependency to every consumer of the source set, including sourcesJar.
         files(outputRoot.resolve("src/main/java")).builtBy(generate)
     }
 

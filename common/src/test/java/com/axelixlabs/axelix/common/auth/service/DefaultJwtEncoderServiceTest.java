@@ -37,7 +37,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
@@ -108,6 +112,34 @@ class DefaultJwtEncoderServiceTest {
 
         // signature
         assertThat(claims.getDigest()).isNotNull();
+    }
+
+    @Test
+    void shouldRoundTripNestedRolesThroughSharedDecoder() {
+        // given.
+        Role component = new DefaultRole("VIEWER", Set.of(OssAuthority.ENV_VALUES_READ));
+        Role admin = new DefaultRole("ADMIN", Set.of(OssAuthority.CACHES_CLEAR), Set.of(component));
+        DefaultUser user = new DefaultUser("user-1", "alice", null, Set.of(admin));
+        DefaultJwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, signingKey, lifespan);
+        DefaultJwtDecoderService decoder =
+                new DefaultJwtDecoderService(new DefaultAuthoritiesManager(null), JwtAlgorithm.HMAC256, signingKey);
+
+        // when.
+        PasswordlessUser decoded = decoder.decodeTokenToUser(encoder.generateToken(user));
+
+        // then.
+        assertThat(decoded.getId()).isEqualTo("user-1");
+        assertThat(decoded.getUsername()).isEqualTo("alice");
+        assertThat(decoded.getRoles()).hasSize(1);
+
+        Role decodedAdmin = decoded.getRoles().iterator().next();
+        assertThat(decodedAdmin.getName()).isEqualTo("ADMIN");
+        assertThat(decodedAdmin.getAuthorities()).containsExactly(OssAuthority.CACHES_CLEAR);
+        assertThat(decodedAdmin.getComponents()).hasSize(1);
+
+        Role decodedViewer = decodedAdmin.getComponents().iterator().next();
+        assertThat(decodedViewer.getName()).isEqualTo("VIEWER");
+        assertThat(decodedViewer.getAuthorities()).containsExactly(OssAuthority.ENV_VALUES_READ);
     }
 
     @Test

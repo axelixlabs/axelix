@@ -21,7 +21,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.jsonwebtoken.JwtBuilder;
@@ -30,16 +29,17 @@ import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
-import com.axelixlabs.axelix.common.auth.core.JwtRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.contract.jwt.AxelixJwtToken;
+import com.axelixlabs.axelix.common.contract.jwt.JwtRole;
 
 /**
  * Service responsible for generating JWT tokens from {@link User} instances.
  *
- * @see JwtRole
+ * @see AxelixJwtToken
  * @since 22.07.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
@@ -67,27 +67,27 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
     @Override
     public String generateToken(User user, Duration lifespan) throws JwtTokenGenerationException {
         validateUser(user);
-        return sign(user.getUsername(), user.getId(), buildRoleClaims(user), lifespan);
+        AxelixJwtToken token =
+                new AxelixJwtToken().sub(user.getUsername()).uid(user.getId()).roles(buildRoleClaims(user));
+        return sign(token, lifespan);
     }
 
     /**
-     * Signs a token whose subject, user id and roles were already taken from a JWT contract model.
-     * {@code roles} is written as the {@code roles} claim and serialized as-is.
+     * Signs the claims from the shared JWT contract model.
      */
-    public String sign(String subject, String userId, Object roles, Duration lifespan)
-            throws JwtTokenGenerationException {
-        if (subject == null || subject.isEmpty()) {
+    public String sign(AxelixJwtToken token, Duration lifespan) throws JwtTokenGenerationException {
+        if (token.getSub() == null || token.getSub().isEmpty()) {
             throw new JwtTokenGenerationException("Username cannot be null or empty");
         }
 
         try {
             Instant now = Instant.now();
             JwtBuilder builder = Jwts.builder()
-                    .subject(subject)
+                    .subject(token.getSub())
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(now.plus(lifespan)))
-                    .claim(TokenClaim.USER_ID.getEncoding(), userId)
-                    .claim(TokenClaim.ROLES.getEncoding(), roles);
+                    .claim(TokenClaim.USER_ID.getEncoding(), token.getUid())
+                    .claim(TokenClaim.ROLES.getEncoding(), token.getRoles());
 
             return signingStrategy.signToken(builder, signingKey).compact();
         } catch (JwtTokenGenerationException e) {
@@ -112,12 +112,12 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
     }
 
     private JwtRole toJwtRole(Role role) {
-        Set<String> authorities =
-                role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        List<String> authorities =
+                role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList());
 
         List<JwtRole> components =
                 role.getComponents().stream().map(this::toJwtRole).collect(Collectors.toList());
 
-        return new JwtRole(role.getName(), authorities, components);
+        return new JwtRole().name(role.getName()).authorities(authorities).components(components);
     }
 }

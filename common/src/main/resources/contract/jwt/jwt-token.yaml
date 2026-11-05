@@ -5,33 +5,17 @@ info:
   description: |
     The JWT payload Axelix Master and the starters exchange.
 
-    Master issues MasterJwtToken. A starter issues StarterJwtToken. The payloads are separate
-    schemas, so each side owns the evolution of the token it produces. Both are the shared
-    JwtClaims object and both carry the same JwtRole values: a role inside either token is the
-    same object.
+    Both sides issue and parse the same token contract.
 components:
   schemas:
-    MasterJwtToken:
-      x-axelix-produced-by: master
-      x-axelix-introduced-in: 1.3.0
-      description: JWT payload issued by Axelix Master and parsed by starters.
-      allOf:
-        - $ref: '#/components/schemas/JwtClaims'
-    StarterJwtToken:
-      x-axelix-produced-by: starter
-      x-axelix-introduced-in: 1.3.0
-      description: JWT payload issued by a starter and parsed by Axelix Master.
-      allOf:
-        - $ref: '#/components/schemas/JwtClaims'
-    # The claim set both tokens are. Master evolution rules apply to it: a starter inside the
-    # compatibility window still parses these claims out of a master-issued token, so the shape
-    # must not change underneath that starter. Starter-issued tokens use this same object.
-    JwtClaims:
+    # Master evolution rules apply: a starter inside the compatibility window still parses these
+    # claims out of a master-issued token, so the shape must not change underneath that starter.
+    AxelixJwtToken:
       x-axelix-produced-by: master
       x-axelix-introduced-in: 1.3.0
       type: object
       additionalProperties: false
-      description: Claims shared by every Axelix JWT.
+      description: JWT payload issued by Axelix Master or a starter.
       required:
         - sub
         - iat
