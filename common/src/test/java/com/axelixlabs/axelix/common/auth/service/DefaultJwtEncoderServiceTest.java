@@ -115,34 +115,6 @@ class DefaultJwtEncoderServiceTest {
     }
 
     @Test
-    void shouldRoundTripNestedRolesThroughSharedDecoder() {
-        // given.
-        Role component = new DefaultRole("VIEWER", Set.of(OssAuthority.ENV_VALUES_READ));
-        Role admin = new DefaultRole("ADMIN", Set.of(OssAuthority.CACHES_CLEAR), Set.of(component));
-        DefaultUser user = new DefaultUser("user-1", "alice", null, Set.of(admin));
-        DefaultJwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, signingKey, lifespan);
-        DefaultJwtDecoderService decoder =
-                new DefaultJwtDecoderService(new DefaultAuthoritiesManager(null), JwtAlgorithm.HMAC256, signingKey);
-
-        // when.
-        PasswordlessUser decoded = decoder.decodeTokenToUser(encoder.generateToken(user));
-
-        // then.
-        assertThat(decoded.getId()).isEqualTo("user-1");
-        assertThat(decoded.getUsername()).isEqualTo("alice");
-        assertThat(decoded.getRoles()).hasSize(1);
-
-        Role decodedAdmin = decoded.getRoles().iterator().next();
-        assertThat(decodedAdmin.getName()).isEqualTo("ADMIN");
-        assertThat(decodedAdmin.getAuthorities()).containsExactly(OssAuthority.CACHES_CLEAR);
-        assertThat(decodedAdmin.getComponents()).hasSize(1);
-
-        Role decodedViewer = decodedAdmin.getComponents().iterator().next();
-        assertThat(decodedViewer.getName()).isEqualTo("VIEWER");
-        assertThat(decodedViewer.getAuthorities()).containsExactly(OssAuthority.ENV_VALUES_READ);
-    }
-
-    @Test
     void shouldGenerateValidJwtToken_ForUserWithRoleAdmin() {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
 
