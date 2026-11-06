@@ -21,6 +21,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
@@ -35,7 +36,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,21 +48,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class BadAuthorityEndpointInvocationContext implements TestTemplateInvocationContext {
 
-    private final WireLevelAuthorities accessAuthority;
+    private final OssAuthority accessAuthority;
 
     /**
      * @param accessAuthority  the authority that is required to access the given endpoint. The assumption is that for
      *                         any given endpoint there will be just one authority required. Therefore, everything else,
      *                         any other authority except this one MUST produce 403 from the backend.
      */
-    public BadAuthorityEndpointInvocationContext(WireLevelAuthorities accessAuthority) {
+    public BadAuthorityEndpointInvocationContext(OssAuthority accessAuthority) {
         this.accessAuthority = accessAuthority;
     }
 
     @Override
     public @NonNull List<Extension> getAdditionalExtensions() {
 
-        EnumSet<WireLevelAuthorities> allTheOtherAuthorities = EnumSet.complementOf(EnumSet.of(accessAuthority));
+        EnumSet<OssAuthority> allTheOtherAuthorities = EnumSet.complementOf(EnumSet.of(accessAuthority));
 
         return allTheOtherAuthorities.stream()
                 .map(ossAuthority -> (Extension) new TestInvocationCallback(ossAuthority))

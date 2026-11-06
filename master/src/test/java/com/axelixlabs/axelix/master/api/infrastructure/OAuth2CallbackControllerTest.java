@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -216,7 +216,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         assertThat(authoritiesCookie)
                 .doesNotContain(
-                        WireLevelAuthorities.ENV_VALUES_READ.getName(), WireLevelAuthorities.CONFIG_PROPS_VALUES_READ.getName());
+                        OssAuthority.ENV_VALUES_READ.getName(), OssAuthority.CONFIG_PROPS_VALUES_READ.getName());
 
         // Verify that the OIDC user was correctly provisioned and persisted in the database
         UserEntity userEntity = userRepository.findByUsername(username).get();

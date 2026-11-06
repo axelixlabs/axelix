@@ -21,10 +21,17 @@ package com.axelixlabs.axelix.common.auth.core;
  * Authorities that well-known .
  *
  * @see Authority
+ *
+ * @deprecated since 1.3, the only source of truth for the authorities will be the state in the database.
+ *             This enum is no longer for the starters that are 1.3+. It is retained solely for the purpose
+ *             of ensuring the backward compatibility window for old version of starters that expect authorities
+ *             to exist in the token.
+ *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public class WireLevelAuthorities {
+@Deprecated(forRemoval = true, since = "1.3")
+public class OssAuthority {
 
     public static final Authority ENV_VALUES_READ_LEGACY = new DefaultAuthority("ENV_VALUES_READ");
 

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,6 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
-import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
@@ -318,7 +318,7 @@ class JwtAuthorizationFilterTest {
 
     @Test
     void shouldReturnForbidden_TokenWithNullNameRoles() {
-        Role role = new DefaultRole(null, Set.of(WireLevelAuthorities.CACHES_CLEAR));
+        Role role = new DefaultRole(null, Set.of(OssAuthority.CACHES_CLEAR));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
 

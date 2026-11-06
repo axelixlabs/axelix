@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -50,11 +50,11 @@ class RequiredAuthorityCheckServiceTest {
     @Test
     void hasAuthority_ShouldReturnTrue_WhenSecurityContextHasUserWithAuthority() {
         securityContext = new DefaultSecurityContext(
-                UserUtils.fromAuthorities(WireLevelAuthorities.CONFIG_PROPS_VALUES_READ), "testToken");
+                UserUtils.fromAuthorities(OssAuthority.CONFIG_PROPS_VALUES_READ), "testToken");
 
         securityContextExecutor.runWithinSecurityContext(
                 () -> {
-                    boolean result = subject.hasAuthority(WireLevelAuthorities.CONFIG_PROPS_VALUES_READ);
+                    boolean result = subject.hasAuthority(OssAuthority.CONFIG_PROPS_VALUES_READ);
                     assertThat(result).isTrue();
                 },
                 securityContext);
@@ -66,7 +66,7 @@ class RequiredAuthorityCheckServiceTest {
 
         securityContextExecutor.runWithinSecurityContext(
                 () -> {
-                    boolean result = subject.hasAuthority(WireLevelAuthorities.ENV_VALUES_READ);
+                    boolean result = subject.hasAuthority(OssAuthority.ENV_VALUES_READ);
                     assertThat(result).isFalse();
                 },
                 securityContext);
@@ -74,7 +74,7 @@ class RequiredAuthorityCheckServiceTest {
 
     @Test
     void hasAuthority_ShouldThrowException_WhenNoSecurityContext() {
-        assertThatThrownBy(() -> subject.hasAuthority(WireLevelAuthorities.CONFIG_PROPS_VALUES_READ))
+        assertThatThrownBy(() -> subject.hasAuthority(OssAuthority.CONFIG_PROPS_VALUES_READ))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

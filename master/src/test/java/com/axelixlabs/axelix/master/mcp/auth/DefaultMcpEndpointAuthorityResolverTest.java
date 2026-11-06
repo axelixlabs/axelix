@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.mcp.auth;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -49,7 +49,7 @@ class DefaultMcpEndpointAuthorityResolverTest {
         Optional<Authority> result = subject.resolve(endpoint);
 
         // then.
-        assertThat(result).contains(WireLevelAuthorities.CACHES_CLEAR);
+        assertThat(result).contains(OssAuthority.CACHES_CLEAR);
     }
 
     @Test

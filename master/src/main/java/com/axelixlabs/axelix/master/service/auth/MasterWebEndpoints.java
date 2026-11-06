@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
@@ -103,16 +103,16 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint CACHE_READ_ONE =
             register("cache:read-one", HttpMethod.GET, ApiPaths.CachesApi.CACHE_NAME, null);
     public static final MasterWebEndpoint CACHE_ENABLE = register(
-            "caches:enable", HttpMethod.POST, ApiPaths.CachesApi.BULK_ENABLE_CACHE, WireLevelAuthorities.CACHES_TOGGLE);
+            "caches:enable", HttpMethod.POST, ApiPaths.CachesApi.BULK_ENABLE_CACHE, OssAuthority.CACHES_TOGGLE);
     public static final MasterWebEndpoint CACHE_DISABLE = register(
-            "caches:disable", HttpMethod.POST, ApiPaths.CachesApi.BULK_DISABLE_CACHE, WireLevelAuthorities.CACHES_TOGGLE);
+            "caches:disable", HttpMethod.POST, ApiPaths.CachesApi.BULK_DISABLE_CACHE, OssAuthority.CACHES_TOGGLE);
     public static final MasterWebEndpoint CACHE_CLEAR_ONE = register(
             "caches:clear-one",
             HttpMethod.DELETE,
             ApiPaths.CachesApi.CACHE_BULK_CLEAR_CACHE,
-            WireLevelAuthorities.CACHES_CLEAR);
+            OssAuthority.CACHES_CLEAR);
     public static final MasterWebEndpoint CACHES_CLEAR_ALL = register(
-            "caches:clear-all", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL, WireLevelAuthorities.CACHES_CLEAR);
+            "caches:clear-all", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL, OssAuthority.CACHES_CLEAR);
 
     // Scheduled tasks
     public static final MasterWebEndpoint SCHEDULED_TASKS_READ =
@@ -126,27 +126,27 @@ public final class MasterWebEndpoints {
             "scheduled-task:enable",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.ENABLE_TASK,
-            WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+            OssAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_DISABLE = register(
             "scheduled-task:disable",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.DISABLE_TASK,
-            WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+            OssAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_EXECUTE = register(
             "scheduled-task:execute",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.EXECUTE,
-            WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+            OssAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_MODIFY_CRON = register(
             "scheduled-task:modify-cron-expression",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION,
-            WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+            OssAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_MODIFY_INTERVAL = register(
             "scheduled-task:modify-interval",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL,
-            WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+            OssAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_VALIDATE_CRON = register(
             "scheduled-task:validate-cron-expression",
             HttpMethod.POST,
@@ -159,14 +159,14 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint GC_LOG_READ_STATUS =
             register("gc-log:read-status", HttpMethod.GET, ApiPaths.GcLogFileApi.STATUS_GC_LOGGING, null);
     public static final MasterWebEndpoint GC_TRIGGER =
-            register("gc:trigger", HttpMethod.POST, ApiPaths.GcLogFileApi.TRIGGER_GC, WireLevelAuthorities.GARBAGE_COLLECTOR);
+            register("gc:trigger", HttpMethod.POST, ApiPaths.GcLogFileApi.TRIGGER_GC, OssAuthority.GARBAGE_COLLECTOR);
     public static final MasterWebEndpoint GC_LOG_ENABLE = register(
-            "gc-log:enable", HttpMethod.POST, ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING, WireLevelAuthorities.GARBAGE_COLLECTOR);
+            "gc-log:enable", HttpMethod.POST, ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING, OssAuthority.GARBAGE_COLLECTOR);
     public static final MasterWebEndpoint GC_LOG_DISABLE = register(
             "gc-log:disable",
             HttpMethod.POST,
             ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING,
-            WireLevelAuthorities.GARBAGE_COLLECTOR);
+            OssAuthority.GARBAGE_COLLECTOR);
 
     // Thread dump
     public static final MasterWebEndpoint THREAD_DUMP_READ =
@@ -235,9 +235,9 @@ public final class MasterWebEndpoints {
 
     // Users
     public static final MasterWebEndpoint USERS_READ =
-            register("users:read", HttpMethod.GET, ApiPaths.UsersApi.USERS_FEED, WireLevelAuthorities.USERS_VIEW);
+            register("users:read", HttpMethod.GET, ApiPaths.UsersApi.USERS_FEED, OssAuthority.USERS_VIEW);
     public static final MasterWebEndpoint USERS_READ_ROLE_COUNTS = register(
-            "users:read-role-counts", HttpMethod.GET, ApiPaths.UsersApi.ROLE_USER_COUNTS, WireLevelAuthorities.USERS_VIEW);
+            "users:read-role-counts", HttpMethod.GET, ApiPaths.UsersApi.ROLE_USER_COUNTS, OssAuthority.USERS_VIEW);
     public static final MasterWebEndpoint USER_READ_ONE =
             register("users:read-one", HttpMethod.GET, ApiPaths.UsersApi.GET_USER_BY_ID, null);
     public static final MasterWebEndpoint LOCAL_LOGIN =
@@ -247,7 +247,7 @@ public final class MasterWebEndpoints {
 
     // Roles
     public static final MasterWebEndpoint ROLES_READ =
-            register("roles:read", HttpMethod.GET, ApiPaths.RolesApi.ROLES_FEED, WireLevelAuthorities.USERS_VIEW);
+            register("roles:read", HttpMethod.GET, ApiPaths.RolesApi.ROLES_FEED, OssAuthority.USERS_VIEW);
 
     // Oidc/Oauth
     public static final MasterWebEndpoint OIDC_AUTH_COMPLETE =
@@ -255,16 +255,16 @@ public final class MasterWebEndpoints {
 
     // User management
     public static final MasterWebEndpoint USER_CREATE = register(
-            "users:create", HttpMethod.POST, ApiPaths.UsersManagementApi.USERS_CREATE, WireLevelAuthorities.USERS_MANAGEMENT);
+            "users:create", HttpMethod.POST, ApiPaths.UsersManagementApi.USERS_CREATE, OssAuthority.USERS_MANAGEMENT);
     public static final MasterWebEndpoint USER_DELETE = register(
-            "users:delete", HttpMethod.DELETE, ApiPaths.UsersManagementApi.USERS_DELETE, WireLevelAuthorities.USERS_MANAGEMENT);
+            "users:delete", HttpMethod.DELETE, ApiPaths.UsersManagementApi.USERS_DELETE, OssAuthority.USERS_MANAGEMENT);
     public static final MasterWebEndpoint USER_UPDATE = register(
-            "users:update", HttpMethod.PUT, ApiPaths.UsersManagementApi.USERS_UPDATE, WireLevelAuthorities.USERS_MANAGEMENT);
+            "users:update", HttpMethod.PUT, ApiPaths.UsersManagementApi.USERS_UPDATE, OssAuthority.USERS_MANAGEMENT);
     public static final MasterWebEndpoint USER_CHANGE_STATUS = register(
             "users:change-status",
             HttpMethod.PUT,
             ApiPaths.UsersManagementApi.USERS_STATUS,
-            WireLevelAuthorities.USERS_MANAGEMENT);
+            OssAuthority.USERS_MANAGEMENT);
 
     // spotless:on
 

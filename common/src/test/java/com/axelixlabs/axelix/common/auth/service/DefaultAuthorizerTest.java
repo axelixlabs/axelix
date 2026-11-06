@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.common.auth.service;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -60,12 +60,12 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                WireLevelAuthorities.SCHEDULED_TASKS_MODIFY,
-                WireLevelAuthorities.CACHES_CLEAR,
-                WireLevelAuthorities.CACHES_TOGGLE,
-                WireLevelAuthorities.GARBAGE_COLLECTOR,
-                WireLevelAuthorities.CONFIG_PROPS_VALUES_READ,
-                WireLevelAuthorities.ENV_VALUES_READ));
+                OssAuthority.SCHEDULED_TASKS_MODIFY,
+                OssAuthority.CACHES_CLEAR,
+                OssAuthority.CACHES_TOGGLE,
+                OssAuthority.GARBAGE_COLLECTOR,
+                OssAuthority.CONFIG_PROPS_VALUES_READ,
+                OssAuthority.ENV_VALUES_READ));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
@@ -75,10 +75,10 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.EDITOR));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                WireLevelAuthorities.SCHEDULED_TASKS_MODIFY,
-                WireLevelAuthorities.CACHES_CLEAR,
-                WireLevelAuthorities.CACHES_TOGGLE,
-                WireLevelAuthorities.GARBAGE_COLLECTOR));
+                OssAuthority.SCHEDULED_TASKS_MODIFY,
+                OssAuthority.CACHES_CLEAR,
+                OssAuthority.CACHES_TOGGLE,
+                OssAuthority.GARBAGE_COLLECTOR));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
@@ -103,14 +103,14 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.EDITOR));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                WireLevelAuthorities.SCHEDULED_TASKS_MODIFY,
-                WireLevelAuthorities.CACHES_CLEAR,
-                WireLevelAuthorities.CACHES_TOGGLE,
-                WireLevelAuthorities.GARBAGE_COLLECTOR,
-                WireLevelAuthorities.CONFIG_PROPS_VALUES_READ,
-                WireLevelAuthorities.ENV_VALUES_READ,
-                WireLevelAuthorities.USERS_MANAGEMENT,
-                WireLevelAuthorities.USERS_VIEW));
+                OssAuthority.SCHEDULED_TASKS_MODIFY,
+                OssAuthority.CACHES_CLEAR,
+                OssAuthority.CACHES_TOGGLE,
+                OssAuthority.GARBAGE_COLLECTOR,
+                OssAuthority.CONFIG_PROPS_VALUES_READ,
+                OssAuthority.ENV_VALUES_READ,
+                OssAuthority.USERS_MANAGEMENT,
+                OssAuthority.USERS_VIEW));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
     }
@@ -120,14 +120,14 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.VIEWER));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                WireLevelAuthorities.SCHEDULED_TASKS_MODIFY,
-                WireLevelAuthorities.CACHES_CLEAR,
-                WireLevelAuthorities.CACHES_TOGGLE,
-                WireLevelAuthorities.GARBAGE_COLLECTOR,
-                WireLevelAuthorities.CONFIG_PROPS_VALUES_READ,
-                WireLevelAuthorities.ENV_VALUES_READ,
-                WireLevelAuthorities.USERS_MANAGEMENT,
-                WireLevelAuthorities.USERS_VIEW));
+                OssAuthority.SCHEDULED_TASKS_MODIFY,
+                OssAuthority.CACHES_CLEAR,
+                OssAuthority.CACHES_TOGGLE,
+                OssAuthority.GARBAGE_COLLECTOR,
+                OssAuthority.CONFIG_PROPS_VALUES_READ,
+                OssAuthority.ENV_VALUES_READ,
+                OssAuthority.USERS_MANAGEMENT,
+                OssAuthority.USERS_VIEW));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
     }
@@ -137,12 +137,12 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                WireLevelAuthorities.SCHEDULED_TASKS_MODIFY,
-                WireLevelAuthorities.CACHES_CLEAR,
-                WireLevelAuthorities.CACHES_TOGGLE,
-                WireLevelAuthorities.GARBAGE_COLLECTOR,
-                WireLevelAuthorities.CONFIG_PROPS_VALUES_READ,
-                WireLevelAuthorities.ENV_VALUES_READ,
+                OssAuthority.SCHEDULED_TASKS_MODIFY,
+                OssAuthority.CACHES_CLEAR,
+                OssAuthority.CACHES_TOGGLE,
+                OssAuthority.GARBAGE_COLLECTOR,
+                OssAuthority.CONFIG_PROPS_VALUES_READ,
+                OssAuthority.ENV_VALUES_READ,
                 UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
@@ -150,21 +150,21 @@ class DefaultAuthorizerTest {
 
     @ParameterizedTest
     @MethodSource("adminAuthorities")
-    void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole(WireLevelAuthorities authority) {
+    void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole(OssAuthority authority) {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN, TestRoles.EDITOR));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(user, new AuthorizationRequest(Set.of(authority))));
     }
 
-    static Stream<WireLevelAuthorities> adminAuthorities() {
+    static Stream<OssAuthority> adminAuthorities() {
         return Stream.of(
-                WireLevelAuthorities.ENV_VALUES_READ,
-                WireLevelAuthorities.CONFIG_PROPS_VALUES_READ,
-                WireLevelAuthorities.SCHEDULED_TASKS_MODIFY,
-                WireLevelAuthorities.CACHES_CLEAR,
-                WireLevelAuthorities.CACHES_TOGGLE,
-                WireLevelAuthorities.GARBAGE_COLLECTOR);
+                OssAuthority.ENV_VALUES_READ,
+                OssAuthority.CONFIG_PROPS_VALUES_READ,
+                OssAuthority.SCHEDULED_TASKS_MODIFY,
+                OssAuthority.CACHES_CLEAR,
+                OssAuthority.CACHES_TOGGLE,
+                OssAuthority.GARBAGE_COLLECTOR);
     }
 
     static Stream<Role> allRoles() {
