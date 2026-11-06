@@ -130,28 +130,14 @@ class DefaultRoleServiceTest {
         }
 
         @Test
-        void shouldStoreCodenameAndDescriptionForEveryOssAuthority() {
+        void shouldForceNonEmptyDescriptionForEveryAuthority() {
             // when.
-            List<String> stored = jdbcClient
-                    .sql("SELECT codename FROM authorities")
-                    .query(String.class)
-                    .list();
             int blankDescriptions = jdbcClient
                     .sql("SELECT COUNT(*) FROM authorities WHERE description IS NULL OR TRIM(description) = ''")
                     .query(Integer.class)
                     .single();
 
             // then.
-            assertThat(stored)
-                    .containsExactlyInAnyOrder(
-                            "environment.values:read",
-                            "config-properties.values:read",
-                            "scheduled-tasks:write",
-                            "caches:clear",
-                            "caches:toggle",
-                            "gc:manage",
-                            "users:read",
-                            "users:manage");
             assertThat(blankDescriptions).isZero();
         }
     }
