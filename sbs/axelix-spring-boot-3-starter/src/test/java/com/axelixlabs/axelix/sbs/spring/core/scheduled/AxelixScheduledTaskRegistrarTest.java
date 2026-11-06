@@ -40,6 +40,7 @@ import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTaskRegistrar.ScheduledAnnotationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Unit tests for {@link AxelixScheduledTaskRegistrar}.
@@ -133,8 +134,10 @@ class AxelixScheduledTaskRegistrarTest {
         assertThat(history.getExecutions()).isEmpty();
     }
 
-    @Test // the tests run on Spring Framework 6.0, which does not support the reactive tasks
+    @Test
     void afterPropertiesSet_shouldNotSetUpTheRecordingRegistryWithoutTheSupportOfTheReactiveTasks() {
+        assumeFalse(AxelixScheduledAnnotationBeanPostProcessor.REACTIVE_SUPPORT_PRESENT);
+
         registrar.afterPropertiesSet();
 
         assertThat(registrar.getObservationRegistry()).isNull();

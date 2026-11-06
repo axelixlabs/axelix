@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.util.ReflectionUtils;
 
@@ -122,6 +123,7 @@ class ScheduledAnnotationRunnableTest {
             assertThat(methodRunnable.getMethod()).isEqualTo(METHOD_RUN);
         });
         assertTaskId(schedulable, TASK_ID);
+        assertTaskId(new Task(new Task(schedulable).getRunnable()).getRunnable(), TASK_ID);
     }
 
     @Test
@@ -141,6 +143,7 @@ class ScheduledAnnotationRunnableTest {
         ScheduledAnnotationRunnable reactive = reactive(() -> {});
 
         assertThat(reactive.schedulable()).isSameAs(reactive);
+        assertTaskId(new Task(reactive.schedulable()).getRunnable(), TASK_ID);
     }
 
     private ScheduledAnnotationRunnable regular(Runnable delegate) {

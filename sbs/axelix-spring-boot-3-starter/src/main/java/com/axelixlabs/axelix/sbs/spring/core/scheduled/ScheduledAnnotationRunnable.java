@@ -17,12 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.SchedulingAwareRunnable;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
+import org.springframework.util.ReflectionUtils;
 
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
@@ -96,6 +98,17 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
         }
         if (runnable instanceof ScheduledMethodView scheduledMethodView) {
             return scheduledMethodView.task;
+        }
+        // Spring wraps Task runnables to track their execution outcomes, including on rescheduling.
+        if (runnable.getClass()
+                .getName()
+                .equals("org.springframework.scheduling.config.Task$OutcomeTrackingRunnable")) {
+            Field delegate = ReflectionUtils.findField(runnable.getClass(), "runnable");
+            if (delegate != null) {
+                ReflectionUtils.makeAccessible(delegate);
+                Object wrapped = ReflectionUtils.getField(delegate, runnable);
+                return wrapped instanceof Runnable wrappedRunnable ? from(wrappedRunnable) : null;
+            }
         }
         return null;
     }
