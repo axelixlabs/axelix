@@ -467,8 +467,8 @@ class DefaultRoleServiceTest {
 
         jdbcClient
                 .sql("INSERT INTO roles_authorities (role_id, authority_id)"
-                        + " SELECT ?, id FROM authorities WHERE name = ?")
-                .params(id, authority.name())
+                        + " SELECT ?, id FROM authorities WHERE codename = ?")
+                .params(id, authority.getCodename())
                 .update();
 
         return id;

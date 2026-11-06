@@ -35,7 +35,7 @@ import com.axelixlabs.axelix.master.domain.iam.RoleEntity;
 public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
 
     @Query("""
-            SELECT r.id AS role_id, r.name AS role_name, a.name AS authority_name
+            SELECT r.id AS role_id, r.name AS role_name, a.codename AS authority_name
             FROM roles r
             LEFT JOIN roles_authorities ra ON ra.role_id = r.id
             LEFT JOIN authorities a ON a.id = ra.authority_id

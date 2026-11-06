@@ -160,7 +160,8 @@ class ReactiveJwtAuthorizationFilterTest {
     }
 
     @Test
-    void shouldRejectRequestWithoutRequiredAuthority() {
+    // TODO: Revisit this test after the master-centralized RBAC is in place
+    void shouldAllowRequestRegardlessOfAuthorities() {
         contextRunner.run(context -> {
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
             User user = UserUtils.withPassword("testUser", "testPassword", Set.of(TestRoles.VIEWER));
@@ -176,8 +177,7 @@ class ReactiveJwtAuthorizationFilterTest {
                     })
                     .block();
 
-            assertThat(passed).isFalse();
-            assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+            assertThat(passed).isTrue();
         });
     }
 

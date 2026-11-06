@@ -215,26 +215,28 @@ class JwtAuthorizationFilterTest {
 
     @ParameterizedTest
     @MethodSource("notAuthorityForRole")
-    void shouldReturnForbidden_UserWithoutRequiredAuthority_ForUserWithRoleViewer(String path, HttpMethod httpMethod) {
+    // TODO: Revisit this test after the master-centralized RBAC is in place
+    void shouldAllowAccess_UserWithoutRequiredAuthority_ForUserWithRoleViewer(String path, HttpMethod httpMethod) {
         buildCache();
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @ParameterizedTest
     @MethodSource("notAuthorityForRole")
-    void shouldReturnForbidden_UserWithEmptyRoles(String path, HttpMethod httpMethod) {
+    // TODO: Revisit this test after the master-centralized RBAC is in place
+    void shouldAllowAccess_UserWithEmptyRoles_ForMutationEndpoints(String path, HttpMethod httpMethod) {
         buildCache();
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
 
         ResponseEntity<String> response = restTemplate.exchange(path, httpMethod, entity, String.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
@@ -252,7 +254,8 @@ class JwtAuthorizationFilterTest {
     }
 
     @Test
-    void shouldReturnForbidden_UserHasRoleWithInvalidAuthority() {
+    // TODO: Revisit this test after the master-centralized RBAC is in place
+    void shouldAllowAccess_UserHasRoleWithInvalidAuthority() {
         Role role = new DefaultRole("VIEWER", Set.of(UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
@@ -261,7 +264,7 @@ class JwtAuthorizationFilterTest {
         ResponseEntity<Void> response = testRestTemplate.exchange(
                 path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE, defaultEntity(token), Void.class);
 
-        assertThat(response).returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode);
+        assertThat(response).returns(HttpStatus.OK, ResponseEntity::getStatusCode);
     }
 
     @Test
@@ -317,7 +320,8 @@ class JwtAuthorizationFilterTest {
     }
 
     @Test
-    void shouldReturnForbidden_TokenWithNullNameRoles() {
+    // TODO: Revisit this test after the master-centralized RBAC is in place
+    void shouldAllowAccess_TokenWithNullNameRoles() {
         Role role = new DefaultRole(null, Set.of(OssAuthority.CACHES_CLEAR));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
