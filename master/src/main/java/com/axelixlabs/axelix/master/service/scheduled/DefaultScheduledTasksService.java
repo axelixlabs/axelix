@@ -21,12 +21,12 @@ import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 
+import com.axelixlabs.axelix.common.contract.scheduledtask.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTasksResponse;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTasksResponse.TaskRunnable;
-import com.axelixlabs.axelix.master.contract.scheduledtask.ServiceScheduledTasks;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.DefaultJacksonMessageDeserializationStrategy;

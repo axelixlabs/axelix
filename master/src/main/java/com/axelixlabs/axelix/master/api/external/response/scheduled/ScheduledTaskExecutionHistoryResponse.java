@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskLaunchType;
+import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 /**
  * The execution history of the scheduled task on all the instances of the application, with a single page of its
