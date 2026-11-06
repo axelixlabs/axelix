@@ -3,6 +3,7 @@ title: "SIGILL on Startup: How the JDK AOT Cache Crashed Axelix in Docker"
 date: 2026-10-28
 authors: ["Artemy Degtyarev"]
 tags: ["Java", "JVM", "Docker"]
+heroImagePath: /posts/aot-cache-sigill/preview.png
 description: "Axelix Master started crashing with SIGILL right after docker run. We trace it to CPU-specific adapter code stored in the JDK 25 AOT cache, look at the upstream fix, and explain how we ship a multi-arch image with an AOT cache that runs on any CPU."
 metaDescription: "Why a JDK 25 AOT cache built on one CPU crashes with SIGILL on another (AOTAdapterCaching, JDK-8388703), how JDK 25.0.5 and JDK 27 address it, and how to ship a portable multi-arch Docker image with an AOT cache."
 ---
