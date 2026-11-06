@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities;
 
+import java.util.function.Supplier;
+
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.contract.metadata.JpaEntities;
@@ -26,15 +28,16 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.JpaEntitiesProfileP
  * Default implementation of {@link JpaEntitiesProfileProvider}.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public class DefaultJpaEntitiesProfileProvider implements JpaEntitiesProfileProvider {
 
-    private final EntityMappingScanner scanner;
+    private final Supplier<JpaEntities> entitiesSupplier;
 
     private volatile @Nullable JpaEntities cached;
 
-    public DefaultJpaEntitiesProfileProvider(EntityMappingScanner scanner) {
-        this.scanner = scanner;
+    public DefaultJpaEntitiesProfileProvider(Supplier<JpaEntities> entitiesSupplier) {
+        this.entitiesSupplier = entitiesSupplier;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class DefaultJpaEntitiesProfileProvider implements JpaEntitiesProfileProv
             synchronized (this) {
                 local = cached;
                 if (local == null) {
-                    local = scanner.scan();
+                    local = entitiesSupplier.get();
                     cached = local;
                 }
             }

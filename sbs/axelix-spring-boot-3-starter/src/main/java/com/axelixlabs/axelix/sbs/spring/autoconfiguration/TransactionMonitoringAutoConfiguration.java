@@ -180,7 +180,8 @@ public class TransactionMonitoringAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean(JpaEntitiesProfileProvider.class)
         public JpaEntitiesProfileProvider entitiesMapProvider(EntityManagerFactory entityManagerFactory) {
-            return new DefaultJpaEntitiesProfileProvider(new EntityMappingScanner(entityManagerFactory));
+            EntityMappingScanner scanner = new EntityMappingScanner(entityManagerFactory);
+            return new DefaultJpaEntitiesProfileProvider(scanner::scan);
         }
     }
 
