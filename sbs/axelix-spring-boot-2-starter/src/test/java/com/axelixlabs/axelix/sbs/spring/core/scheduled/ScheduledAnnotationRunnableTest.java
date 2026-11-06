@@ -71,7 +71,7 @@ class ScheduledAnnotationRunnableTest {
         manual.run();
 
         assertThat(ran).isTrue();
-        assertThat(manual).hasToString(TASK_ID);
+        assertThat(manual.getId()).isEqualTo(TASK_ID);
         assertThat(history.getExecutions())
                 .extracting(ScheduledTaskExecution::getLaunchType)
                 .containsExactly(ScheduledTaskLaunchType.MANUAL);
@@ -80,7 +80,8 @@ class ScheduledAnnotationRunnableTest {
     @Test
     void shouldExposeTheId() {
         assertThat(new ScheduledAnnotationRunnable(() -> {}, TASK_ID, this, METHOD_RUN, history))
-                .hasToString(TASK_ID);
+                .extracting(ScheduledAnnotationRunnable::getId)
+                .isEqualTo(TASK_ID);
     }
 
     @Test

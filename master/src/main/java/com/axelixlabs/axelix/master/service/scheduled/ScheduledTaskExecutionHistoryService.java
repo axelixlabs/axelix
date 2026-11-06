@@ -17,9 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.scheduled;
 
+import java.util.Map;
 import java.util.Set;
-
-import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
@@ -44,11 +43,9 @@ public interface ScheduledTaskExecutionHistoryService {
     void append(Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults);
 
     /**
-     * @return the share of the succeeded executions of the task on all the instances of the application in percent,
-     *         absent when there are no executions.
+     * @return the shares of succeeded executions in percent, keyed by task id. Tasks with no executions are absent.
      */
-    @Nullable
-    Double findSuccessRate(ApplicationId applicationId, String taskId);
+    Map<String, Double> findSuccessRates(ApplicationId applicationId, Set<String> taskIds);
 
     /**
      * @param applicationId the application the task belongs to.

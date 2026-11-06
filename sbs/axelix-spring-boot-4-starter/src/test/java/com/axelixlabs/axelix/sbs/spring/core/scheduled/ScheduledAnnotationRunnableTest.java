@@ -25,6 +25,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.scheduling.SchedulingAwareRunnable;
+import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.util.ReflectionUtils;
 
@@ -61,7 +62,7 @@ class ScheduledAnnotationRunnableTest {
     void shouldExposeTheIdAndTheQualifierOfTheDelegate() {
         ScheduledAnnotationRunnable runnable = regular(new QualifiedRunnable("otherScheduler"));
 
-        assertThat(runnable).hasToString(TASK_ID);
+        assertThat(runnable.getId()).isEqualTo(TASK_ID);
         assertThat(runnable.getQualifier()).isEqualTo("otherScheduler");
     }
 
@@ -109,7 +110,7 @@ class ScheduledAnnotationRunnableTest {
 
         manual.run();
 
-        assertThat(manual).hasToString(TASK_ID);
+        assertThat(manual.getId()).isEqualTo(TASK_ID);
         assertThat(manual.getQualifier()).isEqualTo("otherScheduler");
         assertThat(history.getExecutions())
                 .extracting(ScheduledTaskExecution::getLaunchType)
@@ -127,7 +128,8 @@ class ScheduledAnnotationRunnableTest {
             assertThat(methodRunnable.getMethod()).isEqualTo(METHOD_RUN);
             assertThat(methodRunnable.getQualifier()).isEqualTo("otherScheduler");
         });
-        assertThat(schedulable).hasToString(TASK_ID);
+        assertTaskId(schedulable, TASK_ID);
+        assertTaskId(new Task(new Task(schedulable).getRunnable()).getRunnable(), TASK_ID);
     }
 
     @Test
@@ -147,6 +149,7 @@ class ScheduledAnnotationRunnableTest {
         ScheduledAnnotationRunnable reactive = reactive(() -> {});
 
         assertThat(reactive.schedulable()).isSameAs(reactive);
+        assertTaskId(new Task(reactive.schedulable()).getRunnable(), TASK_ID);
     }
 
     private ScheduledAnnotationRunnable regular(Runnable delegate) {
@@ -155,6 +158,13 @@ class ScheduledAnnotationRunnableTest {
 
     private ScheduledAnnotationRunnable reactive(Runnable delegate) {
         return new ScheduledAnnotationRunnable(delegate, TASK_ID, true, delegate, METHOD_RUN, history);
+    }
+
+    private static void assertTaskId(Runnable runnable, String expectedTaskId) {
+        assertThat(ScheduledAnnotationRunnable.from(runnable))
+                .isNotNull()
+                .extracting(ScheduledAnnotationRunnable::getId)
+                .isEqualTo(expectedTaskId);
     }
 
     private record QualifiedRunnable(@Nullable String qualifier) implements SchedulingAwareRunnable {

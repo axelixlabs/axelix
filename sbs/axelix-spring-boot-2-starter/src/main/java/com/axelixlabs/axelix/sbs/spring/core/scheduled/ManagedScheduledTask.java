@@ -48,7 +48,7 @@ public class ManagedScheduledTask implements AutoCloseable {
     private static final Field SCHEDULED_TASK_FUTURE_FIELD;
 
     /**
-     * Unique identifier for the scheduled task, typically derived from the runnable's toString().
+     * Unique identifier for the scheduled task.
      */
     private final String id;
 

@@ -17,18 +17,20 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.SchedulingAwareRunnable;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
+import org.springframework.util.ReflectionUtils;
 
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 /**
- * The runnable of the task declared by a single {@code @Scheduled} annotation. Its string representation is the id of
- * the task, which tells apart the tasks of the repeatable {@code @Scheduled} annotations of the same method.
+ * The runnable of the task declared by a single {@code @Scheduled} annotation. Its id tells apart the tasks of the
+ * repeatable {@code @Scheduled} annotations of the same method.
  *
  * <p>The execution of a regular task is recorded right here. The execution of a reactive task ends only when its
  * publisher completes, so it is recorded by the {@link ScheduledTaskExecutionObservationHandler}.
@@ -90,6 +92,31 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
                 delegate, id, qualifier, reactive, target, method, history, ScheduledTaskLaunchType.MANUAL);
     }
 
+    static @Nullable ScheduledAnnotationRunnable from(Runnable runnable) {
+        if (runnable instanceof ScheduledAnnotationRunnable scheduledAnnotationRunnable) {
+            return scheduledAnnotationRunnable;
+        }
+        if (runnable instanceof ScheduledMethodView scheduledMethodView) {
+            return scheduledMethodView.task;
+        }
+        // Spring wraps Task runnables to track their execution outcomes, including on rescheduling.
+        if (runnable.getClass()
+                .getName()
+                .equals("org.springframework.scheduling.config.Task$OutcomeTrackingRunnable")) {
+            Field delegate = ReflectionUtils.findField(runnable.getClass(), "runnable");
+            if (delegate != null) {
+                ReflectionUtils.makeAccessible(delegate);
+                Object wrapped = ReflectionUtils.getField(delegate, runnable);
+                return wrapped instanceof Runnable wrappedRunnable ? from(wrappedRunnable) : null;
+            }
+        }
+        return null;
+    }
+
+    public String getId() {
+        return id;
+    }
+
     @Override
     public void run() {
         if (reactive) {
@@ -141,11 +168,6 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
         return qualifier;
     }
 
-    @Override
-    public String toString() {
-        return id;
-    }
-
     /**
      * A simple {@link ScheduledMethodRunnable} that delegates to the regular task, for the libraries expecting the
      * runnable of a {@code @Scheduled} method to be the {@link ScheduledMethodRunnable}, e.g. ShedLock.
@@ -171,11 +193,6 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
 
         public @Nullable String getQualifier() {
             return task.getQualifier();
-        }
-
-        @Override
-        public String toString() {
-            return task.toString();
         }
     }
 }

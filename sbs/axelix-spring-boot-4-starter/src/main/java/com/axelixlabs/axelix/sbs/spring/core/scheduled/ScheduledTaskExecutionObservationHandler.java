@@ -82,7 +82,7 @@ public class ScheduledTaskExecutionObservationHandler implements ObservationHand
         if (task != null) {
             context.put(
                     ReactiveExecution.class,
-                    new ReactiveExecution(task.toString(), task.getLaunchType(), Instant.now(), System.nanoTime()));
+                    new ReactiveExecution(task.getId(), task.getLaunchType(), Instant.now(), System.nanoTime()));
         }
     }
 

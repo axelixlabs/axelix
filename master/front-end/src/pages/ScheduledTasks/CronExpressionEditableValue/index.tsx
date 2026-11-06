@@ -58,7 +58,7 @@ export const CronExpressionEditableValue = ({ task }: IProps) => {
         changeCronExpression({
             instanceId: instanceId!,
             newCronExpression: normalizedCronExpression,
-            trigger: task.runnable.target,
+            trigger: task.taskId,
         })
             .then(() => {
                 message.success(t("ScheduledTasks.cronExpressionChangeSuccess"));

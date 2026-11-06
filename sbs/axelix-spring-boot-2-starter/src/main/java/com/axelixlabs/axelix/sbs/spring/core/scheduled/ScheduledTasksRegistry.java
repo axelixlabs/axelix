@@ -81,7 +81,8 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
     private String resolveId(ScheduledTask task) {
         Task t = task.getTask();
         Runnable r = t.getRunnable();
-        return r.toString();
+        ScheduledAnnotationRunnable scheduledAnnotationRunnable = ScheduledAnnotationRunnable.from(r);
+        return scheduledAnnotationRunnable != null ? scheduledAnnotationRunnable.getId() : r.toString();
     }
 
     @Override

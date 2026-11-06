@@ -82,25 +82,19 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
          {
           "cron": [
             {
-              "runnable": {
-                "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
-              },
+              "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive",
               "expression": "*/2 * * * * *",
               "enabled": true,
               "successRate": null
             },
             {
-              "runnable": {
-                "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
-              },
+              "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask",
               "expression": "*/5 * * * * *",
               "enabled": true,
               "successRate": null
             },
             {
-              "runnable": {
-                "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
-              },
+              "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask",
               "expression": "*/2 * * * * *",
               "enabled": true,
               "successRate": null
@@ -108,9 +102,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
           ],
           "fixedDelay": [
             {
-              "runnable": {
-                "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask"
-              },
+              "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask",
               "interval": 2000,
               "initialDelay": 0,
               "enabled": true,
@@ -119,9 +111,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
           ],
           "fixedRate": [
             {
-              "runnable": {
-                "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
-              },
+              "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask",
               "interval": 2000,
               "initialDelay": 100,
               "enabled": false,
@@ -130,9 +120,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
           ],
           "custom": [
             {
-              "runnable": {
-                "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
-              },
+              "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634",
               "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
               "enabled": false,
               "successRate": null

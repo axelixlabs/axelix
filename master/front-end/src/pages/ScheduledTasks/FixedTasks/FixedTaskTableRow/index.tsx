@@ -35,7 +35,7 @@ export const FixedTaskTableRow = ({ task }: IProps) => {
         <>
             <div className={styles.RowChunksWrapper}>
                 <div className={styles.BodyRowChunk}>
-                    <TooltipWithCopy text={task.runnable.target} />
+                    <TooltipWithCopy text={task.taskId} />
                 </div>
                 <div className={styles.BodyRowChunk}>{task.initialDelay}</div>
                 <div className={styles.BodyRowChunk}>
@@ -45,7 +45,7 @@ export const FixedTaskTableRow = ({ task }: IProps) => {
                     <ScheduledTasksStatusSwitch runnable={task} />
                 </div>
                 <div className={styles.BodyRowChunk}>
-                    <ForceRunTask trigger={task.runnable.target} />
+                    <ForceRunTask trigger={task.taskId} />
                 </div>
             </div>
         </>

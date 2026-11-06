@@ -72,58 +72,56 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
             List<ScheduledCustomTask> custom) {
 
         Task task = managedScheduledTask.getScheduledTask().getTask();
+        ScheduledAnnotationRunnable runnable = ScheduledAnnotationRunnable.from(managedScheduledTask.getRunnable());
+        if (runnable == null) {
+            return;
+        }
 
         if (task instanceof CronTask) {
             CronTask cronTask = (CronTask) task;
-            cron.add(assembleCronTask(cronTask, managedScheduledTask));
+            cron.add(assembleCronTask(cronTask, managedScheduledTask, runnable));
         } else if (task instanceof FixedRateTask) {
             FixedRateTask fixedRateTask = (FixedRateTask) task;
-            fixedRate.add(assembleFixedRateTask(fixedRateTask, managedScheduledTask));
+            fixedRate.add(assembleFixedRateTask(fixedRateTask, managedScheduledTask, runnable));
         } else if (task instanceof FixedDelayTask) {
             FixedDelayTask fixedDelayTask = (FixedDelayTask) task;
-            fixedDelay.add(assembleFixedDelayMap(fixedDelayTask, managedScheduledTask));
+            fixedDelay.add(assembleFixedDelayMap(fixedDelayTask, managedScheduledTask, runnable));
         } else if (task instanceof TriggerTask) {
             TriggerTask customTriggerTask = (TriggerTask) task;
-            custom.add(assembleCustomMap(customTriggerTask, managedScheduledTask));
+            custom.add(assembleCustomMap(customTriggerTask, managedScheduledTask, runnable));
         }
     }
 
-    private ScheduledCronTask assembleCronTask(CronTask task, ManagedScheduledTask managedScheduledTask) {
-        String target = managedScheduledTask.getRunnable().toString();
-
+    private ScheduledCronTask assembleCronTask(
+            CronTask task, ManagedScheduledTask managedScheduledTask, ScheduledAnnotationRunnable runnable) {
         return new ScheduledCronTask()
-                .runnable(new ScheduledTaskRunnable().target(target))
+                .runnable(new ScheduledTaskRunnable().target(runnable.getId()))
                 .expression(task.getExpression())
                 .enabled(managedScheduledTask.isEnabled());
     }
 
     private ScheduledFixedRateTask assembleFixedRateTask(
-            FixedRateTask task, ManagedScheduledTask managedScheduledTask) {
-        String target = task.getRunnable().toString();
-
+            FixedRateTask task, ManagedScheduledTask managedScheduledTask, ScheduledAnnotationRunnable runnable) {
         return new ScheduledFixedRateTask()
-                .runnable(new ScheduledTaskRunnable().target(target))
+                .runnable(new ScheduledTaskRunnable().target(runnable.getId()))
                 .interval(task.getInterval())
                 .initialDelay(task.getInitialDelay())
                 .enabled(managedScheduledTask.isEnabled());
     }
 
     private ScheduledFixedDelayTask assembleFixedDelayMap(
-            FixedDelayTask task, ManagedScheduledTask managedScheduledTask) {
-        String target = task.getRunnable().toString();
-
+            FixedDelayTask task, ManagedScheduledTask managedScheduledTask, ScheduledAnnotationRunnable runnable) {
         return new ScheduledFixedDelayTask()
-                .runnable(new ScheduledTaskRunnable().target(target))
+                .runnable(new ScheduledTaskRunnable().target(runnable.getId()))
                 .interval(task.getInterval())
                 .initialDelay(task.getInitialDelay())
                 .enabled(managedScheduledTask.isEnabled());
     }
 
-    private ScheduledCustomTask assembleCustomMap(TriggerTask task, ManagedScheduledTask managedScheduledTask) {
-        String target = task.getRunnable().toString();
-
+    private ScheduledCustomTask assembleCustomMap(
+            TriggerTask task, ManagedScheduledTask managedScheduledTask, ScheduledAnnotationRunnable runnable) {
         return new ScheduledCustomTask()
-                .runnable(new ScheduledTaskRunnable().target(target))
+                .runnable(new ScheduledTaskRunnable().target(runnable.getId()))
                 .trigger(task.getTrigger().toString())
                 .enabled(managedScheduledTask.isEnabled());
     }

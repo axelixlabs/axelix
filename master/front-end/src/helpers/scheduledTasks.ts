@@ -26,16 +26,14 @@ export const filterScheduledTasks = (
     const formattedSearch = search.toLowerCase().trim();
 
     return {
-        cron: scheduledTasksResponse.cron.filter((value) =>
-            value.runnable.target.toLowerCase().includes(formattedSearch),
-        ),
+        cron: scheduledTasksResponse.cron.filter((value) => value.taskId.toLowerCase().includes(formattedSearch)),
 
         fixedDelay: scheduledTasksResponse.fixedDelay.filter((value) =>
-            value.runnable.target.toLowerCase().includes(formattedSearch),
+            value.taskId.toLowerCase().includes(formattedSearch),
         ),
 
         fixedRate: scheduledTasksResponse.fixedRate.filter((value) =>
-            value.runnable.target.toLowerCase().includes(formattedSearch),
+            value.taskId.toLowerCase().includes(formattedSearch),
         ),
     };
 };

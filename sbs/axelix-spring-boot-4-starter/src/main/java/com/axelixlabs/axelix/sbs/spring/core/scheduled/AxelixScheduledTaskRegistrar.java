@@ -174,7 +174,7 @@ public class AxelixScheduledTaskRegistrar extends ScheduledTaskRegistrar {
                 annotation.target(),
                 annotation.method(),
                 history.require());
-        runnables.put(wrapped.toString(), wrapped);
+        runnables.put(wrapped.getId(), wrapped);
         return wrapped.schedulable();
     }
 

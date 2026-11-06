@@ -16,18 +16,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-interface ITarget {
-    /**
-     * Target field of runnable field
-     */
-    target: string;
-}
-
-export interface IRunnable {
-    /**
-     * Runnable field of scheduled tasks types body
-     */
-    runnable: ITarget;
+export interface IScheduledTask {
+    taskId: string;
 
     /**
      * Whether the given runnable is enabled or not
@@ -38,14 +28,14 @@ export interface IRunnable {
 /**
  * Body chunk of cron task type
  */
-export interface ICron extends IRunnable {
+export interface ICron extends IScheduledTask {
     expression: string;
 }
 
 /**
  * Body chunk of fixedDelay or fixedRate tasks types
  */
-export interface IFixedTasks extends IRunnable {
+export interface IFixedTasks extends IScheduledTask {
     interval: number;
     initialDelay: number;
 }

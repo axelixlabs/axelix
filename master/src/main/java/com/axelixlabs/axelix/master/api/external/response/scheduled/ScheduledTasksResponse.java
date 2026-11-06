@@ -29,13 +29,8 @@ import org.jspecify.annotations.Nullable;
 public record ScheduledTasksResponse(
         List<CronTask> cron, List<FixedDelayTask> fixedDelay, List<FixedRateTask> fixedRate, List<CustomTask> custom) {
 
-    /**
-     * @param target the id of the task.
-     */
-    public record TaskRunnable(String target) {}
-
     public record CronTask(
-            TaskRunnable runnable,
+            String taskId,
             String expression,
             boolean enabled,
             @Nullable Double successRate) {}
@@ -45,7 +40,7 @@ public record ScheduledTasksResponse(
      * @param initialDelay the delay before the first execution, in milliseconds.
      */
     public record FixedDelayTask(
-            TaskRunnable runnable,
+            String taskId,
             long interval,
             long initialDelay,
             boolean enabled,
@@ -56,14 +51,14 @@ public record ScheduledTasksResponse(
      * @param initialDelay the delay before the first execution, in milliseconds.
      */
     public record FixedRateTask(
-            TaskRunnable runnable,
+            String taskId,
             long interval,
             long initialDelay,
             boolean enabled,
             @Nullable Double successRate) {}
 
     public record CustomTask(
-            TaskRunnable runnable,
+            String taskId,
             String trigger,
             boolean enabled,
             @Nullable Double successRate) {}

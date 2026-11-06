@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.scheduled;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -112,20 +113,22 @@ class DefaultScheduledTaskExecutionHistoryServiceTest {
     }
 
     @Test
-    void findSuccessRate_shouldReturnTheShareOfTheSucceededExecutionsOfTheTask() {
+    void findSuccessRates_shouldReturnTheShareOfSucceededExecutionsForEachTask() {
         // given.
         saveFortyExecutions();
+        repository.saveAll(List.of(execution(41, 100L, true, "other-task"), execution(42, 100L, false, "other-task")));
 
         // when.
-        Double successRate = subject.findSuccessRate(APPLICATION_ID, TASK_ID);
+        Map<String, Double> successRates =
+                subject.findSuccessRates(APPLICATION_ID, Set.of(TASK_ID, "other-task", "missing-task"));
 
         // then.
-        assertThat(successRate).isEqualTo(75.0);
+        assertThat(successRates).containsExactlyInAnyOrderEntriesOf(Map.of(TASK_ID, 75.0, "other-task", 50.0));
     }
 
     @Test
-    void findSuccessRate_shouldBeAbsentWhenTheTaskHasNoExecutions() {
-        assertThat(subject.findSuccessRate(APPLICATION_ID, TASK_ID)).isNull();
+    void findSuccessRates_shouldReturnEmptyWhenNoTasksHaveExecutions() {
+        assertThat(subject.findSuccessRates(APPLICATION_ID, Set.of(TASK_ID))).isEmpty();
     }
 
     private void saveFortyExecutions() {
@@ -139,13 +142,17 @@ class DefaultScheduledTaskExecutionHistoryServiceTest {
     }
 
     private ScheduledTaskExecutionResult execution(int number, long durationMillis, boolean success) {
+        return execution(number, durationMillis, success, TASK_ID);
+    }
+
+    private ScheduledTaskExecutionResult execution(int number, long durationMillis, boolean success, String taskId) {
         return new ScheduledTaskExecutionResult(
                 "execution-" + number,
                 "com.axelixlabs",
                 "sample-app",
                 "instance-1",
                 "instance-1-name",
-                TASK_ID,
+                taskId,
                 STARTED_AT.plusSeconds(number),
                 durationMillis,
                 success,

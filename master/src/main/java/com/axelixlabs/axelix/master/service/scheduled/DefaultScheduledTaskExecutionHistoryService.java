@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.service.scheduled;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,6 @@ import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTas
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.repository.ScheduledTaskExecutionResultRepository;
-import com.axelixlabs.axelix.master.repository.ScheduledTaskExecutionResultRepository.ScheduledTaskExecutionStats;
 
 /**
  * Default implementation for interface {@code ScheduledTaskExecutionHistoryService}
@@ -72,15 +72,18 @@ public class DefaultScheduledTaskExecutionHistoryService implements ScheduledTas
     }
 
     @Override
-    public @Nullable Double findSuccessRate(ApplicationId applicationId, String taskId) {
-        ScheduledTaskExecutionStats stats = executionResultRepository.getExecutionStats(
-                applicationId.groupId(), applicationId.artifactId(), taskId);
-
-        if (stats == null || stats.total() == 0) {
-            return null;
+    public Map<String, Double> findSuccessRates(ApplicationId applicationId, Set<String> taskIds) {
+        if (taskIds.isEmpty()) {
+            return Map.of();
         }
 
-        return stats.successful() * 100.0 / stats.total();
+        return executionResultRepository
+                .getExecutionStats(applicationId.groupId(), applicationId.artifactId(), taskIds)
+                .stream()
+                .collect(
+                        HashMap::new,
+                        (rates, stats) -> rates.put(stats.taskId(), stats.successful() * 100.0 / stats.total()),
+                        HashMap::putAll);
     }
 
     @Override
