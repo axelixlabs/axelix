@@ -57,6 +57,7 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyUtils;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  * @author Andrey Kotov
+ * @author Vyacheslav Yanin
  * @since 04.07.2025
  */
 @NullMarked
@@ -79,12 +80,15 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     @Override
     public BeanMetaInfo extract(String beanName, ConfigurableListableBeanFactory beanFactory) {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+
+        Class<?> beanType = beanFactory.getType(beanName, false);
+        boolean actualSingleton = beanFactory.containsSingleton(beanName) && !beanFactory.isFactoryBean(beanName);
+
         Set<String> positiveConditionsKeys = conditionsKeys();
 
-        Class<?> beanType = beanFactory.containsSingleton(beanName)
-                ? beanFactory.getBean(beanName).getClass()
-                : beanFactory.getType(beanName, false);
-        ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(beanType, beanType != null && beanType.isSynthetic());
+        ProxyType beanProxyingType = actualSingleton
+                ? ProxyUtils.analyzeProxyType(beanType, beanType != null && beanType.isSynthetic())
+                : ProxyType.UNKNOWN;
 
         BeanSource beanSource = analyzeBeanSource(beanDefinition, beanName);
 
@@ -147,8 +151,8 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
 
         if (result == null) {
             try {
-                result = beanFactory.getType(beanName);
-                if (Proxy.isProxyClass(result)) {
+                result = beanFactory.getType(beanName, false);
+                if (result != null && Proxy.isProxyClass(result)) {
                     result = Class.forName(beanDefinition.getBeanClassName());
                 }
             } catch (Exception ignored) {
