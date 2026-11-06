@@ -1,14 +1,34 @@
 .MainWrapper {
+    position: sticky;
+    top: calc(var(--axelix-header-height) + 24px);
     display: flex;
     flex-direction: column;
     gap: 14px;
     min-width: 0;
+    max-height: calc(100vh - var(--axelix-header-height) - 48px);
 }
 
 .Groups {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--axelix-grey-300) transparent;
+    scrollbar-gutter: stable;
+}
+
+@media (width <= 900px) {
+    .MainWrapper {
+        position: static;
+        max-height: none;
+    }
+
+    .Groups {
+        overflow-y: visible;
+    }
 }
 
 .Group {
@@ -19,11 +39,11 @@
 
 .GroupTitle {
     padding: 0 10px;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
     letter-spacing: 0.07em;
     text-transform: uppercase;
-    color: var(--prop-text-dim);
+    color: var(--axelix-grey-500);
 }
 
 .Row {
@@ -35,20 +55,20 @@
     font: inherit;
     text-align: left;
     cursor: pointer;
-    background-color: var(--prop-surface);
+    background-color: transparent;
     border: 1px solid transparent;
     border-radius: var(--axelix-border-radius-large);
     transition: background-color 0.15s ease;
 }
 
 .Row:hover {
-    background-color: var(--prop-surface-sunken);
+    background-color: var(--axelix-grey-50);
 }
 
 .Selected,
 .Selected:hover {
-    background-color: var(--prop-accent-surface);
-    border-color: var(--prop-accent-border);
+    background-color: var(--axelix-green-50);
+    border-color: var(--axelix-green-200);
 }
 
 .Dot {
@@ -59,20 +79,20 @@
 }
 
 .DotOk {
-    background-color: var(--prop-accent);
+    background-color: var(--axelix-green-500);
 }
 
 .DotBad {
-    background-color: #dc2626;
+    background-color: var(--axelix-red-600);
 }
 
 .DotOff {
-    background-color: var(--prop-border);
+    background-color: var(--axelix-grey-300);
 }
 
 .DotEmpty {
     background-color: transparent;
-    border: 1.5px solid var(--prop-text-dim);
+    border: 1.5px solid var(--axelix-grey-400);
 }
 
 .Labels {
@@ -83,18 +103,29 @@
     min-width: 0;
 }
 
+.MethodLine {
+    display: flex;
+    min-width: 0;
+}
+
+.Suffix {
+    flex-shrink: 0;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-500);
+}
+
 .Method {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--prop-text);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-900);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .ClassName {
-    font-size: 11px;
-    color: var(--prop-text-faint);
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-500);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -102,6 +133,6 @@
 
 .Rate {
     flex-shrink: 0;
-    font-size: 11.5px;
-    font-weight: 700;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
 }

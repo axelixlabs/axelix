@@ -1,4 +1,5 @@
 .MainWrapper {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -8,8 +9,8 @@
     min-height: 300px;
     padding: 32px;
     text-align: center;
-    border: 1.5px dashed var(--prop-border);
-    border-radius: var(--prop-radius);
+    border: 1.5px dashed var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-large);
 }
 
 .Icon {
@@ -18,28 +19,28 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    font-size: 18px;
-    color: var(--prop-text-faint);
-    background-color: var(--prop-border-faint);
-    border-radius: var(--prop-radius);
+    font-size: var(--axelix-font-size-subtitle);
+    color: var(--axelix-grey-500);
+    background-color: var(--axelix-grey-100);
+    border-radius: var(--axelix-border-radius-large);
 }
 
 .Title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--prop-text);
+    font-size: var(--axelix-font-size-subtitle);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-900);
 }
 
 .Description {
     max-width: 440px;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--prop-text-muted);
+    font-size: var(--axelix-font-size-body);
+    line-height: var(--axelix-line-height-normal);
+    color: var(--axelix-grey-600);
     text-wrap: pretty;
 }
 
 .DocsLink {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--prop-accent);
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-green-600);
 }

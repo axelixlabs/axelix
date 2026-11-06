@@ -15,20 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { ClockCircleOutlined } from "@ant-design/icons";
+
 import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 
-/**
- * The 11a "keep the layout, explain in place" empty state: shown in place of the chart, failures
- * and executions log when a task has no recorded executions.
- */
 export const EmptyExecutionHistory = () => {
     const { t } = useTranslation();
 
     return (
         <div className={styles.MainWrapper}>
-            <span className={styles.Icon}>◷</span>
+            <span className={styles.Icon}>
+                <ClockCircleOutlined />
+            </span>
             <span className={styles.Title}>{t("ScheduledTasks.noHistoryTitle")}</span>
             <span className={styles.Description}>{t("ScheduledTasks.noHistoryDescription")}</span>
             <a className={styles.DocsLink} target="_blank" rel="noopener noreferrer" href="https://axelix.io/docs">

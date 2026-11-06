@@ -3,6 +3,7 @@
     grid-template-columns: 300px minmax(0, 1fr);
     column-gap: 20px;
     align-items: start;
+    min-height: calc(100vh - var(--axelix-header-height) - 48px);
 }
 
 @media (width <= 900px) {

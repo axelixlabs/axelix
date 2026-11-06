@@ -15,45 +15,70 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
-import { type IScheduledTaskExecution, NOW_SECONDS, formatDuration, formatTimeOfDay } from "../../mock";
+import { HintTooltip } from "@/components";
+import { formatTransactionDuration } from "@/helpers";
+import type { IScheduledTaskExecutionRecord } from "@/models";
+
 import shared from "../../shared.module.css";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    runs: IScheduledTaskExecution[];
-    maxDurationMs: number;
+    executions: IScheduledTaskExecutionRecord[];
 }
 
-export const DurationChart = ({ runs, maxDurationMs }: IProps) => {
+const getBarHeight = (durationMillis: number, maxDurationMillis: number): number =>
+    maxDurationMillis > 0 ? 4 + Math.round(90 * Math.sqrt(durationMillis / maxDurationMillis)) : 4;
+
+export const DurationChart = ({ executions }: IProps) => {
     const { t } = useTranslation();
 
-    const barHeight = (durationMs: number): number => 4 + Math.round(90 * Math.sqrt(durationMs / maxDurationMs));
+    const runs = [...executions].reverse();
+    const maxDurationMillis = Math.max(...runs.map((run) => run.durationMillis));
+
+    const firstStartedAt = dayjs(runs[0].startedAt);
+    const lastStartedAt = dayjs(runs[runs.length - 1].startedAt);
+    const axisFormat = firstStartedAt.isSame(lastStartedAt, "day") ? "HH:mm:ss" : "DD.MM HH:mm";
+
+    const renderBarHint = (run: IScheduledTaskExecutionRecord) => (
+        <>
+            <div>{dayjs(run.startedAt).format("DD.MM HH:mm:ss")}</div>
+            <div>{formatTransactionDuration(run.durationMillis)}</div>
+            <div>{run.success ? t("ScheduledTasks.succeeded") : (run.errorType ?? t("ScheduledTasks.failed"))}</div>
+        </>
+    );
 
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.Header}>
-                <span>{t("ScheduledTasks.durationTitle")}</span>
+                <span className={styles.Title}>
+                    {t("ScheduledTasks.durationTitle")}
+                    <HintTooltip content={t("ScheduledTasks.durationHint")}>
+                        <span className={styles.Question}>?</span>
+                    </HintTooltip>
+                </span>
                 <span className={`${shared.Mono} ${styles.Max}`}>
-                    {t("ScheduledTasks.max")} {formatDuration(maxDurationMs)}
+                    {t("ScheduledTasks.max")} {formatTransactionDuration(maxDurationMillis)}
                 </span>
             </div>
 
             <div className={styles.Bars}>
-                {runs.map((run, index) => (
-                    <span
-                        key={index}
-                        className={`${styles.Bar} ${run.succeeded ? styles.BarOk : styles.BarBad}`}
-                        style={{ height: `${barHeight(run.durationMs)}px` }}
-                    />
+                {runs.map((run) => (
+                    <HintTooltip key={`${run.startedAt}-${run.instanceId}`} content={renderBarHint(run)}>
+                        <span
+                            className={`${styles.Bar} ${run.success ? styles.BarOk : styles.BarBad}`}
+                            style={{ height: `${getBarHeight(run.durationMillis, maxDurationMillis)}px` }}
+                        />
+                    </HintTooltip>
                 ))}
             </div>
 
             <div className={`${shared.Mono} ${styles.Axis}`}>
-                <span>{formatTimeOfDay(NOW_SECONDS - runs[0].agoSeconds)}</span>
-                <span>{formatTimeOfDay(NOW_SECONDS - runs[runs.length - 1].agoSeconds)}</span>
+                <span>{firstStartedAt.format(axisFormat)}</span>
+                <span>{lastStartedAt.format(axisFormat)}</span>
             </div>
         </div>
     );

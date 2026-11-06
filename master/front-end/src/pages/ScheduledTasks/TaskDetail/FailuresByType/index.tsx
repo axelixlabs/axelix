@@ -17,51 +17,21 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { type IScheduledTaskExecution, formatRelative } from "../../mock";
+import { formatRelativeTime } from "@/helpers";
+import type { IScheduledTaskFailuresByErrorType } from "@/models";
+
 import shared from "../../shared.module.css";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    runs: IScheduledTaskExecution[];
+    failures: IScheduledTaskFailuresByErrorType[];
 }
 
-interface IFailureGroup {
-    errorType: string;
-    errorMessage: string;
-    count: number;
-    lastAgoSeconds: number;
-}
+export const FailuresByType = ({ failures }: IProps) => {
+    const { t, i18n } = useTranslation();
 
-const groupFailures = (runs: IScheduledTaskExecution[]): IFailureGroup[] => {
-    const byType = new Map<string, IFailureGroup>();
-
-    runs.filter((run) => !run.succeeded).forEach((run) => {
-        const type = run.errorType ?? "";
-        const existing = byType.get(type);
-
-        if (existing) {
-            existing.count += 1;
-            existing.lastAgoSeconds = Math.min(existing.lastAgoSeconds, run.agoSeconds);
-        } else {
-            byType.set(type, {
-                errorType: type,
-                errorMessage: run.errorMessage,
-                count: 1,
-                lastAgoSeconds: run.agoSeconds,
-            });
-        }
-    });
-
-    return [...byType.values()].sort((a, b) => b.count - a.count);
-};
-
-export const FailuresByType = ({ runs }: IProps) => {
-    const { t } = useTranslation();
-
-    const groups = groupFailures(runs);
-
-    if (groups.length === 0) {
+    if (failures.length === 0) {
         return null;
     }
 
@@ -69,15 +39,15 @@ export const FailuresByType = ({ runs }: IProps) => {
         <div className={styles.MainWrapper}>
             <span className={styles.Title}>{t("ScheduledTasks.failuresByType")}</span>
 
-            {groups.map((group) => (
-                <div className={styles.Row} key={group.errorType}>
-                    <span className={`${shared.Mono} ${styles.Count}`}>×{group.count}</span>
+            {failures.map(({ errorType, count, lastErrorMessage, lastOccurredAt }) => (
+                <div className={styles.Row} key={errorType}>
+                    <span className={`${shared.Mono} ${styles.Count}`}>×{count}</span>
                     <span className={styles.Details}>
-                        <span className={`${shared.Mono} ${styles.ErrorType}`}>{group.errorType}</span>
-                        <span className={styles.ErrorMessage}>{group.errorMessage}</span>
+                        <span className={`${shared.Mono} ${styles.ErrorType}`}>{errorType}</span>
+                        {lastErrorMessage && <span className={styles.ErrorMessage}>{lastErrorMessage}</span>}
                     </span>
                     <span className={styles.Last}>
-                        {t("ScheduledTasks.last")} {formatRelative(group.lastAgoSeconds)}
+                        {t("ScheduledTasks.last")} {formatRelativeTime(lastOccurredAt, i18n.language)}
                     </span>
                 </div>
             ))}

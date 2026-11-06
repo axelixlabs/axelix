@@ -15,115 +15,58 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App } from "antd";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+
+import { EmptyHandler, Loader } from "@/components";
+import { fetchData, filterScheduledTasks, getScheduledTaskItems } from "@/helpers";
+import { type IScheduledTasksResponseBody, StatefulRequest } from "@/models";
+import { getScheduledTasksData } from "@/services";
 
 import { TaskDetail } from "./TaskDetail";
 import { TaskList } from "./TaskList";
-import { type IScheduledTaskExecution, createManualRun, formatDuration } from "./mock";
 import styles from "./styles.module.css";
-import { type ITriggerOverride, SEED_ORDER, buildTask, groupTasksByType } from "./taskModel";
-
-/*
- * The redesigned Scheduled Tasks page (design 9b "task list + task detail", with the 11a empty
- * state for tasks without execution history). Everything here is driven by mock data - the backend
- * API that will supply real execution history does not exist yet, so all interactions (toggle,
- * edit trigger, run now, filter, pagination) operate on local state only.
- */
-
-const RUN_DURATION_MS = 1600;
 
 const ScheduledTasks = () => {
-    const { t } = useTranslation();
-    const { message } = App.useApp();
+    const { instanceId } = useParams();
 
-    const [selectedKey, setSelectedKey] = useState("processPendingPayments");
+    const [scheduledTasks, setScheduledTasks] = useState(StatefulRequest.loading<IScheduledTasksResponseBody>());
     const [search, setSearch] = useState("");
-    const [disabled, setDisabled] = useState<Record<string, boolean>>({ refreshSpecialtiesCache: true });
-    const [triggers, setTriggers] = useState<Record<string, ITriggerOverride>>({});
-    const [manualRuns, setManualRuns] = useState<Record<string, IScheduledTaskExecution[]>>({});
-    const [running, setRunning] = useState<Record<string, boolean>>({});
-    const [onlyFailed, setOnlyFailed] = useState(false);
-    const [page, setPage] = useState(0);
+    const [selectedTaskId, setSelectedTaskId] = useState<string>();
 
-    const tasks = SEED_ORDER.map((seed) =>
-        buildTask(seed, {
-            enabled: !disabled[seed.key],
-            triggerOverride: triggers[seed.key],
-            manualRuns: manualRuns[seed.key] ?? [],
-            running: Boolean(running[seed.key]),
-        }),
-    );
+    const loadScheduledTasks = (): Promise<void> =>
+        fetchData(setScheduledTasks, () => getScheduledTasksData(instanceId!));
 
-    const selectedTask = tasks.find((task) => task.key === selectedKey) ?? tasks[0];
+    useEffect(() => {
+        loadScheduledTasks();
+    }, []);
 
-    const query = search.trim().toLowerCase();
-    const visibleTasks = query
-        ? tasks.filter(
-              (task) => task.method.toLowerCase().includes(query) || task.className.toLowerCase().includes(query),
-          )
-        : tasks;
+    if (scheduledTasks.loading) {
+        return <Loader />;
+    }
 
-    const selectTask = (key: string): void => {
-        setSelectedKey(key);
-        setOnlyFailed(false);
-        setPage(0);
-    };
+    if (scheduledTasks.error) {
+        return <EmptyHandler isEmpty />;
+    }
 
-    const toggleEnabled = (enabled: boolean): void => {
-        setDisabled((previous) => ({ ...previous, [selectedKey]: !enabled }));
-        message.success(
-            enabled
-                ? t("ScheduledTasks.resumedToast", { schedule: selectedTask.human })
-                : t("ScheduledTasks.pausedToast"),
-        );
-    };
+    const scheduledTasksData = scheduledTasks.response!;
+    const items = getScheduledTaskItems(scheduledTasksData);
+    const selectedItem = items.find(({ task }) => task.taskId === selectedTaskId) ?? items[0];
 
-    const editTrigger = (override: ITriggerOverride): void => {
-        setTriggers((previous) => ({ ...previous, [selectedKey]: override }));
-        message.success(t("ScheduledTasks.triggerUpdatedToast", { schedule: override.human }));
-    };
-
-    const runNow = (): void => {
-        if (running[selectedKey]) {
-            return;
-        }
-
-        const { key, seed } = selectedTask;
-        setRunning((previous) => ({ ...previous, [key]: true }));
-
-        setTimeout(() => {
-            const run = createManualRun(seed);
-            setRunning((previous) => ({ ...previous, [key]: false }));
-            setManualRuns((previous) => ({ ...previous, [key]: [run, ...(previous[key] ?? [])] }));
-            setOnlyFailed(false);
-            setPage(0);
-            message.success(t("ScheduledTasks.runFinishedToast", { duration: formatDuration(run.durationMs) }));
-        }, RUN_DURATION_MS);
-    };
+    const effectiveScheduledTasks = search ? filterScheduledTasks(scheduledTasksData, search) : scheduledTasksData;
 
     return (
         <div className={styles.Layout}>
             <TaskList
-                groups={groupTasksByType(visibleTasks)}
-                selectedKey={selectedTask.key}
-                onSelect={selectTask}
-                search={search}
-                onSearch={setSearch}
+                scheduledTasks={effectiveScheduledTasks}
+                selectedTaskId={selectedItem?.task.taskId}
+                onSelect={setSelectedTaskId}
+                setSearch={setSearch}
             />
 
-            <TaskDetail
-                key={selectedTask.key}
-                task={selectedTask}
-                onToggleEnabled={toggleEnabled}
-                onRunNow={runNow}
-                onEditTrigger={editTrigger}
-                onlyFailed={onlyFailed}
-                onOnlyFailedChange={setOnlyFailed}
-                page={page}
-                onPageChange={setPage}
-            />
+            {selectedItem && (
+                <TaskDetail key={selectedItem.task.taskId} item={selectedItem} onChange={loadScheduledTasks} />
+            )}
         </div>
     );
 };
