@@ -90,6 +90,20 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
                 delegate, id, qualifier, reactive, target, method, history, ScheduledTaskLaunchType.MANUAL);
     }
 
+    static @Nullable ScheduledAnnotationRunnable from(Runnable runnable) {
+        if (runnable instanceof ScheduledAnnotationRunnable scheduledAnnotationRunnable) {
+            return scheduledAnnotationRunnable;
+        }
+        if (runnable instanceof ScheduledMethodView scheduledMethodView) {
+            return scheduledMethodView.task;
+        }
+        return null;
+    }
+
+    public String getId() {
+        return id;
+    }
+
     @Override
     public void run() {
         if (reactive) {

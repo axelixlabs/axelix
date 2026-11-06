@@ -24,14 +24,14 @@ import { useParams } from "react-router";
 import { NoRequiredAuthorityTooltip } from "@/components";
 import { extractErrorCode } from "@/helpers";
 import { useAuthority, useConfirmableAction } from "@/hooks";
-import { EAuthorities, type IErrorResponse, type IRunnable, StatelessRequest } from "@/models";
+import { EAuthorities, type IErrorResponse, type IScheduledTask, StatelessRequest } from "@/models";
 import { updateScheduledTasksStatus } from "@/services";
 
 interface IProps {
     /**
      * Any runnable task that can be turned off or turned on
      */
-    runnable: IRunnable;
+    runnable: IScheduledTask;
 }
 
 export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
@@ -59,7 +59,7 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
                     force: false,
                     instanceId: instanceId!,
                     statusType: runnable.enabled ? "disable" : "enable",
-                    trigger: runnable.runnable.target,
+                    trigger: runnable.taskId,
                 })
                     .then(() => {
                         message.success(runnable.enabled ? t("ScheduledTasks.disabled") : t("ScheduledTasks.enabled"));

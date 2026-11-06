@@ -17,11 +17,14 @@
  */
 package com.axelixlabs.axelix.master.service.scheduled;
 
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.common.contract.scheduledtask.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
@@ -66,6 +69,14 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
 
         byte[] body = endpointInvoker.invoke(instanceId, ActuatorEndpoints.GET_SCHEDULED_TASKS, NoHttpPayload.INSTANCE);
         ServiceScheduledTasks tasks = scheduledTasksDeserializationStrategy.deserialize(body);
+        Set<String> taskIds = new LinkedHashSet<>();
+        tasks.getCron().forEach(task -> taskIds.add(task.getRunnable().getTarget()));
+        tasks.getFixedDelay().forEach(task -> taskIds.add(task.getRunnable().getTarget()));
+        tasks.getFixedRate().forEach(task -> taskIds.add(task.getRunnable().getTarget()));
+        tasks.getCustom().forEach(task -> taskIds.add(task.getRunnable().getTarget()));
+
+        Map<String, Double> successRates =
+                scheduledTaskExecutionHistoryService.findSuccessRates(instance.applicationId(), taskIds);
 
         return new ScheduledTasksResponse(
                 tasks.getCron().stream()

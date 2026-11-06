@@ -65,16 +65,19 @@ public interface ScheduledTaskExecutionResultRepository
     int deleteStartedBefore(@Param("threshold") Instant threshold);
 
     @Query("""
-    SELECT
-        COUNT(*) AS total,
-        COALESCE(SUM(CASE WHEN success THEN 1 ELSE 0 END), 0) AS successful
+    SELECT task_id AS task_id,
+           COUNT(*) AS total,
+           COALESCE(SUM(CASE WHEN success THEN 1 ELSE 0 END), 0) AS successful
     FROM scheduled_task_execution_results
     WHERE group_id = :groupId
       AND artifact_id = :artifactId
-      AND task_id = :taskId
+      AND task_id IN (:taskIds)
+    GROUP BY task_id
     """)
-    ScheduledTaskExecutionStats getExecutionStats(
-            @Param("groupId") String groupId, @Param("artifactId") String artifactId, @Param("taskId") String taskId);
+    List<ScheduledTaskExecutionStats> getExecutionStats(
+            @Param("groupId") String groupId,
+            @Param("artifactId") String artifactId,
+            @Param("taskIds") Collection<String> taskIds);
     /**
      * Deletes all the executions of every task of every application except the latest ones.
      *
@@ -96,5 +99,5 @@ public interface ScheduledTaskExecutionResultRepository
         """)
     int deleteAllButLatest(@Param("maxExecutionsPerTask") int maxExecutionsPerTask);
 
-    record ScheduledTaskExecutionStats(long total, long successful) {}
+    record ScheduledTaskExecutionStats(String taskId, long total, long successful) {}
 }

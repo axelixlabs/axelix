@@ -57,7 +57,7 @@ export const FixedTasksEditableValue = ({ task }: IProps) => {
         changeScheduledTaskInterval({
             instanceId: instanceId!,
             interval: +normalizedTempValue,
-            trigger: task.runnable.target,
+            trigger: task.taskId,
         })
             .then(() => {
                 message.success(t("ScheduledTasks.fixedTaskIntervalChangeSuccess"));

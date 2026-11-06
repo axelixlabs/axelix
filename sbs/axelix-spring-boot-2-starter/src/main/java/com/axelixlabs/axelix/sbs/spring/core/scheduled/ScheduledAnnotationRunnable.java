@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.lang.reflect.Method;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.scheduling.SchedulingAwareRunnable;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 
@@ -69,6 +71,17 @@ public final class ScheduledAnnotationRunnable extends ScheduledMethodRunnable i
     public ScheduledAnnotationRunnable manual() {
         return new ScheduledAnnotationRunnable(
                 delegate, id, getTarget(), getMethod(), history, ScheduledTaskLaunchType.MANUAL);
+    }
+
+    static @Nullable ScheduledAnnotationRunnable from(Runnable runnable) {
+        if (runnable instanceof ScheduledAnnotationRunnable) {
+            return (ScheduledAnnotationRunnable) runnable;
+        }
+        return null;
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override

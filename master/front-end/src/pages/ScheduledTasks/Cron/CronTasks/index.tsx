@@ -43,7 +43,7 @@ export const CronTasks = ({ cronTasks }: IProps) => {
                     <CronTableHeader />
                     <EmptyHandler isEmpty={cronTasks.length === 0}>
                         {cronTasks.map((task) => (
-                            <CronTaskTableRow task={task} key={task.runnable.target} />
+                            <CronTaskTableRow task={task} key={task.taskId} />
                         ))}
                     </EmptyHandler>
                 </div>
