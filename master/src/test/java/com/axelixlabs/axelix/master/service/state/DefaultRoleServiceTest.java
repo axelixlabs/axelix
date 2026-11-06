@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -127,6 +128,21 @@ class DefaultRoleServiceTest {
 
             // then.
             assertThat(role).isEmpty();
+        }
+
+        @Test
+        void shouldStoreEveryOssAuthority() {
+            // when.
+            List<String> stored = jdbcClient
+                    .sql("SELECT name FROM authorities")
+                    .query(String.class)
+                    .list();
+
+            // then.
+            assertThat(stored)
+                    .containsExactlyInAnyOrderElementsOf(Arrays.stream(OssAuthority.values())
+                            .map(OssAuthority::getName)
+                            .toList());
         }
     }
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.3-007-sqlite-insert-user-management-authorities" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <sqlCheck expectedResult="0">
+        SELECT COUNT(*) FROM authorities WHERE name IN ('USERS_VIEW', 'USERS_MANAGEMENT')
+      </sqlCheck>
+    </preConditions>
+
+    <comment>
+      OssAuthority.USERS_VIEW and OssAuthority.USERS_MANAGEMENT were added in code without a seed row.
+      They stay unassigned: SUPER_ADMIN receives every OssAuthority in memory, and VIEWER, EDITOR, and ADMIN do not.
+    </comment>
+
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a7"/>
+      <column name="name" value="USERS_VIEW"/>
+    </insert>
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a8"/>
+      <column name="name" value="USERS_MANAGEMENT"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>
