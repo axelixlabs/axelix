@@ -31,32 +31,22 @@ export const PERMISSION_GROUPS = [
     { id: "sensitive", authorities: SENSITIVE_AUTHORITIES },
 ] as const;
 
-const ROLE_RANK: Record<ERoles, number> = {
-    [ERoles.VIEWER]: 0,
-    [ERoles.EDITOR]: 1,
-    [ERoles.ADMIN]: 2,
-};
-
-const GRANTS: Record<ERoles, readonly TProfileAuthority[]> = {
+const GRANTS: Partial<Record<ERoles, readonly TProfileAuthority[]>> = {
     [ERoles.VIEWER]: [],
     [ERoles.EDITOR]: RUNTIME_AUTHORITIES,
     [ERoles.ADMIN]: PROFILE_AUTHORITIES,
 };
 
-// Least privileged first, matching the change-roles dialog
-export const PROFILE_ROLES = [ERoles.VIEWER, ERoles.EDITOR, ERoles.ADMIN];
-
-export const compareRoles = (left: ERoles, right: ERoles): number => ROLE_RANK[left] - ROLE_RANK[right];
-
 /**
  * Authorities granted by the given roles. A permission can come from more than one role, so this does not attribute it
- * to a single role.
+ * to a single role. A role outside the built-in grant map contributes nothing here: the roles feed does not include
+ * authorities.
  */
-export const effectiveAuthorities = (roles: readonly ERoles[]): Set<TProfileAuthority> => {
+export const effectiveAuthorities = (roles: readonly string[]): Set<TProfileAuthority> => {
     const granted = new Set<TProfileAuthority>();
 
     roles.forEach((role) => {
-        GRANTS[role].forEach((authority) => granted.add(authority));
+        GRANTS[role as ERoles]?.forEach((authority) => granted.add(authority));
     });
 
     return granted;

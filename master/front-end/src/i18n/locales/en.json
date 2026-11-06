@@ -893,11 +893,6 @@
             "reactivateConfirm": "Reactivate",
             "userSuspended": "User suspended",
             "userReactivated": "User reactivated",
-            "RoleDescriptions": {
-                "VIEWER": "Read-only access to the monitored applications.",
-                "EDITOR": "Performs runtime operations on the monitored applications, including destructive ones such as clearing caches.",
-                "ADMIN": "Everything an editor can do, plus reading sensitive configuration values."
-            },
             "Groups": {
                 "runtime": "Runtime operations",
                 "sensitive": "Sensitive values"

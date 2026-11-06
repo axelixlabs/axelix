@@ -21,10 +21,9 @@ import { useTranslation } from "react-i18next";
 
 import { InfoIcon } from "@/assets";
 import { extractErrorCode, showErrorNotification } from "@/helpers";
-import { type ERoles, type IUser, StatelessRequest } from "@/models";
+import { type IRoleProfile, type IUser, StatelessRequest } from "@/models";
 import { editUser } from "@/services";
 
-import { PROFILE_ROLES } from "../permissions";
 import { userUpdateFrom } from "../userUpdate";
 
 import { RoleOption } from "./RoleOption";
@@ -35,6 +34,11 @@ interface IProps {
      * User whose roles are being edited
      */
     user: IUser;
+
+    /**
+     * Every role that can be granted, from the roles feed
+     */
+    roles: IRoleProfile[];
 
     /**
      * Name used in the dialog title
@@ -62,11 +66,22 @@ interface IProps {
     onSaved: () => void;
 }
 
-export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSaved }: IProps) => {
+const roleOptions = (roles: readonly IRoleProfile[], held: readonly string[]): IRoleProfile[] => {
+    const known = new Set(roles.map((role) => role.name));
+    const missing = held
+        .filter((name) => !known.has(name))
+        .map((name) => ({ id: name, name, membersCount: 0, description: "" }));
+
+    return [...roles, ...missing];
+};
+
+export const ChangeRoles = ({ user, roles, displayName, givenName, open, onClose, onSaved }: IProps) => {
     const { t } = useTranslation();
     const { message } = App.useApp();
-    const [selected, setSelected] = useState<ERoles[]>(user.roles);
+    const [selected, setSelected] = useState<string[]>(user.roles);
     const [requestData, setRequestData] = useState(StatelessRequest.inactive());
+    const options = roleOptions(roles, user.roles);
+    const held = new Set<string>(user.roles);
 
     useEffect(() => {
         if (open) {
@@ -74,11 +89,11 @@ export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSav
         }
     }, [open, user]);
 
-    const added = PROFILE_ROLES.filter((role) => selected.includes(role) && !user.roles.includes(role));
-    const removed = PROFILE_ROLES.filter((role) => !selected.includes(role) && user.roles.includes(role));
+    const added = options.filter((role) => selected.includes(role.name) && !held.has(role.name));
+    const removed = options.filter((role) => !selected.includes(role.name) && held.has(role.name));
     const unchanged = added.length === 0 && removed.length === 0;
 
-    const toggle = (role: ERoles): void => {
+    const toggle = (role: string): void => {
         setSelected((current) =>
             current.includes(role) ? current.filter((item) => item !== role) : [...current, role],
         );
@@ -139,12 +154,13 @@ export const ChangeRoles = ({ user, displayName, givenName, open, onClose, onSav
             }
         >
             <div className={styles.Roles}>
-                {PROFILE_ROLES.map((role) => (
+                {options.map((role) => (
                     <RoleOption
-                        key={role}
-                        role={role}
-                        held={user.roles.includes(role)}
-                        checked={selected.includes(role)}
+                        key={role.id}
+                        role={role.name}
+                        description={role.description}
+                        held={held.has(role.name)}
+                        checked={selected.includes(role.name)}
                         onToggle={toggle}
                     />
                 ))}

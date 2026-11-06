@@ -18,8 +18,6 @@
 import { Checkbox } from "antd";
 import { useTranslation } from "react-i18next";
 
-import type { ERoles } from "@/models";
-
 import styles from "./styles.module.css";
 
 type TRoleState = "current" | "adding" | "revoking" | "plain";
@@ -42,9 +40,14 @@ const roleState = (held: boolean, checked: boolean): TRoleState => {
 
 interface IProps {
     /**
-     * Role this row toggles
+     * Name of the role this row toggles
      */
-    role: ERoles;
+    role: string;
+
+    /**
+     * Description of what the role allows
+     */
+    description: string;
 
     /**
      * Whether the user currently holds the role
@@ -59,10 +62,10 @@ interface IProps {
     /**
      * Toggles the role in the pending selection
      */
-    onToggle: (role: ERoles) => void;
+    onToggle: (role: string) => void;
 }
 
-export const RoleOption = ({ role, held, checked, onToggle }: IProps) => {
+export const RoleOption = ({ role, description, held, checked, onToggle }: IProps) => {
     const { t } = useTranslation();
     const state = roleState(held, checked);
 
@@ -85,7 +88,7 @@ export const RoleOption = ({ role, held, checked, onToggle }: IProps) => {
                         <span className={styles.RevokingLabel}>{t("Users.Profile.revoking")}</span>
                     )}
                 </span>
-                <span className={styles.RoleDescription}>{t(`Users.Profile.RoleDescriptions.${role}`)}</span>
+                {description && <span className={styles.RoleDescription}>{description}</span>}
             </span>
         </div>
     );

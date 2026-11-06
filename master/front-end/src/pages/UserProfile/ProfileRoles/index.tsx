@@ -19,10 +19,9 @@ import { Button } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { StyledTag } from "@/components";
-import type { IUser } from "@/models";
+import type { IRoleProfile, IUser } from "@/models";
 
 import { ProfileCard } from "../ProfileCard";
-import { compareRoles } from "../permissions";
 
 import styles from "./styles.module.css";
 
@@ -33,30 +32,48 @@ interface IProps {
     user: IUser;
 
     /**
+     * Roles from the roles feed. Null until the feed has loaded.
+     */
+    roles: IRoleProfile[] | null;
+
+    /**
      * Opens the change-roles dialog
      */
     onChangeRoles: () => void;
 }
 
-export const ProfileRoles = ({ user, onChangeRoles }: IProps) => {
+const heldInFeedOrder = (held: readonly string[], roles: readonly IRoleProfile[]): string[] => {
+    const order = new Map(roles.map((role, index) => [role.name, index]));
+
+    return [...held].sort(
+        (left, right) => (order.get(left) ?? Number.MAX_SAFE_INTEGER) - (order.get(right) ?? Number.MAX_SAFE_INTEGER),
+    );
+};
+
+export const ProfileRoles = ({ user, roles, onChangeRoles }: IProps) => {
     const { t } = useTranslation();
-    const heldRoles = [...user.roles].sort((left, right) => compareRoles(right, left));
+    const descriptions = new Map(roles?.map((role) => [role.name, role.description]));
+    const heldRoles = roles ? heldInFeedOrder(user.roles, roles) : user.roles;
 
     return (
         <ProfileCard
             title={t("Users.roles")}
             extra={
-                <Button type="link" className={styles.ChangeRoles} onClick={onChangeRoles}>
+                <Button type="link" className={styles.ChangeRoles} disabled={roles === null} onClick={onChangeRoles}>
                     {t("Users.Profile.changeRoles")}
                 </Button>
             }
         >
-            {heldRoles.map((role) => (
-                <div key={role} className={styles.Role}>
-                    <StyledTag>{role}</StyledTag>
-                    <p>{t(`Users.Profile.RoleDescriptions.${role}`)}</p>
-                </div>
-            ))}
+            {heldRoles.map((role) => {
+                const description = descriptions.get(role);
+
+                return (
+                    <div key={role} className={styles.Role}>
+                        <StyledTag>{role}</StyledTag>
+                        {description && <p>{description}</p>}
+                    </div>
+                );
+            })}
         </ProfileCard>
     );
 };

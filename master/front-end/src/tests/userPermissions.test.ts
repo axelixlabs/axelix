@@ -38,4 +38,8 @@ describe("effectiveAuthorities", () => {
     it("grants nothing to a viewer", () => {
         expect(effectiveAuthorities([ERoles.VIEWER]).size).toBe(0);
     });
+
+    it("ignores a role the built-in grant map does not know", () => {
+        expect(effectiveAuthorities(["CUSTOM"]).size).toBe(0);
+    });
 });

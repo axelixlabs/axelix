@@ -20,8 +20,8 @@ import { useParams } from "react-router";
 
 import { EmptyHandler, Loader } from "@/components";
 import { fetchData, getUserFullName } from "@/helpers";
-import { type IUser, StatefulRequest } from "@/models";
-import { getUserById } from "@/services";
+import { type IRoleProfile, type IUser, StatefulRequest } from "@/models";
+import { getRolesFeed, getUserById } from "@/services";
 
 import { ChangeRoles } from "./ChangeRoles";
 import { EditUser } from "./EditUser";
@@ -35,6 +35,7 @@ import styles from "./styles.module.css";
 const UserProfile = () => {
     const { userId } = useParams();
     const [userResponse, setUserResponse] = useState(StatefulRequest.loading<IUser>());
+    const [rolesResponse, setRolesResponse] = useState(StatefulRequest.loading<IRoleProfile[]>());
     const [editing, setEditing] = useState(false);
     const [changingRoles, setChangingRoles] = useState(false);
     const [suspending, setSuspending] = useState(false);
@@ -47,6 +48,10 @@ const UserProfile = () => {
     useEffect(() => {
         loadUser();
     }, [loadUser]);
+
+    useEffect(() => {
+        fetchData(setRolesResponse, () => getRolesFeed());
+    }, []);
 
     if (userResponse.loading) {
         return <Loader />;
@@ -71,13 +76,18 @@ const UserProfile = () => {
             <div className={styles.Columns}>
                 <ProfileDetails user={user} />
                 <div>
-                    <ProfileRoles user={user} onChangeRoles={() => setChangingRoles(true)} />
+                    <ProfileRoles
+                        user={user}
+                        roles={rolesResponse.response}
+                        onChangeRoles={() => setChangingRoles(true)}
+                    />
                     <ProfilePermissions user={user} />
                 </div>
             </div>
             <EditUser user={user} open={editing} onClose={() => setEditing(false)} onSaved={loadUser} />
             <ChangeRoles
                 user={user}
+                roles={rolesResponse.response ?? []}
                 displayName={displayName}
                 givenName={givenName}
                 open={changingRoles}

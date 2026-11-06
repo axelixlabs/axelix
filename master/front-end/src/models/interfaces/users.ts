@@ -165,9 +165,31 @@ export interface IEditUserRequestData {
     password: string | null;
 
     /**
-     * The roles granted to this user
+     * The roles granted to this user. Names, as returned by the roles feed.
      */
-    roles: ERoles[];
+    roles: string[];
+}
+
+export interface IRoleProfile {
+    /**
+     * Unique identifier of the role
+     */
+    id: string;
+
+    /**
+     * Unique name of the role
+     */
+    name: string;
+
+    /**
+     * Number of users the role is assigned to
+     */
+    membersCount: number;
+
+    /**
+     * Human-readable description of what the role allows
+     */
+    description: string;
 }
 
 export interface IRoleUsersCount {

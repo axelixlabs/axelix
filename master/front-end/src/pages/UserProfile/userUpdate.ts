@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ERoles, IEditUserRequestData, IUser } from "@/models";
+import type { IEditUserRequestData, IUser } from "@/models";
 
 /**
  * Builds an update that keeps every field the caller does not override. The update replaces names, so omitting them
@@ -29,7 +29,7 @@ export const userUpdateFrom = (
         lastName?: string | null;
         email?: string | null;
         password?: string | null;
-        roles?: ERoles[];
+        roles?: string[];
     } = {},
 ): IEditUserRequestData => {
     return {
