@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
@@ -48,6 +49,12 @@ public class ManagedServiceWebIdentityAccessManager implements WebIdentityAccess
             throw new InvalidJwtTokenException("Authorization token is missing");
         }
 
-        return jwtDecoderService.decodeTokenToUser(token);
+        // TODO:
+        // we need to check here that:
+        // 1. user is actually axelix master, so that other tokens from other starters are not applicable for us
+        // 2. we also need to split the jwt decoding/encoding services for starter/master-accepted tokens.
+        PasswordlessUser decodedTokenToUser = jwtDecoderService.decodeTokenToUser(token);
+
+        return decodedTokenToUser;
     }
 }
