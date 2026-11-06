@@ -71,11 +71,16 @@ object ContractDocumentsValidator {
     fun validate(document: File, currentAxelixVersion: String, baseline: ReleaseBaseline? = null) {
         val root = YAMLMapper().readTree(document)
         val currentSchemas = ContractSchema.parse(root, currentAxelixVersion)
+        val problems = mutableListOf<String>()
 
-        // stateless checks for the current contract
-        val problems = currentSchemas.flatMap { schema ->
+        val bundleVersion = root.path("info").path("version")
+        if (!bundleVersion.isTextual || bundleVersion.textValue().isNotEmpty()) {
+            problems += "the 'info.version' must be an empty string because versions apply to schemas, not schema bundles"
+        }
+
+        problems += currentSchemas.flatMap { schema ->
             STATELESS_INVARIANTS.flatMap { invariant -> invariant.check(schema) }
-        }.toMutableList()
+        }
 
         if (baseline != null) {
             val releasedByName = baseline.contract(document).orEmpty().associateBy { schema -> schema.name }

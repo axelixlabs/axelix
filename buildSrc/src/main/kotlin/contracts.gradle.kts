@@ -54,6 +54,15 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
             outputDir.set(outputRoot.absolutePath)
             modelPackage.set(contracts.modelBasePackage.map { basePackage -> "$basePackage.$featurePackage" })
 
+            if (featurePackage == "jwt") {
+                schemaMappings.set(mapOf(
+                    "JwtClaims" to "AxelixJwtToken",
+                    "MasterJwtToken" to "AxelixJwtToken",
+                    "StarterJwtToken" to "AxelixJwtToken",
+                ))
+                forcedGenerateSchemas.set(listOf("JwtClaims"))
+            }
+
             // These documents textually duplicate (parts of) metadata-feed.yaml's BasicRegistrationMetadata subtree
             // (GH-1666, see the yaml comments). Avoid duplicate classes: only generate the one model
             // the document actually adds; map everything else to metadata-feed's classes.
@@ -109,8 +118,7 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
             }
         }
 
-        // builtBy carries the task dependency to every consumer of the source set, including the
-        // sourcesJar of the starters the :sbs:starter-domain module is shaded into.
+        // builtBy carries the task dependency to every consumer of the source set, including sourcesJar.
         files(outputRoot.resolve("src/main/java")).builtBy(generate)
     }
 
