@@ -99,7 +99,7 @@ java \
   -Daxelix.master.database.password=... \
   -Daxelix.master.migrations.username=axelix_migrator \
   -Daxelix.master.migrations.password=... \
-  -jar axelix-1.2.2.jar
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
 ```
 
 :::warning
@@ -135,7 +135,7 @@ docker run --rm -p 2935:2935 \
     -Daxelix.master.database.password=... \
     -Daxelix.master.migrations.username=axelix_migrator \
     -Daxelix.master.migrations.password=..." \
-  ghcr.io/axelixlabs/axelix:1.2.2
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -149,7 +149,7 @@ docker run --rm -p 2935:2935 \
     -Daxelix.master.database.password=... \
     -Daxelix.master.migrations.username=axelix_migrator \
     -Daxelix.master.migrations.password=..." \
-  docker.io/axelixlabs/axelix:1.2.2
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
   </Tab>
@@ -170,7 +170,7 @@ docker run --rm -p 2935:2935 \
 ```yaml title="docker-compose.yaml"
 services:
   master:
-    image: ghcr.io/axelixlabs/axelix:1.2.2
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
     ports:
       - "2935:2935"
     environment:
@@ -188,7 +188,7 @@ services:
 ```yaml title="docker-compose.yaml"
 services:
   master:
-    image: docker.io/axelixlabs/axelix:1.2.2
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
     ports:
       - "2935:2935"
     environment:
