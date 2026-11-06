@@ -50,6 +50,7 @@ class ScheduledTaskExecutionResultConverterTest {
         // given.
         InitialSelfRegistrationRequest request = new InitialSelfRegistrationRequest()
                 .instanceId("3c994958-924f-4a12-87d0-a8782e97af10")
+                .instanceName("petclinic-1")
                 .basicRegistrationMetadata(new BasicRegistrationMetadata()
                         .groupId("org.springframework.samples")
                         .artifactId("petclinic")
@@ -93,6 +94,7 @@ class ScheduledTaskExecutionResultConverterTest {
         // then.
         assertThat(results).singleElement().satisfies(result -> {
             assertThat(result.taskId()).isEqualTo("com.example.OwnerJob#run()");
+            assertThat(result.instanceName()).isEqualTo("petclinic-1");
             assertThat(result.launchType()).isEqualTo(ScheduledTaskLaunchType.MANUAL);
         });
     }
@@ -130,6 +132,7 @@ class ScheduledTaskExecutionResultConverterTest {
     private static InitialSelfRegistrationRequest request(ScheduledTaskExecution... executions) {
         return new InitialSelfRegistrationRequest()
                 .instanceId("3c994958-924f-4a12-87d0-a8782e97af10")
+                .instanceName("petclinic-1")
                 .basicRegistrationMetadata(new BasicRegistrationMetadata()
                         .groupId("org.springframework.samples")
                         .artifactId("petclinic")

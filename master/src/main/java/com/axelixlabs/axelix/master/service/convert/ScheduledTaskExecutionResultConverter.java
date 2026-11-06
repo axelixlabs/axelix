@@ -53,13 +53,15 @@ public class ScheduledTaskExecutionResultConverter {
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTaskExecutionResultConverter.class);
 
     public Set<ScheduledTaskExecutionResult> convert(DiscoveredInstanceProfile.Registration discoveredInstanceProfile) {
-        return convert(
-                discoveredInstanceProfile.metadata(),
-                discoveredInstanceProfile.instance().id().instanceId());
+        Instance instance = discoveredInstanceProfile.instance();
+        return convert(discoveredInstanceProfile.metadata(), instance.id().instanceId(), instance.name());
     }
 
     public Set<ScheduledTaskExecutionResult> convert(InitialSelfRegistrationRequest heartBeatMetadata) {
-        return convert(heartBeatMetadata.getBasicRegistrationMetadata(), heartBeatMetadata.getInstanceId());
+        return convert(
+                heartBeatMetadata.getBasicRegistrationMetadata(),
+                heartBeatMetadata.getInstanceId(),
+                heartBeatMetadata.getInstanceName());
     }
 
     public Set<ScheduledTaskExecutionResult> convert(DiscoveredInstanceProfile.Refresh refresh) {
@@ -70,12 +72,14 @@ public class ScheduledTaskExecutionResultConverter {
         return convert(instance, heartBeat.getScheduledTaskExecutions());
     }
 
-    private Set<ScheduledTaskExecutionResult> convert(BasicRegistrationMetadata metadata, String instanceId) {
+    private Set<ScheduledTaskExecutionResult> convert(
+            BasicRegistrationMetadata metadata, String instanceId, String instanceName) {
         return convert(
                 metadata.getInsights().getScheduledTaskExecutions(),
                 metadata.getGroupId(),
                 metadata.getArtifactId(),
-                instanceId);
+                instanceId,
+                instanceName);
     }
 
     private Set<ScheduledTaskExecutionResult> convert(
@@ -84,27 +88,34 @@ public class ScheduledTaskExecutionResultConverter {
                 scheduledTaskExecutions,
                 instance.applicationId().groupId(),
                 instance.applicationId().artifactId(),
-                instance.id().instanceId());
+                instance.id().instanceId(),
+                instance.name());
     }
 
     private Set<ScheduledTaskExecutionResult> convert(
             @Nullable List<ScheduledTaskExecution> scheduledTaskExecutions,
             String groupId,
             String artifactId,
-            String instanceId) {
+            String instanceId,
+            String instanceName) {
         if (scheduledTaskExecutions == null) {
             return Set.of();
         }
 
         return scheduledTaskExecutions.stream()
-                .map(scheduledTaskExecution -> convert(scheduledTaskExecution, groupId, artifactId, instanceId))
+                .map(scheduledTaskExecution ->
+                        convert(scheduledTaskExecution, groupId, artifactId, instanceId, instanceName))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet());
     }
 
     @Nullable
     private ScheduledTaskExecutionResult convert(
-            ScheduledTaskExecution scheduledTaskExecution, String groupId, String artifactId, String instanceId) {
+            ScheduledTaskExecution scheduledTaskExecution,
+            String groupId,
+            String artifactId,
+            String instanceId,
+            String instanceName) {
         if (!hasRequiredFields(scheduledTaskExecution)) {
             logger.warn(
                     "The scheduled task {} reported by the instance {} misses required fields. Skipping this execution result.",
@@ -131,6 +142,7 @@ public class ScheduledTaskExecutionResultConverter {
                 groupId,
                 artifactId,
                 instanceId,
+                instanceName,
                 scheduledTaskExecution.getTaskId(),
                 startedAt,
                 scheduledTaskExecution.getDurationMillis(),

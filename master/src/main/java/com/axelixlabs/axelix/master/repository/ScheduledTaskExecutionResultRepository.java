@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.repository;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
@@ -46,12 +47,34 @@ public interface ScheduledTaskExecutionResultRepository
     Set<String> findStoredIds(Collection<String> ids);
 
     /**
+     * @return all the executions of the given task of the given application, the most recent first.
+     */
+    @Query("""
+        SELECT * FROM scheduled_task_execution_results
+        WHERE group_id = :groupId AND artifact_id = :artifactId AND task_id = :taskId
+        ORDER BY started_at DESC, id DESC
+        """)
+    List<ScheduledTaskExecutionResult> findAllOfTask(
+            @Param("groupId") String groupId, @Param("artifactId") String artifactId, @Param("taskId") String taskId);
+
+    /**
      * @return the number of the deleted executions.
      */
     @Modifying
     @Query("DELETE FROM scheduled_task_execution_results WHERE started_at < :threshold")
     int deleteStartedBefore(@Param("threshold") Instant threshold);
 
+    @Query("""
+    SELECT
+        COUNT(*) AS total,
+        COALESCE(SUM(CASE WHEN success THEN 1 ELSE 0 END), 0) AS successful
+    FROM scheduled_task_execution_results
+    WHERE group_id = :groupId
+      AND artifact_id = :artifactId
+      AND task_id = :taskId
+    """)
+    ScheduledTaskExecutionStats getExecutionStats(
+            @Param("groupId") String groupId, @Param("artifactId") String artifactId, @Param("taskId") String taskId);
     /**
      * Deletes all the executions of every task of every application except the latest ones.
      *
@@ -72,4 +95,6 @@ public interface ScheduledTaskExecutionResultRepository
         )
         """)
     int deleteAllButLatest(@Param("maxExecutionsPerTask") int maxExecutionsPerTask);
+
+    record ScheduledTaskExecutionStats(long total, long successful) {}
 }

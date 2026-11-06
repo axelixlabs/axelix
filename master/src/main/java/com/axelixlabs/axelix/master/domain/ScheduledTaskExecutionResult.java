@@ -41,6 +41,7 @@ import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
  * @param groupId         the group id of the application (the G inside the GAV coordinate).
  * @param artifactId      the artifact id of the application (the A inside the GAV coordinate).
  * @param instanceId      the id of the instance that ran the task.
+ * @param instanceName    the name of the instance that ran the task.
  * @param taskId          the id of the scheduled task, equal to the {@code toString()} of the proxied runnable.
  * @param startedAt       the timestamp when the task started its execution.
  * @param durationMillis  the duration of the task execution in milliseconds.
@@ -58,6 +59,7 @@ public record ScheduledTaskExecutionResult(
         @Column("group_id") String groupId,
         @Column("artifact_id") String artifactId,
         @Column("instance_id") String instanceId,
+        @Column("instance_name") String instanceName,
         @Column("task_id") String taskId,
         @Column("started_at") Instant startedAt,
         @Column("duration_millis") long durationMillis,
