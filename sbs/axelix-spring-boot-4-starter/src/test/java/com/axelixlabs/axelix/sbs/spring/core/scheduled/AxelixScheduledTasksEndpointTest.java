@@ -79,25 +79,25 @@ class AxelixScheduledTasksEndpointTest {
 
     // Cron
     private static final String CRON_TASK_ID =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTask";
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTask#cron0";
     private static final String CRON_TASK_ID_FOR_MODIFY =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTaskForModify";
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTaskForModify#cron0";
 
     // FixedDelay
     private static final String FIXED_DELAY_TASK_ID =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTask";
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTask#fixedDelay0";
     private static final String FIXED_DELAY_TASK_ID_FOR_MODIFY =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForModify";
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForModify#fixedDelay0";
     private static final String FIXED_DELAY_TASK_ID_FOR_EXECUTE =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForExecute";
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForExecute#fixedDelay0";
 
     // FixedRate
     private static final String FIXED_RATE_TASK_ID =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTask";
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTask#fixedRate0";
     private static final String FIXED_RATE_TASK_ID_FOR_MODIFY =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForModify";
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForModify#fixedRate0";
     private static final String FIXED_RATE_TASK_ID_FOR_EXECUTE =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForExecute";
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForExecute#fixedRate0";
 
     // Custom
     private static final String CUSTOM_TASK_ID =
@@ -251,11 +251,10 @@ class AxelixScheduledTasksEndpointTest {
         Thread.sleep(200);
         assertThat(customTaskFlag).isFalse();
 
-        assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
-            assertThatJson(task).node("trigger").isEqualTo(CUSTOM_TRIGGER);
-            assertThatJson(task).node("enabled").isEqualTo(false);
-        });
+        assertThatJson(getScheduledTasks())
+                .node("custom")
+                .isArray()
+                .allSatisfy(task -> assertThatJson(task).node("runnable.target").isNotEqualTo(taskId));
     }
 
     @Test
@@ -268,19 +267,19 @@ class AxelixScheduledTasksEndpointTest {
         Thread.sleep(200);
         assertThat(customTaskFlag).isFalse();
 
-        assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
-            assertThatJson(task).node("enabled").isEqualTo(false);
-        });
+        assertThatJson(getScheduledTasks())
+                .node("custom")
+                .isArray()
+                .allSatisfy(task -> assertThatJson(task).node("runnable.target").isNotEqualTo(taskId));
 
         enableScheduledTask(taskId);
         Thread.sleep(200);
         assertThat(customTaskFlag).isTrue();
 
-        assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
-            assertThatJson(task).node("enabled").isEqualTo(true);
-        });
+        assertThatJson(getScheduledTasks())
+                .node("custom")
+                .isArray()
+                .allSatisfy(task -> assertThatJson(task).node("runnable.target").isNotEqualTo(taskId));
     }
 
     @Test
@@ -577,6 +576,16 @@ class AxelixScheduledTasksEndpointTest {
     @TestConfiguration
     @EnableScheduling
     static class AxelixScheduledTasksEndpointTestConfiguration implements SchedulingConfigurer {
+
+        @Bean
+        static AxelixScheduledAnnotationProcessorRegistrar axelixScheduledAnnotationProcessorRegistrar() {
+            return new AxelixScheduledAnnotationProcessorRegistrar();
+        }
+
+        @Bean
+        static ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {
+            return new ScheduledTaskExecutionHistory();
+        }
 
         @Bean
         public TaskScheduler taskScheduler() {

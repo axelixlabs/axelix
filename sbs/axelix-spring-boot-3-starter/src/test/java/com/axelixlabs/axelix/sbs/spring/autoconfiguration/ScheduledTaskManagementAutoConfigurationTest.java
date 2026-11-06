@@ -305,8 +305,7 @@ class ScheduledTaskManagementAutoConfigurationTest {
                     .isInstanceOfSatisfying(
                             CronTask.class,
                             task -> assertThat(task.getExpression()).isEqualTo("0 0 4 * * *"));
-            assertThat(registry.findRequired(jobs + ".twoCrons#cron1").getRunnable())
-                    .hasToString(jobs + ".twoCrons#cron1");
+            assertThat(registry.findRequired(jobs + ".twoCrons#cron1").getId()).isEqualTo(jobs + ".twoCrons#cron1");
             assertThat(registry.findRequired(jobs + ".twoCrons#cron0").getTask())
                     .isInstanceOfSatisfying(
                             CronTask.class,

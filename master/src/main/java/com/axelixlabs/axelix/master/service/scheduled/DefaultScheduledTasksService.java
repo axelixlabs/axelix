@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.scheduled;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,11 +25,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 
+import com.axelixlabs.axelix.common.contract.scheduledtask.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTasksResponse;
-import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTasksResponse.TaskRunnable;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.DefaultJacksonMessageDeserializationStrategy;
@@ -69,7 +69,7 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
 
         byte[] body = endpointInvoker.invoke(instanceId, ActuatorEndpoints.GET_SCHEDULED_TASKS, NoHttpPayload.INSTANCE);
         ServiceScheduledTasks tasks = scheduledTasksDeserializationStrategy.deserialize(body);
-        Set<String> taskIds = new LinkedHashSet<>();
+        Set<String> taskIds = new HashSet<>();
         tasks.getCron().forEach(task -> taskIds.add(task.getRunnable().getTarget()));
         tasks.getFixedDelay().forEach(task -> taskIds.add(task.getRunnable().getTarget()));
         tasks.getFixedRate().forEach(task -> taskIds.add(task.getRunnable().getTarget()));
@@ -81,41 +81,33 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
         return new ScheduledTasksResponse(
                 tasks.getCron().stream()
                         .map(task -> new ScheduledTasksResponse.CronTask(
-                                new TaskRunnable(task.getRunnable().getTarget()),
+                                task.getRunnable().getTarget(),
                                 task.getExpression(),
                                 task.getEnabled(),
-                                scheduledTaskExecutionHistoryService.findSuccessRate(
-                                        instance.applicationId(),
-                                        task.getRunnable().getTarget())))
+                                successRates.get(task.getRunnable().getTarget())))
                         .toList(),
                 tasks.getFixedDelay().stream()
                         .map(task -> new ScheduledTasksResponse.FixedDelayTask(
-                                new TaskRunnable(task.getRunnable().getTarget()),
+                                task.getRunnable().getTarget(),
                                 task.getInterval(),
                                 task.getInitialDelay(),
                                 task.getEnabled(),
-                                scheduledTaskExecutionHistoryService.findSuccessRate(
-                                        instance.applicationId(),
-                                        task.getRunnable().getTarget())))
+                                successRates.get(task.getRunnable().getTarget())))
                         .toList(),
                 tasks.getFixedRate().stream()
                         .map(task -> new ScheduledTasksResponse.FixedRateTask(
-                                new TaskRunnable(task.getRunnable().getTarget()),
+                                task.getRunnable().getTarget(),
                                 task.getInterval(),
                                 task.getInitialDelay(),
                                 task.getEnabled(),
-                                scheduledTaskExecutionHistoryService.findSuccessRate(
-                                        instance.applicationId(),
-                                        task.getRunnable().getTarget())))
+                                successRates.get(task.getRunnable().getTarget())))
                         .toList(),
                 tasks.getCustom().stream()
                         .map(task -> new ScheduledTasksResponse.CustomTask(
-                                new TaskRunnable(task.getRunnable().getTarget()),
+                                task.getRunnable().getTarget(),
                                 task.getTrigger(),
                                 task.getEnabled(),
-                                scheduledTaskExecutionHistoryService.findSuccessRate(
-                                        instance.applicationId(),
-                                        task.getRunnable().getTarget())))
+                                successRates.get(task.getRunnable().getTarget())))
                         .toList());
     }
 

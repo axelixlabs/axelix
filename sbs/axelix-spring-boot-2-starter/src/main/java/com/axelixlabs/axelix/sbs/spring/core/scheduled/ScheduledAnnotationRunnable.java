@@ -27,8 +27,8 @@ import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 /**
- * The runnable of the task declared by a single {@code @Scheduled} annotation. Its string representation is the id of
- * the task, which tells apart the tasks of the repeatable {@code @Scheduled} annotations of the same method.
+ * The runnable of the task declared by a single {@code @Scheduled} annotation. Its id tells apart the tasks of the
+ * repeatable {@code @Scheduled} annotations of the same method.
  *
  * <p>It is the {@link ScheduledMethodRunnable} of the annotated method, as without Axelix, for the libraries expecting
  * the runnable of a {@code @Scheduled} method to be the {@link ScheduledMethodRunnable}, e.g. ShedLock.
@@ -92,10 +92,5 @@ public final class ScheduledAnnotationRunnable extends ScheduledMethodRunnable i
     @Override
     public boolean isLongLived() {
         return delegate instanceof SchedulingAwareRunnable && ((SchedulingAwareRunnable) delegate).isLongLived();
-    }
-
-    @Override
-    public String toString() {
-        return id;
     }
 }

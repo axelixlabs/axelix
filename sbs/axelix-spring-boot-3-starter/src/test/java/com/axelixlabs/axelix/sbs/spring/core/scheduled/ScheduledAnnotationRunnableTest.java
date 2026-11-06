@@ -60,7 +60,7 @@ class ScheduledAnnotationRunnableTest {
         ScheduledAnnotationRunnable runnable =
                 new ScheduledAnnotationRunnable(() -> {}, TASK_ID, "otherScheduler", false, this, METHOD_RUN, history);
 
-        assertThat(runnable).hasToString(TASK_ID);
+        assertThat(runnable.getId()).isEqualTo(TASK_ID);
         assertThat(runnable.getQualifier()).isEqualTo("otherScheduler");
     }
 
@@ -106,7 +106,7 @@ class ScheduledAnnotationRunnableTest {
         manual.run();
 
         assertThat(ran).isTrue();
-        assertThat(manual).hasToString(TASK_ID);
+        assertThat(manual.getId()).isEqualTo(TASK_ID);
         assertThat(manual.getQualifier()).isEqualTo("otherScheduler");
         assertThat(history.getExecutions())
                 .extracting(ScheduledTaskExecution::getLaunchType)
@@ -121,7 +121,7 @@ class ScheduledAnnotationRunnableTest {
             assertThat(methodRunnable.getTarget()).isSameAs(this);
             assertThat(methodRunnable.getMethod()).isEqualTo(METHOD_RUN);
         });
-        assertThat(schedulable).hasToString(TASK_ID);
+        assertTaskId(schedulable, TASK_ID);
     }
 
     @Test
@@ -149,5 +149,12 @@ class ScheduledAnnotationRunnableTest {
 
     private ScheduledAnnotationRunnable reactive(Runnable delegate) {
         return new ScheduledAnnotationRunnable(delegate, TASK_ID, null, true, this, METHOD_RUN, history);
+    }
+
+    private static void assertTaskId(Runnable runnable, String expectedTaskId) {
+        assertThat(ScheduledAnnotationRunnable.from(runnable))
+                .isNotNull()
+                .extracting(ScheduledAnnotationRunnable::getId)
+                .isEqualTo(expectedTaskId);
     }
 }

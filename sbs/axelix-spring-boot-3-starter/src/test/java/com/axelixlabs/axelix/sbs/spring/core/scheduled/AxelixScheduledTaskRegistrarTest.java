@@ -84,7 +84,7 @@ class AxelixScheduledTaskRegistrarTest {
                 .isInstanceOfSatisfying(
                         CronTask.class,
                         cronTask -> assertThat(cronTask.getExpression()).isEqualTo("0 0 1 * * *"));
-        assertThat(task.getRunnable()).hasToString(METHOD + "#cron0");
+        assertTaskId(task.getRunnable(), METHOD + "#cron0");
 
         task.getRunnable().run();
         assertThat(history.getExecutions())
@@ -109,9 +109,9 @@ class AxelixScheduledTaskRegistrarTest {
                 .allSatisfy(task -> assertThat(task).isInstanceOfSatisfying(IntervalTask.class, intervalTask -> {
                     assertThat(intervalTask.getIntervalDuration()).isEqualTo(INTERVAL);
                     assertThat(intervalTask.getInitialDelayDuration()).isEqualTo(INITIAL_DELAY);
-                }))
-                .extracting(task -> task.getRunnable().toString())
-                .containsExactly(METHOD + "#fixedDelay0", METHOD + "#fixedRate0");
+                }));
+        assertTaskId(fixedDelayTask.getTask().getRunnable(), METHOD + "#fixedDelay0");
+        assertTaskId(fixedRateTask.getTask().getRunnable(), METHOD + "#fixedRate0");
         assertThat(fixedDelayTask.getTask()).isInstanceOf(FixedDelayTask.class);
         assertThat(fixedRateTask.getTask()).isInstanceOf(FixedRateTask.class);
     }
@@ -149,7 +149,10 @@ class AxelixScheduledTaskRegistrarTest {
 
         registrar.afterPropertiesSet();
 
-        assertThat(registrar.findRunnable(METHOD + "#fixedRate0")).hasToString(METHOD + "#fixedRate0");
+        assertThat(registrar.findRunnable(METHOD + "#fixedRate0"))
+                .isNotNull()
+                .extracting(ScheduledAnnotationRunnable::getId)
+                .isEqualTo(METHOD + "#fixedRate0");
     }
 
     private ScheduledTask scheduleFor(ScheduledAnnotationContext annotation, Supplier<ScheduledTask> scheduling) {
@@ -157,6 +160,13 @@ class AxelixScheduledTaskRegistrarTest {
         registrar.process(annotation, () -> scheduledTask.set(scheduling.get()));
         assertThat(scheduledTask.get()).isNotNull();
         return scheduledTask.get();
+    }
+
+    private static void assertTaskId(Runnable runnable, String expectedTaskId) {
+        assertThat(ScheduledAnnotationRunnable.from(runnable))
+                .isNotNull()
+                .extracting(ScheduledAnnotationRunnable::getId)
+                .isEqualTo(expectedTaskId);
     }
 
     private static final class MethodRunnable implements Runnable {

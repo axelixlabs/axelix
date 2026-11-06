@@ -27,8 +27,8 @@ import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 
 /**
- * The runnable of the task declared by a single {@code @Scheduled} annotation. Its string representation is the id of
- * the task, which tells apart the tasks of the repeatable {@code @Scheduled} annotations of the same method.
+ * The runnable of the task declared by a single {@code @Scheduled} annotation. Its id tells apart the tasks of the
+ * repeatable {@code @Scheduled} annotations of the same method.
  *
  * <p>The execution of a regular task is recorded right here. The execution of a reactive task ends only when its
  * publisher completes, so it is recorded by the {@link ScheduledTaskExecutionObservationHandler}.
@@ -150,11 +150,6 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
                 : null;
     }
 
-    @Override
-    public String toString() {
-        return id;
-    }
-
     /**
      * A simple {@link ScheduledMethodRunnable} that delegates to the regular task, for the libraries expecting the
      * runnable of a {@code @Scheduled} method to be the {@link ScheduledMethodRunnable}, e.g. ShedLock.
@@ -181,11 +176,6 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
         @Override
         public @Nullable String getQualifier() {
             return task.getQualifier();
-        }
-
-        @Override
-        public String toString() {
-            return task.toString();
         }
     }
 }
