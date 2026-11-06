@@ -19,12 +19,12 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import java.util.Set;
 
+import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager.AuthoritiesContributor;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,8 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DefaultAuthoritiesManagerTest {
 
     @ParameterizedTest
-    @EnumSource(OssAuthority.class)
-    void shouldDecodeEveryOssAuthority(OssAuthority authority) {
+    @EnumSource(WireLevelAuthorities.class)
+    void shouldDecodeEveryOssAuthority(WireLevelAuthorities authority) {
         DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(null);
 
         Authority decoded = decoder.decode(authority.getName());
@@ -57,21 +57,21 @@ class DefaultAuthoritiesManagerTest {
     void shouldDecodeDefaultAuthorities_WhenContributorIsNull() {
         DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(null);
 
-        assertThat(decoder.decode(OssAuthority.USERS_VIEW.getName())).isSameAs(OssAuthority.USERS_VIEW);
+        assertThat(decoder.decode(WireLevelAuthorities.USERS_VIEW.getName())).isSameAs(WireLevelAuthorities.USERS_VIEW);
     }
 
     @Test
     void shouldDecodeDefaultAuthorities_WhenContributorContributesNull() {
         DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(() -> null);
 
-        assertThat(decoder.decode(OssAuthority.USERS_VIEW.getName())).isSameAs(OssAuthority.USERS_VIEW);
+        assertThat(decoder.decode(WireLevelAuthorities.USERS_VIEW.getName())).isSameAs(WireLevelAuthorities.USERS_VIEW);
     }
 
     @Test
     void shouldDecodeDefaultAuthorities_WhenContributorContributesEmptySet() {
         DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(Set::of);
 
-        assertThat(decoder.decode(OssAuthority.USERS_VIEW.getName())).isSameAs(OssAuthority.USERS_VIEW);
+        assertThat(decoder.decode(WireLevelAuthorities.USERS_VIEW.getName())).isSameAs(WireLevelAuthorities.USERS_VIEW);
     }
 
     @Test
@@ -92,6 +92,6 @@ class DefaultAuthoritiesManagerTest {
         DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(contributor);
 
         assertThat(decoder.decode("CUSTOM_AUTHORITY")).isEqualTo(contributed);
-        assertThat(decoder.decode(OssAuthority.CACHES_CLEAR.getName())).isEqualTo(OssAuthority.CACHES_CLEAR);
+        assertThat(decoder.decode(WireLevelAuthorities.CACHES_CLEAR.getName())).isEqualTo(WireLevelAuthorities.CACHES_CLEAR);
     }
 }

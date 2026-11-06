@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -34,7 +35,6 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.iam.RoleEntity;
@@ -140,9 +140,35 @@ class DefaultRoleServiceTest {
 
             // then.
             assertThat(stored)
-                    .containsExactlyInAnyOrderElementsOf(Arrays.stream(OssAuthority.values())
-                            .map(OssAuthority::getName)
+                    .containsExactlyInAnyOrderElementsOf(Arrays.stream(WireLevelAuthorities.values())
+                            .map(WireLevelAuthorities::getName)
                             .toList());
+        }
+
+        @Test
+        void shouldStoreCodenameAndDescriptionForEveryOssAuthority() {
+            // when.
+            var stored = jdbcClient
+                    .sql("SELECT name, codename FROM authorities")
+                    .query((resultSet, rowNum) -> tuple(resultSet.getString("name"), resultSet.getString("codename")))
+                    .list();
+            int blankDescriptions = jdbcClient
+                    .sql("SELECT COUNT(*) FROM authorities WHERE description IS NULL OR TRIM(description) = ''")
+                    .query(Integer.class)
+                    .single();
+
+            // then.
+            assertThat(stored)
+                    .containsExactlyInAnyOrder(
+                            tuple("ENV_VALUES_READ", "environment.values:read"),
+                            tuple("CONFIG_PROPS_VALUES_READ", "config-properties.values:read"),
+                            tuple("SCHEDULED_TASKS_MODIFY", "scheduled-tasks:write"),
+                            tuple("CACHES_CLEAR", "caches:clear"),
+                            tuple("CACHES_TOGGLE", "caches:toggle"),
+                            tuple("GARBAGE_COLLECTOR", "gc:manage"),
+                            tuple("USERS_VIEW", "users:read"),
+                            tuple("USERS_MANAGEMENT", "users:manage"));
+            assertThat(blankDescriptions).isZero();
         }
     }
 
@@ -205,8 +231,8 @@ class DefaultRoleServiceTest {
         @Test
         void shouldExposeTheRoleItDerivesFromAsAComponent() {
             // given.
-            String parentId = createCustomRole("PARENT", OssAuthority.CACHES_CLEAR);
-            String childId = createCustomRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
+            String parentId = createCustomRole("PARENT", WireLevelAuthorities.CACHES_CLEAR);
+            String childId = createCustomRole("CHILD", WireLevelAuthorities.GARBAGE_COLLECTOR);
             createBond(childId, parentId);
 
             // when.
@@ -215,21 +241,21 @@ class DefaultRoleServiceTest {
             // then. The parent is a component rather than its authorities being copied into the child
             assertThat(child.getAuthorities())
                     .extracting(Authority::getName)
-                    .containsExactly(OssAuthority.GARBAGE_COLLECTOR.getName());
+                    .containsExactly(WireLevelAuthorities.GARBAGE_COLLECTOR.getName());
             assertThat(child.getComponents()).singleElement().satisfies(parent -> {
                 assertThat(parent.getName()).isEqualTo("PARENT");
                 assertThat(parent.getAuthorities())
                         .extracting(Authority::getName)
-                        .containsExactly(OssAuthority.CACHES_CLEAR.getName());
+                        .containsExactly(WireLevelAuthorities.CACHES_CLEAR.getName());
             });
         }
 
         @Test
         void shouldResolveTheBondsTransitively() {
             // given. C derives from B, B derives from A
-            String grandParent = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String parent = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
-            String child = createCustomRole("ROLE C", OssAuthority.GARBAGE_COLLECTOR);
+            String grandParent = createCustomRole("ROLE A", WireLevelAuthorities.ENV_VALUES_READ);
+            String parent = createCustomRole("ROLE B", WireLevelAuthorities.CACHES_CLEAR);
+            String child = createCustomRole("ROLE C", WireLevelAuthorities.GARBAGE_COLLECTOR);
             createBond(parent, grandParent);
             createBond(child, parent);
 
@@ -240,18 +266,18 @@ class DefaultRoleServiceTest {
             assertThat(c.getEffectiveAuthorities())
                     .extracting(Authority::getName)
                     .containsExactlyInAnyOrder(
-                            OssAuthority.GARBAGE_COLLECTOR.getName(),
-                            OssAuthority.CACHES_CLEAR.getName(),
-                            OssAuthority.ENV_VALUES_READ.getName());
+                            WireLevelAuthorities.GARBAGE_COLLECTOR.getName(),
+                            WireLevelAuthorities.CACHES_CLEAR.getName(),
+                            WireLevelAuthorities.ENV_VALUES_READ.getName());
         }
 
         @Test
         void shouldUnionTheAuthoritiesReachedThroughSeveralChains() {
             // given. A diamond: the top role is reached through both branches
-            String top = createCustomRole("TOP", OssAuthority.ENV_VALUES_READ);
-            String left = createCustomRole("LEFT", OssAuthority.CACHES_CLEAR);
-            String right = createCustomRole("RIGHT", OssAuthority.CACHES_TOGGLE);
-            String bottom = createCustomRole("BOTTOM", OssAuthority.GARBAGE_COLLECTOR);
+            String top = createCustomRole("TOP", WireLevelAuthorities.ENV_VALUES_READ);
+            String left = createCustomRole("LEFT", WireLevelAuthorities.CACHES_CLEAR);
+            String right = createCustomRole("RIGHT", WireLevelAuthorities.CACHES_TOGGLE);
+            String bottom = createCustomRole("BOTTOM", WireLevelAuthorities.GARBAGE_COLLECTOR);
             createBond(left, top);
             createBond(right, top);
             createBond(bottom, left);
@@ -264,17 +290,17 @@ class DefaultRoleServiceTest {
             assertThat(role.getEffectiveAuthorities())
                     .extracting(Authority::getName)
                     .containsExactlyInAnyOrder(
-                            OssAuthority.GARBAGE_COLLECTOR.getName(),
-                            OssAuthority.CACHES_CLEAR.getName(),
-                            OssAuthority.CACHES_TOGGLE.getName(),
-                            OssAuthority.ENV_VALUES_READ.getName());
+                            WireLevelAuthorities.GARBAGE_COLLECTOR.getName(),
+                            WireLevelAuthorities.CACHES_CLEAR.getName(),
+                            WireLevelAuthorities.CACHES_TOGGLE.getName(),
+                            WireLevelAuthorities.ENV_VALUES_READ.getName());
         }
 
         @Test
         void shouldResolveTheBondsOfEveryRoleTheUserHolds() {
             // given.
-            String parentId = createCustomRole("PARENT", OssAuthority.CACHES_CLEAR);
-            String childId = createCustomRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
+            String parentId = createCustomRole("PARENT", WireLevelAuthorities.CACHES_CLEAR);
+            String childId = createCustomRole("CHILD", WireLevelAuthorities.GARBAGE_COLLECTOR);
             createBond(childId, parentId);
 
             userService.createLocal("alice", null, null, "alice@example.com", "p", Set.of("CHILD"));
@@ -289,7 +315,7 @@ class DefaultRoleServiceTest {
                     .satisfies(role -> assertThat(role.getEffectiveAuthorities())
                             .extracting(Authority::getName)
                             .containsExactlyInAnyOrder(
-                                    OssAuthority.GARBAGE_COLLECTOR.getName(), OssAuthority.CACHES_CLEAR.getName()));
+                                    WireLevelAuthorities.GARBAGE_COLLECTOR.getName(), WireLevelAuthorities.CACHES_CLEAR.getName()));
         }
     }
 
@@ -342,7 +368,7 @@ class DefaultRoleServiceTest {
         @Test
         void shouldReturnACustomRoleWithItsOwnIdAndDescription() {
             // given.
-            String derivedId = createCustomRole("DERIVED", OssAuthority.ENV_VALUES_READ);
+            String derivedId = createCustomRole("DERIVED", WireLevelAuthorities.ENV_VALUES_READ);
 
             // when.
             List<RoleProfile> feed = roleService.getRolesFeed();
@@ -368,8 +394,8 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateOnABondCycleWrittenAroundTheApplication() {
             // given.
-            String roleA = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String roleB = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            String roleA = createCustomRole("ROLE A", WireLevelAuthorities.ENV_VALUES_READ);
+            String roleB = createCustomRole("ROLE B", WireLevelAuthorities.CACHES_CLEAR);
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
@@ -380,7 +406,7 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateOnARoleThatDerivesFromItself() {
             // given.
-            String role = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            String role = createCustomRole("ROLE A", WireLevelAuthorities.ENV_VALUES_READ);
             createBond(role, role);
 
             // when & then.
@@ -390,9 +416,9 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateOnACycleSpanningThreeRoles() {
             // given. A --> B --> C --> A
-            String roleA = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String roleB = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
-            String roleC = createCustomRole("ROLE C", OssAuthority.CACHES_TOGGLE);
+            String roleA = createCustomRole("ROLE A", WireLevelAuthorities.ENV_VALUES_READ);
+            String roleB = createCustomRole("ROLE B", WireLevelAuthorities.CACHES_CLEAR);
+            String roleC = createCustomRole("ROLE C", WireLevelAuthorities.CACHES_TOGGLE);
             createBond(roleA, roleB);
             createBond(roleB, roleC);
             createBond(roleC, roleA);
@@ -404,9 +430,9 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateWhenTheCycleSitsAboveTheQueriedRole() {
             // given.
-            String leaf = createCustomRole("LEAF", OssAuthority.GARBAGE_COLLECTOR);
-            String roleA = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String roleB = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            String leaf = createCustomRole("LEAF", WireLevelAuthorities.GARBAGE_COLLECTOR);
+            String roleA = createCustomRole("ROLE A", WireLevelAuthorities.ENV_VALUES_READ);
+            String roleB = createCustomRole("ROLE B", WireLevelAuthorities.CACHES_CLEAR);
             createBond(leaf, roleA);
             createBond(roleA, roleB);
             createBond(roleB, roleA);
@@ -418,8 +444,8 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateWhenResolvingTheRolesOfAUserCaughtInACycle() {
             // given.
-            String roleA = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String roleB = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            String roleA = createCustomRole("ROLE A", WireLevelAuthorities.ENV_VALUES_READ);
+            String roleB = createCustomRole("ROLE B", WireLevelAuthorities.CACHES_CLEAR);
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
@@ -434,10 +460,10 @@ class DefaultRoleServiceTest {
         void shouldNotReportACycleForADiamondSharedAncestor() {
             // given. A diamond reaches the same ancestor through two branches - that is a DAG, not a cycle, and the
             // colouring must not mistake the second visit for a back-edge
-            String top = createCustomRole("TOP", OssAuthority.ENV_VALUES_READ);
-            String left = createCustomRole("LEFT", OssAuthority.CACHES_CLEAR);
-            String right = createCustomRole("RIGHT", OssAuthority.CACHES_TOGGLE);
-            String bottom = createCustomRole("BOTTOM", OssAuthority.GARBAGE_COLLECTOR);
+            String top = createCustomRole("TOP", WireLevelAuthorities.ENV_VALUES_READ);
+            String left = createCustomRole("LEFT", WireLevelAuthorities.CACHES_CLEAR);
+            String right = createCustomRole("RIGHT", WireLevelAuthorities.CACHES_TOGGLE);
+            String bottom = createCustomRole("BOTTOM", WireLevelAuthorities.GARBAGE_COLLECTOR);
             createBond(left, top);
             createBond(right, top);
             createBond(bottom, left);
@@ -450,10 +476,10 @@ class DefaultRoleServiceTest {
             assertThat(role.getEffectiveAuthorities())
                     .extracting(Authority::getName)
                     .containsExactlyInAnyOrder(
-                            OssAuthority.GARBAGE_COLLECTOR.getName(),
-                            OssAuthority.CACHES_CLEAR.getName(),
-                            OssAuthority.CACHES_TOGGLE.getName(),
-                            OssAuthority.ENV_VALUES_READ.getName());
+                            WireLevelAuthorities.GARBAGE_COLLECTOR.getName(),
+                            WireLevelAuthorities.CACHES_CLEAR.getName(),
+                            WireLevelAuthorities.CACHES_TOGGLE.getName(),
+                            WireLevelAuthorities.ENV_VALUES_READ.getName());
         }
     }
 
@@ -465,7 +491,7 @@ class DefaultRoleServiceTest {
         return id;
     }
 
-    private String createCustomRole(String name, OssAuthority authority) {
+    private String createCustomRole(String name, WireLevelAuthorities authority) {
         String id = createCustomRole(name);
 
         jdbcClient

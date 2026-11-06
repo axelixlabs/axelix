@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
@@ -75,7 +75,7 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
         @Test
         void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
             // when.
-            User user = fromAuthorities(OssAuthority.ENV_VALUES_READ);
+            User user = fromAuthorities(WireLevelAuthorities.ENV_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
                     () -> environmentService.getEnvironmentFeed(null), securityContext);
@@ -122,7 +122,7 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
         @Test
         void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
             // when.
-            User user = fromAuthorities(OssAuthority.ENV_VALUES_READ);
+            User user = fromAuthorities(WireLevelAuthorities.ENV_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
                     () -> environmentService.getEnvironmentFeed(null), securityContext);

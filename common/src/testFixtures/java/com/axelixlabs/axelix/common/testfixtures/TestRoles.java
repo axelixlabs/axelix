@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.common.testfixtures;
 import java.util.Set;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import com.axelixlabs.axelix.common.auth.core.Role;
 
 // TODO:
@@ -45,20 +45,20 @@ public final class TestRoles {
     public static final Role EDITOR = new DefaultRole(
             "EDITOR",
             Set.of(
-                    OssAuthority.SCHEDULED_TASKS_MODIFY,
-                    OssAuthority.CACHES_CLEAR,
-                    OssAuthority.CACHES_TOGGLE,
-                    OssAuthority.GARBAGE_COLLECTOR));
+                    WireLevelAuthorities.SCHEDULED_TASKS_MODIFY,
+                    WireLevelAuthorities.CACHES_CLEAR,
+                    WireLevelAuthorities.CACHES_TOGGLE,
+                    WireLevelAuthorities.GARBAGE_COLLECTOR));
 
     public static final Role ADMIN = new DefaultRole(
             "ADMIN",
             Set.of(
-                    OssAuthority.SCHEDULED_TASKS_MODIFY,
-                    OssAuthority.CACHES_CLEAR,
-                    OssAuthority.CACHES_TOGGLE,
-                    OssAuthority.GARBAGE_COLLECTOR,
-                    OssAuthority.ENV_VALUES_READ,
-                    OssAuthority.CONFIG_PROPS_VALUES_READ));
+                    WireLevelAuthorities.SCHEDULED_TASKS_MODIFY,
+                    WireLevelAuthorities.CACHES_CLEAR,
+                    WireLevelAuthorities.CACHES_TOGGLE,
+                    WireLevelAuthorities.GARBAGE_COLLECTOR,
+                    WireLevelAuthorities.ENV_VALUES_READ,
+                    WireLevelAuthorities.CONFIG_PROPS_VALUES_READ));
 
     private TestRoles() {}
 }

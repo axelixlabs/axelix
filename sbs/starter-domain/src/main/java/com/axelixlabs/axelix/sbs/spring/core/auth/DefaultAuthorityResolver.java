@@ -22,10 +22,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -49,24 +49,24 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         //  while building the unified distro
 
         // SCHEDULED_TASKS_MODIFY
-        map.put(ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
-        map.put(ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
-        map.put(ActuatorEndpoints.EXECUTE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
-        map.put(ActuatorEndpoints.ENABLE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
-        map.put(ActuatorEndpoints.DISABLE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK, WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK, WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.EXECUTE_SCHEDULED_TASK, WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.ENABLE_SCHEDULED_TASK, WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.DISABLE_SCHEDULED_TASK, WireLevelAuthorities.SCHEDULED_TASKS_MODIFY);
 
         // CACHES_CLEAR
-        map.put(ActuatorEndpoints.CLEAR_ALL_CACHES, OssAuthority.CACHES_CLEAR);
-        map.put(ActuatorEndpoints.CLEAR_SINGLE_CACHE, OssAuthority.CACHES_CLEAR);
+        map.put(ActuatorEndpoints.CLEAR_ALL_CACHES, WireLevelAuthorities.CACHES_CLEAR);
+        map.put(ActuatorEndpoints.CLEAR_SINGLE_CACHE, WireLevelAuthorities.CACHES_CLEAR);
 
         // CACHES_TOGGLE
-        map.put(ActuatorEndpoints.ENABLE_CACHE, OssAuthority.CACHES_TOGGLE);
-        map.put(ActuatorEndpoints.DISABLE_CACHE, OssAuthority.CACHES_TOGGLE);
+        map.put(ActuatorEndpoints.ENABLE_CACHE, WireLevelAuthorities.CACHES_TOGGLE);
+        map.put(ActuatorEndpoints.DISABLE_CACHE, WireLevelAuthorities.CACHES_TOGGLE);
 
         // GARBAGE_COLLECTOR
-        map.put(ActuatorEndpoints.GC_TRIGGER, OssAuthority.GARBAGE_COLLECTOR);
-        map.put(ActuatorEndpoints.DISABLE_GC_LOGGING, OssAuthority.GARBAGE_COLLECTOR);
-        map.put(ActuatorEndpoints.ENABLE_GC_LOGGING, OssAuthority.GARBAGE_COLLECTOR);
+        map.put(ActuatorEndpoints.GC_TRIGGER, WireLevelAuthorities.GARBAGE_COLLECTOR);
+        map.put(ActuatorEndpoints.DISABLE_GC_LOGGING, WireLevelAuthorities.GARBAGE_COLLECTOR);
+        map.put(ActuatorEndpoints.ENABLE_GC_LOGGING, WireLevelAuthorities.GARBAGE_COLLECTOR);
 
         PATH_MAPPINGS = Collections.unmodifiableMap(map);
     }

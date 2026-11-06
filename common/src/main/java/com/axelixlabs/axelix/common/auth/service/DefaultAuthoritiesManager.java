@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 
 /**
  * Default implementation of {@link AuthoritiesManager}.
@@ -38,7 +38,7 @@ public class DefaultAuthoritiesManager implements AuthoritiesManager {
     private final Map<String, Authority> effectiveAuthorities;
 
     public DefaultAuthoritiesManager(@Nullable AuthoritiesContributor authoritiesContributor) {
-        Set<Authority> effectiveAuthorities = new HashSet<>(OssAuthority.asSet());
+        Set<Authority> effectiveAuthorities = new HashSet<>(WireLevelAuthorities.asSet());
 
         if (authoritiesContributor != null) {
 

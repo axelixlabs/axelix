@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
@@ -86,7 +86,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         @Test
         void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
             // when.
-            User user = fromAuthorities(OssAuthority.CONFIG_PROPS_VALUES_READ);
+            User user = fromAuthorities(WireLevelAuthorities.CONFIG_PROPS_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
                     configurationPropertiesService::getConfigProps, securityContext);
@@ -142,7 +142,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         @Test
         void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
             // when.
-            User user = fromAuthorities(OssAuthority.CONFIG_PROPS_VALUES_READ);
+            User user = fromAuthorities(WireLevelAuthorities.CONFIG_PROPS_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
                     configurationPropertiesService::getConfigProps, securityContext);

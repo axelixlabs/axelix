@@ -23,7 +23,7 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ApplicationConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.common.auth.core.WireLevelAuthorities;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 
@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
  */
 public class DefaultConfigurationPropertiesService implements ConfigurationPropertiesService {
 
-    private static final OssAuthority FULL_ACCESS_AUTHORITY = OssAuthority.CONFIG_PROPS_VALUES_READ;
+    private static final WireLevelAuthorities FULL_ACCESS_AUTHORITY = WireLevelAuthorities.CONFIG_PROPS_VALUES_READ;
 
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
     private final ConfigurationPropertiesReportEndpoint delegate;

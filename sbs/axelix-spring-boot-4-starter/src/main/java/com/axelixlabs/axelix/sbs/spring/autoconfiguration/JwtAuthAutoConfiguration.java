@@ -98,8 +98,7 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    public WebIdentityAccessManager webIdentityAccessManager(
-            JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-        return new ManagedServiceWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
+    public WebIdentityAccessManager webIdentityAccessManager(JwtDecoderService jwtDecoderService) {
+        return new ManagedServiceWebIdentityAccessManager(jwtDecoderService);
     }
 }
