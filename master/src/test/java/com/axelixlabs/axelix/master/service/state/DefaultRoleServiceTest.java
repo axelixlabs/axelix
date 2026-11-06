@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -131,26 +130,11 @@ class DefaultRoleServiceTest {
         }
 
         @Test
-        void shouldStoreEveryOssAuthority() {
-            // when.
-            List<String> stored = jdbcClient
-                    .sql("SELECT name FROM authorities")
-                    .query(String.class)
-                    .list();
-
-            // then.
-            assertThat(stored)
-                    .containsExactlyInAnyOrderElementsOf(Arrays.stream(OssAuthority.values())
-                            .map(OssAuthority::getName)
-                            .toList());
-        }
-
-        @Test
         void shouldStoreCodenameAndDescriptionForEveryOssAuthority() {
             // when.
-            var stored = jdbcClient
-                    .sql("SELECT name, codename FROM authorities")
-                    .query((resultSet, rowNum) -> tuple(resultSet.getString("name"), resultSet.getString("codename")))
+            List<String> stored = jdbcClient
+                    .sql("SELECT codename FROM authorities")
+                    .query(String.class)
                     .list();
             int blankDescriptions = jdbcClient
                     .sql("SELECT COUNT(*) FROM authorities WHERE description IS NULL OR TRIM(description) = ''")
@@ -160,14 +144,14 @@ class DefaultRoleServiceTest {
             // then.
             assertThat(stored)
                     .containsExactlyInAnyOrder(
-                            tuple("ENV_VALUES_READ", "environment.values:read"),
-                            tuple("CONFIG_PROPS_VALUES_READ", "config-properties.values:read"),
-                            tuple("SCHEDULED_TASKS_MODIFY", "scheduled-tasks:write"),
-                            tuple("CACHES_CLEAR", "caches:clear"),
-                            tuple("CACHES_TOGGLE", "caches:toggle"),
-                            tuple("GARBAGE_COLLECTOR", "gc:manage"),
-                            tuple("USERS_VIEW", "users:read"),
-                            tuple("USERS_MANAGEMENT", "users:manage"));
+                            "environment.values:read",
+                            "config-properties.values:read",
+                            "scheduled-tasks:write",
+                            "caches:clear",
+                            "caches:toggle",
+                            "gc:manage",
+                            "users:read",
+                            "users:manage");
             assertThat(blankDescriptions).isZero();
         }
     }

@@ -13,5 +13,5 @@
   <include file="db/changelog/sqlite/changelog/1.3/005-add-launch-type-to-scheduled-task-execution-results.xml"/>
   <include file="db/changelog/sqlite/changelog/1.3/006-drop-job-title-and-organizational-unit-from-users.xml"/>
   <include file="db/changelog/sqlite/changelog/1.3/007-insert-user-management-authorities.xml"/>
-  <include file="db/changelog/sqlite/changelog/1.3/008-add-codename-and-description-to-authorities.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.3/008-rename-authority-name-to-codename-and-add-description.xml"/>
 </databaseChangeLog>
