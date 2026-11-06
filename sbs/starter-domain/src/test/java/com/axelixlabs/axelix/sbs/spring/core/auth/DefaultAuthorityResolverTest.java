@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.util.stream.Stream;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,6 +28,7 @@ import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 import static org.assertj.core.api.Assertions.assertThat;

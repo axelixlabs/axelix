@@ -19,12 +19,12 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import java.util.Set;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager.AuthoritiesContributor;
 
 import static org.assertj.core.api.Assertions.assertThat;

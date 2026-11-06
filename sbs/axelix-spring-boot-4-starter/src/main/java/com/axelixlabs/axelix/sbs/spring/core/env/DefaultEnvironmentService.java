@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.endpoint.Show;
@@ -27,6 +26,7 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.core.env.Environment;
 
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;

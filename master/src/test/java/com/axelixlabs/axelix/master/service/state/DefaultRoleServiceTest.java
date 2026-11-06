@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -35,6 +34,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.iam.RoleEntity;

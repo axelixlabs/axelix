@@ -22,10 +22,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;

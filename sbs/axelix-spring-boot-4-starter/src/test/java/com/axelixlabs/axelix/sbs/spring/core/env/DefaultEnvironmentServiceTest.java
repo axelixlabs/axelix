@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;

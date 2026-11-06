@@ -17,11 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 

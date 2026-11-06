@@ -21,7 +21,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
@@ -36,6 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;

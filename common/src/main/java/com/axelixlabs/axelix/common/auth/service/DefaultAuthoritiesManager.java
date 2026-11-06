@@ -23,10 +23,10 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 
 /**
  * Default implementation of {@link AuthoritiesManager}.
