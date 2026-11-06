@@ -128,6 +128,18 @@ class DefaultRoleServiceTest {
             // then.
             assertThat(role).isEmpty();
         }
+
+        @Test
+        void shouldForceNonEmptyDescriptionForEveryAuthority() {
+            // when.
+            int blankDescriptions = jdbcClient
+                    .sql("SELECT COUNT(*) FROM authorities WHERE description IS NULL OR TRIM(description) = ''")
+                    .query(Integer.class)
+                    .single();
+
+            // then.
+            assertThat(blankDescriptions).isZero();
+        }
     }
 
     @Nested

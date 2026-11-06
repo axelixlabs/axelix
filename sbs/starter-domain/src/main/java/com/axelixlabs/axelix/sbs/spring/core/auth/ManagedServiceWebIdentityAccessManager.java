@@ -17,20 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
@@ -43,14 +36,9 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 public class ManagedServiceWebIdentityAccessManager implements WebIdentityAccessManager {
 
     private final JwtDecoderService jwtDecoderService;
-    private final AuthorityResolver authorityResolver;
-    private final Authorizer authorizer;
 
-    public ManagedServiceWebIdentityAccessManager(
-            JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
+    public ManagedServiceWebIdentityAccessManager(JwtDecoderService jwtDecoderService) {
         this.jwtDecoderService = jwtDecoderService;
-        this.authorityResolver = authorityResolver;
-        this.authorizer = authorizer;
     }
 
     @Override
@@ -61,15 +49,12 @@ public class ManagedServiceWebIdentityAccessManager implements WebIdentityAccess
             throw new InvalidJwtTokenException("Authorization token is missing");
         }
 
-        PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
+        // TODO:
+        // we need to check here that:
+        // 1. user is actually axelix master, so that other tokens from other starters are not applicable for us
+        // 2. we also need to split the jwt decoding/encoding services for starter/master-accepted tokens.
+        PasswordlessUser decodedTokenToUser = jwtDecoderService.decodeTokenToUser(token);
 
-        Optional<Authority> requiredAuthority = authorityResolver.resolve(relativeRequestPath, requestHttpMethod);
-
-        AuthorizationRequest authorizationRequest =
-                new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));
-
-        authorizer.authorize(user, authorizationRequest);
-
-        return user;
+        return decodedTokenToUser;
     }
 }

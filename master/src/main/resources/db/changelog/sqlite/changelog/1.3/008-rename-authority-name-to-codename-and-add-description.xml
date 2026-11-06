@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.3-008-sqlite-rename-authority-name-to-codename-and-add-description" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <and>
+        <columnExists tableName="authorities" columnName="name"/>
+        <not>
+          <columnExists tableName="authorities" columnName="codename"/>
+        </not>
+        <not>
+          <columnExists tableName="authorities" columnName="description"/>
+        </not>
+      </and>
+    </preConditions>
+
+    <renameColumn tableName="authorities" oldColumnName="name" newColumnName="codename" columnDataType="TEXT"/>
+    <sql>ALTER TABLE authorities ADD COLUMN description TEXT</sql>
+
+    <update tableName="authorities">
+      <column name="codename" value="environment.values:read"/>
+      <column name="description" value="Grants the right to view values in Environment."/>
+      <where>codename = 'ENV_VALUES_READ'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="codename" value="config-properties.values:read"/>
+      <column name="description" value="Grants the right to view values in Configuration Properties."/>
+      <where>codename = 'CONFIG_PROPS_VALUES_READ'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="codename" value="scheduled-tasks:write"/>
+      <column name="description" value="Allows modifying individual tasks, forcing their execution, and enabling/disabling them at runtime."/>
+      <where>codename = 'SCHEDULED_TASKS_MODIFY'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="codename" value="caches:clear"/>
+      <column name="description" value="Allows clearing individual caches, cache managers, and all application caches at runtime."/>
+      <where>codename = 'CACHES_CLEAR'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="codename" value="caches:toggle"/>
+      <column name="description" value="Allows enabling/disabling individual caches and cache managers at runtime."/>
+      <where>codename = 'CACHES_TOGGLE'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="codename" value="gc:manage"/>
+      <column name="description" value="Allows triggering garbage collection and enabling/disabling garbage collector log monitoring at runtime."/>
+      <where>codename = 'GARBAGE_COLLECTOR'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="codename" value="users:read"/>
+      <column name="description" value="Grants the right to view managed users."/>
+      <where>codename = 'USERS_VIEW'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="codename" value="users:manage"/>
+      <column name="description" value="Allows creating, updating, and deleting managed users at runtime."/>
+      <where>codename = 'USERS_MANAGEMENT'</where>
+    </update>
+  </changeSet>
+</databaseChangeLog>

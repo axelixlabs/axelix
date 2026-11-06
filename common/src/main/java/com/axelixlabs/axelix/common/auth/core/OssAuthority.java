@@ -22,12 +22,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Enumeration of OSS authorities supported by Axelix.
+ * Authorities that well-known .
  *
  * @see Authority
+ *
+ * @deprecated since 1.3, the only source of truth for the authorities will be the state in the database.
+ *             This enum is no longer for the starters that are 1.3+. It is retained solely for the purpose
+ *             of ensuring the backward compatibility window for old version of starters that expect authorities
+ *             to exist in the token.
+ *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
+@Deprecated(forRemoval = true, since = "1.3")
 public enum OssAuthority implements Authority {
 
     /**
