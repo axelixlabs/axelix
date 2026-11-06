@@ -23,9 +23,6 @@ import java.util.Objects;
 /**
  * A field identified by its owner, name and JVM descriptor.
  *
- * @param owner the declaring class' internal name
- * @param name the field's name
- * @param descriptor the field's JVM type descriptor
  * @author Nikita Kirilloff
  */
 public final class FieldRef {
@@ -34,6 +31,11 @@ public final class FieldRef {
     private final String name;
     private final String descriptor;
 
+    /**
+     * @param owner the declaring class' internal name
+     * @param name the field's name
+     * @param descriptor the field's JVM type descriptor
+     */
     public FieldRef(String owner, String name, String descriptor) {
         this.owner = owner;
         this.name = name;

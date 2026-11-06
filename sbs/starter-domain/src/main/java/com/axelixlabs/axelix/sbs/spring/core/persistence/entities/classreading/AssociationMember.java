@@ -23,8 +23,6 @@ import java.util.Objects;
 /**
  * An association identified by its name and the Java member used to access it.
  *
- * @param name the association name
- * @param member the field or accessor method associated with it
  * @author Nikita Kirilloff
  */
 public final class AssociationMember {
@@ -32,6 +30,10 @@ public final class AssociationMember {
     private final String name;
     private final Member member;
 
+    /**
+     * @param name the association name
+     * @param member the field or accessor method associated with it
+     */
     public AssociationMember(String name, Member member) {
         this.name = Objects.requireNonNull(name, "name");
         this.member = Objects.requireNonNull(member, "member");
