@@ -15,33 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ETriggerType, IScheduledTask } from "./taskModel";
+import shared from "./shared.module.css";
 
-type ClassMap = { [key: string]: string };
+export const HEALTHY_SUCCESS_RATE = 90;
 
-/**
- * Picks the trigger-type badge class from the shared stylesheet.
- */
-export const triggerTypeClass = (shared: ClassMap, type: ETriggerType): string => {
-    if (type === "Cron") {
-        return shared.TypeCron;
-    }
-
-    return type === "Fixed delay" ? shared.TypeFixedDelay : shared.TypeFixedRate;
-};
-
-/**
- * Picks the success-rate colour class: dim when the task is off or has no history, otherwise
- * green / amber / red by how healthy the rate is.
- */
-export const successRateClass = (shared: ClassMap, task: IScheduledTask): string => {
-    if (!task.enabled || !task.hasHistory) {
+export const getSuccessRateClass = (successRate: number | null, enabled: boolean): string => {
+    if (!enabled || successRate === null) {
         return shared.RateOff;
     }
 
-    if (task.successRate === 100) {
+    if (successRate === 100) {
         return shared.RateGood;
     }
 
-    return task.successRate >= 90 ? shared.RateWarn : shared.RateBad;
+    return successRate >= HEALTHY_SUCCESS_RATE ? shared.RateWarn : shared.RateBad;
 };

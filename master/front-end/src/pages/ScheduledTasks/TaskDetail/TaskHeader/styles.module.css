@@ -1,0 +1,58 @@
+.Header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px 40px;
+    flex-wrap: wrap;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--axelix-grey-100);
+}
+
+.TitleBlock {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 6px;
+    min-width: 0;
+}
+
+.Method {
+    font-size: var(--axelix-font-size-subtitle);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-900);
+    overflow-wrap: anywhere;
+}
+
+.Suffix {
+    font-weight: var(--axelix-font-weight-regular);
+    color: var(--axelix-grey-500);
+}
+
+.ClassName {
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-500);
+    overflow-wrap: anywhere;
+}
+
+.TriggerLine {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 2px;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-600);
+}
+
+.TriggerLine .Expression {
+    color: var(--axelix-grey-700);
+    background-color: var(--axelix-grey-50);
+    border-color: var(--axelix-grey-200);
+}
+
+.Controls {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    flex-shrink: 0;
+}

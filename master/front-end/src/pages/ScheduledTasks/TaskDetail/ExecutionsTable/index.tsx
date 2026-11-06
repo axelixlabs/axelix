@@ -15,56 +15,49 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Pagination } from "antd";
+import dayjs from "dayjs";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { type IScheduledTaskExecution, NOW_SECONDS, formatDuration, formatTimeOfDay } from "../../mock";
+import { EmptyHandler } from "@/components";
+import { formatTransactionDuration } from "@/helpers";
+import type { IScheduledTaskExecutionRecord } from "@/models";
+
 import shared from "../../shared.module.css";
-import type { IScheduledTask } from "../../taskModel";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    task: IScheduledTask;
-    onlyFailed: boolean;
-    onOnlyFailedChange: (value: boolean) => void;
-    page: number;
-    onPageChange: (page: number) => void;
+    executions: IScheduledTaskExecutionRecord[];
 }
+
+type TExecutionsFilter = "all" | "failed";
 
 const PAGE_SIZE = 8;
 
-export const ExecutionsTable = ({ task, onlyFailed, onOnlyFailedChange, page, onPageChange }: IProps) => {
+const formatStartedAt = (startedAt: string): string => {
+    const started = dayjs(startedAt);
+
+    return started.format(started.isSame(dayjs(), "day") ? "HH:mm:ss" : "DD.MM HH:mm:ss");
+};
+
+export const ExecutionsTable = ({ executions }: IProps) => {
     const { t } = useTranslation();
 
-    const list = [...task.manualRuns, ...[...task.runs].reverse()].filter((run) => !onlyFailed || !run.succeeded);
+    const [filter, setFilter] = useState<TExecutionsFilter>("all");
+    const [page, setPage] = useState(1);
 
-    const pageCount = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
-    const currentPage = Math.min(page, pageCount - 1);
-    const pageItems = list.slice(currentPage * PAGE_SIZE, currentPage * PAGE_SIZE + PAGE_SIZE);
+    // TODO: The filter and the table only cover the latest 30 executions, the default page of the history API
+    const failedExecutions = executions.filter((execution) => !execution.success);
+    const visibleExecutions = filter === "failed" ? failedExecutions : executions;
+    const firstIndex = (page - 1) * PAGE_SIZE;
+    const pageExecutions = visibleExecutions.slice(firstIndex, firstIndex + PAGE_SIZE);
 
-    const goTo = (target: number): void => onPageChange(Math.max(0, Math.min(pageCount - 1, target)));
-
-    const shownLabel = list.length
-        ? t("ScheduledTasks.executionsShown", {
-              from: currentPage * PAGE_SIZE + 1,
-              to: Math.min(list.length, currentPage * PAGE_SIZE + PAGE_SIZE),
-              total: list.length,
-          })
-        : t("ScheduledTasks.executionsShownEmpty");
-
-    const renderResult = (run: IScheduledTaskExecution) => (
-        <span className={styles.Result}>
-            <span className={styles.ResultLine}>
-                {run.succeeded ? (
-                    <span className={styles.ResultSucceeded}>✓ {t("ScheduledTasks.succeeded")}</span>
-                ) : (
-                    <span className={`${shared.Mono} ${styles.ResultFailed}`}>✕ {run.errorType}</span>
-                )}
-                {run.manual && <span className={styles.ManualChip}>{t("ScheduledTasks.manual")}</span>}
-            </span>
-            {run.errorMessage && <span className={styles.ResultMessage}>{run.errorMessage}</span>}
-        </span>
-    );
+    const handleFilterChange = (newFilter: TExecutionsFilter): void => {
+        setFilter(newFilter);
+        setPage(1);
+    };
 
     return (
         <div className={styles.MainWrapper}>
@@ -74,75 +67,75 @@ export const ExecutionsTable = ({ task, onlyFailed, onOnlyFailedChange, page, on
                 <div className={styles.Filter}>
                     <button
                         type="button"
-                        onClick={() => onOnlyFailedChange(false)}
-                        className={`${styles.FilterOption} ${onlyFailed ? "" : styles.FilterActive}`}
+                        onClick={() => handleFilterChange("all")}
+                        className={`${styles.FilterOption} ${filter === "all" ? styles.FilterActive : ""}`}
                     >
-                        {t("ScheduledTasks.all")} {task.runs.length}
+                        {t("ScheduledTasks.all")} {executions.length}
                     </button>
                     <button
                         type="button"
-                        onClick={() => onOnlyFailedChange(true)}
-                        className={`${styles.FilterOption} ${styles.FilterFailed} ${
-                            onlyFailed ? styles.FilterFailedActive : ""
-                        } ${onlyFailed ? styles.FilterActive : ""}`}
+                        onClick={() => handleFilterChange("failed")}
+                        className={`${styles.FilterOption} ${styles.FilterFailed} ${filter === "failed" ? styles.FilterActive : ""}`}
                     >
-                        {t("ScheduledTasks.failed")} {task.failedCount}
+                        {t("ScheduledTasks.failed")} {failedExecutions.length}
                     </button>
                 </div>
             </div>
 
             <div className={styles.ColumnHeader}>
-                <span>{t("ScheduledTasks.startedInstance")}</span>
-                <span className={styles.ColumnHeaderDuration}>{t("ScheduledTasks.duration")}</span>
+                <span>{t("ScheduledTasks.started")}</span>
+                <span>{t("ScheduledTasks.instance")}</span>
+                <span className={styles.Duration}>{t("ScheduledTasks.duration")}</span>
                 <span>{t("ScheduledTasks.result")}</span>
             </div>
 
-            {pageItems.map((run, index) => (
-                <div
-                    key={`${currentPage}-${index}`}
-                    className={`${styles.Row} ${run.succeeded ? "" : styles.RowFailed}`}
-                >
-                    <span className={styles.Started}>
-                        <span className={`${shared.Mono} ${styles.StartedTime}`}>
-                            {formatTimeOfDay(NOW_SECONDS - run.agoSeconds)}
+            <EmptyHandler isEmpty={visibleExecutions.length === 0}>
+                {pageExecutions.map((execution) => (
+                    <div
+                        key={`${execution.startedAt}-${execution.instanceId}`}
+                        className={`${styles.Row} ${execution.success ? "" : styles.RowFailed}`}
+                    >
+                        <span className={shared.Mono}>{formatStartedAt(execution.startedAt)}</span>
+                        <span className={`${shared.Mono} ${styles.Instance}`}>{execution.instanceName}</span>
+                        <span className={`${shared.Mono} ${styles.Duration}`}>
+                            {formatTransactionDuration(execution.durationMillis)}
                         </span>
-                        <span className={`${shared.Mono} ${styles.Instance}`}>{run.instance}</span>
-                    </span>
-                    <span className={`${shared.Mono} ${styles.Duration}`}>{formatDuration(run.durationMs)}</span>
-                    {renderResult(run)}
-                </div>
-            ))}
+                        {execution.success ? (
+                            <span className={styles.ResultSucceeded}>✓ {t("ScheduledTasks.succeeded")}</span>
+                        ) : (
+                            <span className={styles.Result}>
+                                <span className={`${shared.Mono} ${styles.ResultFailed}`}>
+                                    ✕ {execution.errorType ?? t("ScheduledTasks.failed")}
+                                </span>
+                                {execution.errorMessage && (
+                                    <span className={styles.ResultMessage}>{execution.errorMessage}</span>
+                                )}
+                            </span>
+                        )}
+                    </div>
+                ))}
+            </EmptyHandler>
 
             <div className={styles.Footer}>
-                <span className={styles.Shown}>{shownLabel}</span>
-                <div className={styles.Pager}>
-                    <button
-                        type="button"
-                        className={styles.PagerButton}
-                        disabled={currentPage === 0}
-                        onClick={() => goTo(currentPage - 1)}
-                    >
-                        ‹
-                    </button>
-                    {Array.from({ length: pageCount }, (_, index) => (
-                        <button
-                            type="button"
-                            key={index}
-                            onClick={() => goTo(index)}
-                            className={`${styles.PagerButton} ${index === currentPage ? styles.PageActive : ""}`}
-                        >
-                            {index + 1}
-                        </button>
-                    ))}
-                    <button
-                        type="button"
-                        className={styles.PagerButton}
-                        disabled={currentPage === pageCount - 1}
-                        onClick={() => goTo(currentPage + 1)}
-                    >
-                        ›
-                    </button>
-                </div>
+                <span>
+                    {visibleExecutions.length > 0
+                        ? t("ScheduledTasks.executionsShown", {
+                              from: firstIndex + 1,
+                              to: firstIndex + pageExecutions.length,
+                              total: visibleExecutions.length,
+                          })
+                        : t("ScheduledTasks.executionsShownEmpty")}
+                </span>
+                <Pagination
+                    className={styles.Pagination}
+                    size="small"
+                    current={page}
+                    pageSize={PAGE_SIZE}
+                    total={visibleExecutions.length}
+                    showSizeChanger={false}
+                    hideOnSinglePage
+                    onChange={setPage}
+                />
             </div>
         </div>
     );
