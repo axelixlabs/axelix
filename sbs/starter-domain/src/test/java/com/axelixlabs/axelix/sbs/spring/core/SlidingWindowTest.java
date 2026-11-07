@@ -21,8 +21,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Unit tests for {@link SlidingWindow}.
@@ -118,57 +121,6 @@ class SlidingWindowTest {
     }
 
     @Test
-    void clear_shouldNotRemoveElementsWhenSizeIsLessThanOrEqualToCapacity() {
-        // given.
-        slidingWindow.put("element1");
-        slidingWindow.put("element2");
-        slidingWindow.put("element3");
-
-        // when.
-        slidingWindow.clear();
-
-        // then.
-        List<String> result = slidingWindow.get();
-        assertThat(result).hasSize(3);
-        assertThat(result).containsExactly("element1", "element2", "element3");
-    }
-
-    @Test
-    void clear_shouldRemoveExcessElementsWhenSizeExceedsCapacity() {
-        // given.
-        int elementsToAdd = CAPACITY + 3;
-        for (int i = 0; i < elementsToAdd; i++) {
-            slidingWindow.put("element" + i);
-        }
-
-        // when.
-        slidingWindow.clear();
-
-        // then.
-        List<String> result = slidingWindow.get();
-        assertThat(result).hasSize(CAPACITY);
-        assertThat(result).containsExactly("element3", "element4", "element5", "element6", "element7");
-    }
-
-    @Test
-    void clear_shouldRemoveOldestElementsFirst() {
-        // given.
-        for (int i = 0; i < CAPACITY + 1; i++) {
-            slidingWindow.put("element" + i);
-        }
-
-        // when.
-        slidingWindow.clear();
-
-        // then.
-        List<String> result = slidingWindow.get();
-        assertThat(result).hasSize(CAPACITY);
-        assertThat(result).doesNotContain("element0");
-        assertThat(result).contains("element1");
-        assertThat(result).contains("element5");
-    }
-
-    @Test
     void get_shouldReturnNewListInstance() {
         // given.
         slidingWindow.put("element1");
@@ -183,31 +135,38 @@ class SlidingWindowTest {
         assertThat(result1).isEqualTo(result2);
     }
 
-    @Test
-    void clear_shouldHandleEmptyWindow() {
-        // given.
-        // window is empty
-
-        // when.
-        slidingWindow.clear();
-
-        // then.
-        List<String> result = slidingWindow.get();
-        assertThat(result).isEmpty();
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void constructor_shouldRejectNonPositiveCapacity(int capacity) {
+        // when / then.
+        assertThatThrownBy(() -> new SlidingWindow<>(capacity)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void removeIf_shouldRemoveOnlyMatchingElementsKeepingTheOrder() {
+    void put_shouldKeepOnlyLatestElementWhenCapacityIsOne() {
         // given.
-        slidingWindow.put("keep1");
-        slidingWindow.put("drop1");
-        slidingWindow.put("keep2");
-        slidingWindow.put("drop2");
+        SlidingWindow<String> window = new SlidingWindow<>(1);
 
         // when.
-        slidingWindow.removeIf(element -> element.startsWith("drop"));
+        window.put("first");
+        window.put("second");
 
         // then.
-        assertThat(slidingWindow.get()).containsExactly("keep1", "keep2");
+        assertThat(window.get()).containsExactly("second");
+    }
+
+    @Test
+    void get_shouldReturnIndependentCopy() {
+        // given.
+        slidingWindow.put("first");
+        List<String> snapshot = slidingWindow.get();
+
+        // when.
+        for (int i = 0; i < CAPACITY * 3; i++) {
+            slidingWindow.put("next" + i);
+        }
+
+        // then.
+        assertThat(snapshot).containsExactly("first");
     }
 }

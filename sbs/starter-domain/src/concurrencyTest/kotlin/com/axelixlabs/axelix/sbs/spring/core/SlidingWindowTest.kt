@@ -17,32 +17,46 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core
 
+import org.jetbrains.lincheck.datastructures.ModelCheckingOptions
 import org.jetbrains.lincheck.datastructures.Operation
-import org.jetbrains.lincheck.datastructures.Param
 import org.jetbrains.lincheck.datastructures.StressOptions
-import org.jetbrains.lincheck.datastructures.StringGen
+import org.jetbrains.lincheck.datastructures.Validate
 import org.junit.jupiter.api.Test
-import java.time.Duration
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Lincheck test for [SlidingWindow].
  *
  * @author Mikhail Polivakha
  */
-@Param(name = "element", gen = StringGen::class)
 class SlidingWindowTest {
 
-    private val slidingWindow = SlidingWindow<String>(5)
+    private val slidingWindow = SlidingWindow<Int>(2)
+    private val inserted = AtomicInteger()
 
     @Operation
-    fun put(@Param(name = "element") element: String) = slidingWindow.put(element)
+    fun put() {
+        slidingWindow.put(inserted.getAndIncrement())
+    }
 
     @Operation
-    fun get() = slidingWindow.get().size
+    fun get() {
+        val entries = slidingWindow.get()
+        check(entries.size <= 2)
+        check(entries.distinct().size == entries.size)
+        check(entries.all { it >= 0 && it < inserted.get() })
+    }
 
-    @Operation
-    fun clear() = slidingWindow.clear()
+    @Validate
+    fun validate() {
+        val entries = slidingWindow.get()
+        check(entries.size == minOf(2, inserted.get()))
+        check(entries.distinct().size == entries.size)
+    }
 
     @Test
-    fun test_StressTesting() = StressOptions().check(SlidingWindowTest::class.java)
+    fun test_ModelChecking() = ModelCheckingOptions().iterations(50).invocationsPerIteration(100).check(SlidingWindowTest::class.java)
+
+    @Test
+    fun test_StressTesting() = StressOptions().iterations(30).invocationsPerIteration(1000).check(SlidingWindowTest::class.java)
 }
