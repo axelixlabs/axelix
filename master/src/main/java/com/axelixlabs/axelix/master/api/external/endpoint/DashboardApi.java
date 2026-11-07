@@ -33,34 +33,25 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceD
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.Ecosystem;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SupportStatus;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardService;
 import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.ecosystem.DependencyLibrariesQuery;
-import com.axelixlabs.axelix.master.service.ecosystem.LanguagesProfileService;
-import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
-import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
 /**
  * API for rendering the dashboard.
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 @ExternalApiRestController
 public class DashboardApi {
 
-    private final SpringPortfolioService springPortfolioService;
-    private final LanguagesProfileService languagesProfileService;
-    private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
+    private final DashboardService dashboardService;
     private final DependencyAnalysisService dependencyAnalysisService;
 
-    public DashboardApi(
-            SpringPortfolioService springPortfolioService,
-            LanguagesProfileService languagesProfileService,
-            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
-            DependencyAnalysisService dependencyAnalysisService) {
-        this.springPortfolioService = springPortfolioService;
-        this.languagesProfileService = languagesProfileService;
-        this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
+    public DashboardApi(DashboardService dashboardService, DependencyAnalysisService dependencyAnalysisService) {
+        this.dashboardService = dashboardService;
         this.dependencyAnalysisService = dependencyAnalysisService;
     }
 
@@ -69,7 +60,7 @@ public class DashboardApi {
      */
     @GetMapping(path = ApiPaths.DashboardApi.PERSISTENCE)
     public PersistenceDashboardResponse getPersistenceDashboard() {
-        return databaseHistoricalApplicationSnapshotService.getPersistenceDashboard();
+        return dashboardService.getPersistenceDashboard();
     }
 
     /**
@@ -77,7 +68,7 @@ public class DashboardApi {
      */
     @GetMapping(path = ApiPaths.DashboardApi.DEPENDENCIES)
     public DependenciesDashboardResponse getDependenciesDashboard() {
-        return dependencyAnalysisService.getDashboard();
+        return dashboardService.getDependenciesDashboard();
     }
 
     /**
@@ -109,7 +100,7 @@ public class DashboardApi {
      */
     @GetMapping(path = ApiPaths.DashboardApi.SPRING_PORTFOLIO)
     public SpringPortfolioResponse getSpringPortfolio() {
-        return springPortfolioService.getSpringPortfolio();
+        return dashboardService.getSpringPortfolio();
     }
 
     /**
@@ -117,6 +108,6 @@ public class DashboardApi {
      */
     @GetMapping(path = ApiPaths.DashboardApi.LANGUAGES)
     public LanguagesProfileResponse getLanguagesProfile() {
-        return languagesProfileService.getLanguagesProfile();
+        return dashboardService.getLanguagesProfile();
     }
 }
