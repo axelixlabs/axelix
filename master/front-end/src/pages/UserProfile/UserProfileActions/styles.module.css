@@ -1,6 +1,5 @@
 .MainWrapper {
-    display: flex;
-    column-gap: 8px;
+    margin-top: var(--axelix-space-2);
 }
 
 .OidcDeleteNote {
@@ -24,12 +23,7 @@
     color: var(--axelix-orange-400);
 }
 
-/* TODO: Fix this in future */
 .DeleteUser {
-    background-color: #ff4d54;
-}
-
-/* TODO: Fix this in future */
-.DeleteUser:hover {
-    background-color: var(--axelix-red-600) !important;
+    height: auto;
+    padding: 0;
 }

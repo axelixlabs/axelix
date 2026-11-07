@@ -1,0 +1,31 @@
+.Permission {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-2);
+    padding: 9px 0;
+    font-size: var(--axelix-font-size-body);
+    line-height: var(--axelix-line-height-tight);
+}
+
+.Off {
+    color: var(--axelix-grey-500);
+}
+
+.Granted {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-50);
+    color: var(--axelix-green-700);
+}
+
+.Denied {
+    width: 16px;
+    height: 16px;
+    border: 1.5px dashed var(--axelix-grey-300);
+    border-radius: 50%;
+    flex: none;
+}

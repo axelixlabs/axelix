@@ -145,6 +145,16 @@ export interface IEditUserRequestData {
     username: string;
 
     /**
+     * First name of the user, which may be null
+     */
+    firstName: string | null;
+
+    /**
+     * Last name of the user, which may be null
+     */
+    lastName: string | null;
+
+    /**
      * Email address of the user, which may be null
      */
     email: string | null;
@@ -187,16 +197,4 @@ export interface IUsersFilters {
      * Origins of users account
      */
     userOrigins: EUserOrigin[];
-}
-
-export interface IEditableUser extends Omit<IUser, "email"> {
-    /**
-     * Email address of the user
-     */
-    email: string;
-
-    /**
-     * Password of the user
-     */
-    password: string;
 }
