@@ -29,55 +29,49 @@ import { EAuthorities, type IErrorResponse, StatelessRequest } from "@/models";
 import { forceRunTask } from "@/services";
 
 interface IProps {
-    /**
-     * Trigger for force run
-     */
     trigger: string;
 }
 
-export const ForceRunTask = ({ trigger }: IProps) => {
-    const { t } = useTranslation();
+export const RunTaskButton = ({ trigger }: IProps) => {
     const scheduledTasksAccess = useAuthority(EAuthorities.SCHEDULED_TASKS_MODIFY);
 
+    const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
     const confirmAction = useConfirmableAction();
 
-    const [forceRunTaskData, setForceRunTaskData] = useState(StatelessRequest.inactive());
+    const [forceRunRequest, setForceRunRequest] = useState(StatelessRequest.inactive());
 
-    const forceRunClickHandler = (): void => {
+    const runTask = (): void => {
         confirmAction({
             title: t("ScheduledTasks.runThisTaskTitle"),
             content: t("ScheduledTasks.runThisTaskDescription"),
             onOk() {
-                setForceRunTaskData(StatelessRequest.loading());
+                setForceRunRequest(StatelessRequest.loading());
 
-                forceRunTask({
-                    instanceId: instanceId!,
-                    trigger: trigger,
-                })
+                forceRunTask({ instanceId: instanceId!, trigger: trigger })
                     .then(() => {
-                        setForceRunTaskData(StatelessRequest.success());
+                        setForceRunRequest(StatelessRequest.success());
                         message.success(t("ScheduledTasks.runSuccess"));
                     })
                     .catch((error: AxiosError<IErrorResponse>) => {
-                        setForceRunTaskData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
+                        setForceRunRequest(StatelessRequest.error(extractErrorCode(error?.response?.data)));
                     });
             },
         });
     };
 
     return (
-        <>
-            <NoRequiredAuthorityTooltip disabled={!scheduledTasksAccess}>
-                <Button
-                    icon={<RunIcon />}
-                    type="primary"
-                    onClick={forceRunClickHandler}
-                    loading={forceRunTaskData.loading}
-                    disabled={!scheduledTasksAccess}
-                />
-            </NoRequiredAuthorityTooltip>
-        </>
+        <NoRequiredAuthorityTooltip disabled={!scheduledTasksAccess}>
+            <Button
+                icon={<RunIcon />}
+                type="primary"
+                onClick={runTask}
+                loading={forceRunRequest.loading}
+                disabled={!scheduledTasksAccess}
+            >
+                {t("ScheduledTasks.runNow")}
+            </Button>
+        </NoRequiredAuthorityTooltip>
     );
 };

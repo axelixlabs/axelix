@@ -1,0 +1,49 @@
+.Mono {
+    font-family: var(--axelix-font-family-code);
+}
+
+/* TODO: Extract a shared chip component together with HealthStatusBadge */
+.TypeBadge {
+    display: inline-flex;
+    flex-shrink: 0;
+    padding: 1px 7px;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    white-space: nowrap;
+    border: 1px solid transparent;
+    border-radius: 5px;
+}
+
+.TypeCron {
+    color: var(--axelix-blue-700);
+    background-color: var(--axelix-blue-50);
+    border-color: var(--axelix-blue-200);
+}
+
+.TypeFixedDelay {
+    color: var(--axelix-purple-700);
+    background-color: var(--axelix-purple-50);
+    border-color: var(--axelix-purple-200);
+}
+
+.TypeFixedRate {
+    color: #c11574;
+    background-color: #fdf2fa;
+    border-color: #fbcfe8;
+}
+
+.RateGood {
+    color: var(--axelix-green-600);
+}
+
+.RateWarn {
+    color: var(--axelix-orange-700);
+}
+
+.RateBad {
+    color: var(--axelix-red-700);
+}
+
+.RateOff {
+    color: var(--axelix-grey-500);
+}

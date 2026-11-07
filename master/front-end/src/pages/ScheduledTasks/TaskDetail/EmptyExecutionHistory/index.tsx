@@ -15,21 +15,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { ClockCircleOutlined } from "@ant-design/icons";
+
 import { useTranslation } from "react-i18next";
 
-import styles from "../../styles.module.css";
+import styles from "./styles.module.css";
 
-export const CronTableHeader = () => {
+export const EmptyExecutionHistory = () => {
     const { t } = useTranslation();
 
     return (
-        <>
-            <div className={styles.RowChunksWrapper}>
-                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.runnable")}</div>
-                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.expression")}</div>
-                <div className={styles.HeaderRowChunk}>{t("status")}</div>
-                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.run")}</div>
-            </div>
-        </>
+        <div className={styles.MainWrapper}>
+            <span className={styles.Icon}>
+                <ClockCircleOutlined />
+            </span>
+            <span className={styles.Title}>{t("ScheduledTasks.noHistoryTitle")}</span>
+            <span className={styles.Description}>{t("ScheduledTasks.noHistoryDescription")}</span>
+            <a className={styles.DocsLink} target="_blank" rel="noopener noreferrer" href="https://axelix.io/docs">
+                {t("ScheduledTasks.readDocs")}
+            </a>
+        </div>
     );
 };

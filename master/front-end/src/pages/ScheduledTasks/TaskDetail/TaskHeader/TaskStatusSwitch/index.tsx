@@ -28,13 +28,11 @@ import { EAuthorities, type IErrorResponse, type IScheduledTask, StatelessReques
 import { updateScheduledTasksStatus } from "@/services";
 
 interface IProps {
-    /**
-     * Any runnable task that can be turned off or turned on
-     */
-    runnable: IScheduledTask;
+    task: IScheduledTask;
+    onChange: () => Promise<void>;
 }
 
-export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
+export const TaskStatusSwitch = ({ task, onChange }: IProps) => {
     const scheduledTasksAccess = useAuthority(EAuthorities.SCHEDULED_TASKS_MODIFY);
 
     const { t } = useTranslation();
@@ -44,12 +42,10 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
 
     const [mutationRequest, setMutationRequest] = useState(StatelessRequest.inactive());
 
-    const switchTaskStatus = () => {
+    const switchTaskStatus = (): void => {
         confirmAction({
-            title: runnable.enabled
-                ? t("ScheduledTasks.disableThisTaskTitle")
-                : t("ScheduledTasks.enableThisTaskTitle"),
-            content: runnable.enabled
+            title: task.enabled ? t("ScheduledTasks.disableThisTaskTitle") : t("ScheduledTasks.enableThisTaskTitle"),
+            content: task.enabled
                 ? t("ScheduledTasks.disableThisTaskDescription")
                 : t("ScheduledTasks.enableThisTaskDescription"),
             onOk() {
@@ -58,32 +54,32 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
                 updateScheduledTasksStatus({
                     force: false,
                     instanceId: instanceId!,
-                    statusType: runnable.enabled ? "disable" : "enable",
-                    trigger: runnable.taskId,
+                    statusType: task.enabled ? "disable" : "enable",
+                    trigger: task.taskId,
                 })
                     .then(() => {
-                        message.success(runnable.enabled ? t("ScheduledTasks.disabled") : t("ScheduledTasks.enabled"));
-                        runnable.enabled = !runnable.enabled;
-                        setMutationRequest(StatelessRequest.success());
+                        message.success(task.enabled ? t("ScheduledTasks.disabled") : t("ScheduledTasks.enabled"));
+
+                        return onChange();
                     })
+                    .then(() => setMutationRequest(StatelessRequest.success()))
                     .catch((error: AxiosError<IErrorResponse>) => {
                         setMutationRequest(StatelessRequest.error(extractErrorCode(error?.response?.data)));
                     });
             },
         });
     };
+
     return (
-        <>
-            <NoRequiredAuthorityTooltip disabled={!scheduledTasksAccess}>
-                <Switch
-                    checkedChildren={t("on")}
-                    unCheckedChildren={t("off")}
-                    onChange={() => switchTaskStatus()}
-                    loading={mutationRequest.loading}
-                    checked={runnable.enabled}
-                    disabled={!scheduledTasksAccess}
-                />
-            </NoRequiredAuthorityTooltip>
-        </>
+        <NoRequiredAuthorityTooltip disabled={!scheduledTasksAccess}>
+            <Switch
+                checkedChildren={t("on")}
+                unCheckedChildren={t("off")}
+                onChange={switchTaskStatus}
+                loading={mutationRequest.loading}
+                checked={task.enabled}
+                disabled={!scheduledTasksAccess}
+            />
+        </NoRequiredAuthorityTooltip>
     );
 };

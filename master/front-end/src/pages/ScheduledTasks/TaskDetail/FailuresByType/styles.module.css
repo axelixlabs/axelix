@@ -1,0 +1,55 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--axelix-grey-100);
+}
+
+.Title {
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-900);
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 120px;
+    column-gap: 12px;
+    align-items: baseline;
+    padding: 10px 12px;
+    background-color: var(--axelix-red-50);
+    border: 1px solid var(--axelix-red-200);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.Count {
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-red-700);
+}
+
+.Details {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.ErrorType {
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-900);
+}
+
+.ErrorMessage {
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-600);
+}
+
+.Last {
+    font-size: var(--axelix-font-size-caption);
+    text-align: right;
+    color: var(--axelix-grey-500);
+}

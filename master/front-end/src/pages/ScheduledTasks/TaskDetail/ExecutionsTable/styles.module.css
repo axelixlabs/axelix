@@ -1,0 +1,152 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+}
+
+.Title {
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-900);
+}
+
+.Filter {
+    display: flex;
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.FilterOption {
+    padding: 4px 10px;
+    font: inherit;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-900);
+    cursor: pointer;
+    background-color: var(--axelix-white);
+    border: none;
+}
+
+.FilterOption + .FilterOption {
+    border-left: 1px solid var(--axelix-grey-300);
+}
+
+.FilterActive {
+    font-weight: var(--axelix-font-weight-semibold);
+    background-color: var(--axelix-grey-100);
+}
+
+.FilterFailed {
+    color: var(--axelix-red-700);
+}
+
+.ColumnHeader,
+.Row {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr) 110px minmax(0, 1.5fr);
+    column-gap: 14px;
+    padding: 8px 20px;
+    border-top: 1px solid var(--axelix-grey-100);
+}
+
+.ColumnHeader {
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+    background-color: var(--axelix-grey-50);
+}
+
+.Row {
+    align-items: baseline;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-900);
+}
+
+.RowFailed {
+    background-color: var(--axelix-red-50);
+}
+
+.Instance {
+    color: var(--axelix-grey-500);
+    overflow-wrap: anywhere;
+}
+
+.Duration {
+    text-align: right;
+}
+
+.Result {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.ResultSucceeded {
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-green-700);
+}
+
+.ResultFailed {
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-red-700);
+}
+
+.ResultMessage {
+    color: var(--axelix-grey-600);
+}
+
+.Footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 12px;
+    padding: 10px 20px;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-500);
+    border-top: 1px solid var(--axelix-grey-100);
+}
+
+.Footer .Pagination :global(.ant-pagination-item:not(.ant-pagination-item-active)),
+.Footer .Pagination :global(.ant-pagination-prev),
+.Footer .Pagination :global(.ant-pagination-next) {
+    background-color: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.Footer .Pagination :global(.ant-pagination-item-active) {
+    background-color: var(--axelix-green-50);
+    border: 1px solid var(--axelix-green-200);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.Footer .Pagination :global(.ant-pagination-item a) {
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-600);
+}
+
+.Footer .Pagination :global(.ant-pagination-item-active a) {
+    font-weight: var(--axelix-font-weight-regular);
+    color: var(--axelix-green-700);
+}
+
+.Footer .Pagination :global(.ant-pagination-prev svg),
+.Footer .Pagination :global(.ant-pagination-next svg) {
+    width: 8px;
+    height: 8px;
+    color: var(--axelix-grey-500);
+}
+
+.Footer .Pagination :global(.ant-pagination-disabled svg) {
+    color: var(--axelix-grey-300);
+}

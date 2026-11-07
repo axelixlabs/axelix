@@ -15,22 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 
-import styles from "../../styles.module.css";
+import { formatInterval } from "@/helpers";
 
-export const FixedTaskTableHeader = () => {
-    const { t } = useTranslation();
+export const getIntervalDescription = (
+    type: "fixedDelay" | "fixedRate",
+    interval: number,
+    language: string,
+    t: TFunction,
+): string => {
+    const duration = formatInterval(interval, language);
 
-    return (
-        <>
-            <div className={styles.RowChunksWrapper}>
-                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.runnable")}</div>
-                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.initialDelay")}</div>
-                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.interval")}</div>
-                <div className={styles.HeaderRowChunk}>{t("status")}</div>
-                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.run")}</div>
-            </div>
-        </>
-    );
+    return type === "fixedDelay"
+        ? t("ScheduledTasks.fixedDelayPreview", { duration })
+        : t("ScheduledTasks.fixedRatePreview", { duration });
 };
