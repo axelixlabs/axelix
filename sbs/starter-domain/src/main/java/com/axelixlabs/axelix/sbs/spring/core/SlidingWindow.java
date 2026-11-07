@@ -17,15 +17,17 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
- * The sliding window implementation.
+ * A fixed-capacity, non-blocking history with configurable write guarantees.
+ * Supports at most {@link Long#MAX_VALUE} insertions per window.
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
@@ -33,55 +35,89 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class SlidingWindow<E> {
 
-    private final Deque<E> deque;
+    private final AtomicReferenceArray<@Nullable Entry<E>> buffer;
+    private final AtomicLong nextSequence = new AtomicLong();
     private final int capacity;
-    private final Object lock = new Object();
+    private final WriteMode writeMode;
 
+    public enum WriteMode {
+        /** Prevents delayed writers from overwriting newer entries. */
+        STRICT,
+        /** Allows delayed writers to overwrite newer entries. */
+        BEST_EFFORT
+    }
+
+    /**
+     * Creates a window with strict writes.
+     *
+     * @param capacity the maximum number of elements to keep.
+     */
     public SlidingWindow(int capacity) {
-        this.deque = new LinkedList<>();
+        this(capacity, WriteMode.STRICT);
+    }
+
+    /**
+     * @param capacity the maximum number of elements to keep.
+     * @param writeMode the insertion guarantees.
+     */
+    public SlidingWindow(int capacity, WriteMode writeMode) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Capacity must be positive");
+        }
         this.capacity = capacity;
+        this.writeMode = writeMode;
+        this.buffer = new AtomicReferenceArray<>(capacity);
     }
 
+    /**
+     * Adds an element, replacing the oldest one when the window is full.
+     * Concurrent insertions are ordered by their assigned sequence numbers.
+     */
     public void put(E element) {
-        synchronized (lock) {
-            deque.offer(element);
-            clear();
+        long sequence = nextSequence.getAndIncrement();
+        int slot = (int) (sequence % capacity);
+        Entry<E> update = new Entry<>(sequence, element);
+
+        if (writeMode == WriteMode.BEST_EFFORT) {
+            buffer.set(slot, update);
+            return;
         }
-    }
 
-    public List<E> get() {
-        synchronized (lock) {
-            var copy = new LinkedList<>(deque);
-
-            if (copy.size() > capacity) {
-                return copy.subList(copy.size() - capacity, copy.size());
-            }
-
-            return copy;
-        }
-    }
-
-    public void removeIf(Predicate<? super E> filter) {
-        synchronized (lock) {
-            deque.removeIf(filter);
-        }
-    }
-
-    public void clear() {
-        synchronized (lock) {
-            int currentSize = deque.size();
-
-            if (currentSize <= capacity) {
+        while (true) {
+            Entry<E> current = buffer.get(slot);
+            if (current != null && current.sequence > sequence) {
                 return;
             }
-
-            // We're not draining the queue till the 'capacity' size to avoid potential infinite loop
-            int toRemove = currentSize - capacity;
-            for (int i = 0; i < toRemove; i++) {
-                if (deque.pollFirst() == null) {
-                    break;
-                }
+            if (buffer.compareAndSet(slot, current, update)) {
+                return;
             }
+        }
+    }
+
+    /**
+     * Returns a weakly consistent copy of up to capacity elements in insertion order.
+     * Best-effort writes may leave gaps even after writers finish.
+     */
+    public List<E> get() {
+        long end = nextSequence.get();
+        long start = Math.max(0, end - capacity);
+        List<E> result = new ArrayList<>((int) (end - start));
+        for (long sequence = start; sequence < end; sequence++) {
+            Entry<E> entry = buffer.get((int) (sequence % capacity));
+            if (entry != null && entry.sequence == sequence) {
+                result.add(entry.value);
+            }
+        }
+        return result;
+    }
+
+    private static final class Entry<E> {
+        private final long sequence;
+        private final E value;
+
+        private Entry(long sequence, E value) {
+            this.sequence = sequence;
+            this.value = value;
         }
     }
 }

@@ -17,32 +17,93 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core
 
+import org.jetbrains.lincheck.datastructures.ModelCheckingOptions
 import org.jetbrains.lincheck.datastructures.Operation
-import org.jetbrains.lincheck.datastructures.Param
 import org.jetbrains.lincheck.datastructures.StressOptions
-import org.jetbrains.lincheck.datastructures.StringGen
-import org.junit.jupiter.api.Test
-import java.time.Duration
+import org.jetbrains.lincheck.datastructures.Validate
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Lincheck test for [SlidingWindow].
+ * Lincheck tests for concurrent writes and weakly consistent reads.
  *
  * @author Mikhail Polivakha
  */
-@Param(name = "element", gen = StringGen::class)
 class SlidingWindowTest {
 
-    private val slidingWindow = SlidingWindow<String>(5)
+    @ParameterizedTest
+    @ValueSource(classes = [StrictWithoutEviction::class, StrictWithEviction::class, BestEffort::class])
+    fun modelChecking(scenario: Class<*>) = ModelCheckingOptions()
+        .iterations(50)
+        .invocationsPerIteration(100)
+        .threads(3)
+        .actorsPerThread(3)
+        .actorsBefore(0)
+        .actorsAfter(0)
+        .check(scenario)
 
-    @Operation
-    fun put(@Param(name = "element") element: String) = slidingWindow.put(element)
+    @ParameterizedTest
+    @ValueSource(classes = [StrictWithoutEviction::class, StrictWithEviction::class, BestEffort::class])
+    fun stressTesting(scenario: Class<*>) = StressOptions()
+        .iterations(30)
+        .invocationsPerIteration(1000)
+        .threads(3)
+        .actorsPerThread(3)
+        .actorsBefore(0)
+        .actorsAfter(0)
+        .check(scenario)
 
-    @Operation
-    fun get() = slidingWindow.get().size
+    // Nine operations can insert at most eighteen entries.
+    class StrictWithoutEviction : Scenario(32, SlidingWindow.WriteMode.STRICT)
 
-    @Operation
-    fun clear() = slidingWindow.clear()
+    class StrictWithEviction : Scenario(2, SlidingWindow.WriteMode.STRICT)
 
-    @Test
-    fun test_StressTesting() = StressOptions().check(SlidingWindowTest::class.java)
+    class BestEffort : Scenario(2, SlidingWindow.WriteMode.BEST_EFFORT)
+
+    abstract class Scenario(private val capacity: Int, private val mode: SlidingWindow.WriteMode) {
+        private val slidingWindow = SlidingWindow<Int>(capacity, mode)
+        private val pairs = AtomicInteger()
+
+        @Operation
+        fun putPair() {
+            val first = pairs.getAndIncrement() * 2
+            slidingWindow.put(first)
+            slidingWindow.put(first + 1)
+        }
+
+        @Operation
+        fun get() {
+            validateEntries(slidingWindow.get())
+        }
+
+        @Validate
+        fun validate() {
+            val entries = slidingWindow.get()
+            validateEntries(entries)
+            if (mode == SlidingWindow.WriteMode.STRICT) {
+                val inserted = pairs.get() * 2
+                check(entries.size == minOf(capacity, inserted))
+                if (inserted <= capacity) {
+                    check(entries.sorted() == (0 until inserted).toList())
+                }
+                // A retained first write cannot outlive its later write once all writers finish.
+                for (entry in entries.filter { it % 2 == 0 }) {
+                    check(entry + 1 in entries)
+                }
+            }
+        }
+
+        private fun validateEntries(entries: List<Int>) {
+            check(entries.size <= capacity)
+            check(entries.distinct().size == entries.size)
+            check(entries.all { it >= 0 && it < pairs.get() * 2 })
+            for ((index, entry) in entries.withIndex()) {
+                if (entry % 2 == 0) {
+                    val successor = entries.indexOf(entry + 1)
+                    check(successor == -1 || successor > index)
+                }
+            }
+        }
+    }
 }

@@ -73,3 +73,24 @@ tasks {
         compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
     }
 }
+
+// Benchmarks have their own classpath and are not included in published artifacts or check.
+val jmh = sourceSets.create("jmh") {
+    compileClasspath += sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().output
+}
+
+val jmhVersion = "1.37"
+dependencies {
+    add(jmh.implementationConfigurationName, "org.openjdk.jmh:jmh-core:$jmhVersion")
+    add(jmh.annotationProcessorConfigurationName, "org.openjdk.jmh:jmh-generator-annprocess:$jmhVersion")
+}
+
+tasks.register<JavaExec>("jmh") {
+    group = "verification"
+    description = "Measures SlidingWindow latency and allocations with JMH."
+    classpath = jmh.runtimeClasspath
+    mainClass.set("org.openjdk.jmh.Main")
+    args("-foe", "true", "-prof", "gc")
+    args(providers.gradleProperty("jmhArgs").orElse("SlidingWindowBenchmark").get().trim().split(Regex("\\s+")))
+}
