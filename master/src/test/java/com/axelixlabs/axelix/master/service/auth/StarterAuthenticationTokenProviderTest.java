@@ -20,8 +20,8 @@ package com.axelixlabs.axelix.master.service.auth;
 import java.time.Duration;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,8 +50,8 @@ class StarterAuthenticationTokenProviderTest {
     private static final String SIGNING_KEY =
             "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff";
     private final ScopedValueSecurityContextExecutor securityContextExecutor = new ScopedValueSecurityContextExecutor();
-    private final DefaultJwtEncoderService encoder =
-            new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5));
+    private final DefaultUserJwtEncoderService encoder =
+            new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5));
     private final StarterAuthenticationTokenProvider tokenProvider = new StarterAuthenticationTokenProvider(
             securityContextExecutor, encoder, new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY));
 
@@ -68,7 +68,7 @@ class StarterAuthenticationTokenProviderTest {
 
         // then.
         assertThat(token).isEqualTo(callerToken);
-        PasswordlessUser decoded = new DefaultJwtDecoderService(
+        PasswordlessUser decoded = new DefaultUserJwtDecoderService(
                         new DefaultAuthoritiesManager(null), JwtAlgorithm.HMAC512, SIGNING_KEY)
                 .decodeTokenToUser(token);
         assertThat(decoded.getId()).isEqualTo(caller.getId());
@@ -113,7 +113,7 @@ class StarterAuthenticationTokenProviderTest {
         String token = tokenProvider.discoveryToken();
 
         // then.
-        PasswordlessUser legacyUser = new DefaultJwtDecoderService(
+        PasswordlessUser legacyUser = new DefaultUserJwtDecoderService(
                         new DefaultAuthoritiesManager(null), JwtAlgorithm.HMAC512, SIGNING_KEY)
                 .decodeTokenToUser(token);
         assertThat(legacyUser.getId()).isEqualTo(TechUser.MASTER.getId());

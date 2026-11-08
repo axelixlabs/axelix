@@ -44,19 +44,19 @@ import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
 
 /**
- * Default implementation of {@link JwtDecoderService}.
+ * Default implementation of {@link UserJwtDecoderService}.
  *
  * @since 22.07.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public class DefaultJwtDecoderService implements JwtDecoderService {
+public class DefaultUserJwtDecoderService implements UserJwtDecoderService {
 
     private final JwtVerificationStrategy verificationStrategy;
     private final AuthoritiesManager authoritiesManager;
     private final String signingKey;
 
-    public DefaultJwtDecoderService(AuthoritiesManager authoritiesManager, JwtAlgorithm algorithm, String signingKey) {
+    public DefaultUserJwtDecoderService(AuthoritiesManager authoritiesManager, JwtAlgorithm algorithm, String signingKey) {
         Assert.notNull(algorithm, "The jwt signing algorithm is not specified, although it is required");
         Assert.notNull(signingKey, "The jwt signing key is not specified, although it is required");
 

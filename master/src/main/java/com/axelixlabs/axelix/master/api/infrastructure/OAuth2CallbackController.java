@@ -44,7 +44,7 @@ import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
@@ -76,7 +76,7 @@ public class OAuth2CallbackController {
 
     private final OidcClient oidcClient;
     private final CookieService cookieService;
-    private final JwtEncoderService jwtEncoderService;
+    private final UserJwtEncoderService userJwtEncoderService;
     private final OAuth2Properties oAuth2Properties;
     private final UserService userService;
     private final UserInfoJsonAccessor userInfoJsonAccessor;
@@ -85,14 +85,14 @@ public class OAuth2CallbackController {
     public OAuth2CallbackController(
             OidcClient oidcClient,
             CookieService cookieService,
-            JwtEncoderService jwtEncoderService,
+            UserJwtEncoderService userJwtEncoderService,
             OAuth2Properties oAuth2Properties,
             UserService userService,
             UserInfoJsonAccessor userInfoJsonAccessor,
             List<OidcIdTokenClaimsValidator> claimsValidators) {
         this.oidcClient = oidcClient;
         this.cookieService = cookieService;
-        this.jwtEncoderService = jwtEncoderService;
+        this.userJwtEncoderService = userJwtEncoderService;
         this.oAuth2Properties = oAuth2Properties;
         this.userService = userService;
         this.userInfoJsonAccessor = userInfoJsonAccessor;
@@ -127,7 +127,7 @@ public class OAuth2CallbackController {
 
         User user = new PasswordlessUser(userId, identity.username(), Set.of(role));
 
-        String ourToken = jwtEncoderService.generateToken(user);
+        String ourToken = userJwtEncoderService.generateToken(user);
 
         ResponseCookie cookie = cookieService.buildAuthCookie(ourToken);
         ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesMetadataCookie(user.getRoles());

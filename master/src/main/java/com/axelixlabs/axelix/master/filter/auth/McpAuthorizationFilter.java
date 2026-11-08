@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.filter.auth.requestcontext.McpRequestContext
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
 
 /**
@@ -70,7 +70,7 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
     private final boolean isOAuth2FlowEnabled;
     private final McpIdentityAccessManager mcpIdentityAccessManager;
     private final SecurityContextExecutor securityContextExecutor;
-    private final JwtEncoderService jwtEncoderService;
+    private final UserJwtEncoderService userJwtEncoderService;
     private final McpServerStreamableHttpProperties mcpProperties;
     private final List<OnMcpSuccessfulResult> onMcpSuccessfulResultInterceptors;
 
@@ -78,12 +78,12 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
             ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
             McpIdentityAccessManager mcpIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
-            JwtEncoderService jwtEncoderService,
+            UserJwtEncoderService userJwtEncoderService,
             McpServerStreamableHttpProperties mcpProperties,
             List<OnMcpSuccessfulResult> onMcpSuccessfulResultInterceptors) {
         this.mcpIdentityAccessManager = mcpIdentityAccessManager;
         this.securityContextExecutor = securityContextExecutor;
-        this.jwtEncoderService = jwtEncoderService;
+        this.userJwtEncoderService = userJwtEncoderService;
         this.mcpProperties = mcpProperties;
         this.onMcpSuccessfulResultInterceptors = onMcpSuccessfulResultInterceptors;
 
@@ -127,7 +127,7 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
             User authenticatedUser =
                     mcpIdentityAccessManager.verifyAccess(mcpRequestContext.mcpEndpoint(), authorizationHeader);
 
-            String accessToken = jwtEncoderService.generateToken(authenticatedUser);
+            String accessToken = userJwtEncoderService.generateToken(authenticatedUser);
 
             securityContextExecutor.runWithinSecurityContext(
                     () -> {

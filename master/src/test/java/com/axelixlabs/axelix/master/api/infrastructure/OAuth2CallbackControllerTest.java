@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,6 @@ import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
@@ -112,7 +112,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     private OidcIdTokenClaimsValidator claimsValidator;
 
     @Autowired
-    private JwtDecoderService jwtDecoderService;
+    private UserJwtDecoderService userJwtDecoderService;
 
     @Autowired
     private UserRepository userRepository;
@@ -188,7 +188,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         String authTokenCookie = findCookie(cookies, "auth_token");
         String authoritiesCookie = findCookie(cookies, "authorities");
 
-        PasswordlessUser decodedTokenToUser = jwtDecoderService.decodeTokenToUser(
+        PasswordlessUser decodedTokenToUser = userJwtDecoderService.decodeTokenToUser(
                 // trying to extract an actual token from the cookie value
                 authTokenCookie.substring(authTokenCookie.indexOf("=") + 1, authTokenCookie.indexOf(";")));
 

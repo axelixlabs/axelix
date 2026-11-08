@@ -47,7 +47,7 @@ import com.axelixlabs.axelix.master.domain.auth.User;
  * @author Mikhail Polivakha
  */
 @NullMarked
-public class DefaultJwtEncoderService implements JwtEncoderService {
+public class DefaultUserJwtEncoderService implements UserJwtEncoderService {
 
     private final JwtSigningStrategy signingStrategy;
 
@@ -55,7 +55,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
 
     private final Duration lifespan;
 
-    public DefaultJwtEncoderService(final JwtAlgorithm algorithm, final String signingKey, final Duration lifespan) {
+    public DefaultUserJwtEncoderService(final JwtAlgorithm algorithm, final String signingKey, final Duration lifespan) {
         this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
         this.signingKey = signingKey;
         this.lifespan = lifespan;

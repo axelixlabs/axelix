@@ -27,15 +27,13 @@ import com.axelixlabs.axelix.master.domain.auth.User;
 /**
  * Contract for generating signed JWT tokens from {@link User} representations.
  *
- * <p>Implementations of this interface serialize user identity and authorization
- * data into a secure JWT string.</p>
- *
  * @since 23.07.2025
+ *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
 @NullMarked
-public interface JwtEncoderService {
+public interface UserJwtEncoderService {
 
     /**
      * Generates a signed JWT token from the given {@link User} object.

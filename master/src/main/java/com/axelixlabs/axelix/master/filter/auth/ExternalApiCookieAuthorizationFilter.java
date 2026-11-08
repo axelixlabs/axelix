@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -48,7 +49,6 @@ import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebRequestContext;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 
 /**
@@ -61,18 +61,18 @@ import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulRe
 public class ExternalApiCookieAuthorizationFilter extends OncePerRequestFilter {
 
     private final SecurityContextExecutor securityContextExecutor;
-    private final JwtDecoderService jwtDecoderService;
+    private final UserJwtDecoderService userJwtDecoderService;
     private final Authorizer authorizer;
     private final List<OnWebSuccessfulResult> onSuccessInterceptors;
 
     public ExternalApiCookieAuthorizationFilter(
             SecurityContextExecutor securityContextExecutor,
-            JwtDecoderService jwtDecoderService,
+            UserJwtDecoderService userJwtDecoderService,
             Authorizer authorizer,
             List<OnWebSuccessfulResult> interceptors) {
 
         this.securityContextExecutor = securityContextExecutor;
-        this.jwtDecoderService = jwtDecoderService;
+        this.userJwtDecoderService = userJwtDecoderService;
         this.authorizer = authorizer;
         this.onSuccessInterceptors = interceptors;
     }
@@ -112,7 +112,7 @@ public class ExternalApiCookieAuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
+            PasswordlessUser user = userJwtDecoderService.decodeTokenToUser(token);
 
             authorizeUser(currentRequestContext, user);
 

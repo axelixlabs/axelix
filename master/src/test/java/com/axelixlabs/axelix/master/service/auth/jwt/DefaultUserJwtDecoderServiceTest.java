@@ -59,15 +59,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Integration tests for {@link JwtDecoderService}, verifying correct decoding and validation of JWT tokens.
+ * Integration tests for {@link UserJwtDecoderService}, verifying correct decoding and validation of JWT tokens.
  *
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(classes = DefaultJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
+@SpringBootTest(classes = DefaultUserJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
 @TestPropertySource("classpath:jwt-services-test.properties")
-class DefaultJwtDecoderServiceTest {
+class DefaultUserJwtDecoderServiceTest {
 
     private static final String USER_NAME = "testUser";
     private static final String PASSWORD = "testPassword";
@@ -79,10 +79,10 @@ class DefaultJwtDecoderServiceTest {
     private String signingKey;
 
     @Autowired
-    private JwtDecoderService jwtDecoderService;
+    private UserJwtDecoderService userJwtDecoderService;
 
     @Autowired
-    private JwtEncoderService jwtEncoderService;
+    private UserJwtEncoderService userJwtEncoderService;
 
     @Autowired
     private AuthoritiesManager authoritiesManager;
@@ -92,10 +92,10 @@ class DefaultJwtDecoderServiceTest {
     void shouldDecodeValidJwtToken_ForViewer(Role role) {
         // given.
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // when.
-        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
+        PasswordlessUser decodedUser = userJwtDecoderService.decodeTokenToUser(token);
 
         // then.
         assertThat(decodedUser.getRoles()).hasSize(1);
@@ -117,10 +117,10 @@ class DefaultJwtDecoderServiceTest {
     void shouldDecodeValidJwtToken_MultipleRoles() {
         User user = UserUtils.withPassword(
                 USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN, TestRoles.EDITOR, TestRoles.VIEWER));
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // when.
-        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
+        PasswordlessUser decodedUser = userJwtDecoderService.decodeTokenToUser(token);
 
         // Admin
         assertThat(decodedUser.getRoles()).hasSize(3);
@@ -157,9 +157,9 @@ class DefaultJwtDecoderServiceTest {
     @Test
     void shouldEncodeDecodeTokenWithHS256() {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
-        JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
+        UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
         String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR)));
-        JwtDecoderService decoder256 = new DefaultJwtDecoderService(authoritiesManager, JwtAlgorithm.HMAC256, key256);
+        UserJwtDecoderService decoder256 = new DefaultUserJwtDecoderService(authoritiesManager, JwtAlgorithm.HMAC256, key256);
 
         // when.
         PasswordlessUser decodedUser = decoder256.decodeTokenToUser(token);
@@ -180,9 +180,9 @@ class DefaultJwtDecoderServiceTest {
     void shouldEncodeDecodeTokenWithHS384() {
         String key384 =
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
-        JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
+        UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
         String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN)));
-        JwtDecoderService decoder384 = new DefaultJwtDecoderService(authoritiesManager, JwtAlgorithm.HMAC384, key384);
+        UserJwtDecoderService decoder384 = new DefaultUserJwtDecoderService(authoritiesManager, JwtAlgorithm.HMAC384, key384);
 
         // when.
         PasswordlessUser decodedUser = decoder384.decodeTokenToUser(token);
@@ -203,9 +203,9 @@ class DefaultJwtDecoderServiceTest {
     void shouldPreserveContributedCustomAuthority() {
         Role role = new DefaultRole("VIEWER", Set.of(CustomAuthority.CUSTOM_AUTHORITY));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
-        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
+        PasswordlessUser decodedUser = userJwtDecoderService.decodeTokenToUser(token);
 
         assertThat(decodedUser.getRoles())
                 .first()
@@ -220,10 +220,10 @@ class DefaultJwtDecoderServiceTest {
         // given.
         Role role = new DefaultRole("VIEWER", Set.of((Authority) () -> authorityName));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // when.
-        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
+        PasswordlessUser decodedUser = userJwtDecoderService.decodeTokenToUser(token);
 
         // then.
         assertThat(decodedUser.getRoles())
@@ -234,8 +234,8 @@ class DefaultJwtDecoderServiceTest {
     @Test
     void shouldDecodeValidJwtTokenWithoutUserRoles() {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
-        String token = jwtEncoderService.generateToken(user);
-        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
+        String token = userJwtEncoderService.generateToken(user);
+        PasswordlessUser decodedUser = userJwtDecoderService.decodeTokenToUser(token);
 
         assertThat(decodedUser.getUsername()).isEqualTo(USER_NAME);
         assertThat(decodedUser.getRoles()).isEmpty();
@@ -244,31 +244,31 @@ class DefaultJwtDecoderServiceTest {
     @Test
     void shouldThrowOnExpiredToken() {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
-        String token = jwtEncoderService.generateToken(user, Duration.ofSeconds(0));
+        String token = userJwtEncoderService.generateToken(user, Duration.ofSeconds(0));
 
-        assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(token))
+        assertThatThrownBy(() -> userJwtDecoderService.decodeTokenToUser(token))
                 .isInstanceOf(ExpiredJwtTokenException.class);
     }
 
     @Test
     void shouldThrowOnTamperedToken() {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
-        assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(token + "x"))
+        assertThatThrownBy(() -> userJwtDecoderService.decodeTokenToUser(token + "x"))
                 .isInstanceOf(InvalidJwtTokenException.class);
     }
 
     @Test
     void shouldFailToDecodeTokenWithWrongSecret() {
         String wrongSecret = "MX3TNBx0j8bGCjGWCvq1JffIqqzXLIV-URlKFLX4mfA";
-        JwtEncoderService encoderWithWrongSecret =
-                new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, wrongSecret, lifespan);
+        UserJwtEncoderService encoderWithWrongSecret =
+                new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, wrongSecret, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
         String token = encoderWithWrongSecret.generateToken(user);
 
-        assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(token))
+        assertThatThrownBy(() -> userJwtDecoderService.decodeTokenToUser(token))
                 .isInstanceOf(InvalidJwtTokenException.class);
     }
 
@@ -277,10 +277,10 @@ class DefaultJwtDecoderServiceTest {
         // given.
         String userId = "stable-id-42";
         User user = new DefaultUser(userId, USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // when.
-        PasswordlessUser decoded = jwtDecoderService.decodeTokenToUser(token);
+        PasswordlessUser decoded = userJwtDecoderService.decodeTokenToUser(token);
 
         // then.
         assertThat(decoded.getId()).isEqualTo(userId);
@@ -297,7 +297,7 @@ class DefaultJwtDecoderServiceTest {
                 .compact();
 
         // when.
-        ThrowableAssert.ThrowingCallable callable = () -> jwtDecoderService.decodeTokenToUser(tokenWithNoUserId);
+        ThrowableAssert.ThrowingCallable callable = () -> userJwtDecoderService.decodeTokenToUser(tokenWithNoUserId);
 
         // then.
         assertThatThrownBy(callable).isInstanceOf(JwtParsingException.class);
@@ -313,9 +313,9 @@ class DefaultJwtDecoderServiceTest {
     }
 
     /**
-     * Minimal test configuration for {@link JwtDecoderService} integration testing.
+     * Minimal test configuration for {@link UserJwtDecoderService} integration testing.
      *
-     * <p>Registers beans for {@link JwtDecoderService}, allowing
+     * <p>Registers beans for {@link UserJwtDecoderService}, allowing
      * full-stack testing of JWT encoding and decoding within a Spring context.</p>
      */
     @SpringBootConfiguration
@@ -327,19 +327,19 @@ class DefaultJwtDecoderServiceTest {
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(
+        public UserJwtDecoderService jwtDecoderService(
                 final AuthoritiesManager authoritiesManager,
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultJwtDecoderService(authoritiesManager, algorithm, signingKey);
+            return new DefaultUserJwtDecoderService(authoritiesManager, algorithm, signingKey);
         }
 
         @Bean
-        JwtEncoderService jwtEncoderService(
+        UserJwtEncoderService jwtEncoderService(
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan,
                 final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
+            return new DefaultUserJwtEncoderService(algorithm, signingKey, lifespan);
         }
     }
 }

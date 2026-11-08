@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth;
 import java.util.Map;
 import java.util.Optional;
 
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -51,8 +52,7 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHand
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcAuthorizeEndpointAdditionalParametersProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
@@ -127,8 +127,8 @@ class SecurityAutoConfigurationTest {
                 assertThat(context).hasSingleBean(MasterWebEndpointResolver.class);
                 assertThat(context).hasSingleBean(Authorizer.class);
                 assertThat(context).hasSingleBean(MasterRequestContextInitFilter.class);
-                assertThat(context).hasSingleBean(JwtEncoderService.class);
-                assertThat(context).hasSingleBean(JwtDecoderService.class);
+                assertThat(context).hasSingleBean(UserJwtEncoderService.class);
+                assertThat(context).hasSingleBean(UserJwtDecoderService.class);
                 assertThat(context).hasSingleBean(CookieService.class);
                 assertThat(context).hasSingleBean(ExternalApiCookieAuthorizationFilter.class);
                 assertThat(context).hasSingleBean(SuperAdminUserAuthenticator.class);
@@ -201,8 +201,8 @@ class SecurityAutoConfigurationTest {
             contextRunner.run(context -> {
                 // then.
                 assertThat(context).hasNotFailed();
-                assertThat(context).hasSingleBean(JwtEncoderService.class);
-                assertThat(context).hasSingleBean(JwtDecoderService.class);
+                assertThat(context).hasSingleBean(UserJwtEncoderService.class);
+                assertThat(context).hasSingleBean(UserJwtDecoderService.class);
                 assertThat(context).hasSingleBean(Authorizer.class);
             });
         }
