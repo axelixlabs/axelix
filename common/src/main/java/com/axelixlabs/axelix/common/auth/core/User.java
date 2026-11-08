@@ -23,6 +23,9 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * An abstraction of the user, who tries to interact with Axelix in any shape or form.
+ * <p>
+ * Note that this abstraction represents the real user trying to work with our system,
+ * as opposed to {@link TechUser}, which is the technical user, i.e. not the real client.
  *
  * @since 16.07.25
  * @author Mikhail Polivakha
