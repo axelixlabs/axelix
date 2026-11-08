@@ -44,7 +44,7 @@ import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;

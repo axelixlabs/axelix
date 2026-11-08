@@ -51,8 +51,8 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHand
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.JwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcAuthorizeEndpointAdditionalParametersProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;

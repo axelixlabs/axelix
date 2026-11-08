@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth;
+package com.axelixlabs.axelix.master.service.auth.jwt;
 
 import java.time.Duration;
 import java.util.List;
@@ -50,6 +50,8 @@ import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
 import com.axelixlabs.axelix.master.domain.auth.User;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
+import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesManager;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 

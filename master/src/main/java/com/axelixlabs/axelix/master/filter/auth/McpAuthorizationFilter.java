@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.filter.auth.requestcontext.McpRequestContext
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
-import com.axelixlabs.axelix.master.service.auth.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
 
 /**

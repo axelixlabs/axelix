@@ -24,6 +24,7 @@ import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
 /**

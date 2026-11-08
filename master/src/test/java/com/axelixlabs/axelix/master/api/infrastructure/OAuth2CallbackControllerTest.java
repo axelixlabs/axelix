@@ -53,7 +53,7 @@ import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
-import com.axelixlabs.axelix.master.service.auth.JwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;

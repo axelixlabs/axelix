@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.master.service.auth;
 import java.time.Duration;
 import java.util.Set;
 
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

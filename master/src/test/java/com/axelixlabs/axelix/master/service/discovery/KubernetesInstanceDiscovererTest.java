@@ -62,7 +62,7 @@ import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
-import com.axelixlabs.axelix.master.service.auth.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;

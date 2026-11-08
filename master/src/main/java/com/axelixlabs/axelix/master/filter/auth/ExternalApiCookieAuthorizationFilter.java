@@ -48,7 +48,7 @@ import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebRequestContext;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
-import com.axelixlabs.axelix.master.service.auth.JwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 
 /**

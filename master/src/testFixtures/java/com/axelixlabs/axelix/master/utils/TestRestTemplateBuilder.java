@@ -36,8 +36,8 @@ import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.User;
-import com.axelixlabs.axelix.master.service.auth.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.master.service.auth.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 

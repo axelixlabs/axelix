@@ -15,9 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.encoder;
+package com.axelixlabs.axelix.master.service.auth;
 
-import com.axelixlabs.axelix.master.service.auth.SuperAdminPasswordEncoder;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
