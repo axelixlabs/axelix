@@ -34,6 +34,11 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/**
+ * Unit tests for {@link ManagedServiceWebIdentityAccessManager}.
+ *
+ * @author Mikhail Polivakha
+ */
 class ManagedServiceWebIdentityAccessManagerTest {
     private static final String SIGNING_KEY =
             "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff";

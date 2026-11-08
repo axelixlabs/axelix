@@ -67,7 +67,8 @@ public class StarterAuthenticationTokenProvider {
         if (version.major() > 1 || (version.major() == 1 && version.minor() >= 3)) {
             return techUserJwtSerializer.serialize(TechUser.MASTER);
         }
-        // Remove this legacy branch and the version check in 1.6, when starters before 1.3 leave the compatibility window.
+        // Remove this legacy branch and the version check in 1.6, when starters before 1.3 leave the compatibility
+        // window.
         return securityContextExecutor.requireSecurityContext().token();
     }
 
