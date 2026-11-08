@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.common.auth.service.tech;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 
@@ -35,7 +36,9 @@ public interface TechUserJwtDeserializer {
      * @param token signed JWT to deserialize
      * @return technical user identified by the token subject
      * @throws InvalidJwtTokenException if the token is invalid or tampered with
-     * @throws JwtParsingException if the token cannot be parsed or its subject is not a technical user
+     * @throws ExpiredJwtTokenException if the token has expired
+     * @throws JwtParsingException if the token cannot be parsed, lacks issued-at or expiration claims,
+     *                             or its subject is not a technical user
      */
-    TechUser deserialize(String token) throws InvalidJwtTokenException, JwtParsingException;
+    TechUser deserialize(String token) throws InvalidJwtTokenException, JwtParsingException, ExpiredJwtTokenException;
 }

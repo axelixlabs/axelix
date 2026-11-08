@@ -54,7 +54,9 @@ public class JwtAuthTestConfiguration {
     @Bean
     public TechUserJwtSerializer techUserJwtSerializer(AuthProperties authProperties) {
         return new DefaultTechUserJwtSerializer(
-                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
+                authProperties.getJwt().getAlgorithm(),
+                authProperties.getJwt().getSigningKey(),
+                authProperties.getJwt().getDuration());
     }
 
     @Bean

@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -50,6 +51,7 @@ import org.springframework.test.context.TestPropertySource;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.beans.BeansFeed;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
@@ -70,6 +72,7 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCacheManager;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
@@ -145,6 +148,9 @@ class JwtAuthorizationFilterTest {
     @Autowired
     private TechUserJwtSerializer techUserJwtSerializer;
 
+    @Autowired
+    private AuthProperties authProperties;
+
     @ParameterizedTest
     @MethodSource("adminEndpoints")
     void shouldAllowAccessForMaster(String path, HttpMethod httpMethod) {
@@ -157,6 +163,23 @@ class JwtAuthorizationFilterTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void shouldRejectExpiredMasterToken() {
+        // given.
+        String token = new DefaultTechUserJwtSerializer(
+                        authProperties.getJwt().getAlgorithm(),
+                        authProperties.getJwt().getSigningKey(),
+                        Duration.ofMinutes(-1))
+                .serialize(TechUser.MASTER);
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test

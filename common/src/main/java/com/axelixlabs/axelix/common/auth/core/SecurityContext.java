@@ -25,11 +25,6 @@ package com.axelixlabs.axelix.common.auth.core;
 public interface SecurityContext {
 
     /**
-     * @return user that currently performing the operation.
-     */
-    User currentUser();
-
-    /**
      * @return access token that has been provided by the user.
      */
     String token();

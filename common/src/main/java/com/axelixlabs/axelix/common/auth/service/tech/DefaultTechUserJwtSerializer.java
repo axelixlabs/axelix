@@ -17,6 +17,10 @@
  */
 package com.axelixlabs.axelix.common.auth.service.tech;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.NullMarked;
 
@@ -38,16 +42,25 @@ public class DefaultTechUserJwtSerializer implements TechUserJwtSerializer {
 
     private final String signingKey;
 
-    public DefaultTechUserJwtSerializer(JwtAlgorithm algorithm, String signingKey) {
+    private final Duration lifespan;
+
+    public DefaultTechUserJwtSerializer(JwtAlgorithm algorithm, String signingKey, Duration lifespan) {
         this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
         this.signingKey = signingKey;
+        this.lifespan = lifespan;
     }
 
     @Override
     public String serialize(TechUser techUser) throws JwtTokenGenerationException {
         try {
+            Instant now = Instant.now();
             return signingStrategy
-                    .signToken(Jwts.builder().subject(techUser.getId()), signingKey)
+                    .signToken(
+                            Jwts.builder()
+                                    .subject(techUser.getId())
+                                    .issuedAt(Date.from(now))
+                                    .expiration(Date.from(now.plus(lifespan))),
+                            signingKey)
                     .compact();
         } catch (JwtTokenGenerationException e) {
             throw e;

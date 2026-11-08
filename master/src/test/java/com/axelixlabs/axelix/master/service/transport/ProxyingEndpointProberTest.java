@@ -128,7 +128,7 @@ class ProxyingEndpointProberTest {
         // when.
         byte[] response = securityContextExecutor.callWithinSecurityContext(
                 () -> endEndpointProber.invoke(instance.id(), NoHttpPayload.INSTANCE),
-                new DefaultSecurityContext(caller, callerToken));
+                new DefaultSecurityContext(callerToken));
 
         // then.
         RecordedRequest request = server.takeRequest();
@@ -155,7 +155,11 @@ class ProxyingEndpointProberTest {
         assertThat(request.getHeaders().values("Authorization")).hasSize(1);
         String token = request.getHeader("Authorization").substring("Bearer ".length());
         assertThat(claims(token).getSubject()).isEqualTo(TechUser.MASTER.getId());
-        assertThat(claims(token)).containsOnlyKeys("sub");
+        assertThat(claims(token)).containsOnlyKeys("sub", "iat", "exp");
+        assertThat(java.time.Duration.between(
+                        claims(token).getIssuedAt().toInstant(),
+                        claims(token).getExpiration().toInstant()))
+                .isEqualTo(jwtProperties.lifespan());
     }
 
     @Test
@@ -193,12 +197,12 @@ class ProxyingEndpointProberTest {
                     endEndpointProber.invoke(legacy.id(), NoHttpPayload.INSTANCE);
                     endEndpointProber.invoke(modern.id(), NoHttpPayload.INSTANCE);
                 },
-                new DefaultSecurityContext(caller, callerToken));
+                new DefaultSecurityContext(callerToken));
 
         // then.
         assertThat(server.takeRequest().getHeader("Authorization")).isEqualTo("Bearer " + callerToken);
         String modernToken = server.takeRequest().getHeader("Authorization").substring("Bearer ".length());
-        assertThat(claims(modernToken)).containsOnlyKeys("sub");
+        assertThat(claims(modernToken)).containsOnlyKeys("sub", "iat", "exp");
         assertThat(claims(modernToken).getSubject()).isEqualTo(TechUser.MASTER.getId());
     }
 

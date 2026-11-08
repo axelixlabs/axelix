@@ -54,7 +54,9 @@ class StarterAuthenticationTokenProviderTest {
     private final DefaultJwtEncoderService encoder =
             new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5));
     private final StarterAuthenticationTokenProvider tokenProvider = new StarterAuthenticationTokenProvider(
-            securityContextExecutor, encoder, new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY));
+            securityContextExecutor,
+            encoder,
+            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5)));
 
     @ParameterizedTest
     @ValueSource(strings = {"1.1.0", "1.1.1", "1.2.0", "1.2.1", "1.2.2"})
@@ -65,7 +67,7 @@ class StarterAuthenticationTokenProviderTest {
 
         // when.
         String token = securityContextExecutor.callWithinSecurityContext(
-                () -> tokenProvider.tokenFor(version), new DefaultSecurityContext(caller, callerToken));
+                () -> tokenProvider.tokenFor(version), new DefaultSecurityContext(callerToken));
 
         // then.
         assertThat(token).isEqualTo(callerToken);
@@ -90,7 +92,7 @@ class StarterAuthenticationTokenProviderTest {
         assertThat(new HmacVerificationStrategy()
                         .verifyAndParse(token, SIGNING_KEY)
                         .getPayload())
-                .containsOnlyKeys("sub");
+                .containsOnlyKeys("sub", "iat", "exp");
     }
 
     @ParameterizedTest

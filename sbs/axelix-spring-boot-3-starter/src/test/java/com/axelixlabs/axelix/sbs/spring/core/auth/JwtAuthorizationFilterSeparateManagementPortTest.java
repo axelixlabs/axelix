@@ -87,7 +87,8 @@ class JwtAuthorizationFilterSeparateManagementPortTest {
     void shouldAllowAccess_TokenIsValid() {
         String token = new DefaultTechUserJwtSerializer(
                         authProperties.getJwt().getAlgorithm(),
-                        authProperties.getJwt().getSigningKey())
+                        authProperties.getJwt().getSigningKey(),
+                        authProperties.getJwt().getDuration())
                 .serialize(TechUser.MASTER);
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token);
