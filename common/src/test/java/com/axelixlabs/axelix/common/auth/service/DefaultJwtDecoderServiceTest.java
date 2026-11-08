@@ -106,11 +106,7 @@ class DefaultJwtDecoderServiceTest {
     }
 
     static Stream<Arguments> roles() {
-        return Stream.of(
-                Arguments.of(TestRoles.VIEWER),
-                Arguments.of(TestRoles.EDITOR),
-                Arguments.of(TestRoles.ADMIN),
-                Arguments.of(DefaultRole.MANAGED_SERVICE));
+        return Stream.of(Arguments.of(TestRoles.VIEWER), Arguments.of(TestRoles.EDITOR), Arguments.of(TestRoles.ADMIN));
     }
 
     @Test

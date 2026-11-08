@@ -32,7 +32,6 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
@@ -110,14 +109,12 @@ class DefaultRoleServiceTest {
         }
 
         @Test
-        void shouldNotResolveInternalRoles() {
+        void shouldNotResolveSuperAdminRole() {
             // when.
             Optional<Role> superAdmin = roleService.findByName(SuperAdminUserAuthenticator.SUPER_ADMIN_ROLE_NAME);
-            Optional<Role> managedService = roleService.findByName(DefaultRole.MANAGED_SERVICE.getName());
 
             // then.
             assertThat(superAdmin).isEmpty();
-            assertThat(managedService).isEmpty();
         }
 
         @Test

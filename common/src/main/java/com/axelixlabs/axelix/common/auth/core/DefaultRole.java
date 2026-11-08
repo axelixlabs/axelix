@@ -30,12 +30,6 @@ import java.util.Set;
  */
 public final class DefaultRole implements Role {
 
-    public static final Role MANAGED_SERVICE;
-
-    static {
-        MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of());
-    }
-
     private final String name;
     private final Set<Authority> authorities;
     private final Set<Role> components;

@@ -32,8 +32,8 @@ import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenti
  *
  * <p>Roles are stored in the database: the built-in {@code ADMIN}, {@code EDITOR} and {@code VIEWER} roles are
  * inserted by a Liquibase migration, any other role is created by Axelix Enterprise. Note that the internal
- * {@link SuperAdminUserAuthenticator#SUPER_ADMIN_ROLE_NAME} and {@code MANAGED_SERVICE} roles are <strong>not</strong>
- * resolvable through this service: they are never persisted and never assigned to a managed user.</p>
+ * {@link SuperAdminUserAuthenticator#SUPER_ADMIN_ROLE_NAME} role is <strong>not</strong>
+ * resolvable through this service: it is never persisted and never assigned to a managed user.</p>
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha

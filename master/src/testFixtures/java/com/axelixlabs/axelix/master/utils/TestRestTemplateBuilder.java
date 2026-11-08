@@ -31,9 +31,11 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
@@ -66,13 +68,18 @@ public class TestRestTemplateBuilder {
 
     private final JwtEncoderService defaultJwtEncoderService;
     private final JwtEncoderService expiredJwtEncoderService;
+    private final TechUserJwtSerializer techUserJwtSerializer;
 
     @EventListener
     public void handleServletWebServerInitializedEvent(ServletWebServerInitializedEvent event) {
         this.testTomcatServerPort = event.getWebServer().getPort();
     }
 
-    public TestRestTemplateBuilder(JwtProperties jwtProperties, JwtEncoderService defaultJwtEncoderService) {
+    public TestRestTemplateBuilder(
+            JwtProperties jwtProperties,
+            JwtEncoderService defaultJwtEncoderService,
+            TechUserJwtSerializer techUserJwtSerializer) {
+        this.techUserJwtSerializer = techUserJwtSerializer;
         this.defaultJwtEncoderService = defaultJwtEncoderService;
         this.expiredJwtEncoderService =
                 new DefaultJwtEncoderService(jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO);
@@ -102,12 +109,8 @@ public class TestRestTemplateBuilder {
         return buildWithToken(user, token);
     }
 
-    public IdentityAwareTestRestTemplate withRoleTokenInAuthorizationHeader(Role role) {
-        User user = UserUtils.fromRoles(role);
-
-        String token = defaultJwtEncoderService.generateToken(user);
-
-        return buildWithTokenInAuthorizationHeader(user, token);
+    public TestRestTemplate withTechUserTokenInAuthorizationHeader(TechUser techUser) {
+        return buildWithTokenInAuthorizationHeader(techUserJwtSerializer.serialize(techUser));
     }
 
     // START: Bad token auth scenarios
@@ -155,14 +158,6 @@ public class TestRestTemplateBuilder {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .baseUri(HOST + testTomcatServerPort)
                 .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(CookieProperties.AUTH_COOKIE_NAME, token)));
-    }
-
-    private IdentityAwareTestRestTemplate buildWithTokenInAuthorizationHeader(User user, String token) {
-        return new IdentityAwareTestRestTemplate(
-                user,
-                new RestTemplateBuilder()
-                        .baseUri(HOST + testTomcatServerPort)
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token));
     }
 
     private TestRestTemplate buildWithTokenInAuthorizationHeader(String token) {

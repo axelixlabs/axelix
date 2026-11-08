@@ -42,7 +42,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
@@ -247,7 +247,7 @@ public class InstanceSelfRegistrationInternalApiTest {
     void shouldRegisterServiceInstance() {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // then.
@@ -333,7 +333,7 @@ public class InstanceSelfRegistrationInternalApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity(
                         "/api/internal/service/register", defaultJsonEntity(requestWithEmptyGroupId), Void.class);
 
@@ -360,7 +360,7 @@ public class InstanceSelfRegistrationInternalApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity(
                         "/api/internal/service/register",
                         defaultJsonEntity(requestWithIncompatibleStarter),
@@ -384,7 +384,7 @@ public class InstanceSelfRegistrationInternalApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity(
                         "/api/internal/service/register", defaultJsonEntity(requestWithDetectedFeatures), Void.class);
 
@@ -404,7 +404,7 @@ public class InstanceSelfRegistrationInternalApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(requestWithSbom(sbom)), Void.class);
 
         // then.
@@ -423,7 +423,7 @@ public class InstanceSelfRegistrationInternalApiTest {
     void shouldSkipSbomAndStillRegisterWhenSbomIsMalformed() {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity(
                         "/api/internal/service/register",
                         defaultJsonEntity(requestWithSbom("{ \"bomFormat\": \"CycloneDX\"")),
@@ -439,12 +439,12 @@ public class InstanceSelfRegistrationInternalApiTest {
     void shouldRefreshInstanceOnHeartbeatV2() {
         // given.
         restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT_V2), Void.class);
 
         // then.
@@ -488,7 +488,7 @@ public class InstanceSelfRegistrationInternalApiTest {
     void shouldReturnBadRequestOnHeartbeatWithMissingRequiredField(String missingField, String heartbeat) {
         // given.
         restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
         Instant registeredHeartBeat = instanceRegistry
                 .get(InstanceId.of(TEST_INSTANCE_ID))
@@ -497,7 +497,7 @@ public class InstanceSelfRegistrationInternalApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(heartbeat), Void.class);
 
         // then.
@@ -532,7 +532,7 @@ public class InstanceSelfRegistrationInternalApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT_V2), Void.class);
 
         // then.
@@ -546,7 +546,7 @@ public class InstanceSelfRegistrationInternalApiTest {
     void shouldReturnConflictOnHeartbeatOfUnknownInstance() {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT_V2), Void.class);
 
         // then.
@@ -610,7 +610,7 @@ public class InstanceSelfRegistrationInternalApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(requestWithNoFeatures), Void.class);
 
         // then.

@@ -45,7 +45,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
@@ -537,7 +537,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         """;
 
         restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity(
                         "/api/internal/service/register", defaultJsonEntity(selfRegistrationRequest), Void.class);
 
@@ -593,7 +593,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         """;
 
         restTemplate
-                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity(
                         "/api/internal/service/register", defaultJsonEntity(selfRegistrationRequest), Void.class);
 

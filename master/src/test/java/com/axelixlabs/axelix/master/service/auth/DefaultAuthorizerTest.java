@@ -27,7 +27,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -168,7 +167,7 @@ class DefaultAuthorizerTest {
     }
 
     static Stream<Role> allRoles() {
-        return Stream.of(TestRoles.ADMIN, TestRoles.EDITOR, DefaultRole.MANAGED_SERVICE, TestRoles.VIEWER);
+        return Stream.of(TestRoles.ADMIN, TestRoles.EDITOR, TestRoles.VIEWER);
     }
 
     enum UnrecognizedAuthority implements Authority {
