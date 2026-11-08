@@ -33,6 +33,7 @@ import org.springframework.boot.webmvc.autoconfigure.DispatcherServletAutoConfig
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ReactiveJwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
@@ -70,6 +71,7 @@ class JwtAuthAutoConfigurationTest {
             assertThat(context).hasSingleBean(JwtAuthAutoConfiguration.class);
             assertThat(context).hasSingleBean(TechUserJwtDeserializer.class);
             assertThat(context).hasSingleBean(JwtEncoderService.class);
+            assertThat(context).hasSingleBean(TechUserJwtSerializer.class);
             assertThat(context).hasSingleBean(WebIdentityAccessManager.class);
         });
     }

@@ -26,7 +26,7 @@ import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.error.handle.ExceptionHandler;
-import com.axelixlabs.axelix.master.exception.auth.InvalidCronExpressionException;
+import com.axelixlabs.axelix.master.exception.InvalidCronExpressionException;
 
 /**
  * The exception handler for the {@link InvalidCronExpressionException}.

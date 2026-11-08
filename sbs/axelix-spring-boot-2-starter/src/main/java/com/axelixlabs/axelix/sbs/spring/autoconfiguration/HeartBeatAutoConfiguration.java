@@ -24,7 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
@@ -74,13 +74,13 @@ public class HeartBeatAutoConfiguration {
             HeartBeatConfigurationProperties properties,
             ObjectMapper objectMapper,
             HeartBeatMetadataAssembler heartBeatMetadataAssembler,
-            JwtEncoderService jwtEncoderService) {
+            TechUserJwtSerializer techUserJwtSerializer) {
         return new HeartBeatService(
                 new SLF4JLogger(LoggerFactory.getLogger(HeartBeatService.class)),
                 objectMapper::writeValueAsString,
                 properties,
                 heartBeatMetadataAssembler,
-                jwtEncoderService);
+                techUserJwtSerializer);
     }
 
     @Bean

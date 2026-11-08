@@ -25,7 +25,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,9 +32,8 @@ import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -56,8 +54,6 @@ public class HeartBeatService implements Closeable {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String REGISTRATION_PATH = "/service/register";
     private static final String HEARTBEAT_PATH = "/service/heartbeat/v2";
-    private static final PasswordlessUser TECH_USER =
-            new PasswordlessUser("AXELIX.STARTER", "AXELIX.STARTER", Set.of(DefaultRole.MANAGED_SERVICE));
 
     private final HttpClient httpClient;
     private final JsonSerializationFunction serializationFunction;
@@ -65,13 +61,10 @@ public class HeartBeatService implements Closeable {
     private final HeartBeatMetadataAssembler heartBeatMetadataAssembler;
     private final ScheduledExecutorService executor;
     private final Logger logger;
-    private final JwtEncoderService jwtEncoderService;
+    private final TechUserJwtSerializer techUserJwtSerializer;
 
     @Nullable
     private volatile String heartbeatUrl;
-
-    @SuppressWarnings("NullAway.Init")
-    private volatile String currentToken;
 
     private volatile boolean registered;
 
@@ -80,10 +73,10 @@ public class HeartBeatService implements Closeable {
             JsonSerializationFunction serializationFunction,
             HeartBeatConfigurationProperties properties,
             HeartBeatMetadataAssembler heartBeatMetadataAssembler,
-            JwtEncoderService jwtEncoderService) {
+            TechUserJwtSerializer techUserJwtSerializer) {
 
         this.logger = logger;
-        this.jwtEncoderService = jwtEncoderService;
+        this.techUserJwtSerializer = techUserJwtSerializer;
         this.httpClient =
                 HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
         this.properties = properties;
@@ -98,7 +91,6 @@ public class HeartBeatService implements Closeable {
     }
 
     public void scheduleHeartBeat() {
-        currentToken = jwtEncoderService.generateToken(TECH_USER);
         heartbeatUrl = resolveHeartbeatUrl(properties.getMasterUrl());
         executor.scheduleAtFixedRate(
                 this::heartbeat, 0L, properties.getHeartbeatInterval().getSeconds(), TimeUnit.SECONDS);
@@ -115,8 +107,7 @@ public class HeartBeatService implements Closeable {
                 if (is2xxSuccessful(statusCode)) {
                     logger.trace("Heartbeat successful. Master URL: {}", heartbeatUrl);
                 } else if (isUnauthorized(statusCode)) {
-                    logger.debug("Master heartbeat failed. Token expired. Re-generating token");
-                    currentToken = jwtEncoderService.generateToken(TECH_USER);
+                    logger.debug("Master heartbeat failed. Unauthorized. Will retry with a fresh token");
                 } else if (isConflict(statusCode)) {
                     logger.info("Master does not know this instance. Registering again");
                     registered = false;
@@ -144,8 +135,7 @@ public class HeartBeatService implements Closeable {
             logger.trace("Registration successful. Master URL: {}", properties.getMasterUrl());
             registered = true;
         } else if (isUnauthorized(statusCode)) {
-            logger.debug("Master registration failed. Token expired. Re-generating token");
-            currentToken = jwtEncoderService.generateToken(TECH_USER);
+            logger.debug("Master registration failed. Unauthorized. Will retry with a fresh token");
         } else {
             logger.info("Master registration failed, HTTP status: {}\"", statusCode);
         }
@@ -196,7 +186,9 @@ public class HeartBeatService implements Closeable {
             }
         }
 
-        builder.header(AUTHORIZATION_HEADER, AuthenticationSchemes.BEARER.prefix() + currentToken);
+        builder.header(
+                AUTHORIZATION_HEADER,
+                AuthenticationSchemes.BEARER.prefix() + techUserJwtSerializer.serialize(TechUser.MANAGED_SERVICE));
 
         return builder.build();
     }

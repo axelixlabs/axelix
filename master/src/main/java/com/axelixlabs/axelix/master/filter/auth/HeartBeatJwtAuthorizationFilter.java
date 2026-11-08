@@ -19,9 +19,6 @@ package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
 
-import com.axelixlabs.axelix.common.auth.core.TechUser;
-import com.axelixlabs.axelix.common.auth.exception.TechUserAuthorizationException;
-import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,9 +33,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
+import com.axelixlabs.axelix.common.auth.exception.TechUserAuthorizationException;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
 import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
@@ -59,14 +57,9 @@ public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
     private static final String HEART_BEAT_REQUEST_PATH =
             WebAutoConfiguration.INTERNAL_API_PATH + ApiPaths.SelfRegistrationApi.HEARTBEAT;
 
-    private final SecurityContextExecutor securityContextExecutor;
     private final TechUserJwtDeserializer techUserJwtDeserializer;
 
-    public HeartBeatJwtAuthorizationFilter(
-        SecurityContextExecutor securityContextExecutor,
-        TechUserJwtDeserializer techUserJwtDeserializer
-    ) {
-        this.securityContextExecutor = securityContextExecutor;
+    public HeartBeatJwtAuthorizationFilter(TechUserJwtDeserializer techUserJwtDeserializer) {
         this.techUserJwtDeserializer = techUserJwtDeserializer;
     }
 
@@ -96,14 +89,7 @@ public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
             throw new TechUserAuthorizationException(incomingTechUser);
         }
 
-        try {
-            securityContextExecutor.runWithinSecurityContext(
-                    () -> filterChain.doFilter(request, response), new DefaultSecurityContext(token));
-        } catch (ServletException | IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ServletException(e);
-        }
+        filterChain.doFilter(request, response);
     }
 
     @Nullable

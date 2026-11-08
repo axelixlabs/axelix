@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.time.Duration;
-
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
@@ -28,8 +26,8 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HealthDetectionFunction;
@@ -133,8 +131,8 @@ class HeartBeatAutoConfigurationTest {
         }
 
         @Bean
-        public JwtEncoderService jwtEncoderService() {
-            return new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1));
+        public TechUserJwtSerializer techUserJwtSerializer() {
+            return new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, "secret");
         }
     }
 

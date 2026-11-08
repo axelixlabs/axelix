@@ -30,7 +30,9 @@ import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ManagedServiceWebIdentityAccessManager;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
@@ -59,6 +61,12 @@ public class JwtAuthAutoConfiguration {
     @Bean
     public TechUserJwtDeserializer techUserJwtDeserializer(AuthProperties authProperties) {
         return new DefaultTechUserJwtDeserializer(
+                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
+    }
+
+    @Bean
+    public TechUserJwtSerializer techUserJwtSerializer(AuthProperties authProperties) {
+        return new DefaultTechUserJwtSerializer(
                 authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
     }
 
