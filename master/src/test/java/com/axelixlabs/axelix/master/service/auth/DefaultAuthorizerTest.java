@@ -27,10 +27,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.AuthorizationRequest;
-import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.exception.auth.AuthorizationException;
+import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
@@ -59,12 +59,12 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                OssAuthority.SCHEDULED_TASKS_MODIFY,
-                OssAuthority.CACHES_CLEAR,
-                OssAuthority.CACHES_TOGGLE,
-                OssAuthority.GARBAGE_COLLECTOR,
-                OssAuthority.CONFIG_PROPS_VALUES_READ,
-                OssAuthority.ENV_VALUES_READ));
+                TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                TestAuthorities.CACHES_CLEAR,
+                TestAuthorities.CACHES_TOGGLE,
+                TestAuthorities.GARBAGE_COLLECTOR,
+                TestAuthorities.CONFIG_PROPS_VALUES_READ,
+                TestAuthorities.ENV_VALUES_READ));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
@@ -74,10 +74,10 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.EDITOR));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                OssAuthority.SCHEDULED_TASKS_MODIFY,
-                OssAuthority.CACHES_CLEAR,
-                OssAuthority.CACHES_TOGGLE,
-                OssAuthority.GARBAGE_COLLECTOR));
+                TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                TestAuthorities.CACHES_CLEAR,
+                TestAuthorities.CACHES_TOGGLE,
+                TestAuthorities.GARBAGE_COLLECTOR));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
@@ -102,14 +102,14 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.EDITOR));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                OssAuthority.SCHEDULED_TASKS_MODIFY,
-                OssAuthority.CACHES_CLEAR,
-                OssAuthority.CACHES_TOGGLE,
-                OssAuthority.GARBAGE_COLLECTOR,
-                OssAuthority.CONFIG_PROPS_VALUES_READ,
-                OssAuthority.ENV_VALUES_READ,
-                OssAuthority.USERS_MANAGEMENT,
-                OssAuthority.USERS_VIEW));
+                TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                TestAuthorities.CACHES_CLEAR,
+                TestAuthorities.CACHES_TOGGLE,
+                TestAuthorities.GARBAGE_COLLECTOR,
+                TestAuthorities.CONFIG_PROPS_VALUES_READ,
+                TestAuthorities.ENV_VALUES_READ,
+                TestAuthorities.USERS_MANAGEMENT,
+                TestAuthorities.USERS_VIEW));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
     }
@@ -119,14 +119,14 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.VIEWER));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                OssAuthority.SCHEDULED_TASKS_MODIFY,
-                OssAuthority.CACHES_CLEAR,
-                OssAuthority.CACHES_TOGGLE,
-                OssAuthority.GARBAGE_COLLECTOR,
-                OssAuthority.CONFIG_PROPS_VALUES_READ,
-                OssAuthority.ENV_VALUES_READ,
-                OssAuthority.USERS_MANAGEMENT,
-                OssAuthority.USERS_VIEW));
+                TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                TestAuthorities.CACHES_CLEAR,
+                TestAuthorities.CACHES_TOGGLE,
+                TestAuthorities.GARBAGE_COLLECTOR,
+                TestAuthorities.CONFIG_PROPS_VALUES_READ,
+                TestAuthorities.ENV_VALUES_READ,
+                TestAuthorities.USERS_MANAGEMENT,
+                TestAuthorities.USERS_VIEW));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
     }
@@ -136,12 +136,12 @@ class DefaultAuthorizerTest {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                OssAuthority.SCHEDULED_TASKS_MODIFY,
-                OssAuthority.CACHES_CLEAR,
-                OssAuthority.CACHES_TOGGLE,
-                OssAuthority.GARBAGE_COLLECTOR,
-                OssAuthority.CONFIG_PROPS_VALUES_READ,
-                OssAuthority.ENV_VALUES_READ,
+                TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                TestAuthorities.CACHES_CLEAR,
+                TestAuthorities.CACHES_TOGGLE,
+                TestAuthorities.GARBAGE_COLLECTOR,
+                TestAuthorities.CONFIG_PROPS_VALUES_READ,
+                TestAuthorities.ENV_VALUES_READ,
                 UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
@@ -149,21 +149,21 @@ class DefaultAuthorizerTest {
 
     @ParameterizedTest
     @MethodSource("adminAuthorities")
-    void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole(OssAuthority authority) {
+    void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole(TestAuthorities authority) {
         PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN, TestRoles.EDITOR));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(user, new AuthorizationRequest(Set.of(authority))));
     }
 
-    static Stream<OssAuthority> adminAuthorities() {
+    static Stream<TestAuthorities> adminAuthorities() {
         return Stream.of(
-                OssAuthority.ENV_VALUES_READ,
-                OssAuthority.CONFIG_PROPS_VALUES_READ,
-                OssAuthority.SCHEDULED_TASKS_MODIFY,
-                OssAuthority.CACHES_CLEAR,
-                OssAuthority.CACHES_TOGGLE,
-                OssAuthority.GARBAGE_COLLECTOR);
+                TestAuthorities.ENV_VALUES_READ,
+                TestAuthorities.CONFIG_PROPS_VALUES_READ,
+                TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                TestAuthorities.CACHES_CLEAR,
+                TestAuthorities.CACHES_TOGGLE,
+                TestAuthorities.GARBAGE_COLLECTOR);
     }
 
     static Stream<Role> allRoles() {

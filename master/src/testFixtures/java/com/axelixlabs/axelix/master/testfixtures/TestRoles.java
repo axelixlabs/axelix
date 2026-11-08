@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.testfixtures;
 import java.util.Set;
 
 import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
-import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 
 // TODO:
@@ -45,20 +44,20 @@ public final class TestRoles {
     public static final Role EDITOR = new DefaultRole(
             "EDITOR",
             Set.of(
-                    OssAuthority.SCHEDULED_TASKS_MODIFY,
-                    OssAuthority.CACHES_CLEAR,
-                    OssAuthority.CACHES_TOGGLE,
-                    OssAuthority.GARBAGE_COLLECTOR));
+                    TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                    TestAuthorities.CACHES_CLEAR,
+                    TestAuthorities.CACHES_TOGGLE,
+                    TestAuthorities.GARBAGE_COLLECTOR));
 
     public static final Role ADMIN = new DefaultRole(
             "ADMIN",
             Set.of(
-                    OssAuthority.SCHEDULED_TASKS_MODIFY,
-                    OssAuthority.CACHES_CLEAR,
-                    OssAuthority.CACHES_TOGGLE,
-                    OssAuthority.GARBAGE_COLLECTOR,
-                    OssAuthority.ENV_VALUES_READ,
-                    OssAuthority.CONFIG_PROPS_VALUES_READ));
+                    TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                    TestAuthorities.CACHES_CLEAR,
+                    TestAuthorities.CACHES_TOGGLE,
+                    TestAuthorities.GARBAGE_COLLECTOR,
+                    TestAuthorities.ENV_VALUES_READ,
+                    TestAuthorities.CONFIG_PROPS_VALUES_READ));
 
     private TestRoles() {}
 }

@@ -17,30 +17,34 @@
  */
 package com.axelixlabs.axelix.master.service.auth;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 
 /**
- * An abstraction that serves as the single accessor for all the {@link Authority authorities}
- * in the application.
+ * Database-backed implementation of {@link AuthoritiesService}.
  *
  * @author Mikhail Polivakha
  */
-public interface AuthoritiesManager {
+public class DefaultAuthoritiesService implements AuthoritiesService {
+    private final AuthorityRepository authorityRepository;
 
-    /**
-     * Constructs the necessary authority
-     *
-     * @return the authority associated with the given {@code name}, or {@code null}, if there is no.
-     */
+    public DefaultAuthoritiesService(AuthorityRepository authorityRepository) {
+        this.authorityRepository = authorityRepository;
+    }
+
+    @Override
     @Nullable
-    Authority decode(String name);
+    public Authority decode(String name) {
+        return authorityRepository.findByCodename(name).orElse(null);
+    }
 
-    /**
-     * @return all the authorities this accessor is aware about.
-     */
-    Set<Authority> getAll();
+    @Override
+    public Set<Authority> getAll() {
+        return new HashSet<>(authorityRepository.findAll());
+    }
 }

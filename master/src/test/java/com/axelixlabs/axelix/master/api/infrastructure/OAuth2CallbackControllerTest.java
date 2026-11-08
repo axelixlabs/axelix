@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +44,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
-import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
@@ -55,6 +53,7 @@ import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableExcept
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
@@ -62,6 +61,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
+import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
@@ -216,7 +216,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         assertThat(authoritiesCookie)
                 .doesNotContain(
-                        OssAuthority.ENV_VALUES_READ.getName(), OssAuthority.CONFIG_PROPS_VALUES_READ.getName());
+                        TestAuthorities.ENV_VALUES_READ.getName(), TestAuthorities.CONFIG_PROPS_VALUES_READ.getName());
 
         // Verify that the OIDC user was correctly provisioned and persisted in the database
         UserEntity userEntity = userRepository.findByUsername(username).get();

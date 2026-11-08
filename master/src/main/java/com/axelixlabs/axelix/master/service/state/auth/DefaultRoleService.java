@@ -40,7 +40,7 @@ import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleParentBond;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityName;
-import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
 
 /**
  * JDBC-based implementation of {@link RoleService} that reads roles from the {@code roles}, {@code roles_authorities},
@@ -55,11 +55,11 @@ import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
 public class DefaultRoleService implements RoleService {
 
     private final RoleRepository roleRepository;
-    private final AuthoritiesManager authoritiesManager;
+    private final AuthoritiesService authoritiesService;
 
-    public DefaultRoleService(RoleRepository roleRepository, AuthoritiesManager authoritiesManager) {
+    public DefaultRoleService(RoleRepository roleRepository, AuthoritiesService authoritiesService) {
         this.roleRepository = roleRepository;
-        this.authoritiesManager = authoritiesManager;
+        this.authoritiesService = authoritiesService;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class DefaultRoleService implements RoleService {
             Set<Authority> granted = authorities.computeIfAbsent(row.roleId(), _ -> new HashSet<>());
 
             if (row.authorityName() != null) {
-                Optional.ofNullable(authoritiesManager.decode(row.authorityName()))
+                Optional.ofNullable(authoritiesService.decode(row.authorityName()))
                         .ifPresent(granted::add);
             }
         }

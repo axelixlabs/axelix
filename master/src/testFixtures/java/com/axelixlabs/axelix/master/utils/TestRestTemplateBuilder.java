@@ -33,11 +33,11 @@ import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
-import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
+import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
@@ -94,11 +94,11 @@ public class TestRestTemplateBuilder {
     }
 
     public IdentityAwareTestRestTemplate asUsersFeedViewer() {
-        return withRole(new DefaultRole("USERS_FEED_VIEWER", Set.of(OssAuthority.USERS_VIEW)));
+        return withRole(new DefaultRole("USERS_FEED_VIEWER", Set.of(TestAuthorities.USERS_VIEW)));
     }
 
     public IdentityAwareTestRestTemplate asUsersFeedEditor() {
-        return withRole(new DefaultRole("USERS_FEED_EDITOR", Set.of(OssAuthority.USERS_MANAGEMENT)));
+        return withRole(new DefaultRole("USERS_FEED_EDITOR", Set.of(TestAuthorities.USERS_MANAGEMENT)));
     }
 
     public IdentityAwareTestRestTemplate withRole(Role role) {

@@ -26,7 +26,6 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
-import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 
 /**
  * The catalog of every {@link MasterWebEndpoint Axelix Master web API endpoint} exposed to the UI. This is the
@@ -102,17 +101,14 @@ public final class MasterWebEndpoints {
             register("caches:read", HttpMethod.GET, ApiPaths.CachesApi.INSTANCE_ID, null);
     public static final MasterWebEndpoint CACHE_READ_ONE =
             register("cache:read-one", HttpMethod.GET, ApiPaths.CachesApi.CACHE_NAME, null);
-    public static final MasterWebEndpoint CACHE_ENABLE = register(
-            "caches:enable", HttpMethod.POST, ApiPaths.CachesApi.BULK_ENABLE_CACHE, OssAuthority.CACHES_TOGGLE);
-    public static final MasterWebEndpoint CACHE_DISABLE = register(
-            "caches:disable", HttpMethod.POST, ApiPaths.CachesApi.BULK_DISABLE_CACHE, OssAuthority.CACHES_TOGGLE);
+    public static final MasterWebEndpoint CACHE_ENABLE =
+            register("caches:enable", HttpMethod.POST, ApiPaths.CachesApi.BULK_ENABLE_CACHE, () -> "caches:toggle");
+    public static final MasterWebEndpoint CACHE_DISABLE =
+            register("caches:disable", HttpMethod.POST, ApiPaths.CachesApi.BULK_DISABLE_CACHE, () -> "caches:toggle");
     public static final MasterWebEndpoint CACHE_CLEAR_ONE = register(
-            "caches:clear-one",
-            HttpMethod.DELETE,
-            ApiPaths.CachesApi.CACHE_BULK_CLEAR_CACHE,
-            OssAuthority.CACHES_CLEAR);
+            "caches:clear-one", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_BULK_CLEAR_CACHE, () -> "caches:clear");
     public static final MasterWebEndpoint CACHES_CLEAR_ALL = register(
-            "caches:clear-all", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL, OssAuthority.CACHES_CLEAR);
+            "caches:clear-all", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL, () -> "caches:clear");
 
     // Scheduled tasks
     public static final MasterWebEndpoint SCHEDULED_TASKS_READ =
@@ -126,27 +122,27 @@ public final class MasterWebEndpoints {
             "scheduled-task:enable",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.ENABLE_TASK,
-            OssAuthority.SCHEDULED_TASKS_MODIFY);
+            () -> "scheduled-tasks:write");
     public static final MasterWebEndpoint SCHEDULED_TASK_DISABLE = register(
             "scheduled-task:disable",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.DISABLE_TASK,
-            OssAuthority.SCHEDULED_TASKS_MODIFY);
+            () -> "scheduled-tasks:write");
     public static final MasterWebEndpoint SCHEDULED_TASK_EXECUTE = register(
             "scheduled-task:execute",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.EXECUTE,
-            OssAuthority.SCHEDULED_TASKS_MODIFY);
+            () -> "scheduled-tasks:write");
     public static final MasterWebEndpoint SCHEDULED_TASK_MODIFY_CRON = register(
             "scheduled-task:modify-cron-expression",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION,
-            OssAuthority.SCHEDULED_TASKS_MODIFY);
+            () -> "scheduled-tasks:write");
     public static final MasterWebEndpoint SCHEDULED_TASK_MODIFY_INTERVAL = register(
             "scheduled-task:modify-interval",
             HttpMethod.POST,
             ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL,
-            OssAuthority.SCHEDULED_TASKS_MODIFY);
+            () -> "scheduled-tasks:write");
     public static final MasterWebEndpoint SCHEDULED_TASK_VALIDATE_CRON = register(
             "scheduled-task:validate-cron-expression",
             HttpMethod.POST,
@@ -159,14 +155,11 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint GC_LOG_READ_STATUS =
             register("gc-log:read-status", HttpMethod.GET, ApiPaths.GcLogFileApi.STATUS_GC_LOGGING, null);
     public static final MasterWebEndpoint GC_TRIGGER =
-            register("gc:trigger", HttpMethod.POST, ApiPaths.GcLogFileApi.TRIGGER_GC, OssAuthority.GARBAGE_COLLECTOR);
-    public static final MasterWebEndpoint GC_LOG_ENABLE = register(
-            "gc-log:enable", HttpMethod.POST, ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING, OssAuthority.GARBAGE_COLLECTOR);
-    public static final MasterWebEndpoint GC_LOG_DISABLE = register(
-            "gc-log:disable",
-            HttpMethod.POST,
-            ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING,
-            OssAuthority.GARBAGE_COLLECTOR);
+            register("gc:trigger", HttpMethod.POST, ApiPaths.GcLogFileApi.TRIGGER_GC, () -> "gc:manage");
+    public static final MasterWebEndpoint GC_LOG_ENABLE =
+            register("gc-log:enable", HttpMethod.POST, ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING, () -> "gc:manage");
+    public static final MasterWebEndpoint GC_LOG_DISABLE =
+            register("gc-log:disable", HttpMethod.POST, ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING, () -> "gc:manage");
 
     // Thread dump
     public static final MasterWebEndpoint THREAD_DUMP_READ =
@@ -235,9 +228,9 @@ public final class MasterWebEndpoints {
 
     // Users
     public static final MasterWebEndpoint USERS_READ =
-            register("users:read", HttpMethod.GET, ApiPaths.UsersApi.USERS_FEED, OssAuthority.USERS_VIEW);
-    public static final MasterWebEndpoint USERS_READ_ROLE_COUNTS = register(
-            "users:read-role-counts", HttpMethod.GET, ApiPaths.UsersApi.ROLE_USER_COUNTS, OssAuthority.USERS_VIEW);
+            register("users:read", HttpMethod.GET, ApiPaths.UsersApi.USERS_FEED, () -> "users:read");
+    public static final MasterWebEndpoint USERS_READ_ROLE_COUNTS =
+            register("users:read-role-counts", HttpMethod.GET, ApiPaths.UsersApi.ROLE_USER_COUNTS, () -> "users:read");
     public static final MasterWebEndpoint USER_READ_ONE =
             register("users:read-one", HttpMethod.GET, ApiPaths.UsersApi.GET_USER_BY_ID, null);
     public static final MasterWebEndpoint LOCAL_LOGIN =
@@ -247,24 +240,21 @@ public final class MasterWebEndpoints {
 
     // Roles
     public static final MasterWebEndpoint ROLES_READ =
-            register("roles:read", HttpMethod.GET, ApiPaths.RolesApi.ROLES_FEED, OssAuthority.USERS_VIEW);
+            register("roles:read", HttpMethod.GET, ApiPaths.RolesApi.ROLES_FEED, () -> "users:read");
 
     // Oidc/Oauth
     public static final MasterWebEndpoint OIDC_AUTH_COMPLETE =
             register("oidc:auth:complete", HttpMethod.GET, ApiPaths.OAuth2Api.CALLBACK, null);
 
     // User management
-    public static final MasterWebEndpoint USER_CREATE = register(
-            "users:create", HttpMethod.POST, ApiPaths.UsersManagementApi.USERS_CREATE, OssAuthority.USERS_MANAGEMENT);
-    public static final MasterWebEndpoint USER_DELETE = register(
-            "users:delete", HttpMethod.DELETE, ApiPaths.UsersManagementApi.USERS_DELETE, OssAuthority.USERS_MANAGEMENT);
-    public static final MasterWebEndpoint USER_UPDATE = register(
-            "users:update", HttpMethod.PUT, ApiPaths.UsersManagementApi.USERS_UPDATE, OssAuthority.USERS_MANAGEMENT);
+    public static final MasterWebEndpoint USER_CREATE =
+            register("users:create", HttpMethod.POST, ApiPaths.UsersManagementApi.USERS_CREATE, () -> "users:manage");
+    public static final MasterWebEndpoint USER_DELETE =
+            register("users:delete", HttpMethod.DELETE, ApiPaths.UsersManagementApi.USERS_DELETE, () -> "users:manage");
+    public static final MasterWebEndpoint USER_UPDATE =
+            register("users:update", HttpMethod.PUT, ApiPaths.UsersManagementApi.USERS_UPDATE, () -> "users:manage");
     public static final MasterWebEndpoint USER_CHANGE_STATUS = register(
-            "users:change-status",
-            HttpMethod.PUT,
-            ApiPaths.UsersManagementApi.USERS_STATUS,
-            OssAuthority.USERS_MANAGEMENT);
+            "users:change-status", HttpMethod.PUT, ApiPaths.UsersManagementApi.USERS_STATUS, () -> "users:manage");
 
     // spotless:on
 

@@ -30,7 +30,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdmin
 import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.DefaultUser;
 import com.axelixlabs.axelix.master.domain.auth.User;
-import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.SuperAdminPasswordEncoder;
 
 /**
@@ -56,15 +56,15 @@ public class SuperAdminUserAuthenticator implements UserAuthenticator {
 
     private final SuperAdminConfigurationProperties superAdminConfiguration;
     private final SuperAdminPasswordEncoder passwordEncoder;
-    private final AuthoritiesManager authoritiesManager;
+    private final AuthoritiesService authoritiesService;
 
     public SuperAdminUserAuthenticator(
             SuperAdminConfigurationProperties superAdminConfiguration,
             SuperAdminPasswordEncoder passwordEncoder,
-            AuthoritiesManager authoritiesManager) {
+            AuthoritiesService authoritiesService) {
         this.superAdminConfiguration = superAdminConfiguration;
         this.passwordEncoder = passwordEncoder;
-        this.authoritiesManager = authoritiesManager;
+        this.authoritiesService = authoritiesService;
     }
 
     @PostConstruct
@@ -87,7 +87,7 @@ public class SuperAdminUserAuthenticator implements UserAuthenticator {
                     SUPER_ADMIN_USER_ID,
                     superAdminConfiguration.getUsername(),
                     passwordEncoder.extractEncodedPassword(superAdminConfiguration.getPassword()),
-                    Set.of(new DefaultRole(SUPER_ADMIN_ROLE_NAME, authoritiesManager.getAll())));
+                    Set.of(new DefaultRole(SUPER_ADMIN_ROLE_NAME, authoritiesService.getAll())));
         }
 
         return null;
