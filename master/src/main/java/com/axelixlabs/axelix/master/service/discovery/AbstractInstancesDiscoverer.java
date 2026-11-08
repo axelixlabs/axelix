@@ -41,6 +41,7 @@ import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.Instance.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
@@ -155,7 +156,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
                             InstanceStatus.fromHealthStatus(masterPing.getHealthStatus()),
                             new MemoryUsage(masterPing.getMemoryDetails().getHeap())),
                     masterPing);
-        } catch (EndpointInvocationException | BadRequestException error) {
+        } catch (EndpointInvocationException | BadRequestException | InstanceNotFoundException error) {
             logger.warn(
                     "Unable to fetch the master ping of the managed service with id : {}. Skipping it",
                     instance.id().instanceId(),
