@@ -27,8 +27,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
@@ -66,19 +64,11 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     public TechUserJwtSerializer techUserJwtSerializer(AuthProperties authProperties) {
-        return new DefaultTechUserJwtSerializer(
-                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
-    }
-
-    @Bean
-    public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
         if (JwtDefaults.isDefaultSigningKey(authProperties.getJwt().getSigningKey())) {
             log.warn(JwtDefaults.STARTER_DEFAULT_SIGNING_KEY_IN_USE_WARNING_MESSAGE);
         }
-        return new DefaultJwtEncoderService(
-                authProperties.getJwt().getAlgorithm(),
-                authProperties.getJwt().getSigningKey(),
-                authProperties.getJwt().getDuration());
+        return new DefaultTechUserJwtSerializer(
+                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
     }
 
     @Bean

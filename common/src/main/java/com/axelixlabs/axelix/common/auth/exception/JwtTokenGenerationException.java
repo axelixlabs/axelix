@@ -17,12 +17,9 @@
  */
 package com.axelixlabs.axelix.common.auth.exception;
 
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-
 /**
  * The exception that happened during the JWT token generation process.
  *
- * @see JwtEncoderService
  * @since 23.07.2025
  * @author Nikita Kirillov
  */

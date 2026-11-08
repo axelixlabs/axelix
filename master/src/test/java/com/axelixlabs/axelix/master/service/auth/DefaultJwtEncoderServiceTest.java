@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.service;
+package com.axelixlabs.axelix.master.service.auth;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -58,8 +58,8 @@ import static org.assertj.core.api.Assertions.within;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-@SpringBootTest
-@Import(DefaultJwtEncoderServiceTest.DefaultJwtEncoderServiceTestConfiguration.class)
+@SpringBootTest(classes = DefaultJwtEncoderServiceTest.DefaultJwtEncoderServiceTestConfiguration.class)
+@TestPropertySource("classpath:jwt-services-test.properties")
 class DefaultJwtEncoderServiceTest {
 
     private static final String USER_NAME = "testUser";

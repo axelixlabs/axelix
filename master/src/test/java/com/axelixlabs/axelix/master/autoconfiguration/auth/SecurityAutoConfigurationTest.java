@@ -38,8 +38,6 @@ import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
 import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
@@ -53,6 +51,8 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHand
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
+import com.axelixlabs.axelix.master.service.auth.JwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcAuthorizeEndpointAdditionalParametersProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;

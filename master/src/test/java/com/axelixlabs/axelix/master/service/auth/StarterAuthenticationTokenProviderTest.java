@@ -31,8 +31,6 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.HmacVerificationStrategy;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
