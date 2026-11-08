@@ -21,49 +21,66 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.data.repository.query.Param;
-
-import com.axelixlabs.axelix.master.domain.iam.RoleEntity;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 /**
- * Repository for {@link RoleEntity} aggregate.
+ * Queries roles, their authorities, and their relationships.
  *
  * @author Sergey Cherkasov
  */
-public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
+@Repository
+public class RoleRepository {
 
-    @Query("""
+    private final JdbcClient jdbcClient;
+
+    public RoleRepository(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
+    }
+
+    public List<RoleWithAuthorityName> findAllWithAuthorities() {
+        return jdbcClient.sql("""
             SELECT r.id AS role_id, r.name AS role_name, a.codename AS authority_name
             FROM roles r
             LEFT JOIN roles_authorities ra ON ra.role_id = r.id
             LEFT JOIN authorities a ON a.id = ra.authority_id
-            """)
-    List<RoleWithAuthorityName> findAllWithAuthorities();
+            """).query((rs, rowNum) -> new RoleWithAuthorityName(
+                    rs.getString("role_id"), rs.getString("role_name"), rs.getString("authority_name"))).list();
+    }
 
-    @Query("SELECT role_id AS role_id, parent_role_id AS parent_role_id FROM roles_parents")
-    List<RoleParentBond> findAllParentBonds();
+    public List<RoleParentBond> findAllParentBonds() {
+        return jdbcClient
+                .sql("SELECT role_id AS role_id, parent_role_id AS parent_role_id FROM roles_parents")
+                .query((rs, rowNum) -> new RoleParentBond(rs.getString("role_id"), rs.getString("parent_role_id")))
+                .list();
+    }
 
-    @Query("SELECT role_id FROM users_roles WHERE user_id = :userId")
-    List<String> findRoleIdsOfUser(@Param("userId") String userId);
+    public List<String> findRoleIdsOfUser(String userId) {
+        return jdbcClient
+                .sql("SELECT role_id FROM users_roles WHERE user_id = :userId")
+                .param("userId", userId)
+                .query((rs, rowNum) -> rs.getString("role_id"))
+                .list();
+    }
 
     /**
      * Returns every role together with how many users it is assigned to. A role that nobody holds is returned
      * with a members count of zero.
      */
-    @Query("""
+    public List<RoleProfile> findRolesFeed() {
+        return jdbcClient.sql("""
             SELECT r.id AS id, r.name AS name, COUNT(ur.user_id) AS members_count, r.description AS description
             FROM roles r
             LEFT JOIN users_roles ur ON ur.role_id = r.id
             GROUP BY r.id, r.name, r.description
-            """)
-    List<RoleProfile> findRolesFeed();
+            """).query((rs, rowNum) -> new RoleProfile(
+                    rs.getString("id"), rs.getString("name"), rs.getInt("members_count"), rs.getString("description"))).list();
+    }
 
-    record RoleWithAuthorityName(
+    public record RoleWithAuthorityName(
             String roleId, String roleName, @Nullable String authorityName) {}
 
-    record RoleParentBond(String roleId, String parentRoleId) {}
+    public record RoleParentBond(String roleId, String parentRoleId) {}
 
     /**
      * One role as returned for the roles feed.
@@ -73,5 +90,5 @@ public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
      * @param membersCount Number of users the role is assigned to.
      * @param description  Human-readable description of what the role allows.
      */
-    record RoleProfile(String id, String name, int membersCount, String description) {}
+    public record RoleProfile(String id, String name, int membersCount, String description) {}
 }

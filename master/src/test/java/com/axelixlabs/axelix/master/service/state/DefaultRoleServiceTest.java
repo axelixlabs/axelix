@@ -28,13 +28,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.Role;
-import com.axelixlabs.axelix.master.domain.iam.RoleEntity;
 import com.axelixlabs.axelix.master.domain.iam.RoleOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleProfile;
@@ -67,9 +65,6 @@ class DefaultRoleServiceTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private JdbcAggregateTemplate jdbcAggregateTemplate;
 
     @Autowired
     private JdbcClient jdbcClient;
@@ -453,7 +448,10 @@ class DefaultRoleServiceTest {
     private String createCustomRole(String name) {
         String id = UUID.randomUUID().toString();
 
-        jdbcAggregateTemplate.insert(new RoleEntity(id, name, "Description", RoleOrigin.WEB_UI));
+        jdbcClient
+                .sql("INSERT INTO roles (id, name, description, role_origin) VALUES (?, ?, ?, ?)")
+                .params(id, name, "Description", RoleOrigin.WEB_UI.name())
+                .update();
 
         return id;
     }
