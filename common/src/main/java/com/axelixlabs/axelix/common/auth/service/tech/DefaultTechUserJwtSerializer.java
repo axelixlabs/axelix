@@ -17,14 +17,14 @@
  */
 package com.axelixlabs.axelix.common.auth.service.tech;
 
-import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
-import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 
 /**
  * Default {@link TechUserJwtSerializer} implementation.

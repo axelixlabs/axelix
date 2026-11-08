@@ -19,8 +19,6 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import java.nio.charset.StandardCharsets;
 
-import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
-import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -32,6 +30,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

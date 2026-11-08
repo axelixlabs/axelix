@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.common.auth.service.tech;
 
-import com.axelixlabs.axelix.common.auth.service.JwtVerificationStrategy;
-import com.axelixlabs.axelix.common.auth.service.JwtVerificationStrategyFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import org.jspecify.annotations.NullMarked;
@@ -27,6 +25,8 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.service.JwtVerificationStrategy;
+import com.axelixlabs.axelix.common.auth.service.JwtVerificationStrategyFactory;
 
 /**
  * Default {@link TechUserJwtDeserializer} implementation.

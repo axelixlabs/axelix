@@ -19,10 +19,6 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import java.nio.charset.StandardCharsets;
 
-import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
-import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
-import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
-import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
@@ -33,6 +29,10 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
