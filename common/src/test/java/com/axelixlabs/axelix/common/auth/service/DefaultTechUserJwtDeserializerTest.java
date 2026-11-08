@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserial
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -98,19 +96,38 @@ class DefaultTechUserJwtDeserializerTest {
         assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"iat", "exp", "both"})
-    void shouldRejectMissingLifetimeClaims(String missingClaim) {
+    @Test
+    void shouldRejectMissingIssuedAtClaim() {
         // given.
-        JwtBuilder builder = Jwts.builder().subject(TechUser.MASTER.getId());
-        if (!missingClaim.equals("iat") && !missingClaim.equals("both")) {
-            builder.issuedAt(Date.from(Instant.now()));
-        }
-        if (!missingClaim.equals("exp") && !missingClaim.equals("both")) {
-            builder.expiration(Date.from(Instant.now().plusSeconds(300)));
-        }
-        String token = builder.signWith(
-                        Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+        String token = Jwts.builder()
+                .subject(TechUser.MASTER.getId())
+                .expiration(Date.from(Instant.now().plusSeconds(300)))
+                .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
+
+        // when / then.
+        assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
+    }
+
+    @Test
+    void shouldRejectMissingExpirationClaim() {
+        // given.
+        String token = Jwts.builder()
+                .subject(TechUser.MASTER.getId())
+                .issuedAt(Date.from(Instant.now()))
+                .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
+
+        // when / then.
+        assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
+    }
+
+    @Test
+    void shouldRejectMissingLifetimeClaims() {
+        // given.
+        String token = Jwts.builder()
+                .subject(TechUser.MASTER.getId())
+                .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
                 .compact();
 
         // when / then.
