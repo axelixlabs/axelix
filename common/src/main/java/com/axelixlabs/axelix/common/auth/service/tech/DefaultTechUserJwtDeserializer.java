@@ -60,6 +60,12 @@ public class DefaultTechUserJwtDeserializer implements TechUserJwtDeserializer {
         }
     }
 
+    /*
+     * JWT parsing, signature verification and validation of any expiry claim happen before this method.
+     * The subject identifies the technical user; additional legacy claims such as uid and roles are ignored.
+     * This is intentional: initial discovery uses a legacy-format master token because the starter version
+     * is not yet known. That token must be accepted by both older starters and starters from 1.3 onward.
+     */
     private TechUser resolveTechUser(String subject) {
         for (TechUser techUser : TechUser.values()) {
             if (techUser.getId().equals(subject)) {

@@ -32,6 +32,14 @@ import com.axelixlabs.axelix.common.utils.SemanticVersion;
  */
 public class StarterAuthenticationTokenProvider {
 
+    /**
+     * Legacy representation of the master identity for initial discovery, before the starter version is known.
+     * Older starters require the legacy claims; starters from 1.3 accept the master subject and ignore those
+     * additional claims. The roles are empty because metadata discovery requires no authorities.
+     *
+     * @deprecated remove in 1.6, when all starters in the compatibility window support technical-user tokens
+     */
+    @Deprecated(forRemoval = true, since = "1.3")
     private static final PasswordlessUser DISCOVERY_USER =
             new PasswordlessUser(TechUser.MASTER.getId(), TechUser.MASTER.getId(), Set.of());
 
@@ -59,13 +67,18 @@ public class StarterAuthenticationTokenProvider {
         if (version.major() > 1 || (version.major() == 1 && version.minor() >= 3)) {
             return techUserJwtSerializer.serialize(TechUser.MASTER);
         }
+        // Remove this legacy branch and the version check in 1.6, when starters before 1.3 leave the compatibility window.
         return securityContextExecutor.requireSecurityContext().token();
     }
 
     /**
      * Initial discovery has no starter version yet. A legacy master token supplies the uid and
      * roles required by older decoders, and the master subject accepted by the 1.3 decoder.
+     *
+     * @deprecated replace the legacy encoding with a master technical-user token in 1.6.
+     *             Discovery authentication remains necessary; see {@link #DISCOVERY_USER}.
      */
+    @Deprecated(forRemoval = true, since = "1.3")
     public String discoveryToken() {
         return jwtEncoderService.generateToken(DISCOVERY_USER, Duration.ofMinutes(5));
     }
