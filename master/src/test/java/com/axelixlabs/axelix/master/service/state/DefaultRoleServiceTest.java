@@ -320,12 +320,9 @@ class DefaultRoleServiceTest {
             List<RoleProfile> feed = roleService.getRolesFeed();
 
             // then.
-            assertThat(entryNamed(feed, TestRoles.EDITOR.name()).membersCount())
-                    .isEqualTo(2);
-            assertThat(entryNamed(feed, TestRoles.VIEWER.name()).membersCount())
-                    .isEqualTo(1);
-            assertThat(entryNamed(feed, TestRoles.ADMIN.name()).membersCount())
-                    .isZero();
+            assertThat(entryNamed(feed, TestRoles.EDITOR.name()).membersCount()).isEqualTo(2);
+            assertThat(entryNamed(feed, TestRoles.VIEWER.name()).membersCount()).isEqualTo(1);
+            assertThat(entryNamed(feed, TestRoles.ADMIN.name()).membersCount()).isZero();
         }
 
         @Test
@@ -480,8 +477,7 @@ class DefaultRoleServiceTest {
         assertThat(actual.name()).isEqualTo(expected.name());
         assertThat(actual.authorities())
                 .extracting(Authority::getName)
-                .containsExactlyInAnyOrderElementsOf(expected.authorities().stream()
-                        .map(Authority::getName)
-                        .toList());
+                .containsExactlyInAnyOrderElementsOf(
+                        expected.authorities().stream().map(Authority::getName).toList());
     }
 }

@@ -27,11 +27,7 @@ import java.util.Set;
  * @see Role
  * @since 16.07.25
  */
-public record DefaultRole(
-    String name,
-    Set<Authority> authorities,
-    Set<Role> components
-) implements Role {
+public record DefaultRole(String name, Set<Authority> authorities, Set<Role> components) implements Role {
 
     public DefaultRole(String name, Set<Authority> authorities) {
         this(name, authorities, Collections.emptySet());

@@ -41,8 +41,8 @@ import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**

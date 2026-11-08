@@ -55,7 +55,8 @@ public class DefaultUserJwtEncoderService implements UserJwtEncoderService {
 
     private final Duration lifespan;
 
-    public DefaultUserJwtEncoderService(final JwtAlgorithm algorithm, final String signingKey, final Duration lifespan) {
+    public DefaultUserJwtEncoderService(
+            final JwtAlgorithm algorithm, final String signingKey, final Duration lifespan) {
         this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
         this.signingKey = signingKey;
         this.lifespan = lifespan;
