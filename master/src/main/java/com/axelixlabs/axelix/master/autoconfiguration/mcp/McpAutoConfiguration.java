@@ -26,8 +26,8 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.filter.auth.McpAuthorizationFilter;
 import com.axelixlabs.axelix.master.mcp.auth.DefaultMcpEndpointAuthorityResolver;
 import com.axelixlabs.axelix.master.mcp.auth.DefaultMcpEndpointResolver;

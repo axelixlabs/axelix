@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.mcp.auth.handler;
 import org.springframework.http.HttpHeaders;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 
 /**

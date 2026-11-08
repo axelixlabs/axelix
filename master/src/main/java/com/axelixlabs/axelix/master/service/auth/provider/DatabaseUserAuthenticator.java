@@ -22,8 +22,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.DefaultUser;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;

@@ -49,17 +49,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.HmacVerificationStrategy;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.common.utils.SemanticVersion;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
@@ -71,6 +70,7 @@ import com.axelixlabs.axelix.master.service.serde.DefaultJacksonMessageDeseriali
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.DefaultEndpointProber;
 import com.axelixlabs.axelix.master.service.transport.EndpointProber;
+import com.axelixlabs.axelix.master.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor;

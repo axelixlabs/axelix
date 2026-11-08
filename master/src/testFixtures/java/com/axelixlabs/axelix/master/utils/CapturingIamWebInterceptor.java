@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebAccessDenied;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebAuthenticationFailure;

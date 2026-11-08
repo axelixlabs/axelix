@@ -29,7 +29,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.CeilingBlocker;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.StarterVersionUsage;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
@@ -38,6 +37,7 @@ import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepo
 import com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
+import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
 import static com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy.WINDOW_SIZE;
 

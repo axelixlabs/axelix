@@ -30,11 +30,11 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
+import com.axelixlabs.axelix.master.domain.auth.Role;
+import com.axelixlabs.axelix.master.domain.auth.User;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
+import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesManager;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -38,12 +38,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TokenClaim;
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
-import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.master.domain.auth.Role;
+import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
+import com.axelixlabs.axelix.master.domain.auth.User;
+import com.axelixlabs.axelix.master.testfixtures.TestRoles;
+import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;

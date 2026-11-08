@@ -23,14 +23,14 @@ import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 
 /**
  * The catalog of every {@link MasterWebEndpoint Axelix Master web API endpoint} exposed to the UI. This is the
- * master-side counterpart of {@link com.axelixlabs.axelix.common.domain.ActuatorEndpoints} and the single source
+ * master-side counterpart of {@link com.axelixlabs.axelix.master.domain.ActuatorEndpoints} and the single source
  * of truth for the {@code (path, method) -> (operation code, required authority)} mapping.
  * <p>
  * Only a subset of endpoints currently carries a required {@link Authority}; the remaining endpoints (mostly reads)

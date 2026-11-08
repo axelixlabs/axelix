@@ -25,13 +25,13 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
-import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.api.external.response.profile.InstanceProfileResponse;
 import com.axelixlabs.axelix.master.domain.instance.DetectedFeatures;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.InstancesToShortProfileConverter;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
 /**
  * Default {@link InstanceProfileService}.

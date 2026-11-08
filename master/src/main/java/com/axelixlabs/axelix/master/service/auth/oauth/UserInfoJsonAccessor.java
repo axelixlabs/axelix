@@ -21,8 +21,8 @@ import java.util.Locale;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.exception.auth.OidcRoleExtractionException;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 

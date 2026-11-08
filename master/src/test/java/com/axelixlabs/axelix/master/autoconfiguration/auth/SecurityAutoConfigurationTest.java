@@ -36,14 +36,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.web.client.RestClient;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
-import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.LocalAuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.OidcAuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.SuperAdminAuthenticationOption;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContext;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
+import com.axelixlabs.axelix.master.domain.function.ThrowingCallable;
+import com.axelixlabs.axelix.master.domain.function.ThrowingRunnable;
 import com.axelixlabs.axelix.master.filter.auth.ExternalApiCookieAuthorizationFilter;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;

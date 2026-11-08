@@ -31,10 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.iam.RoleEntity;
 import com.axelixlabs.axelix.master.domain.iam.RoleOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
@@ -44,6 +43,7 @@ import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenti
 import com.axelixlabs.axelix.master.service.state.auth.DefaultRoleService;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
+import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;

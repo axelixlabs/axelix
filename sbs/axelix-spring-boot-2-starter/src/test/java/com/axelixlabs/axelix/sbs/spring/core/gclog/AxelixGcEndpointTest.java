@@ -73,7 +73,7 @@ class AxelixGcEndpointTest {
     void status_shouldReturnCurrentStatus() {
         // User with the VIEWER role has the authority to view the gc log status.
         ResponseEntity<GcLogStatus> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-gc/log/status", GcLogStatus.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-gc/log/status", GcLogStatus.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -91,7 +91,7 @@ class AxelixGcEndpointTest {
         GcLogEnableRequest request = new GcLogEnableRequest().level(availableLevels.get(0));
 
         ResponseEntity<Void> response =
-                restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", request, Void.class);
+                restTemplate.asMaster().postForEntity("/actuator/axelix-gc/log/enable", request, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -106,12 +106,12 @@ class AxelixGcEndpointTest {
         GcLogEnableRequest enableRequest = new GcLogEnableRequest().level(availableLevels.get(0));
 
         ResponseEntity<Void> enableResponse =
-                restTemplate.asAdmin().postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
+                restTemplate.asMaster().postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
 
         assertThat(enableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         ResponseEntity<Void> disableResponse =
-                restTemplate.asAdmin().postForEntity("/actuator/axelix-gc/log/disable", null, Void.class);
+                restTemplate.asMaster().postForEntity("/actuator/axelix-gc/log/disable", null, Void.class);
 
         assertThat(disableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -126,7 +126,7 @@ class AxelixGcEndpointTest {
         GcLogEnableRequest enableRequest = new GcLogEnableRequest().level(availableLevels.get(0));
 
         ResponseEntity<Void> enableResponse =
-                restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
+                restTemplate.asMaster().postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
 
         assertThat(enableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -134,7 +134,7 @@ class AxelixGcEndpointTest {
         Thread.sleep(500);
 
         ResponseEntity<byte[]> response =
-                restTemplate.asEditor().getForEntity("/actuator/axelix-gc/log/file", byte[].class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-gc/log/file", byte[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
@@ -144,7 +144,7 @@ class AxelixGcEndpointTest {
     @Test
     void triggerGc_shouldTriggerGarbageCollection() {
         ResponseEntity<Void> response =
-                restTemplate.asEditor().postForEntity("/actuator/axelix-gc/trigger", HttpEntity.EMPTY, Void.class);
+                restTemplate.asMaster().postForEntity("/actuator/axelix-gc/trigger", HttpEntity.EMPTY, Void.class);
 
         // Cannot assert GC happened, but endpoint should respond
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -155,7 +155,7 @@ class AxelixGcEndpointTest {
         GcLogEnableRequest request = new GcLogEnableRequest().level("invalid-level");
 
         ResponseEntity<String> response =
-                restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", request, String.class);
+                restTemplate.asMaster().postForEntity("/actuator/axelix-gc/log/enable", request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -167,7 +167,7 @@ class AxelixGcEndpointTest {
 
     private GcLogStatus getStatus() {
         ResponseEntity<GcLogStatus> response =
-                restTemplate.asEditor().getForEntity("/actuator/axelix-gc/log/status", GcLogStatus.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-gc/log/status", GcLogStatus.class);
 
         return response.getBody();
     }

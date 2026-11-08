@@ -37,11 +37,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.contract.metadata.GarbageCollector;
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
-import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
+import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;

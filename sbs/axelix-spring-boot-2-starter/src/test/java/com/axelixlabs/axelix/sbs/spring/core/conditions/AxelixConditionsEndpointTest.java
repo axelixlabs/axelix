@@ -93,7 +93,7 @@ class AxelixConditionsEndpointTest {
 
         // when.
         ResponseEntity<ConditionsFeed> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-conditions", ConditionsFeed.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-conditions", ConditionsFeed.class);
 
         // then.
         assertThat(response).isNotNull();

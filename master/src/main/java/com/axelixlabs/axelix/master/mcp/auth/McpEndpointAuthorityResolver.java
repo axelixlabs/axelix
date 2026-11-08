@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.mcp.auth;
 
 import java.util.Optional;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 
 /**

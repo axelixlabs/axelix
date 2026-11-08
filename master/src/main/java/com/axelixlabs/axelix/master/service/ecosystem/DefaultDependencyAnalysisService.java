@@ -40,8 +40,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
-import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.DependenciesDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.DependencyLibrariesResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.DependencyLibrariesResponse.UsedLibrary;
@@ -49,6 +47,7 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.DependencyLi
 import com.axelixlabs.axelix.master.api.external.response.dependencies.AnalyzedDependency;
 import com.axelixlabs.axelix.master.api.external.response.dependencies.AppFrameworkInfo;
 import com.axelixlabs.axelix.master.api.external.response.dependencies.DependencyAnalysisResponse;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
@@ -58,6 +57,7 @@ import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformReleaseLin
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.Ecosystem;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SupportStatus;
+import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.domain.instance.InstanceSbom;

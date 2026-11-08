@@ -31,11 +31,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
+import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;

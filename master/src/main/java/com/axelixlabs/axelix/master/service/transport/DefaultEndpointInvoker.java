@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 

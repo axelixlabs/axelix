@@ -32,13 +32,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.utils.Assert;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
+import com.axelixlabs.axelix.master.domain.auth.Role;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserStatus;

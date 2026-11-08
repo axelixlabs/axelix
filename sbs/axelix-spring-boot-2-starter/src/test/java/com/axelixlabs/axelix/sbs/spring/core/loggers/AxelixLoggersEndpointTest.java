@@ -103,7 +103,7 @@ public class AxelixLoggersEndpointTest {
     void shouldReturnAllLoggers() {
         // when.
         ResponseEntity<String> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-loggers", String.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-loggers", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -113,7 +113,7 @@ public class AxelixLoggersEndpointTest {
     @MethodSource("provideInvalidLoggerAndGroupPaths")
     void shouldReturnBadRequest_WhenLoggerOrGroupNotFound(String path) {
         // when.
-        ResponseEntity<String> response = testRestTemplate.asEditor().getForEntity(path, String.class);
+        ResponseEntity<String> response = testRestTemplate.asMaster().getForEntity(path, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -126,7 +126,7 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         ResponseEntity<Void> response = testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(request),
@@ -145,7 +145,7 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         ResponseEntity<Void> response = testRestTemplate
-                .asViewer()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/group/%s/change-level", GROUP),
                         defaultJsonEntity(request),
@@ -165,7 +165,7 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         ResponseEntity<Void> response =
-                testRestTemplate.asViewer().postForEntity(path, defaultJsonEntity(request), Void.class);
+                testRestTemplate.asMaster().postForEntity(path, defaultJsonEntity(request), Void.class);
 
         // then.
         assertThat(response).isNotNull();
@@ -178,7 +178,7 @@ public class AxelixLoggersEndpointTest {
         String request = "{\"configuredLevel\":\"error\"}";
 
         testRestTemplate
-                .asViewer()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", ABC_RESET_LOGGER),
                         defaultJsonEntity(request),
@@ -188,7 +188,7 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         testRestTemplate
-                .asViewer()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/reset", ABC_RESET_LOGGER), null, Void.class);
 
@@ -203,7 +203,7 @@ public class AxelixLoggersEndpointTest {
         String request = "{\"configuredLevel\":\"error\"}";
 
         testRestTemplate
-                .asViewer()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", AB_RESET_LOGGER),
                         defaultJsonEntity(request),
@@ -213,7 +213,7 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         testRestTemplate
-                .asViewer()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/reset", AB_RESET_LOGGER), null, Void.class);
 
@@ -225,7 +225,7 @@ public class AxelixLoggersEndpointTest {
     @Test
     void shouldReturnBadRequest_WhenResettingUnknownLogger() {
         ResponseEntity<Void> response = testRestTemplate
-                .asViewer()
+                .asMaster()
                 .postForEntity("/actuator/axelix-loggers/logger/non.existent.logger/reset", null, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -238,7 +238,7 @@ public class AxelixLoggersEndpointTest {
         String request = "{\"configuredLevel\":\"debug\",\"ttlSeconds\":30}";
 
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(request),
@@ -246,7 +246,7 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         ResponseEntity<SingleLoggerProfile> response = testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
 
         // then.
@@ -264,7 +264,7 @@ public class AxelixLoggersEndpointTest {
         String request = "{\"configuredLevel\":\"debug\"}";
 
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(request),
@@ -272,7 +272,7 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         ResponseEntity<SingleLoggerProfile> response = testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
 
         // then.
@@ -291,7 +291,7 @@ public class AxelixLoggersEndpointTest {
         String permanentRequest = "{\"configuredLevel\":\"trace\"}";
 
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(temporaryRequest),
@@ -301,7 +301,7 @@ public class AxelixLoggersEndpointTest {
 
         // when. — permanent over temporary
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(permanentRequest),
@@ -309,7 +309,7 @@ public class AxelixLoggersEndpointTest {
 
         // then. — override should disappear
         ResponseEntity<SingleLoggerProfile> response = testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
 
         SingleLoggerProfile loggerProfile = response.getBody();
@@ -325,7 +325,7 @@ public class AxelixLoggersEndpointTest {
         String request = "{\"configuredLevel\":\"debug\",\"ttlSeconds\":30}";
 
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(request),
@@ -335,12 +335,12 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(String.format("/actuator/axelix-loggers/logger/%s/reset", LOGGER), null, Void.class);
 
         // then.
         ResponseEntity<SingleLoggerProfile> response = testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
 
         SingleLoggerProfile loggerProfile = response.getBody();
@@ -358,7 +358,7 @@ public class AxelixLoggersEndpointTest {
         String secondRequest = "{\"configuredLevel\":\"trace\",\"ttlSeconds\":60}";
 
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(firstRequest),
@@ -370,7 +370,7 @@ public class AxelixLoggersEndpointTest {
 
         // when.
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(secondRequest),
@@ -380,7 +380,7 @@ public class AxelixLoggersEndpointTest {
 
         // then.
         ResponseEntity<SingleLoggerProfile> response = testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
 
         SingleLoggerProfile loggerProfile = response.getBody();

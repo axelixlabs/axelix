@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.service.auth.provider;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.User;
 
 /**
  * SPI interface that is capable to authenticate the {@link User} by his/her username and password credentials.

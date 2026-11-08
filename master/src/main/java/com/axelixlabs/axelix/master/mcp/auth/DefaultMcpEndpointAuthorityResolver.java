@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 

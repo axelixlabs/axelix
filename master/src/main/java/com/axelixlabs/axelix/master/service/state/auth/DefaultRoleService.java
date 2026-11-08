@@ -34,13 +34,13 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleParentBond;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityName;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
 
 /**
  * JDBC-based implementation of {@link RoleService} that reads roles from the {@code roles}, {@code roles_authorities},

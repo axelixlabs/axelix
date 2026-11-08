@@ -152,7 +152,7 @@ class AxelixCachesEndpointTest {
     void get_shouldReturnSingleCacheByName() {
         // when.
         ResponseEntity<String> response =
-                testRestTemplate.asViewer().getForEntity(path(MAIN_CACHE_MANAGER, TEST_CACHE_1), String.class);
+                testRestTemplate.asMaster().getForEntity(path(MAIN_CACHE_MANAGER, TEST_CACHE_1), String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -186,7 +186,7 @@ class AxelixCachesEndpointTest {
         cache2.get("notCache1");
         cache2.get("notCache2");
 
-        ResponseEntity<CachesFeed> response = testRestTemplate.asEditor().getForEntity(rootPath(), CachesFeed.class);
+        ResponseEntity<CachesFeed> response = testRestTemplate.asMaster().getForEntity(rootPath(), CachesFeed.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         CacheManagerDto cacheManager = getCacheManager(response.getBody(), MAIN_CACHE_MANAGER);
@@ -219,7 +219,7 @@ class AxelixCachesEndpointTest {
         cache.put(key2, "value2");
 
         ResponseEntity<Void> response = testRestTemplate
-                .asEditor()
+                .asMaster()
                 .exchange(
                         path(CLEAR_CACHE_MANAGER, TEST_CACHE_1 + "/clear?key=key2"),
                         HttpMethod.DELETE,
@@ -239,7 +239,7 @@ class AxelixCachesEndpointTest {
         cache.put(key2, "value2");
 
         ResponseEntity<Void> response = testRestTemplate
-                .asEditor()
+                .asMaster()
                 .exchange(path(CLEAR_CACHE_MANAGER, TEST_CACHE_1 + "/clear"), HttpMethod.DELETE, null, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -253,10 +253,10 @@ class AxelixCachesEndpointTest {
 
         // when.
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForObject(path(ENABLE_CACHE_MANAGER, TEST_CACHE_1 + "/disable"), defaultEntity(), Void.class);
         testRestTemplate
-                .asEditor()
+                .asMaster()
                 .postForObject(path(ENABLE_CACHE_MANAGER, TEST_CACHE_1 + "/enable"), defaultEntity(), Void.class);
 
         // then.
@@ -274,7 +274,7 @@ class AxelixCachesEndpointTest {
         disabledCache.put("key1", "value");
 
         testRestTemplate
-                .asAdmin()
+                .asMaster()
                 .postForObject(
                         path(DISABLE_CACHE_MANAGER, targetDisabledCache + "/disable"), defaultEntity(), Void.class);
 
@@ -289,7 +289,7 @@ class AxelixCachesEndpointTest {
 
     @Test
     void caches_shouldReturnAllCachesWithEnabledStatus() {
-        ResponseEntity<CachesFeed> response = testRestTemplate.asViewer().getForEntity(rootPath(), CachesFeed.class);
+        ResponseEntity<CachesFeed> response = testRestTemplate.asMaster().getForEntity(rootPath(), CachesFeed.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         CacheManagerDto cacheManager = getCacheManager(response.getBody(), MAIN_CACHE_MANAGER);
@@ -318,11 +318,11 @@ class AxelixCachesEndpointTest {
         mainCacheManager.getCache(TEST_CACHE_1);
 
         testRestTemplate
-                .asEditor()
+                .asMaster()
                 .postForObject(path(ENABLE_CACHE_MANAGER, TEST_CACHE_1 + "/disable"), defaultEntity(), Void.class);
 
         ResponseEntity<CachesFeed> afterDisablingResponse =
-                testRestTemplate.asEditor().getForEntity(rootPath(), CachesFeed.class);
+                testRestTemplate.asMaster().getForEntity(rootPath(), CachesFeed.class);
         assertThat(afterDisablingResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         CacheDto disabledCache =
@@ -333,11 +333,11 @@ class AxelixCachesEndpointTest {
         assertThat(disabledCache.getEnabled()).isFalse();
 
         testRestTemplate
-                .asEditor()
+                .asMaster()
                 .postForObject(path(ENABLE_CACHE_MANAGER, TEST_CACHE_1 + "/enable"), defaultEntity(), Void.class);
 
         ResponseEntity<CachesFeed> afterEnablingResponse =
-                testRestTemplate.asEditor().getForEntity(rootPath(), CachesFeed.class);
+                testRestTemplate.asMaster().getForEntity(rootPath(), CachesFeed.class);
         assertThat(afterEnablingResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         CacheDto enabledCache =
@@ -351,10 +351,10 @@ class AxelixCachesEndpointTest {
     @Test
     void disable_shouldShowMixedEnabledStatusWhenSomeCachesAreDisabled() {
         testRestTemplate
-                .asEditor()
+                .asMaster()
                 .postForObject(path(DISABLE_CACHE_MANAGER, TEST_CACHE_1 + "/disable"), defaultEntity(), Void.class);
 
-        ResponseEntity<CachesFeed> response = testRestTemplate.asAdmin().getForEntity(rootPath(), CachesFeed.class);
+        ResponseEntity<CachesFeed> response = testRestTemplate.asMaster().getForEntity(rootPath(), CachesFeed.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -378,7 +378,7 @@ class AxelixCachesEndpointTest {
     @Disabled
     void enableCache_shouldHandleNonExistentCache() {
         ResponseEntity<Void> response = testRestTemplate
-                .asEditor()
+                .asMaster()
                 .postForEntity(path(ENABLE_CACHE_MANAGER, "/nonExistentCache/enable"), defaultEntity(), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -387,7 +387,7 @@ class AxelixCachesEndpointTest {
     @Test
     void disableCache_shouldHandleNonExistentCache() {
         ResponseEntity<Void> response = testRestTemplate
-                .asEditor()
+                .asMaster()
                 .postForEntity(path(DISABLE_CACHE_MANAGER, "/nonExistentCache/disable"), defaultEntity(), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -397,7 +397,7 @@ class AxelixCachesEndpointTest {
     @MethodSource("nonExistentManagerAndCachePaths")
     void cacheOperation_shouldThrowExceptionForNonExistentManager(String cacheManagerName, String relativePath) {
         ResponseEntity<String> response = testRestTemplate
-                .asEditor()
+                .asMaster()
                 .postForEntity(path(cacheManagerName, relativePath), defaultEntity(), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);

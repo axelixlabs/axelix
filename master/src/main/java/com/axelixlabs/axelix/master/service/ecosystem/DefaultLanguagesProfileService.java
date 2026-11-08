@@ -25,11 +25,11 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.LanguagesProfileResponse;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.ApplicationLanguages;
+import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
 import static com.axelixlabs.axelix.master.api.external.response.dashboard.LanguagesProfileResponse.JavaReleaseUsage;
 import static com.axelixlabs.axelix.master.api.external.response.dashboard.LanguagesProfileResponse.JdkVendorUsage;

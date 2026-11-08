@@ -27,16 +27,16 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.NullMarked;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TokenClaim;
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.contract.jwt.AxelixJwtToken;
 import com.axelixlabs.axelix.common.contract.jwt.JwtRole;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.Role;
+import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
+import com.axelixlabs.axelix.master.domain.auth.User;
 
 /**
  * Service responsible for generating JWT tokens from {@link User} instances.

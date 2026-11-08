@@ -35,9 +35,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
+import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebRequestContext;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;

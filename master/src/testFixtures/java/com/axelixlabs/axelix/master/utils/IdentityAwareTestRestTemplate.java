@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.utils;
 import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.User;
 
 /**
  * {@link TestRestTemplate} which has a bounded {@link User} that executes all the requests.
