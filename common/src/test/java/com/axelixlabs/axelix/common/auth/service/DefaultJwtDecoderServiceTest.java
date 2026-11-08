@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -106,10 +107,10 @@ class DefaultJwtDecoderServiceTest {
 
     static Stream<Arguments> roles() {
         return Stream.of(
-                Arguments.of(TestRoles.VIEWER), Arguments.of(TestRoles.EDITOR), Arguments.of(TestRoles.ADMIN)
-                //            Arguments.of(DefaultRole.MANAGED_SERVICE)
-                //            TODO: For now decoder is not aware of the internal authorities
-                );
+                Arguments.of(TestRoles.VIEWER),
+                Arguments.of(TestRoles.EDITOR),
+                Arguments.of(TestRoles.ADMIN),
+                Arguments.of(DefaultRole.MANAGED_SERVICE));
     }
 
     @Test
@@ -213,14 +214,18 @@ class DefaultJwtDecoderServiceTest {
                         .containsExactly(CustomAuthority.CUSTOM_AUTHORITY.getName()));
     }
 
-    @Test
-    void shouldDropAuthorityUnknownToDecoder() {
-        Role role = new DefaultRole("VIEWER", Set.of((Authority) () -> "TOTALLY_UNKNOWN_AUTHORITY"));
+    @ParameterizedTest
+    @ValueSource(strings = {"TOTALLY_UNKNOWN_AUTHORITY", "INTERNAL.HEARTBEAT"})
+    void shouldDropAuthorityUnknownToDecoder(String authorityName) {
+        // given.
+        Role role = new DefaultRole("VIEWER", Set.of((Authority) () -> authorityName));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
 
+        // when.
         PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
 
+        // then.
         assertThat(decodedUser.getRoles())
                 .first()
                 .satisfies(r -> assertThat(r.getAuthorities()).isEmpty());

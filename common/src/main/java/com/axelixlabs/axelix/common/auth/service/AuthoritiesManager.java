@@ -22,13 +22,10 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.InternalAuthorities;
 
 /**
  * An abstraction that serves as the single accessor for all the {@link Authority authorities}
  * in the application.
- * <p>
- * Note, that this abstraction is now aware of the {@link InternalAuthorities}.
  *
  * @author Mikhail Polivakha
  */

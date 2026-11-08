@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.axelixlabs.axelix.common.auth.core.InternalAuthorities.HEART_BEATING_AUTHORITY;
-
 /**
  * Default {@link Role} backed by real {@link #authorities}.
  *
@@ -35,7 +33,7 @@ public final class DefaultRole implements Role {
     public static final Role MANAGED_SERVICE;
 
     static {
-        MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(HEART_BEATING_AUTHORITY));
+        MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of());
     }
 
     private final String name;
