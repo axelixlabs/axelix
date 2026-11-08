@@ -132,7 +132,7 @@ class SuperAdminUserAuthenticatorTest {
             assertThat(user).isNotNull();
             assertThat(user.getUsername()).isEqualTo(USERNAME);
             assertThat(user.getRoles())
-                    .extracting(Role::getName)
+                    .extracting(Role::name)
                     .containsExactly(SuperAdminUserAuthenticator.SUPER_ADMIN_ROLE_NAME);
         }
 

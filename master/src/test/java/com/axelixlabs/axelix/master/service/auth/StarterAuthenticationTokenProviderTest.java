@@ -76,7 +76,7 @@ class StarterAuthenticationTokenProviderTest {
         assertThat(decoded.getId()).isEqualTo(caller.getId());
         assertThat(decoded.getRoles())
                 .flatExtracting(role -> role.getEffectiveAuthorities())
-                .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.getAuthorities());
+                .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.authorities());
     }
 
     @ParameterizedTest
@@ -133,7 +133,7 @@ class StarterAuthenticationTokenProviderTest {
 
     private AuthoritiesService authoritiesService() {
         AuthoritiesService service = mock(AuthoritiesService.class);
-        for (com.axelixlabs.axelix.master.domain.auth.Authority authority : TestRoles.EDITOR.getAuthorities()) {
+        for (com.axelixlabs.axelix.master.domain.auth.Authority authority : TestRoles.EDITOR.authorities()) {
             when(service.decode(authority.getName())).thenReturn(authority);
         }
         return service;

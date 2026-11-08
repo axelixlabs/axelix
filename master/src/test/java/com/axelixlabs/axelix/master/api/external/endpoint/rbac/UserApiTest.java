@@ -184,7 +184,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldNotAuthenticateUserFromDatabaseWithInvalidCredentials() {
         userService.createLocal(
-                "db-user", null, null, "db-user@example.com", "db-password", Set.of(TestRoles.VIEWER.getName()));
+                "db-user", null, null, "db-user@example.com", "db-password", Set.of(TestRoles.VIEWER.name()));
 
         LoginRequest loginRequest = new LoginRequest("db-user", "wrong-password");
 

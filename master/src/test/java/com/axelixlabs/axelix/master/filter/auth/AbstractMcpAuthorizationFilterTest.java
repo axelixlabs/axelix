@@ -223,7 +223,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String password = "test-password";
 
             userService.createLocal(
-                    username, null, null, "test-email@example.com", password, Set.of(TestRoles.VIEWER.getName()));
+                    username, null, null, "test-email@example.com", password, Set.of(TestRoles.VIEWER.name()));
             String userId =
                     userService.findUserByUsername(username).orElseThrow().id();
 
@@ -282,7 +282,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "viewer-user";
             String password = "viewer-password";
             userService.createLocal(
-                    username, null, null, username + "@example.com", password, Set.of(TestRoles.VIEWER.getName()));
+                    username, null, null, username + "@example.com", password, Set.of(TestRoles.VIEWER.name()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -303,7 +303,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "viewer-user";
             String password = "viewer-password";
             userService.createLocal(
-                    username, null, null, username + "@example.com", password, Set.of(TestRoles.VIEWER.getName()));
+                    username, null, null, username + "@example.com", password, Set.of(TestRoles.VIEWER.name()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -347,7 +347,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
                     null,
                     null,
                     OidcSubjectHash.of(OIDC_ISSUER_URI, OIDC_SUBJECT),
-                    TestRoles.VIEWER.getName());
+                    TestRoles.VIEWER.name());
         }
 
         @Test

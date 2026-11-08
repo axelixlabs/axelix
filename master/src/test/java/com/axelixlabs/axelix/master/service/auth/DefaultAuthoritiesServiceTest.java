@@ -68,7 +68,7 @@ class DefaultAuthoritiesServiceTest {
         // then.
         assertThat(decoded.getRoles())
                 .singleElement()
-                .satisfies(role -> assertThat(role.getAuthorities()).containsExactly(authority));
+                .satisfies(role -> assertThat(role.authorities()).containsExactly(authority));
     }
 
     @Test

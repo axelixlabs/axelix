@@ -93,9 +93,9 @@ class DefaultRoleServiceTest {
         @Test
         void shouldReturnBuiltInRolesMatchingTheOnesTestsAreBuiltUpon() {
             // when.
-            Optional<Role> viewer = roleService.findByName(TestRoles.VIEWER.getName());
-            Optional<Role> editor = roleService.findByName(TestRoles.EDITOR.getName());
-            Optional<Role> admin = roleService.findByName(TestRoles.ADMIN.getName());
+            Optional<Role> viewer = roleService.findByName(TestRoles.VIEWER.name());
+            Optional<Role> editor = roleService.findByName(TestRoles.EDITOR.name());
+            Optional<Role> admin = roleService.findByName(TestRoles.ADMIN.name());
 
             // then.
             assertThat(viewer).hasValueSatisfying(role -> assertGrantsSameAs(role, TestRoles.VIEWER));
@@ -140,7 +140,7 @@ class DefaultRoleServiceTest {
         @Test
         void shouldReturnTheSingleRoleGrantedToTheUser() {
             // given.
-            String userId = createUserWithRoles(TestRoles.VIEWER.getName());
+            String userId = createUserWithRoles(TestRoles.VIEWER.name());
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
@@ -152,16 +152,16 @@ class DefaultRoleServiceTest {
         @Test
         void shouldReturnEveryRoleWithItsAuthorities() {
             // given.
-            String userId = createUserWithRoles(TestRoles.ADMIN.getName(), TestRoles.EDITOR.getName());
+            String userId = createUserWithRoles(TestRoles.ADMIN.name(), TestRoles.EDITOR.name());
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
 
             // then.
             assertThat(roles).hasSize(2);
-            assertThat(roleNamed(roles, TestRoles.ADMIN.getName()))
+            assertThat(roleNamed(roles, TestRoles.ADMIN.name()))
                     .satisfies(role -> assertGrantsSameAs(role, TestRoles.ADMIN));
-            assertThat(roleNamed(roles, TestRoles.EDITOR.getName()))
+            assertThat(roleNamed(roles, TestRoles.EDITOR.name()))
                     .satisfies(role -> assertGrantsSameAs(role, TestRoles.EDITOR));
         }
 
@@ -181,7 +181,7 @@ class DefaultRoleServiceTest {
 
         private static Role roleNamed(Set<Role> roles, String name) {
             return roles.stream()
-                    .filter(role -> role.getName().equals(name))
+                    .filter(role -> role.name().equals(name))
                     .findFirst()
                     .orElseThrow();
         }
@@ -201,12 +201,12 @@ class DefaultRoleServiceTest {
             Role child = roleService.findByName("CHILD").orElseThrow();
 
             // then. The parent is a component rather than its authorities being copied into the child
-            assertThat(child.getAuthorities())
+            assertThat(child.authorities())
                     .extracting(Authority::getName)
                     .containsExactly(TestAuthorities.GARBAGE_COLLECTOR.getName());
-            assertThat(child.getComponents()).singleElement().satisfies(parent -> {
-                assertThat(parent.getName()).isEqualTo("PARENT");
-                assertThat(parent.getAuthorities())
+            assertThat(child.components()).singleElement().satisfies(parent -> {
+                assertThat(parent.name()).isEqualTo("PARENT");
+                assertThat(parent.authorities())
                         .extracting(Authority::getName)
                         .containsExactly(TestAuthorities.CACHES_CLEAR.getName());
             });
@@ -296,35 +296,35 @@ class DefaultRoleServiceTest {
                     .containsExactlyInAnyOrder(
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b1",
-                                    TestRoles.VIEWER.getName(),
+                                    TestRoles.VIEWER.name(),
                                     "Read-only access to the monitored applications."),
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b2",
-                                    TestRoles.EDITOR.getName(),
+                                    TestRoles.EDITOR.name(),
                                     "Performs runtime operations on the monitored applications, including destructive"
                                             + " ones such as clearing caches."),
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b3",
-                                    TestRoles.ADMIN.getName(),
+                                    TestRoles.ADMIN.name(),
                                     "Everything an editor can do, plus reading sensitive configuration values."));
         }
 
         @Test
         void shouldCountTheUsersEachRoleIsAssignedTo() {
             // given.
-            userService.createLocal("alice", null, null, "alice@example.com", "p", Set.of(TestRoles.EDITOR.getName()));
-            userService.createLocal("bob", null, null, "bob@example.com", "p", Set.of(TestRoles.EDITOR.getName()));
-            userService.createLocal("carol", null, null, "carol@example.com", "p", Set.of(TestRoles.VIEWER.getName()));
+            userService.createLocal("alice", null, null, "alice@example.com", "p", Set.of(TestRoles.EDITOR.name()));
+            userService.createLocal("bob", null, null, "bob@example.com", "p", Set.of(TestRoles.EDITOR.name()));
+            userService.createLocal("carol", null, null, "carol@example.com", "p", Set.of(TestRoles.VIEWER.name()));
 
             // when.
             List<RoleProfile> feed = roleService.getRolesFeed();
 
             // then.
-            assertThat(entryNamed(feed, TestRoles.EDITOR.getName()).membersCount())
+            assertThat(entryNamed(feed, TestRoles.EDITOR.name()).membersCount())
                     .isEqualTo(2);
-            assertThat(entryNamed(feed, TestRoles.VIEWER.getName()).membersCount())
+            assertThat(entryNamed(feed, TestRoles.VIEWER.name()).membersCount())
                     .isEqualTo(1);
-            assertThat(entryNamed(feed, TestRoles.ADMIN.getName()).membersCount())
+            assertThat(entryNamed(feed, TestRoles.ADMIN.name()).membersCount())
                     .isZero();
         }
 
@@ -477,10 +477,10 @@ class DefaultRoleServiceTest {
     }
 
     private static void assertGrantsSameAs(Role actual, Role expected) {
-        assertThat(actual.getName()).isEqualTo(expected.getName());
-        assertThat(actual.getAuthorities())
+        assertThat(actual.name()).isEqualTo(expected.name());
+        assertThat(actual.authorities())
                 .extracting(Authority::getName)
-                .containsExactlyInAnyOrderElementsOf(expected.getAuthorities().stream()
+                .containsExactlyInAnyOrderElementsOf(expected.authorities().stream()
                         .map(Authority::getName)
                         .toList());
     }

@@ -156,12 +156,12 @@ public class OAuth2CallbackController {
                     metadata.lastName() == null ? entity.lastName() : metadata.lastName(),
                     metadata.email(),
                     null,
-                    Set.of(role.getName()),
+                    Set.of(role.name()),
                     Instant.now());
             return entity.id();
         } else {
             return userService.createFromOidc(
-                    username, metadata.firstName(), metadata.lastName(), metadata.email(), oidcSubject, role.getName());
+                    username, metadata.firstName(), metadata.lastName(), metadata.email(), oidcSubject, role.name());
         }
     }
 

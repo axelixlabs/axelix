@@ -102,13 +102,13 @@ class DefaultUserJwtDecoderServiceTest {
         // then.
         assertThat(decodedUser.getRoles()).hasSize(1);
         assertThat(decodedUser.getRoles().stream()
-                        .filter(it -> it.getName().equals(role.getName()))
+                        .filter(it -> it.name().equals(role.name()))
                         .findFirst()
                         .orElseThrow()
-                        .getAuthorities())
+                        .authorities())
                 .extracting(Authority::getName)
                 .containsExactlyInAnyOrderElementsOf(
-                        role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList()));
+                        role.authorities().stream().map(Authority::getName).collect(Collectors.toList()));
     }
 
     static Stream<Arguments> roles() {
@@ -127,32 +127,32 @@ class DefaultUserJwtDecoderServiceTest {
         // Admin
         assertThat(decodedUser.getRoles()).hasSize(3);
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals(TestRoles.ADMIN.getName()))
+                        .filter(role -> role.name().equals(TestRoles.ADMIN.name()))
                         .findFirst()
                         .orElseThrow()
-                        .getAuthorities())
+                        .authorities())
                 .extracting(Authority::getName)
-                .containsExactlyInAnyOrderElementsOf(TestRoles.ADMIN.getAuthorities().stream()
+                .containsExactlyInAnyOrderElementsOf(TestRoles.ADMIN.authorities().stream()
                         .map(Authority::getName)
                         .collect(Collectors.toList()));
 
         // Editor
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals(TestRoles.EDITOR.getName()))
+                        .filter(role -> role.name().equals(TestRoles.EDITOR.name()))
                         .findFirst()
                         .orElseThrow()
-                        .getAuthorities())
+                        .authorities())
                 .extracting(Authority::getName)
-                .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.getAuthorities().stream()
+                .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.authorities().stream()
                         .map(Authority::getName)
                         .collect(Collectors.toList()));
 
         // Viewer
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals(TestRoles.VIEWER.getName()))
+                        .filter(role -> role.name().equals(TestRoles.VIEWER.name()))
                         .findFirst()
                         .orElseThrow()
-                        .getAuthorities())
+                        .authorities())
                 .isEmpty();
     }
 
@@ -170,10 +170,10 @@ class DefaultUserJwtDecoderServiceTest {
         // then.
         assertThat(decodedUser.getUsername()).isEqualTo(USER_NAME);
         assertThat(decodedUser.getRoles()).singleElement().satisfies(role -> {
-            assertThat(role.getName()).isEqualTo(TestRoles.EDITOR.getName());
-            assertThat(role.getAuthorities())
+            assertThat(role.name()).isEqualTo(TestRoles.EDITOR.name());
+            assertThat(role.authorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.getAuthorities().stream()
+                    .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.authorities().stream()
                             .map(Authority::getName)
                             .collect(Collectors.toList()));
         });
@@ -194,10 +194,10 @@ class DefaultUserJwtDecoderServiceTest {
         // then.
         assertThat(decodedUser.getUsername()).isEqualTo(USER_NAME);
         assertThat(decodedUser.getRoles()).singleElement().satisfies(role -> {
-            assertThat(role.getName()).isEqualTo(TestRoles.ADMIN.getName());
-            assertThat(role.getAuthorities())
+            assertThat(role.name()).isEqualTo(TestRoles.ADMIN.name());
+            assertThat(role.authorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrderElementsOf(TestRoles.ADMIN.getAuthorities().stream()
+                    .containsExactlyInAnyOrderElementsOf(TestRoles.ADMIN.authorities().stream()
                             .map(Authority::getName)
                             .collect(Collectors.toList()));
         });
@@ -213,7 +213,7 @@ class DefaultUserJwtDecoderServiceTest {
 
         assertThat(decodedUser.getRoles())
                 .first()
-                .satisfies(r -> assertThat(r.getAuthorities())
+                .satisfies(r -> assertThat(r.authorities())
                         .extracting(Authority::getName)
                         .containsExactly(CustomAuthority.CUSTOM_AUTHORITY.getName()));
     }
@@ -232,7 +232,7 @@ class DefaultUserJwtDecoderServiceTest {
         // then.
         assertThat(decodedUser.getRoles())
                 .first()
-                .satisfies(r -> assertThat(r.getAuthorities()).isEmpty());
+                .satisfies(r -> assertThat(r.authorities()).isEmpty());
     }
 
     @Test
