@@ -22,13 +22,9 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
  * Default implementation of {@link EnvironmentService}
@@ -37,41 +33,19 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
  */
 public class DefaultEnvironmentService implements EnvironmentService {
 
-    private static final OssAuthority FULL_ACCESS_AUTHORITY = OssAuthority.ENV_VALUES_READ;
-
     private final EnvironmentEndpoint delegate;
-    private final EnvironmentEndpoint sanitizedDelegate;
     private final EnvPropertyEnricher envPropertyEnricher;
-    private final RequiredAuthorityCheckService requiredAuthorityCheckService;
 
-    public DefaultEnvironmentService(
-            Environment environment,
-            SmartSanitizingFunction smartSanitizingFunction,
-            EnvPropertyEnricher envPropertyEnricher,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
+    public DefaultEnvironmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
         this.envPropertyEnricher = envPropertyEnricher;
         this.delegate = new EnvironmentEndpoint(environment, List.of());
-        this.sanitizedDelegate = new EnvironmentEndpoint(environment, List.of(smartSanitizingFunction));
-        this.requiredAuthorityCheckService = requiredAuthorityCheckService;
 
-        // Spring Boot 2.7 has default sanitization keys (password, secret, key, token, etc.)
-        // To rely purely on our SmartSanitizingFunction and ensure identical behavior for both
-        // delegates, we explicitly clear the default list with setKeysToSanitize().
+        // Spring Boot 2.7 has default sanitization keys (password, secret, key, token, etc.).
+        // Clear them so that sanitization decisions can be made by Axelix Master.
         this.delegate.setKeysToSanitize();
-        this.sanitizedDelegate.setKeysToSanitize();
     }
 
     public EnvironmentFeed getEnvironmentFeed(@Nullable String pattern) {
-        boolean hasAuthority = requiredAuthorityCheckService.hasAuthority(FULL_ACCESS_AUTHORITY);
-
-        EnvironmentDescriptor originalDescriptor;
-
-        if (hasAuthority) {
-            originalDescriptor = delegate.environment(pattern);
-        } else {
-            originalDescriptor = sanitizedDelegate.environment(pattern);
-        }
-
-        return envPropertyEnricher.enrich(originalDescriptor);
+        return envPropertyEnricher.enrich(delegate.environment(pattern));
     }
 }

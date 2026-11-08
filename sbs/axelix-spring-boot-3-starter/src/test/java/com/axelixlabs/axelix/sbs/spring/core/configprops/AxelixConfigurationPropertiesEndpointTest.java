@@ -53,7 +53,7 @@ public class AxelixConfigurationPropertiesEndpointTest extends AbstractConfigPro
 
     @ParameterizedTest
     @MethodSource("propertiesFeed")
-    void shouldReturnPropertiesNameAndValue_forNonAdminRoles(String propertyName, String expectedValue, Role role) {
+    void shouldReturnPropertiesNameAndValueRegardlessOfRole(String propertyName, String expectedValue, Role role) {
         ResponseEntity<ConfigurationPropertiesFeed> response = restTemplate
                 .withRole(role)
                 .getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
@@ -73,14 +73,14 @@ public class AxelixConfigurationPropertiesEndpointTest extends AbstractConfigPro
 
     private static Stream<Arguments> propertiesFeed() {
         return Stream.of(
-                Arguments.of("tags.environment", "******", TestRoles.VIEWER),
-                Arguments.of("tags.version", "******", TestRoles.VIEWER),
-                Arguments.of("tags.forSanitization", "******", TestRoles.VIEWER),
-                Arguments.of("tags.FOR_SANITIZATION", "******", TestRoles.VIEWER),
-                Arguments.of("tags.environment", "******", TestRoles.EDITOR),
-                Arguments.of("tags.version", "******", TestRoles.EDITOR),
-                Arguments.of("tags.forSanitization", "******", TestRoles.EDITOR),
-                Arguments.of("tags.FOR_SANITIZATION", "******", TestRoles.EDITOR),
+                Arguments.of("tags.environment", "test", TestRoles.VIEWER),
+                Arguments.of("tags.version", "1.0.0", TestRoles.VIEWER),
+                Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.VIEWER),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.VIEWER),
+                Arguments.of("tags.environment", "test", TestRoles.EDITOR),
+                Arguments.of("tags.version", "1.0.0", TestRoles.EDITOR),
+                Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.EDITOR),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.EDITOR),
                 Arguments.of("tags.environment", "test", TestRoles.ADMIN),
                 Arguments.of("tags.version", "1.0.0", TestRoles.ADMIN),
                 Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.ADMIN),

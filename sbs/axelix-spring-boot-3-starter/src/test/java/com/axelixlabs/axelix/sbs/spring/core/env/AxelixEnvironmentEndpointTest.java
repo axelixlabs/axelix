@@ -98,8 +98,8 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
     }
 
     @ParameterizedTest(name = "Property ''{0}'' should have value ''{1}'' for ''{2}''")
-    @MethodSource("sanitizationArgsSource")
-    void shouldReturnACorrectValueForTheGivenPropertyConsideringTheRole(String propertyName, String value, Role role) {
+    @MethodSource("propertyValues")
+    void shouldReturnPropertyValueRegardlessOfRole(String propertyName, String value, Role role) {
         ResponseEntity<EnvironmentFeed> response =
                 restTemplate.withRole(role).getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
@@ -191,12 +191,12 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
                 Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
     }
 
-    public static Stream<Arguments> sanitizationArgsSource() {
+    public static Stream<Arguments> propertyValues() {
         return Stream.of(
-                Arguments.of("axelix.env.test.toBeSanitized", "******", TestRoles.EDITOR),
-                Arguments.of("AXELIX_FOR_SANITIZATION", "******", TestRoles.EDITOR),
-                Arguments.of("axelix.env.test.toBeSanitized", "******", TestRoles.VIEWER),
-                Arguments.of("AXELIX_FOR_SANITIZATION", "******", TestRoles.VIEWER),
+                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", TestRoles.EDITOR),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", TestRoles.EDITOR),
+                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", TestRoles.VIEWER),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", TestRoles.VIEWER),
                 Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", TestRoles.ADMIN),
                 Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", TestRoles.ADMIN));
     }

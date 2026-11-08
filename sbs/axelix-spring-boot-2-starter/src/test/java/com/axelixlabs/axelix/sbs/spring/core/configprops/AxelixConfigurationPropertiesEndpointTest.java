@@ -44,10 +44,7 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
-import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -90,7 +87,7 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
     @ParameterizedTest
     @MethodSource("propertiesFeed")
-    void shouldReturnPropertiesNameAndValue_forNonAdminRoles(String propertyName, String expectedValue, Role role) {
+    void shouldReturnPropertiesNameAndValueRegardlessOfRole(String propertyName, String expectedValue, Role role) {
         ResponseEntity<ConfigurationPropertiesFeed> response = restTemplate
                 .withRole(role)
                 .getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
@@ -115,10 +112,10 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
     private static Stream<Arguments> propertiesFeed() {
         return Stream.of(
-                Arguments.of("tags.forSanitization", "******", TestRoles.VIEWER),
-                Arguments.of("tags.FOR_SANITIZATION", "******", TestRoles.VIEWER),
-                Arguments.of("tags.forSanitization", "******", TestRoles.EDITOR),
-                Arguments.of("tags.FOR_SANITIZATION", "******", TestRoles.EDITOR),
+                Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.VIEWER),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.VIEWER),
+                Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.EDITOR),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.EDITOR),
                 Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.ADMIN),
                 Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.ADMIN),
                 Arguments.of("tags.version", "1.0.0", TestRoles.VIEWER),
@@ -264,34 +261,10 @@ public class AxelixConfigurationPropertiesEndpointTest {
         }
 
         @Bean
-        public PropertyNameNormalizer propertyNameNormalizer() {
-            return new DefaultPropertyNameNormalizer();
-        }
-
-        @Bean
-        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(
-                    List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
-                    propertyNameNormalizer);
-        }
-
-        @Bean
-        public RequiredAuthorityCheckService requiredAuthorityCheckService(
-                SecurityContextExecutor securityContextExecutor) {
-            return new RequiredAuthorityCheckService(securityContextExecutor);
-        }
-
-        @Bean
         public ConfigurationPropertiesService configurationPropertiesService(
-                SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,
-                ConfigurationPropertiesConverter configurationPropertiesConverter,
-                RequiredAuthorityCheckService requiredAuthorityCheckService) {
-            return new DefaultConfigurationPropertiesService(
-                    smartSanitizingFunction,
-                    applicationContext,
-                    configurationPropertiesConverter,
-                    requiredAuthorityCheckService);
+                ConfigurationPropertiesConverter configurationPropertiesConverter) {
+            return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
         }
 
         @Bean

@@ -20,60 +20,37 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import java.util.List;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ApplicationConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 
 /**
  * Default implementation of {@link ConfigurationPropertiesService}.
  *
  * @since 13.11.2025
+ *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
 public class DefaultConfigurationPropertiesService implements ConfigurationPropertiesService {
 
-    private static final OssAuthority FULL_ACCESS_AUTHORITY = OssAuthority.CONFIG_PROPS_VALUES_READ;
-
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
     private final ConfigurationPropertiesReportEndpoint delegate;
-    private final ConfigurationPropertiesReportEndpoint sanitizedDelegate;
-    private final RequiredAuthorityCheckService requiredAuthorityCheckService;
 
     public DefaultConfigurationPropertiesService(
-            SmartSanitizingFunction smartSanitizingFunction,
-            ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
+            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
+
         this.configurationPropertiesConverter = configurationPropertiesConverter;
-        this.requiredAuthorityCheckService = requiredAuthorityCheckService;
         this.delegate = new ConfigurationPropertiesReportEndpoint(List.of());
         this.delegate.setApplicationContext(applicationContext);
-        this.sanitizedDelegate = new ConfigurationPropertiesReportEndpoint(List.of(smartSanitizingFunction));
-        this.sanitizedDelegate.setApplicationContext(applicationContext);
 
         // Spring Boot 2.7 has default sanitization keys (password, secret, key, token, etc.).
-        // To rely purely on our SmartSanitizingFunction and ensure identical behavior for all delegates
-        // and across all versions of our starter, we explicitly clear the default list with setKeysToSanitize().
+        // Clear them so that sanitization decisions can be made by Axelix Master.
         this.delegate.setKeysToSanitize();
-        this.sanitizedDelegate.setKeysToSanitize();
     }
 
     public ConfigurationPropertiesFeed getConfigProps() {
-        boolean hasAuthority = requiredAuthorityCheckService.hasAuthority(FULL_ACCESS_AUTHORITY);
-
-        ApplicationConfigurationProperties originalDescriptor;
-
-        if (hasAuthority) {
-            originalDescriptor = delegate.configurationProperties();
-        } else {
-            originalDescriptor = sanitizedDelegate.configurationProperties();
-        }
-
-        return configurationPropertiesConverter.convert(originalDescriptor);
+        return configurationPropertiesConverter.convert(delegate.configurationProperties());
     }
 }

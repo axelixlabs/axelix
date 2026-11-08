@@ -20,11 +20,13 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
@@ -35,10 +37,10 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  */
 public class ManagedServiceWebIdentityAccessManager implements WebIdentityAccessManager {
 
-    private final JwtDecoderService jwtDecoderService;
+    private final TechUserJwtDeserializer techUserJwtDeserializer;
 
-    public ManagedServiceWebIdentityAccessManager(JwtDecoderService jwtDecoderService) {
-        this.jwtDecoderService = jwtDecoderService;
+    public ManagedServiceWebIdentityAccessManager(TechUserJwtDeserializer techUserJwtDeserializer) {
+        this.techUserJwtDeserializer = techUserJwtDeserializer;
     }
 
     @Override
@@ -53,7 +55,12 @@ public class ManagedServiceWebIdentityAccessManager implements WebIdentityAccess
         // we need to check here that:
         // 1. user is actually axelix master, so that other tokens from other starters are not applicable for us
         // 2. we also need to split the jwt decoding/encoding services for starter/master-accepted tokens.
-        PasswordlessUser decodedTokenToUser = jwtDecoderService.decodeTokenToUser(token);
+        PasswordlessUser decodedTokenToUser = techUserJwtDeserializer.decodeTokenToUser(token);
+        TechUser deserialize = techUserJwtDeserializer.deserialize(token);
+
+        if (TechUser.MASTER.getId().equals(deserialize.getId())) {
+            return
+        }
 
         return decodedTokenToUser;
     }

@@ -30,9 +30,7 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
  * Base class for the {@code configprops} integration tests.
  *
  * <p>It fixes a single, shared merged context configuration (the same {@code classes}, properties and imports)
- * so that every subclass resolves to the <strong>same cached</strong> Spring {@link ApplicationContext}. The
- * differing sanitization behavior is provided by the named service beans declared in
- * {@link ConfigPropsTestSupportConfiguration}.
+ * so that every subclass resolves to the <strong>same cached</strong> Spring {@link ApplicationContext}.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov

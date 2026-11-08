@@ -21,21 +21,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
-import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.contract.env.Property;
-import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
-import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -46,94 +38,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
 
-    private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
+    @Autowired
+    private EnvironmentService environmentService;
 
-    @Nested
-    class WithoutExplicitSanitizationProperties {
+    @Test
+    void shouldReturnEnvironmentWithoutSanitization() {
+        // when.
+        EnvironmentFeed environmentFeed = environmentService.getEnvironmentFeed(null);
 
-        @Autowired
-        @Qualifier(EnvSharedTestConfig.SANITIZE_ALL_ENVIRONMENT_SERVICE)
-        private EnvironmentService environmentService;
+        // then.
+        Set<@Nullable String> values = environmentFeed.getPropertySources().stream()
+                .flatMap(propertySource -> propertySource.getProperties().stream())
+                .map(Property::getValue)
+                .collect(Collectors.toSet());
 
-        @Test
-        void shouldReturnSanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
-            // when.
-            User user = fromAuthorities();
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
-                    () -> environmentService.getEnvironmentFeed(null), securityContext);
-
-            // then.
-            Set<@Nullable String> values = environmentFeed.getPropertySources().stream()
-                    .flatMap(propertySource -> propertySource.getProperties().stream())
-                    .map(Property::getValue)
-                    .collect(Collectors.toSet());
-
-            assertThat(values).containsOnly("******");
-        }
-
-        @Test
-        void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
-            // when.
-            User user = fromAuthorities(OssAuthority.ENV_VALUES_READ);
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
-                    () -> environmentService.getEnvironmentFeed(null), securityContext);
-
-            // then.
-            Set<@Nullable String> values = environmentFeed.getPropertySources().stream()
-                    .flatMap(propertySource -> propertySource.getProperties().stream())
-                    .map(Property::getValue)
-                    .collect(Collectors.toSet());
-
-            assertThat(values).doesNotContain("******");
-        }
-    }
-
-    @Nested
-    class WithExplicitSanitizationProperties {
-
-        @Autowired
-        @Qualifier(EnvSharedTestConfig.EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE)
-        private EnvironmentService environmentService;
-
-        @Test
-        void shouldReturnOnlyExplicitlySanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
-            // when.
-            User user = fromAuthorities();
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
-                    () -> environmentService.getEnvironmentFeed(null), securityContext);
-
-            // then.
-            Set<String> sanitizedPropertyNames = environmentFeed.getPropertySources().stream()
-                    .flatMap(propertySource -> propertySource.getProperties().stream())
-                    .filter(property -> "******".equals(property.getValue()))
-                    .map(Property::getName)
-                    .collect(Collectors.toSet());
-
-            assertThat(sanitizedPropertyNames)
-                    .containsOnly(
-                            "axelix.prop.test.tags.forSanitization",
-                            "axelix.prop.test.tags.FOR_SANITIZATION",
-                            "axelix.env.test.toBeSanitized");
-        }
-
-        @Test
-        void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
-            // when.
-            User user = fromAuthorities(OssAuthority.ENV_VALUES_READ);
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
-                    () -> environmentService.getEnvironmentFeed(null), securityContext);
-
-            // then.
-            Set<@Nullable String> values = environmentFeed.getPropertySources().stream()
-                    .flatMap(propertySource -> propertySource.getProperties().stream())
-                    .map(Property::getValue)
-                    .collect(Collectors.toSet());
-
-            assertThat(values).doesNotContain("******");
-        }
+        assertThat(values).contains("shouldBeSanitized", "toBeSanitized").doesNotContain("******");
     }
 }

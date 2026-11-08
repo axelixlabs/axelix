@@ -60,7 +60,7 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
             "test.inner.timeout=1500",
             "test.inner.constructor.timeout=2500",
             "test.method.timeout=4200",
-            // DefaultEnvironmentServiceTest (explicit sanitization scenario)
+            // DefaultEnvironmentServiceTest
             "axelix.prop.test.tags.forSanitization=toBeSanitized",
             "axelix.prop.test.tags.FOR_SANITIZATION=toBeSanitized",
             // AxelixEnvironmentEndpointTest

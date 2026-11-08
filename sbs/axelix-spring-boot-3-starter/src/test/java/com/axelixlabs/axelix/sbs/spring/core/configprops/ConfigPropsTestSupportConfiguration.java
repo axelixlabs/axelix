@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -28,21 +27,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SharedAxelixConfigurationProperties;
 
 /**
  * Shared test configuration for the {@code configprops} integration tests.
- *
- * <p>It provides the beans common to every configprops integration test and registers a single shared
- * {@link SharedAxelixConfigurationProperties} binding. The {@link DefaultConfigurationPropertiesService}
- * beans differ only in their {@link SmartSanitizingFunction} configuration; declaring them in the same
- * context lets the tests select the desired sanitization behavior by qualifier while still sharing one
- * cached Spring context. The {@link AxelixConfigurationPropertiesEndpoint} is wired to the service that
- * sanitizes the {@code forSanitization} tags so the HTTP endpoint test can exercise it.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
@@ -52,11 +40,6 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportC
 @TestConfiguration
 @EnableConfigurationProperties(SharedAxelixConfigurationProperties.class)
 public class ConfigPropsTestSupportConfiguration {
-
-    public static final String SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE =
-            "sanitizeAllConfigurationPropertiesService";
-    public static final String EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE =
-            "explicitlySanitizedConfigurationPropertiesService";
 
     @Bean
     public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
@@ -70,55 +53,14 @@ public class ConfigPropsTestSupportConfiguration {
     }
 
     @Bean
-    public PropertyNameNormalizer propertyNameNormalizer() {
-        return new DefaultPropertyNameNormalizer();
-    }
-
-    @Bean
-    public RequiredAuthorityCheckService requiredAuthorityCheckService(
-            SecurityContextExecutor securityContextExecutor) {
-        return new RequiredAuthorityCheckService(securityContextExecutor);
-    }
-
-    @Bean(name = SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE)
-    public DefaultConfigurationPropertiesService sanitizeAllConfigurationPropertiesService(
-            ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
-            RequiredAuthorityCheckService requiredAuthorityCheckService,
-            PropertyNameNormalizer propertyNameNormalizer) {
-        SmartSanitizingFunction smartSanitizingFunction =
-                new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
-        return new DefaultConfigurationPropertiesService(
-                smartSanitizingFunction,
-                applicationContext,
-                configurationPropertiesConverter,
-                requiredAuthorityCheckService);
-    }
-
-    @Bean(name = EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE)
-    public DefaultConfigurationPropertiesService explicitlySanitizedConfigurationPropertiesService(
-            ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
-            RequiredAuthorityCheckService requiredAuthorityCheckService,
-            PropertyNameNormalizer propertyNameNormalizer) {
-        SmartSanitizingFunction smartSanitizingFunction = new SmartSanitizingFunction(
-                List.of(
-                        "axelix.prop.test.tags.environment",
-                        "axelix.prop.test.tags.version",
-                        "axelix.prop.test.tags.forSanitization",
-                        "axelix.prop.test.tags.FOR_SANITIZATION"),
-                propertyNameNormalizer);
-        return new DefaultConfigurationPropertiesService(
-                smartSanitizingFunction,
-                applicationContext,
-                configurationPropertiesConverter,
-                requiredAuthorityCheckService);
+    public ConfigurationPropertiesService configurationPropertiesService(
+            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
+        return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
     }
 
     @Bean
     public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-            @Qualifier(EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE)
-                    DefaultConfigurationPropertiesService configurationPropertiesService,
+            ConfigurationPropertiesService configurationPropertiesService,
             SecurityContextExecutor securityContextExecutor) {
         return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService, securityContextExecutor);
     }

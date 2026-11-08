@@ -20,13 +20,10 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import java.util.List;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.context.ApplicationContext;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 
 /**
  * Default implementation of {@link ConfigurationPropertiesService}.
@@ -38,40 +35,19 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
  */
 public class DefaultConfigurationPropertiesService implements ConfigurationPropertiesService {
 
-    private static final OssAuthority FULL_ACCESS_AUTHORITY = OssAuthority.CONFIG_PROPS_VALUES_READ;
-
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
     private final ConfigurationPropertiesReportEndpoint delegate;
-    private final ConfigurationPropertiesReportEndpoint sanitizedDelegate;
-    private final RequiredAuthorityCheckService requiredAuthorityCheckService;
 
     public DefaultConfigurationPropertiesService(
-            SmartSanitizingFunction smartSanitizingFunction,
-            ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
+            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
         this.configurationPropertiesConverter = configurationPropertiesConverter;
-        this.requiredAuthorityCheckService = requiredAuthorityCheckService;
 
-        // ALWAYS is required here in order for Spring Boot to invoke our custom sanitization function
+        // ALWAYS is required here so that property values are included in the response.
         this.delegate = new ConfigurationPropertiesReportEndpoint(List.of(), Show.ALWAYS);
         this.delegate.setApplicationContext(applicationContext);
-        this.sanitizedDelegate =
-                new ConfigurationPropertiesReportEndpoint(List.of(smartSanitizingFunction), Show.ALWAYS);
-        this.sanitizedDelegate.setApplicationContext(applicationContext);
     }
 
     public ConfigurationPropertiesFeed getConfigProps() {
-        boolean hasAuthority = requiredAuthorityCheckService.hasAuthority(FULL_ACCESS_AUTHORITY);
-
-        ConfigurationPropertiesDescriptor originalDescriptor;
-
-        if (hasAuthority) {
-            originalDescriptor = delegate.configurationProperties();
-        } else {
-            originalDescriptor = sanitizedDelegate.configurationProperties();
-        }
-
-        return configurationPropertiesConverter.convert(originalDescriptor);
+        return configurationPropertiesConverter.convert(delegate.configurationProperties());
     }
 }

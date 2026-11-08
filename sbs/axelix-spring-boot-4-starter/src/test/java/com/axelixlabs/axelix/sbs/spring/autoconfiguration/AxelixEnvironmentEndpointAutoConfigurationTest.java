@@ -23,7 +23,6 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
@@ -59,7 +58,6 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
             assertThat(context).hasSingleBean(AxelixEnvironmentEndpoint.class);
             assertThat(context).hasSingleBean(ValueInjectionTrackerBeanPostProcessor.class);
             assertThat(context).hasSingleBean(EnvironmentService.class);
-            assertThat(context).hasSingleBean(RequiredAuthorityCheckService.class);
         });
     }
 

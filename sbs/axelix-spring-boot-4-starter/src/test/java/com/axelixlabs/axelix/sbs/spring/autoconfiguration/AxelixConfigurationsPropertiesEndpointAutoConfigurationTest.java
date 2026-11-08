@@ -24,7 +24,6 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
@@ -57,7 +56,6 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             assertThat(context).hasSingleBean(SmartSanitizingFunction.class);
             assertThat(context).hasSingleBean(ConfigurationPropertiesService.class);
             assertThat(context).hasSingleBean(AxelixConfigurationPropertiesEndpoint.class);
-            assertThat(context).hasSingleBean(RequiredAuthorityCheckService.class);
             assertThat(context).hasSingleBean(SecurityContextExecutor.class);
         });
     }
@@ -90,7 +88,6 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesConverter.class);
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesFlattener.class);
             assertThat(context).doesNotHaveBean(SecurityContextExecutor.class);
-            assertThat(context).doesNotHaveBean(RequiredAuthorityCheckService.class);
         });
     }
 }

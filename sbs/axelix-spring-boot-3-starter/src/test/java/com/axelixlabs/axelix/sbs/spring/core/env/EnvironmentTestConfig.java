@@ -27,7 +27,6 @@ import org.springframework.core.env.Environment;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
@@ -35,7 +34,6 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationProperties
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
  * Environment test configuration.
@@ -63,32 +61,14 @@ public class EnvironmentTestConfig {
     }
 
     @Bean
-    public RequiredAuthorityCheckService requiredAuthorityCheckService(
-            SecurityContextExecutor securityContextExecutor) {
-        return new RequiredAuthorityCheckService(securityContextExecutor);
-    }
-
-    @Bean
-    public EnvironmentService environmentService(
-            Environment environment,
-            SmartSanitizingFunction smartSanitizingFunction,
-            EnvPropertyEnricher envPropertyEnricher,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
-        return new DefaultEnvironmentService(
-                environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
+    public EnvironmentService environmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
+        return new DefaultEnvironmentService(environment, envPropertyEnricher);
     }
 
     @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
-            SmartSanitizingFunction smartSanitizingFunction,
-            ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
-        return new DefaultConfigurationPropertiesService(
-                smartSanitizingFunction,
-                applicationContext,
-                configurationPropertiesConverter,
-                requiredAuthorityCheckService);
+            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
+        return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
     }
 
     @Bean

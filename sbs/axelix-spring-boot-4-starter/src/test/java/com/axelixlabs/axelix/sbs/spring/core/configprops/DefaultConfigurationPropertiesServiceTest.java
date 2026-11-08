@@ -17,29 +17,17 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
-import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
-import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
-import static com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE;
-import static com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -53,107 +41,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPropsSharedContextTest {
 
-    private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
+    @Autowired
+    private ConfigurationPropertiesService configurationPropertiesService;
 
-    @Nested
-    class WithoutExplicitSanitizationProperties {
+    @Test
+    void shouldReturnConfigurationPropertiesWithoutSanitization() {
+        // when.
+        ConfigurationPropertiesFeed configProps = configurationPropertiesService.getConfigProps();
 
-        @Autowired
-        @Qualifier(SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE)
-        private ConfigurationPropertiesService configurationPropertiesService;
+        // then.
+        Set<@Nullable String> values = configProps.getBeans().stream()
+                .flatMap(bean -> bean.getProperties().stream())
+                .map(ConfigurationPropertiesEntry::getValue)
+                .collect(Collectors.toSet());
 
-        @Test
-        void shouldReturnSanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
-            // when.
-            User user = fromAuthorities();
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    configurationPropertiesService::getConfigProps, securityContext);
-
-            // then.
-            Set<@Nullable String> values = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .map(ConfigurationPropertiesEntry::getValue)
-                    .collect(Collectors.toSet());
-
-            // TODO: Well, the "null" sanitization policy is not something that we currently have control over.
-            // It is also not clear if we want to sanitize "null" values in general. I think
-            // that it makes sense to sanitize them as well, but currently it is not possible due
-            // to internal implementation of the Spring Boot Actuator native config props endpoint.
-            assertThat(values).containsOnly(null, "******");
-        }
-
-        @Test
-        void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
-            // when.
-            User user = fromAuthorities(OssAuthority.CONFIG_PROPS_VALUES_READ);
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    configurationPropertiesService::getConfigProps, securityContext);
-
-            // then.
-            Set<@Nullable String> values = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .map(ConfigurationPropertiesEntry::getValue)
-                    .collect(Collectors.toSet());
-
-            assertThat(values).doesNotContain("******");
-        }
-    }
-
-    @Nested
-    class WithExplicitSanitizationProperties {
-
-        @Autowired
-        @Qualifier(EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE)
-        private ConfigurationPropertiesService configurationPropertiesService;
-
-        @Test
-        void shouldReturnOnlyExplicitlySanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
-            // when.
-            User user = fromAuthorities();
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    configurationPropertiesService::getConfigProps, securityContext);
-
-            // then.
-            Map<String, String> sanitizedProperties = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .filter(prop -> "******".equals(prop.getValue()))
-                    .collect(Collectors.toMap(
-                            ConfigurationPropertiesEntry::getKey, ConfigurationPropertiesEntry::getValue));
-
-            assertThat(sanitizedProperties)
-                    .containsOnlyKeys(
-                            "tags.environment", "tags.version", "tags.forSanitization", "tags.FOR_SANITIZATION")
-                    .containsValues("******", "******");
-
-            List<ConfigurationPropertiesEntry> nonSanitizedProps = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .filter(prop -> !"******".equals(prop.getValue()))
-                    .filter(prop -> prop.getValue() != null)
-                    .toList();
-
-            assertThat(nonSanitizedProps)
-                    .allMatch(prop -> !prop.getKey().contains("tags.environment")
-                            && !prop.getKey().contains("tags.version"));
-        }
-
-        @Test
-        void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
-            // when.
-            User user = fromAuthorities(OssAuthority.CONFIG_PROPS_VALUES_READ);
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    configurationPropertiesService::getConfigProps, securityContext);
-
-            // then.
-            Set<@Nullable String> values = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .map(ConfigurationPropertiesEntry::getValue)
-                    .collect(Collectors.toSet());
-
-            assertThat(values).doesNotContain("******");
-        }
+        assertThat(values).contains("toBeSanitized").doesNotContain("******");
     }
 }

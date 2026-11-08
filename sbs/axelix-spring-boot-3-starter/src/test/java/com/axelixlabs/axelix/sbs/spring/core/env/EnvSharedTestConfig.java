@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -38,16 +37,13 @@ import org.springframework.core.env.Environment;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
  * Shared test configuration backing a single, cached Spring context for all {@code env} integration tests.
@@ -61,12 +57,6 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
 public class EnvSharedTestConfig {
 
     public static final String SAMPLE_BEAN_NAME = "axelixTestBeanWithCustomAnnotations";
-
-    public static final String SANITIZE_ALL_ENVIRONMENT_SERVICE = "sanitizeAllEnvironmentService";
-    public static final String EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE = "explicitSanitizeEnvironmentService";
-
-    private static final String SANITIZE_ALL_SMART_SANITIZATION_FUNCTION = "sanitizeAllSmartSanitizingFunction";
-    private static final String EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION = "explicitSmartSanitizingFunction";
 
     @Bean
     public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
@@ -85,12 +75,6 @@ public class EnvSharedTestConfig {
     }
 
     @Bean
-    public RequiredAuthorityCheckService requiredAuthorityCheckService(
-            SecurityContextExecutor securityContextExecutor) {
-        return new RequiredAuthorityCheckService(securityContextExecutor);
-    }
-
-    @Bean
     public PropertyNameNormalizer propertyNameNormalizer() {
         return new DefaultPropertyNameNormalizer();
     }
@@ -99,12 +83,6 @@ public class EnvSharedTestConfig {
     public PropertyMetadataExtractor propertyMetadataExtractor(
             ConfigurableEnvironment environment, PropertyNameNormalizer propertyNameNormalizer) {
         return new DefaultPropertyMetadataExtractor(environment, propertyNameNormalizer);
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = EndpointsConfigurationProperties.CONFIG_PROPS_PREFIX)
-    public EndpointsConfigurationProperties endpointsConfigurationProperties() {
-        return new EndpointsConfigurationProperties();
     }
 
     /**
@@ -117,34 +95,10 @@ public class EnvSharedTestConfig {
         return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
     }
 
-    @Bean(SANITIZE_ALL_SMART_SANITIZATION_FUNCTION)
-    public SmartSanitizingFunction sanitizeAllSmartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-        return new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
-    }
-
-    @Bean(EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION)
-    public SmartSanitizingFunction explicitSmartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-        return new SmartSanitizingFunction(
-                List.of(
-                        "axelix.prop.test.tags.forSanitization",
-                        "axelix.prop.test.tags.FOR_SANITIZATION",
-                        "axelix.env.test.toBeSanitized",
-                        "AXELIX_FOR_SANITIZATION"),
-                propertyNameNormalizer);
-    }
-
     @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
-            @Qualifier(EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION)
-                    SmartSanitizingFunction smartSanitizingFunction,
-            ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
-        return new DefaultConfigurationPropertiesService(
-                smartSanitizingFunction,
-                applicationContext,
-                configurationPropertiesConverter,
-                requiredAuthorityCheckService);
+            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
+        return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
     }
 
     @Bean
@@ -162,31 +116,14 @@ public class EnvSharedTestConfig {
                 valueInjectionTrackerBeanPostProcessor);
     }
 
-    @Bean(SANITIZE_ALL_ENVIRONMENT_SERVICE)
-    public EnvironmentService sanitizeAllEnvironmentService(
-            Environment environment,
-            @Qualifier(SANITIZE_ALL_SMART_SANITIZATION_FUNCTION) SmartSanitizingFunction smartSanitizingFunction,
-            EnvPropertyEnricher envPropertyEnricher,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
-        return new DefaultEnvironmentService(
-                environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
-    }
-
-    @Bean(EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE)
-    public EnvironmentService explicitSanitizeEnvironmentService(
-            Environment environment,
-            @Qualifier(EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION)
-                    SmartSanitizingFunction smartSanitizingFunction,
-            EnvPropertyEnricher envPropertyEnricher,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
-        return new DefaultEnvironmentService(
-                environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
+    @Bean
+    public EnvironmentService environmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
+        return new DefaultEnvironmentService(environment, envPropertyEnricher);
     }
 
     @Bean
     public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-            @Qualifier(EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE) EnvironmentService environmentService,
-            SecurityContextExecutor securityContextExecutor) {
+            EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
         return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
     }
 

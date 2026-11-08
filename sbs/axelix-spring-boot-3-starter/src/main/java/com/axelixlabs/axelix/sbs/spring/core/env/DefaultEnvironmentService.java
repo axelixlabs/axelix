@@ -23,13 +23,9 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
  * Default implementation of {@link EnvironmentService}
@@ -38,35 +34,15 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
  */
 public class DefaultEnvironmentService implements EnvironmentService {
 
-    private static final OssAuthority FULL_ACCESS_AUTHORITY = OssAuthority.ENV_VALUES_READ;
-
     private final EnvironmentEndpoint delegate;
-    private final EnvironmentEndpoint sanitizedDelegate;
     private final EnvPropertyEnricher envPropertyEnricher;
-    private final RequiredAuthorityCheckService requiredAuthorityCheckService;
 
-    public DefaultEnvironmentService(
-            Environment environment,
-            SmartSanitizingFunction smartSanitizingFunction,
-            EnvPropertyEnricher envPropertyEnricher,
-            RequiredAuthorityCheckService requiredAuthorityCheckService) {
+    public DefaultEnvironmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
         this.envPropertyEnricher = envPropertyEnricher;
         this.delegate = new EnvironmentEndpoint(environment, List.of(), Show.ALWAYS);
-        this.sanitizedDelegate = new EnvironmentEndpoint(environment, List.of(smartSanitizingFunction), Show.ALWAYS);
-        this.requiredAuthorityCheckService = requiredAuthorityCheckService;
     }
 
     public EnvironmentFeed getEnvironmentFeed(@Nullable String pattern) {
-        boolean hasAuthority = requiredAuthorityCheckService.hasAuthority(FULL_ACCESS_AUTHORITY);
-
-        EnvironmentDescriptor originalDescriptor;
-
-        if (hasAuthority) {
-            originalDescriptor = delegate.environment(pattern);
-        } else {
-            originalDescriptor = sanitizedDelegate.environment(pattern);
-        }
-
-        return envPropertyEnricher.enrich(originalDescriptor);
+        return envPropertyEnricher.enrich(delegate.environment(pattern));
     }
 }
