@@ -38,6 +38,7 @@ import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserial
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -98,7 +99,7 @@ class DefaultTechUserJwtDeserializerTest {
     }
 
     @ParameterizedTest
-    @org.junit.jupiter.params.provider.ValueSource(strings = {"iat", "exp", "both"})
+    @ValueSource(strings = {"iat", "exp", "both"})
     void shouldRejectMissingLifetimeClaims(String missingClaim) {
         // given.
         JwtBuilder builder = Jwts.builder().subject(TechUser.MASTER.getId());
