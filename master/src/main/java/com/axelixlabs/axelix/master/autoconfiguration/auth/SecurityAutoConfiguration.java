@@ -173,8 +173,7 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public TechUserJwtSerializer techUserJwtSerializer(JwtProperties jwtProperties) {
-            return new DefaultTechUserJwtSerializer(
-                    jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan());
+            return new DefaultTechUserJwtSerializer(jwtProperties.algorithm(), jwtProperties.signingKey());
         }
 
         @Bean

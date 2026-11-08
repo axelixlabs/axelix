@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import java.time.Duration;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -47,7 +45,7 @@ class ManagedServiceWebIdentityAccessManagerTest {
     private final ManagedServiceWebIdentityAccessManager subject = new ManagedServiceWebIdentityAccessManager(
             new DefaultTechUserJwtDeserializer(JwtAlgorithm.HMAC512, SIGNING_KEY));
     private final DefaultTechUserJwtSerializer serializer =
-            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5));
+            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY);
 
     @ParameterizedTest
     @ValueSource(strings = {"/axelix-env", "/axelix-caches/main/cache/clear"})
@@ -83,8 +81,7 @@ class ManagedServiceWebIdentityAccessManagerTest {
         // given.
         String token = new DefaultTechUserJwtSerializer(
                         JwtAlgorithm.HMAC512,
-                        "32573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff",
-                        Duration.ofMinutes(5))
+                        "32573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff")
                 .serialize(TechUser.MASTER);
 
         // when / then.

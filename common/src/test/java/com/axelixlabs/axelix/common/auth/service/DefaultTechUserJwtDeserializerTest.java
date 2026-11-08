@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.common.auth.service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
@@ -51,7 +50,7 @@ class DefaultTechUserJwtDeserializerTest {
     private static final String SIGNING_KEY = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
 
     private final TechUserJwtSerializer serializer =
-            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC256, SIGNING_KEY, Duration.ofMinutes(5));
+            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC256, SIGNING_KEY);
 
     private final TechUserJwtDeserializer deserializer =
             new DefaultTechUserJwtDeserializer(JwtAlgorithm.HMAC256, SIGNING_KEY);
@@ -74,8 +73,7 @@ class DefaultTechUserJwtDeserializerTest {
         // given.
         TechUserJwtSerializer anotherSerializer = new DefaultTechUserJwtSerializer(
                 JwtAlgorithm.HMAC256,
-                "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437",
-                Duration.ofMinutes(5));
+                "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437");
         String token = anotherSerializer.serialize(TechUser.MASTER);
 
         // when / then.

@@ -69,7 +69,7 @@ public class TestRestTemplateBuilder {
     public TestRestTemplateBuilder(
             final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
             final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-        this.techUserJwtSerializer = new DefaultTechUserJwtSerializer(algorithm, signingKey, Duration.ofMinutes(5));
+        this.techUserJwtSerializer = new DefaultTechUserJwtSerializer(algorithm, signingKey);
         this.expiredJwtEncoderService = new DefaultJwtEncoderService(algorithm, signingKey, Duration.ZERO);
     }
 

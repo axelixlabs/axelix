@@ -125,8 +125,7 @@ class KubernetesInstanceDiscovererTest {
                     securityContextExecutor,
                     new DefaultJwtEncoderService(
                             JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY, Duration.ofMinutes(5)),
-                    new DefaultTechUserJwtSerializer(
-                            JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY, Duration.ofMinutes(5)));
+                    new DefaultTechUserJwtSerializer(JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY));
         }
 
         @Bean

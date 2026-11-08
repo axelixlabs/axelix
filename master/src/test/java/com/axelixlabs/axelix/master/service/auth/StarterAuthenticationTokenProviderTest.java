@@ -54,9 +54,7 @@ class StarterAuthenticationTokenProviderTest {
     private final DefaultJwtEncoderService encoder =
             new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5));
     private final StarterAuthenticationTokenProvider tokenProvider = new StarterAuthenticationTokenProvider(
-            securityContextExecutor,
-            encoder,
-            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5)));
+            securityContextExecutor, encoder, new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY));
 
     @ParameterizedTest
     @ValueSource(strings = {"1.1.0", "1.1.1", "1.2.0", "1.2.1", "1.2.2"})

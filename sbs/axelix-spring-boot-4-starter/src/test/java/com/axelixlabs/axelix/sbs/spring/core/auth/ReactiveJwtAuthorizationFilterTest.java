@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.net.URI;
-import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Test;
@@ -117,7 +116,7 @@ class ReactiveJwtAuthorizationFilterTest {
             // given.
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
             AuthProperties.Jwt jwt = context.getBean(AuthProperties.class).getJwt();
-            String token = new DefaultTechUserJwtSerializer(jwt.getAlgorithm(), jwt.getSigningKey(), jwt.getDuration())
+            String token = new DefaultTechUserJwtSerializer(jwt.getAlgorithm(), jwt.getSigningKey())
                     .serialize(TechUser.MASTER);
             MockServerWebExchange exchange = MockServerWebExchange.from(
                     MockServerHttpRequest.get("/actuator/axelix-env").header(HttpHeaders.AUTHORIZATION, bearer(token)));
@@ -141,7 +140,7 @@ class ReactiveJwtAuthorizationFilterTest {
             // given.
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
             AuthProperties.Jwt jwt = context.getBean(AuthProperties.class).getJwt();
-            String token = new DefaultTechUserJwtSerializer(jwt.getAlgorithm(), jwt.getSigningKey(), jwt.getDuration())
+            String token = new DefaultTechUserJwtSerializer(jwt.getAlgorithm(), jwt.getSigningKey())
                     .serialize(TechUser.MANAGED_SERVICE);
             MockServerWebExchange exchange = MockServerWebExchange.from(
                     MockServerHttpRequest.get("/actuator/axelix-env").header(HttpHeaders.AUTHORIZATION, bearer(token)));
@@ -167,8 +166,7 @@ class ReactiveJwtAuthorizationFilterTest {
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
             String token = new DefaultTechUserJwtSerializer(
                             context.getBean(AuthProperties.class).getJwt().getAlgorithm(),
-                            context.getBean(AuthProperties.class).getJwt().getSigningKey(),
-                            Duration.ofMinutes(5))
+                            context.getBean(AuthProperties.class).getJwt().getSigningKey())
                     .serialize(TechUser.MASTER);
             MockServerWebExchange exchange = MockServerWebExchange.from(
                     MockServerHttpRequest.get("/actuator/axelix-env").header(HttpHeaders.AUTHORIZATION, bearer(token)));
@@ -188,8 +186,7 @@ class ReactiveJwtAuthorizationFilterTest {
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
             String token = new DefaultTechUserJwtSerializer(
                             context.getBean(AuthProperties.class).getJwt().getAlgorithm(),
-                            context.getBean(AuthProperties.class).getJwt().getSigningKey(),
-                            Duration.ofMinutes(5))
+                            context.getBean(AuthProperties.class).getJwt().getSigningKey())
                     .serialize(TechUser.MASTER);
             MockServerWebExchange exchange = MockServerWebExchange.from(
                     MockServerHttpRequest.delete("/actuator/axelix-caches/mainCacheManager/cache/clear")
@@ -212,8 +209,7 @@ class ReactiveJwtAuthorizationFilterTest {
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
             String token = new DefaultTechUserJwtSerializer(
                             context.getBean(AuthProperties.class).getJwt().getAlgorithm(),
-                            context.getBean(AuthProperties.class).getJwt().getSigningKey(),
-                            Duration.ofMinutes(5))
+                            context.getBean(AuthProperties.class).getJwt().getSigningKey())
                     .serialize(TechUser.MASTER);
             MockServerWebExchange exchange =
                     MockServerWebExchange.from(MockServerHttpRequest.get("/actuator/axelix-env")
