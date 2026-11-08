@@ -46,7 +46,9 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
@@ -163,6 +165,11 @@ public class SecurityAutoConfiguration {
     @AutoConfiguration
     @EnableConfigurationProperties(JwtProperties.class)
     public static class JwtAutoConfiguration {
+
+        @Bean
+        public TechUserJwtDeserializer techUserJwtDeserializer(JwtProperties jwtProperties) {
+            return new DefaultTechUserJwtDeserializer(jwtProperties.algorithm(), jwtProperties.signingKey());
+        }
 
         @Bean
         public TechUserJwtSerializer techUserJwtSerializer(JwtProperties jwtProperties) {

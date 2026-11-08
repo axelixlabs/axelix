@@ -459,7 +459,7 @@ class KubernetesInstanceDiscovererTest {
         assertThat(new HmacVerificationStrategy()
                         .verifyAndParse(token, JwtDefaults.DEFAULT_SIGNING_KEY)
                         .getPayload())
-                .containsOnlyKeys("sub");
+                .containsOnlyKeys("sub", "iat", "exp");
     }
 
     @Test
@@ -484,7 +484,7 @@ class KubernetesInstanceDiscovererTest {
         assertThat(new HmacVerificationStrategy()
                         .verifyAndParse(token, JwtDefaults.DEFAULT_SIGNING_KEY)
                         .getPayload())
-                .containsOnlyKeys("sub");
+                .containsOnlyKeys("sub", "iat", "exp");
     }
 
     @Test

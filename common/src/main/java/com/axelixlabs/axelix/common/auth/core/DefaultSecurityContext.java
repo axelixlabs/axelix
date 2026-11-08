@@ -24,17 +24,10 @@ package com.axelixlabs.axelix.common.auth.core;
  */
 public class DefaultSecurityContext implements SecurityContext {
 
-    private final User user;
     private final String token;
 
-    public DefaultSecurityContext(User user, String token) {
-        this.user = user;
+    public DefaultSecurityContext(String token) {
         this.token = token;
-    }
-
-    @Override
-    public User currentUser() {
-        return user;
     }
 
     @Override

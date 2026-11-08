@@ -18,6 +18,8 @@
 package com.axelixlabs.axelix.common.auth.service;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Date;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -27,6 +29,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
@@ -37,6 +40,11 @@ import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/**
+ * Unit tests for {@link DefaultTechUserJwtDeserializer}.
+ *
+ * @author Mikhail Polivakha
+ */
 class DefaultTechUserJwtDeserializerTest {
 
     private static final String SIGNING_KEY = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
@@ -77,10 +85,65 @@ class DefaultTechUserJwtDeserializerTest {
         // given.
         String token = Jwts.builder()
                 .subject("UNKNOWN")
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plusSeconds(300)))
                 .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
                 .compact();
 
         // when / then.
         assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
+    }
+
+    @Test
+    void shouldRejectMissingIssuedAtClaim() {
+        // given.
+        String token = Jwts.builder()
+                .subject(TechUser.MASTER.getId())
+                .expiration(Date.from(Instant.now().plusSeconds(300)))
+                .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
+
+        // when / then.
+        assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
+    }
+
+    @Test
+    void shouldRejectMissingExpirationClaim() {
+        // given.
+        String token = Jwts.builder()
+                .subject(TechUser.MASTER.getId())
+                .issuedAt(Date.from(Instant.now()))
+                .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
+
+        // when / then.
+        assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
+    }
+
+    @Test
+    void shouldRejectMissingLifetimeClaims() {
+        // given.
+        String token = Jwts.builder()
+                .subject(TechUser.MASTER.getId())
+                .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
+
+        // when / then.
+        assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
+    }
+
+    @Test
+    void shouldRejectExpiredToken() {
+        // given.
+        Instant now = Instant.now();
+        String token = Jwts.builder()
+                .subject(TechUser.MASTER.getId())
+                .issuedAt(Date.from(now.minusSeconds(120)))
+                .expiration(Date.from(now.minusSeconds(60)))
+                .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
+
+        // when / then.
+        assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(ExpiredJwtTokenException.class);
     }
 }

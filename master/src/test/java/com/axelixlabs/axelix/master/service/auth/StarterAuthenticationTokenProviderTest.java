@@ -65,7 +65,7 @@ class StarterAuthenticationTokenProviderTest {
 
         // when.
         String token = securityContextExecutor.callWithinSecurityContext(
-                () -> tokenProvider.tokenFor(version), new DefaultSecurityContext(caller, callerToken));
+                () -> tokenProvider.tokenFor(version), new DefaultSecurityContext(callerToken));
 
         // then.
         assertThat(token).isEqualTo(callerToken);
@@ -90,7 +90,7 @@ class StarterAuthenticationTokenProviderTest {
         assertThat(new HmacVerificationStrategy()
                         .verifyAndParse(token, SIGNING_KEY)
                         .getPayload())
-                .containsOnlyKeys("sub");
+                .containsOnlyKeys("sub", "iat", "exp");
     }
 
     @ParameterizedTest

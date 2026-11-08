@@ -17,10 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import io.jsonwebtoken.Jwts;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +53,7 @@ import org.springframework.test.context.TestPropertySource;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.beans.BeansFeed;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
@@ -70,6 +74,7 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCacheManager;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
@@ -145,6 +150,9 @@ class JwtAuthorizationFilterTest {
     @Autowired
     private TechUserJwtSerializer techUserJwtSerializer;
 
+    @Autowired
+    private AuthProperties authProperties;
+
     @ParameterizedTest
     @MethodSource("adminEndpoints")
     void shouldAllowAccessForMaster(String path, HttpMethod httpMethod) {
@@ -157,6 +165,27 @@ class JwtAuthorizationFilterTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void shouldRejectExpiredMasterToken() {
+        // given.
+        String token = JwtSigningStrategyFactory.createSigningStrategy(
+                        authProperties.getJwt().getAlgorithm())
+                .signToken(
+                        Jwts.builder()
+                                .subject(TechUser.MASTER.getId())
+                                .issuedAt(Date.from(Instant.now().minusSeconds(120)))
+                                .expiration(Date.from(Instant.now().minusSeconds(60))),
+                        authProperties.getJwt().getSigningKey())
+                .compact();
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test

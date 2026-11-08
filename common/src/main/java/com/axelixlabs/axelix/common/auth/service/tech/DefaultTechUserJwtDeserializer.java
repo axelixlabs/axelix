@@ -18,11 +18,13 @@
 package com.axelixlabs.axelix.common.auth.service.tech;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.common.auth.service.JwtVerificationStrategy;
@@ -46,13 +48,19 @@ public class DefaultTechUserJwtDeserializer implements TechUserJwtDeserializer {
     }
 
     @Override
-    public TechUser deserialize(String token) throws InvalidJwtTokenException, JwtParsingException {
+    public TechUser deserialize(String token)
+            throws InvalidJwtTokenException, JwtParsingException, ExpiredJwtTokenException {
         try {
             Claims claims =
                     verificationStrategy.verifyAndParse(token, signingKey).getPayload();
+            if (claims.getIssuedAt() == null || claims.getExpiration() == null) {
+                throw new JwtParsingException("Technical-user JWT must contain issued-at and expiration claims");
+            }
             return resolveTechUser(claims.getSubject());
         } catch (JwtParsingException e) {
             throw e;
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredJwtTokenException("JWT token has expired", e);
         } catch (JwtException e) {
             throw new InvalidJwtTokenException("JWT token is invalid or tampered", e);
         } catch (Exception e) {
@@ -61,7 +69,7 @@ public class DefaultTechUserJwtDeserializer implements TechUserJwtDeserializer {
     }
 
     /*
-     * JWT parsing, signature verification and validation of any expiry claim happen before this method.
+     * JWT parsing, signature verification and validation of the required issued-at and expiry claims happen before this method.
      * The subject identifies the technical user; additional legacy claims such as uid and roles are ignored.
      * This is intentional: initial discovery uses a legacy-format master token because the starter version
      * is not yet known. That token must be accepted by both older starters and starters from 1.3 onward.

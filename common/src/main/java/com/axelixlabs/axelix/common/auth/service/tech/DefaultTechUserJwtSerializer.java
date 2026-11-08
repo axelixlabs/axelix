@@ -17,6 +17,10 @@
  */
 package com.axelixlabs.axelix.common.auth.service.tech;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.NullMarked;
 
@@ -34,6 +38,12 @@ import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 @NullMarked
 public class DefaultTechUserJwtSerializer implements TechUserJwtSerializer {
 
+    /**
+     * Token is extremely short-lived since it is issued on per-request basis.
+     * It also addresses the security concern.
+     */
+    private static final Duration LIFESPAN = Duration.ofMinutes(1);
+
     private final JwtSigningStrategy signingStrategy;
 
     private final String signingKey;
@@ -46,8 +56,14 @@ public class DefaultTechUserJwtSerializer implements TechUserJwtSerializer {
     @Override
     public String serialize(TechUser techUser) throws JwtTokenGenerationException {
         try {
+            Instant now = Instant.now();
             return signingStrategy
-                    .signToken(Jwts.builder().subject(techUser.getId()), signingKey)
+                    .signToken(
+                            Jwts.builder()
+                                    .subject(techUser.getId())
+                                    .issuedAt(Date.from(now))
+                                    .expiration(Date.from(now.plus(LIFESPAN))),
+                            signingKey)
                     .compact();
         } catch (JwtTokenGenerationException e) {
             throw e;

@@ -23,7 +23,7 @@ import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 
 /**
- * Serializes a {@link TechUser} into a signed JWT whose only claim is the subject.
+ * Serializes a {@link TechUser} into a signed JWT containing the subject, issued-at time and expiration time.
  *
  * @author Mikhail Polivakha
  */
@@ -32,7 +32,7 @@ public interface TechUserJwtSerializer {
 
     /**
      * @param techUser technical user to place in the JWT subject
-     * @return signed JWT containing only the technical user's subject
+     * @return signed JWT containing the technical user's subject and a bounded lifetime
      * @throws JwtTokenGenerationException if the token cannot be generated
      */
     String serialize(TechUser techUser) throws JwtTokenGenerationException;
