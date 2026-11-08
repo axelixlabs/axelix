@@ -49,6 +49,9 @@ public interface EndpointProber<O> {
 
     /**
      * Invoke the actual {@link ActuatorEndpoint} using the given base url.
+     * Used for initial discovery, before the starter version is known. Authentication must be
+     * compatible with both legacy and technical-user token decoders. For registered instances,
+     * use {@link #invoke(InstanceId, HttpPayload)} so authentication follows the starter version.
      *
      * @param baseUrl the base url of the request
      * @param httpPayload the abstraction that encapsulates the http payload of the request

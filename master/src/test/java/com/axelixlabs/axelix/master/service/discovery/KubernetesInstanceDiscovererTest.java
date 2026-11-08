@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.discovery;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -47,7 +48,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.HmacVerificationStrategy;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
@@ -59,6 +64,7 @@ import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
+import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.serde.DefaultJacksonMessageDeserializationStrategy;
@@ -114,6 +120,15 @@ class KubernetesInstanceDiscovererTest {
     static class CurrentConfig {
 
         @Bean
+        public StarterAuthenticationTokenProvider tokenProvider(SecurityContextExecutor securityContextExecutor) {
+            return new StarterAuthenticationTokenProvider(
+                    securityContextExecutor,
+                    new DefaultJwtEncoderService(
+                            JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY, Duration.ofMinutes(5)),
+                    new DefaultTechUserJwtSerializer(JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY));
+        }
+
+        @Bean
         public SecurityContextExecutor securityContextExecutor() {
             return new StaticTestSecurityContextExecutor();
         }
@@ -121,13 +136,13 @@ class KubernetesInstanceDiscovererTest {
         @Bean
         public DefaultEndpointProber<BasicRegistrationMetadata> managedServiceMetadataEndpointProber(
                 InstanceRegistry instanceRegistry,
-                SecurityContextExecutor securityContextExecutor,
+                StarterAuthenticationTokenProvider tokenProvider,
                 HttpClient httpClient) {
             return new DefaultEndpointProber<>(
                     instanceRegistry,
                     new DefaultJacksonMessageDeserializationStrategy<>(
                             new ObjectMapper(), BasicRegistrationMetadata.class),
-                    securityContextExecutor,
+                    tokenProvider,
                     ActuatorEndpoints.METADATA,
                     httpClient);
         }
@@ -140,12 +155,12 @@ class KubernetesInstanceDiscovererTest {
         @Bean
         public DefaultEndpointProber<MasterPing> masterPingEndpointProber(
                 InstanceRegistry instanceRegistry,
-                SecurityContextExecutor securityContextExecutor,
+                StarterAuthenticationTokenProvider tokenProvider,
                 HttpClient httpClient) {
             return new DefaultEndpointProber<>(
                     instanceRegistry,
                     new DefaultJacksonMessageDeserializationStrategy<>(new ObjectMapper(), MasterPing.class),
-                    securityContextExecutor,
+                    tokenProvider,
                     ActuatorEndpoints.PING,
                     httpClient);
         }
@@ -169,6 +184,8 @@ class KubernetesInstanceDiscovererTest {
 
     @BeforeEach
     void startServer() throws IOException {
+        Mockito.doCallRealMethod().when(instanceRegistry).getOrThrow(Mockito.any(InstanceId.class));
+
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         stubs = new KubernetesDiscoveryStubs(discoveryClient, mockWebServer);
@@ -436,7 +453,13 @@ class KubernetesInstanceDiscovererTest {
             assertThat(it.masterPing().getTransactions()).isEmpty();
         });
         assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-ping");
+        RecordedRequest pingRequest = mockWebServer.takeRequest();
+        assertThat(pingRequest.getPath()).isEqualTo("/actuator/axelix-ping");
+        String token = pingRequest.getHeader("Authorization").substring("Bearer ".length());
+        assertThat(new HmacVerificationStrategy()
+                        .verifyAndParse(token, JwtDefaults.DEFAULT_SIGNING_KEY)
+                        .getPayload())
+                .containsOnlyKeys("sub");
     }
 
     @Test
@@ -455,7 +478,13 @@ class KubernetesInstanceDiscovererTest {
 
         assertThat(profiles).isEmpty();
         assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
-        assertThat(mockWebServer.takeRequest().getPath()).isEqualTo("/actuator/axelix-ping");
+        RecordedRequest pingRequest = mockWebServer.takeRequest();
+        assertThat(pingRequest.getPath()).isEqualTo("/actuator/axelix-ping");
+        String token = pingRequest.getHeader("Authorization").substring("Bearer ".length());
+        assertThat(new HmacVerificationStrategy()
+                        .verifyAndParse(token, JwtDefaults.DEFAULT_SIGNING_KEY)
+                        .getPayload())
+                .containsOnlyKeys("sub");
     }
 
     @Test

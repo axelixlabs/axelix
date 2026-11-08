@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.discovery;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,10 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
@@ -59,12 +54,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(ShortPollingInstanceDiscoveryScheduler.class);
 
-    private static final PasswordlessUser TECH_USER = new PasswordlessUser("AXELIX.MASTER", "AXELIX.MASTER", Set.of());
-
     private final InstancesDiscoverer instancesDiscoverer;
     private final InstanceRegistry instanceRegistry;
-    private final JwtEncoderService jwtEncoderService;
-    private final SecurityContextExecutor securityContextExecutor;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
     private final ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter;
@@ -74,8 +65,6 @@ public class ShortPollingInstanceDiscoveryScheduler {
     public ShortPollingInstanceDiscoveryScheduler(
             InstancesDiscoverer instancesDiscoverer,
             InstanceRegistry instanceRegistry,
-            JwtEncoderService jwtEncoderService,
-            SecurityContextExecutor securityContextExecutor,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate,
             ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
@@ -84,8 +73,6 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
-        this.jwtEncoderService = jwtEncoderService;
-        this.securityContextExecutor = securityContextExecutor;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
         this.scheduledTaskExecutionResultConverter = scheduledTaskExecutionResultConverter;
@@ -96,10 +83,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
     @Scheduled(cron = "${axelix.master.discovery.auto.broadcast.schedule}")
     public void performDiscovery() {
 
-        String token = jwtEncoderService.generateToken(TECH_USER, Duration.ofSeconds(300));
-
-        Set<DiscoveredInstanceProfile> discoveredInstances = securityContextExecutor.callWithinSecurityContext(
-                instancesDiscoverer::discoverSafely, new DefaultSecurityContext(TECH_USER, token));
+        Set<DiscoveredInstanceProfile> discoveredInstances = instancesDiscoverer.discoverSafely();
 
         if (discoveredInstances.isEmpty()) {
             logger.error("""

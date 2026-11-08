@@ -21,11 +21,11 @@ import java.net.http.HttpClient;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.serde.NoOpMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -41,9 +41,9 @@ public class DiscardingAbstractEndpointProber extends AbstractEndpointProber<byt
     public DiscardingAbstractEndpointProber(
             InstanceRegistry instanceRegistry,
             ActuatorEndpoint actuatorEndpoint,
-            SecurityContextExecutor securityContextExecutor,
+            StarterAuthenticationTokenProvider tokenProvider,
             HttpClient httpClient) {
-        super(instanceRegistry, NoOpMessageDeserializationStrategy.INSTANCE, securityContextExecutor, httpClient);
+        super(instanceRegistry, NoOpMessageDeserializationStrategy.INSTANCE, tokenProvider, httpClient);
         this.actuatorEndpoint = actuatorEndpoint;
     }
 

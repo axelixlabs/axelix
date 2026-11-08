@@ -46,6 +46,8 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.LocalAuthenticationOption;
@@ -70,6 +72,7 @@ import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
@@ -160,6 +163,20 @@ public class SecurityAutoConfiguration {
     @AutoConfiguration
     @EnableConfigurationProperties(JwtProperties.class)
     public static class JwtAutoConfiguration {
+
+        @Bean
+        public TechUserJwtSerializer techUserJwtSerializer(JwtProperties jwtProperties) {
+            return new DefaultTechUserJwtSerializer(jwtProperties.algorithm(), jwtProperties.signingKey());
+        }
+
+        @Bean
+        public StarterAuthenticationTokenProvider starterAuthenticationTokenProvider(
+                SecurityContextExecutor securityContextExecutor,
+                JwtEncoderService jwtEncoderService,
+                TechUserJwtSerializer techUserJwtSerializer) {
+            return new StarterAuthenticationTokenProvider(
+                    securityContextExecutor, jwtEncoderService, techUserJwtSerializer);
+        }
 
         private static final Logger log = LoggerFactory.getLogger(JwtAutoConfiguration.class);
 

@@ -21,8 +21,8 @@ import java.net.http.HttpClient;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
+import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -38,10 +38,10 @@ public class DefaultEndpointProber<O> extends AbstractEndpointProber<O> {
     public DefaultEndpointProber(
             InstanceRegistry instanceRegistry,
             MessageDeserializationStrategy<O> messageDeserializationStrategy,
-            SecurityContextExecutor securityContextExecutor,
+            StarterAuthenticationTokenProvider tokenProvider,
             ActuatorEndpoint actuatorEndpoint,
             HttpClient httpClient) {
-        super(instanceRegistry, messageDeserializationStrategy, securityContextExecutor, httpClient);
+        super(instanceRegistry, messageDeserializationStrategy, tokenProvider, httpClient);
         this.actuatorEndpoint = actuatorEndpoint;
     }
 

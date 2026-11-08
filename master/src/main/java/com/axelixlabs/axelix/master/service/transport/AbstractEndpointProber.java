@@ -31,13 +31,12 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.serde.DeserializationException;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -53,16 +52,16 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     private final InstanceRegistry instanceRegistry;
     private final MessageDeserializationStrategy<O> messageDeserializationStrategy;
     private final HttpClient httpClient;
-    private final SecurityContextExecutor securityContextExecutor;
+    private final StarterAuthenticationTokenProvider tokenProvider;
 
     protected AbstractEndpointProber(
             InstanceRegistry instanceRegistry,
             MessageDeserializationStrategy<O> messageDeserializationStrategy,
-            SecurityContextExecutor securityContextExecutor,
+            StarterAuthenticationTokenProvider tokenProvider,
             HttpClient httpClient) {
         this.instanceRegistry = instanceRegistry;
         this.messageDeserializationStrategy = messageDeserializationStrategy;
-        this.securityContextExecutor = securityContextExecutor;
+        this.tokenProvider = tokenProvider;
         this.httpClient = httpClient;
     }
 
@@ -71,7 +70,8 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
         Instance instance = instanceRegistry.getOrThrow(instanceId);
 
-        HttpRequest request = buildHttpRequest(supports(), httpPayload, instance.actuatorUrl());
+        HttpRequest request = buildHttpRequest(
+                supports(), httpPayload, instance.actuatorUrl(), tokenProvider.tokenFor(instance.starterVersion()));
 
         return invokeInternal(instanceId.instanceId(), request);
     }
@@ -79,7 +79,7 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     @Override
     public @NonNull O invoke(@NonNull String baseUrl, HttpPayload httpPayload)
             throws EndpointInvocationException, BadRequestException {
-        HttpRequest request = buildHttpRequest(supports(), httpPayload, baseUrl);
+        HttpRequest request = buildHttpRequest(supports(), httpPayload, baseUrl, tokenProvider.discoveryToken());
         return invokeInternal(baseUrl, request);
     }
 
@@ -106,7 +106,8 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
         }
     }
 
-    private HttpRequest buildHttpRequest(ActuatorEndpoint endpoint, HttpPayload httpPayload, String baseOrActuatorUrl) {
+    private HttpRequest buildHttpRequest(
+            ActuatorEndpoint endpoint, HttpPayload httpPayload, String baseOrActuatorUrl, String token) {
 
         String url = baseOrActuatorUrl
                 + endpoint.path().expand(httpPayload.pathVariableValues(), httpPayload.queryParameters());
@@ -125,9 +126,7 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             }
         }
 
-        SecurityContext securityContext = securityContextExecutor.requireSecurityContext();
-
-        builder.header(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + securityContext.token());
+        builder.setHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token);
 
         return builder.build();
     }
