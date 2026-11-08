@@ -44,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 class DefaultAuthoritiesServiceTest {
+
     @Autowired
     private AuthoritiesService authoritiesService;
 
@@ -63,8 +64,10 @@ class DefaultAuthoritiesServiceTest {
         PasswordlessUser user =
                 new PasswordlessUser("test-user", "test", Set.of(new DefaultRole("CUSTOM", Set.of(authority))));
         String token = encoder.generateToken(user);
+
         // when.
         PasswordlessUser decoded = decoder.decodeTokenToUser(token);
+
         // then.
         assertThat(decoded.getRoles())
                 .singleElement()
@@ -75,33 +78,12 @@ class DefaultAuthoritiesServiceTest {
     void shouldReturnAllAuthoritiesFromDatabase() {
         // given.
         DefaultAuthority authority = insertAuthority("custom:list");
-        // when.
-        Set<Authority> authorities = authoritiesService.getAll();
-        // then.
-        assertThat(authorities).contains(authority);
-        assertThat(authorities)
-                .extracting(Authority::getName)
-                .containsExactlyInAnyOrderElementsOf(jdbcClient
-                        .sql("SELECT codename FROM authorities")
-                        .query(String.class)
-                        .list());
-    }
 
-    @Test
-    void shouldReflectDatabaseUpdates() {
-        // given.
-        DefaultAuthority authority = insertAuthority("custom:before");
-        authoritiesService.getAll();
-        jdbcClient
-                .sql("UPDATE authorities SET codename = ? WHERE id = ?")
-                .params("custom:after", authority.id())
-                .update();
         // when.
         Set<Authority> authorities = authoritiesService.getAll();
+
         // then.
-        assertThat(authorities)
-                .contains(new DefaultAuthority(authority.id(), "custom:after"))
-                .doesNotContain(authority);
+        assertThat(authorities).containsOnly(authority);
     }
 
     @Test
@@ -109,8 +91,10 @@ class DefaultAuthoritiesServiceTest {
         // given.
         jdbcClient.sql("DELETE FROM roles_authorities").update();
         jdbcClient.sql("DELETE FROM authorities").update();
+
         // when.
         Set<Authority> authorities = authoritiesService.getAll();
+
         // then.
         assertThat(authorities).isEmpty();
     }

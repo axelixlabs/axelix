@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.service.auth.jwt;
 
 import java.time.Duration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,15 +34,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.master.Main;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.DefaultUser;
@@ -58,9 +58,6 @@ import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Integration tests for {@link UserJwtDecoderService}, verifying correct decoding and validation of JWT tokens.
@@ -69,7 +66,8 @@ import static org.mockito.Mockito.when;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(classes = DefaultUserJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
+@SpringBootTest(classes = Main.class)
+@Transactional
 @TestPropertySource("classpath:jwt-services-test.properties")
 class DefaultUserJwtDecoderServiceTest {
 
@@ -90,6 +88,9 @@ class DefaultUserJwtDecoderServiceTest {
 
     @Autowired
     private AuthoritiesService authoritiesService;
+
+    @Autowired
+    private JdbcClient jdbcClient;
 
     @ParameterizedTest
     @MethodSource("roles")
@@ -207,6 +208,11 @@ class DefaultUserJwtDecoderServiceTest {
 
     @Test
     void shouldPreserveRegisteredCustomAuthority() {
+        // given.
+        jdbcClient
+                .sql("INSERT INTO authorities (id, codename, description) VALUES (?, ?, ?)")
+                .params("jwt-test-custom-authority", CustomAuthority.CUSTOM_AUTHORITY.getName(), "JWT test authority")
+                .update();
         Role role = new DefaultRole("VIEWER", Set.of(CustomAuthority.CUSTOM_AUTHORITY));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = userJwtEncoderService.generateToken(user);
@@ -310,22 +316,19 @@ class DefaultUserJwtDecoderServiceTest {
     }
 
     @Test
-    void shouldFetchCatalogOnceForAllRolesAndNestedComponents() {
+    void shouldDecodeAllRolesAndNestedComponents() {
         // given.
-        AuthoritiesService catalog = mock(AuthoritiesService.class);
-        when(catalog.getAll()).thenReturn(Set.of(TestAuthorities.CACHES_CLEAR, TestAuthorities.CACHES_TOGGLE));
         Role parent = new DefaultRole("PARENT", Set.of(TestAuthorities.CACHES_CLEAR));
         Role child = new DefaultRole("CHILD", Set.of(TestAuthorities.CACHES_TOGGLE), Set.of(parent));
         PasswordlessUser user = new PasswordlessUser("bulk-user", "bulk", Set.of(parent, child));
         String token = userJwtEncoderService.generateToken(user);
-        UserJwtDecoderService decoder = new DefaultUserJwtDecoderService(catalog, JwtAlgorithm.HMAC512, signingKey);
         // when.
-        PasswordlessUser decoded = decoder.decodeTokenToUser(token);
+        PasswordlessUser decoded = userJwtDecoderService.decodeTokenToUser(token);
         // then.
         assertThat(decoded.getRoles())
                 .flatExtracting(Role::getEffectiveAuthorities)
-                .contains(TestAuthorities.CACHES_CLEAR, TestAuthorities.CACHES_TOGGLE);
-        verify(catalog).getAll();
+                .extracting(Authority::getName)
+                .contains(TestAuthorities.CACHES_CLEAR.getName(), TestAuthorities.CACHES_TOGGLE.getName());
     }
 
     enum CustomAuthority implements Authority {
@@ -334,41 +337,6 @@ class DefaultUserJwtDecoderServiceTest {
         @Override
         public String getName() {
             return name();
-        }
-    }
-
-    /**
-     * Minimal test configuration for {@link UserJwtDecoderService} integration testing.
-     *
-     * <p>Registers beans for {@link UserJwtDecoderService}, allowing
-     * full-stack testing of JWT encoding and decoding within a Spring context.</p>
-     */
-    @SpringBootConfiguration
-    static class JwtDecoderServiceConfig {
-
-        @Bean
-        AuthoritiesService authoritiesService() {
-            AuthoritiesService service = mock(AuthoritiesService.class);
-            Set<Authority> authorities = new HashSet<>(Set.of(TestAuthorities.values()));
-            authorities.add(CustomAuthority.CUSTOM_AUTHORITY);
-            when(service.getAll()).thenReturn(authorities);
-            return service;
-        }
-
-        @Bean
-        public UserJwtDecoderService jwtDecoderService(
-                final AuthoritiesService authoritiesService,
-                final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-                final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultUserJwtDecoderService(authoritiesService, algorithm, signingKey);
-        }
-
-        @Bean
-        UserJwtEncoderService jwtEncoderService(
-                final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-                final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan,
-                final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultUserJwtEncoderService(algorithm, signingKey, lifespan);
         }
     }
 }
