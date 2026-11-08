@@ -19,15 +19,13 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
+import com.axelixlabs.axelix.common.auth.exception.TechUserAuthorizationException;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * The main entrypoint for evaluating the possibility of processing the HTTP request (both Authentication
- * and Authorization). So essentially this service is the entrypoint for IAM checks for every HTTP request
- * (presumably that comes from the Axelix Master)
+ * and Authorization). So essentially this service is the entrypoint for IAM checks for every HTTP request.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
@@ -36,19 +34,17 @@ public interface WebIdentityAccessManager {
 
     /**
      * Main entrypoint for IAM. In case any problem is encountered, then the corresponding exception is thrown.
-     * In case access is granted, the method returns the user identified by the bearer access token has been granted access.
+     * In case access is granted, the method simply returns.
      *
      * @param relativeRequestPath the relative path of the request with prefix like (/api/external or /actuator) being
      *                            already stripped. e.g. it is expected to be {@code /beans/feed} or {@code /axelix-beans}.
      * @param requestHttpMethod   the HTTP method of the request.
      * @param token               the Bearer access token of the user.
      *
-     * @return the user that was granted access.
-     *
-     * @throws AuthorizationException in case the user is not authorized to access the given API.
-     * @throws JwtProcessingException in case the implementation is unable to verify the validity
-     *                                of the token or if the token is deemed invalid.
+     * @throws TechUserAuthorizationException in case the user is not authorized to access the given API.
+     * @throws JwtProcessingException         in case the implementation is unable to verify the validity
+     *                                        of the token or if the token is deemed invalid.
      */
-    User verifyAccess(String relativeRequestPath, HttpMethod requestHttpMethod, @Nullable String token)
-            throws AuthorizationException, JwtProcessingException;
+    void verifyAccess(String relativeRequestPath, HttpMethod requestHttpMethod, @Nullable String token)
+            throws TechUserAuthorizationException, JwtProcessingException;
 }

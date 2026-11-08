@@ -15,25 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.common.auth.exception;
 
-import org.springframework.context.annotation.Bean;
-
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 
 /**
- * Auto-configuration for the {@link SecurityContextExecutor}.
+ * Exception occurring when the tech user is trying to execute operation
+ * which it is not supposed to do.
  *
- * @author Sergey Cherkasov
- * @author Ilya Naumov
+ * @author Mikhail Polivakha
  */
-@AxelixAutoConfiguration
-public class SecurityContextExecutorAutoConfiguration {
+public class TechUserAuthorizationException extends RuntimeException {
 
-    @Bean
-    public SecurityContextExecutor securityContextExecutor() {
-        return new ThreadLocalSecurityContextExecutor();
+    public TechUserAuthorizationException(TechUser techUser) {
+        super(String.format("The %s is forbidden to execute given operation", techUser.getId()));
     }
 }

@@ -17,16 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
-import java.security.Principal;
-
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.AxelixPrincipal;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
@@ -39,23 +35,13 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.AxelixPrincipal;
 public class AxelixEnvironmentEndpoint {
 
     private final EnvironmentService environmentService;
-    private final SecurityContextExecutor securityContextExecutor;
 
-    public AxelixEnvironmentEndpoint(
-            EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
+    public AxelixEnvironmentEndpoint(EnvironmentService environmentService) {
         this.environmentService = environmentService;
-        this.securityContextExecutor = securityContextExecutor;
     }
 
     @GetMapping
-    public EnvironmentFeed environment(@Nullable String pattern, @Nullable Principal principal) {
-        if (principal instanceof AxelixPrincipal axelixPrincipal) {
-            // we're using reactive
-            return securityContextExecutor.callWithinSecurityContext(
-                    () -> environmentService.getEnvironmentFeed(pattern), axelixPrincipal.securityContext());
-        } else {
-            // we're working on the standard servlet app, JwtAuthorizationFilter has already set the security context
-            return environmentService.getEnvironmentFeed(pattern);
-        }
+    public EnvironmentFeed environment(@Nullable String pattern) {
+        return environmentService.getEnvironmentFeed(pattern);
     }
 }

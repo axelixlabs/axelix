@@ -31,14 +31,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.exception.TechUserAuthorizationException;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
@@ -49,21 +45,17 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ *
  * @since 29.07.2025
  */
 @SuppressWarnings("NullAway") // TODO: Pending issue GH-42 – introduce exception translator and refactor this filter
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final WebIdentityAccessManager webIdentityAccessManager;
-    private final SecurityContextExecutor securityContextExecutor;
     private final String baseActuatorPath;
 
-    public JwtAuthorizationFilter(
-            WebIdentityAccessManager webIdentityAccessManager,
-            SecurityContextExecutor securityContextExecutor,
-            String baseActuatorPath) {
+    public JwtAuthorizationFilter(WebIdentityAccessManager webIdentityAccessManager, String baseActuatorPath) {
         this.webIdentityAccessManager = webIdentityAccessManager;
-        this.securityContextExecutor = securityContextExecutor;
         this.baseActuatorPath = baseActuatorPath;
     }
 
@@ -86,14 +78,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             String relativePath = request.getServletPath().substring(baseActuatorPath.length());
 
-            User user = webIdentityAccessManager.verifyAccess(relativePath, requestHttpMethod, token);
+            webIdentityAccessManager.verifyAccess(relativePath, requestHttpMethod, token);
 
-            securityContextExecutor.runWithinSecurityContext(
-                    () -> filterChain.doFilter(request, response), new DefaultSecurityContext(user, token));
+            filterChain.doFilter(request, response);
 
         } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
             respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-        } catch (AuthorizationException e) {
+        } catch (TechUserAuthorizationException e) {
             respondWith(response, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
         } catch (Exception e) {
             throw new ServletException(e);

@@ -15,26 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.exception;
+package com.axelixlabs.axelix.master.service.auth;
 
+import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.exception.auth.AuthorizationException;
 
 /**
- * The exception that happened during the authorization.
+ * SPI interface that is capable of authorizing the given {@link User} against an {@link AuthorizationRequest}.
  *
  * @since 16.07.25
  * @author Mikhail Polivakha
  */
-public class AuthorizationException extends RuntimeException {
+public interface Authorizer {
 
-    private final User user;
-
-    public AuthorizationException(String errorMessage, User user) {
-        super(errorMessage);
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
-    }
+    /**
+     * Authorizes the given {@link User} against the specified {@link AuthorizationRequest}.
+     * Normal exit signals that the request is authorized.
+     *
+     * @param user the user to authorize
+     * @param authorizationRequest the request containing required authorities
+     * @throws AuthorizationException if access is denied
+     */
+    void authorize(User user, AuthorizationRequest authorizationRequest) throws AuthorizationException;
 }

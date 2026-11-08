@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.exception.auth;
 
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 
 /**
  * Exception thrown when a suspended user attempts to log in.

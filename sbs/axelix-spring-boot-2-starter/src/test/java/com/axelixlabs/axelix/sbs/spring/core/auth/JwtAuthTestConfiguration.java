@@ -19,22 +19,16 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.time.Duration;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.server.PathContainer;
-import org.springframework.web.util.pattern.PathPattern;
-import org.springframework.web.util.pattern.PathPatternParser;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
 /**
@@ -58,34 +52,19 @@ public class JwtAuthTestConfiguration {
     }
 
     @Bean
-    public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
-        return new DefaultJwtDecoderService(
-                new DefaultAuthoritiesManager(null),
-                authProperties.getJwt().getAlgorithm(),
-                authProperties.getJwt().getSigningKey());
+    public TechUserJwtSerializer techUserJwtSerializer(AuthProperties authProperties) {
+        return new DefaultTechUserJwtSerializer(
+                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
     }
 
     @Bean
-    public AuthorityResolver authorityResolver() {
-        return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
-            PathPattern parse = new PathPatternParser().parse(pathTemplate);
-            return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
-        });
+    public TechUserJwtDeserializer techUserJwtDeserializer(AuthProperties authProperties) {
+        return new DefaultTechUserJwtDeserializer(
+                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
     }
 
     @Bean
-    public Authorizer authorizer() {
-        return new DefaultAuthorizer();
-    }
-
-    @Bean
-    public WebIdentityAccessManager securityManager(JwtDecoderService jwtDecoderService) {
-        return new ManagedServiceWebIdentityAccessManager(jwtDecoderService);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SecurityContextExecutor securityContextExecutor() {
-        return new ThreadLocalSecurityContextExecutor();
+    public WebIdentityAccessManager securityManager(TechUserJwtDeserializer techUserJwtDeserializer) {
+        return new ManagedServiceWebIdentityAccessManager(techUserJwtDeserializer);
     }
 }

@@ -25,21 +25,13 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.server.PathContainer;
-import org.springframework.web.util.pattern.PathPattern;
-import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
-import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ManagedServiceWebIdentityAccessManager;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
@@ -52,8 +44,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
  * @author Ilya Naumov
  * @since 22.07.2025
  */
-@AxelixAutoConfiguration(
-        after = {SecurityContextExecutorAutoConfiguration.class, ValidationListenerAutoConfiguration.class})
+@AxelixAutoConfiguration(after = {ValidationListenerAutoConfiguration.class})
 @EnableConfigurationProperties(WebEndpointProperties.class)
 public class JwtAuthAutoConfiguration {
 
@@ -66,11 +57,9 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
-        return new DefaultJwtDecoderService(
-                new DefaultAuthoritiesManager(null),
-                authProperties.getJwt().getAlgorithm(),
-                authProperties.getJwt().getSigningKey());
+    public TechUserJwtDeserializer techUserJwtDeserializer(AuthProperties authProperties) {
+        return new DefaultTechUserJwtDeserializer(
+                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
     }
 
     @Bean
@@ -85,20 +74,7 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    public AuthorityResolver authorityResolver() {
-        return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
-            PathPattern parse = new PathPatternParser().parse(pathTemplate);
-            return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
-        });
-    }
-
-    @Bean
-    public Authorizer authorizer() {
-        return new DefaultAuthorizer();
-    }
-
-    @Bean
-    public WebIdentityAccessManager webIdentityAccessManager(JwtDecoderService jwtDecoderService) {
-        return new ManagedServiceWebIdentityAccessManager(jwtDecoderService);
+    public WebIdentityAccessManager webIdentityAccessManager(TechUserJwtDeserializer techUserJwtDeserializer) {
+        return new ManagedServiceWebIdentityAccessManager(techUserJwtDeserializer);
     }
 }

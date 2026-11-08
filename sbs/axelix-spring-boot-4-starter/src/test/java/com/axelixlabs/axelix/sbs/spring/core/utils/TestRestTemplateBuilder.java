@@ -18,9 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.utils;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.restclient.RestTemplateBuilder;
@@ -33,8 +31,11 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
@@ -57,7 +58,7 @@ public class TestRestTemplateBuilder {
     // kind of have to lean towards a listener here.
     private int testTomcatServerPort;
 
-    private final JwtEncoderService defaultJwtEncoderService;
+    private final TechUserJwtSerializer techUserJwtSerializer;
     private final JwtEncoderService expiredJwtEncoderService;
 
     @EventListener
@@ -68,7 +69,7 @@ public class TestRestTemplateBuilder {
     public TestRestTemplateBuilder(
             final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
             final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-        this.defaultJwtEncoderService = new DefaultJwtEncoderService(algorithm, signingKey, Duration.ofHours(1));
+        this.techUserJwtSerializer = new DefaultTechUserJwtSerializer(algorithm, signingKey);
         this.expiredJwtEncoderService = new DefaultJwtEncoderService(algorithm, signingKey, Duration.ZERO);
     }
 
@@ -85,7 +86,7 @@ public class TestRestTemplateBuilder {
     }
 
     public TestRestTemplate withRole(Role role) {
-        String token = generateToken(new Role[] {role});
+        String token = techUserJwtSerializer.serialize(TechUser.MASTER);
 
         return buildWithToken(token);
     }
@@ -124,11 +125,6 @@ public class TestRestTemplateBuilder {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .rootUri(HOST + testTomcatServerPort)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + expiredToken));
-    }
-
-    private String generateToken(Role[] roles) {
-        return defaultJwtEncoderService.generateToken(
-                UserUtils.withPassword(USERNAME, PASSWORD, Arrays.stream(roles).collect(Collectors.toSet())));
     }
 
     private String generateExpiredToken() {

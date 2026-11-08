@@ -32,7 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
  * @author Sergey Cherkasov
  * @author Ilya Naumov
  */
-@AxelixAutoConfiguration(after = {SecurityContextExecutorAutoConfiguration.class})
+@AxelixAutoConfiguration
 public class EndpointPropertiesSupportAutoConfiguration {
 
     @Bean

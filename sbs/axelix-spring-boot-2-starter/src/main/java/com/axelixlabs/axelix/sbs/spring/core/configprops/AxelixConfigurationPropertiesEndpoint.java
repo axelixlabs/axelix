@@ -17,16 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import java.security.Principal;
-
-import org.jspecify.annotations.Nullable;
-
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.AxelixPrincipal;
 
 /**
  * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}
@@ -40,24 +34,13 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.AxelixPrincipal;
 public class AxelixConfigurationPropertiesEndpoint {
 
     private final ConfigurationPropertiesService configurationPropertiesService;
-    private final SecurityContextExecutor securityContextExecutor;
 
-    public AxelixConfigurationPropertiesEndpoint(
-            ConfigurationPropertiesService configurationPropertiesService,
-            SecurityContextExecutor securityContextExecutor) {
+    public AxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesService configurationPropertiesService) {
         this.configurationPropertiesService = configurationPropertiesService;
-        this.securityContextExecutor = securityContextExecutor;
     }
 
     @GetMapping
-    public ConfigurationPropertiesFeed configurationProperties(@Nullable Principal principal) {
-        if (principal instanceof AxelixPrincipal) {
-            // we're using reactive
-            return securityContextExecutor.callWithinSecurityContext(
-                    configurationPropertiesService::getConfigProps, ((AxelixPrincipal) principal).securityContext());
-        } else {
-            // we're working on the standard servlet app, JwtAuthorizationFilter has already set the security context
-            return configurationPropertiesService.getConfigProps();
-        }
+    public ConfigurationPropertiesFeed configurationProperties() {
+        return configurationPropertiesService.getConfigProps();
     }
 }

@@ -26,7 +26,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SharedAxelixConfigurationProperties;
 
 /**
@@ -60,9 +59,8 @@ public class ConfigPropsTestSupportConfiguration {
 
     @Bean
     public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-            ConfigurationPropertiesService configurationPropertiesService,
-            SecurityContextExecutor securityContextExecutor) {
-        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService, securityContextExecutor);
+            ConfigurationPropertiesService configurationPropertiesService) {
+        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
     }
 
     @ConfigurationProperties(prefix = "axelix.prop.test")

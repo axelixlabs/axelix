@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -28,10 +27,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -48,15 +47,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.beans.BeansFeed;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
@@ -136,37 +129,73 @@ class JwtAuthorizationFilterTest {
         }
     }
 
-    @Value("${axelix.sbs.auth.jwt.lifespan}")
-    private Duration lifespan;
-
     @Autowired
     private TestRestTemplate restTemplate;
 
     @Autowired
     private JwtEncoderService jwtEncoderService;
 
+    @Autowired
+    private TechUserJwtSerializer techUserJwtSerializer;
+
     @ParameterizedTest
     @MethodSource("adminEndpoints")
-    void shouldAllowAccess_ForUserWithRoleAdmin(String path, HttpMethod httpMethod) {
+    void shouldAllowAccessForMaster(String path, HttpMethod httpMethod) {
+        // given.
         buildCache();
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
-        HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
+        String token = techUserJwtSerializer.serialize(TechUser.MASTER);
 
-        ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
+        // when.
+        ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, defaultEntity(token), Void.class);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
+    @Test
+    void shouldRejectManagedServiceToken() {
+        // given.
+        String token = techUserJwtSerializer.serialize(TechUser.MANAGED_SERVICE);
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
     @ParameterizedTest
-    @MethodSource("adminEndpoints")
-    void shouldAllowAccess_MultipleRoles(String path, HttpMethod httpMethod) {
-        buildCache();
-        User user = UserUtils.withPassword(
-                USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN, TestRoles.EDITOR, TestRoles.VIEWER));
-        HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
+    @ValueSource(strings = {"", "malformed", "BearerToken"})
+    void shouldRejectInvalidToken(String token) {
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token), String.class);
 
-        ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
 
+    @Test
+    void shouldRejectHumanUserToken() {
+        // given.
+        String token =
+                jwtEncoderService.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN)));
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldAllowHealthWithoutToken() {
+        // when.
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/health", String.class);
+
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
@@ -179,186 +208,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
                 Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
-    }
-
-    @ParameterizedTest
-    @MethodSource("editorEndpoints")
-    void shouldAllowAccess_ForUserWithRoleEditor(String path, HttpMethod httpMethod) {
-        buildCache();
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
-        HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    static Stream<Arguments> editorEndpoints() {
-        return Stream.of(
-                Arguments.of("/actuator/axelix-caches", HttpMethod.GET),
-                Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
-                Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
-                Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
-                Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
-    }
-
-    @ParameterizedTest
-    @MethodSource("viewerEndpoints")
-    void shouldAllowAccess_ForUserWithRoleViewer(String path, HttpMethod httpMethod) {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
-        HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @ParameterizedTest
-    @MethodSource("viewerEndpoints")
-    void shouldAllowAccess_UserWithEmptyRoles(String path, HttpMethod httpMethod) {
-        buildCache();
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
-        HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        ResponseEntity<String> response = restTemplate.exchange(path, httpMethod, entity, String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    static Stream<Arguments> viewerEndpoints() {
-        return Stream.of(
-                Arguments.of("/actuator/axelix-caches", HttpMethod.GET),
-                Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
-                Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
-    }
-
-    @ParameterizedTest
-    @MethodSource("notAuthorityForRole")
-    // TODO: Revisit this test after the master-centralized RBAC is in place
-    void shouldAllowAccess_UserWithoutRequiredAuthority_ForUserWithRoleViewer(String path, HttpMethod httpMethod) {
-        buildCache();
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
-        HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @ParameterizedTest
-    @MethodSource("notAuthorityForRole")
-    // TODO: Revisit this test after the master-centralized RBAC is in place
-    void shouldAllowAccess_UserWithEmptyRoles_ForMutationEndpoints(String path, HttpMethod httpMethod) {
-        buildCache();
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
-        HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        ResponseEntity<String> response = restTemplate.exchange(path, httpMethod, entity, String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    static Stream<Arguments> notAuthorityForRole() {
-        return Stream.of(
-                Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
-                Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST));
-    }
-
-    @Test
-    void shouldReturnUnauthorized_AuthorizationHeaderIsMalformed() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "BearerToken" + jwtEncoderService.generateToken(user));
-
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-        ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, entity, String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @Test
-    // TODO: Revisit this test after the master-centralized RBAC is in place
-    void shouldAllowAccess_UserHasRoleWithInvalidAuthority() {
-        buildCache();
-        Role role = new DefaultRole("VIEWER", Set.of(UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY));
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
-        String token = jwtEncoderService.generateToken(user);
-
-        ResponseEntity<Void> response = testRestTemplate.exchange(
-                path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE, defaultEntity(token), Void.class);
-
-        assertThat(response).returns(HttpStatus.OK, ResponseEntity::getStatusCode);
-    }
-
-    @Test
-    void shouldReturnUnauthorized_TokenIsTampered() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
-        String token = jwtEncoderService.generateToken(user);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token + "x"), String.class);
-
-        assertThat(response).returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode);
-    }
-
-    @Test
-    void shouldReturnUnauthorized_TokenSigningKeyIsTampered() {
-        String wrongSecret = "MX3TNBx0j8bGCjGWCvq1JffIqqzXLIV-URlKFLX4mfA";
-        JwtEncoderService encoderWithWrongSecret =
-                new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, wrongSecret, lifespan);
-
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
-        String token = encoderWithWrongSecret.generateToken(user);
-
-        ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token), String.class);
-
-        assertThat(response).returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode);
-    }
-
-    @Test
-    void shouldReturnUnauthorized_TokenIsExpired() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
-        String token = jwtEncoderService.generateToken(user, Duration.ofDays(0));
-
-        ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token), String.class);
-
-        assertThat(response).returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode);
-    }
-
-    @Test
-    void shouldReturnUnauthorized_TokenIsMissing() {
-        ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(""), String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @Test
-    void shouldReturnAllowNonAxelixActuatorEndpointToBeInvokedWithoutToken() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/health", String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    // TODO: Revisit this test after the master-centralized RBAC is in place
-    void shouldAllowAccess_TokenWithNullNameRoles() {
-        Role role = new DefaultRole(null, Set.of(OssAuthority.CACHES_CLEAR));
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
-        String token = jwtEncoderService.generateToken(user);
-
-        ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(token), String.class);
-
-        assertThat(response).returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode);
     }
 
     private HttpEntity<Void> defaultEntity(String token) {
@@ -385,15 +234,6 @@ class JwtAuthorizationFilterTest {
 
     private void buildCache() {
         cacheManager.getCache(TEST_CACHE_1).put("key1", "value1");
-    }
-
-    enum UnrecognizedAuthority implements Authority {
-        UNRECOGNIZED_AUTHORITY;
-
-        @Override
-        public String getName() {
-            return name();
-        }
     }
 
     @TestConfiguration
@@ -432,9 +272,8 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
-            return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+            return new AxelixEnvironmentEndpoint(environmentService);
         }
 
         @Bean

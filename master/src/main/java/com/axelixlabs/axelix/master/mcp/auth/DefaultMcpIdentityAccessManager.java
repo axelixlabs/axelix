@@ -30,12 +30,12 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.utils.Assert;
+import com.axelixlabs.axelix.master.exception.auth.AuthorizationException;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
+import com.axelixlabs.axelix.master.service.auth.Authorizer;
 
 /**
  * Default implementation of the {@link McpIdentityAccessManager}.

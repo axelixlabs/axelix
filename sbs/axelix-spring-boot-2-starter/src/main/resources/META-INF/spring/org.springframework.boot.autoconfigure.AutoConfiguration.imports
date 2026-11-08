@@ -22,6 +22,5 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.HeartBeatAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCoreNamingAutoConfiguration

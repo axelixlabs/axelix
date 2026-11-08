@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,13 +36,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
-import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
+import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
@@ -76,7 +74,7 @@ class JwtAuthorizationFilterSeparateManagementPortTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private JwtEncoderService jwtEncoderService;
+    private AuthProperties authProperties;
 
     @Test
     void shouldReturnUnauthorized_TokenIsMissing() {
@@ -87,8 +85,10 @@ class JwtAuthorizationFilterSeparateManagementPortTest {
 
     @Test
     void shouldAllowAccess_TokenIsValid() {
-        String token = jwtEncoderService.generateToken(
-                UserUtils.withPassword("testUser", "testPassword", Set.of(TestRoles.ADMIN)));
+        String token = new DefaultTechUserJwtSerializer(
+                        authProperties.getJwt().getAlgorithm(),
+                        authProperties.getJwt().getSigningKey())
+                .serialize(TechUser.MASTER);
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token);
 
@@ -114,9 +114,8 @@ class JwtAuthorizationFilterSeparateManagementPortTest {
     static class EnvEndpointConfiguration {
 
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
-            return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+            return new AxelixEnvironmentEndpoint(environmentService);
         }
 
         @Bean

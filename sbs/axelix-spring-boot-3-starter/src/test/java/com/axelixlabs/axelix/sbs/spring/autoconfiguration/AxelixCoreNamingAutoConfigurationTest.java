@@ -43,9 +43,7 @@ class AxelixCoreNamingAutoConfigurationTest {
     @Test
     void shouldRenameBeanToAxelixConvention() {
         contextRunner
-                .withConfiguration(AutoConfigurations.of(
-                        EndpointPropertiesSupportAutoConfiguration.class,
-                        SecurityContextExecutorAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(EndpointPropertiesSupportAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).hasSingleBean(AxelixBeanRenamingProcessor.class);
 

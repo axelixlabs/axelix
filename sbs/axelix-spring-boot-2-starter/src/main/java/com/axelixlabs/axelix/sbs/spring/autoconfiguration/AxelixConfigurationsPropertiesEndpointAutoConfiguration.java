@@ -21,7 +21,6 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.condition.Conditi
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
@@ -62,8 +61,7 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-            ConfigurationPropertiesService configurationPropertiesService,
-            SecurityContextExecutor securityContextExecutor) {
-        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService, securityContextExecutor);
+            ConfigurationPropertiesService configurationPropertiesService) {
+        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
     }
 }

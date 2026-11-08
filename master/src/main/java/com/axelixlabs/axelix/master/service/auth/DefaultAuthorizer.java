@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.service;
+package com.axelixlabs.axelix.master.service.auth;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
+import com.axelixlabs.axelix.master.exception.auth.AuthorizationException;
 
 /**
  * Default implementation of {@link Authorizer}.

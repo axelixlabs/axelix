@@ -46,7 +46,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.contract.env.Property;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
@@ -393,9 +392,8 @@ class AxelixEnvironmentEndpointTest {
         }
 
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
-            return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+            return new AxelixEnvironmentEndpoint(environmentService);
         }
 
         @Bean

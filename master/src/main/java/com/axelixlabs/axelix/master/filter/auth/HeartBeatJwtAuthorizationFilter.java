@@ -40,11 +40,11 @@ import com.axelixlabs.axelix.common.auth.core.InternalAuthorities;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
+import com.axelixlabs.axelix.master.service.auth.Authorizer;
 
 /**
  * Auth filter that is supposed to act like a central point for authenticating and authorizing the heartbeats.

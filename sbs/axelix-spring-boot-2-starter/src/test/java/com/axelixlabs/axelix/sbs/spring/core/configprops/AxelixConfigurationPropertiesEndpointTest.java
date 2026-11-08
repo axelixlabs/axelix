@@ -40,7 +40,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
@@ -269,9 +268,8 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
         @Bean
         public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-                DefaultConfigurationPropertiesService configurationPropertiesService,
-                SecurityContextExecutor securityContextExecutor) {
-            return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService, securityContextExecutor);
+                DefaultConfigurationPropertiesService configurationPropertiesService) {
+            return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
         }
     }
 }

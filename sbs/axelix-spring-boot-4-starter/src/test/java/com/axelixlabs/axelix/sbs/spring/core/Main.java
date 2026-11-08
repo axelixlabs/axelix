@@ -43,7 +43,6 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.HeartBeatAutoConfigura
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration;
@@ -80,7 +79,6 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAuto
             LibraryInformationProviderAutoConfiguration.class,
             AxelixLoggersEndpointAutoConfiguration.class,
             AxelixLogsEndpointAutoConfiguration.class,
-            SecurityContextExecutorAutoConfiguration.class,
             ValidationListenerAutoConfiguration.class,
         })
 @EnableCaching

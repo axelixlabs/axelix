@@ -43,8 +43,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(
                     AxelixConfigurationsPropertiesEndpointAutoConfiguration.class,
-                    EndpointPropertiesSupportAutoConfiguration.class,
-                    SecurityContextExecutorAutoConfiguration.class))
+                    EndpointPropertiesSupportAutoConfiguration.class))
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-configprops");
 
     @Test
@@ -56,7 +55,6 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             assertThat(context).hasSingleBean(SmartSanitizingFunction.class);
             assertThat(context).hasSingleBean(ConfigurationPropertiesService.class);
             assertThat(context).hasSingleBean(AxelixConfigurationPropertiesEndpoint.class);
-            assertThat(context).hasSingleBean(SecurityContextExecutor.class);
         });
     }
 

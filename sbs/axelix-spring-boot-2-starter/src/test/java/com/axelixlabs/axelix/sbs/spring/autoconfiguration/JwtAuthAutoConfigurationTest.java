@@ -31,11 +31,9 @@ import org.springframework.boot.test.context.runner.WebApplicationContextRunner;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ReactiveJwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
@@ -56,13 +54,11 @@ class JwtAuthAutoConfigurationTest {
                     "axelix.sbs.auth.jwt",
                     "axelix.sbs.auth.jwt.algorithm=HMAC512",
                     "axelix.sbs.auth.jwt.signing-key=secret")
-            .withConfiguration(AutoConfigurations.of(
-                    JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class));
 
     private final WebApplicationContextRunner webContextRunner = new WebApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(
                     JwtAuthAutoConfiguration.class,
-                    SecurityContextExecutorAutoConfiguration.class,
                     EndpointAutoConfiguration.class,
                     WebEndpointAutoConfiguration.class,
                     DispatcherServletAutoConfiguration.class,
@@ -72,12 +68,10 @@ class JwtAuthAutoConfigurationTest {
     void shouldCreateAllBeansInDefaultScenario() {
         contextRunner.run(context -> {
             assertThat(context).hasSingleBean(JwtAuthAutoConfiguration.class);
-            assertThat(context).hasSingleBean(JwtDecoderService.class);
+            assertThat(context).doesNotHaveBean(JwtDecoderService.class);
             assertThat(context).hasSingleBean(JwtEncoderService.class);
-            assertThat(context).hasSingleBean(AuthorityResolver.class);
-            assertThat(context).hasSingleBean(Authorizer.class);
+            assertThat(context).hasSingleBean(TechUserJwtDeserializer.class);
             assertThat(context).hasSingleBean(WebIdentityAccessManager.class);
-            assertThat(context).hasSingleBean(SecurityContextExecutor.class);
         });
     }
 
@@ -86,7 +80,6 @@ class JwtAuthAutoConfigurationTest {
         new ReactiveWebApplicationContextRunner()
                 .withConfiguration(AutoConfigurations.of(
                         JwtAuthAutoConfiguration.class,
-                        SecurityContextExecutorAutoConfiguration.class,
                         EndpointAutoConfiguration.class,
                         WebEndpointAutoConfiguration.class,
                         ManagementContextAutoConfiguration.class))
@@ -99,8 +92,7 @@ class JwtAuthAutoConfigurationTest {
     @Test
     void shouldUseDefaults_whenAlgorithmAndSigningKeyAreMissing() {
         new ApplicationContextRunner()
-                .withConfiguration(AutoConfigurations.of(
-                        JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).hasNotFailed();
 
@@ -119,8 +111,7 @@ class JwtAuthAutoConfigurationTest {
                         "axelix.sbs.auth.jwt",
                         "axelix.sbs.auth.jwt.algorithm=RSA512",
                         "axelix.sbs.auth.jwt.signing-key=secret")
-                .withConfiguration(AutoConfigurations.of(
-                        JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);

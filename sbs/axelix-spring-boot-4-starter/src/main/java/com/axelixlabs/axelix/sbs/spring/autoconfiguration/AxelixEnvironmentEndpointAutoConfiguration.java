@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
@@ -71,7 +70,7 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
     public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
-            PropertyNameNormalizer propertyNameNormalizer, SecurityContextExecutor securityContextExecutor) {
+            PropertyNameNormalizer propertyNameNormalizer) {
         return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
     }
 
@@ -81,8 +80,7 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     }
 
     @Bean
-    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-            EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
-        return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
+    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+        return new AxelixEnvironmentEndpoint(environmentService);
     }
 }

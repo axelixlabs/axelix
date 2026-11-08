@@ -27,7 +27,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.filter.auth.McpAuthorizationFilter;
@@ -38,6 +37,7 @@ import com.axelixlabs.axelix.master.mcp.auth.McpEndpointAuthorityResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpEndpointResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
+import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
 
 /**

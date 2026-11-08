@@ -24,12 +24,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.AbstractExceptionHandler;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.error.handle.ExceptionHandler;
+import com.axelixlabs.axelix.master.exception.auth.AuthorizationException;
 import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpIamEventInterceptor;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInterceptor;
 

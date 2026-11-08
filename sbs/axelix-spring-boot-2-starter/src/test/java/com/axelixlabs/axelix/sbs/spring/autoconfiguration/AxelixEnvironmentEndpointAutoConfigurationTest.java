@@ -45,8 +45,7 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-env")
             .withConfiguration(AutoConfigurations.of(
                     AxelixEnvironmentEndpointAutoConfiguration.class,
-                    EndpointPropertiesSupportAutoConfiguration.class,
-                    SecurityContextExecutorAutoConfiguration.class));
+                    EndpointPropertiesSupportAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
@@ -67,8 +66,7 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
                 .withPropertyValues("management.endpoints.web.exposure.exclude=axelix-env")
                 .withConfiguration(AutoConfigurations.of(
                         AxelixEnvironmentEndpointAutoConfiguration.class,
-                        EndpointPropertiesSupportAutoConfiguration.class,
-                        SecurityContextExecutorAutoConfiguration.class))
+                        EndpointPropertiesSupportAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixEnvironmentEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(PropertyMetadataExtractor.class);

@@ -34,10 +34,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
@@ -67,11 +65,6 @@ public class EnvSharedTestConfig {
     public ConfigurationPropertiesConverter configurationPropertiesConverter(
             ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
         return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
-    }
-
-    @Bean
-    public SecurityContextExecutor securityContextExecutor() {
-        return new ThreadLocalSecurityContextExecutor();
     }
 
     @Bean
@@ -122,9 +115,8 @@ public class EnvSharedTestConfig {
     }
 
     @Bean
-    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-            EnvironmentService environmentService, SecurityContextExecutor securityContextExecutor) {
-        return new AxelixEnvironmentEndpoint(environmentService, securityContextExecutor);
+    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+        return new AxelixEnvironmentEndpoint(environmentService);
     }
 
     @Bean(SAMPLE_BEAN_NAME)

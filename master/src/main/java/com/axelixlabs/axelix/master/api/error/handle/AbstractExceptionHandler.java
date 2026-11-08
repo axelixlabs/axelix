@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.data.util.ProxyUtils;
 
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
+import com.axelixlabs.axelix.master.exception.auth.AuthorizationException;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebRequestContext;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.McpRequestContext;

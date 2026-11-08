@@ -18,10 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.net.URI;
-import java.security.Principal;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,13 +36,11 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
-import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -65,7 +60,6 @@ class ReactiveJwtAuthorizationFilterTest {
                             + "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff")
             .withConfiguration(AutoConfigurations.of(
                     JwtAuthAutoConfiguration.class,
-                    SecurityContextExecutorAutoConfiguration.class,
                     EndpointAutoConfiguration.class,
                     WebEndpointAutoConfiguration.class,
                     ManagementContextAutoConfiguration.class));
@@ -117,26 +111,51 @@ class ReactiveJwtAuthorizationFilterTest {
     }
 
     @Test
-    void shouldPassAuthorizedRequestWithAxelixPrincipal() {
+    void shouldPassAuthorizedMasterRequest() {
         contextRunner.run(context -> {
+            // given.
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
-            User user = UserUtils.withPassword("testUser", "testPassword", Set.of(TestRoles.VIEWER));
-            String token = context.getBean(JwtEncoderService.class).generateToken(user);
+            AuthProperties.Jwt jwt = context.getBean(AuthProperties.class).getJwt();
+            String token = new DefaultTechUserJwtSerializer(jwt.getAlgorithm(), jwt.getSigningKey())
+                    .serialize(TechUser.MASTER);
             MockServerWebExchange exchange = MockServerWebExchange.from(
                     MockServerHttpRequest.get("/actuator/axelix-env").header(HttpHeaders.AUTHORIZATION, bearer(token)));
-            AtomicReference<Principal> principal = new AtomicReference<>();
+            AtomicBoolean passed = new AtomicBoolean();
 
-            filter.filter(
-                            exchange,
-                            e -> e.getPrincipal()
-                                    .doOnNext(principal::set)
-                                    .then(e.getResponse().setComplete()))
+            // when.
+            filter.filter(exchange, e -> {
+                        passed.set(true);
+                        return e.getResponse().setComplete();
+                    })
                     .block();
 
-            assertThat(principal.get()).isInstanceOfSatisfying(AxelixPrincipal.class, axelixPrincipal -> {
-                assertThat(axelixPrincipal.getName()).isEqualTo("testUser");
-                assertThat(axelixPrincipal.securityContext().token()).isEqualTo(token);
-            });
+            // then.
+            assertThat(passed).isTrue();
+        });
+    }
+
+    @Test
+    void shouldRejectManagedServiceToken() {
+        contextRunner.run(context -> {
+            // given.
+            ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
+            AuthProperties.Jwt jwt = context.getBean(AuthProperties.class).getJwt();
+            String token = new DefaultTechUserJwtSerializer(jwt.getAlgorithm(), jwt.getSigningKey())
+                    .serialize(TechUser.MANAGED_SERVICE);
+            MockServerWebExchange exchange = MockServerWebExchange.from(
+                    MockServerHttpRequest.get("/actuator/axelix-env").header(HttpHeaders.AUTHORIZATION, bearer(token)));
+            AtomicBoolean passed = new AtomicBoolean();
+
+            // when.
+            filter.filter(exchange, e -> {
+                        passed.set(true);
+                        return e.getResponse().setComplete();
+                    })
+                    .block();
+
+            // then.
+            assertThat(passed).isFalse();
+            assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         });
     }
 
@@ -145,8 +164,10 @@ class ReactiveJwtAuthorizationFilterTest {
         contextRunner.run(context -> {
             // given.
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
-            User user = UserUtils.withPassword("testUser", "testPassword", Set.of(TestRoles.ADMIN));
-            String token = context.getBean(JwtEncoderService.class).generateToken(user);
+            String token = new DefaultTechUserJwtSerializer(
+                            context.getBean(AuthProperties.class).getJwt().getAlgorithm(),
+                            context.getBean(AuthProperties.class).getJwt().getSigningKey())
+                    .serialize(TechUser.MASTER);
             MockServerWebExchange exchange = MockServerWebExchange.from(
                     MockServerHttpRequest.get("/actuator/axelix-env").header(HttpHeaders.AUTHORIZATION, bearer(token)));
 
@@ -160,12 +181,13 @@ class ReactiveJwtAuthorizationFilterTest {
     }
 
     @Test
-    // TODO: Revisit this test after the master-centralized RBAC is in place
-    void shouldAllowRequestRegardlessOfAuthorities() {
+    void shouldAllowMasterMutationRequest() {
         contextRunner.run(context -> {
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
-            User user = UserUtils.withPassword("testUser", "testPassword", Set.of(TestRoles.VIEWER));
-            String token = context.getBean(JwtEncoderService.class).generateToken(user);
+            String token = new DefaultTechUserJwtSerializer(
+                            context.getBean(AuthProperties.class).getJwt().getAlgorithm(),
+                            context.getBean(AuthProperties.class).getJwt().getSigningKey())
+                    .serialize(TechUser.MASTER);
             MockServerWebExchange exchange = MockServerWebExchange.from(
                     MockServerHttpRequest.delete("/actuator/axelix-caches/mainCacheManager/cache/clear")
                             .header(HttpHeaders.AUTHORIZATION, bearer(token)));
@@ -185,8 +207,10 @@ class ReactiveJwtAuthorizationFilterTest {
     void shouldRejectRequestWithTamperedToken() {
         contextRunner.run(context -> {
             ReactiveJwtAuthorizationFilter filter = context.getBean(ReactiveJwtAuthorizationFilter.class);
-            User user = UserUtils.withPassword("testUser", "testPassword", Set.of(TestRoles.ADMIN));
-            String token = context.getBean(JwtEncoderService.class).generateToken(user);
+            String token = new DefaultTechUserJwtSerializer(
+                            context.getBean(AuthProperties.class).getJwt().getAlgorithm(),
+                            context.getBean(AuthProperties.class).getJwt().getSigningKey())
+                    .serialize(TechUser.MASTER);
             MockServerWebExchange exchange =
                     MockServerWebExchange.from(MockServerHttpRequest.get("/actuator/axelix-env")
                             .header(HttpHeaders.AUTHORIZATION, bearer(token + "x")));

@@ -40,13 +40,10 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.exception.TechUserAuthorizationException;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
@@ -84,17 +81,14 @@ public class ReactiveJwtAuthorizationFilter implements WebFilter {
                         HttpMethod requestHttpMethod =
                                 HttpMethod.valueOf(request.getMethod().name());
                         String relativePath = normalizedPath(path).substring(baseActuatorPath.length());
-                        User user = webIdentityAccessManager.verifyAccess(relativePath, requestHttpMethod, token);
-                        SecurityContext securityContext = new DefaultSecurityContext(user, token);
+                        webIdentityAccessManager.verifyAccess(relativePath, requestHttpMethod, token);
 
-                        AxelixPrincipal principal = new AxelixPrincipal(securityContext);
                         axelixExchange = exchange.mutate()
                                 .request(new BoundedElasticBodyRequest(request))
-                                .principal(Mono.just(principal))
                                 .build();
                     } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
                         return respondWith(exchange.getResponse(), HttpStatus.UNAUTHORIZED, e.getMessage());
-                    } catch (AuthorizationException e) {
+                    } catch (TechUserAuthorizationException e) {
                         return respondWith(exchange.getResponse(), HttpStatus.FORBIDDEN, e.getMessage());
                     }
 

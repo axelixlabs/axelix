@@ -24,7 +24,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixManagementContextConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ReactiveJwtAuthorizationFilter;
@@ -48,12 +47,10 @@ public class JwtAuthManagementContextConfiguration {
 
         @Bean
         public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-                WebIdentityAccessManager webIdentityAccessManager,
-                SecurityContextExecutor securityContextExecutor,
-                WebEndpointProperties webEndpointProperties) {
+                WebIdentityAccessManager webIdentityAccessManager, WebEndpointProperties webEndpointProperties) {
 
-            var jwtAuthorizationFilter = new JwtAuthorizationFilter(
-                    webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
+            var jwtAuthorizationFilter =
+                    new JwtAuthorizationFilter(webIdentityAccessManager, webEndpointProperties.getBasePath());
             var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
             registration.setName("jwtAuthorizationFilter");
             return registration;
