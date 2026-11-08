@@ -17,14 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
@@ -43,12 +39,6 @@ public class JwtAuthTestConfiguration {
     @ConfigurationProperties(prefix = AuthProperties.CONFIG_PROPS_PREFIX)
     public AuthProperties authProperties() {
         return new AuthProperties();
-    }
-
-    @Bean
-    public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
-        return new DefaultJwtEncoderService(
-                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey(), Duration.ofHours(1));
     }
 
     @Bean

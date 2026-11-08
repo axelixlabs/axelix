@@ -50,7 +50,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.HmacVerificationStrategy;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
@@ -64,6 +63,7 @@ import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
+import com.axelixlabs.axelix.master.service.auth.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;

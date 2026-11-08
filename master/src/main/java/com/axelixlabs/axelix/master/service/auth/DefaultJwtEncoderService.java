@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.service;
+package com.axelixlabs.axelix.master.service.auth;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,6 +33,8 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.contract.jwt.AxelixJwtToken;
 import com.axelixlabs.axelix.common.contract.jwt.JwtRole;
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.service;
+package com.axelixlabs.axelix.master.service.auth;
 
 import java.time.Duration;
 import java.util.List;
@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
@@ -49,6 +50,8 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
@@ -63,6 +66,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = DefaultJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
+@TestPropertySource("classpath:jwt-services-test.properties")
 class DefaultJwtDecoderServiceTest {
 
     private static final String USER_NAME = "testUser";

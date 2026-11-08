@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.service;
+package com.axelixlabs.axelix.master.service.auth;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +39,9 @@ import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
+import com.axelixlabs.axelix.common.auth.service.JwtVerificationStrategy;
+import com.axelixlabs.axelix.common.auth.service.JwtVerificationStrategyFactory;
 
 /**
  * Default implementation of {@link JwtDecoderService}.

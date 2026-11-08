@@ -39,7 +39,6 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
@@ -50,6 +49,7 @@ import com.axelixlabs.axelix.master.filter.auth.requestcontext.McpRequestContext
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
+import com.axelixlabs.axelix.master.service.auth.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
 
 /**

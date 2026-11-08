@@ -17,8 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.utils;
 
-import java.time.Duration;
-import java.util.Set;
+import java.time.Instant;
+import java.util.Date;
+
+import io.jsonwebtoken.Jwts;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -32,12 +34,11 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
-import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
 /**
  * Configuration for the tests that cover the HTTP API side.
@@ -50,8 +51,6 @@ import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 public class TestRestTemplateBuilder {
 
     private static final String HOST = "http://localhost:";
-    private static final String USERNAME = "testUser";
-    private static final String PASSWORD = "testPassword";
 
     // We cannot use @LocalServerPort here since at the time of this
     // bean initialization, the webserver is not yet started, so, we
@@ -59,7 +58,8 @@ public class TestRestTemplateBuilder {
     private int testTomcatServerPort;
 
     private final TechUserJwtSerializer techUserJwtSerializer;
-    private final JwtEncoderService expiredJwtEncoderService;
+    private final JwtSigningStrategy signingStrategy;
+    private final String signingKey;
 
     @EventListener
     public void handleServletWebServerInitializedEvent(ServletWebServerInitializedEvent event) {
@@ -70,7 +70,8 @@ public class TestRestTemplateBuilder {
             final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
             final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
         this.techUserJwtSerializer = new DefaultTechUserJwtSerializer(algorithm, signingKey);
-        this.expiredJwtEncoderService = new DefaultJwtEncoderService(algorithm, signingKey, Duration.ZERO);
+        this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
+        this.signingKey = signingKey;
     }
 
     public TestRestTemplate asViewer() {
@@ -128,6 +129,13 @@ public class TestRestTemplateBuilder {
     }
 
     private String generateExpiredToken() {
-        return expiredJwtEncoderService.generateToken(UserUtils.withPassword(USERNAME, PASSWORD, Set.of()));
+        return signingStrategy
+                .signToken(
+                        Jwts.builder()
+                                .subject(TechUser.MASTER.getId())
+                                .issuedAt(Date.from(Instant.now().minusSeconds(120)))
+                                .expiration(Date.from(Instant.now().minusSeconds(60))),
+                        signingKey)
+                .compact();
     }
 }

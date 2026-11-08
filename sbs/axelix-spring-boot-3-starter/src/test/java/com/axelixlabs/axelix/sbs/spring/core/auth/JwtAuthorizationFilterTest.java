@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import io.jsonwebtoken.Jwts;
@@ -51,12 +50,9 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.beans.BeansFeed;
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
-import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
@@ -112,7 +108,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JwtAuthorizationFilterTest {
 
     private static final String USER_NAME = "testUser";
-    private static final String PASSWORD = "testPassword";
 
     // Cache and CacheManager names under test
     private static final String TEST_CACHE_1 = "cache";
@@ -141,9 +136,6 @@ class JwtAuthorizationFilterTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-
-    @Autowired
-    private JwtEncoderService jwtEncoderService;
 
     @Autowired
     private TechUserJwtSerializer techUserJwtSerializer;
@@ -213,8 +205,17 @@ class JwtAuthorizationFilterTest {
     @Test
     void shouldRejectHumanUserToken() {
         // given.
-        String token =
-                jwtEncoderService.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN)));
+        String token = JwtSigningStrategyFactory.createSigningStrategy(
+                        authProperties.getJwt().getAlgorithm())
+                .signToken(
+                        Jwts.builder()
+                                .subject(USER_NAME)
+                                .claim("uid", "human-user")
+                                .claim("roles", List.of())
+                                .issuedAt(Date.from(Instant.now()))
+                                .expiration(Date.from(Instant.now().plusSeconds(60))),
+                        authProperties.getJwt().getSigningKey())
+                .compact();
 
         // when.
         ResponseEntity<String> response =

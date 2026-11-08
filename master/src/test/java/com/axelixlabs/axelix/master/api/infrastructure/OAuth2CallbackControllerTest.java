@@ -45,7 +45,6 @@ import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
@@ -56,6 +55,7 @@ import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
+import com.axelixlabs.axelix.master.service.auth.JwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
