@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.master.mcp.auth.McpEndpointResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
 
 /**
@@ -56,14 +56,14 @@ public class McpAutoConfiguration {
             ObjectProvider<OAuth2Properties> oAuth2PropertiesObjectProvider,
             McpIdentityAccessManager mcpIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
-            JwtEncoderService jwtEncoderService,
+            UserJwtEncoderService userJwtEncoderService,
             McpServerStreamableHttpProperties mcpProperties,
             ObjectProvider<OnMcpSuccessfulResult> onMcpSuccessfulResultInterceptors) {
         return new McpAuthorizationFilter(
                 oAuth2PropertiesObjectProvider,
                 mcpIdentityAccessManager,
                 securityContextExecutor,
-                jwtEncoderService,
+            userJwtEncoderService,
                 mcpProperties,
                 onMcpSuccessfulResultInterceptors.stream().toList());
     }

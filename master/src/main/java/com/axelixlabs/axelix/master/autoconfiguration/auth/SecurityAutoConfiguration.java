@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.ObjectMapper;
@@ -67,10 +69,8 @@ import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesManager;
 import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesManager.AuthoritiesContributor;
 import com.axelixlabs.axelix.master.service.auth.DefaultAuthorizer;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
@@ -154,9 +154,9 @@ public class SecurityAutoConfiguration {
 
     @Bean
     public ExternalAuthenticationApiFilter externalAuthenticationApiFilter(
-            JwtDecoderService jwtDecoderService, ObjectProvider<OnWebSuccessfulResult> onSuccessfulResultInterceptors) {
+        UserJwtDecoderService userJwtDecoderService, ObjectProvider<OnWebSuccessfulResult> onSuccessfulResultInterceptors) {
         return new ExternalAuthenticationApiFilter(
-                jwtDecoderService, onSuccessfulResultInterceptors.stream().toList());
+            userJwtDecoderService, onSuccessfulResultInterceptors.stream().toList());
     }
 
     /**
@@ -179,26 +179,26 @@ public class SecurityAutoConfiguration {
         @Bean
         public StarterAuthenticationTokenProvider starterAuthenticationTokenProvider(
                 SecurityContextExecutor securityContextExecutor,
-                JwtEncoderService jwtEncoderService,
+                UserJwtEncoderService userJwtEncoderService,
                 TechUserJwtSerializer techUserJwtSerializer) {
             return new StarterAuthenticationTokenProvider(
-                    securityContextExecutor, jwtEncoderService, techUserJwtSerializer);
+                    securityContextExecutor, userJwtEncoderService, techUserJwtSerializer);
         }
 
         private static final Logger log = LoggerFactory.getLogger(JwtAutoConfiguration.class);
 
         @Bean
-        public JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
+        public UserJwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
             if (JwtDefaults.isDefaultSigningKey(jwtProperties.signingKey())) {
                 log.warn(JwtDefaults.MASTER_DEFAULT_SIGNING_KEY_IN_USE_WARNING_MESSAGE);
             }
-            return new DefaultJwtEncoderService(
+            return new DefaultUserJwtEncoderService(
                     jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan());
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties, AuthoritiesManager authoritiesManager) {
-            return new DefaultJwtDecoderService(
+        public UserJwtDecoderService jwtDecoderService(JwtProperties jwtProperties, AuthoritiesManager authoritiesManager) {
+            return new DefaultUserJwtDecoderService(
                     authoritiesManager, jwtProperties.algorithm(), jwtProperties.signingKey());
         }
     }
@@ -217,14 +217,14 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public ExternalApiCookieAuthorizationFilter cookieBasedJwtAuthorizationFilter(
-                JwtDecoderService jwtDecoderService,
+                UserJwtDecoderService userJwtDecoderService,
                 Authorizer authorizer,
                 SecurityContextExecutor securityContextExecutor,
                 ObjectProvider<OnWebSuccessfulResult> iamEvaluationInterceptors) {
 
             return new ExternalApiCookieAuthorizationFilter(
                     securityContextExecutor,
-                    jwtDecoderService,
+                userJwtDecoderService,
                     authorizer,
                     iamEvaluationInterceptors.orderedStream().toList());
         }

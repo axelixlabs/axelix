@@ -22,6 +22,7 @@ import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Set;
 
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import io.jsonwebtoken.Claims;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -49,8 +50,7 @@ import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.serde.DefaultJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -74,10 +74,10 @@ class ProxyingEndpointProberTest {
     private SecurityContextExecutor securityContextExecutor;
 
     @Autowired
-    private JwtEncoderService encoder;
+    private UserJwtEncoderService encoder;
 
     @Autowired
-    private JwtDecoderService decoder;
+    private UserJwtDecoderService decoder;
 
     @Autowired
     private JwtProperties jwtProperties;

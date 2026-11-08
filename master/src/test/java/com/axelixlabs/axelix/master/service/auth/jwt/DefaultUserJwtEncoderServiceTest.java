@@ -52,15 +52,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 
 /**
- * Integration tests for {@link JwtEncoderService}, verifying correct JWT generation logic.
+ * Integration tests for {@link UserJwtEncoderService}, verifying correct JWT generation logic.
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-@SpringBootTest(classes = DefaultJwtEncoderServiceTest.DefaultJwtEncoderServiceTestConfiguration.class)
+@SpringBootTest(classes = DefaultUserJwtEncoderServiceTest.DefaultJwtEncoderServiceTestConfiguration.class)
 @TestPropertySource("classpath:jwt-services-test.properties")
-class DefaultJwtEncoderServiceTest {
+class DefaultUserJwtEncoderServiceTest {
 
     private static final String USER_NAME = "testUser";
     private static final String PASSWORD = "testPassword";
@@ -75,7 +75,7 @@ class DefaultJwtEncoderServiceTest {
     private Duration lifespan;
 
     @Autowired
-    private JwtEncoderService jwtEncoderService;
+    private UserJwtEncoderService userJwtEncoderService;
 
     @Test
     void shouldGenerateTokenWithRequiredClaims() {
@@ -84,7 +84,7 @@ class DefaultJwtEncoderServiceTest {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(viewer));
 
         // when.
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // then.
         Jws<Claims> claims = Jwts.parser()
@@ -115,7 +115,7 @@ class DefaultJwtEncoderServiceTest {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
 
         // when.
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // then.
         // language=json
@@ -147,7 +147,7 @@ class DefaultJwtEncoderServiceTest {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
         // when.
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // then.
         // language=json
@@ -179,7 +179,7 @@ class DefaultJwtEncoderServiceTest {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
 
         // when.
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // then.
         // language=json
@@ -207,7 +207,7 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN, TestRoles.EDITOR, TestRoles.VIEWER));
 
         // when.
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // then.
         // language=json
@@ -256,7 +256,7 @@ class DefaultJwtEncoderServiceTest {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
 
         // when.
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         // then.
         // language=json
@@ -268,7 +268,7 @@ class DefaultJwtEncoderServiceTest {
     @Test
     void shouldGenerateValidJwtToken_WithHs256() {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
-        JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
+        UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
@@ -310,7 +310,7 @@ class DefaultJwtEncoderServiceTest {
     void shouldGenerateValidJwtToken_WithHs384() {
         String key384 =
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
-        JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
+        UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
 
@@ -344,7 +344,7 @@ class DefaultJwtEncoderServiceTest {
     void shouldFailWithInsufficientlyShortSecretKey() {
         String shortSecretKey = "shortKey";
         JwtAlgorithm jwtAlgorithm = JwtAlgorithm.HMAC256;
-        DefaultJwtEncoderService invalidService = new DefaultJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
+        DefaultUserJwtEncoderService invalidService = new DefaultUserJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
@@ -354,7 +354,7 @@ class DefaultJwtEncoderServiceTest {
     @Test
     void shouldGenerateProperlyFormattedToken() {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         assertThat(token.split("\\.")).hasSize(3);
     }
@@ -373,11 +373,11 @@ class DefaultJwtEncoderServiceTest {
     static class DefaultJwtEncoderServiceTestConfiguration {
 
         @Bean
-        JwtEncoderService jwtEncoderService(
+        UserJwtEncoderService jwtEncoderService(
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan,
                 final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
+            return new DefaultUserJwtEncoderService(algorithm, signingKey, lifespan);
         }
     }
 }

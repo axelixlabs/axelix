@@ -24,7 +24,7 @@ import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
 /**
@@ -44,15 +44,15 @@ public class StarterAuthenticationTokenProvider {
             new PasswordlessUser(TechUser.MASTER.getId(), TechUser.MASTER.getId(), Set.of());
 
     private final SecurityContextExecutor securityContextExecutor;
-    private final JwtEncoderService jwtEncoderService;
+    private final UserJwtEncoderService userJwtEncoderService;
     private final TechUserJwtSerializer techUserJwtSerializer;
 
     public StarterAuthenticationTokenProvider(
             SecurityContextExecutor securityContextExecutor,
-            JwtEncoderService jwtEncoderService,
+            UserJwtEncoderService userJwtEncoderService,
             TechUserJwtSerializer techUserJwtSerializer) {
         this.securityContextExecutor = securityContextExecutor;
-        this.jwtEncoderService = jwtEncoderService;
+        this.userJwtEncoderService = userJwtEncoderService;
         this.techUserJwtSerializer = techUserJwtSerializer;
     }
 
@@ -81,6 +81,6 @@ public class StarterAuthenticationTokenProvider {
      */
     @Deprecated(forRemoval = true, since = "1.3")
     public String discoveryToken() {
-        return jwtEncoderService.generateToken(DISCOVERY_USER, Duration.ofMinutes(5));
+        return userJwtEncoderService.generateToken(DISCOVERY_USER, Duration.ofMinutes(5));
     }
 }

@@ -41,7 +41,7 @@ import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
@@ -59,7 +59,7 @@ public class UserApi {
 
     private final CookieService cookieService;
     private final UserAuthenticator userAuthenticator;
-    private final JwtEncoderService jwtEncoderService;
+    private final UserJwtEncoderService userJwtEncoderService;
     private final UserService userService;
 
     private static final InvalidCredentialsException INVALID_CREDENTIALS_EXCEPTION = new InvalidCredentialsException();
@@ -67,11 +67,11 @@ public class UserApi {
     public UserApi(
             CookieService cookieService,
             UserAuthenticator userAuthenticator,
-            JwtEncoderService jwtEncoderService,
+            UserJwtEncoderService userJwtEncoderService,
             UserService userService) {
         this.cookieService = cookieService;
         this.userAuthenticator = userAuthenticator;
-        this.jwtEncoderService = jwtEncoderService;
+        this.userJwtEncoderService = userJwtEncoderService;
         this.userService = userService;
     }
 
@@ -119,7 +119,7 @@ public class UserApi {
             throw INVALID_CREDENTIALS_EXCEPTION;
         }
 
-        String token = jwtEncoderService.generateToken(user);
+        String token = userJwtEncoderService.generateToken(user);
 
         ResponseCookie cookie = cookieService.buildAuthCookie(token);
         ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesMetadataCookie(user.getRoles());

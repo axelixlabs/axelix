@@ -36,8 +36,8 @@ import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.User;
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
@@ -66,8 +66,8 @@ public class TestRestTemplateBuilder {
     // kind of have to lean towards a listener here.
     private int testTomcatServerPort;
 
-    private final JwtEncoderService defaultJwtEncoderService;
-    private final JwtEncoderService expiredJwtEncoderService;
+    private final UserJwtEncoderService defaultUserJwtEncoderService;
+    private final UserJwtEncoderService expiredUserJwtEncoderService;
     private final TechUserJwtSerializer techUserJwtSerializer;
 
     @EventListener
@@ -77,12 +77,12 @@ public class TestRestTemplateBuilder {
 
     public TestRestTemplateBuilder(
             JwtProperties jwtProperties,
-            JwtEncoderService defaultJwtEncoderService,
+            UserJwtEncoderService defaultUserJwtEncoderService,
             TechUserJwtSerializer techUserJwtSerializer) {
         this.techUserJwtSerializer = techUserJwtSerializer;
-        this.defaultJwtEncoderService = defaultJwtEncoderService;
-        this.expiredJwtEncoderService =
-                new DefaultJwtEncoderService(jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO);
+        this.defaultUserJwtEncoderService = defaultUserJwtEncoderService;
+        this.expiredUserJwtEncoderService =
+                new DefaultUserJwtEncoderService(jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO);
     }
 
     public IdentityAwareTestRestTemplate asViewer() {
@@ -104,7 +104,7 @@ public class TestRestTemplateBuilder {
     public IdentityAwareTestRestTemplate withRole(Role role) {
         User user = UserUtils.fromRoles(role);
 
-        String token = defaultJwtEncoderService.generateToken(user);
+        String token = defaultUserJwtEncoderService.generateToken(user);
 
         return buildWithToken(user, token);
     }
@@ -117,7 +117,7 @@ public class TestRestTemplateBuilder {
     public TestRestTemplate withExpiredToken() {
         User user = UserUtils.fromRoles();
 
-        String expiredToken = expiredJwtEncoderService.generateToken(user);
+        String expiredToken = expiredUserJwtEncoderService.generateToken(user);
 
         return buildWithToken(user, expiredToken);
     }
@@ -167,6 +167,6 @@ public class TestRestTemplateBuilder {
     }
 
     private String generateExpiredToken() {
-        return expiredJwtEncoderService.generateToken(UserUtils.fromRoles());
+        return expiredUserJwtEncoderService.generateToken(UserUtils.fromRoles());
     }
 }

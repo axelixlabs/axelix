@@ -45,7 +45,7 @@ import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
@@ -90,7 +90,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     private JwtProperties jwtProperties;
 
     @Autowired
-    private JwtEncoderService jwtEncoderService;
+    private UserJwtEncoderService userJwtEncoderService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -247,7 +247,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldClearCookieOnLogout() {
         PasswordlessUser actor = UserUtils.passwordless("someUser", Set.of());
-        String token = jwtEncoderService.generateToken(actor);
+        String token = userJwtEncoderService.generateToken(actor);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

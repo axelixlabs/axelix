@@ -29,7 +29,7 @@ import com.axelixlabs.axelix.master.domain.auth.User;
  * @since 23.07.2025
  * @author Nikita Kirillov
  */
-public interface JwtDecoderService {
+public interface UserJwtDecoderService {
 
     /**
      * Parses the given JWT token and converts it into a {@link User}.

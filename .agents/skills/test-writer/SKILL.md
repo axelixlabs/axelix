@@ -60,7 +60,7 @@ void decodesUserFromValidToken() {
     String token = validTokenFor(user);
 
     // when.
-    PasswordlessUser decoded = jwtDecoderService.decodeTokenToUser(token);
+    PasswordlessUser decoded = userJwtDecoderService.decodeTokenToUser(token);
 
     // then.
     assertThat(decoded.getUsername()).isEqualTo(user.getUsername());
@@ -75,7 +75,7 @@ The exception type is part of the contract; its human-readable message is not. A
 
 ```java
 // then.
-assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(expiredToken))
+assertThatThrownBy(() -> userJwtDecoderService.decodeTokenToUser(expiredToken))
         .isInstanceOf(ExpiredJwtTokenException.class);
 ```
 
