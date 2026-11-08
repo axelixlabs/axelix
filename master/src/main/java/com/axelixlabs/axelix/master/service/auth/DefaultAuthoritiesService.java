@@ -20,8 +20,6 @@ package com.axelixlabs.axelix.master.service.auth;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jspecify.annotations.Nullable;
-
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 
@@ -31,16 +29,11 @@ import com.axelixlabs.axelix.master.repository.AuthorityRepository;
  * @author Mikhail Polivakha
  */
 public class DefaultAuthoritiesService implements AuthoritiesService {
+
     private final AuthorityRepository authorityRepository;
 
     public DefaultAuthoritiesService(AuthorityRepository authorityRepository) {
         this.authorityRepository = authorityRepository;
-    }
-
-    @Override
-    @Nullable
-    public Authority decode(String name) {
-        return authorityRepository.findByCodename(name).orElse(null);
     }
 
     @Override

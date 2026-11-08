@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.jsonwebtoken.Claims;
@@ -98,12 +99,15 @@ public class DefaultUserJwtDecoderService implements UserJwtDecoderService {
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> rolesClaim = claims.get(TokenClaim.ROLES.getEncoding(), List.class);
 
+        Map<String, Authority> catalog =
+                authoritiesService.getAll().stream().collect(Collectors.toMap(Authority::getName, Function.identity()));
+
         return Optional.ofNullable(rolesClaim).orElse(List.of()).stream()
-                .map(this::mapToRole)
+                .map(role -> mapToRole(role, catalog))
                 .collect(Collectors.toSet());
     }
 
-    private Role mapToRole(Map<String, Object> roleMap) {
+    private Role mapToRole(Map<String, Object> roleMap, Map<String, Authority> catalog) {
         String roleName = (String) roleMap.get(TokenClaim.ROLE_NAME.getEncoding());
 
         if (roleName == null) {
@@ -115,7 +119,7 @@ public class DefaultUserJwtDecoderService implements UserJwtDecoderService {
                 (List<String>) roleMap.getOrDefault(TokenClaim.AUTHORITIES.getEncoding(), List.of());
 
         Set<Authority> authorities = authoritiesList.stream()
-                .map(authoritiesService::decode)
+                .map(catalog::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -123,7 +127,8 @@ public class DefaultUserJwtDecoderService implements UserJwtDecoderService {
         List<Map<String, Object>> components =
                 (List<Map<String, Object>>) roleMap.getOrDefault("components", List.of());
 
-        Set<Role> componentRoles = components.stream().map(this::mapToRole).collect(Collectors.toSet());
+        Set<Role> componentRoles =
+                components.stream().map(role -> mapToRole(role, catalog)).collect(Collectors.toSet());
 
         return new DefaultRole(roleName, authorities, componentRoles);
     }

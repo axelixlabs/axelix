@@ -133,9 +133,7 @@ class StarterAuthenticationTokenProviderTest {
 
     private AuthoritiesService authoritiesService() {
         AuthoritiesService service = mock(AuthoritiesService.class);
-        for (com.axelixlabs.axelix.master.domain.auth.Authority authority : TestRoles.EDITOR.authorities()) {
-            when(service.decode(authority.getName())).thenReturn(authority);
-        }
+        when(service.getAll()).thenReturn(TestRoles.EDITOR.authorities());
         return service;
     }
 }

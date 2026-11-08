@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.auth.jwt;
 
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -307,6 +309,25 @@ class DefaultUserJwtDecoderServiceTest {
         assertThatThrownBy(callable).isInstanceOf(JwtParsingException.class);
     }
 
+    @Test
+    void shouldFetchCatalogOnceForAllRolesAndNestedComponents() {
+        // given.
+        AuthoritiesService catalog = mock(AuthoritiesService.class);
+        when(catalog.getAll()).thenReturn(Set.of(TestAuthorities.CACHES_CLEAR, TestAuthorities.CACHES_TOGGLE));
+        Role parent = new DefaultRole("PARENT", Set.of(TestAuthorities.CACHES_CLEAR));
+        Role child = new DefaultRole("CHILD", Set.of(TestAuthorities.CACHES_TOGGLE), Set.of(parent));
+        PasswordlessUser user = new PasswordlessUser("bulk-user", "bulk", Set.of(parent, child));
+        String token = userJwtEncoderService.generateToken(user);
+        UserJwtDecoderService decoder = new DefaultUserJwtDecoderService(catalog, JwtAlgorithm.HMAC512, signingKey);
+        // when.
+        PasswordlessUser decoded = decoder.decodeTokenToUser(token);
+        // then.
+        assertThat(decoded.getRoles())
+                .flatExtracting(Role::getEffectiveAuthorities)
+                .contains(TestAuthorities.CACHES_CLEAR, TestAuthorities.CACHES_TOGGLE);
+        verify(catalog).getAll();
+    }
+
     enum CustomAuthority implements Authority {
         CUSTOM_AUTHORITY;
 
@@ -328,11 +349,9 @@ class DefaultUserJwtDecoderServiceTest {
         @Bean
         AuthoritiesService authoritiesService() {
             AuthoritiesService service = mock(AuthoritiesService.class);
-            when(service.decode(CustomAuthority.CUSTOM_AUTHORITY.getName()))
-                    .thenReturn(CustomAuthority.CUSTOM_AUTHORITY);
-            for (com.axelixlabs.axelix.master.domain.auth.Authority authority : TestAuthorities.values()) {
-                when(service.decode(authority.getName())).thenReturn(authority);
-            }
+            Set<Authority> authorities = new HashSet<>(Set.of(TestAuthorities.values()));
+            authorities.add(CustomAuthority.CUSTOM_AUTHORITY);
+            when(service.getAll()).thenReturn(authorities);
             return service;
         }
 

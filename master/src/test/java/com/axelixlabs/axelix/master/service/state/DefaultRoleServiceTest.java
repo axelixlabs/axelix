@@ -34,8 +34,10 @@ import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.iam.RoleOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleProfile;
 import com.axelixlabs.axelix.master.repository.UserRepository;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.auth.DefaultRoleService;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
@@ -47,6 +49,9 @@ import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests of {@link DefaultRoleService}.
@@ -119,6 +124,28 @@ class DefaultRoleServiceTest {
 
             // then.
             assertThat(role).isEmpty();
+        }
+
+        @Test
+        void shouldFetchCatalogOnceForWholeRoleGraph() {
+            // given.
+            RoleRepository repository = mock(RoleRepository.class);
+            AuthoritiesService catalog = mock(AuthoritiesService.class);
+            when(catalog.getAll()).thenReturn(Set.of(TestAuthorities.CACHES_CLEAR, TestAuthorities.CACHES_TOGGLE));
+            when(repository.findAllWithAuthorities())
+                    .thenReturn(List.of(
+                            new RoleRepository.RoleWithAuthorityName("parent", "PARENT", "caches:clear"),
+                            new RoleRepository.RoleWithAuthorityName("child", "CHILD", "caches:toggle")));
+            when(repository.findAllParentBonds())
+                    .thenReturn(List.of(new RoleRepository.RoleParentBond("child", "parent")));
+            RoleService service = new DefaultRoleService(repository, catalog);
+            // when.
+            Optional<Role> role = service.findByName("CHILD");
+            // then.
+            assertThat(role)
+                    .hasValueSatisfying(value -> assertThat(value.getEffectiveAuthorities())
+                            .containsExactlyInAnyOrder(TestAuthorities.CACHES_CLEAR, TestAuthorities.CACHES_TOGGLE));
+            verify(catalog).getAll();
         }
 
         @Test

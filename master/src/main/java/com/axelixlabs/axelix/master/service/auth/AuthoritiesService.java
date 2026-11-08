@@ -19,8 +19,6 @@ package com.axelixlabs.axelix.master.service.auth;
 
 import java.util.Set;
 
-import org.jspecify.annotations.Nullable;
-
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 
 /**
@@ -29,14 +27,6 @@ import com.axelixlabs.axelix.master.domain.auth.Authority;
  * @author Mikhail Polivakha
  */
 public interface AuthoritiesService {
-
-    /**
-     * Looks up an authority by its database codename.
-     *
-     * @return the stored authority with the given codename, or {@code null} if it does not exist.
-     */
-    @Nullable
-    Authority decode(String name);
 
     /**
      * @return all authorities currently stored in the database.

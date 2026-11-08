@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
@@ -84,6 +85,8 @@ public class DefaultRoleService implements RoleService {
     }
 
     private RoleGraph getGraph() {
+        Map<String, Authority> catalog =
+                authoritiesService.getAll().stream().collect(Collectors.toMap(Authority::getName, Function.identity()));
         Map<String, String> names = new HashMap<>();
         Map<String, Set<Authority>> authorities = new HashMap<>();
 
@@ -92,8 +95,7 @@ public class DefaultRoleService implements RoleService {
             Set<Authority> granted = authorities.computeIfAbsent(row.roleId(), _ -> new HashSet<>());
 
             if (row.authorityName() != null) {
-                Optional.ofNullable(authoritiesService.decode(row.authorityName()))
-                        .ifPresent(granted::add);
+                Optional.ofNullable(catalog.get(row.authorityName())).ifPresent(granted::add);
             }
         }
 

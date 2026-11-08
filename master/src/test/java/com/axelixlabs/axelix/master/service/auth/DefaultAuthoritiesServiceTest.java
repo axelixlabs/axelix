@@ -72,32 +72,6 @@ class DefaultAuthoritiesServiceTest {
     }
 
     @Test
-    void shouldDecodeAuthorityDefinedOnlyInDatabase() {
-        // given.
-        DefaultAuthority authority = insertAuthority("custom:read");
-        // when.
-        Authority decoded = authoritiesService.decode(authority.codename());
-        // then.
-        assertThat(decoded).isEqualTo(authority);
-    }
-
-    @Test
-    void shouldReturnNullForUnknownCodename() {
-        // when.
-        Authority decoded = authoritiesService.decode("unknown:authority");
-        // then.
-        assertThat(decoded).isNull();
-    }
-
-    @Test
-    void shouldNotResolveLegacyEnumName() {
-        // when.
-        Authority decoded = authoritiesService.decode("CACHES_CLEAR");
-        // then.
-        assertThat(decoded).isNull();
-    }
-
-    @Test
     void shouldReturnAllAuthoritiesFromDatabase() {
         // given.
         DefaultAuthority authority = insertAuthority("custom:list");
@@ -123,9 +97,11 @@ class DefaultAuthoritiesServiceTest {
                 .params("custom:after", authority.id())
                 .update();
         // when.
-        Authority decoded = authoritiesService.decode("custom:after");
+        Set<Authority> authorities = authoritiesService.getAll();
         // then.
-        assertThat(decoded).isEqualTo(new DefaultAuthority(authority.id(), "custom:after"));
+        assertThat(authorities)
+                .contains(new DefaultAuthority(authority.id(), "custom:after"))
+                .doesNotContain(authority);
     }
 
     @Test

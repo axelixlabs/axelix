@@ -17,16 +17,12 @@
  */
 package com.axelixlabs.axelix.master.domain.auth;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
-
 /**
  * The default implementation of {@link Authority}.
  *
  * @author Mikhail Polivakha
  */
-@Table("authorities")
-public record DefaultAuthority(@Id String id, String codename) implements Authority {
+public record DefaultAuthority(String id, String codename) implements Authority {
 
     @Override
     public String getName() {

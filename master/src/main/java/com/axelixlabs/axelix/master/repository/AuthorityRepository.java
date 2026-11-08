@@ -18,9 +18,9 @@
 package com.axelixlabs.axelix.master.repository;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.data.repository.Repository;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
 
@@ -29,8 +29,18 @@ import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
  *
  * @author Mikhail Polivakha
  */
-public interface AuthorityRepository extends Repository<DefaultAuthority, String> {
-    List<DefaultAuthority> findAll();
+@Repository
+public class AuthorityRepository {
+    private final JdbcClient jdbcClient;
 
-    Optional<DefaultAuthority> findByCodename(String codename);
+    public AuthorityRepository(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
+    }
+
+    public List<DefaultAuthority> findAll() {
+        return jdbcClient
+                .sql("SELECT id, codename FROM authorities")
+                .query((rs, rowNum) -> new DefaultAuthority(rs.getString("id"), rs.getString("codename")))
+                .list();
+    }
 }
