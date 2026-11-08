@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -45,11 +44,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.heartbeatv2.HeartBeatMetadataV2;
 import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
@@ -67,7 +66,6 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
 
 import static com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoPropertiesLoader.AXELIX_INFO_LOCATION;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * Integration test for {@link HeartBeatService}
@@ -100,12 +98,12 @@ class HeartBeatServiceTest {
     private HeartBeatMetadataAssembler metadataAssembler;
 
     @Autowired
-    private JwtEncoderService jwtEncoderService;
+    private TechUserJwtSerializer techUserJwtSerializer;
 
     private HeartBeatService heartBeatService;
 
     @Autowired
-    private JwtDecoderService jwtDecoderService;
+    private TechUserJwtDeserializer techUserJwtDeserializer;
 
     @Autowired
     private ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
@@ -126,17 +124,15 @@ class HeartBeatServiceTest {
         }
 
         @Bean
-        public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
-            return new DefaultJwtEncoderService(
+        public TechUserJwtSerializer techUserJwtSerializer(AuthProperties authProperties) {
+            return new DefaultTechUserJwtSerializer(
                     authProperties.getJwt().getAlgorithm(),
-                    authProperties.getJwt().getSigningKey(),
-                    Duration.ofHours(1));
+                    authProperties.getJwt().getSigningKey());
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
-            return new DefaultJwtDecoderService(
-                    new DefaultAuthoritiesManager(null),
+        public TechUserJwtDeserializer techUserJwtDeserializer(AuthProperties authProperties) {
+            return new DefaultTechUserJwtDeserializer(
                     authProperties.getJwt().getAlgorithm(),
                     authProperties.getJwt().getSigningKey());
         }
@@ -246,7 +242,7 @@ class HeartBeatServiceTest {
         properties.setMasterUrl(
                 "http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort() + masterUrlPath);
         heartBeatService = new HeartBeatService(
-                new NoOpLogger(), serializationFunction, properties, metadataAssembler, jwtEncoderService);
+                new NoOpLogger(), serializationFunction, properties, metadataAssembler, techUserJwtSerializer);
         heartBeatService.scheduleHeartBeat();
     }
 
@@ -271,7 +267,7 @@ class HeartBeatServiceTest {
         String token =
                 authHeader.substring(AuthenticationSchemes.BEARER.prefix().length());
 
-        assertThatCode(() -> jwtDecoderService.decodeTokenToUser(token)).doesNotThrowAnyException();
+        assertThat(techUserJwtDeserializer.deserialize(token)).isEqualTo(TechUser.MANAGED_SERVICE);
     }
 
     @Test
@@ -385,6 +381,10 @@ class HeartBeatServiceTest {
         assertThat(heartbeat.getHeader("Content-Type")).isEqualTo("application/json");
         assertThat(heartbeat.getHeader(HeartBeatService.AUTHORIZATION_HEADER))
                 .startsWith(AuthenticationSchemes.BEARER.prefix());
+        String token = heartbeat
+                .getHeader(HeartBeatService.AUTHORIZATION_HEADER)
+                .substring(AuthenticationSchemes.BEARER.prefix().length());
+        assertThat(techUserJwtDeserializer.deserialize(token)).isEqualTo(TechUser.MANAGED_SERVICE);
         assertThat(heartbeat.getBody().readUtf8()).contains("instanceId").doesNotContain("testApp");
     }
 

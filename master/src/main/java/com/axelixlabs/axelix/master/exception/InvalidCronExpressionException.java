@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.exception.auth;
+package com.axelixlabs.axelix.master.exception;
 
 /**
  * Thrown in case the cron expression is invalid.

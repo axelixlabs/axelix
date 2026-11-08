@@ -40,7 +40,7 @@ import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpre
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTasksResponse;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
-import com.axelixlabs.axelix.master.exception.auth.InvalidCronExpressionException;
+import com.axelixlabs.axelix.master.exception.InvalidCronExpressionException;
 import com.axelixlabs.axelix.master.service.scheduled.ScheduledTasksService;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
