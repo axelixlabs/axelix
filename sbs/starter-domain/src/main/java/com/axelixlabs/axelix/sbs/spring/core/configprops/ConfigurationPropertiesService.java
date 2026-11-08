@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 
 /**
@@ -29,11 +28,6 @@ public interface ConfigurationPropertiesService {
 
     /**
      * Retrieves the configuration properties feed.
-     * <p>
-     * Values may be sanitized based on the current user's access level.
-     * Users with {@link OssAuthority#CONFIG_PROPS_VALUES_READ} receive full (unsanitized) values.
-     * Others receive sanitized values according to the configured sanitization rules.
-     * </p>
      *
      * @return ConfigurationPropertiesFeed containing all configuration properties
      */

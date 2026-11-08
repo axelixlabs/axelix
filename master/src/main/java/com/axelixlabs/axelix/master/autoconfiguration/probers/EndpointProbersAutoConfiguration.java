@@ -26,11 +26,11 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.contract.details.InstanceDetails;
 import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.serde.DefaultJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
@@ -54,13 +54,15 @@ import com.axelixlabs.axelix.master.service.transport.ProxyingEndpointProber;
 public class EndpointProbersAutoConfiguration {
 
     private final InstanceRegistry instanceRegistry;
-    private final SecurityContextExecutor securityContextExecutor;
+    private final StarterAuthenticationTokenProvider tokenProvider;
     private final HttpClient httpClient;
 
     public EndpointProbersAutoConfiguration(
-            InstanceRegistry instanceRegistry, SecurityContextExecutor securityContextExecutor, HttpClient httpClient) {
+            InstanceRegistry instanceRegistry,
+            StarterAuthenticationTokenProvider tokenProvider,
+            HttpClient httpClient) {
         this.instanceRegistry = instanceRegistry;
-        this.securityContextExecutor = securityContextExecutor;
+        this.tokenProvider = tokenProvider;
         this.httpClient = httpClient;
     }
 
@@ -68,81 +70,81 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public ProxyingEndpointProber getLogEntriesTailEndpointProber() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_LOG_ENTRIES_TAIL, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_LOG_ENTRIES_TAIL, tokenProvider, httpClient);
     }
 
     // Loggers
     @Bean
     public DiscardingAbstractEndpointProber setOneLoggerEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.SET_ONE_LOGGER, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.SET_ONE_LOGGER, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber resetLoggerLevelForLoggerEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.RESET_FOR_LOGGER, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.RESET_FOR_LOGGER, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber setLevelForLoggerGroupEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.SET_FOR_LOGGER_GROUP, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.SET_FOR_LOGGER_GROUP, tokenProvider, httpClient);
     }
 
     @Bean
     public ProxyingEndpointProber getAllLoggersEndpointProber() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_ALL_LOGGERS, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_ALL_LOGGERS, tokenProvider, httpClient);
     }
 
     @Bean
     public ProxyingEndpointProber getOneLoggerEndpointProber() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_ONE_LOGGER, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_ONE_LOGGER, tokenProvider, httpClient);
     }
 
     @Bean
     public ProxyingEndpointProber getLoggerGroupEndpointProber() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_LOGGER_GROUP, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_LOGGER_GROUP, tokenProvider, httpClient);
     }
 
     // Caches
     @Bean
     public DiscardingAbstractEndpointProber clearAllCachesEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.CLEAR_ALL_CACHES, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.CLEAR_ALL_CACHES, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber clearSingleCacheEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.CLEAR_SINGLE_CACHE, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.CLEAR_SINGLE_CACHE, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber enableCacheEndpointProver() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.ENABLE_CACHE, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.ENABLE_CACHE, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber disableCacheEndpointProver() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.DISABLE_CACHE, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.DISABLE_CACHE, tokenProvider, httpClient);
     }
 
     @Bean
     public ProxyingEndpointProber getSingleCacheEndpointProver() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_SINGLE_CACHE, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_SINGLE_CACHE, tokenProvider, httpClient);
     }
 
     @Bean
     public ProxyingEndpointProber getAllCachesEndpointProver() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_ALL_CACHES, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_ALL_CACHES, tokenProvider, httpClient);
     }
 
     // Details
@@ -151,7 +153,7 @@ public class EndpointProbersAutoConfiguration {
         return new DefaultEndpointProber<>(
                 instanceRegistry,
                 new DefaultJacksonMessageDeserializationStrategy<>(objectMapper, InstanceDetails.class),
-                securityContextExecutor,
+                tokenProvider,
                 ActuatorEndpoints.GET_DETAILS,
                 httpClient);
     }
@@ -162,7 +164,7 @@ public class EndpointProbersAutoConfiguration {
         return new DefaultEndpointProber<>(
                 instanceRegistry,
                 new DefaultJacksonMessageDeserializationStrategy<>(objectMapper, BasicRegistrationMetadata.class),
-                securityContextExecutor,
+                tokenProvider,
                 ActuatorEndpoints.METADATA,
                 httpClient);
     }
@@ -173,7 +175,7 @@ public class EndpointProbersAutoConfiguration {
         return new DefaultEndpointProber<>(
                 instanceRegistry,
                 new DefaultJacksonMessageDeserializationStrategy<>(objectMapper, MasterPing.class),
-                securityContextExecutor,
+                tokenProvider,
                 ActuatorEndpoints.PING,
                 httpClient);
     }
@@ -182,8 +184,7 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public EndpointProber<byte[]> getBeansEndpointProber() {
         return new CachingEndpointProber<>(
-                new ProxyingEndpointProber(
-                        instanceRegistry, ActuatorEndpoints.GET_BEANS, securityContextExecutor, httpClient),
+                new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_BEANS, tokenProvider, httpClient),
                 bytes -> Arrays.copyOf(bytes, bytes.length));
     }
 
@@ -191,7 +192,7 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public ProxyingEndpointProber getThreadDumpEndpointProber() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_THREAD_DUMP, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_THREAD_DUMP, tokenProvider, httpClient);
     }
 
     @Bean
@@ -199,7 +200,7 @@ public class EndpointProbersAutoConfiguration {
         return new DiscardingAbstractEndpointProber(
                 instanceRegistry,
                 ActuatorEndpoints.THREAD_DUMP_ENABLE_CONTENTION_MONITORING,
-                securityContextExecutor,
+                tokenProvider,
                 httpClient);
     }
 
@@ -208,7 +209,7 @@ public class EndpointProbersAutoConfiguration {
         return new DiscardingAbstractEndpointProber(
                 instanceRegistry,
                 ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING,
-                securityContextExecutor,
+                tokenProvider,
                 httpClient);
     }
 
@@ -216,20 +217,20 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public ProxyingEndpointProber getMetricGroupsEndpointProver() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_METRIC_GROUPS, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_METRIC_GROUPS, tokenProvider, httpClient);
     }
 
     @Bean
     public ProxyingEndpointProber getSingleMetricEndpointProver() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_SINGLE_METRIC, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_SINGLE_METRIC, tokenProvider, httpClient);
     }
 
     // Environment Property
     @Bean
     public EndpointProber<byte[]> getAllEnvironmentEndpointProver() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, tokenProvider, httpClient);
     }
 
     // HeapDump
@@ -237,11 +238,7 @@ public class EndpointProbersAutoConfiguration {
     public DefaultEndpointProber<Resource> getHeapDumpEndpointProver(
             HeapDumpMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(
-                instanceRegistry,
-                deserializationStrategy,
-                securityContextExecutor,
-                ActuatorEndpoints.GET_HEAP_DUMP,
-                httpClient);
+                instanceRegistry, deserializationStrategy, tokenProvider, ActuatorEndpoints.GET_HEAP_DUMP, httpClient);
     }
 
     // Garbage Collector Log
@@ -251,7 +248,7 @@ public class EndpointProbersAutoConfiguration {
         return new DefaultEndpointProber<>(
                 instanceRegistry,
                 deserializationStrategy,
-                securityContextExecutor,
+                tokenProvider,
                 ActuatorEndpoints.GET_GC_LOG_FILE,
                 httpClient);
     }
@@ -259,68 +256,62 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public ProxyingEndpointProber getGcLogStatusEndpointProber() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_STATUS_GC_LOGGING, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_STATUS_GC_LOGGING, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber gcTriggerEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GC_TRIGGER, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GC_TRIGGER, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber enableGcLoggingEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.ENABLE_GC_LOGGING, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.ENABLE_GC_LOGGING, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber disableGcLoggingEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.DISABLE_GC_LOGGING, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.DISABLE_GC_LOGGING, tokenProvider, httpClient);
     }
 
     // Scheduled tasks
     @Bean
     public ProxyingEndpointProber getScheduledTasksEndpointProber() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_SCHEDULED_TASKS, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_SCHEDULED_TASKS, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber executeScheduledTasksEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.EXECUTE_SCHEDULED_TASK, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.EXECUTE_SCHEDULED_TASK, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber enableScheduledTasksEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.ENABLE_SCHEDULED_TASK, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.ENABLE_SCHEDULED_TASK, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber disableScheduledTasksEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.DISABLE_SCHEDULED_TASK, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.DISABLE_SCHEDULED_TASK, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber modifyCronExpressionScheduledTasksEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry,
-                ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK,
-                securityContextExecutor,
-                httpClient);
+                instanceRegistry, ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK, tokenProvider, httpClient);
     }
 
     @Bean
     public DiscardingAbstractEndpointProber modifyIntervalScheduledTasksEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry,
-                ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK,
-                securityContextExecutor,
-                httpClient);
+                instanceRegistry, ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK, tokenProvider, httpClient);
     }
 
     // Conditions
@@ -328,7 +319,7 @@ public class EndpointProbersAutoConfiguration {
     public EndpointProber<byte[]> getConditionsProber() {
         return new CachingEndpointProber<>(
                 new ProxyingEndpointProber(
-                        instanceRegistry, ActuatorEndpoints.GET_CONDITIONS, securityContextExecutor, httpClient),
+                        instanceRegistry, ActuatorEndpoints.GET_CONDITIONS, tokenProvider, httpClient),
                 bytes -> Arrays.copyOf(bytes, bytes.length));
     }
 
@@ -336,7 +327,7 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public EndpointProber<byte[]> getConfigPropsProber() {
         return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, securityContextExecutor, httpClient);
+                instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, tokenProvider, httpClient);
     }
 
     // Dependencies (SBOM). To be removed in 1.6 together with ActuatorEndpoints.GET_DEPENDENCIES_SBOM.
@@ -344,6 +335,6 @@ public class EndpointProbersAutoConfiguration {
     @Deprecated(forRemoval = true, since = "1.3")
     public EndpointProber<byte[]> getDependenciesSbomProber() {
         return new CachingEndpointProber<>(new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_DEPENDENCIES_SBOM, securityContextExecutor, httpClient));
+                instanceRegistry, ActuatorEndpoints.GET_DEPENDENCIES_SBOM, tokenProvider, httpClient));
     }
 }

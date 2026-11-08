@@ -148,7 +148,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
     private DiscoveredInstanceProfile.@Nullable Refresh refresh(Instance instance) {
         try {
-            MasterPing masterPing = masterPingProber.invoke(instance.actuatorUrl(), NoHttpPayload.INSTANCE);
+            MasterPing masterPing = masterPingProber.invoke(instance.id(), NoHttpPayload.INSTANCE);
 
             return new DiscoveredInstanceProfile.Refresh(
                     instance.copy(

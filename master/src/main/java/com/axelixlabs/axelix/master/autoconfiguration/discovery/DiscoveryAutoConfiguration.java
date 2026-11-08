@@ -32,8 +32,6 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
@@ -63,8 +61,6 @@ public class DiscoveryAutoConfiguration {
     public ShortPollingInstanceDiscoveryScheduler shortPollingInstanceDiscoveryScheduler(
             InstancesDiscoverer instancesDiscoverer,
             InstanceRegistry instanceRegistry,
-            JwtEncoderService jwtEncoderService,
-            SecurityContextExecutor securityContextExecutor,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate,
             ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
@@ -73,8 +69,6 @@ public class DiscoveryAutoConfiguration {
         return new ShortPollingInstanceDiscoveryScheduler(
                 instancesDiscoverer,
                 instanceRegistry,
-                jwtEncoderService,
-                securityContextExecutor,
                 databaseHistoricalApplicationSnapshotService,
                 transactionTemplate,
                 scheduledTaskExecutionResultConverter,

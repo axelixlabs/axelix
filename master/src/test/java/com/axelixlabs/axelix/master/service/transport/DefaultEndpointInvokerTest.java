@@ -53,6 +53,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
@@ -337,43 +338,39 @@ public class DefaultEndpointInvokerTest {
         @Bean
         public DiscardingAbstractEndpointProber invokeNoValueMethodEndpointProber(
                 InstanceRegistry instanceRegistry,
-                SecurityContextExecutor securityContextExecutor,
+                StarterAuthenticationTokenProvider tokenProvider,
                 HttpClient httpClient) {
             return new DiscardingAbstractEndpointProber(
-                    instanceRegistry, METHOD_INVOKE_NO_VALUE, securityContextExecutor, httpClient);
+                    instanceRegistry, METHOD_INVOKE_NO_VALUE, tokenProvider, httpClient);
         }
 
         @Bean
         public DiscardingAbstractEndpointProber invokeNoValueMethodWithBadRequestEndpointProber(
                 InstanceRegistry instanceRegistry,
-                SecurityContextExecutor securityContextExecutor,
+                StarterAuthenticationTokenProvider tokenProvider,
                 HttpClient httpClient) {
             return new DiscardingAbstractEndpointProber(
-                    instanceRegistry, METHOD_INVOKE_NO_VALUE_BAD_REQUEST, securityContextExecutor, httpClient);
+                    instanceRegistry, METHOD_INVOKE_NO_VALUE_BAD_REQUEST, tokenProvider, httpClient);
         }
 
         @Bean
         public DefaultEndpointProber<JsonNode> invokeMethodEndpointProber(
                 InstanceRegistry instanceRegistry,
                 TestJacksonMessageDeserializationStrategy deserializationStrategy,
-                SecurityContextExecutor securityContextExecutor,
+                StarterAuthenticationTokenProvider tokenProvider,
                 HttpClient httpClient) {
             return new DefaultEndpointProber<>(
-                    instanceRegistry, deserializationStrategy, securityContextExecutor, METHOD_INVOKE, httpClient);
+                    instanceRegistry, deserializationStrategy, tokenProvider, METHOD_INVOKE, httpClient);
         }
 
         @Bean
         public DefaultEndpointProber<JsonNode> invokeMethodWithBadRequestEndpointProber(
                 InstanceRegistry instanceRegistry,
                 TestJacksonMessageDeserializationStrategy deserializationStrategy,
-                SecurityContextExecutor securityContextExecutor,
+                StarterAuthenticationTokenProvider tokenProvider,
                 HttpClient httpClient) {
             return new DefaultEndpointProber<>(
-                    instanceRegistry,
-                    deserializationStrategy,
-                    securityContextExecutor,
-                    METHOD_INVOKE_BAD_REQUEST,
-                    httpClient);
+                    instanceRegistry, deserializationStrategy, tokenProvider, METHOD_INVOKE_BAD_REQUEST, httpClient);
         }
 
         @Component
