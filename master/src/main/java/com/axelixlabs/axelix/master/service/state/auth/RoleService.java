@@ -25,7 +25,7 @@ import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.repository.RoleRepository;
-import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator;
 
 /**
  * Service that resolves the roles Axelix Master knows about.

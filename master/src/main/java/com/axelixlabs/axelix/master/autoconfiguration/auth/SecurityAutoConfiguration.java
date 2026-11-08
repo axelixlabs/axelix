@@ -75,7 +75,7 @@ import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
-import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
+import com.axelixlabs.axelix.master.service.auth.SuperAdminPasswordEncoder;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathJsonInspector;
@@ -83,10 +83,10 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcAuthorizeEndpointAddi
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
-import com.axelixlabs.axelix.master.service.auth.provider.CompositeUserAuthenticator;
-import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
-import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
-import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.CompositeUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.DatabaseUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 

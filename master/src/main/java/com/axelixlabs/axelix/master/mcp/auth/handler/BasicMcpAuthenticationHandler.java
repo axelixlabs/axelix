@@ -29,7 +29,7 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
-import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
 
 /**
  * {@link McpAuthenticationHandler} that is capable to authenticate {@link AuthenticationSchemes#BASIC Basic auth} requests.

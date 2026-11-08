@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.provider;
+package com.axelixlabs.axelix.master.service.auth.basic;
 
 import java.util.Objects;
 import java.util.Set;
@@ -31,7 +31,7 @@ import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.DefaultUser;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
-import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
+import com.axelixlabs.axelix.master.service.auth.SuperAdminPasswordEncoder;
 
 /**
  * {@link UserAuthenticator} that authenticates Super Admin.

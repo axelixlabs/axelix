@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.encoder;
+package com.axelixlabs.axelix.master.service.auth;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +34,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
 
 /**
- * Password encoder wrapper for {@link com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator}.
+ * Password encoder wrapper for {@link com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator}.
  * Supports plaintext and {@code {bcrypt}}, {@code {noop}} prefixes via {@link DelegatingPasswordEncoder}.
  *
  * @author Ilya Naumov

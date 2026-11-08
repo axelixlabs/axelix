@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.auth.encoder;
 
+import com.axelixlabs.axelix.master.service.auth.SuperAdminPasswordEncoder;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
