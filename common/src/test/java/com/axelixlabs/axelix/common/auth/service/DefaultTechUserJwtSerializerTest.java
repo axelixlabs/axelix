@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -75,7 +76,7 @@ class DefaultTechUserJwtSerializerTest {
     }
 
     @ParameterizedTest
-    @org.junit.jupiter.params.provider.ValueSource(longs = {60, 300, 3600})
+    @ValueSource(longs = {60, 300, 3600})
     void shouldUseConfiguredLifespan(long seconds) {
         // given.
         TechUserJwtSerializer configuredSerializer =
