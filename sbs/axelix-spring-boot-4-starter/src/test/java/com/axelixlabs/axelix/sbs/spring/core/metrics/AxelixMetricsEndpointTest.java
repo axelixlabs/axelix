@@ -57,7 +57,7 @@ class AxelixMetricsEndpointTest extends AbstractMetricsSharedContextTest {
         // when.
         String metricName = "jvm.memory.max";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -97,7 +97,7 @@ class AxelixMetricsEndpointTest extends AbstractMetricsSharedContextTest {
         // when.
         String metricName = "for.value.transformations";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.asEditor().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -113,7 +113,7 @@ class AxelixMetricsEndpointTest extends AbstractMetricsSharedContextTest {
         // when.
         String metricName = "jvm.gc.overhead";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.asAdmin().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -128,7 +128,7 @@ class AxelixMetricsEndpointTest extends AbstractMetricsSharedContextTest {
     void shouldReturnGroupedMetricsWithDescriptions(String groupName, String metricName, String metricDescription) {
         // when.
         ResponseEntity<MetricsGroupsFeed> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metrics", MetricsGroupsFeed.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-metrics", MetricsGroupsFeed.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();

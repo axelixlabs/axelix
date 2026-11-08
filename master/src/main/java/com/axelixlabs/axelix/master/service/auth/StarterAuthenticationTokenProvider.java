@@ -20,11 +20,11 @@ package com.axelixlabs.axelix.master.service.auth;
 import java.time.Duration;
 import java.util.Set;
 
-import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
-import com.axelixlabs.axelix.common.utils.SemanticVersion;
+import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
+import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
 /**
  * Selects outbound authentication according to the target starter's protocol version.

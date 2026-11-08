@@ -94,7 +94,7 @@ public class AxelixConditionsEndpointTest {
         String negativeMethodName = "negativeConditionBean";
 
         ResponseEntity<ConditionsFeed> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-conditions", ConditionsFeed.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-conditions", ConditionsFeed.class);
 
         // PositiveMatches()
         assertThat(response).isNotNull();

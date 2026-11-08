@@ -32,13 +32,11 @@ import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
-import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 
 /**
  * Configuration for the tests that cover the HTTP API side.
@@ -74,22 +72,8 @@ public class TestRestTemplateBuilder {
         this.signingKey = signingKey;
     }
 
-    public TestRestTemplate asViewer() {
-        return withRole(TestRoles.VIEWER);
-    }
-
-    public TestRestTemplate asEditor() {
-        return withRole(TestRoles.EDITOR);
-    }
-
-    public TestRestTemplate asAdmin() {
-        return withRole(TestRoles.ADMIN);
-    }
-
-    public TestRestTemplate withRole(Role role) {
-        String token = techUserJwtSerializer.serialize(TechUser.MASTER);
-
-        return buildWithToken(token);
+    public TestRestTemplate asMaster() {
+        return buildWithToken(techUserJwtSerializer.serialize(TechUser.MASTER));
     }
 
     // START: Bad token auth scenarios

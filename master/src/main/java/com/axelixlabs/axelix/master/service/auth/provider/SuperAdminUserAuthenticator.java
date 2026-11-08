@@ -26,11 +26,11 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.DefaultUser;
+import com.axelixlabs.axelix.master.domain.auth.User;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
 import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
 
 /**

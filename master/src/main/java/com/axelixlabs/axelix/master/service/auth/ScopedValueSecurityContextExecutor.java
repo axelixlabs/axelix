@@ -23,10 +23,10 @@ import org.jspecify.annotations.NullMarked;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
-import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContext;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
+import com.axelixlabs.axelix.master.domain.function.ThrowingCallable;
+import com.axelixlabs.axelix.master.domain.function.ThrowingRunnable;
 
 /**
  * {@link SecurityContextExecutor} that is based upon the JDK 25 {@link ScopedValue}.

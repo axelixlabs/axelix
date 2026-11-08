@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
 

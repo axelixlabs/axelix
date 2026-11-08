@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseCookie;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 
 /**
  * Default implementation of {@link CookieService}.

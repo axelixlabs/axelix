@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-import com.axelixlabs.axelix.common.utils.CollectionUtils;
 import com.axelixlabs.axelix.master.autoconfiguration.discovery.KubernetesDiscoveryProperties.DiscoveryFilters;
+import com.axelixlabs.axelix.master.utils.CollectionUtils;
 
 /**
  * Custom Kubernetes implementation of {@link DiscoveryClient}.

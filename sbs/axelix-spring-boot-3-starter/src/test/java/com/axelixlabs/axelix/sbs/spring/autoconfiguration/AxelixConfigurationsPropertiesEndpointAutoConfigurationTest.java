@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
@@ -85,7 +84,6 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(PropertyNameNormalizer.class);
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesConverter.class);
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesFlattener.class);
-            assertThat(context).doesNotHaveBean(SecurityContextExecutor.class);
         });
     }
 }

@@ -55,7 +55,7 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
 
         // when.
         ResponseEntity<BeansFeed> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-beans", BeansFeed.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-beans", BeansFeed.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -76,7 +76,7 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
 
         // when.
         ResponseEntity<BeansFeed> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-beans", BeansFeed.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-beans", BeansFeed.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -89,7 +89,7 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
     void shouldKeepTheWireFormatOfTheBeansFeed() {
         // when.
         ResponseEntity<String> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-beans", String.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-beans", String.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();

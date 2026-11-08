@@ -34,10 +34,9 @@ import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
-import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.common.utils.SemanticVersion;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
+import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.Instance.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
@@ -46,6 +45,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.service.transport.EndpointProber;
+import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
 /**
  * Abstract implementation of {@link InstancesDiscoverer} that performs common tasks like checking

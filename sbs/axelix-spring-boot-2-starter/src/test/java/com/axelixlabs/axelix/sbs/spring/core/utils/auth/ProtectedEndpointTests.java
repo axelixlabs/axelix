@@ -26,20 +26,18 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * The annotation should be placed over the test class's method to signify that this API resource is supposed
- * to be a protected one, i.e. we require the access token to access it with the correct privilege.
+ * to be a protected one, i.e. we require the access token to access it from Axelix Master.
  * <p>
  * By placing this annotation on the test template method of the Junit test class, the {@link ProtectedEndpointExtension}
- * listener will be invoked to create necessary {@link BadAuthorityEndpointInvocationContext invocation contexts}
- * that are themselves going to check the negative authentication/authorization cases.
+ * listener will be invoked to create necessary invocation contexts
+ * that are themselves going to check the negative authentication cases.
  *
  * @see TestTemplate
  * @see ProtectedEndpointExtension
- * @see BadAuthorityEndpointInvocationContext
  *
  * @author Mikhail Polivakha
  */
@@ -59,12 +57,6 @@ public @interface ProtectedEndpointTests {
      * Http method of the endpoint.
      */
     HttpMethod method();
-
-    /**
-     * The authority that is required to access this endpoint. The size of array is expected to always be either
-     * zero or one, where zero means there is no authority to check for this endpoint.
-     */
-    OssAuthority[] requiredAuthority() default {};
 
     /**
      * Optional JSON request body for POST, PUT, or PATCH. When empty, the request is sent without a body (same as

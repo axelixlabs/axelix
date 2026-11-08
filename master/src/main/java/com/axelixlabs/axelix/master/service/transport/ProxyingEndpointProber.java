@@ -21,7 +21,7 @@ import java.net.http.HttpClient;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

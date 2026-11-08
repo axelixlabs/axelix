@@ -39,10 +39,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
@@ -86,10 +84,9 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
     @ParameterizedTest
     @MethodSource("propertiesFeed")
-    void shouldReturnPropertiesNameAndValueRegardlessOfRole(String propertyName, String expectedValue, Role role) {
-        ResponseEntity<ConfigurationPropertiesFeed> response = restTemplate
-                .withRole(role)
-                .getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
+    void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
+        ResponseEntity<ConfigurationPropertiesFeed> response =
+                restTemplate.asMaster().getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
 
         List<ConfigurationPropertiesEntry> properties = response.getBody().getBeans().stream()
                 .filter(bean -> bean.getPrefix().equals("axelix.prop.test"))
@@ -111,30 +108,22 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
     private static Stream<Arguments> propertiesFeed() {
         return Stream.of(
-                Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.VIEWER),
-                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.VIEWER),
-                Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.EDITOR),
-                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.EDITOR),
-                Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.ADMIN),
-                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.ADMIN),
-                Arguments.of("tags.version", "1.0.0", TestRoles.VIEWER),
-                Arguments.of("enabledContexts[0]", "user-service", TestRoles.VIEWER),
-                Arguments.of("enabledContexts[1]", "payment-service", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[0].name", "user-api", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[0].methods[0].type", "GET", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3", TestRoles.VIEWER),
-                Arguments.of(
-                        "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[0].methods[1].type", "POST", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[1].name", "payment-api", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[1].methods[0].type", "PUT", TestRoles.VIEWER),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2", TestRoles.VIEWER),
-                Arguments.of(
-                        "httpClient.requests[1].methods[0].retries[0].parameters.log-level",
-                        "DEBUG",
-                        TestRoles.VIEWER));
+                Arguments.of("tags.forSanitization", "toBeSanitized"),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized"),
+                Arguments.of("tags.version", "1.0.0"),
+                Arguments.of("enabledContexts[0]", "user-service"),
+                Arguments.of("enabledContexts[1]", "payment-service"),
+                Arguments.of("httpClient.requests[0].name", "user-api"),
+                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
+                Arguments.of("httpClient.requests[0].methods[0].type", "GET"),
+                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3"),
+                Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000"),
+                Arguments.of("httpClient.requests[0].methods[1].type", "POST"),
+                Arguments.of("httpClient.requests[1].name", "payment-api"),
+                Arguments.of("httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2"),
+                Arguments.of("httpClient.requests[1].methods[0].type", "PUT"),
+                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2"),
+                Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG"));
     }
 
     @ConstructorBinding

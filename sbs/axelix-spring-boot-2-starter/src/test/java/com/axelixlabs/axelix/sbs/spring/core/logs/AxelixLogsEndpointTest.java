@@ -67,7 +67,7 @@ class AxelixLogsEndpointTest {
 
         // when.
         ResponseEntity<LogEntriesTail> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-logs?limit=1000", LogEntriesTail.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-logs?limit=1000", LogEntriesTail.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -102,7 +102,7 @@ class AxelixLogsEndpointTest {
 
         // when.
         ResponseEntity<LogEntriesTail> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-logs?limit=2", LogEntriesTail.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-logs?limit=2", LogEntriesTail.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -129,7 +129,7 @@ class AxelixLogsEndpointTest {
     void shouldReturnBadRequest_WhenLimitIsLessThanOne() {
         // when.
         ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-logs?limit=0", String.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-logs?limit=0", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -143,7 +143,7 @@ class AxelixLogsEndpointTest {
 
         // when.
         ResponseEntity<LogEntriesTail> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-logs", LogEntriesTail.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-logs", LogEntriesTail.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

@@ -22,12 +22,12 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
 
 /**
  * First-class representation of a single Axelix Master web API endpoint — i.e. one operation a user can
- * invoke from the UI. It is the master-side analogue of {@link com.axelixlabs.axelix.common.domain.ActuatorEndpoint}.
+ * invoke from the UI. It is the master-side analogue of {@link com.axelixlabs.axelix.master.domain.ActuatorEndpoint}.
  *
  * @param operationCode stable, human-readable identifier of the operation, e.g. {@code "environment:read"}.
  * @param method        the HTTP method the endpoint is reached by.

@@ -44,7 +44,7 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
     void shouldReceiveServiceMetadata() {
         // when.
         ResponseEntity<String> result =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metadata", String.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-metadata", String.class);
 
         // then.
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();

@@ -19,8 +19,8 @@ package com.axelixlabs.axelix.master.mcp.auth;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthorizationException;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 

@@ -32,7 +32,6 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.CeilingBlocker;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.StarterVersionUsage;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
@@ -44,6 +43,7 @@ import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
+import com.axelixlabs.axelix.master.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;

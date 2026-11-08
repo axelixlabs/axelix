@@ -67,7 +67,7 @@ class AxelixDetailsEndpointTest {
     @Test
     void shouldReturnValidDetailsStructure() {
         ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-details", String.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-details", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 

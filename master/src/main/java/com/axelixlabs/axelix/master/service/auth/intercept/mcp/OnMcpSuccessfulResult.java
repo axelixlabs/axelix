@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.service.auth.intercept.mcp;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 
 /**

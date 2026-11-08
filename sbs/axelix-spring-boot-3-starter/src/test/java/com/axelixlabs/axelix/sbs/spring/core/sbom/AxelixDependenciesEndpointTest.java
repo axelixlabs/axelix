@@ -74,7 +74,7 @@ class AxelixDependenciesEndpointTest {
 
         // when.
         ResponseEntity<String> response =
-                testRestTemplate.asViewer().getForEntity("/actuator/axelix-dependencies", String.class);
+                testRestTemplate.asMaster().getForEntity("/actuator/axelix-dependencies", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

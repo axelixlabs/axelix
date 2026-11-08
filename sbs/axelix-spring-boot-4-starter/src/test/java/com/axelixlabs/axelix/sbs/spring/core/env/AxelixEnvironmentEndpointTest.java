@@ -35,11 +35,9 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.contract.env.Property;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -83,7 +81,7 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
     @MethodSource("propertyExpectations")
     void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = findPropertyAppearances(propertyName, response);
 
@@ -97,11 +95,11 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
                 .isEqualTo(expectedValue);
     }
 
-    @ParameterizedTest(name = "Property ''{0}'' should have value ''{1}'' for ''{2}''")
+    @ParameterizedTest(name = "Property ''{0}'' should have value ''{1}''")
     @MethodSource("propertyValues")
-    void shouldReturnPropertyValueRegardlessOfRole(String propertyName, String value, Role role) {
+    void shouldReturnPropertyValue(String propertyName, String value) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.withRole(role).getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = findPropertyAppearances(propertyName, response);
 
@@ -115,7 +113,7 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
 
     @Test
     void shouldReturnValidJsonStructure() {
-        ResponseEntity<String> response = restTemplate.asViewer().getForEntity("/actuator/axelix-env", String.class);
+        ResponseEntity<String> response = restTemplate.asMaster().getForEntity("/actuator/axelix-env", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -160,7 +158,7 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
     @MethodSource("propertyName")
     void shouldReturnTheBeanNameThatMatchesTheConfigProps(String propertyName) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.asEditor().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = findPropertyAppearances(propertyName, response);
 
@@ -173,7 +171,7 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
     @MethodSource("propertySourceDescription")
     void shouldReturnDescriptionKnownPropertySource(String sourceName, String sourceDescription) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         assertThat(response.getBody().getPropertySources())
                 .filteredOn(e -> e.getName().equals(sourceName))
@@ -193,12 +191,8 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
 
     public static Stream<Arguments> propertyValues() {
         return Stream.of(
-                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", TestRoles.EDITOR),
-                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", TestRoles.EDITOR),
-                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", TestRoles.VIEWER),
-                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", TestRoles.VIEWER),
-                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", TestRoles.ADMIN),
-                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", TestRoles.ADMIN));
+                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized"),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized"));
     }
 
     private static Stream<Arguments> propertyName() {

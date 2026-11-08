@@ -2,7 +2,6 @@ import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
     id("common")
-    id("java-test-fixtures")
     id("contracts")
 }
 

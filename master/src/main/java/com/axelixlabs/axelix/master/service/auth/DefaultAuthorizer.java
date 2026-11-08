@@ -20,9 +20,9 @@ package com.axelixlabs.axelix.master.service.auth;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.AuthorizationRequest;
+import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthorizationException;
 
 /**

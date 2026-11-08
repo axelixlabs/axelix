@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.utils.auth;
 
-import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -41,24 +40,6 @@ public class ProtectedEndpointExtension implements TestTemplateInvocationContext
 
     @Override
     public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(ExtensionContext context) {
-        Method requiredTestMethod = context.getRequiredTestMethod();
-
-        ProtectedEndpointTests annotation = requiredTestMethod.getAnnotation(ProtectedEndpointTests.class);
-
-        Stream<BadAuthorityEndpointInvocationContext> first;
-
-        if (annotation.requiredAuthority().length > 0) {
-            first = Stream.of(
-                    new BadAuthorityEndpointInvocationContext(annotation.requiredAuthority()[0]));
-        } else {
-            first = Stream.of();
-        }
-
-        return Stream.concat(
-                // authorization negative cases
-                first,
-
-                // authentication negative cases
-                Stream.of(new BadTokenProtectedEndpointInvocationContext()));
+        return Stream.of(new BadTokenProtectedEndpointInvocationContext());
     }
 }

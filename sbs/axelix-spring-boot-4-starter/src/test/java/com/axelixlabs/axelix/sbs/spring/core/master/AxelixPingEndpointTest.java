@@ -42,7 +42,7 @@ class AxelixPingEndpointTest extends AbstractMasterSharedContextTest {
     @Test
     void shouldReceivePing() {
         // when.
-        ResponseEntity<String> result = testRestTemplate.asViewer().getForEntity("/actuator/axelix-ping", String.class);
+        ResponseEntity<String> result = testRestTemplate.asMaster().getForEntity("/actuator/axelix-ping", String.class);
 
         // then.
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();

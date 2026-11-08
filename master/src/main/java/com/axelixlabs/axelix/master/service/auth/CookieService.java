@@ -21,8 +21,8 @@ import java.util.Set;
 
 import org.springframework.http.ResponseCookie;
 
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.Role;
+import com.axelixlabs.axelix.master.domain.auth.User;
 
 /**
  * Service interface for authentication HTTP cookie operations.

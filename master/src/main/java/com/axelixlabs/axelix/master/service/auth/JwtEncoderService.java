@@ -21,8 +21,8 @@ import java.time.Duration;
 
 import org.jspecify.annotations.NullMarked;
 
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.master.domain.auth.User;
 
 /**
  * Contract for generating signed JWT tokens from {@link User} representations.

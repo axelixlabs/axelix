@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.service.discovery;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.common.utils.SemanticVersion;
+import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
 /**
  * {@link CompatibilityDetectionStrategy} that enforces the compatibility window: Axelix Master

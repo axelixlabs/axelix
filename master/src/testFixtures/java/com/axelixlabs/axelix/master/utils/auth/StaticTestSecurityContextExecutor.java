@@ -21,11 +21,11 @@ import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
-import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
+import com.axelixlabs.axelix.master.domain.auth.DefaultSecurityContext;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContext;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
+import com.axelixlabs.axelix.master.domain.function.ThrowingCallable;
+import com.axelixlabs.axelix.master.domain.function.ThrowingRunnable;
 
 /**
  * {@link SecurityContextExecutor} for tests: always exposes a static token so actuator probers can build

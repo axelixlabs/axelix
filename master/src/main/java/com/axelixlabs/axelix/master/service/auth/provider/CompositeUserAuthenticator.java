@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.auth.User;
 
 /**
  * Composite {@link UserAuthenticator}.

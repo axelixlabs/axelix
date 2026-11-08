@@ -21,7 +21,7 @@ import java.util.Collection;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 
 /**
  * Thrown if the role name is not found in the Axelix system {@link Role}.

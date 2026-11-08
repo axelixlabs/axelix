@@ -35,12 +35,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
-import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.common.domain.http.SingleValueQueryParameter;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.domain.http.SingleValueQueryParameter;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.transport.CachingEndpointProber.CacheKey;

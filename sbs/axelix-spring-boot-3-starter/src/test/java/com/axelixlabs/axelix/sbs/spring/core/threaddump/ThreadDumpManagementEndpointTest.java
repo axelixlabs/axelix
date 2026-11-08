@@ -58,7 +58,7 @@ public class ThreadDumpManagementEndpointTest {
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
         // when.
-        restTemplate.asViewer().postForEntity("/actuator/axelix-thread-dump/enable", null, Void.class);
+        restTemplate.asMaster().postForEntity("/actuator/axelix-thread-dump/enable", null, Void.class);
 
         // then.
         assertThat(threadMXBean.isThreadContentionMonitoringEnabled()).isTrue();
@@ -68,7 +68,7 @@ public class ThreadDumpManagementEndpointTest {
     void shouldReceiveThreadDumpJson() {
         // when.
         ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-thread-dump", String.class);
+                restTemplate.asMaster().getForEntity("/actuator/axelix-thread-dump", String.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -110,7 +110,7 @@ public class ThreadDumpManagementEndpointTest {
         threadMXBean.setThreadContentionMonitoringEnabled(true);
 
         // when.
-        restTemplate.asViewer().postForEntity("/actuator/axelix-thread-dump/disable", null, Void.class);
+        restTemplate.asMaster().postForEntity("/actuator/axelix-thread-dump/disable", null, Void.class);
 
         // then.
         assertThat(threadMXBean.isThreadContentionMonitoringEnabled()).isFalse();
