@@ -17,9 +17,11 @@
  */
 package com.axelixlabs.axelix.master.service.auth;
 
+import java.util.List;
 import java.util.Set;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository.AuthorityProfile;
 
 /**
  * Access to the authority catalog stored in the database.
@@ -32,4 +34,9 @@ public interface AuthoritiesService {
      * @return all authorities currently stored in the database.
      */
     Set<Authority> getAll();
+
+    /**
+     * @return all authority profiles currently stored in the database, ordered by codename.
+     */
+    List<AuthorityProfile> getAuthoritiesFeed();
 }

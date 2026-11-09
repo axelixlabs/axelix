@@ -60,6 +60,11 @@ public final class ApiPaths {
         public static final String ROLE_USER_COUNTS = "/users/role-counts";
     }
 
+    public static final class AuthoritiesApi {
+
+        public static final String AUTHORITIES_FEED = "/authorities/feed";
+    }
+
     public static final class RolesApi {
 
         /**
