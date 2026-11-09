@@ -21,18 +21,22 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseCookie;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
 import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.Role;
-import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,6 +50,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @TestPropertySource(properties = {"axelix.master.auth.jwt.lifespan=12h"})
 class DefaultCookieServiceTest {
+    private Authority envValuesRead;
+    private Authority cachesClear;
+    private Authority cachesToggle;
+
+    @Autowired
+    private JdbcClient jdbcClient;
+
+    @BeforeEach
+    void insertAuthorities() {
+        envValuesRead = insertAuthority("test-ENV_VALUES_READ", "test:environment.values:read");
+        cachesClear = insertAuthority("test-CACHES_CLEAR", "test:caches:clear");
+        cachesToggle = insertAuthority("test-CACHES_TOGGLE", "test:caches:toggle");
+    }
+
+    @AfterEach
+    void deleteAuthorities() {
+        jdbcClient
+                .sql(
+                        "DELETE FROM authorities WHERE id IN ('test-ENV_VALUES_READ', 'test-CACHES_CLEAR', 'test-CACHES_TOGGLE')")
+                .update();
+    }
 
     @Autowired
     private CookieService cookieService;
@@ -78,8 +103,7 @@ class DefaultCookieServiceTest {
     @Test
     void buildAuthoritiesMetadataCookie_WithDistinctAuthorities_ReturnsBase64EncodedJsonCookie() {
         // given.
-        Role targetRole =
-                new DefaultRole("OBSERVER", Set.of(TestAuthorities.CACHES_TOGGLE, TestAuthorities.ENV_VALUES_READ));
+        Role targetRole = new DefaultRole("OBSERVER", Set.of(cachesToggle, envValuesRead));
 
         // when.
         ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
@@ -95,19 +119,19 @@ class DefaultCookieServiceTest {
             assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.lifespan());
         });
         assertThat(decodedValue).startsWith("[").endsWith("]");
-        assertThat(decodedValue).contains(TestAuthorities.CACHES_TOGGLE.getName());
-        assertThat(decodedValue).contains(TestAuthorities.ENV_VALUES_READ.getName());
+        assertThat(decodedValue).contains("test:caches:toggle");
+        assertThat(decodedValue).contains("test:environment.values:read");
     }
 
     @Test
     void buildAuthoritiesMetadataCookie_WithInheritedAuthorities_IncludesTheOnesReachedThroughTheComponents() {
         // given. The front-end decides what to show from this cookie, so an inherited authority has to reach it just
         // like a direct one
-        Role grandParent = new DefaultRole("GRAND_PARENT", Set.of(TestAuthorities.CACHES_CLEAR));
+        Role grandParent = new DefaultRole("GRAND_PARENT", Set.of(cachesClear));
         Role child = new DefaultRole(
                 "CHILD",
-                Set.of(TestAuthorities.CACHES_TOGGLE),
-                Set.of(new DefaultRole("PARENT", Set.of(TestAuthorities.ENV_VALUES_READ), Set.of(grandParent))));
+                Set.of(cachesToggle),
+                Set.of(new DefaultRole("PARENT", Set.of(envValuesRead), Set.of(grandParent))));
 
         // when.
         ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(child));
@@ -116,9 +140,9 @@ class DefaultCookieServiceTest {
 
         // then. Own, inherited and inherited-transitively alike
         assertThat(decodedValue)
-                .contains(TestAuthorities.CACHES_TOGGLE.getName())
-                .contains(TestAuthorities.ENV_VALUES_READ.getName())
-                .contains(TestAuthorities.CACHES_CLEAR.getName());
+                .contains("test:caches:toggle")
+                .contains("test:environment.values:read")
+                .contains("test:caches:clear");
     }
 
     @Test
@@ -164,5 +188,17 @@ class DefaultCookieServiceTest {
         assertThat(cookie.getValue()).isEmpty();
         assertThat(cookie.getMaxAge().toSeconds()).isZero();
         assertThat(cookie.isHttpOnly()).isFalse();
+    }
+
+    private Authority insertAuthority(String id, String codename) {
+        jdbcClient
+                .sql("INSERT INTO authorities (id, codename, description) VALUES (?, ?, ?)")
+                .params(id, codename, "Test authority")
+                .update();
+        return jdbcClient
+                .sql("SELECT id, codename FROM authorities WHERE id = ?")
+                .param(id)
+                .query((rs, n) -> new DefaultAuthority(rs.getString("id"), rs.getString("codename")))
+                .single();
     }
 }

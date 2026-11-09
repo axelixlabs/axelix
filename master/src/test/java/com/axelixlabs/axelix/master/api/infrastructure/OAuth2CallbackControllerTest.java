@@ -61,7 +61,6 @@ import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
-import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
@@ -90,6 +89,9 @@ import static org.mockito.Mockito.when;
             "axelix.master.auth.options.oauth2.role-attribute-path=roles[0]"
         })
 class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
+
+    @Autowired
+    protected TestRoles testRoles;
 
     private static final String CODE = "test-code";
     private static final String ID_TOKEN = "test-id-token";
@@ -167,7 +169,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         when(oidcClient.validateIdToken(ID_TOKEN))
                 .thenReturn(new ValidatedOidcIdentity(username, SUBJECT, identityClaims));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.editor());
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "given_name")).thenReturn(firstName);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "family_name")).thenReturn(lastName);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "email")).thenReturn(email);
@@ -194,10 +196,10 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         assertThat(decodedTokenToUser.getUsername()).isEqualTo(username);
         assertThat(decodedTokenToUser.getRoles()).singleElement().satisfies(role -> {
-            assertThat(role.name()).isEqualTo(TestRoles.EDITOR.name());
+            assertThat(role.name()).isEqualTo(testRoles.editor().name());
             assertThat(role.authorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.authorities().stream()
+                    .containsExactlyInAnyOrderElementsOf(testRoles.editor().authorities().stream()
                             .map(Authority::getName)
                             .toList());
         });
@@ -210,13 +212,11 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 .asString()
                 .actual();
 
-        TestRoles.EDITOR.authorities().stream()
+        testRoles.editor().authorities().stream()
                 .map(Authority::getName)
                 .forEach(name -> assertThat(decodedAuthorities).contains(name));
 
-        assertThat(authoritiesCookie)
-                .doesNotContain(
-                        TestAuthorities.ENV_VALUES_READ.getName(), TestAuthorities.CONFIG_PROPS_VALUES_READ.getName());
+        assertThat(authoritiesCookie).doesNotContain("environment.values:read", "config-properties.values:read");
 
         // Verify that the OIDC user was correctly provisioned and persisted in the database
         UserEntity userEntity = userRepository.findByUsername(username).get();
@@ -247,14 +247,14 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 "Name",
                 "original@gmail.com",
                 expectedOidcSubject(SUBJECT),
-                TestRoles.VIEWER.name());
+                testRoles.viewer().name());
 
         // and.
         String userInfoJson = "{\"email\": \"%s\"}".formatted(updatedEmail);
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
         when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.editor());
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "email")).thenReturn(updatedEmail);
         Instant beforeLogin = Instant.now();
 
@@ -269,7 +269,8 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         assertThat(updated.firstName()).isEqualTo("Original");
         assertThat(updated.lastName()).isEqualTo("Name");
         assertThat(updated.email()).isEqualTo(updatedEmail);
-        assertThat(userService.findRoleNamesByUserId(updated.id())).containsOnly(TestRoles.EDITOR.name());
+        assertThat(userService.findRoleNamesByUserId(updated.id()))
+                .containsOnly(testRoles.editor().name());
         assertThat(updated.userOrigin()).isEqualTo(UserOrigin.OIDC);
         assertThat(updated.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
         assertSuccessfulCallback(MasterWebEndpoints.OIDC_AUTH_COMPLETE, UserUtils.passwordless(username, Set.of()));
@@ -286,7 +287,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 "Doe",
                 "john@example.com",
                 expectedOidcSubject(SUBJECT),
-                TestRoles.VIEWER.name());
+                testRoles.viewer().name());
         UserEntity original = userRepository.findByUsername(originalUsername).orElseThrow();
 
         // and the provider now presents a DIFFERENT username for the SAME subject.
@@ -295,7 +296,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         when(oidcClient.validateIdToken(ID_TOKEN))
                 .thenReturn(new ValidatedOidcIdentity(newUsername, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.editor());
 
         // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(
@@ -322,7 +323,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
         when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.editor());
 
         // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(

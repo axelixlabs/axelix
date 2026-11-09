@@ -33,9 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
@@ -62,9 +60,12 @@ import static org.assertj.core.api.Assertions.within;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-@SpringBootTest(classes = DefaultUserJwtEncoderServiceTest.DefaultJwtEncoderServiceTestConfiguration.class)
+@SpringBootTest(classes = com.axelixlabs.axelix.master.Main.class)
 @TestPropertySource("classpath:jwt-services-test.properties")
 class DefaultUserJwtEncoderServiceTest {
+
+    @Autowired
+    protected TestRoles testRoles;
 
     private static final String USER_NAME = "testUser";
     private static final String PASSWORD = "testPassword";
@@ -84,7 +85,7 @@ class DefaultUserJwtEncoderServiceTest {
     @Test
     void shouldSerializeGeneratedModelWithLifetimeAndNestedRoles() throws Exception {
         // given.
-        Role parent = TestRoles.EDITOR;
+        Role parent = testRoles.editor();
         Role child = new DefaultRole("CHILD", Set.of(), Set.of(parent));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(child));
         Instant before = Instant.now().truncatedTo(ChronoUnit.SECONDS);
@@ -115,7 +116,7 @@ class DefaultUserJwtEncoderServiceTest {
     @Test
     void shouldGenerateTokenWithRequiredClaims() {
         // given.
-        Role viewer = TestRoles.VIEWER;
+        Role viewer = testRoles.viewer();
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(viewer));
 
         // when.
@@ -147,7 +148,7 @@ class DefaultUserJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateValidJwtToken_ForUserWithRoleAdmin() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.admin()));
 
         // when.
         String token = userJwtEncoderService.generateToken(user);
@@ -179,7 +180,7 @@ class DefaultUserJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateValidJwtToken_ForUserWithRoleEditor() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.editor()));
 
         // when.
         String token = userJwtEncoderService.generateToken(user);
@@ -211,7 +212,7 @@ class DefaultUserJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateValidJwtToken_ForUserWithRoleViewer() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.viewer()));
 
         // when.
         String token = userJwtEncoderService.generateToken(user);
@@ -239,7 +240,7 @@ class DefaultUserJwtEncoderServiceTest {
     @Test
     void shouldGenerateValidJwtToken_MultipleRoles() {
         User user = UserUtils.withPassword(
-                USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN, TestRoles.EDITOR, TestRoles.VIEWER));
+                USER_NAME, PASSWORD, Set.of(testRoles.admin(), testRoles.editor(), testRoles.viewer()));
 
         // when.
         String token = userJwtEncoderService.generateToken(user);
@@ -305,7 +306,7 @@ class DefaultUserJwtEncoderServiceTest {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
         UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
 
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.editor()));
 
         // when.
         String token = encoder.generateToken(user);
@@ -347,7 +348,7 @@ class DefaultUserJwtEncoderServiceTest {
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
         UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
 
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.viewer()));
 
         // when.
         String token = encoder.generateToken(user);
@@ -382,7 +383,7 @@ class DefaultUserJwtEncoderServiceTest {
         DefaultUserJwtEncoderService invalidService =
                 new DefaultUserJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
 
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.editor()));
 
         assertThatThrownBy(() -> invalidService.generateToken(user)).isInstanceOf(JwtTokenGenerationException.class);
     }
@@ -403,17 +404,5 @@ class DefaultUserJwtEncoderServiceTest {
     private String getHeader(String token) {
         String[] parts = token.split("\\.");
         return new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
-    }
-
-    @SpringBootConfiguration
-    static class DefaultJwtEncoderServiceTestConfiguration {
-
-        @Bean
-        UserJwtEncoderService jwtEncoderService(
-                final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-                final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan,
-                final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultUserJwtEncoderService(algorithm, signingKey, lifespan);
-        }
     }
 }

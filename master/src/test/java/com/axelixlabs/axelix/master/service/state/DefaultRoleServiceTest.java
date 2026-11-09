@@ -34,13 +34,15 @@ import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.iam.RoleOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
+import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleProfile;
 import com.axelixlabs.axelix.master.repository.UserRepository;
+import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.auth.DefaultRoleService;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
-import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
@@ -58,7 +60,15 @@ import static org.assertj.core.api.Assertions.tuple;
 class DefaultRoleServiceTest {
 
     @Autowired
+    protected TestRoles testRoles;
+
     private RoleService roleService;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     @Autowired
     private UserService userService;
@@ -72,6 +82,7 @@ class DefaultRoleServiceTest {
     @BeforeEach
     @AfterEach
     void cleanCustomRolesAndUsers() {
+        roleService = new DefaultRoleService(roleRepository, new DefaultAuthoritiesService(authorityRepository));
         List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
         if (!ids.isEmpty()) {
             userService.deleteByIds(ids);
@@ -85,6 +96,7 @@ class DefaultRoleServiceTest {
                 .sql("DELETE FROM roles WHERE role_origin <> ?")
                 .param(RoleOrigin.BUILT_IN.name())
                 .update();
+        jdbcClient.sql("DELETE FROM authorities WHERE codename LIKE 'test:%'").update();
     }
 
     @Nested
@@ -93,14 +105,14 @@ class DefaultRoleServiceTest {
         @Test
         void shouldReturnBuiltInRolesMatchingTheOnesTestsAreBuiltUpon() {
             // when.
-            Optional<Role> viewer = roleService.findByName(TestRoles.VIEWER.name());
-            Optional<Role> editor = roleService.findByName(TestRoles.EDITOR.name());
-            Optional<Role> admin = roleService.findByName(TestRoles.ADMIN.name());
+            Optional<Role> viewer = roleService.findByName(testRoles.viewer().name());
+            Optional<Role> editor = roleService.findByName(testRoles.editor().name());
+            Optional<Role> admin = roleService.findByName(testRoles.admin().name());
 
             // then.
-            assertThat(viewer).hasValueSatisfying(role -> assertGrantsSameAs(role, TestRoles.VIEWER));
-            assertThat(editor).hasValueSatisfying(role -> assertGrantsSameAs(role, TestRoles.EDITOR));
-            assertThat(admin).hasValueSatisfying(role -> assertGrantsSameAs(role, TestRoles.ADMIN));
+            assertThat(viewer).hasValueSatisfying(role -> assertGrantsSameAs(role, testRoles.viewer()));
+            assertThat(editor).hasValueSatisfying(role -> assertGrantsSameAs(role, testRoles.editor()));
+            assertThat(admin).hasValueSatisfying(role -> assertGrantsSameAs(role, testRoles.admin()));
         }
 
         @Test
@@ -124,8 +136,8 @@ class DefaultRoleServiceTest {
         @Test
         void shouldResolveAuthoritiesForWholeRoleGraph() {
             // given.
-            String parentId = createCustomRole("PARENT", TestAuthorities.CACHES_CLEAR);
-            String childId = createCustomRole("CHILD", TestAuthorities.CACHES_TOGGLE);
+            String parentId = createCustomRole("PARENT", "test:caches:clear");
+            String childId = createCustomRole("CHILD", "test:caches:toggle");
             createBond(childId, parentId);
 
             // when.
@@ -135,8 +147,7 @@ class DefaultRoleServiceTest {
             assertThat(role)
                     .hasValueSatisfying(value -> assertThat(value.getEffectiveAuthorities())
                             .extracting(Authority::getName)
-                            .containsExactlyInAnyOrder(
-                                    TestAuthorities.CACHES_CLEAR.getName(), TestAuthorities.CACHES_TOGGLE.getName()));
+                            .containsExactlyInAnyOrder("test:caches:clear", "test:caches:toggle"));
         }
 
         @Test
@@ -158,29 +169,30 @@ class DefaultRoleServiceTest {
         @Test
         void shouldReturnTheSingleRoleGrantedToTheUser() {
             // given.
-            String userId = createUserWithRoles(TestRoles.VIEWER.name());
+            String userId = createUserWithRoles(testRoles.viewer().name());
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
 
             // then.
-            assertThat(roles).singleElement().satisfies(role -> assertGrantsSameAs(role, TestRoles.VIEWER));
+            assertThat(roles).singleElement().satisfies(role -> assertGrantsSameAs(role, testRoles.viewer()));
         }
 
         @Test
         void shouldReturnEveryRoleWithItsAuthorities() {
             // given.
-            String userId = createUserWithRoles(TestRoles.ADMIN.name(), TestRoles.EDITOR.name());
+            String userId = createUserWithRoles(
+                    testRoles.admin().name(), testRoles.editor().name());
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
 
             // then.
             assertThat(roles).hasSize(2);
-            assertThat(roleNamed(roles, TestRoles.ADMIN.name()))
-                    .satisfies(role -> assertGrantsSameAs(role, TestRoles.ADMIN));
-            assertThat(roleNamed(roles, TestRoles.EDITOR.name()))
-                    .satisfies(role -> assertGrantsSameAs(role, TestRoles.EDITOR));
+            assertThat(roleNamed(roles, testRoles.admin().name()))
+                    .satisfies(role -> assertGrantsSameAs(role, testRoles.admin()));
+            assertThat(roleNamed(roles, testRoles.editor().name()))
+                    .satisfies(role -> assertGrantsSameAs(role, testRoles.editor()));
         }
 
         @Test
@@ -211,31 +223,27 @@ class DefaultRoleServiceTest {
         @Test
         void shouldExposeTheRoleItDerivesFromAsAComponent() {
             // given.
-            String parentId = createCustomRole("PARENT", TestAuthorities.CACHES_CLEAR);
-            String childId = createCustomRole("CHILD", TestAuthorities.GARBAGE_COLLECTOR);
+            String parentId = createCustomRole("PARENT", "test:caches:clear");
+            String childId = createCustomRole("CHILD", "test:gc:manage");
             createBond(childId, parentId);
 
             // when.
             Role child = roleService.findByName("CHILD").orElseThrow();
 
             // then. The parent is a component rather than its authorities being copied into the child
-            assertThat(child.authorities())
-                    .extracting(Authority::getName)
-                    .containsExactly(TestAuthorities.GARBAGE_COLLECTOR.getName());
+            assertThat(child.authorities()).extracting(Authority::getName).containsExactly("test:gc:manage");
             assertThat(child.components()).singleElement().satisfies(parent -> {
                 assertThat(parent.name()).isEqualTo("PARENT");
-                assertThat(parent.authorities())
-                        .extracting(Authority::getName)
-                        .containsExactly(TestAuthorities.CACHES_CLEAR.getName());
+                assertThat(parent.authorities()).extracting(Authority::getName).containsExactly("test:caches:clear");
             });
         }
 
         @Test
         void shouldResolveTheBondsTransitively() {
             // given. C derives from B, B derives from A
-            String grandParent = createCustomRole("ROLE A", TestAuthorities.ENV_VALUES_READ);
-            String parent = createCustomRole("ROLE B", TestAuthorities.CACHES_CLEAR);
-            String child = createCustomRole("ROLE C", TestAuthorities.GARBAGE_COLLECTOR);
+            String grandParent = createCustomRole("ROLE A", "test:environment.values:read");
+            String parent = createCustomRole("ROLE B", "test:caches:clear");
+            String child = createCustomRole("ROLE C", "test:gc:manage");
             createBond(parent, grandParent);
             createBond(child, parent);
 
@@ -245,19 +253,16 @@ class DefaultRoleServiceTest {
             // then.
             assertThat(c.getEffectiveAuthorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrder(
-                            TestAuthorities.GARBAGE_COLLECTOR.getName(),
-                            TestAuthorities.CACHES_CLEAR.getName(),
-                            TestAuthorities.ENV_VALUES_READ.getName());
+                    .containsExactlyInAnyOrder("test:gc:manage", "test:caches:clear", "test:environment.values:read");
         }
 
         @Test
         void shouldUnionTheAuthoritiesReachedThroughSeveralChains() {
             // given. A diamond: the top role is reached through both branches
-            String top = createCustomRole("TOP", TestAuthorities.ENV_VALUES_READ);
-            String left = createCustomRole("LEFT", TestAuthorities.CACHES_CLEAR);
-            String right = createCustomRole("RIGHT", TestAuthorities.CACHES_TOGGLE);
-            String bottom = createCustomRole("BOTTOM", TestAuthorities.GARBAGE_COLLECTOR);
+            String top = createCustomRole("TOP", "test:environment.values:read");
+            String left = createCustomRole("LEFT", "test:caches:clear");
+            String right = createCustomRole("RIGHT", "test:caches:toggle");
+            String bottom = createCustomRole("BOTTOM", "test:gc:manage");
             createBond(left, top);
             createBond(right, top);
             createBond(bottom, left);
@@ -270,17 +275,17 @@ class DefaultRoleServiceTest {
             assertThat(role.getEffectiveAuthorities())
                     .extracting(Authority::getName)
                     .containsExactlyInAnyOrder(
-                            TestAuthorities.GARBAGE_COLLECTOR.getName(),
-                            TestAuthorities.CACHES_CLEAR.getName(),
-                            TestAuthorities.CACHES_TOGGLE.getName(),
-                            TestAuthorities.ENV_VALUES_READ.getName());
+                            "test:gc:manage",
+                            "test:caches:clear",
+                            "test:caches:toggle",
+                            "test:environment.values:read");
         }
 
         @Test
         void shouldResolveTheBondsOfEveryRoleTheUserHolds() {
             // given.
-            String parentId = createCustomRole("PARENT", TestAuthorities.CACHES_CLEAR);
-            String childId = createCustomRole("CHILD", TestAuthorities.GARBAGE_COLLECTOR);
+            String parentId = createCustomRole("PARENT", "test:caches:clear");
+            String childId = createCustomRole("CHILD", "test:gc:manage");
             createBond(childId, parentId);
 
             userService.createLocal("alice", null, null, "alice@example.com", "p", Set.of("CHILD"));
@@ -294,9 +299,7 @@ class DefaultRoleServiceTest {
                     .singleElement()
                     .satisfies(role -> assertThat(role.getEffectiveAuthorities())
                             .extracting(Authority::getName)
-                            .containsExactlyInAnyOrder(
-                                    TestAuthorities.GARBAGE_COLLECTOR.getName(),
-                                    TestAuthorities.CACHES_CLEAR.getName()));
+                            .containsExactlyInAnyOrder("test:gc:manage", "test:caches:clear"));
         }
     }
 
@@ -314,39 +317,60 @@ class DefaultRoleServiceTest {
                     .containsExactlyInAnyOrder(
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b1",
-                                    TestRoles.VIEWER.name(),
+                                    testRoles.viewer().name(),
                                     "Read-only access to the monitored applications."),
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b2",
-                                    TestRoles.EDITOR.name(),
+                                    testRoles.editor().name(),
                                     "Performs runtime operations on the monitored applications, including destructive"
                                             + " ones such as clearing caches."),
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b3",
-                                    TestRoles.ADMIN.name(),
+                                    testRoles.admin().name(),
                                     "Everything an editor can do, plus reading sensitive configuration values."));
         }
 
         @Test
         void shouldCountTheUsersEachRoleIsAssignedTo() {
             // given.
-            userService.createLocal("alice", null, null, "alice@example.com", "p", Set.of(TestRoles.EDITOR.name()));
-            userService.createLocal("bob", null, null, "bob@example.com", "p", Set.of(TestRoles.EDITOR.name()));
-            userService.createLocal("carol", null, null, "carol@example.com", "p", Set.of(TestRoles.VIEWER.name()));
+            userService.createLocal(
+                    "alice",
+                    null,
+                    null,
+                    "alice@example.com",
+                    "p",
+                    Set.of(testRoles.editor().name()));
+            userService.createLocal(
+                    "bob",
+                    null,
+                    null,
+                    "bob@example.com",
+                    "p",
+                    Set.of(testRoles.editor().name()));
+            userService.createLocal(
+                    "carol",
+                    null,
+                    null,
+                    "carol@example.com",
+                    "p",
+                    Set.of(testRoles.viewer().name()));
 
             // when.
             List<RoleProfile> feed = roleService.getRolesFeed();
 
             // then.
-            assertThat(entryNamed(feed, TestRoles.EDITOR.name()).membersCount()).isEqualTo(2);
-            assertThat(entryNamed(feed, TestRoles.VIEWER.name()).membersCount()).isEqualTo(1);
-            assertThat(entryNamed(feed, TestRoles.ADMIN.name()).membersCount()).isZero();
+            assertThat(entryNamed(feed, testRoles.editor().name()).membersCount())
+                    .isEqualTo(2);
+            assertThat(entryNamed(feed, testRoles.viewer().name()).membersCount())
+                    .isEqualTo(1);
+            assertThat(entryNamed(feed, testRoles.admin().name()).membersCount())
+                    .isZero();
         }
 
         @Test
         void shouldReturnACustomRoleWithItsOwnIdAndDescription() {
             // given.
-            String derivedId = createCustomRole("DERIVED", TestAuthorities.ENV_VALUES_READ);
+            String derivedId = createCustomRole("DERIVED", "test:environment.values:read");
 
             // when.
             List<RoleProfile> feed = roleService.getRolesFeed();
@@ -372,8 +396,8 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateOnABondCycleWrittenAroundTheApplication() {
             // given.
-            String roleA = createCustomRole("ROLE A", TestAuthorities.ENV_VALUES_READ);
-            String roleB = createCustomRole("ROLE B", TestAuthorities.CACHES_CLEAR);
+            String roleA = createCustomRole("ROLE A", "test:environment.values:read");
+            String roleB = createCustomRole("ROLE B", "test:caches:clear");
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
@@ -384,7 +408,7 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateOnARoleThatDerivesFromItself() {
             // given.
-            String role = createCustomRole("ROLE A", TestAuthorities.ENV_VALUES_READ);
+            String role = createCustomRole("ROLE A", "test:environment.values:read");
             createBond(role, role);
 
             // when & then.
@@ -394,9 +418,9 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateOnACycleSpanningThreeRoles() {
             // given. A --> B --> C --> A
-            String roleA = createCustomRole("ROLE A", TestAuthorities.ENV_VALUES_READ);
-            String roleB = createCustomRole("ROLE B", TestAuthorities.CACHES_CLEAR);
-            String roleC = createCustomRole("ROLE C", TestAuthorities.CACHES_TOGGLE);
+            String roleA = createCustomRole("ROLE A", "test:environment.values:read");
+            String roleB = createCustomRole("ROLE B", "test:caches:clear");
+            String roleC = createCustomRole("ROLE C", "test:caches:toggle");
             createBond(roleA, roleB);
             createBond(roleB, roleC);
             createBond(roleC, roleA);
@@ -408,9 +432,9 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateWhenTheCycleSitsAboveTheQueriedRole() {
             // given.
-            String leaf = createCustomRole("LEAF", TestAuthorities.GARBAGE_COLLECTOR);
-            String roleA = createCustomRole("ROLE A", TestAuthorities.ENV_VALUES_READ);
-            String roleB = createCustomRole("ROLE B", TestAuthorities.CACHES_CLEAR);
+            String leaf = createCustomRole("LEAF", "test:gc:manage");
+            String roleA = createCustomRole("ROLE A", "test:environment.values:read");
+            String roleB = createCustomRole("ROLE B", "test:caches:clear");
             createBond(leaf, roleA);
             createBond(roleA, roleB);
             createBond(roleB, roleA);
@@ -422,8 +446,8 @@ class DefaultRoleServiceTest {
         @Test
         void shouldTerminateWhenResolvingTheRolesOfAUserCaughtInACycle() {
             // given.
-            String roleA = createCustomRole("ROLE A", TestAuthorities.ENV_VALUES_READ);
-            String roleB = createCustomRole("ROLE B", TestAuthorities.CACHES_CLEAR);
+            String roleA = createCustomRole("ROLE A", "test:environment.values:read");
+            String roleB = createCustomRole("ROLE B", "test:caches:clear");
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
@@ -438,10 +462,10 @@ class DefaultRoleServiceTest {
         void shouldNotReportACycleForADiamondSharedAncestor() {
             // given. A diamond reaches the same ancestor through two branches - that is a DAG, not a cycle, and the
             // colouring must not mistake the second visit for a back-edge
-            String top = createCustomRole("TOP", TestAuthorities.ENV_VALUES_READ);
-            String left = createCustomRole("LEFT", TestAuthorities.CACHES_CLEAR);
-            String right = createCustomRole("RIGHT", TestAuthorities.CACHES_TOGGLE);
-            String bottom = createCustomRole("BOTTOM", TestAuthorities.GARBAGE_COLLECTOR);
+            String top = createCustomRole("TOP", "test:environment.values:read");
+            String left = createCustomRole("LEFT", "test:caches:clear");
+            String right = createCustomRole("RIGHT", "test:caches:toggle");
+            String bottom = createCustomRole("BOTTOM", "test:gc:manage");
             createBond(left, top);
             createBond(right, top);
             createBond(bottom, left);
@@ -454,10 +478,10 @@ class DefaultRoleServiceTest {
             assertThat(role.getEffectiveAuthorities())
                     .extracting(Authority::getName)
                     .containsExactlyInAnyOrder(
-                            TestAuthorities.GARBAGE_COLLECTOR.getName(),
-                            TestAuthorities.CACHES_CLEAR.getName(),
-                            TestAuthorities.CACHES_TOGGLE.getName(),
-                            TestAuthorities.ENV_VALUES_READ.getName());
+                            "test:gc:manage",
+                            "test:caches:clear",
+                            "test:caches:toggle",
+                            "test:environment.values:read");
         }
     }
 
@@ -472,13 +496,18 @@ class DefaultRoleServiceTest {
         return id;
     }
 
-    private String createCustomRole(String name, TestAuthorities authority) {
+    private String createCustomRole(String name, String authority) {
+        String authorityId = UUID.randomUUID().toString();
+        jdbcClient
+                .sql("INSERT INTO authorities (id, codename, description) VALUES (?, ?, ?)")
+                .params(authorityId, authority, "Test authority")
+                .update();
         String id = createCustomRole(name);
 
         jdbcClient
                 .sql("INSERT INTO roles_authorities (role_id, authority_id)"
                         + " SELECT ?, id FROM authorities WHERE codename = ?")
-                .params(id, authority.getName())
+                .params(id, authority)
                 .update();
 
         return id;
@@ -493,9 +522,22 @@ class DefaultRoleServiceTest {
 
     private static void assertGrantsSameAs(Role actual, Role expected) {
         assertThat(actual.name()).isEqualTo(expected.name());
+        Set<String> expectedAuthorities =
+                switch (expected.name()) {
+                    case "VIEWER" -> Set.of();
+                    case "EDITOR" -> Set.of("scheduled-tasks:write", "caches:clear", "caches:toggle", "gc:manage");
+                    case "ADMIN" ->
+                        Set.of(
+                                "scheduled-tasks:write",
+                                "caches:clear",
+                                "caches:toggle",
+                                "gc:manage",
+                                "environment.values:read",
+                                "config-properties.values:read");
+                    default -> throw new IllegalArgumentException();
+                };
         assertThat(actual.authorities())
                 .extracting(Authority::getName)
-                .containsExactlyInAnyOrderElementsOf(
-                        expected.authorities().stream().map(Authority::getName).toList());
+                .containsExactlyInAnyOrderElementsOf(expectedAuthorities);
     }
 }

@@ -72,6 +72,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ProxyingEndpointProberTest {
 
     @Autowired
+    protected TestRoles testRoles;
+
+    @Autowired
     private SecurityContextExecutor securityContextExecutor;
 
     @Autowired
@@ -123,7 +126,7 @@ class ProxyingEndpointProberTest {
         // given.
         Instance instance = instance(version);
         server.enqueue(new MockResponse().setBody("legacy-response"));
-        PasswordlessUser caller = new PasswordlessUser("caller", "operator", Set.of(TestRoles.EDITOR));
+        PasswordlessUser caller = new PasswordlessUser("caller", "operator", Set.of(testRoles.editor()));
         String callerToken = encoder.generateToken(caller);
 
         // when.
@@ -189,7 +192,7 @@ class ProxyingEndpointProberTest {
         Instance modern = instance("1.3.0-SNAPSHOT");
         server.enqueue(new MockResponse().setBody("legacy"));
         server.enqueue(new MockResponse().setBody("modern"));
-        PasswordlessUser caller = new PasswordlessUser("caller", "operator", Set.of(TestRoles.EDITOR));
+        PasswordlessUser caller = new PasswordlessUser("caller", "operator", Set.of(testRoles.editor()));
         String callerToken = encoder.generateToken(caller);
 
         // when.

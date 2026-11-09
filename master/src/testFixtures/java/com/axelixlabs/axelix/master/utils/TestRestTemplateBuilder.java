@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.utils;
 import java.time.Duration;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.web.server.servlet.context.ServletWebServerInitializedEvent;
@@ -35,9 +36,9 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtPropert
 import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.User;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
-import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
@@ -59,6 +60,9 @@ import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 @Component
 public class TestRestTemplateBuilder {
 
+    @Autowired
+    private TestRoles testRoles;
+
     private static final String HOST = "http://localhost:";
 
     // We cannot use @LocalServerPort here since at the time of this
@@ -69,6 +73,9 @@ public class TestRestTemplateBuilder {
     private final UserJwtEncoderService defaultUserJwtEncoderService;
     private final UserJwtEncoderService expiredUserJwtEncoderService;
     private final TechUserJwtSerializer techUserJwtSerializer;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     @EventListener
     public void handleServletWebServerInitializedEvent(ServletWebServerInitializedEvent event) {
@@ -86,19 +93,29 @@ public class TestRestTemplateBuilder {
     }
 
     public IdentityAwareTestRestTemplate asViewer() {
-        return withRole(TestRoles.VIEWER);
+        return withRole(testRoles.viewer());
     }
 
     public IdentityAwareTestRestTemplate asEditor() {
-        return withRole(TestRoles.EDITOR);
+        return withRole(testRoles.editor());
     }
 
     public IdentityAwareTestRestTemplate asUsersFeedViewer() {
-        return withRole(new DefaultRole("USERS_FEED_VIEWER", Set.of(TestAuthorities.USERS_VIEW)));
+        return withRole(new DefaultRole(
+                "USERS_FEED_VIEWER",
+                Set.of(authorityRepository.findAll().stream()
+                        .filter(it -> it.getName().equals("users:read"))
+                        .findFirst()
+                        .orElseThrow())));
     }
 
     public IdentityAwareTestRestTemplate asUsersFeedEditor() {
-        return withRole(new DefaultRole("USERS_FEED_EDITOR", Set.of(TestAuthorities.USERS_MANAGEMENT)));
+        return withRole(new DefaultRole(
+                "USERS_FEED_EDITOR",
+                Set.of(authorityRepository.findAll().stream()
+                        .filter(it -> it.getName().equals("users:manage"))
+                        .findFirst()
+                        .orElseThrow())));
     }
 
     public IdentityAwareTestRestTemplate withRole(Role role) {

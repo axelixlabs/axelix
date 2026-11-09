@@ -59,6 +59,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         })
 class RolesApiTest extends AbstractProtectedEndpointTest {
 
+    @Autowired
+    protected TestRoles testRoles;
+
     private static final String ROLES_FEED_PATH = "/api/external/roles/feed";
 
     @Autowired
@@ -82,7 +85,12 @@ class RolesApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnTheFeedOfTheBuiltInRoles() {
         // given.
         userService.createLocal(
-                "alice", null, null, "alice@example.com", "aliceSecret", Set.of(TestRoles.EDITOR.name()));
+                "alice",
+                null,
+                null,
+                "alice@example.com",
+                "aliceSecret",
+                Set.of(testRoles.editor().name()));
 
         // language=json
         String expectedFeed = """

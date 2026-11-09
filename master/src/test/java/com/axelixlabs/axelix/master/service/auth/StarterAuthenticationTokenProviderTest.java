@@ -26,6 +26,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.HmacVerificationStrategy;
@@ -47,7 +50,11 @@ import static org.mockito.Mockito.when;
  *
  * @author Mikhail Polivakha
  */
+@SpringBootTest
 class StarterAuthenticationTokenProviderTest {
+
+    @Autowired
+    protected TestRoles testRoles;
 
     private static final String SIGNING_KEY =
             "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff";
@@ -61,7 +68,7 @@ class StarterAuthenticationTokenProviderTest {
     @ValueSource(strings = {"1.1.0", "1.1.1", "1.2.0", "1.2.1", "1.2.2"})
     void shouldPreserveCallerIdentityAndAuthoritiesForLegacyStarters(String version) {
         // given.
-        PasswordlessUser caller = new PasswordlessUser("user-id", "operator", Set.of(TestRoles.EDITOR));
+        PasswordlessUser caller = new PasswordlessUser("user-id", "operator", Set.of(testRoles.editor()));
         String callerToken = encoder.generateToken(caller);
 
         // when.
@@ -76,7 +83,7 @@ class StarterAuthenticationTokenProviderTest {
         assertThat(decoded.getId()).isEqualTo(caller.getId());
         assertThat(decoded.getRoles())
                 .flatExtracting(role -> role.getEffectiveAuthorities())
-                .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.authorities());
+                .containsExactlyInAnyOrderElementsOf(testRoles.editor().authorities());
     }
 
     @ParameterizedTest
@@ -133,7 +140,7 @@ class StarterAuthenticationTokenProviderTest {
 
     private AuthoritiesService authoritiesService() {
         AuthoritiesService service = mock(AuthoritiesService.class);
-        when(service.getAll()).thenReturn(TestRoles.EDITOR.authorities());
+        when(service.getAll()).thenReturn(testRoles.editor().authorities());
         return service;
     }
 }

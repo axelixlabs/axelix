@@ -19,9 +19,13 @@ package com.axelixlabs.axelix.master.domain.auth;
 
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,50 +35,80 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
+@SpringBootTest
 class DefaultRoleTest {
+    private Authority envValuesRead;
+    private Authority cachesClear;
+    private Authority cachesToggle;
+    private Authority garbageCollector;
+
+    @Autowired
+    private JdbcClient jdbcClient;
+
+    @BeforeEach
+    void insertAuthorities() {
+        envValuesRead = insertAuthority("test-ENV_VALUES_READ", "test:environment.values:read");
+        cachesClear = insertAuthority("test-CACHES_CLEAR", "test:caches:clear");
+        cachesToggle = insertAuthority("test-CACHES_TOGGLE", "test:caches:toggle");
+        garbageCollector = insertAuthority("test-GARBAGE_COLLECTOR", "test:gc:manage");
+    }
+
+    @AfterEach
+    void deleteAuthorities() {
+        jdbcClient
+                .sql(
+                        "DELETE FROM authorities WHERE id IN ('test-ENV_VALUES_READ', 'test-CACHES_CLEAR', 'test-CACHES_TOGGLE', 'test-GARBAGE_COLLECTOR')")
+                .update();
+    }
 
     @Test
     void shouldReturnItsOwnAuthoritiesWhenItDerivesFromNobody() {
         // given.
-        Role role = new DefaultRole("VIEWER", Set.of(TestAuthorities.CACHES_TOGGLE));
+        Role role = new DefaultRole("VIEWER", Set.of(cachesToggle));
 
         // when & then.
         assertThat(role.getEffectiveAuthorities())
                 .extracting(Authority::getName)
-                .containsExactly(TestAuthorities.CACHES_TOGGLE.getName());
+                .containsExactly("test:caches:toggle");
     }
 
     @Test
     void shouldUniteTheAuthoritiesOfTheWholeChainItDerivesFrom() {
         // given. C derives from B, B derives from A
-        Role grandParent = new DefaultRole("A", Set.of(TestAuthorities.ENV_VALUES_READ));
-        Role parent = new DefaultRole("B", Set.of(TestAuthorities.CACHES_CLEAR), Set.of(grandParent));
-        Role child = new DefaultRole("C", Set.of(TestAuthorities.GARBAGE_COLLECTOR), Set.of(parent));
+        Role grandParent = new DefaultRole("A", Set.of(envValuesRead));
+        Role parent = new DefaultRole("B", Set.of(cachesClear), Set.of(grandParent));
+        Role child = new DefaultRole("C", Set.of(garbageCollector), Set.of(parent));
 
         // when & then. The walk goes all the way down rather than one level
         assertThat(child.getEffectiveAuthorities())
                 .extracting(Authority::getName)
-                .containsExactlyInAnyOrder(
-                        TestAuthorities.GARBAGE_COLLECTOR.getName(),
-                        TestAuthorities.CACHES_CLEAR.getName(),
-                        TestAuthorities.ENV_VALUES_READ.getName());
+                .containsExactlyInAnyOrder("test:gc:manage", "test:caches:clear", "test:environment.values:read");
     }
 
     @Test
     void shouldCountTheRoleReachedThroughSeveralBranchesOnce() {
         // given. A diamond: the top role is reached through both of them
-        Role top = new DefaultRole("TOP", Set.of(TestAuthorities.ENV_VALUES_READ));
-        Role left = new DefaultRole("LEFT", Set.of(TestAuthorities.CACHES_CLEAR), Set.of(top));
-        Role right = new DefaultRole("RIGHT", Set.of(TestAuthorities.CACHES_TOGGLE), Set.of(top));
-        Role bottom = new DefaultRole("BOTTOM", Set.of(TestAuthorities.GARBAGE_COLLECTOR), Set.of(left, right));
+        Role top = new DefaultRole("TOP", Set.of(envValuesRead));
+        Role left = new DefaultRole("LEFT", Set.of(cachesClear), Set.of(top));
+        Role right = new DefaultRole("RIGHT", Set.of(cachesToggle), Set.of(top));
+        Role bottom = new DefaultRole("BOTTOM", Set.of(garbageCollector), Set.of(left, right));
 
         // when & then. Reaching the same authority twice neither duplicates it nor loses the rest
         assertThat(bottom.getEffectiveAuthorities())
                 .extracting(Authority::getName)
                 .containsExactlyInAnyOrder(
-                        TestAuthorities.GARBAGE_COLLECTOR.getName(),
-                        TestAuthorities.CACHES_CLEAR.getName(),
-                        TestAuthorities.CACHES_TOGGLE.getName(),
-                        TestAuthorities.ENV_VALUES_READ.getName());
+                        "test:gc:manage", "test:caches:clear", "test:caches:toggle", "test:environment.values:read");
+    }
+
+    private Authority insertAuthority(String id, String codename) {
+        jdbcClient
+                .sql("INSERT INTO authorities (id, codename, description) VALUES (?, ?, ?)")
+                .params(id, codename, "Test authority")
+                .update();
+        return jdbcClient
+                .sql("SELECT id, codename FROM authorities WHERE id = ?")
+                .param(id)
+                .query((rs, n) -> new DefaultAuthority(rs.getString("id"), rs.getString("codename")))
+                .single();
     }
 }

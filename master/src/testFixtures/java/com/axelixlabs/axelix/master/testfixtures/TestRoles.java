@@ -17,47 +17,33 @@
  */
 package com.axelixlabs.axelix.master.testfixtures;
 
-import java.util.Set;
+import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.Role;
-
-// TODO:
-//  Having that test fixture is fine for now, but this is (to me) clearly a code smell.
-//  The problem is that in the future, when the authorities are going to be added, they
-//  are gonna be added in the DB as the migration. And we will have to manually sync the
-//  authorities of the ROLE outlined in the new migration with the authorities in here.
-//  In plain English - we potentially repeat ourselves. Now, we may name such roles in some
-//  artificial fashion, so that they are not really VIEWER or EDITOR, but in this case, we
-//  are gonna need to revisit their usages. I guess that some testing code explicitly relies
-//  on the role being VIEWER/EDITOR/ADMIN (although, it must not! This is a code smell)
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 
 /**
- * The built-in Axelix roles, as tests need to see them.
+ * Database-backed access to built-in roles for tests.
  *
  * @author Sergey Cherkasov
  */
+@Component
 public final class TestRoles {
+    private final RoleService roleService;
 
-    public static final Role VIEWER = new DefaultRole("VIEWER", Set.of());
+    public TestRoles(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
-    public static final Role EDITOR = new DefaultRole(
-            "EDITOR",
-            Set.of(
-                    TestAuthorities.SCHEDULED_TASKS_MODIFY,
-                    TestAuthorities.CACHES_CLEAR,
-                    TestAuthorities.CACHES_TOGGLE,
-                    TestAuthorities.GARBAGE_COLLECTOR));
+    public Role viewer() {
+        return roleService.findByName("VIEWER").orElseThrow();
+    }
 
-    public static final Role ADMIN = new DefaultRole(
-            "ADMIN",
-            Set.of(
-                    TestAuthorities.SCHEDULED_TASKS_MODIFY,
-                    TestAuthorities.CACHES_CLEAR,
-                    TestAuthorities.CACHES_TOGGLE,
-                    TestAuthorities.GARBAGE_COLLECTOR,
-                    TestAuthorities.ENV_VALUES_READ,
-                    TestAuthorities.CONFIG_PROPS_VALUES_READ));
+    public Role editor() {
+        return roleService.findByName("EDITOR").orElseThrow();
+    }
 
-    private TestRoles() {}
+    public Role admin() {
+        return roleService.findByName("ADMIN").orElseThrow();
+    }
 }

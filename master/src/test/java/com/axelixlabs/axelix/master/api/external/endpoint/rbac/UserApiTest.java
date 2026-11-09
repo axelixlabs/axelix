@@ -76,6 +76,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         })
 class UserApiTest extends AbstractProtectedEndpointTest {
 
+    @Autowired
+    protected TestRoles testRoles;
+
     private static final String USERS_FEED_PATH = "/api/external/users/feed";
     private static final String USER_BY_ID_PATH = "/api/external/users/feed/{userId}";
     private static final String ROLE_USER_COUNTS_PATH = "/api/external/users/role-counts";
@@ -184,7 +187,12 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldNotAuthenticateUserFromDatabaseWithInvalidCredentials() {
         userService.createLocal(
-                "db-user", null, null, "db-user@example.com", "db-password", Set.of(TestRoles.VIEWER.name()));
+                "db-user",
+                null,
+                null,
+                "db-user@example.com",
+                "db-password",
+                Set.of(testRoles.viewer().name()));
 
         LoginRequest loginRequest = new LoginRequest("db-user", "wrong-password");
 
