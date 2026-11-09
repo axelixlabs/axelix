@@ -5,11 +5,8 @@ info:
   description: |
     The JWT payload Axelix Master and the starters exchange.
 
-    Master issues MasterJwtToken. A starter issues StarterJwtToken. The payloads are separate
-    schemas, so each side owns the evolution of the token it produces. Both are the shared
-    JwtClaims object and both carry the same JwtRole values: a role inside either token is the
-    same object. The generator maps all three schemas to one AxelixJwtToken Java class.
-    TechUserJwtToken identifies Axelix components themselves and is exchanged in both directions.
+    Master issues MasterJwtToken for users. Technical users exchange TechUserJwtToken in both
+    directions between Master and starters. Both payloads include issued-at and expiration claims.
 components:
   schemas:
     TechUserJwtToken:
@@ -20,10 +17,22 @@ components:
       description: JWT payload that identifies the technical user exchanging the token.
       required:
         - sub
+        - iat
+        - exp
       properties:
         sub:
           type: string
           description: Stable identifier of the technical user. The JWT "sub" claim.
+          x-axelix-introduced-in: 1.3.0
+        iat:
+          type: integer
+          format: int64
+          description: Issued-at time, as a JWT NumericDate (seconds since the epoch).
+          x-axelix-introduced-in: 1.3.0
+        exp:
+          type: integer
+          format: int64
+          description: Expiration time, as a JWT NumericDate (seconds since the epoch).
           x-axelix-introduced-in: 1.3.0
     MasterJwtToken:
       x-axelix-produced-by: master
@@ -31,21 +40,12 @@ components:
       description: JWT payload issued by Axelix Master and parsed by starters.
       allOf:
         - $ref: '#/components/schemas/JwtClaims'
-    StarterJwtToken:
-      x-axelix-produced-by: starter
-      x-axelix-introduced-in: 1.3.0
-      description: JWT payload issued by a starter and parsed by Axelix Master.
-      allOf:
-        - $ref: '#/components/schemas/JwtClaims'
-    # The claim set both tokens are. Master evolution rules apply to it: a starter inside the
-    # compatibility window still parses these claims out of a master-issued token, so the shape
-    # must not change underneath that starter. Starter-issued tokens use this same object.
     JwtClaims:
       x-axelix-produced-by: master
       x-axelix-introduced-in: 1.3.0
       type: object
       additionalProperties: false
-      description: Claims shared by every Axelix JWT.
+      description: Claims carried by user JWTs issued by Axelix Master.
       required:
         - sub
         - iat

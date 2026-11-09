@@ -21,7 +21,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -35,6 +37,7 @@ import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
+import com.axelixlabs.axelix.common.contract.jwt.TechUserJwtToken;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,7 +56,7 @@ class DefaultTechUserJwtSerializerTest {
 
     @ParameterizedTest
     @EnumSource(TechUser.class)
-    void shouldSerializeTechnicalUserWithIssuedAtAndExpiration(TechUser techUser) {
+    void shouldSerializeTechnicalUserWithIssuedAtAndExpiration(TechUser techUser) throws Exception {
         // given.
         Instant before = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
@@ -66,12 +69,12 @@ class DefaultTechUserJwtSerializerTest {
                 .build()
                 .parseSignedClaims(token);
         assertThat(claims.getPayload()).containsOnlyKeys("sub", "iat", "exp");
-        assertThat(claims.getPayload().getSubject()).isEqualTo(techUser.getId());
-        assertThat(claims.getPayload().getIssuedAt().toInstant()).isBetween(before, Instant.now());
-        assertThat(Duration.between(
-                        claims.getPayload().getIssuedAt().toInstant(),
-                        claims.getPayload().getExpiration().toInstant()))
-                .isEqualTo(Duration.ofMinutes(1));
+        TechUserJwtToken payload = new ObjectMapper()
+                .readValue(Base64.getUrlDecoder().decode(token.split("\\.")[1]), TechUserJwtToken.class);
+        assertThat(payload.getSub()).isEqualTo(techUser.getId());
+        assertThat(Instant.ofEpochSecond(payload.getIat())).isBetween(before, Instant.now());
+        assertThat(payload.getExp() - payload.getIat())
+                .isEqualTo(Duration.ofMinutes(1).getSeconds());
     }
 
     @Test

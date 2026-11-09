@@ -24,6 +24,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -39,6 +40,9 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.contract.jwt.AxelixJwtToken;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
 import com.axelixlabs.axelix.master.domain.auth.User;
@@ -76,6 +80,37 @@ class DefaultUserJwtEncoderServiceTest {
 
     @Autowired
     private UserJwtEncoderService userJwtEncoderService;
+
+    @Test
+    void shouldSerializeGeneratedModelWithLifetimeAndNestedRoles() throws Exception {
+        // given.
+        Role parent = TestRoles.EDITOR;
+        Role child = new DefaultRole("CHILD", Set.of(), Set.of(parent));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(child));
+        Instant before = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+
+        // when.
+        String token = userJwtEncoderService.generateToken(user);
+
+        // then.
+        AxelixJwtToken payload = new ObjectMapper().readValue(getPayload(token), AxelixJwtToken.class);
+        assertThat(payload.getSub()).isEqualTo(user.getUsername());
+        assertThat(payload.getUid()).isEqualTo(user.getId());
+        assertThat(Instant.ofEpochSecond(payload.getIat())).isBetween(before, Instant.now());
+        assertThat(payload.getExp() - payload.getIat()).isEqualTo(lifespan.getSeconds());
+        assertThat(payload.getRoles()).singleElement().satisfies(role -> {
+            assertThat(role.getName()).isEqualTo("CHILD");
+            assertThat(role.getAuthorities()).isEmpty();
+            assertThat(role.getComponents()).singleElement().satisfies(component -> {
+                assertThat(component.getName()).isEqualTo(parent.name());
+                assertThat(component.getAuthorities())
+                        .containsExactlyInAnyOrderElementsOf(parent.authorities().stream()
+                                .map(Authority::getName)
+                                .toList());
+                assertThat(component.getComponents()).isEmpty();
+            });
+        });
+    }
 
     @Test
     void shouldGenerateTokenWithRequiredClaims() {

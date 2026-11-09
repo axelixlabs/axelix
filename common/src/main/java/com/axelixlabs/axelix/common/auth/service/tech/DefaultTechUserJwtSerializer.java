@@ -19,8 +19,8 @@ package com.axelixlabs.axelix.common.auth.service.tech;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.NullMarked;
 
@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
+import com.axelixlabs.axelix.common.contract.jwt.TechUserJwtToken;
 
 /**
  * Default {@link TechUserJwtSerializer} implementation.
@@ -44,6 +45,8 @@ public class DefaultTechUserJwtSerializer implements TechUserJwtSerializer {
      */
     private static final Duration LIFESPAN = Duration.ofMinutes(1);
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final JwtSigningStrategy signingStrategy;
 
     private final String signingKey;
@@ -57,13 +60,10 @@ public class DefaultTechUserJwtSerializer implements TechUserJwtSerializer {
     public String serialize(TechUser techUser) throws JwtTokenGenerationException {
         try {
             Instant now = Instant.now();
+            TechUserJwtToken token = new TechUserJwtToken(
+                    techUser.getId(), now.getEpochSecond(), now.plus(LIFESPAN).getEpochSecond());
             return signingStrategy
-                    .signToken(
-                            Jwts.builder()
-                                    .subject(techUser.getId())
-                                    .issuedAt(Date.from(now))
-                                    .expiration(Date.from(now.plus(LIFESPAN))),
-                            signingKey)
+                    .signToken(Jwts.builder().content(OBJECT_MAPPER.writeValueAsBytes(token)), signingKey)
                     .compact();
         } catch (JwtTokenGenerationException e) {
             throw e;

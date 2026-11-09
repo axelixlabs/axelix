@@ -18,6 +18,7 @@ dependencies {
 
     // Applied by the 'contracts' convention plugin, see contracts.gradle.kts
     implementation("org.openapitools:openapi-generator-gradle-plugin:7.25.0")
+    implementation("org.openapitools:openapi-generator:7.25.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
