@@ -31,10 +31,27 @@ import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
  */
 @Repository
 public class AuthorityRepository {
+
     private final JdbcClient jdbcClient;
 
     public AuthorityRepository(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
+    }
+
+    // TODO:
+    // This method should not exist. We should use getAll in all cases. Currently we use it because the authority model
+    // in the domain is not aware of the display name or description.
+    // This will be fixed when we introduce the mapping table that moves all references and interconnections between authorities
+    // and endpoints into the database in the dedicated mapping table.
+    public List<AuthorityProfile> findAllProfiles() {
+        return jdbcClient
+                .sql("SELECT id, codename, display_name, description FROM authorities ORDER BY codename")
+                .query((rs, rowNum) -> new AuthorityProfile(
+                        rs.getString("id"),
+                        rs.getString("codename"),
+                        rs.getString("display_name"),
+                        rs.getString("description")))
+                .list();
     }
 
     public List<DefaultAuthority> findAll() {
@@ -43,4 +60,6 @@ public class AuthorityRepository {
                 .query((rs, rowNum) -> new DefaultAuthority(rs.getString("id"), rs.getString("codename")))
                 .list();
     }
+
+    public record AuthorityProfile(String id, String codename, String displayName, String description) {}
 }

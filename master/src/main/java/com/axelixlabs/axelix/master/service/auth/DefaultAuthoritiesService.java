@@ -18,11 +18,13 @@
 package com.axelixlabs.axelix.master.service.auth;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.repository.AuthorityRepository;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository.AuthorityProfile;
 
 /**
  * Database-backed implementation of {@link AuthoritiesService}.
@@ -31,10 +33,18 @@ import com.axelixlabs.axelix.master.repository.AuthorityRepository;
  */
 public class DefaultAuthoritiesService implements AuthoritiesService {
 
+    private final AuthorityRepository authorityRepository;
+
     private final Lazy<Set<Authority>> authorities;
 
     public DefaultAuthoritiesService(AuthorityRepository authorityRepository) {
+        this.authorityRepository = authorityRepository;
         this.authorities = Lazy.of(() -> new HashSet<>(authorityRepository.findAll()));
+    }
+
+    @Override
+    public List<AuthorityProfile> getAuthoritiesFeed() {
+        return authorityRepository.findAllProfiles();
     }
 
     @Override

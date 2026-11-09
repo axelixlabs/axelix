@@ -248,6 +248,9 @@ public final class MasterWebEndpoints {
             register("auth:logout", HttpMethod.POST, ApiPaths.UsersApi.LOGOUT, null);
 
     // Roles
+    public static final MasterWebEndpoint AUTHORITIES_READ =
+            register("authorities:read", HttpMethod.GET, ApiPaths.AuthoritiesApi.AUTHORITIES_FEED, () -> "users:read");
+
     public static final MasterWebEndpoint ROLES_READ =
             register("roles:read", HttpMethod.GET, ApiPaths.RolesApi.ROLES_FEED, () -> "users:read");
 
