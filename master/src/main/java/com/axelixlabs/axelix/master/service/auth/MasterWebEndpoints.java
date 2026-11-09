@@ -101,6 +101,15 @@ public final class MasterWebEndpoints {
             register("caches:read", HttpMethod.GET, ApiPaths.CachesApi.INSTANCE_ID, null);
     public static final MasterWebEndpoint CACHE_READ_ONE =
             register("cache:read-one", HttpMethod.GET, ApiPaths.CachesApi.CACHE_NAME, null);
+
+    /*
+    TODO:
+
+    using codenames of authorities here is purely wrong. The authorities are NOT identified by their codename, but rather
+    by an ID, so this reference is going to potentially break. We need to reference authorities by their IDs.
+
+    The ultimate solution for the problem I guess would be to store that kind of mapping in the database.
+    */
     public static final MasterWebEndpoint CACHE_ENABLE =
             register("caches:enable", HttpMethod.POST, ApiPaths.CachesApi.BULK_ENABLE_CACHE, () -> "caches:toggle");
     public static final MasterWebEndpoint CACHE_DISABLE =

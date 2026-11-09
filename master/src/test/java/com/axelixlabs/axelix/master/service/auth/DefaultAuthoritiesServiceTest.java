@@ -31,10 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
-import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
-import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
