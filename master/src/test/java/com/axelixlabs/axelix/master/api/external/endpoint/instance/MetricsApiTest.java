@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -218,7 +219,7 @@ public class MetricsApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnJSONMetricsGroupResponse() {
         // when.
-        var viewer = restTemplate.asViewer();
+        var viewer = restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/metrics/{instanceId}", String.class, activeInstanceId);
 
@@ -236,8 +237,9 @@ public class MetricsApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         registry.register(TestInstanceFactory.create(instanceId));
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/metrics/{instanceId}", String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/metrics/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -248,8 +250,9 @@ public class MetricsApiTest extends AbstractProtectedEndpointTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/metrics/{instanceId}", String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/metrics/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

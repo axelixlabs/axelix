@@ -42,6 +42,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
@@ -205,7 +206,8 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnTheDependencyAnalysis() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/dependencies/{instanceId}", String.class, instanceWithSbom);
@@ -224,7 +226,7 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnNotFoundWhenTheInstanceServesNoSbom() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/dependencies/{instanceId}", String.class, instanceWithoutSbom);
 
         // then.
@@ -238,7 +240,7 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/dependencies/{instanceId}", String.class, instanceId);
 
         // then.
@@ -248,7 +250,8 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldDownloadRawSbom() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/dependencies/{instanceId}/download", String.class, instanceWithSbom);
@@ -273,7 +276,7 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/dependencies/{instanceId}/download", String.class, instanceWithoutSbom);
 
         // then.
@@ -285,7 +288,7 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnNotFoundWhenDownloadingSbomAndInstanceServesNone() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/dependencies/{instanceId}/download", String.class, instanceWithoutSbom);
 
         // then.
@@ -299,7 +302,7 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/dependencies/{instanceId}/download", String.class, instanceId);
 
         // then.

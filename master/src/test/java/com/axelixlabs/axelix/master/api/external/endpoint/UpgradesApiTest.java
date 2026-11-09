@@ -40,6 +40,7 @@ import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.Snapsho
 import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
@@ -89,7 +90,8 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
         jdbcAggregateTemplate.insertAll(List.of(snapshot("app-a", today, "1.1.2"), snapshot("app-b", today, "1.2.1")));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity("/api/external/upgrades", String.class);
 
         // then.
@@ -131,7 +133,8 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnEmptyUpgradesWhenNoServiceHasBeenSeen() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity("/api/external/upgrades", String.class);
 
         // then.
@@ -153,7 +156,8 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
         jdbcAggregateTemplate.insertAll(List.of(snapshot("app-a", today, "1.2.1"), snapshot("app-b", today, "1.5.0")));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(IMPACT_URL, String.class);
 
         // then.
@@ -168,7 +172,7 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnBadRequestForInvalidTargetVersion() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/upgrades/impact?targetVersion=not-a-version", String.class);
 
         // then.
@@ -178,8 +182,9 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnBadRequestForTargetVersionWithPatchSegment() {
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/upgrades/impact?targetVersion=1.6.0", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/upgrades/impact?targetVersion=1.6.0", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -55,7 +55,10 @@ import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.repository.ScheduledTaskExecutionResultRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -76,6 +79,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 28.08.2025
  */
 public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
+    @Autowired
+    private AuthorityRepository endpointAuthorityRepository;
+
+    private Role operationRole;
+
+    @BeforeEach
+    void setUpEndpointRoles() {
+        operationRole = new DefaultRole(
+                "OPERATION_TEST_ROLE",
+                Set.of(endpointAuthorityRepository.findAll().stream()
+                        .filter(authority -> authority.getName().equals("scheduled-tasks:write"))
+                        .findFirst()
+                        .orElseThrow()));
+    }
 
     // language=json
     private static final String EXPECTED_MASTER_RESPONSE = """
@@ -253,7 +270,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnJSONScheduledTasksResponse() {
         // when.
-        var viewer = restTemplate.asViewer();
+        var viewer = restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
 
@@ -305,7 +322,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/history?taskId={taskId}",
                         String.class,
@@ -371,7 +388,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -408,7 +425,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 execution("other-app", activeInstanceId, taskId, startedAt.plusSeconds(4), 500, null, null)));
 
         // when.
-        var viewer = restTemplate.asViewer();
+        var viewer = restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(
                 "/api/external/scheduled-tasks/{instanceId}/history?taskId={taskId}&page=1&size=2",
                 String.class,
@@ -472,7 +489,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnBadRequestForOutOfBoundsPageOnGetExecutionHistory(int page, int size) {
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/history?taskId=task&page={page}&size={size}",
                         String.class,
@@ -488,7 +505,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnBadRequestForUnregisteredInstanceOnGetExecutionHistory() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/history?taskId=task",
                         String.class,
@@ -529,7 +546,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        var editor = restTemplate.asEditor();
+        var editor = restTemplate.withRole(operationRole);
         ResponseEntity<String> body = editor.postForEntity(
                 "/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                 requestBody,
@@ -553,7 +570,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 .cronExpression("*/5 * * * * *");
 
         // when.
-        var editor = restTemplate.asEditor();
+        var editor = restTemplate.withRole(operationRole);
         ResponseEntity<Void> response = editor.postForEntity(
                 "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                 requestBody,
@@ -571,7 +588,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
         var requestBody = new ScheduledTaskCronExpressionValidationRequest("*/5 * * * * *");
 
         // when.
-        var editor = restTemplate.asEditor();
+        var editor = restTemplate.withRole(operationRole);
         ResponseEntity<ScheduledTaskCronExpressionValidationResponse> response = editor.postForEntity(
                 "/api/external/scheduled-tasks/validate-cron-expression",
                 requestBody,
@@ -591,7 +608,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
         var requestBody = new ScheduledTaskCronExpressionValidationRequest(invalidCronExpression);
 
         // when.
-        var editor = restTemplate.asEditor();
+        var editor = restTemplate.withRole(operationRole);
         ResponseEntity<ScheduledTaskCronExpressionValidationResponse> response = editor.postForEntity(
                 "/api/external/scheduled-tasks/validate-cron-expression",
                 requestBody,
@@ -623,7 +640,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
@@ -644,7 +661,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 .interval(555555L);
 
         // when.
-        var editor = restTemplate.asEditor();
+        var editor = restTemplate.withRole(operationRole);
         ResponseEntity<Void> response = editor.postForEntity(
                 "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                 requestBody,
@@ -663,7 +680,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        var editor = restTemplate.asEditor();
+        var editor = restTemplate.withRole(operationRole);
         ResponseEntity<Void> response = editor.postForEntity(
                 "/api/external/scheduled-tasks/{instanceId}/execute", requestBody, Void.class, activeInstanceId);
 
@@ -680,7 +697,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, instanceId);
 
         // then.
@@ -693,7 +710,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, instanceId);
 
         // then.
@@ -712,7 +729,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
         // when.
         registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
@@ -733,7 +750,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
@@ -756,7 +773,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
         // when.
         registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
@@ -776,7 +793,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
@@ -799,7 +816,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
         // when.
         registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
@@ -819,7 +836,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
@@ -841,7 +858,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
         // when.
         registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
@@ -860,7 +877,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,

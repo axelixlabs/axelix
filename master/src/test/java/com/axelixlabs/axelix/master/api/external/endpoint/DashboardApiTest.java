@@ -51,6 +51,7 @@ import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
@@ -149,7 +150,8 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 persistenceMetadata("com.example", "service-b", List.of(), Map.of("owner", 3))));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/persistence", String.class);
 
         // then.
@@ -176,7 +178,8 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 metadata("com.example", "service-b", GarbageCollector.ZGC)));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/spring-portfolio", String.class);
 
         // then.
@@ -201,7 +204,8 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 languagesSnapshot("com.example", "b", 21, JdkVendor.ADOPTIUM, "2.1.0")));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/languages", String.class);
 
         // then.
@@ -242,7 +246,8 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                         "org.springframework:spring-core:6.1.5"));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/dependencies", String.class);
 
         // then.
@@ -271,8 +276,9 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnEmptyDependenciesDashboardWhenNothingRecorded() {
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/dashboard/dependencies", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/dashboard/dependencies", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -301,8 +307,9 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 Instant.now()));
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/dashboard/dependencies", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/dashboard/dependencies", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -330,7 +337,8 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 CycloneDxDocuments.of("com.example:service-c:1.0.0", "com.example.platform:platform-commons:1.10.0"));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/dashboard/dependencies/libraries", String.class);
 
@@ -391,13 +399,13 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> byStatusAndEcosystem = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/dashboard/dependencies/libraries"
                                 + "?status=MAINTENANCE&status=SUNSET&ecosystem=OBSERVABILITY&page=1&size=2",
                         String.class);
         ResponseEntity<String> bySearch = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/dashboard/dependencies/libraries?search=LOGBACK", String.class);
 
         // then.
@@ -418,7 +426,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     void shouldRejectAnInvalidPageOfUsedLibraries() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/dashboard/dependencies/libraries?size=0", String.class);
 
         // then.

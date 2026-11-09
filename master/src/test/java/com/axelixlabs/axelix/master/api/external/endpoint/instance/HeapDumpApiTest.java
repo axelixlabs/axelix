@@ -40,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -113,7 +114,8 @@ class HeapDumpApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnHeapDumpAsAttachment() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
         ResponseEntity<byte[]> response =
                 viewer.getForEntity("/api/external/heapdump/{instanceId}", byte[].class, activeInstanceId);
@@ -138,8 +140,9 @@ class HeapDumpApiTest extends AbstractProtectedEndpointTest {
         registry.register(TestInstanceFactory.create(instanceId));
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/heapdump/{instanceId}", String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/heapdump/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -150,8 +153,9 @@ class HeapDumpApiTest extends AbstractProtectedEndpointTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/heapdump/{instanceId}", String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/heapdump/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

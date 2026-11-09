@@ -42,6 +42,7 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.contract.metadata.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
@@ -287,7 +288,8 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnJSONDetailsResponse() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/details/{instanceId}", String.class, activeInstanceId);
 
@@ -301,7 +303,8 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnJSONDetailsResponseWithoutPlugin() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/details/{instanceId}", String.class, instanceWithoutPluginId);
 
@@ -319,8 +322,9 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         registry.register(TestInstanceFactory.create(instanceId));
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -331,8 +335,9 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

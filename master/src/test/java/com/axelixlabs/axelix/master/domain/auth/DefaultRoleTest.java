@@ -64,7 +64,7 @@ class DefaultRoleTest {
     @Test
     void shouldReturnItsOwnAuthoritiesWhenItDerivesFromNobody() {
         // given.
-        Role role = new DefaultRole("VIEWER", Set.of(cachesToggle));
+        Role role = new DefaultRole("EMPTY_TEST_ROLE", Set.of(cachesToggle));
 
         // when & then.
         assertThat(role.getEffectiveAuthorities())

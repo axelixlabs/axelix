@@ -21,7 +21,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -29,10 +28,7 @@ import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +54,6 @@ import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesService;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,10 +69,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest(classes = Main.class)
 @Transactional
 @TestPropertySource("classpath:jwt-services-test.properties")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultUserJwtDecoderServiceTest {
     @BeforeEach
     void setUp() {
+        Authority readReports = insertAuthority("jwt-test-report", "test:reports:read");
+        Authority runMaintenance = insertAuthority("jwt-test-maintenance", "test:maintenance:run");
+        reportingRole = new DefaultRole("REPORTING", Set.of(readReports, runMaintenance));
+        maintenanceRole = new DefaultRole("MAINTENANCE", Set.of(runMaintenance));
+        emptyRole = new DefaultRole("EMPTY", Set.of());
         authoritiesService = new DefaultAuthoritiesService(new AuthorityRepository(jdbcClient));
         userJwtDecoderService = new DefaultUserJwtDecoderService(authoritiesService, JwtAlgorithm.HMAC512, signingKey);
     }
@@ -86,12 +85,13 @@ class DefaultUserJwtDecoderServiceTest {
     void deleteAuthorities() {
         jdbcClient
                 .sql(
-                        "DELETE FROM authorities WHERE id IN ('test-CACHES_CLEAR', 'test-CACHES_TOGGLE', 'jwt-test-custom-authority')")
+                        "DELETE FROM authorities WHERE id IN ('test-CACHES_CLEAR', 'test-CACHES_TOGGLE', 'jwt-test-custom-authority', 'jwt-test-report', 'jwt-test-maintenance')")
                 .update();
     }
 
-    @Autowired
-    protected TestRoles testRoles;
+    private Role reportingRole;
+    private Role maintenanceRole;
+    private Role emptyRole;
 
     private static final String USER_NAME = "testUser";
     private static final String PASSWORD = "testPassword";
@@ -113,9 +113,15 @@ class DefaultUserJwtDecoderServiceTest {
     private JdbcClient jdbcClient;
 
     @ParameterizedTest
-    @MethodSource("roles")
-    void shouldDecodeValidJwtToken_ForViewer(Role role) {
+    @ValueSource(strings = {"empty", "reporting", "maintenance"})
+    void shouldDecodeValidJwtToken_ForAdHocRole(String scenario) {
         // given.
+        Role role =
+                switch (scenario) {
+                    case "empty" -> emptyRole;
+                    case "reporting" -> reportingRole;
+                    default -> maintenanceRole;
+                };
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = userJwtEncoderService.generateToken(user);
 
@@ -134,46 +140,40 @@ class DefaultUserJwtDecoderServiceTest {
                         role.authorities().stream().map(Authority::getName).collect(Collectors.toList()));
     }
 
-    Stream<Arguments> roles() {
-        return Stream.of(
-                Arguments.of(testRoles.viewer()), Arguments.of(testRoles.editor()), Arguments.of(testRoles.admin()));
-    }
-
     @Test
     void shouldDecodeValidJwtToken_MultipleRoles() {
-        User user = UserUtils.withPassword(
-                USER_NAME, PASSWORD, Set.of(testRoles.admin(), testRoles.editor(), testRoles.viewer()));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(reportingRole, maintenanceRole, emptyRole));
         String token = userJwtEncoderService.generateToken(user);
 
         // when.
         PasswordlessUser decodedUser = userJwtDecoderService.decodeTokenToUser(token);
 
-        // Admin
+        // Reporting role.
         assertThat(decodedUser.getRoles()).hasSize(3);
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.name().equals(testRoles.admin().name()))
+                        .filter(role -> role.name().equals(reportingRole.name()))
                         .findFirst()
                         .orElseThrow()
                         .authorities())
                 .extracting(Authority::getName)
-                .containsExactlyInAnyOrderElementsOf(testRoles.admin().authorities().stream()
+                .containsExactlyInAnyOrderElementsOf(reportingRole.authorities().stream()
                         .map(Authority::getName)
                         .collect(Collectors.toList()));
 
-        // Editor
+        // Maintenance role.
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.name().equals(testRoles.editor().name()))
+                        .filter(role -> role.name().equals(maintenanceRole.name()))
                         .findFirst()
                         .orElseThrow()
                         .authorities())
                 .extracting(Authority::getName)
-                .containsExactlyInAnyOrderElementsOf(testRoles.editor().authorities().stream()
+                .containsExactlyInAnyOrderElementsOf(maintenanceRole.authorities().stream()
                         .map(Authority::getName)
                         .collect(Collectors.toList()));
 
-        // Viewer
+        // Empty role.
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.name().equals(testRoles.viewer().name()))
+                        .filter(role -> role.name().equals(emptyRole.name()))
                         .findFirst()
                         .orElseThrow()
                         .authorities())
@@ -184,7 +184,7 @@ class DefaultUserJwtDecoderServiceTest {
     void shouldEncodeDecodeTokenWithHS256() {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
         UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
-        String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.editor())));
+        String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(maintenanceRole)));
         UserJwtDecoderService decoder256 =
                 new DefaultUserJwtDecoderService(authoritiesService, JwtAlgorithm.HMAC256, key256);
 
@@ -194,10 +194,10 @@ class DefaultUserJwtDecoderServiceTest {
         // then.
         assertThat(decodedUser.getUsername()).isEqualTo(USER_NAME);
         assertThat(decodedUser.getRoles()).singleElement().satisfies(role -> {
-            assertThat(role.name()).isEqualTo(testRoles.editor().name());
+            assertThat(role.name()).isEqualTo(maintenanceRole.name());
             assertThat(role.authorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrderElementsOf(testRoles.editor().authorities().stream()
+                    .containsExactlyInAnyOrderElementsOf(maintenanceRole.authorities().stream()
                             .map(Authority::getName)
                             .collect(Collectors.toList()));
         });
@@ -208,7 +208,7 @@ class DefaultUserJwtDecoderServiceTest {
         String key384 =
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
         UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
-        String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.admin())));
+        String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(reportingRole)));
         UserJwtDecoderService decoder384 =
                 new DefaultUserJwtDecoderService(authoritiesService, JwtAlgorithm.HMAC384, key384);
 
@@ -218,10 +218,10 @@ class DefaultUserJwtDecoderServiceTest {
         // then.
         assertThat(decodedUser.getUsername()).isEqualTo(USER_NAME);
         assertThat(decodedUser.getRoles()).singleElement().satisfies(role -> {
-            assertThat(role.name()).isEqualTo(testRoles.admin().name());
+            assertThat(role.name()).isEqualTo(reportingRole.name());
             assertThat(role.authorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrderElementsOf(testRoles.admin().authorities().stream()
+                    .containsExactlyInAnyOrderElementsOf(reportingRole.authorities().stream()
                             .map(Authority::getName)
                             .collect(Collectors.toList()));
         });
@@ -231,7 +231,7 @@ class DefaultUserJwtDecoderServiceTest {
     void shouldPreserveRegisteredCustomAuthority() {
         // given.
         Authority customAuthority = insertAuthority("jwt-test-custom-authority", "jwt:test:custom");
-        Role role = new DefaultRole("VIEWER", Set.of(customAuthority));
+        Role role = new DefaultRole("CUSTOM", Set.of(customAuthority));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = userJwtEncoderService.generateToken(user);
 
@@ -250,7 +250,7 @@ class DefaultUserJwtDecoderServiceTest {
     @ValueSource(strings = {"TOTALLY_UNKNOWN_AUTHORITY", "INTERNAL.HEARTBEAT"})
     void shouldDropAuthorityUnknownToDecoder(String authorityName) {
         // given.
-        Role role = new DefaultRole("VIEWER", Set.of(() -> authorityName));
+        Role role = new DefaultRole("CUSTOM", Set.of(() -> authorityName));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = userJwtEncoderService.generateToken(user);
 
@@ -275,7 +275,7 @@ class DefaultUserJwtDecoderServiceTest {
 
     @Test
     void shouldThrowOnExpiredToken() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.admin()));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(reportingRole));
         String token = userJwtEncoderService.generateToken(user, Duration.ofSeconds(0));
 
         assertThatThrownBy(() -> userJwtDecoderService.decodeTokenToUser(token))
@@ -284,7 +284,7 @@ class DefaultUserJwtDecoderServiceTest {
 
     @Test
     void shouldThrowOnTamperedToken() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.admin()));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(reportingRole));
         String token = userJwtEncoderService.generateToken(user);
 
         assertThatThrownBy(() -> userJwtDecoderService.decodeTokenToUser(token + "x"))
@@ -308,7 +308,7 @@ class DefaultUserJwtDecoderServiceTest {
     void shouldPreserveUserIdWhenDecodingToken() {
         // given.
         String userId = "stable-id-42";
-        User user = new DefaultUser(userId, USER_NAME, PASSWORD, Set.of(testRoles.viewer()));
+        User user = new DefaultUser(userId, USER_NAME, PASSWORD, Set.of(emptyRole));
         String token = userJwtEncoderService.generateToken(user);
 
         // when.

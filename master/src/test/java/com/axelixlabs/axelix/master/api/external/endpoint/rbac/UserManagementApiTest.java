@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint.rbac;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,12 +32,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserStatus;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
@@ -56,6 +61,46 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = "axelix.master.auth.options.local.enabled=true")
 public class UserManagementApiTest extends AbstractProtectedEndpointTest {
+    @Autowired
+    private JdbcClient roleJdbcClient;
+
+    @BeforeEach
+    void insertTestRoles() {
+        for (String name : Set.of("TEST_BASIC", "TEST_REPORTS", "TEST_OPERATIONS")) {
+            roleJdbcClient
+                    .sql("INSERT INTO roles (id, name, description, role_origin) VALUES (?, ?, ?, ?)")
+                    .params("user-management-" + name, name, "Test role", "WEB_UI")
+                    .update();
+        }
+    }
+
+    @AfterEach
+    void deleteTestRoles() {
+        List<String> userIds =
+                userRepository.findAll().stream().map(UserEntity::id).toList();
+        if (!userIds.isEmpty()) {
+            userService.deleteByIds(userIds);
+        }
+        roleJdbcClient
+                .sql("DELETE FROM roles WHERE id IN (?, ?, ?)")
+                .params("user-management-TEST_BASIC", "user-management-TEST_REPORTS", "user-management-TEST_OPERATIONS")
+                .update();
+    }
+
+    @Autowired
+    private AuthorityRepository endpointAuthorityRepository;
+
+    private Role usersManagerRole;
+
+    @BeforeEach
+    void setUpEndpointRoles() {
+        usersManagerRole = new DefaultRole(
+                "USERS_MANAGER_TEST_ROLE",
+                Set.of(endpointAuthorityRepository.findAll().stream()
+                        .filter(authority -> authority.getName().equals("users:manage"))
+                        .findFirst()
+                        .orElseThrow()));
+    }
 
     private static final String USERS_CREATE_PATH = "/api/external/users-management/create";
     private static final String USERS_DELETE_PATH = "/api/external/users-management/delete";
@@ -94,12 +139,12 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "lastName": "User",
                   "email": "newUser@example.com",
                   "password": "plainPassword",
-                  "roles": ["EDITOR", "VIEWER"]
+                  "roles": ["TEST_REPORTS", "TEST_BASIC"]
                 }
                 """;
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
@@ -116,7 +161,8 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         assertThat(saved.firstName()).isEqualTo("New");
         assertThat(saved.lastName()).isEqualTo("User");
         assertThat(saved.email()).isEqualTo("newUser@example.com");
-        assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactlyInAnyOrder("EDITOR", "VIEWER");
+        assertThat(userService.findRoleNamesByUserId(saved.id()))
+                .containsExactlyInAnyOrder("TEST_REPORTS", "TEST_BASIC");
         assertThat(saved.userOrigin()).isEqualTo(UserOrigin.LOCAL);
         assertThat(saved.status()).isEqualTo(UserStatus.ACTIVE);
         assertThat(saved.lastLoginAt()).isNull();
@@ -139,7 +185,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -161,7 +207,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -183,7 +229,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -205,7 +251,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -227,7 +273,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -245,13 +291,13 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "existingUser",
                   "email": "other@example.com",
                   "password": "p",
-                  "roles": ["VIEWER"]
+                  "roles": ["TEST_BASIC"]
                 }
                 """;
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), String.class);
 
         // then.
@@ -270,13 +316,13 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "existingUser",
                   "email": "user_test@example.com",
                   "password": "p",
-                  "roles": ["VIEWER"]
+                  "roles": ["TEST_BASIC"]
                 }
                 """;
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), String.class);
 
         // then.
@@ -297,7 +343,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
@@ -323,7 +369,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(first.id(), second.id(), third.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
@@ -350,7 +396,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), String.class);
 
         // then.
@@ -371,7 +417,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
 
         // then.
@@ -390,7 +436,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
 
         // then.
@@ -410,13 +456,13 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "firstName": "New",
                   "lastName": "Name",
                   "email": "new@example.com",
-                  "roles": ["ADMIN", "EDITOR"],
+                  "roles": ["TEST_OPERATIONS", "TEST_REPORTS"],
                   "password": "newPass"
                 }
                 """.formatted(user.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -429,7 +475,8 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         assertThat(updated.firstName()).isEqualTo("New");
         assertThat(updated.lastName()).isEqualTo("Name");
         assertThat(updated.email()).isEqualTo("new@example.com");
-        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactlyInAnyOrder("ADMIN", "EDITOR");
+        assertThat(userService.findRoleNamesByUserId(user.id()))
+                .containsExactlyInAnyOrder("TEST_OPERATIONS", "TEST_REPORTS");
         assertThat(passwordEncoder.matches("newPass", updated.password())).isTrue();
         assertSuccessfulCallback(MasterWebEndpoints.USER_UPDATE, superAdmin.getActor());
     }
@@ -447,13 +494,13 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "id": "%s",
                   "username": "%s",
                   "email": null,
-                  "roles": ["VIEWER"],
+                  "roles": ["TEST_BASIC"],
                   "password": null
                 }
                 """.formatted(user.id(), newUsername);
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -464,7 +511,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         UserEntity updated = userRepository.findById(user.id()).orElseThrow();
         assertThat(updated.username()).isEqualTo(newUsername);
         assertThat(updated.email()).isEqualTo(null);
-        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("VIEWER");
+        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("TEST_BASIC");
         assertThat(passwordEncoder.matches(oldPassword, updated.password())).isTrue();
         assertSuccessfulCallback(MasterWebEndpoints.USER_UPDATE, superAdmin.getActor());
     }
@@ -481,14 +528,14 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "id": "%s",
                   "username": "alice",
                   "email": "bob@example.com",
-                  "roles": ["VIEWER"],
+                  "roles": ["TEST_BASIC"],
                   "password": null
                 }
                 """.formatted(bob.id());
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
 
         // then.
@@ -511,14 +558,14 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "id": "%s",
                   "username": "bob",
                   "email": "alice@example.com",
-                  "roles": ["VIEWER"],
+                  "roles": ["TEST_BASIC"],
                   "password": null
                 }
                 """.formatted(bob.id());
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
 
         // then.
@@ -538,18 +585,18 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 {
                   "id": "%s",
                   "username": "u",
-                  "roles": ["VIEWER", "  SUPER_ADMIN "]
+                  "roles": ["TEST_BASIC", "  SUPER_ADMIN "]
                 }
                 """.formatted(user.id());
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("VIEWER");
+        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("TEST_BASIC");
     }
 
     @Test
@@ -565,7 +612,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -588,12 +635,12 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("VIEWER");
+        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("TEST_BASIC");
     }
 
     @Test
@@ -605,13 +652,13 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 {
                   "id": "%s",
                   "username": "u",
-                  "roles": ["VIEWER", "   "]
+                  "roles": ["TEST_BASIC", "   "]
                 }
                 """.formatted(user.id());
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -633,7 +680,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -654,7 +701,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -682,7 +729,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(first.id(), second.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -710,7 +757,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(first.id(), second.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -736,7 +783,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(usersManagerRole);
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -762,7 +809,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
 
         // then.
@@ -784,7 +831,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
 
         // then.
@@ -806,7 +853,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -826,7 +873,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -847,7 +894,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -870,7 +917,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asUsersFeedEditor()
+                .withRole(usersManagerRole)
                 .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -894,12 +941,12 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     private UserEntity createUser(String username, String email, String password) {
-        userService.createLocal(username, null, null, email, password, Set.of("VIEWER"));
+        userService.createLocal(username, null, null, email, password, Set.of("TEST_BASIC"));
         return userRepository.findByUsername(username).orElseThrow();
     }
 
     private UserEntity createOidcUser(String username, String email, String oidcSubject) {
-        userService.createFromOidc(username, null, null, email, oidcSubject, "VIEWER");
+        userService.createFromOidc(username, null, null, email, oidcSubject, "TEST_BASIC");
         return userRepository.findByUsername(username).orElseThrow();
     }
 }

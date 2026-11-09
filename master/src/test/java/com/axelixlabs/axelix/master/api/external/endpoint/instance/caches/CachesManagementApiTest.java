@@ -45,7 +45,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.api.external.request.caches.CacheBulkStatusChangeRequest;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
@@ -62,6 +65,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 class CachesManagementApiTest extends AbstractProtectedEndpointTest {
+    @Autowired
+    private AuthorityRepository endpointAuthorityRepository;
+
+    private Role operationRole;
+
+    @BeforeEach
+    void setUpEndpointRoles() {
+        operationRole = new DefaultRole(
+                "OPERATION_TEST_ROLE",
+                Set.of(endpointAuthorityRepository.findAll().stream()
+                        .filter(authority -> authority.getName().equals("caches:toggle"))
+                        .findFirst()
+                        .orElseThrow()));
+    }
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
     private static final String siblingInstanceId = UUID.randomUUID().toString();
@@ -139,7 +156,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
         // given.
         CacheBulkStatusChangeRequest requestBody =
                 new CacheBulkStatusChangeRequest(List.of(activeInstanceId, siblingInstanceId), "manager", "orders");
-        IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+        IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
         // when.
         ResponseEntity<String> response =
@@ -162,7 +179,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
         // given.
         CacheBulkStatusChangeRequest requestBody =
                 new CacheBulkStatusChangeRequest(List.of(activeInstanceId), "manager", "orders");
-        IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+        IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
         // when.
         ResponseEntity<String> response =
@@ -184,7 +201,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
         // given.
         CacheBulkStatusChangeRequest requestBody = new CacheBulkStatusChangeRequest(
                 List.of("", " ", activeInstanceId, activeInstanceId, siblingInstanceId), "manager", "orders");
-        IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+        IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
         // when.
         ResponseEntity<String> response =
@@ -210,8 +227,9 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
                 new CacheBulkStatusChangeRequest(List.of(failingInstanceId, siblingInstanceId), "manager", "orders");
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asEditor().postForEntity("/api/external/caches/cache/enable", requestBody, String.class);
+        ResponseEntity<String> response = restTemplate
+                .withRole(operationRole)
+                .postForEntity("/api/external/caches/cache/enable", requestBody, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -231,8 +249,9 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
                 new CacheBulkStatusChangeRequest(List.of(failingInstanceId, siblingInstanceId), "manager", "orders");
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asEditor().postForEntity("/api/external/caches/cache/disable", requestBody, String.class);
+        ResponseEntity<String> response = restTemplate
+                .withRole(operationRole)
+                .postForEntity("/api/external/caches/cache/disable", requestBody, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -252,7 +271,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -273,7 +292,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -294,7 +313,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -314,7 +333,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -334,7 +353,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -354,7 +373,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -374,7 +393,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -394,7 +413,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -414,7 +433,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -434,7 +453,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -451,7 +470,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.
@@ -470,7 +489,7 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity("/api/external/caches/cache/" + operation, requestBody, String.class);
 
         // then.

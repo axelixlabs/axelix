@@ -45,6 +45,7 @@ import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.DefaultSecurityContext;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
@@ -55,7 +56,6 @@ import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.serde.DefaultJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 
@@ -70,9 +70,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @Transactional
 class ProxyingEndpointProberTest {
-
-    @Autowired
-    protected TestRoles testRoles;
 
     @Autowired
     private SecurityContextExecutor securityContextExecutor;
@@ -126,7 +123,8 @@ class ProxyingEndpointProberTest {
         // given.
         Instance instance = instance(version);
         server.enqueue(new MockResponse().setBody("legacy-response"));
-        PasswordlessUser caller = new PasswordlessUser("caller", "operator", Set.of(testRoles.editor()));
+        PasswordlessUser caller =
+                new PasswordlessUser("caller", "operator", Set.of(new DefaultRole("FORWARDED_CALLER", Set.of())));
         String callerToken = encoder.generateToken(caller);
 
         // when.
@@ -192,7 +190,8 @@ class ProxyingEndpointProberTest {
         Instance modern = instance("1.3.0-SNAPSHOT");
         server.enqueue(new MockResponse().setBody("legacy"));
         server.enqueue(new MockResponse().setBody("modern"));
-        PasswordlessUser caller = new PasswordlessUser("caller", "operator", Set.of(testRoles.editor()));
+        PasswordlessUser caller =
+                new PasswordlessUser("caller", "operator", Set.of(new DefaultRole("FORWARDED_CALLER", Set.of())));
         String callerToken = encoder.generateToken(caller);
 
         // when.

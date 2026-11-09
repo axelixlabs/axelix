@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -136,7 +137,8 @@ public class LoggersApiGroupByNameTest extends AbstractProtectedEndpointTest {
         String groupName = "test";
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(
                 "/api/external/loggers/{instanceId}/group/{groupName}", String.class, activeInstanceId, groupName);
 
@@ -160,7 +162,8 @@ public class LoggersApiGroupByNameTest extends AbstractProtectedEndpointTest {
         String groupName = "web";
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(
                 "/api/external/loggers/{instanceId}/group/{groupName}", String.class, activeInstanceId, groupName);
 
@@ -181,7 +184,7 @@ public class LoggersApiGroupByNameTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}", Void.class, instanceId, groupName);
 
@@ -196,7 +199,7 @@ public class LoggersApiGroupByNameTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}", String.class, instanceId, groupName);
 

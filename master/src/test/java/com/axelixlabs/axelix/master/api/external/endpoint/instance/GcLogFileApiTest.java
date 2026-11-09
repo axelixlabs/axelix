@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.api.external.endpoint.instance;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -40,7 +41,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.contract.gclog.GcLogEnableRequest;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -56,6 +60,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GcLogFileApiTest {
+    @Autowired
+    private AuthorityRepository endpointAuthorityRepository;
+
+    private Role operationRole;
+
+    @BeforeEach
+    void setUpEndpointRoles() {
+        operationRole = new DefaultRole(
+                "OPERATION_TEST_ROLE",
+                Set.of(endpointAuthorityRepository.findAll().stream()
+                        .filter(authority -> authority.getName().equals("gc:manage"))
+                        .findFirst()
+                        .orElseThrow()));
+    }
 
     private static final String GC_LOG_STATUS_RESPONSE =
             // language=json
@@ -142,7 +160,7 @@ class GcLogFileApiTest {
     @Test
     void shouldReturnGcLogFileAsPlainText() {
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/garbage-collector/logs/{instanceId}/file", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -153,7 +171,7 @@ class GcLogFileApiTest {
     @Test
     void shouldReturnStatusGcLogging() {
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/garbage-collector/logs/{instanceId}/status", String.class, activeInstanceId);
 
@@ -165,7 +183,7 @@ class GcLogFileApiTest {
     @Test
     void shouldTriggerGc() {
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/garbage-collector/{instanceId}/trigger",
                         HttpEntity.EMPTY,
@@ -179,7 +197,7 @@ class GcLogFileApiTest {
     void shouldEnableGcLogging() {
         GcLogEnableRequest requestBody = new GcLogEnableRequest().level("info");
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/garbage-collector/logs/{instanceId}/enable",
                         requestBody,
@@ -192,7 +210,7 @@ class GcLogFileApiTest {
     @Test
     void shouldDisableGcLogging() {
         ResponseEntity<Void> response = restTemplate
-                .asEditor()
+                .withRole(operationRole)
                 .postForEntity(
                         "/api/external/garbage-collector/logs/{instanceId}/disable",
                         HttpEntity.EMPTY,
@@ -210,7 +228,7 @@ class GcLogFileApiTest {
         registry.register(TestInstanceFactory.create(instanceId));
 
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/garbage-collector/logs/{instanceId}/file", String.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -221,7 +239,7 @@ class GcLogFileApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/garbage-collector/logs/{instanceId}/file", String.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

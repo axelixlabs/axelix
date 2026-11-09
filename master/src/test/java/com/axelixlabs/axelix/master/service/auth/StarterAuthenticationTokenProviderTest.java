@@ -21,6 +21,8 @@ import java.time.Duration;
 import java.util.Set;
 
 import io.jsonwebtoken.Claims;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -28,17 +30,21 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.HmacVerificationStrategy;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.DefaultSecurityContext;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,7 +60,30 @@ import static org.mockito.Mockito.when;
 class StarterAuthenticationTokenProviderTest {
 
     @Autowired
-    protected TestRoles testRoles;
+    private JdbcClient jdbcClient;
+
+    private Role callerRole;
+
+    @BeforeEach
+    void setUpRole() {
+        jdbcClient
+                .sql("INSERT INTO authorities (id, codename, description) VALUES (?, ?, ?)")
+                .params("token-provider-test-read", "test:token-provider:read", "Token provider test authority")
+                .update();
+        Authority authority = jdbcClient
+                .sql("SELECT id, codename FROM authorities WHERE id = ?")
+                .param("token-provider-test-read")
+                .query((rs, n) -> new DefaultAuthority(rs.getString("id"), rs.getString("codename")))
+                .single();
+        callerRole = new DefaultRole("LEGACY_CALLER", Set.of(authority));
+    }
+
+    @AfterEach
+    void cleanUpAuthority() {
+        jdbcClient
+                .sql("DELETE FROM authorities WHERE id = 'token-provider-test-read'")
+                .update();
+    }
 
     private static final String SIGNING_KEY =
             "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff";
@@ -68,7 +97,7 @@ class StarterAuthenticationTokenProviderTest {
     @ValueSource(strings = {"1.1.0", "1.1.1", "1.2.0", "1.2.1", "1.2.2"})
     void shouldPreserveCallerIdentityAndAuthoritiesForLegacyStarters(String version) {
         // given.
-        PasswordlessUser caller = new PasswordlessUser("user-id", "operator", Set.of(testRoles.editor()));
+        PasswordlessUser caller = new PasswordlessUser("user-id", "operator", Set.of(callerRole));
         String callerToken = encoder.generateToken(caller);
 
         // when.
@@ -83,7 +112,7 @@ class StarterAuthenticationTokenProviderTest {
         assertThat(decoded.getId()).isEqualTo(caller.getId());
         assertThat(decoded.getRoles())
                 .flatExtracting(role -> role.getEffectiveAuthorities())
-                .containsExactlyInAnyOrderElementsOf(testRoles.editor().authorities());
+                .containsExactlyInAnyOrderElementsOf(callerRole.authorities());
     }
 
     @ParameterizedTest
@@ -140,7 +169,7 @@ class StarterAuthenticationTokenProviderTest {
 
     private AuthoritiesService authoritiesService() {
         AuthoritiesService service = mock(AuthoritiesService.class);
-        when(service.getAll()).thenReturn(testRoles.editor().authorities());
+        when(service.getAll()).thenReturn(callerRole.authorities());
         return service;
     }
 }

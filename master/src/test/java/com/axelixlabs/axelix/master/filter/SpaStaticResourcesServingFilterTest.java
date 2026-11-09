@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.filter;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -30,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -54,7 +57,7 @@ class SpaStaticResourcesServingFilterTest {
         String expected =
                 StreamUtils.copyToString(new ClassPathResource(SPA_DIST + "/assets/main.js").getInputStream(), UTF_8);
 
-        TestRestTemplate rest = restTemplateBuilder.asViewer();
+        TestRestTemplate rest = restTemplateBuilder.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = rest.getForEntity("/assets/main.js", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -67,7 +70,7 @@ class SpaStaticResourcesServingFilterTest {
         String expected =
                 StreamUtils.copyToString(new ClassPathResource(SPA_DIST + "/assets/style.css").getInputStream(), UTF_8);
 
-        TestRestTemplate rest = restTemplateBuilder.asViewer();
+        TestRestTemplate rest = restTemplateBuilder.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = rest.getForEntity("/assets/style.css", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -81,7 +84,7 @@ class SpaStaticResourcesServingFilterTest {
         String expected =
                 StreamUtils.copyToString(new ClassPathResource(SPA_DIST + "/index.html").getInputStream(), UTF_8);
 
-        TestRestTemplate rest = restTemplateBuilder.asViewer();
+        TestRestTemplate rest = restTemplateBuilder.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = rest.getForEntity(contextPath, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

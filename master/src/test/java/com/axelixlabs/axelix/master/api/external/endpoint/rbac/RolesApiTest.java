@@ -31,11 +31,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
@@ -58,9 +60,20 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.master.auth.options.super-admin.credentials.password=admin",
         })
 class RolesApiTest extends AbstractProtectedEndpointTest {
-
     @Autowired
-    protected TestRoles testRoles;
+    private AuthorityRepository endpointAuthorityRepository;
+
+    private Role usersReaderRole;
+
+    @BeforeEach
+    void setUpEndpointRoles() {
+        usersReaderRole = new DefaultRole(
+                "USERS_READER_TEST_ROLE",
+                Set.of(endpointAuthorityRepository.findAll().stream()
+                        .filter(authority -> authority.getName().equals("users:read"))
+                        .findFirst()
+                        .orElseThrow()));
+    }
 
     private static final String ROLES_FEED_PATH = "/api/external/roles/feed";
 
@@ -84,13 +97,7 @@ class RolesApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnTheFeedOfTheBuiltInRoles() {
         // given.
-        userService.createLocal(
-                "alice",
-                null,
-                null,
-                "alice@example.com",
-                "aliceSecret",
-                Set.of(testRoles.editor().name()));
+        userService.createLocal("alice", null, null, "alice@example.com", "aliceSecret", Set.of("EDITOR"));
 
         // language=json
         String expectedFeed = """
@@ -117,7 +124,7 @@ class RolesApiTest extends AbstractProtectedEndpointTest {
                 """;
 
         // when.
-        IdentityAwareTestRestTemplate rolesViewer = restTemplateBuilder.asUsersFeedViewer();
+        IdentityAwareTestRestTemplate rolesViewer = restTemplateBuilder.withRole(usersReaderRole);
         ResponseEntity<String> response = rolesViewer.getForEntity(ROLES_FEED_PATH, String.class);
 
         // then.

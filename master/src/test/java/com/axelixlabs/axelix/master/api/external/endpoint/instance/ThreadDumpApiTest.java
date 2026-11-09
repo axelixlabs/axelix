@@ -43,6 +43,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -290,7 +291,8 @@ class ThreadDumpApiTest extends AbstractProtectedEndpointTest {
 
     @Test
     void shouldReturnJSONThreadDumpFeed() {
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/thread-dump/{instanceId}", String.class, activeInstanceId);
@@ -310,7 +312,7 @@ class ThreadDumpApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/thread-dump/{instanceId}", String.class, instanceId);
 
         // then.
@@ -322,7 +324,7 @@ class ThreadDumpApiTest extends AbstractProtectedEndpointTest {
         String instanceId = UUID.randomUUID().toString();
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/thread-dump/{instanceId}", String.class, instanceId);
 
         // then.
@@ -333,7 +335,8 @@ class ThreadDumpApiTest extends AbstractProtectedEndpointTest {
     @MethodSource("managementCachesContentionMonitoring")
     void shouldEnableOrDisableContentionMonitoring(String contentionMonitoringStatus) throws InterruptedException {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
         ResponseEntity<Void> response = viewer.postForEntity(
                 "/api/external/thread-dump/{instanceId}/thread-contention-monitoring" + contentionMonitoringStatus,
@@ -358,7 +361,7 @@ class ThreadDumpApiTest extends AbstractProtectedEndpointTest {
         registry.register(TestInstanceFactory.create(instanceId));
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
@@ -378,7 +381,7 @@ class ThreadDumpApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,

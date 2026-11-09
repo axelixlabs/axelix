@@ -29,22 +29,25 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 import com.axelixlabs.axelix.common.contract.jwt.AxelixJwtToken;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
 import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
 import com.axelixlabs.axelix.master.domain.auth.User;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -64,8 +67,40 @@ import static org.assertj.core.api.Assertions.within;
 @TestPropertySource("classpath:jwt-services-test.properties")
 class DefaultUserJwtEncoderServiceTest {
 
+    private Role reportingRole;
+    private Role maintenanceRole;
+    private Role emptyRole;
+
     @Autowired
-    protected TestRoles testRoles;
+    private JdbcClient jdbcClient;
+
+    @BeforeEach
+    void setUpRoles() {
+        Authority readReports = insertAuthority("encoder-test-report", "test:reports:read");
+        Authority runMaintenance = insertAuthority("encoder-test-maintenance", "test:maintenance:run");
+        reportingRole = new DefaultRole("REPORTING", Set.of(readReports, runMaintenance));
+        maintenanceRole = new DefaultRole("MAINTENANCE", Set.of(runMaintenance));
+        emptyRole = new DefaultRole("EMPTY", Set.of());
+    }
+
+    @AfterEach
+    void cleanUpAuthorities() {
+        jdbcClient
+                .sql("DELETE FROM authorities WHERE id IN ('encoder-test-report', 'encoder-test-maintenance')")
+                .update();
+    }
+
+    private Authority insertAuthority(String id, String codename) {
+        jdbcClient
+                .sql("INSERT INTO authorities (id, codename, description) VALUES (?, ?, ?)")
+                .params(id, codename, "JWT encoder test authority")
+                .update();
+        return jdbcClient
+                .sql("SELECT id, codename FROM authorities WHERE id = ?")
+                .param(id)
+                .query((rs, n) -> new DefaultAuthority(rs.getString("id"), rs.getString("codename")))
+                .single();
+    }
 
     private static final String USER_NAME = "testUser";
     private static final String PASSWORD = "testPassword";
@@ -85,7 +120,7 @@ class DefaultUserJwtEncoderServiceTest {
     @Test
     void shouldSerializeGeneratedModelWithLifetimeAndNestedRoles() throws Exception {
         // given.
-        Role parent = testRoles.editor();
+        Role parent = maintenanceRole;
         Role child = new DefaultRole("CHILD", Set.of(), Set.of(parent));
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(child));
         Instant before = Instant.now().truncatedTo(ChronoUnit.SECONDS);
@@ -116,8 +151,8 @@ class DefaultUserJwtEncoderServiceTest {
     @Test
     void shouldGenerateTokenWithRequiredClaims() {
         // given.
-        Role viewer = testRoles.viewer();
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(viewer));
+        Role role = emptyRole;
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
 
         // when.
         String token = userJwtEncoderService.generateToken(user);
@@ -147,144 +182,58 @@ class DefaultUserJwtEncoderServiceTest {
     }
 
     @Test
-    void shouldGenerateValidJwtToken_ForUserWithRoleAdmin() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.admin()));
+    void shouldSerializeRoleWithAuthorities() {
+        // given.
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(reportingRole));
 
         // when.
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
-        // language=json
-        String expectedPayload = String.format(
-                "{" + "  \"sub\": \"%s\","
-                        + "  \"roles\": [{"
-                        + "    \"name\": \"ADMIN\","
-                        + "    \"authorities\": ["
-                        + "      \"scheduled-tasks:write\","
-                        + "      \"caches:clear\","
-                        + "      \"gc:manage\","
-                        + "      \"environment.values:read\","
-                        + "      \"config-properties.values:read\","
-                        + "      \"caches:toggle\""
-                        + "    ],"
-                        + "    \"components\": []"
-                        + "  }]"
-                        + "}",
-                USER_NAME);
-
         assertThatJson(getPayload(token))
                 .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
-                .isEqualTo(expectedPayload);
+                .isEqualTo("""
+                    {"sub":"testUser","roles":[{"name":"REPORTING",
+                    "authorities":["test:reports:read","test:maintenance:run"],"components":[]}]}
+                    """);
     }
 
     @Test
-    void shouldGenerateValidJwtToken_ForUserWithRoleEditor() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.editor()));
+    void shouldSerializeRoleWithoutAuthorities() {
+        // given.
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(emptyRole));
 
         // when.
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
-        // language=json
-        String expectedPayload = String.format(
-                "{" + "  \"sub\": \"%s\","
-                        + "  \"roles\": ["
-                        + "    {"
-                        + "      \"name\": \"EDITOR\","
-                        + "      \"authorities\": ["
-                        + "        \"scheduled-tasks:write\","
-                        + "        \"caches:clear\","
-                        + "        \"gc:manage\","
-                        + "        \"caches:toggle\""
-                        + "      ],"
-                        + "      \"components\": []"
-                        + "    }"
-                        + "  ]"
-                        + "}",
-                USER_NAME);
-
         assertThatJson(getPayload(token))
                 .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
-                .isEqualTo(expectedPayload);
-    }
-
-    @Test
-    void shouldGenerateValidJwtToken_ForUserWithRoleViewer() {
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.viewer()));
-
-        // when.
-        String token = userJwtEncoderService.generateToken(user);
-
-        // then.
-        // language=json
-        String expectedPayload = String.format(
-                "{" + "  \"sub\": \"%s\","
-                        + "  \"roles\": ["
-                        + "    {"
-                        + "      \"name\": \"VIEWER\","
-                        + "      \"authorities\": [],"
-                        + "      \"components\": []"
-                        + "    }"
-                        + "  ]"
-                        + "}",
-                USER_NAME);
-
-        assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat", "uid")
-                .when(IGNORING_ARRAY_ORDER)
-                .isEqualTo(expectedPayload);
+                .isEqualTo("""
+                    {"sub":"testUser","roles":[{"name":"EMPTY","authorities":[],"components":[]}]}
+                    """);
     }
 
     @Test
     void shouldGenerateValidJwtToken_MultipleRoles() {
-        User user = UserUtils.withPassword(
-                USER_NAME, PASSWORD, Set.of(testRoles.admin(), testRoles.editor(), testRoles.viewer()));
+        // given.
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(reportingRole, maintenanceRole, emptyRole));
 
         // when.
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
-        // language=json
-        String expectedPayload = String.format(
-                "{" + "  \"sub\": \"%s\","
-                        + "  \"roles\": ["
-                        + "    {"
-                        + "      \"name\": \"ADMIN\","
-                        + "      \"authorities\": ["
-                        + "        \"scheduled-tasks:write\","
-                        + "        \"caches:clear\","
-                        + "        \"gc:manage\","
-                        + "        \"environment.values:read\","
-                        + "        \"config-properties.values:read\","
-                        + "        \"caches:toggle\""
-                        + "      ],"
-                        + "      \"components\": []"
-                        + "    },"
-                        + "    {"
-                        + "      \"name\": \"EDITOR\","
-                        + "      \"authorities\": ["
-                        + "        \"scheduled-tasks:write\","
-                        + "        \"caches:clear\","
-                        + "        \"gc:manage\","
-                        + "        \"caches:toggle\""
-                        + "      ],"
-                        + "      \"components\": []"
-                        + "    },"
-                        + "    {"
-                        + "      \"name\": \"VIEWER\","
-                        + "      \"authorities\": [],"
-                        + "      \"components\": []"
-                        + "    }"
-                        + "  ]"
-                        + "}",
-                USER_NAME);
-
         assertThatJson(getPayload(token))
                 .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
-                .isEqualTo(expectedPayload);
+                .isEqualTo("""
+                    {"sub":"testUser","roles":[
+                    {"name":"REPORTING","authorities":["test:reports:read","test:maintenance:run"],"components":[]},
+                    {"name":"MAINTENANCE","authorities":["test:maintenance:run"],"components":[]},
+                    {"name":"EMPTY","authorities":[],"components":[]}]}
+                    """);
     }
 
     @Test
@@ -306,7 +255,7 @@ class DefaultUserJwtEncoderServiceTest {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
         UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
 
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.editor()));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(maintenanceRole));
 
         // when.
         String token = encoder.generateToken(user);
@@ -319,22 +268,10 @@ class DefaultUserJwtEncoderServiceTest {
 
         // payload
         // language=json
-        String expectedPayload = String.format(
-                "{" + "  \"sub\": \"%s\","
-                        + "  \"roles\": ["
-                        + "    {"
-                        + "      \"name\": \"EDITOR\","
-                        + "      \"authorities\": ["
-                        + "        \"scheduled-tasks:write\","
-                        + "        \"caches:clear\","
-                        + "        \"gc:manage\","
-                        + "        \"caches:toggle\""
-                        + "      ],"
-                        + "      \"components\": []"
-                        + "    }"
-                        + "  ]"
-                        + "}",
-                USER_NAME);
+        String expectedPayload = """
+                {"sub":"testUser","roles":[{"name":"MAINTENANCE",
+                "authorities":["test:maintenance:run"],"components":[]}]}
+                """;
 
         assertThatJson(getPayload(token))
                 .whenIgnoringPaths("exp", "iat", "uid")
@@ -348,7 +285,7 @@ class DefaultUserJwtEncoderServiceTest {
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
         UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
 
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.viewer()));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(emptyRole));
 
         // when.
         String token = encoder.generateToken(user);
@@ -365,7 +302,7 @@ class DefaultUserJwtEncoderServiceTest {
                 "{" + "  \"sub\": \"%s\","
                         + "  \"roles\": ["
                         + "    {"
-                        + "      \"name\": \"VIEWER\","
+                        + "      \"name\": \"EMPTY\","
                         + "      \"authorities\": [],"
                         + "      \"components\": []"
                         + "    }"
@@ -383,7 +320,7 @@ class DefaultUserJwtEncoderServiceTest {
         DefaultUserJwtEncoderService invalidService =
                 new DefaultUserJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
 
-        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(testRoles.editor()));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(maintenanceRole));
 
         assertThatThrownBy(() -> invalidService.generateToken(user)).isInstanceOf(JwtTokenGenerationException.class);
     }

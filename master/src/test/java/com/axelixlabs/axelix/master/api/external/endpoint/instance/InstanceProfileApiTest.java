@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.DetectedFeatures;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
@@ -79,7 +80,8 @@ class InstanceProfileApiTest extends AbstractProtectedEndpointTest {
         register("1.3.0", new DetectedFeatures(EnumSet.of(InstanceFeature.CACHES)));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(PROFILE_PATH, String.class, instanceId);
 
         // then.
@@ -99,7 +101,9 @@ class InstanceProfileApiTest extends AbstractProtectedEndpointTest {
         String instanceId = register("1.3.0", new DetectedFeatures(EnumSet.noneOf(InstanceFeature.class)));
 
         // when.
-        ResponseEntity<String> response = restTemplate.asViewer().getForEntity(PROFILE_PATH, String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity(PROFILE_PATH, String.class, instanceId);
 
         // then.
         assertThatJson(response.getBody()).node("siblingsCount").isEqualTo(0);
@@ -112,7 +116,9 @@ class InstanceProfileApiTest extends AbstractProtectedEndpointTest {
         String instanceId = register("1.2.0", null);
 
         // when.
-        ResponseEntity<String> response = restTemplate.asViewer().getForEntity(PROFILE_PATH, String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity(PROFILE_PATH, String.class, instanceId);
 
         // then.
         assertThatJson(response.getBody())
@@ -127,7 +133,9 @@ class InstanceProfileApiTest extends AbstractProtectedEndpointTest {
         String instanceId = register("1.1.0", null);
 
         // when.
-        ResponseEntity<String> response = restTemplate.asViewer().getForEntity(PROFILE_PATH, String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity(PROFILE_PATH, String.class, instanceId);
 
         // then.
         assertThatJson(response.getBody())
@@ -139,8 +147,9 @@ class InstanceProfileApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnBadRequestForAnUnknownInstance() {
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity(PROFILE_PATH, String.class, UUID.randomUUID());
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity(PROFILE_PATH, String.class, UUID.randomUUID());
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

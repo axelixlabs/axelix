@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -225,7 +226,8 @@ class ConditionsApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnJSONConditionsFeed() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/conditions/feed/{instanceId}", String.class, activeInstanceId);
@@ -245,7 +247,7 @@ class ConditionsApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/conditions/feed/{instanceId}", String.class, instanceId);
 
         // then.
@@ -258,7 +260,7 @@ class ConditionsApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/conditions/feed/{instanceId}", String.class, instanceId);
 
         // then.

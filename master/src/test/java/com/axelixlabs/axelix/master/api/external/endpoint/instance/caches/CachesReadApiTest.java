@@ -39,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.contract.caches.CachesFeed;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -223,7 +224,8 @@ public class CachesReadApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnJSONAllCachesResponse() {
         // when
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/caches/{instanceId}", String.class, activeInstanceId);
 
@@ -249,7 +251,8 @@ public class CachesReadApiTest extends AbstractProtectedEndpointTest {
         """.formatted(requestedCacheName, requestedCacheManagerName);
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(
                 "/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
                 String.class,
@@ -273,7 +276,8 @@ public class CachesReadApiTest extends AbstractProtectedEndpointTest {
             """;
 
         // when
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<CachesFeed> response =
                 viewer.getForEntity("/api/external/caches/{instanceId}", CachesFeed.class, activeInstanceIdEmptyCaches);
 
@@ -291,8 +295,9 @@ public class CachesReadApiTest extends AbstractProtectedEndpointTest {
         registry.register(TestInstanceFactory.create(instanceId));
 
         // when.
-        ResponseEntity<?> response =
-                restTemplate.asViewer().getForEntity("/api/external/caches/{instanceId}", Void.class, instanceId);
+        ResponseEntity<?> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/caches/{instanceId}", Void.class, instanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -303,8 +308,9 @@ public class CachesReadApiTest extends AbstractProtectedEndpointTest {
         String instanceId = "unregistered-caches-instance";
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/caches/{instanceId}", String.class, instanceId);
+        ResponseEntity<String> response = restTemplate
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                .getForEntity("/api/external/caches/{instanceId}", String.class, instanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -319,7 +325,7 @@ public class CachesReadApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
                         Void.class,
@@ -337,7 +343,7 @@ public class CachesReadApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
                         String.class,

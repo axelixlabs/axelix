@@ -52,10 +52,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
@@ -68,7 +71,6 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.CapturingIamMcpInterceptor;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 
@@ -88,7 +90,9 @@ import static org.mockito.Mockito.when;
 abstract class AbstractMcpAuthorizationFilterTest {
 
     @Autowired
-    protected TestRoles testRoles;
+    private JdbcClient roleJdbcClient;
+
+    protected final Role authenticatedRole = new DefaultRole("MCP_CALLER_TEST_ROLE", Set.of());
 
     private static final String MCP_PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version";
 
@@ -134,6 +138,10 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
     @BeforeEach
     void setUpRestTemplate() {
+        roleJdbcClient
+                .sql("INSERT INTO roles (id, name, description, role_origin) VALUES (?, ?, ?, ?)")
+                .params("mcp-caller-test-role", authenticatedRole.name(), "MCP test role", "WEB_UI")
+                .update();
         capturingIamMcpInterceptor.reset();
         instanceRepository.deleteAll();
         List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
@@ -146,6 +154,13 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
     @AfterEach
     void tearDown() {
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
+        roleJdbcClient
+                .sql("DELETE FROM roles WHERE id = 'mcp-caller-test-role'")
+                .update();
         capturingIamMcpInterceptor.reset();
     }
 
@@ -226,12 +241,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String password = "test-password";
 
             userService.createLocal(
-                    username,
-                    null,
-                    null,
-                    "test-email@example.com",
-                    password,
-                    Set.of(testRoles.viewer().name()));
+                    username, null, null, "test-email@example.com", password, Set.of(authenticatedRole.name()));
             String userId =
                     userService.findUserByUsername(username).orElseThrow().id();
 
@@ -290,12 +300,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "viewer-user";
             String password = "viewer-password";
             userService.createLocal(
-                    username,
-                    null,
-                    null,
-                    username + "@example.com",
-                    password,
-                    Set.of(testRoles.viewer().name()));
+                    username, null, null, username + "@example.com", password, Set.of(authenticatedRole.name()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -316,12 +321,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "viewer-user";
             String password = "viewer-password";
             userService.createLocal(
-                    username,
-                    null,
-                    null,
-                    username + "@example.com",
-                    password,
-                    Set.of(testRoles.viewer().name()));
+                    username, null, null, username + "@example.com", password, Set.of(authenticatedRole.name()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -365,7 +365,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
                     null,
                     null,
                     OidcSubjectHash.of(OIDC_ISSUER_URI, OIDC_SUBJECT),
-                    testRoles.viewer().name());
+                    authenticatedRole.name());
         }
 
         @Test
@@ -378,7 +378,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String provisionedUserId = persistOidcAgentUser();
             registerInstanceForBeansTool(activeInstanceId);
             when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
-            when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.viewer());
+            when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(authenticatedRole);
             when(userInfoJsonAccessor.extractSubject(userInfoJson)).thenReturn(OIDC_SUBJECT);
             HttpHeaders headers = bearerAuthHeaders(token);
             String mcpSessionId = initializeMcpSession(restTemplate, headers, mcpProperties);
@@ -404,7 +404,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             persistOidcAgentUser();
             when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
-            when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.viewer());
+            when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(authenticatedRole);
             when(userInfoJsonAccessor.extractSubject(userInfoJson)).thenReturn(OIDC_SUBJECT);
             HttpHeaders headers = bearerAuthHeaders(token);
 
@@ -466,7 +466,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             persistOidcAgentUser();
             when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
-            when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.viewer());
+            when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(authenticatedRole);
             when(userInfoJsonAccessor.extractSubject(userInfoJson)).thenReturn(OIDC_SUBJECT);
             HttpHeaders headers = bearerAuthHeaders(token);
 

@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfi
 import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
@@ -148,7 +149,8 @@ class TransactionMonitoringApiTest extends AbstractProtectedEndpointTest {
         historicalApplicationSnapshotService.reloadCurrentState(metadata);
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(
                 "/api/external/transaction-monitoring/{instanceId}", String.class, activeInstanceId);
 
@@ -166,7 +168,8 @@ class TransactionMonitoringApiTest extends AbstractProtectedEndpointTest {
         historicalApplicationSnapshotService.reloadCurrentState(TestMetadataFactory.create(groupId, artifactId));
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(
                 "/api/external/transaction-monitoring/{instanceId}", String.class, activeInstanceId);
 
@@ -184,7 +187,7 @@ class TransactionMonitoringApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/transaction-monitoring/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -197,7 +200,7 @@ class TransactionMonitoringApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/transaction-monitoring/{instanceId}", String.class, instanceId);
 
         // then.

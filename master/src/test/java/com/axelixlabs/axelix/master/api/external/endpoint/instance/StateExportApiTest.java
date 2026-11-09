@@ -44,6 +44,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
@@ -367,7 +368,7 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         ResponseEntity<?> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .postForEntity(
                         "/api/external/export-state/{instanceId}",
                         new HttpEntity<>(HTTP_REQUEST_BODY, headers),
@@ -385,7 +386,7 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .postForEntity(
                         "/api/external/export-state/{instanceId}",
                         new HttpEntity<>(HTTP_REQUEST_BODY, headers),
@@ -409,7 +410,7 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        var viewer = restTemplate.asViewer();
+        var viewer = restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<byte[]> response = viewer.postForEntity(
                 "/api/external/export-state/{instanceId}",
                 new HttpEntity<>(HTTP_REQUEST_BODY, headers),

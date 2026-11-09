@@ -43,7 +43,6 @@ import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticat
 import com.axelixlabs.axelix.master.service.state.auth.DefaultRoleService;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,9 +57,6 @@ import static org.assertj.core.api.Assertions.tuple;
  */
 @DatabaseMatrixTest
 class DefaultRoleServiceTest {
-
-    @Autowired
-    protected TestRoles testRoles;
 
     private RoleService roleService;
 
@@ -103,16 +99,16 @@ class DefaultRoleServiceTest {
     class FindByName {
 
         @Test
-        void shouldReturnBuiltInRolesMatchingTheOnesTestsAreBuiltUpon() {
+        void shouldSeedExpectedBuiltInRolePermissions() {
             // when.
-            Optional<Role> viewer = roleService.findByName(testRoles.viewer().name());
-            Optional<Role> editor = roleService.findByName(testRoles.editor().name());
-            Optional<Role> admin = roleService.findByName(testRoles.admin().name());
+            Optional<Role> viewer = roleService.findByName("VIEWER");
+            Optional<Role> editor = roleService.findByName("EDITOR");
+            Optional<Role> admin = roleService.findByName("ADMIN");
 
             // then.
-            assertThat(viewer).hasValueSatisfying(role -> assertGrantsSameAs(role, testRoles.viewer()));
-            assertThat(editor).hasValueSatisfying(role -> assertGrantsSameAs(role, testRoles.editor()));
-            assertThat(admin).hasValueSatisfying(role -> assertGrantsSameAs(role, testRoles.admin()));
+            assertThat(viewer).hasValueSatisfying(role -> assertBuiltInGrants(role, "VIEWER"));
+            assertThat(editor).hasValueSatisfying(role -> assertBuiltInGrants(role, "EDITOR"));
+            assertThat(admin).hasValueSatisfying(role -> assertBuiltInGrants(role, "ADMIN"));
         }
 
         @Test
@@ -169,30 +165,37 @@ class DefaultRoleServiceTest {
         @Test
         void shouldReturnTheSingleRoleGrantedToTheUser() {
             // given.
-            String userId = createUserWithRoles(testRoles.viewer().name());
+            createCustomRole("REPORT_READER", "test:reports:read");
+            String userId = createUserWithRoles("REPORT_READER");
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
 
             // then.
-            assertThat(roles).singleElement().satisfies(role -> assertGrantsSameAs(role, testRoles.viewer()));
+            assertThat(roles).singleElement().satisfies(role -> {
+                assertThat(role.name()).isEqualTo("REPORT_READER");
+                assertThat(role.authorities()).extracting(Authority::getName).containsExactly("test:reports:read");
+            });
         }
 
         @Test
         void shouldReturnEveryRoleWithItsAuthorities() {
             // given.
-            String userId = createUserWithRoles(
-                    testRoles.admin().name(), testRoles.editor().name());
+            createCustomRole("REPORT_READER", "test:reports:read");
+            createCustomRole("JOB_OPERATOR", "test:jobs:run");
+            String userId = createUserWithRoles("REPORT_READER", "JOB_OPERATOR");
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
 
             // then.
             assertThat(roles).hasSize(2);
-            assertThat(roleNamed(roles, testRoles.admin().name()))
-                    .satisfies(role -> assertGrantsSameAs(role, testRoles.admin()));
-            assertThat(roleNamed(roles, testRoles.editor().name()))
-                    .satisfies(role -> assertGrantsSameAs(role, testRoles.editor()));
+            assertThat(roleNamed(roles, "REPORT_READER").authorities())
+                    .extracting(Authority::getName)
+                    .containsExactly("test:reports:read");
+            assertThat(roleNamed(roles, "JOB_OPERATOR").authorities())
+                    .extracting(Authority::getName)
+                    .containsExactly("test:jobs:run");
         }
 
         @Test
@@ -317,54 +320,36 @@ class DefaultRoleServiceTest {
                     .containsExactlyInAnyOrder(
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b1",
-                                    testRoles.viewer().name(),
+                                    "VIEWER",
                                     "Read-only access to the monitored applications."),
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b2",
-                                    testRoles.editor().name(),
+                                    "EDITOR",
                                     "Performs runtime operations on the monitored applications, including destructive"
                                             + " ones such as clearing caches."),
                             tuple(
                                     "00000000-0000-0000-0000-0000000000b3",
-                                    testRoles.admin().name(),
+                                    "ADMIN",
                                     "Everything an editor can do, plus reading sensitive configuration values."));
         }
 
         @Test
         void shouldCountTheUsersEachRoleIsAssignedTo() {
             // given.
-            userService.createLocal(
-                    "alice",
-                    null,
-                    null,
-                    "alice@example.com",
-                    "p",
-                    Set.of(testRoles.editor().name()));
-            userService.createLocal(
-                    "bob",
-                    null,
-                    null,
-                    "bob@example.com",
-                    "p",
-                    Set.of(testRoles.editor().name()));
-            userService.createLocal(
-                    "carol",
-                    null,
-                    null,
-                    "carol@example.com",
-                    "p",
-                    Set.of(testRoles.viewer().name()));
+            createCustomRole("REPORT_READER");
+            createCustomRole("JOB_OPERATOR");
+            createCustomRole("UNASSIGNED");
+            userService.createLocal("alice", null, null, "alice@example.com", "p", Set.of("REPORT_READER"));
+            userService.createLocal("bob", null, null, "bob@example.com", "p", Set.of("REPORT_READER"));
+            userService.createLocal("carol", null, null, "carol@example.com", "p", Set.of("JOB_OPERATOR"));
 
             // when.
             List<RoleProfile> feed = roleService.getRolesFeed();
 
             // then.
-            assertThat(entryNamed(feed, testRoles.editor().name()).membersCount())
-                    .isEqualTo(2);
-            assertThat(entryNamed(feed, testRoles.viewer().name()).membersCount())
-                    .isEqualTo(1);
-            assertThat(entryNamed(feed, testRoles.admin().name()).membersCount())
-                    .isZero();
+            assertThat(entryNamed(feed, "REPORT_READER").membersCount()).isEqualTo(2);
+            assertThat(entryNamed(feed, "JOB_OPERATOR").membersCount()).isEqualTo(1);
+            assertThat(entryNamed(feed, "UNASSIGNED").membersCount()).isZero();
         }
 
         @Test
@@ -520,10 +505,10 @@ class DefaultRoleServiceTest {
                 .update();
     }
 
-    private static void assertGrantsSameAs(Role actual, Role expected) {
-        assertThat(actual.name()).isEqualTo(expected.name());
+    private static void assertBuiltInGrants(Role actual, String expectedName) {
+        assertThat(actual.name()).isEqualTo(expectedName);
         Set<String> expectedAuthorities =
-                switch (expected.name()) {
+                switch (expectedName) {
                     case "VIEWER" -> Set.of();
                     case "EDITOR" -> Set.of("scheduled-tasks:write", "caches:clear", "caches:toggle", "gc:manage");
                     case "ADMIN" ->

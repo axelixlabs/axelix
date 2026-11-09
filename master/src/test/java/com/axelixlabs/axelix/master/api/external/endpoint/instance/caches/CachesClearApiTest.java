@@ -49,7 +49,10 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.api.external.request.caches.CacheBulkClearRequest;
 import com.axelixlabs.axelix.master.api.external.request.caches.CachesBulkClearRequest;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
@@ -66,6 +69,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 class CachesClearApiTest extends AbstractProtectedEndpointTest {
+    @Autowired
+    private AuthorityRepository endpointAuthorityRepository;
+
+    private Role operationRole;
+
+    @BeforeEach
+    void setUpEndpointRoles() {
+        operationRole = new DefaultRole(
+                "OPERATION_TEST_ROLE",
+                Set.of(endpointAuthorityRepository.findAll().stream()
+                        .filter(authority -> authority.getName().equals("caches:clear"))
+                        .findFirst()
+                        .orElseThrow()));
+    }
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
     private static final String siblingInstanceId = UUID.randomUUID().toString();
@@ -145,7 +162,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
             // given.
             CachesBulkClearRequest requestBody =
                     new CachesBulkClearRequest(List.of(activeInstanceId, siblingInstanceId));
-            IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+            IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
             // when.
             ResponseEntity<String> response = editor.exchange(
@@ -164,7 +181,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
         void shouldClearOnSingleInstance() {
             // given.
             CachesBulkClearRequest requestBody = new CachesBulkClearRequest(List.of(activeInstanceId));
-            IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+            IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
             // when.
             ResponseEntity<String> response = editor.exchange(
@@ -182,7 +199,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
             // given.
             CachesBulkClearRequest requestBody =
                     new CachesBulkClearRequest(List.of("", " ", activeInstanceId, activeInstanceId, siblingInstanceId));
-            IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+            IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
             // when.
             ResponseEntity<String> response = editor.exchange(
@@ -207,7 +224,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/clear",
                             HttpMethod.DELETE,
@@ -231,7 +248,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/clear",
                             HttpMethod.DELETE,
@@ -253,7 +270,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/clear",
                             HttpMethod.DELETE,
@@ -275,7 +292,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/clear",
                             HttpMethod.DELETE,
@@ -296,7 +313,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
             // given.
             CacheBulkClearRequest requestBody =
                     new CacheBulkClearRequest(List.of(activeInstanceId, siblingInstanceId), "manager", "orders");
-            IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+            IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
             // when.
             ResponseEntity<String> response = editor.exchange(
@@ -316,7 +333,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
             // given.
             CacheBulkClearRequest requestBody =
                     new CacheBulkClearRequest(List.of(activeInstanceId), "manager", "orders");
-            IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+            IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
             // when.
             ResponseEntity<String> response = editor.exchange(
@@ -334,7 +351,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
             // given.
             CacheBulkClearRequest requestBody = new CacheBulkClearRequest(
                     List.of("", " ", activeInstanceId, activeInstanceId, siblingInstanceId), "manager", "orders");
-            IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+            IdentityAwareTestRestTemplate editor = restTemplate.withRole(operationRole);
 
             // when.
             ResponseEntity<String> response = editor.exchange(
@@ -359,7 +376,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/cache/clear",
                             HttpMethod.DELETE,
@@ -383,7 +400,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/cache/clear",
                             HttpMethod.DELETE,
@@ -406,7 +423,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/cache/clear",
                             HttpMethod.DELETE,
@@ -430,7 +447,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/cache/clear",
                             HttpMethod.DELETE,
@@ -454,7 +471,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/cache/clear",
                             HttpMethod.DELETE,
@@ -478,7 +495,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/cache/clear",
                             HttpMethod.DELETE,
@@ -498,7 +515,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/cache/clear",
                             HttpMethod.DELETE,
@@ -520,7 +537,7 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asEditor()
+                    .withRole(operationRole)
                     .exchange(
                             "/api/external/caches/cache/clear",
                             HttpMethod.DELETE,

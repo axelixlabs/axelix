@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -314,7 +315,8 @@ public class ConfigPropsApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnJSONConfigPropsFeed() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response =
                 viewer.getForEntity("/api/external/configprops/feed/{instanceId}", String.class, activeInstanceId);
 
@@ -334,7 +336,7 @@ public class ConfigPropsApiTest extends AbstractProtectedEndpointTest {
         registry.register(TestInstanceFactory.create(instanceId));
 
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/configprops/feed/{instanceId}", String.class, instanceId);
 
         // then.
@@ -347,7 +349,7 @@ public class ConfigPropsApiTest extends AbstractProtectedEndpointTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity("/api/external/configprops/feed/{instanceId}", String.class, instanceId);
 
         // then.

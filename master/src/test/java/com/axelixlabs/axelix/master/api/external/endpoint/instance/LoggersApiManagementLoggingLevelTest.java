@@ -48,6 +48,7 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelGroupBulkChangeRequest;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkResetRequest;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -154,7 +155,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of(activeInstanceId, siblingInstanceId), "logger.name", null, "DEBUG");
 
             // when.
-            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            IdentityAwareTestRestTemplate viewer =
+                    restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
             ResponseEntity<String> response =
                     viewer.postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
@@ -176,8 +178,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of(failingInstanceId, activeInstanceId), "logger.name", null, "DEBUG");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -196,8 +199,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     new LogLevelLoggerBulkChangeRequest(List.of(instanceId), "logger.name", null, "DEBUG");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -215,8 +219,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
             requestBody.put("configuredLevel", "DEBUG");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -230,7 +235,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of(activeInstanceId, activeInstanceId), "logger.name", null, "DEBUG");
 
             // when.
-            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            IdentityAwareTestRestTemplate viewer =
+                    restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
             ResponseEntity<String> response =
                     viewer.postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
@@ -253,8 +259,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
             requestBody.put("configuredLevel", configuredLevel);
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -273,8 +280,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
             requestBody.put("configuredLevel", "DEBUG");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -289,8 +297,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     Map.of("instanceIds", List.of("", " "), "loggerName", "logger.name", "configuredLevel", "DEBUG");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -304,8 +313,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of("unknown-logger-instance", siblingInstanceId), "logger.name", null, "DEBUG");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -321,8 +331,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of(activeInstanceId, anotherApplicationInstanceId), "logger.name", null, "DEBUG");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -341,7 +352,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of(activeInstanceId, siblingInstanceId), "groupName", "INFO");
 
             // when.
-            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            IdentityAwareTestRestTemplate viewer =
+                    restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
             ResponseEntity<String> response =
                     viewer.postForEntity("/api/external/loggers/group", requestBody, String.class);
 
@@ -363,8 +375,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of(failingInstanceId, activeInstanceId), "groupName", "INFO");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/group", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -382,8 +395,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of("unregistered-loggers-group-instance"), "groupName", "INFO");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/group", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -397,8 +411,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
                     List.of(activeInstanceId, anotherApplicationInstanceId), "groupName", "INFO");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/group", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -417,8 +432,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
             requestBody.put("configuredLevel", "INFO");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/group", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -437,8 +453,9 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
             requestBody.put("configuredLevel", "INFO");
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().postForEntity("/api/external/loggers/group", requestBody, String.class);
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .postForEntity("/api/external/loggers/group", requestBody, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -454,7 +471,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
             // given.
             LogLevelLoggerBulkResetRequest requestBody =
                     new LogLevelLoggerBulkResetRequest(List.of(activeInstanceId), "reset.logger.name");
-            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            IdentityAwareTestRestTemplate viewer =
+                    restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
             // when.
             ResponseEntity<String> response =
@@ -473,7 +491,8 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
             // given.
             LogLevelLoggerBulkResetRequest requestBody = new LogLevelLoggerBulkResetRequest(
                     List.of(activeInstanceId, siblingInstanceId), "reset.logger.name");
-            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            IdentityAwareTestRestTemplate viewer =
+                    restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
             // when.
             ResponseEntity<String> response =
@@ -498,7 +517,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asViewer()
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                     .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
             // then.
@@ -518,7 +537,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asViewer()
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                     .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
             // then.
@@ -536,7 +555,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asViewer()
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                     .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
             // then.
@@ -556,7 +575,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asViewer()
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                     .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
             // then.
@@ -573,7 +592,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asViewer()
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                     .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
             // then.
@@ -593,7 +612,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
 
             // when.
             ResponseEntity<String> response = restTemplate
-                    .asViewer()
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                     .postForEntity("/api/external/loggers/logger/reset", requestBody, String.class);
 
             // then.

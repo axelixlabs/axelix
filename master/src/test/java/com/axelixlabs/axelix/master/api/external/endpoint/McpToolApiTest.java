@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -236,7 +237,8 @@ public class McpToolApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnMcpToolsFeed() {
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
 
         ResponseEntity<String> response = viewer.getForEntity("/api/external/mcp/tools-feed", String.class);
 

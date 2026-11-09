@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -137,7 +138,8 @@ public class LoggersApiLoggerByNameTest extends AbstractProtectedEndpointTest {
         String loggerName = "com.example";
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(
                 "/api/external/loggers/{instanceId}/logger/{loggerName}", String.class, activeInstanceId, loggerName);
 
@@ -161,7 +163,8 @@ public class LoggersApiLoggerByNameTest extends AbstractProtectedEndpointTest {
         String loggerName = "org.springframework.web";
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        IdentityAwareTestRestTemplate viewer =
+                restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
         ResponseEntity<String> response = viewer.getForEntity(
                 "/api/external/loggers/{instanceId}/logger/{loggerName}", String.class, activeInstanceId, loggerName);
 
@@ -182,7 +185,7 @@ public class LoggersApiLoggerByNameTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}", Void.class, instanceId, loggerName);
 
@@ -197,7 +200,7 @@ public class LoggersApiLoggerByNameTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}", String.class, instanceId, loggerName);
 

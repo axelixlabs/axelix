@@ -38,13 +38,17 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
 import com.axelixlabs.axelix.master.domain.iam.UserStatus;
@@ -61,7 +65,6 @@ import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
@@ -90,8 +93,53 @@ import static org.mockito.Mockito.when;
         })
 class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
+    private Role oidcRole;
+    private Role previousRole;
+
     @Autowired
-    protected TestRoles testRoles;
+    private JdbcClient roleJdbcClient;
+
+    @BeforeEach
+    void insertTestRoles() {
+        for (String name : Set.of("OIDC_TEST_ROLE", "PREVIOUS_TEST_ROLE", "LOCAL_TEST_ROLE")) {
+            roleJdbcClient
+                    .sql("INSERT INTO roles (id, name, description, role_origin) VALUES (?, ?, ?, ?)")
+                    .params(name, name, "Callback test role", "WEB_UI")
+                    .update();
+        }
+        roleJdbcClient
+                .sql("INSERT INTO authorities (id, codename, description) VALUES (?, ?, ?)")
+                .params("oidc-test-authority", "test:oidc:read", "Callback test authority")
+                .update();
+        Authority authority = roleJdbcClient
+                .sql("SELECT id, codename FROM authorities WHERE id = ?")
+                .param("oidc-test-authority")
+                .query((rs, n) -> new DefaultAuthority(rs.getString("id"), rs.getString("codename")))
+                .single();
+        roleJdbcClient
+                .sql("INSERT INTO roles_authorities (role_id, authority_id) VALUES (?, ?)")
+                .params("OIDC_TEST_ROLE", "oidc-test-authority")
+                .update();
+        oidcRole = new DefaultRole("OIDC_TEST_ROLE", Set.of(authority));
+        previousRole = new DefaultRole("PREVIOUS_TEST_ROLE", Set.of());
+    }
+
+    @AfterEach
+    void deleteTestRoles() {
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
+        roleJdbcClient
+                .sql("DELETE FROM roles_authorities WHERE role_id = 'OIDC_TEST_ROLE'")
+                .update();
+        roleJdbcClient
+                .sql("DELETE FROM roles WHERE id IN ('OIDC_TEST_ROLE', 'PREVIOUS_TEST_ROLE', 'LOCAL_TEST_ROLE')")
+                .update();
+        roleJdbcClient
+                .sql("DELETE FROM authorities WHERE id = 'oidc-test-authority'")
+                .update();
+    }
 
     private static final String CODE = "test-code";
     private static final String ID_TOKEN = "test-id-token";
@@ -169,7 +217,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         when(oidcClient.validateIdToken(ID_TOKEN))
                 .thenReturn(new ValidatedOidcIdentity(username, SUBJECT, identityClaims));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.editor());
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(oidcRole);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "given_name")).thenReturn(firstName);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "family_name")).thenReturn(lastName);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "email")).thenReturn(email);
@@ -196,10 +244,10 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         assertThat(decodedTokenToUser.getUsername()).isEqualTo(username);
         assertThat(decodedTokenToUser.getRoles()).singleElement().satisfies(role -> {
-            assertThat(role.name()).isEqualTo(testRoles.editor().name());
+            assertThat(role.name()).isEqualTo(oidcRole.name());
             assertThat(role.authorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrderElementsOf(testRoles.editor().authorities().stream()
+                    .containsExactlyInAnyOrderElementsOf(oidcRole.authorities().stream()
                             .map(Authority::getName)
                             .toList());
         });
@@ -212,11 +260,11 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 .asString()
                 .actual();
 
-        testRoles.editor().authorities().stream()
+        oidcRole.authorities().stream()
                 .map(Authority::getName)
                 .forEach(name -> assertThat(decodedAuthorities).contains(name));
 
-        assertThat(authoritiesCookie).doesNotContain("environment.values:read", "config-properties.values:read");
+        assertThat(decodedAuthorities).isEqualTo("[test:oidc:read]");
 
         // Verify that the OIDC user was correctly provisioned and persisted in the database
         UserEntity userEntity = userRepository.findByUsername(username).get();
@@ -229,7 +277,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         assertThat(userEntity.oidcSubject()).isEqualTo(expectedOidcSubject(SUBJECT));
         assertThat(userService.findRoleNamesByUserId(userEntity.id()))
                 .hasSize(1)
-                .containsOnly("EDITOR");
+                .containsOnly("OIDC_TEST_ROLE");
         assertThat(userEntity.userOrigin()).isEqualTo(UserOrigin.OIDC);
         assertThat(userEntity.status()).isEqualTo(UserStatus.ACTIVE);
         assertThat(userEntity.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
@@ -242,19 +290,14 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         String username = "test-user";
         String updatedEmail = "updated@gmail.com";
         userService.createFromOidc(
-                username,
-                "Original",
-                "Name",
-                "original@gmail.com",
-                expectedOidcSubject(SUBJECT),
-                testRoles.viewer().name());
+                username, "Original", "Name", "original@gmail.com", expectedOidcSubject(SUBJECT), previousRole.name());
 
         // and.
         String userInfoJson = "{\"email\": \"%s\"}".formatted(updatedEmail);
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
         when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.editor());
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(oidcRole);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "email")).thenReturn(updatedEmail);
         Instant beforeLogin = Instant.now();
 
@@ -269,8 +312,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         assertThat(updated.firstName()).isEqualTo("Original");
         assertThat(updated.lastName()).isEqualTo("Name");
         assertThat(updated.email()).isEqualTo(updatedEmail);
-        assertThat(userService.findRoleNamesByUserId(updated.id()))
-                .containsOnly(testRoles.editor().name());
+        assertThat(userService.findRoleNamesByUserId(updated.id())).containsOnly(oidcRole.name());
         assertThat(updated.userOrigin()).isEqualTo(UserOrigin.OIDC);
         assertThat(updated.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
         assertSuccessfulCallback(MasterWebEndpoints.OIDC_AUTH_COMPLETE, UserUtils.passwordless(username, Set.of()));
@@ -282,12 +324,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         String originalUsername = "john.old";
         String newUsername = "john.new";
         userService.createFromOidc(
-                originalUsername,
-                "John",
-                "Doe",
-                "john@example.com",
-                expectedOidcSubject(SUBJECT),
-                testRoles.viewer().name());
+                originalUsername, "John", "Doe", "john@example.com", expectedOidcSubject(SUBJECT), previousRole.name());
         UserEntity original = userRepository.findByUsername(originalUsername).orElseThrow();
 
         // and the provider now presents a DIFFERENT username for the SAME subject.
@@ -296,7 +333,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         when(oidcClient.validateIdToken(ID_TOKEN))
                 .thenReturn(new ValidatedOidcIdentity(newUsername, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.editor());
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(oidcRole);
 
         // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(
@@ -316,14 +353,14 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     void shouldReturn400WhenOidcUserConflictsWithExistingLocalAccount() {
         // given.
         String username = "test-user";
-        userService.createLocal(username, null, null, null, "test-password", Set.of("ADMIN"));
+        userService.createLocal(username, null, null, null, "test-password", Set.of("LOCAL_TEST_ROLE"));
 
         // and.
         String userInfoJson = "someJson";
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
         when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(testRoles.editor());
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(oidcRole);
 
         // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(
@@ -334,7 +371,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(userInDb).isPresent().hasValueSatisfying(userEntity -> {
             assertThat(userEntity.userOrigin()).isEqualTo(UserOrigin.LOCAL);
-            assertThat(userService.findRoleNamesByUserId(userEntity.id())).containsOnly("ADMIN");
+            assertThat(userService.findRoleNamesByUserId(userEntity.id())).containsOnly("LOCAL_TEST_ROLE");
         });
     }
 

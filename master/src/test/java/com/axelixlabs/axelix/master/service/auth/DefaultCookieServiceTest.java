@@ -148,7 +148,7 @@ class DefaultCookieServiceTest {
     @Test
     void buildAuthoritiesMetadataCookie_WithNoAuthorities_ReturnsBase64EncodedJsonEmptyArrayCookie() {
         // given.
-        Role targetRole = new DefaultRole("VIEWER", Set.of());
+        Role targetRole = new DefaultRole("EMPTY_TEST_ROLE", Set.of());
 
         // when.
         ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
@@ -36,19 +37,22 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.domain.iam.UserStatus;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -75,9 +79,46 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.master.auth.options.super-admin.credentials.password=admin",
         })
 class UserApiTest extends AbstractProtectedEndpointTest {
+    @Autowired
+    private JdbcClient roleJdbcClient;
+
+    @BeforeEach
+    void insertTestRoles() {
+        for (String name : Set.of("TEST_BASIC", "TEST_REPORTS", "TEST_OPERATIONS")) {
+            roleJdbcClient
+                    .sql("INSERT INTO roles (id, name, description, role_origin) VALUES (?, ?, ?, ?)")
+                    .params("user-api-" + name, name, "Test role", "WEB_UI")
+                    .update();
+        }
+    }
+
+    @AfterEach
+    void deleteTestRoles() {
+        List<String> userIds =
+                userRepository.findAll().stream().map(UserEntity::id).toList();
+        if (!userIds.isEmpty()) {
+            userService.deleteByIds(userIds);
+        }
+        roleJdbcClient
+                .sql("DELETE FROM roles WHERE id IN (?, ?, ?)")
+                .params("user-api-TEST_BASIC", "user-api-TEST_REPORTS", "user-api-TEST_OPERATIONS")
+                .update();
+    }
 
     @Autowired
-    protected TestRoles testRoles;
+    private AuthorityRepository endpointAuthorityRepository;
+
+    private Role usersReaderRole;
+
+    @BeforeEach
+    void setUpEndpointRoles() {
+        usersReaderRole = new DefaultRole(
+                "USERS_READER_TEST_ROLE",
+                Set.of(endpointAuthorityRepository.findAll().stream()
+                        .filter(authority -> authority.getName().equals("users:read"))
+                        .findFirst()
+                        .orElseThrow()));
+    }
 
     private static final String USERS_FEED_PATH = "/api/external/users/feed";
     private static final String USER_BY_ID_PATH = "/api/external/users/feed/{userId}";
@@ -166,7 +207,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         String username = "db-user";
         String password = "db-password";
 
-        userService.createLocal(username, null, null, "db-user@example.com", password, Set.of("VIEWER"));
+        userService.createLocal(username, null, null, "db-user@example.com", password, Set.of("TEST_BASIC"));
         UserEntity user = userRepository.findByUsername(username).orElseThrow();
 
         LoginRequest loginRequest = new LoginRequest(username, password);
@@ -186,13 +227,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
     @Test
     void shouldNotAuthenticateUserFromDatabaseWithInvalidCredentials() {
-        userService.createLocal(
-                "db-user",
-                null,
-                null,
-                "db-user@example.com",
-                "db-password",
-                Set.of(testRoles.viewer().name()));
+        userService.createLocal("db-user", null, null, "db-user@example.com", "db-password", Set.of("TEST_BASIC"));
 
         LoginRequest loginRequest = new LoginRequest("db-user", "wrong-password");
 
@@ -209,7 +244,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnForbiddenForSuspendedDatabaseUser() {
         // given.
-        userService.createLocal("db-user", null, null, "db-user@example.com", "db-password", Set.of("VIEWER"));
+        userService.createLocal("db-user", null, null, "db-user@example.com", "db-password", Set.of("TEST_BASIC"));
         UserEntity user = userRepository.findByUsername("db-user").orElseThrow();
         userService.updateStatusByIds(List.of(user.id()), UserStatus.SUSPENDED);
         LoginRequest loginRequest = new LoginRequest("db-user", "db-password");
@@ -234,7 +269,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         String password = "db-password";
 
         // and.
-        userService.createLocal(username, null, null, "db-user@example.com", password, Set.of("VIEWER"));
+        userService.createLocal(username, null, null, "db-user@example.com", password, Set.of("TEST_BASIC"));
         UserEntity user = userRepository.findByUsername(username).orElseThrow();
         userService.updateStatusByIds(List.of(user.id()), UserStatus.SUSPENDED);
         userService.updateStatusByIds(List.of(user.id()), UserStatus.ACTIVE);
@@ -323,10 +358,11 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnAllManagedUsers() {
         // given.
-        userService.createLocal("alice", "Alice", "Smith", "alice@example.com", "aliceSecret", Set.of("ADMIN"));
+        userService.createLocal(
+                "alice", "Alice", "Smith", "alice@example.com", "aliceSecret", Set.of("TEST_OPERATIONS"));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
 
-        userService.createFromOidc("bob", "Bob", null, "bob@example.com", "hash-bob", "VIEWER");
+        userService.createFromOidc("bob", "Bob", null, "bob@example.com", "hash-bob", "TEST_BASIC");
         UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
 
         // language=json
@@ -338,7 +374,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                     "firstName": "Alice",
                     "lastName": "Smith",
                     "email": "alice@example.com",
-                    "roles": ["ADMIN"],
+                    "roles": ["TEST_OPERATIONS"],
                     "userOrigin": "LOCAL",
                     "status": "ACTIVE",
                     "lastLoginAt": null
@@ -349,7 +385,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                     "firstName": "Bob",
                     "lastName": null,
                     "email": "bob@example.com",
-                    "roles": ["VIEWER"],
+                    "roles": ["TEST_BASIC"],
                     "userOrigin": "OIDC",
                     "status": "ACTIVE",
                     "lastLoginAt": "${json-unit.any-string}"
@@ -358,7 +394,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(alice.id(), bob.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.asUsersFeedViewer();
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(usersReaderRole);
         ResponseEntity<String> response = superAdmin.getForEntity(USERS_FEED_PATH, String.class);
 
         // then.
@@ -372,7 +408,8 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnUserByHisId() {
         // given.
-        userService.createLocal("alice", "Alice", "Smith", "alice@example.com", "aliceSecret", Set.of("ADMIN"));
+        userService.createLocal(
+                "alice", "Alice", "Smith", "alice@example.com", "aliceSecret", Set.of("TEST_OPERATIONS"));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
         userService.updateStatusByIds(List.of(alice.id()), UserStatus.SUSPENDED);
 
@@ -384,7 +421,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                   "firstName": "Alice",
                   "lastName": "Smith",
                   "email": "alice@example.com",
-                  "roles": ["ADMIN"],
+                  "roles": ["TEST_OPERATIONS"],
                   "userOrigin": "LOCAL",
                   "status": "SUSPENDED",
                   "lastLoginAt": null
@@ -392,7 +429,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(alice.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.asUsersFeedViewer();
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(usersReaderRole);
         ResponseEntity<String> response = superAdmin.getForEntity(USER_BY_ID_PATH, String.class, alice.id());
 
         // then.
@@ -409,8 +446,9 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         String unknownUserId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<String> response =
-                restTemplateBuilder.asUsersFeedViewer().getForEntity(USER_BY_ID_PATH, String.class, unknownUserId);
+        ResponseEntity<String> response = restTemplateBuilder
+                .withRole(usersReaderRole)
+                .getForEntity(USER_BY_ID_PATH, String.class, unknownUserId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -419,7 +457,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnEmptyUsersFeed() {
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.asUsersFeedViewer();
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(usersReaderRole);
         ResponseEntity<String> response = superAdmin.getForEntity(USERS_FEED_PATH, String.class);
 
         // then.
@@ -433,26 +471,35 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnUserCountsByRole() {
         // given.
         userService.createLocal(
-                "alice", "Alice", "Smith", "alice@example.com", "aliceSecret", Set.of("ADMIN", "EDITOR"));
-        userService.createFromOidc("bob", "Bob", null, "bob@example.com", "hash-bob", "VIEWER");
+                "alice",
+                "Alice",
+                "Smith",
+                "alice@example.com",
+                "aliceSecret",
+                Set.of("TEST_OPERATIONS", "TEST_REPORTS"));
+        userService.createFromOidc("bob", "Bob", null, "bob@example.com", "hash-bob", "TEST_BASIC");
 
         // language=json
         String expectedCounts = """
                 [
-                  { "role": "ADMIN", "usersCount": 1 },
-                  { "role": "EDITOR", "usersCount": 1 },
-                  { "role": "VIEWER", "usersCount": 1 }
+                  { "role": "TEST_OPERATIONS", "usersCount": 1 },
+                  { "role": "TEST_REPORTS", "usersCount": 1 },
+                  { "role": "TEST_BASIC", "usersCount": 1 }
                 ]
                 """;
 
         // when.
-        IdentityAwareTestRestTemplate viewer = restTemplateBuilder.asUsersFeedViewer();
+        IdentityAwareTestRestTemplate viewer = restTemplateBuilder.withRole(usersReaderRole);
         ResponseEntity<String> response = viewer.getForEntity(ROLE_USER_COUNTS_PATH, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).isEqualTo(expectedCounts);
+        assertThatJson(response.getBody())
+                .when(
+                        net.javacrumbs.jsonunit.core.Option.IGNORING_EXTRA_ARRAY_ITEMS,
+                        net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo(expectedCounts);
         assertSuccessfulCallback(MasterWebEndpoints.USERS_READ_ROLE_COUNTS, viewer.getActor());
     }
 

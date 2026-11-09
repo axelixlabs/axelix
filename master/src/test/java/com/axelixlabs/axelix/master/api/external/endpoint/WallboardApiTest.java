@@ -31,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.domain.ApplicationId;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
@@ -135,7 +136,7 @@ public class WallboardApiTest extends AbstractProtectedEndpointTest {
                     """.formatted(instance1Id, instance2Id);
 
             // when.
-            var viewer = restTemplate.asViewer();
+            var viewer = restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
             ResponseEntity<String> response = viewer.getForEntity(GRID_URL, String.class);
 
             // then.
@@ -155,7 +156,9 @@ public class WallboardApiTest extends AbstractProtectedEndpointTest {
 
             try {
                 // when.
-                ResponseEntity<String> response = restTemplate.asViewer().getForEntity(GRID_URL, String.class);
+                ResponseEntity<String> response = restTemplate
+                        .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                        .getForEntity(GRID_URL, String.class);
 
                 // then.
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -182,7 +185,7 @@ public class WallboardApiTest extends AbstractProtectedEndpointTest {
                     """;
 
             // when.
-            var viewer = restTemplate.asViewer();
+            var viewer = restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
             ResponseEntity<String> response = viewer.getForEntity(GRID_URL, String.class);
 
             // then.
@@ -212,7 +215,7 @@ public class WallboardApiTest extends AbstractProtectedEndpointTest {
             registry.register(TestInstanceFactory.create("other-1", "com.axelixlabs", "other-app"));
 
             // when.
-            var viewer = restTemplate.asViewer();
+            var viewer = restTemplate.withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()));
             ResponseEntity<String> response = viewer.getForEntity(SIBLINGS_URL, String.class, "petclinic-1");
 
             // then.
@@ -234,8 +237,9 @@ public class WallboardApiTest extends AbstractProtectedEndpointTest {
             registry.register(TestInstanceFactory.create("other-1", "com.axelixlabs", "other-app"));
 
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().getForEntity(SIBLINGS_URL, String.class, "petclinic-1");
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .getForEntity(SIBLINGS_URL, String.class, "petclinic-1");
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -247,8 +251,9 @@ public class WallboardApiTest extends AbstractProtectedEndpointTest {
         @Test
         void shouldRejectUnknownInstance() {
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().getForEntity(SIBLINGS_URL, String.class, "unknown-instance");
+            ResponseEntity<String> response = restTemplate
+                    .withRole(new DefaultRole("AUTHENTICATED_TEST_ROLE", Set.of()))
+                    .getForEntity(SIBLINGS_URL, String.class, "unknown-instance");
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
