@@ -22,8 +22,14 @@ import com.axelixlabs.axelix.master.domain.auth.Authority;
 /**
  * Authority codenames used by tests of built-in permissions.
  *
+ * @deprecated This is the wrong way to initialize the authorities in tests. The source of
+ *             truth for authorities is supposed to be the database, and only it. As a result,
+ *             using this test authorities is simply wrong, we should instead insert test records
+ *             in the database and then clean them up afterwards.
+ *
  * @author Mikhail Polivakha
  */
+@Deprecated(forRemoval = true)
 public enum TestAuthorities implements Authority {
     ENV_VALUES_READ("environment.values:read"),
     CONFIG_PROPS_VALUES_READ("config-properties.values:read"),
