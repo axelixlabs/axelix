@@ -64,6 +64,7 @@ import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.serde.DefaultJacksonMessageDeserializationStrategy;
@@ -90,6 +91,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class KubernetesInstanceDiscovererTest {
 
     private static MockWebServer mockWebServer;
+
+    @MockitoBean
+    private UserJwtDecoderService userJwtDecoderService;
 
     @MockitoBean
     private DiscoveryClient discoveryClient;
@@ -120,12 +124,14 @@ class KubernetesInstanceDiscovererTest {
     static class CurrentConfig {
 
         @Bean
-        public StarterAuthenticationTokenProvider tokenProvider(SecurityContextExecutor securityContextExecutor) {
+        public StarterAuthenticationTokenProvider tokenProvider(
+                SecurityContextExecutor securityContextExecutor, UserJwtDecoderService decoder) {
             return new StarterAuthenticationTokenProvider(
                     securityContextExecutor,
                     new DefaultUserJwtEncoderService(
                             JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY, Duration.ofMinutes(5)),
-                    new DefaultTechUserJwtSerializer(JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY));
+                    new DefaultTechUserJwtSerializer(JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY),
+                    decoder);
         }
 
         @Bean
