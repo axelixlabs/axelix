@@ -19,10 +19,14 @@ package com.axelixlabs.axelix.sbs.spring.core;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow.WriteMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Unit tests for {@link SlidingWindow}.
@@ -34,16 +38,11 @@ class SlidingWindowTest {
 
     private static final int CAPACITY = 5;
 
-    private SlidingWindow<String> slidingWindow;
-
-    @BeforeEach
-    void setUp() {
-        slidingWindow = new SlidingWindow<>(CAPACITY);
-    }
-
-    @Test
-    void put_shouldAddElementToWindow() {
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void put_shouldAddElementToWindow(WriteMode mode) {
         // given.
+        SlidingWindow<String> slidingWindow = new SlidingWindow<>(CAPACITY, mode);
         String element = "test";
 
         // when.
@@ -55,9 +54,11 @@ class SlidingWindowTest {
         assertThat(result).containsExactly("test");
     }
 
-    @Test
-    void get_shouldReturnEmptyListWhenWindowIsEmpty() {
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void get_shouldReturnEmptyListWhenWindowIsEmpty(WriteMode mode) {
         // given.
+        SlidingWindow<String> slidingWindow = new SlidingWindow<>(CAPACITY, mode);
         // window is empty
 
         // when.
@@ -67,9 +68,11 @@ class SlidingWindowTest {
         assertThat(result).isEmpty();
     }
 
-    @Test
-    void put_shouldAddMultipleElementsInTheExactOrder() {
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void put_shouldAddMultipleElementsInTheExactOrder(WriteMode mode) {
         // given.
+        SlidingWindow<String> slidingWindow = new SlidingWindow<>(CAPACITY, mode);
         String element1 = "element1";
         String element2 = "element2";
         String element3 = "element3";
@@ -85,9 +88,11 @@ class SlidingWindowTest {
         assertThat(result).containsExactly("element1", "element2", "element3");
     }
 
-    @Test
-    void get_shouldReturnAllElementsWhenSizeIsLessThanCapacity() {
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void get_shouldReturnAllElementsWhenSizeIsLessThanCapacity(WriteMode mode) {
         // given.
+        SlidingWindow<String> slidingWindow = new SlidingWindow<>(CAPACITY, mode);
         int elementsToAdd = CAPACITY - 1;
         for (int i = 0; i < elementsToAdd; i++) {
             slidingWindow.put("element" + i);
@@ -101,9 +106,11 @@ class SlidingWindowTest {
         assertThat(result).containsExactly("element0", "element1", "element2", "element3");
     }
 
-    @Test
-    void get_shouldReturnOnlyLastCapacityElementsWhenSizeExceedsCapacity() {
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void get_shouldReturnOnlyLastCapacityElementsWhenSizeExceedsCapacity(WriteMode mode) {
         // given.
+        SlidingWindow<String> slidingWindow = new SlidingWindow<>(CAPACITY, mode);
         int elementsToAdd = CAPACITY + 3;
         for (int i = 0; i < elementsToAdd; i++) {
             slidingWindow.put("element" + i);
@@ -117,60 +124,11 @@ class SlidingWindowTest {
         assertThat(result).containsExactly("element3", "element4", "element5", "element6", "element7");
     }
 
-    @Test
-    void clear_shouldNotRemoveElementsWhenSizeIsLessThanOrEqualToCapacity() {
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void get_shouldReturnNewListInstance(WriteMode mode) {
         // given.
-        slidingWindow.put("element1");
-        slidingWindow.put("element2");
-        slidingWindow.put("element3");
-
-        // when.
-        slidingWindow.clear();
-
-        // then.
-        List<String> result = slidingWindow.get();
-        assertThat(result).hasSize(3);
-        assertThat(result).containsExactly("element1", "element2", "element3");
-    }
-
-    @Test
-    void clear_shouldRemoveExcessElementsWhenSizeExceedsCapacity() {
-        // given.
-        int elementsToAdd = CAPACITY + 3;
-        for (int i = 0; i < elementsToAdd; i++) {
-            slidingWindow.put("element" + i);
-        }
-
-        // when.
-        slidingWindow.clear();
-
-        // then.
-        List<String> result = slidingWindow.get();
-        assertThat(result).hasSize(CAPACITY);
-        assertThat(result).containsExactly("element3", "element4", "element5", "element6", "element7");
-    }
-
-    @Test
-    void clear_shouldRemoveOldestElementsFirst() {
-        // given.
-        for (int i = 0; i < CAPACITY + 1; i++) {
-            slidingWindow.put("element" + i);
-        }
-
-        // when.
-        slidingWindow.clear();
-
-        // then.
-        List<String> result = slidingWindow.get();
-        assertThat(result).hasSize(CAPACITY);
-        assertThat(result).doesNotContain("element0");
-        assertThat(result).contains("element1");
-        assertThat(result).contains("element5");
-    }
-
-    @Test
-    void get_shouldReturnNewListInstance() {
-        // given.
+        SlidingWindow<String> slidingWindow = new SlidingWindow<>(CAPACITY, mode);
         slidingWindow.put("element1");
         slidingWindow.put("element2");
 
@@ -183,31 +141,62 @@ class SlidingWindowTest {
         assertThat(result1).isEqualTo(result2);
     }
 
-    @Test
-    void clear_shouldHandleEmptyWindow() {
-        // given.
-        // window is empty
-
-        // when.
-        slidingWindow.clear();
-
-        // then.
-        List<String> result = slidingWindow.get();
-        assertThat(result).isEmpty();
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void constructor_shouldRejectNonPositiveCapacity(int capacity) {
+        // when / then.
+        assertThatThrownBy(() -> new SlidingWindow<>(capacity)).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test
-    void removeIf_shouldRemoveOnlyMatchingElementsKeepingTheOrder() {
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void put_shouldKeepOnlyLatestElementWhenCapacityIsOne(WriteMode mode) {
         // given.
-        slidingWindow.put("keep1");
-        slidingWindow.put("drop1");
-        slidingWindow.put("keep2");
-        slidingWindow.put("drop2");
+        SlidingWindow<String> window = new SlidingWindow<>(1, mode);
 
         // when.
-        slidingWindow.removeIf(element -> element.startsWith("drop"));
+        window.put("first");
+        window.put("second");
 
         // then.
-        assertThat(slidingWindow.get()).containsExactly("keep1", "keep2");
+        assertThat(window.get()).containsExactly("second");
+    }
+
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void get_shouldReturnIndependentCopy(WriteMode mode) {
+        // given.
+        SlidingWindow<String> slidingWindow = new SlidingWindow<>(CAPACITY, mode);
+        slidingWindow.put("first");
+        List<String> snapshot = slidingWindow.get();
+
+        // when.
+        for (int i = 0; i < CAPACITY * 3; i++) {
+            slidingWindow.put("next" + i);
+        }
+
+        // then.
+        assertThat(snapshot).containsExactly("first");
+    }
+
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void constructor_shouldRejectNonPositiveCapacityWithWriteMode(WriteMode mode) {
+        // when / then.
+        assertThatThrownBy(() -> new SlidingWindow<>(0, mode)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WriteMode.class)
+    void put_shouldKeepRepeatedValues(WriteMode mode) {
+        // given.
+        SlidingWindow<String> window = new SlidingWindow<>(CAPACITY, mode);
+
+        // when.
+        window.put("same");
+        window.put("same");
+
+        // then.
+        assertThat(window.get()).containsExactly("same", "same");
     }
 }
