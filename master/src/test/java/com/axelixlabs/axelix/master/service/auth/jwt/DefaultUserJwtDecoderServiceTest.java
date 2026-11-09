@@ -51,7 +51,9 @@ import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
 import com.axelixlabs.axelix.master.domain.auth.User;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
+import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesService;
 import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
@@ -79,6 +81,9 @@ class DefaultUserJwtDecoderServiceTest {
 
     @Value("${axelix.master.auth.jwt.signing_key}")
     private String signingKey;
+
+    @Value("${axelix.master.auth.jwt.algorithm}")
+    private JwtAlgorithm algorithm;
 
     @Autowired
     private UserJwtDecoderService userJwtDecoderService;
@@ -217,8 +222,14 @@ class DefaultUserJwtDecoderServiceTest {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(role));
         String token = userJwtEncoderService.generateToken(user);
 
-        PasswordlessUser decodedUser = userJwtDecoderService.decodeTokenToUser(token);
+        // Use a fresh catalog because the shared service may have cached authorities before the insert.
+        UserJwtDecoderService decoder = new DefaultUserJwtDecoderService(
+                new DefaultAuthoritiesService(new AuthorityRepository(jdbcClient)), algorithm, signingKey);
 
+        // when.
+        PasswordlessUser decodedUser = decoder.decodeTokenToUser(token);
+
+        // then.
         assertThat(decodedUser.getRoles())
                 .first()
                 .satisfies(r -> assertThat(r.authorities())
