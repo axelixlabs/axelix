@@ -17,7 +17,9 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint.rbac;
 
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,17 +29,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.master.api.external.response.AuthorityProfileResponse;
+import com.axelixlabs.axelix.master.api.external.response.UserAuthoritiesResponse;
+import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.groups.Tuple.tuple;
 
 /**
  * Integration tests for {@link AuthoritiesApi}.
@@ -60,50 +62,69 @@ class AuthoritiesApiTest extends AbstractProtectedEndpointTest {
     private TestRestTemplateBuilder restTemplateBuilder;
 
     @Autowired
-    private JdbcClient jdbcClient;
+    private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
-    void shouldReturnAllAuthorityProfiles() {
+    void shouldRequireUserId() {
         // given.
-        Integer count = jdbcClient
-                .sql("SELECT COUNT(*) FROM authorities")
-                .query(Integer.class)
-                .single();
         IdentityAwareTestRestTemplate viewer = restTemplateBuilder.asUsersFeedViewer();
 
         // when.
-        ResponseEntity<AuthorityProfileResponse[]> response =
-                viewer.getForEntity(AUTHORITIES_FEED_PATH, AuthorityProfileResponse[].class);
+        ResponseEntity<String> response = viewer.getForEntity(AUTHORITIES_FEED_PATH, String.class);
 
         // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThat(response.getBody()).hasSize(count);
-        assertThat(response.getBody())
-                .extracting(AuthorityProfileResponse::codename)
-                .isSorted()
-                .contains("users:read", "users:manage");
-        assertThat(response.getBody()).allSatisfy(authority -> {
-            assertThat(authority.id()).isNotBlank();
-            assertThat(authority.displayName()).isNotBlank();
-            assertThat(authority.description()).isNotBlank();
-        });
-        assertThat(response.getBody())
-                .extracting(AuthorityProfileResponse::codename, AuthorityProfileResponse::displayName)
-                .containsExactlyInAnyOrder(
-                        tuple("environment.values:read", "View Environment Values"),
-                        tuple("config-properties.values:read", "View Configuration Property Values"),
-                        tuple("scheduled-tasks:write", "Manage Scheduled Tasks"),
-                        tuple("caches:clear", "Clear Caches"),
-                        tuple("caches:toggle", "Enable or Disable Caches"),
-                        tuple("gc:manage", "Manage Garbage Collection"),
-                        tuple("users:read", "View Users"),
-                        tuple("users:manage", "Manage Users"));
-        assertSuccessfulCallback(MasterWebEndpoints.AUTHORITIES_READ, viewer.getActor());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldReturnUserAuthorityPartition() {
+        // given.
+        String username = "authority-feed-" + UUID.randomUUID();
+        userService.createLocal(username, null, null, null, "password", Set.of("EDITOR"));
+        String userId = userRepository.findByUsername(username).orElseThrow().id();
+        IdentityAwareTestRestTemplate viewer = restTemplateBuilder.asUsersFeedViewer();
+
+        try {
+            // when.
+            ResponseEntity<UserAuthoritiesResponse> response =
+                    viewer.getForEntity(AUTHORITIES_FEED_PATH + "?userId=" + userId, UserAuthoritiesResponse.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+            assertThat(response.getBody().effectiveAuthorities())
+                    .extracting(UserAuthoritiesResponse.AuthorityProfileResponse::codename)
+                    .isSorted()
+                    .containsExactly("caches:clear", "caches:toggle", "gc:manage", "scheduled-tasks:write");
+            assertThat(response.getBody().ungrantedAuthorities())
+                    .extracting(UserAuthoritiesResponse.AuthorityProfileResponse::codename)
+                    .isSorted()
+                    .containsExactly(
+                            "config-properties.values:read", "environment.values:read", "users:manage", "users:read");
+            assertSuccessfulCallback(MasterWebEndpoints.AUTHORITIES_READ, viewer.getActor());
+        } finally {
+            userService.deleteByIds(List.of(userId));
+        }
+    }
+
+    @Test
+    void shouldReturnNotFoundForMissingUser() {
+        // given.
+        IdentityAwareTestRestTemplate viewer = restTemplateBuilder.asUsersFeedViewer();
+
+        // when.
+        ResponseEntity<String> response = viewer.getForEntity(AUTHORITIES_FEED_PATH + "?userId=missing", String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
-        return Set.of(new TestableMasterWebEndpoint(MasterWebEndpoints.AUTHORITIES_READ, AUTHORITIES_FEED_PATH));
+        return Set.of(new TestableMasterWebEndpoint(
+                MasterWebEndpoints.AUTHORITIES_READ, AUTHORITIES_FEED_PATH + "?userId=missing"));
     }
 }

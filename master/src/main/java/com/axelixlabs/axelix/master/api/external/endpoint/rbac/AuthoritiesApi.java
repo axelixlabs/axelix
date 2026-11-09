@@ -17,36 +17,31 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint.rbac;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.AuthorityProfileResponse;
-import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
+import com.axelixlabs.axelix.master.api.external.response.UserAuthoritiesResponse;
+import com.axelixlabs.axelix.master.service.auth.UserAuthoritiesService;
 
 /**
- * The API for reading the authority catalog.
+ * The API for reading the authority catalog partitioned by a user's effective grants.
  *
  * @author Mikhail Polivakha
  */
 @ExternalApiRestController
 public class AuthoritiesApi {
 
-    private final AuthoritiesService authoritiesService;
+    private final UserAuthoritiesService userAuthoritiesService;
 
-    public AuthoritiesApi(AuthoritiesService authoritiesService) {
-        this.authoritiesService = authoritiesService;
+    public AuthoritiesApi(UserAuthoritiesService userAuthoritiesService) {
+        this.userAuthoritiesService = userAuthoritiesService;
     }
 
     @GetMapping(path = ApiPaths.AuthoritiesApi.AUTHORITIES_FEED)
-    public ResponseEntity<List<AuthorityProfileResponse>> getAuthoritiesFeed() {
-        List<AuthorityProfileResponse> authorities = authoritiesService.getAuthoritiesFeed().stream()
-                .map(AuthorityProfileResponse::from)
-                .toList();
-
-        return ResponseEntity.ok(authorities);
+    public ResponseEntity<UserAuthoritiesResponse> getAuthoritiesFeed(@RequestParam String userId) {
+        return ResponseEntity.ok(UserAuthoritiesResponse.from(userAuthoritiesService.getAuthorities(userId)));
     }
 }
