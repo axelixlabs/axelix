@@ -38,8 +38,7 @@ import com.axelixlabs.axelix.common.auth.exception.TechUserAuthorizationExceptio
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
- * A custom servlet filter that restricts access to Actuator endpoints based on JWT token presence, validity,
- * and mapped {@link Authority} authorities.
+ * A custom servlet filter that restricts access to Actuator endpoints based on JWT token presence and validity.
  * <p>
  * Rejects unauthorized requests before they reach the application logic.
  *

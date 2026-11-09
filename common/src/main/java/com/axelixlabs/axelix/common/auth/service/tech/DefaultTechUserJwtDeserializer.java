@@ -50,15 +50,16 @@ public class DefaultTechUserJwtDeserializer implements TechUserJwtDeserializer {
     @Override
     public TechUser deserialize(String token)
             throws InvalidJwtTokenException, JwtParsingException, ExpiredJwtTokenException {
+        Claims claims = parseClaims(token);
+        if (claims.getIssuedAt() == null || claims.getExpiration() == null) {
+            throw new JwtParsingException("Technical-user JWT must contain issued-at and expiration claims");
+        }
+        return resolveTechUser(claims.getSubject());
+    }
+
+    private Claims parseClaims(String token) {
         try {
-            Claims claims =
-                    verificationStrategy.verifyAndParse(token, signingKey).getPayload();
-            if (claims.getIssuedAt() == null || claims.getExpiration() == null) {
-                throw new JwtParsingException("Technical-user JWT must contain issued-at and expiration claims");
-            }
-            return resolveTechUser(claims.getSubject());
-        } catch (JwtParsingException e) {
-            throw e;
+            return verificationStrategy.verifyAndParse(token, signingKey).getPayload();
         } catch (ExpiredJwtException e) {
             throw new ExpiredJwtTokenException("JWT token has expired", e);
         } catch (JwtException e) {

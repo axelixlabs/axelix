@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.transport;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -156,10 +157,10 @@ class ProxyingEndpointProberTest {
         String token = request.getHeader("Authorization").substring("Bearer ".length());
         assertThat(claims(token).getSubject()).isEqualTo(TechUser.MASTER.getId());
         assertThat(claims(token)).containsOnlyKeys("sub", "iat", "exp");
-        assertThat(java.time.Duration.between(
+        assertThat(Duration.between(
                         claims(token).getIssuedAt().toInstant(),
                         claims(token).getExpiration().toInstant()))
-                .isEqualTo(jwtProperties.lifespan());
+                .isEqualTo(Duration.ofMinutes(1));
     }
 
     @Test

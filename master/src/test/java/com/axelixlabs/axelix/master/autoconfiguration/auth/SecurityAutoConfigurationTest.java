@@ -49,6 +49,7 @@ import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestCont
 import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
@@ -525,6 +526,11 @@ class SecurityAutoConfigurationTest {
         @Bean
         public RoleService roleService() {
             return Mockito.mock(RoleService.class);
+        }
+
+        @Bean
+        public AuthorityRepository authorityRepository() {
+            return Mockito.mock(AuthorityRepository.class);
         }
     }
 
