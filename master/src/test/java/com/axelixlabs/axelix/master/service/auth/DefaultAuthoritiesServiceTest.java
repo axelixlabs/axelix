@@ -86,6 +86,11 @@ class DefaultAuthoritiesServiceTest {
         // given.
         DefaultAuthority authority = insertAuthority("custom:list");
         authoritiesService.getAll();
+
+        // This scenario is purely hypothetical, since the authorities are not supposed to change
+        // during the axelix master lifetime. It is safe to cache em, but the insertion of authorities
+        // in the middle of axleix master being running is something that is impossible, here we do it
+        // just for the sake of the test
         insertAuthority("custom:write");
 
         // when.
