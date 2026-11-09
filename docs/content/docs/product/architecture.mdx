@@ -150,9 +150,11 @@ from OIDC provider (e.g. by querying the <code>/userinfo</code> endpoint, if ava
 
 ### IAM. Important Nuances
 
-- **Shared JWT signing key.** As of now, both Axelix Master and the Axelix Starter will use **the symmetrically
-  encrypted JWT**.  That implies that the same `signing-key` must be configured on Master and on every Axelix Starter.
-  Master signs tokens to call starter endpoints, the starter signs heartbeats for self-registration. A key mismatch
-  produces `401` and a rejected call rather than silent drift.
+- **Shared JWT signing key.** Master and every Axelix Starter must use the same signing key and HMAC algorithm.
+  Master checks the signed-in user's authorities for UI and MCP requests. When calling a starter from 1.3 onward,
+  it sends a short-lived JWT identifying itself as `AXELIX.MASTER`, without the user's roles or authorities.
+  The starter verifies the signature, expiry, and Master identity. For older starters, Master reissues the user's
+  token with legacy authority names because those starters still check permissions themselves.
+  The starter also signs registration and heartbeat requests with the shared key. A key mismatch produces `401`.
 - **TLS is the operator's responsibility.** Master listens on plain HTTP by default. Put it behind a TLS-terminating
   proxy and set `axelix.master.auth.cookie.secure=true` for any non-local deployment.

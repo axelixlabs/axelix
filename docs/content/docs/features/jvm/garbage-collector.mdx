@@ -19,9 +19,9 @@ Reading the GC log file and inspecting the logging status are available to every
 **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open the page and download an existing log. The active controls are
 gated by a separate authority:
 
-- **Trigger GC**, **Enable GC Logging**, and **Disable GC Logging** require the `GARBAGE_COLLECTOR` authority.
+- **Trigger GC**, **Enable GC Logging**, and **Disable GC Logging** require the `gc:manage` authority.
 
-`GARBAGE_COLLECTOR` is granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. **VIEWER** sees the
+`gc:manage` is granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. **VIEWER** sees the
 buttons but the destructive ones stay disabled. See [Roles and
 authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
@@ -49,11 +49,11 @@ Once logging is enabled, the page header exposes three actions:
 
 1. **Trigger GC** <Image src="/img/feature/icons/play-icon.png" width={20} height={20}/> — forces a collection by invoking
    `System.gc()` on the instance, so you do not have to wait for a natural GC event to produce entries. Requires
-   `GARBAGE_COLLECTOR`.
+   `gc:manage`.
 2. **Download GC Log** <Image src="/img/feature/icons/download-icon.png" width={25} height={27}/> — streams the current GC
    log file to the browser as `text/plain`. Read-only — available to everyone.
 3. **Disable GC Logging** <Image src="/img/feature/icons/disable-icon.png" width={25} height={27}/> — switches GC logging
-   back off without touching the already-written log file. Requires `GARBAGE_COLLECTOR`.
+   back off without touching the already-written log file. Requires `gc:manage`.
 
 A representative line from a downloaded GC log, annotated:
 

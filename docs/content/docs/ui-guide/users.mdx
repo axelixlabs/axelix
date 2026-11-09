@@ -7,13 +7,13 @@ description: "The **Users** screen is where you see who can sign in to Axelix Ma
 
 ## Who can open this page
 
-The **Users** link only appears for accounts that hold the `USERS_VIEW` authority. By default, that authority is bundled
+The **Users** link only appears for accounts that hold the `users:read` authority. By default, that authority is bundled
 only with the built-in `SUPER_ADMIN` role — `ADMIN`, `EDITOR`, and `VIEWER` cannot see the link or load the page. See
 [Roles and authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 grant table.
 
 The **Create User** button, and the edit and delete controls on the profile screen, additionally require the
-`USERS_MANAGEMENT` authority, which is also reserved for `SUPER_ADMIN`.
+`users:manage` authority, which is also reserved for `SUPER_ADMIN`.
 
 ## The users list
 

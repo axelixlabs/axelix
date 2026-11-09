@@ -35,7 +35,7 @@ resolved for it.
 - **Value**:      The value Spring resolved for the field. Properties with no value are shown as `null`.
 
 :::info
-By default, every value is masked as `******` for callers that do not carry the `CONFIG_PROPS_VALUES_READ` authority.
+By default, every value is masked as `******` for callers that do not carry the `config-properties.values:read` authority.
 See [Value sanitization](#value-sanitization) below for how to choose which keys are masked and who sees the originals.
 :::
 
@@ -44,7 +44,7 @@ See [Value sanitization](#value-sanitization) below for how to choose which keys
 Axelix never relies on the Spring Boot `management.endpoint.configprops.show-values` switch — it always asks Spring Boot
 to return raw values (`Show.ALWAYS`) and applies its own masking on top, driven by an authority check.
 
-**Who sees raw values.** Callers carrying the `CONFIG_PROPS_VALUES_READ` authority — granted by the built-in **ADMIN**
+**Who sees raw values.** Callers carrying the `config-properties.values:read` authority — granted by the built-in **ADMIN**
 and **SUPER_ADMIN** roles — receive the originals. Everyone else gets values replaced with `******`. See [Roles and
 authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
