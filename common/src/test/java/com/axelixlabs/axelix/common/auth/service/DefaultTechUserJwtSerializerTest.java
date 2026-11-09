@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializ
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.jwt.TechUserJwtToken;
 
+import static com.axelixlabs.axelix.common.testfixtures.JwtSchemaAssertions.assertJwtPayloadMatchesSchema;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -64,6 +65,7 @@ class DefaultTechUserJwtSerializerTest {
         String token = serializer.serialize(techUser);
 
         // then.
+        assertJwtPayloadMatchesSchema(token, "TechUserJwtToken");
         Jws<Claims> claims = Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)))
                 .build()
