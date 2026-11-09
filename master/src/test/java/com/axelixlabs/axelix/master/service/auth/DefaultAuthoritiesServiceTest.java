@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.master.service.auth;
 import java.util.Set;
 import java.util.UUID;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,13 @@ class DefaultAuthoritiesServiceTest {
     @Autowired
     private JdbcClient jdbcClient;
 
+    @BeforeEach
+    @AfterEach
+    void setUp() {
+        jdbcClient.sql("DELETE FROM roles_authorities").update();
+        jdbcClient.sql("DELETE FROM authorities").update();
+    }
+
     @Test
     void shouldReturnAllAuthoritiesFromDatabase() {
         // given.
@@ -65,10 +74,6 @@ class DefaultAuthoritiesServiceTest {
 
     @Test
     void shouldReturnEmptyCatalogWhenTableIsEmpty() {
-        // given.
-        jdbcClient.sql("DELETE FROM roles_authorities").update();
-        jdbcClient.sql("DELETE FROM authorities").update();
-
         // when.
         Set<Authority> authorities = authoritiesService.getAll();
 
