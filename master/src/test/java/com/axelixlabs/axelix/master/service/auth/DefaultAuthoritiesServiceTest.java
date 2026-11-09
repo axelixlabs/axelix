@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,8 +44,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class DefaultAuthoritiesServiceTest {
 
-    @Autowired
     private AuthoritiesService authoritiesService;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     @Autowired
     private JdbcClient jdbcClient;
@@ -54,6 +57,7 @@ class DefaultAuthoritiesServiceTest {
     void setUp() {
         jdbcClient.sql("DELETE FROM roles_authorities").update();
         jdbcClient.sql("DELETE FROM authorities").update();
+        authoritiesService = new DefaultAuthoritiesService(authorityRepository);
     }
 
     @Test
@@ -75,6 +79,20 @@ class DefaultAuthoritiesServiceTest {
 
         // then.
         assertThat(authorities).isEmpty();
+    }
+
+    @Test
+    void shouldCacheAuthorities() {
+        // given.
+        DefaultAuthority authority = insertAuthority("custom:list");
+        authoritiesService.getAll();
+        insertAuthority("custom:write");
+
+        // when.
+        Set<Authority> authorities = authoritiesService.getAll();
+
+        // then.
+        assertThat(authorities).containsOnly(authority);
     }
 
     private DefaultAuthority insertAuthority(String codename) {
