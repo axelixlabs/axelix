@@ -15,9 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
-
-import type { TProfileAuthority } from "../../permissions";
+import type { IAuthorityProfile } from "@/models";
 
 import styles from "./styles.module.css";
 
@@ -25,7 +23,7 @@ interface IProps {
     /**
      * Authority rendered on this row
      */
-    authority: TProfileAuthority;
+    authority: IAuthorityProfile;
 
     /**
      * Whether the user's roles grant this authority
@@ -34,8 +32,6 @@ interface IProps {
 }
 
 export const PermissionRow = ({ authority, granted }: IProps) => {
-    const { t } = useTranslation();
-
     return (
         <div className={`${styles.Permission} ${granted ? "" : styles.Off}`}>
             {granted ? (
@@ -53,7 +49,7 @@ export const PermissionRow = ({ authority, granted }: IProps) => {
             ) : (
                 <span className={styles.Denied} />
             )}
-            <span>{t(`Users.Profile.Authorities.${authority}`)}</span>
+            <span title={authority.description}>{authority.displayName}</span>
         </div>
     );
 };

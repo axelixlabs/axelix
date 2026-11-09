@@ -906,19 +906,7 @@
             "reactivateBody": "{{name}} снова сможет входить.",
             "reactivateConfirm": "Разблокировать",
             "userSuspended": "Пользователь заблокирован",
-            "userReactivated": "Пользователь разблокирован",
-            "Groups": {
-                "runtime": "Операции выполнения",
-                "sensitive": "Чувствительные значения"
-            },
-            "Authorities": {
-                "SCHEDULED_TASKS_MODIFY": "Изменять запланированные задачи",
-                "CACHES_CLEAR": "Очищать кэши",
-                "CACHES_TOGGLE": "Включать и отключать кэши",
-                "GARBAGE_COLLECTOR": "Логирование сборщика мусора",
-                "ENV_VALUES_READ": "Читать значения окружения",
-                "CONFIG_PROPS_VALUES_READ": "Читать значения свойств конфигурации"
-            }
+            "userReactivated": "Пользователь разблокирован"
         }
     },
     "Roles": {

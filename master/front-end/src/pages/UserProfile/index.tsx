@@ -20,8 +20,8 @@ import { useParams } from "react-router";
 
 import { EmptyHandler, Loader } from "@/components";
 import { fetchData, getUserFullName } from "@/helpers";
-import { type IRoleProfile, type IUser, StatefulRequest } from "@/models";
-import { getRolesFeed, getUserById } from "@/services";
+import { type IRoleProfile, type IUser, type IUserAuthorities, StatefulRequest } from "@/models";
+import { getRolesFeed, getUserAuthorities, getUserById } from "@/services";
 
 import { ChangeRoles } from "./ChangeRoles";
 import { EditUser } from "./EditUser";
@@ -36,12 +36,15 @@ const UserProfile = () => {
     const { userId } = useParams();
     const [userResponse, setUserResponse] = useState(StatefulRequest.loading<IUser>());
     const [rolesResponse, setRolesResponse] = useState(StatefulRequest.loading<IRoleProfile[]>());
+    const [authoritiesResponse, setAuthoritiesResponse] = useState(StatefulRequest.loading<IUserAuthorities>());
     const [editing, setEditing] = useState(false);
     const [changingRoles, setChangingRoles] = useState(false);
     const [suspending, setSuspending] = useState(false);
 
     const loadUser = useCallback((): void => {
         setUserResponse(StatefulRequest.loading<IUser>());
+        setAuthoritiesResponse(StatefulRequest.loading<IUserAuthorities>());
+        fetchData(setAuthoritiesResponse, () => getUserAuthorities(userId!));
         fetchData(setUserResponse, () => getUserById(userId!));
     }, [userId]);
 
@@ -81,7 +84,7 @@ const UserProfile = () => {
                         roles={rolesResponse.response}
                         onChangeRoles={() => setChangingRoles(true)}
                     />
-                    <ProfilePermissions user={user} />
+                    <ProfilePermissions authoritiesResponse={authoritiesResponse} />
                 </div>
             </div>
             <EditUser user={user} open={editing} onClose={() => setEditing(false)} onSaved={loadUser} />

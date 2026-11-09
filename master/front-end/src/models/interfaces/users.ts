@@ -220,3 +220,33 @@ export interface IUsersFilters {
      */
     userOrigins: EUserOrigin[];
 }
+
+export interface IAuthorityProfile {
+    /**
+     * Unique identifier of the authority
+     */
+    id: string;
+
+    /**
+     * Unique codename of the authority
+     */
+    codename: string;
+
+    /**
+     * Human-readable name of the authority
+     */
+    displayName: string;
+
+    /**
+     * Description of what the authority allows
+     */
+    description: string;
+}
+
+export interface IUserAuthorities {
+    /** Authorities granted through any of the user's roles, including inherited roles. */
+    effectiveAuthorities: IAuthorityProfile[];
+
+    /** Catalog authorities not granted through any of the user's roles. */
+    ungrantedAuthorities: IAuthorityProfile[];
+}

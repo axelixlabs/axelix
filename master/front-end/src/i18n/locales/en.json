@@ -892,19 +892,7 @@
             "reactivateBody": "{{name}} will be able to sign in again.",
             "reactivateConfirm": "Reactivate",
             "userSuspended": "User suspended",
-            "userReactivated": "User reactivated",
-            "Groups": {
-                "runtime": "Runtime operations",
-                "sensitive": "Sensitive values"
-            },
-            "Authorities": {
-                "SCHEDULED_TASKS_MODIFY": "Modify scheduled tasks",
-                "CACHES_CLEAR": "Clear caches",
-                "CACHES_TOGGLE": "Enable and disable caches",
-                "GARBAGE_COLLECTOR": "Garbage collector logging",
-                "ENV_VALUES_READ": "Read environment values",
-                "CONFIG_PROPS_VALUES_READ": "Read configuration property values"
-            }
+            "userReactivated": "User reactivated"
         }
     },
     "Roles": {

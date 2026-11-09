@@ -17,37 +17,39 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { IUser } from "@/models";
+import { EmptyHandler, Loader } from "@/components";
+import type { IUserAuthorities, StatefulRequest } from "@/models";
 
 import { ProfileCard } from "../ProfileCard";
-import { PERMISSION_GROUPS, effectiveAuthorities } from "../permissions";
 
 import { PermissionRow } from "./PermissionRow";
 import styles from "./styles.module.css";
 
 interface IProps {
-    /**
-     * User whose effective permissions are shown
-     */
-    user: IUser;
+    /** User-specific authority catalog from the backend. */
+    authoritiesResponse: StatefulRequest<IUserAuthorities>;
 }
 
-export const ProfilePermissions = ({ user }: IProps) => {
+export const ProfilePermissions = ({ authoritiesResponse }: IProps) => {
     const { t } = useTranslation();
-    const granted = effectiveAuthorities(user.roles);
+    const authorities = authoritiesResponse.response;
 
     return (
         <ProfileCard title={t("Users.Profile.permissions")} hint={t("Users.Profile.permissionsHint")}>
-            {PERMISSION_GROUPS.map((group) => (
-                <div key={group.id} className={styles.GroupBlock}>
-                    <div className={`TextCaps ${styles.Group}`}>{t(`Users.Profile.Groups.${group.id}`)}</div>
-                    <div className={styles.Grid}>
-                        {group.authorities.map((authority) => (
-                            <PermissionRow key={authority} authority={authority} granted={granted.has(authority)} />
-                        ))}
-                    </div>
+            {authoritiesResponse.loading ? (
+                <Loader />
+            ) : authoritiesResponse.error || !authorities ? (
+                <EmptyHandler isEmpty />
+            ) : (
+                <div className={styles.Grid}>
+                    {authorities.effectiveAuthorities.map((authority) => (
+                        <PermissionRow key={authority.id} authority={authority} granted />
+                    ))}
+                    {authorities.ungrantedAuthorities.map((authority) => (
+                        <PermissionRow key={authority.id} authority={authority} granted={false} />
+                    ))}
                 </div>
-            ))}
+            )}
         </ProfileCard>
     );
 };
