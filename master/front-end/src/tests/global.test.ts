@@ -69,10 +69,10 @@ describe("getCookie", () => {
     });
 
     it("Should handle both the JWT access cookie and the Authorities metadata cookie", () => {
-        document.cookie = "authorities=[SCHEDULED_TASKS_MODIFY,CACHES_TOGGLE];auth_token=jwt-token";
+        document.cookie = "authorities=[scheduled-tasks:write,caches:toggle];auth_token=jwt-token";
 
         expect(getCookie("auth_token")).toBe("jwt-token");
-        expect(getCookie("authorities")).toBe("[SCHEDULED_TASKS_MODIFY,CACHES_TOGGLE]");
+        expect(getCookie("authorities")).toBe("[scheduled-tasks:write,caches:toggle]");
     });
 
     it("Should handle no requested cookie found", () => {
@@ -101,9 +101,15 @@ describe("getCookie", () => {
 
 describe("parseAuthorities", () => {
     it("Should handle common path", () => {
-        expect(parseAuthorities("[SCHEDULED_TASKS_MODIFY,CACHES_TOGGLE]")).toEqual([
+        expect(
+            parseAuthorities("[scheduled-tasks:write,caches:clear,caches:toggle,gc:manage,users:read,license:enter]"),
+        ).toEqual([
             EAuthorities.SCHEDULED_TASKS_MODIFY,
+            EAuthorities.CACHES_CLEAR,
             EAuthorities.CACHES_TOGGLE,
+            EAuthorities.GARBAGE_COLLECTOR,
+            EAuthorities.USERS_VIEW,
+            EAuthorities.LICENSE_ENTER,
         ]);
     });
 

@@ -59,10 +59,10 @@ export enum EPlatformName {
 }
 
 export enum EAuthorities {
-    SCHEDULED_TASKS_MODIFY = "SCHEDULED_TASKS_MODIFY",
-    CACHES_CLEAR = "CACHES_CLEAR",
-    CACHES_TOGGLE = "CACHES_TOGGLE",
-    GARBAGE_COLLECTOR = "GARBAGE_COLLECTOR",
-    USERS_VIEW = "USERS_VIEW",
+    SCHEDULED_TASKS_MODIFY = "scheduled-tasks:write",
+    CACHES_CLEAR = "caches:clear",
+    CACHES_TOGGLE = "caches:toggle",
+    GARBAGE_COLLECTOR = "gc:manage",
+    USERS_VIEW = "users:read",
     LICENSE_ENTER = "license:enter",
 }

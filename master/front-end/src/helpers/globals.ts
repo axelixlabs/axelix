@@ -159,7 +159,7 @@ export const parseAuthorities = (authorities: string): EAuthorities[] => {
     const authorityNames = authoritiesWithoutBrackets.split(",");
     const trimmedAuthorityNames = authorityNames.map((authorityName) => authorityName.trim());
 
-    return trimmedAuthorityNames
-        .map((authorityName) => EAuthorities[authorityName as keyof typeof EAuthorities])
-        .filter((value) => value !== undefined && value !== null);
+    return trimmedAuthorityNames.filter((authorityName): authorityName is EAuthorities =>
+        Object.values(EAuthorities).includes(authorityName as EAuthorities),
+    );
 };
