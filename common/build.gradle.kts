@@ -3,7 +3,7 @@ import net.ltgt.gradle.errorprone.errorprone
 plugins {
     id("common")
     id("contracts")
-    `java-test-fixtures`
+    id("java-test-fixtures")
 }
 
 val jsonUnitAssertJVersion = "2.40.1"
