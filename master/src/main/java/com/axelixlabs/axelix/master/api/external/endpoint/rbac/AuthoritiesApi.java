@@ -30,7 +30,7 @@ import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
 /**
  * The API for reading the authority catalog.
  *
- * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @ExternalApiRestController
 public class AuthoritiesApi {

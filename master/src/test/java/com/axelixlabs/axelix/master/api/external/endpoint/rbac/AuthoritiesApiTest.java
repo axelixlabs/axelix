@@ -42,7 +42,7 @@ import static org.assertj.core.groups.Tuple.tuple;
 /**
  * Integration tests for {@link AuthoritiesApi}.
  *
- * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate
