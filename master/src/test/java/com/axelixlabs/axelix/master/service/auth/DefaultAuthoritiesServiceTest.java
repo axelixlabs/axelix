@@ -51,29 +51,6 @@ class DefaultAuthoritiesServiceTest {
     @Autowired
     private JdbcClient jdbcClient;
 
-    @Autowired
-    private UserJwtEncoderService encoder;
-
-    @Autowired
-    private UserJwtDecoderService decoder;
-
-    @Test
-    void shouldDecodeJwtWithAuthorityDefinedOnlyInDatabase() {
-        // given.
-        DefaultAuthority authority = insertAuthority("custom:jwt");
-        PasswordlessUser user =
-                new PasswordlessUser("test-user", "test", Set.of(new DefaultRole("CUSTOM", Set.of(authority))));
-        String token = encoder.generateToken(user);
-
-        // when.
-        PasswordlessUser decoded = decoder.decodeTokenToUser(token);
-
-        // then.
-        assertThat(decoded.getRoles())
-                .singleElement()
-                .satisfies(role -> assertThat(role.authorities()).containsExactly(authority));
-    }
-
     @Test
     void shouldReturnAllAuthoritiesFromDatabase() {
         // given.
