@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ERoles, EUserDisplayStatus, EUserOrigin, EUserStatus } from "../enums/users";
+import type { ERoles, EUserDisplayStatus, EUserOrigin, EUserStatus } from "@/models";
 
 export interface IUser {
     /**
