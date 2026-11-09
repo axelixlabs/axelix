@@ -119,7 +119,7 @@ class ProxyingEndpointProberTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"1.1.0", "1.1.1", "1.2.0", "1.2.1", "1.2.2"})
-    void shouldForwardCallerTokenToRegisteredLegacyStarter(String version) throws InterruptedException {
+    void shouldReissueCallerTokenForRegisteredLegacyStarter(String version) throws InterruptedException {
         // given.
         Instance instance = instance(version);
         server.enqueue(new MockResponse().setBody("legacy-response"));
@@ -134,7 +134,14 @@ class ProxyingEndpointProberTest {
         // then.
         RecordedRequest request = server.takeRequest();
         assertThat(request.getPath()).isEqualTo("/actuator/axelix-env");
-        assertThat(request.getHeader("Authorization")).isEqualTo("Bearer " + callerToken);
+        String token = request.getHeader("Authorization").substring("Bearer ".length());
+        assertThat(token).isNotEqualTo(callerToken);
+        assertThat(claims(token).getSubject()).isEqualTo(caller.getUsername());
+        assertThat(claims(token).get("uid")).isEqualTo(caller.getId());
+        assertThat(Duration.between(
+                        claims(token).getIssuedAt().toInstant(),
+                        claims(token).getExpiration().toInstant()))
+                .isEqualTo(Duration.ofMinutes(5));
         assertThat(new String(response, java.nio.charset.StandardCharsets.UTF_8))
                 .isEqualTo("legacy-response");
     }
@@ -201,7 +208,10 @@ class ProxyingEndpointProberTest {
                 new DefaultSecurityContext(callerToken));
 
         // then.
-        assertThat(server.takeRequest().getHeader("Authorization")).isEqualTo("Bearer " + callerToken);
+        String legacyToken = server.takeRequest().getHeader("Authorization").substring("Bearer ".length());
+        assertThat(legacyToken).isNotEqualTo(callerToken);
+        assertThat(claims(legacyToken).getSubject()).isEqualTo(caller.getUsername());
+        assertThat(claims(legacyToken).get("uid")).isEqualTo(caller.getId());
         String modernToken = server.takeRequest().getHeader("Authorization").substring("Bearer ".length());
         assertThat(claims(modernToken)).containsOnlyKeys("sub", "iat", "exp");
         assertThat(claims(modernToken).getSubject()).isEqualTo(TechUser.MASTER.getId());
