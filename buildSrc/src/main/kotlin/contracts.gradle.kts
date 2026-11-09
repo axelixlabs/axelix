@@ -48,7 +48,7 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
         val generate = tasks.register<GenerateTask>(
             "openApiGenerate" + bundle.split('-').joinToString("") { part -> part.replaceFirstChar(Char::uppercase) }) {
 
-            generatorName.set("java")
+            generatorName.set(if (featurePackage == "jwt") "contract.JwtJavaCodegen" else "java")
             library.set("resttemplate")
             inputSpec.set(document.absolutePath)
             outputDir.set(outputRoot.absolutePath)

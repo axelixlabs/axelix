@@ -60,10 +60,8 @@ public class DefaultTechUserJwtSerializer implements TechUserJwtSerializer {
     public String serialize(TechUser techUser) throws JwtTokenGenerationException {
         try {
             Instant now = Instant.now();
-            TechUserJwtToken token = new TechUserJwtToken()
-                    .sub(techUser.getId())
-                    .iat(now.getEpochSecond())
-                    .exp(now.plus(LIFESPAN).getEpochSecond());
+            TechUserJwtToken token = new TechUserJwtToken(
+                    techUser.getId(), now.getEpochSecond(), now.plus(LIFESPAN).getEpochSecond());
             return signingStrategy
                     .signToken(Jwts.builder().content(OBJECT_MAPPER.writeValueAsBytes(token)), signingKey)
                     .compact();
