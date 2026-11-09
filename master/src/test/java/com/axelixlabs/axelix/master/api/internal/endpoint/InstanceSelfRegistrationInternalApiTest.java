@@ -260,8 +260,9 @@ public class InstanceSelfRegistrationInternalApiTest {
         String request = JSON_REQUEST.replace("1.0.0-SNAPSHOT", starterVersion);
 
         // when.
-        ResponseEntity<Void> response = restTemplate.withoutToken().postForEntity(
-                "/api/internal/service/register", new HttpEntity<>(request, headers), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .withoutToken()
+                .postForEntity("/api/internal/service/register", new HttpEntity<>(request, headers), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(HttpStatus.NO_CONTENT);
@@ -458,8 +459,9 @@ public class InstanceSelfRegistrationInternalApiTest {
         String request = JSON_REQUEST.replace("1.0.0-SNAPSHOT", starterVersion);
 
         // when.
-        ResponseEntity<Void> response = restTemplate.withoutToken().postForEntity(
-                "/api/internal/service/register", new HttpEntity<>(request, headers), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .withoutToken()
+                .postForEntity("/api/internal/service/register", new HttpEntity<>(request, headers), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -481,17 +483,19 @@ public class InstanceSelfRegistrationInternalApiTest {
                                 .issuedAt(Date.from(now))
                                 .expiration(Date.from(now.plusSeconds(300)))
                                 .claim("uid", "AXELIX.STARTER")
-                                .claim("roles", List.of(Map.of(
-                                        "name", "MANAGED_SERVICE",
-                                        "authorities", List.of("INTERNAL.HEARTBEAT"),
-                                        "components", List.of()))),
+                                .claim(
+                                        "roles",
+                                        List.of(Map.of(
+                                                "name", "MANAGED_SERVICE",
+                                                "authorities", List.of("INTERNAL.HEARTBEAT"),
+                                                "components", List.of()))),
                         properties.signingKey())
                 .compact();
         return Stream.of(
                 Arguments.of("1.1 legacy token", "1.1.0", legacyToken),
                 Arguments.of("1.2 legacy token", "1.2.0", legacyToken),
-                Arguments.of("1.3 technical-user token", "1.3.0-SNAPSHOT",
-                        serializer.serialize(TechUser.MANAGED_SERVICE)));
+                Arguments.of(
+                        "1.3 technical-user token", "1.3.0-SNAPSHOT", serializer.serialize(TechUser.MANAGED_SERVICE)));
     }
 
     @Test
