@@ -49,6 +49,7 @@ import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 
+import static com.axelixlabs.axelix.common.testfixtures.JwtSchemaAssertions.assertJwtPayloadMatchesSchema;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,6 +94,7 @@ class DefaultUserJwtEncoderServiceTest {
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
         AxelixJwtToken payload = new ObjectMapper().readValue(getPayload(token), AxelixJwtToken.class);
         assertThat(payload.getSub()).isEqualTo(user.getUsername());
         assertThat(payload.getUid()).isEqualTo(user.getId());
@@ -122,6 +124,7 @@ class DefaultUserJwtEncoderServiceTest {
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
         Jws<Claims> claims = Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
                 .build()
@@ -153,6 +156,7 @@ class DefaultUserJwtEncoderServiceTest {
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
         // language=json
         String expectedPayload = String.format(
                 "{" + "  \"sub\": \"%s\","
@@ -185,6 +189,7 @@ class DefaultUserJwtEncoderServiceTest {
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
         // language=json
         String expectedPayload = String.format(
                 "{" + "  \"sub\": \"%s\","
@@ -217,6 +222,7 @@ class DefaultUserJwtEncoderServiceTest {
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
         // language=json
         String expectedPayload = String.format(
                 "{" + "  \"sub\": \"%s\","
@@ -245,6 +251,7 @@ class DefaultUserJwtEncoderServiceTest {
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
         // language=json
         String expectedPayload = String.format(
                 "{" + "  \"sub\": \"%s\","
@@ -294,6 +301,7 @@ class DefaultUserJwtEncoderServiceTest {
         String token = userJwtEncoderService.generateToken(user);
 
         // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
         // language=json
         String expectedPayload = String.format("{" + "  \"sub\": \"%s\"," + "  \"roles\": []" + "}", USER_NAME);
 
@@ -309,6 +317,9 @@ class DefaultUserJwtEncoderServiceTest {
 
         // when.
         String token = encoder.generateToken(user);
+
+        // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
 
         // header
         // language=json
@@ -352,6 +363,9 @@ class DefaultUserJwtEncoderServiceTest {
         // when.
         String token = encoder.generateToken(user);
 
+        // then.
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
+
         // header
         // language=json
         String expectedHeader = "{\"alg\": \"HS384\"}";
@@ -392,6 +406,7 @@ class DefaultUserJwtEncoderServiceTest {
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
         String token = userJwtEncoderService.generateToken(user);
 
+        assertJwtPayloadMatchesSchema(token, "MasterJwtToken");
         assertThat(token.split("\\.")).hasSize(3);
     }
 

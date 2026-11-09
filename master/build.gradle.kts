@@ -34,6 +34,7 @@ val jackson2Version = "2.21.7"
 dependencies {
     // Self
     api(project(":common"))
+    testImplementation(testFixtures(project(":common")))
 
     // Impl
     api(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))

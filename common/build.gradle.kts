@@ -3,11 +3,15 @@ import net.ltgt.gradle.errorprone.errorprone
 plugins {
     id("common")
     id("contracts")
+    id("java-test-fixtures")
 }
 
 val jsonUnitAssertJVersion = "2.40.1"
 
 dependencies {
+    testFixturesImplementation("com.github.erosb:json-sKema:0.25.0")
+    testFixturesImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.3")
+
     // Compile: the generated contract classes carry Jackson annotations, which is the only piece
     // of Jackson we allow for these models: the annotations are honored by both Jackson 2 (Spring
     // Boot 2/3 starters) and Jackson 3 (Spring Boot 4 starter), and the compileOnly scope leaks
