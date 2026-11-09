@@ -294,10 +294,42 @@ jobs:
           # TODO: that will not work in case we would have multiple charts
           values: charts/axelix/values.yaml
 
-      - name: Package the Helm chart
+      - name: Package and sign the Helm chart
+        env:
+          GNUPGHOME: ${{ runner.temp }}/helm-gnupg
+          PRODUCTION_GPG_SECRET_KEY: ${{ env.PRODUCTION_GPG_SECRET_KEY }}
+          PRODUCTION_GPG_SECRET_KEY_PASSPHRASE: ${{ env.PRODUCTION_GPG_SECRET_KEY_PASSPHRASE }}
         run: |
+          set -euo pipefail
+          : "${PRODUCTION_GPG_SECRET_KEY:?Bitwarden did not provide the Maven signing key}"
+          : "${PRODUCTION_GPG_SECRET_KEY_PASSPHRASE:?Bitwarden did not provide the Maven signing passphrase}"
+
+          umask 077
+          
+          keyring="${RUNNER_TEMP}/helm-signing-keyring.gpg"
+          trap 'rm -f "${keyring}"' EXIT
+          mkdir -m 700 "${GNUPGHOME}"
+          printf '%s' "${PRODUCTION_GPG_SECRET_KEY}" | gpg --batch --import
+          
+          signing_uid="$(gpg --batch --list-secret-keys --with-colons | awk -F: '$1 == "uid" { print $10; exit }')"
+          if [ -z "${signing_uid}" ]; then
+            echo "Could not find a GPG key UID" >&2
+            exit 1
+          fi
+          
+          printf '%s' "${PRODUCTION_GPG_SECRET_KEY_PASSPHRASE}" | gpg --batch --pinentry-mode loopback \
+            --passphrase-fd 0 \
+            --export-secret-keys "${signing_uid}" > "${keyring}"
+          
           cp values.schema.json charts/axelix/
-          helm package charts/axelix --destination helm-chart-dist
+          mkdir -p helm-chart-dist
+          
+          printf '%s' "${PRODUCTION_GPG_SECRET_KEY_PASSPHRASE}" | helm package charts/axelix \
+            --destination helm-chart-dist \
+            --sign \
+            --key "${signing_uid}" \
+            --keyring "${keyring}" \
+            --passphrase-file -
 
       - name: Create and push the fleet release tag
         run: |
@@ -333,4 +365,5 @@ jobs:
             --title "${RELEASE_TAG}" \
             --notes "TODO: release notes" \
             "axelix-${RELEASE_TAG}.jar" \
-            "helm-chart-dist/axelix-${RELEASE_TAG}.tgz"
+            "helm-chart-dist/axelix-${RELEASE_TAG}.tgz" \
+            "helm-chart-dist/axelix-${RELEASE_TAG}.tgz.prov"
