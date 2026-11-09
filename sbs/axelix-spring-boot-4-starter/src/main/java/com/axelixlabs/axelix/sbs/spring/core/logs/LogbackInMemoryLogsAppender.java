@@ -21,7 +21,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
-import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
  * @author Mikhail Polivakha
  * @see Log4j2InMemoryLogsAppender
  */
-public class LogbackInMemoryLogsAppender extends AppenderBase<ILoggingEvent> {
+public class LogbackInMemoryLogsAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
     private static final String APPENDER_NAME = "axelix-in-memory-logs";
 

@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 /**
  * Logback appender that detects Hibernate's in-memory pagination by intercepting
@@ -28,7 +28,7 @@ import ch.qos.logback.core.AppenderBase;
  *
  * @author Nikita Kirillov
  */
-public class LogbackInMemoryPaginationAppender extends AppenderBase<ILoggingEvent> {
+public class LogbackInMemoryPaginationAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
     // Only for Hibernate 5.x (Spring Boot 2.x).
     private static final String HHH000104 = "HHH000104";

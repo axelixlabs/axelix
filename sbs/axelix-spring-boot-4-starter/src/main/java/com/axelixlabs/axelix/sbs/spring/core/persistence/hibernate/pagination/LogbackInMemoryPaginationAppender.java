@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.InMemoryPaginationHolder;
 
@@ -33,7 +33,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.InMemoryPagin
  *
  * @author Nikita Kirillov
  */
-public class LogbackInMemoryPaginationAppender extends AppenderBase<ILoggingEvent> {
+public class LogbackInMemoryPaginationAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
     // Only for Hibernate 6.x – 7.3.x (Spring Boot 3.x and 4.0.x).
     private static final String HHH90003004 = "HHH90003004";
