@@ -20,10 +20,14 @@ package com.axelixlabs.axelix.master.api.internal.endpoint;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,10 +47,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
@@ -435,17 +442,22 @@ public class InstanceSelfRegistrationInternalApiTest {
         assertThat(jdbcAggregateTemplate.findAll(ApplicationDependencies.class)).isEmpty();
     }
 
-    @Test
-    void shouldRefreshInstanceOnHeartbeatV2() {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("heartbeatTokens")
+    void shouldRefreshInstanceOnHeartbeatV2(String format, String token) {
         // given.
         restTemplate
                 .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // when.
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
         ResponseEntity<Void> response = restTemplate
-                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
-                .postForEntity("/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT_V2), Void.class);
+                .withoutToken()
+                .postForEntity(
+                        "/api/internal/service/heartbeat/v2", new HttpEntity<>(JSON_HEARTBEAT_V2, headers), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -481,6 +493,30 @@ public class InstanceSelfRegistrationInternalApiTest {
                 .containsExactlyInAnyOrder(
                         tuple(Instant.parse("2026-09-27T10:00:00.123Z"), ScheduledTaskLaunchType.SCHEDULED),
                         tuple(Instant.parse("2026-09-27T10:01:00.456Z"), ScheduledTaskLaunchType.MANUAL));
+    }
+
+    private static Stream<Arguments> heartbeatTokens(
+            @Autowired JwtProperties properties, @Autowired TechUserJwtSerializer serializer) {
+        Instant now = Instant.now();
+        // The starter before 1.3 used this subject and nested role, not the new technical-user identity.
+        String legacyToken = JwtSigningStrategyFactory.createSigningStrategy(properties.algorithm())
+                .signToken(
+                        Jwts.builder()
+                                .subject("AXELIX.STARTER")
+                                .issuedAt(Date.from(now))
+                                .expiration(Date.from(now.plusSeconds(300)))
+                                .claim("uid", "AXELIX.STARTER")
+                                .claim(
+                                        "roles",
+                                        List.of(Map.of(
+                                                "name", "MANAGED_SERVICE",
+                                                "authorities", List.of("INTERNAL.HEARTBEAT"),
+                                                "components", List.of()))),
+                        properties.signingKey())
+                .compact();
+        return Stream.of(
+                Arguments.of("legacy starter token", legacyToken),
+                Arguments.of("technical-user token", serializer.serialize(TechUser.MANAGED_SERVICE)));
     }
 
     @ParameterizedTest(name = "{0}")

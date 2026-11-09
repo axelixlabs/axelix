@@ -20,11 +20,12 @@ package com.axelixlabs.axelix.master.api.external.response;
 import com.axelixlabs.axelix.master.repository.AuthorityRepository.AuthorityProfile;
 
 /**
- * Public view of an authority, including its identifier, unique codename and description.
+ * Public view of an authority, including its identifier, unique codename, display name and description.
  */
-public record AuthorityProfileResponse(String id, String codename, String description) {
+public record AuthorityProfileResponse(String id, String codename, String displayName, String description) {
 
     public static AuthorityProfileResponse from(AuthorityProfile authority) {
-        return new AuthorityProfileResponse(authority.id(), authority.codename(), authority.description());
+        return new AuthorityProfileResponse(
+                authority.id(), authority.codename(), authority.displayName(), authority.description());
     }
 }

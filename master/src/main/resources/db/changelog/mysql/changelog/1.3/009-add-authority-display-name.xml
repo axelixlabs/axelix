@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.3-009-mysql-add-authority-display-name" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="authorities" columnName="display_name"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="authorities">
+      <column name="display_name" type="VARCHAR(255)"/>
+    </addColumn>
+
+    <update tableName="authorities">
+      <column name="display_name" valueComputed="codename"/>
+    </update>
+    <update tableName="authorities">
+      <column name="display_name" value="View Environment Values"/>
+      <where>codename = 'environment.values:read'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="display_name" value="View Configuration Property Values"/>
+      <where>codename = 'config-properties.values:read'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="display_name" value="Manage Scheduled Tasks"/>
+      <where>codename = 'scheduled-tasks:write'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="display_name" value="Clear Caches"/>
+      <where>codename = 'caches:clear'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="display_name" value="Enable or Disable Caches"/>
+      <where>codename = 'caches:toggle'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="display_name" value="Manage Garbage Collection"/>
+      <where>codename = 'gc:manage'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="display_name" value="View Users"/>
+      <where>codename = 'users:read'</where>
+    </update>
+    <update tableName="authorities">
+      <column name="display_name" value="Manage Users"/>
+      <where>codename = 'users:manage'</where>
+    </update>
+
+    <addNotNullConstraint tableName="authorities" columnName="display_name" columnDataType="VARCHAR(255)"/>
+  </changeSet>
+</databaseChangeLog>

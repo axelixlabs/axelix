@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 
 /**
  * Integration tests for {@link AuthoritiesApi}.
@@ -84,8 +85,20 @@ class AuthoritiesApiTest extends AbstractProtectedEndpointTest {
                 .contains("users:read", "users:manage");
         assertThat(response.getBody()).allSatisfy(authority -> {
             assertThat(authority.id()).isNotBlank();
+            assertThat(authority.displayName()).isNotBlank();
             assertThat(authority.description()).isNotBlank();
         });
+        assertThat(response.getBody())
+                .extracting(AuthorityProfileResponse::codename, AuthorityProfileResponse::displayName)
+                .containsExactlyInAnyOrder(
+                        tuple("environment.values:read", "View Environment Values"),
+                        tuple("config-properties.values:read", "View Configuration Property Values"),
+                        tuple("scheduled-tasks:write", "Manage Scheduled Tasks"),
+                        tuple("caches:clear", "Clear Caches"),
+                        tuple("caches:toggle", "Enable or Disable Caches"),
+                        tuple("gc:manage", "Manage Garbage Collection"),
+                        tuple("users:read", "View Users"),
+                        tuple("users:manage", "Manage Users"));
         assertSuccessfulCallback(MasterWebEndpoints.AUTHORITIES_READ, viewer.getActor());
     }
 

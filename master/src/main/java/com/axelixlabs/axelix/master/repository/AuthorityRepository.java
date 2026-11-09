@@ -37,13 +37,16 @@ public class AuthorityRepository {
         this.jdbcClient = jdbcClient;
     }
 
-    public record AuthorityProfile(String id, String codename, String description) {}
+    public record AuthorityProfile(String id, String codename, String displayName, String description) {}
 
     public List<AuthorityProfile> findAllProfiles() {
         return jdbcClient
-                .sql("SELECT id, codename, description FROM authorities ORDER BY codename")
-                .query((rs, rowNum) ->
-                        new AuthorityProfile(rs.getString("id"), rs.getString("codename"), rs.getString("description")))
+                .sql("SELECT id, codename, display_name, description FROM authorities ORDER BY codename")
+                .query((rs, rowNum) -> new AuthorityProfile(
+                        rs.getString("id"),
+                        rs.getString("codename"),
+                        rs.getString("display_name"),
+                        rs.getString("description")))
                 .list();
     }
 
