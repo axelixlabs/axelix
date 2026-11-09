@@ -20,10 +20,14 @@ package com.axelixlabs.axelix.master.api.internal.endpoint;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,10 +47,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
+import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskLaunchType;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
@@ -243,12 +250,18 @@ public class InstanceSelfRegistrationInternalApiTest {
         capturingIamWebInterceptor.reset();
     }
 
-    @Test
-    void shouldRegisterServiceInstance() {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("registrationTokens")
+    void shouldRegisterServiceInstance(String format, String starterVersion, String token) {
+        // given.
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        String request = JSON_REQUEST.replace("1.0.0-SNAPSHOT", starterVersion);
+
         // when.
-        ResponseEntity<Void> response = restTemplate
-                .withTechUserTokenInAuthorizationHeader(TechUser.MANAGED_SERVICE)
-                .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
+        ResponseEntity<Void> response = restTemplate.withoutToken().postForEntity(
+                "/api/internal/service/register", new HttpEntity<>(request, headers), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(HttpStatus.NO_CONTENT);
@@ -261,7 +274,7 @@ public class InstanceSelfRegistrationInternalApiTest {
                     .isEqualTo(ApplicationId.of("org.springframework.samples", "petclinic"));
             assertThat(instance.name()).isEqualTo("petclinic");
             assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
-            assertThat(instance.starterVersion()).isEqualTo("1.0.0-SNAPSHOT");
+            assertThat(instance.starterVersion()).isEqualTo(starterVersion);
             assertThat(instance.javaVersion()).isEqualTo(new JavaVersion(25, 0, 0, 0));
             assertThat(instance.springBootVersion()).isEqualTo("3.5.0");
             assertThat(instance.springFrameworkVersion()).isEqualTo("6.1.2");
@@ -433,6 +446,53 @@ public class InstanceSelfRegistrationInternalApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isPresent();
         assertThat(jdbcAggregateTemplate.findAll(ApplicationDependencies.class)).isEmpty();
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("registrationTokens")
+    void shouldRefreshExistingInstanceOnRegistration(String format, String starterVersion, String token) {
+        // given. Older starters use repeated registration as their heartbeat.
+        instanceRegistry.register(TestInstanceFactory.withStarterVersion(TEST_INSTANCE_ID, starterVersion));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        String request = JSON_REQUEST.replace("1.0.0-SNAPSHOT", starterVersion);
+
+        // when.
+        ResponseEntity<Void> response = restTemplate.withoutToken().postForEntity(
+                "/api/internal/service/register", new HttpEntity<>(request, headers), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).get().satisfies(instance -> {
+            assertThat(instance.starterVersion()).isEqualTo(starterVersion);
+            assertThat(instance.memoryUsage().heap()).isEqualTo(12000.0);
+            assertThat(instance.latestHeartBeat()).isNotNull();
+        });
+    }
+
+    private static Stream<Arguments> registrationTokens(
+            @Autowired JwtProperties properties, @Autowired TechUserJwtSerializer serializer) {
+        Instant now = Instant.now();
+        // Match the subject and role claims emitted by starters before 1.3.
+        String legacyToken = JwtSigningStrategyFactory.createSigningStrategy(properties.algorithm())
+                .signToken(
+                        Jwts.builder()
+                                .subject("AXELIX.STARTER")
+                                .issuedAt(Date.from(now))
+                                .expiration(Date.from(now.plusSeconds(300)))
+                                .claim("uid", "AXELIX.STARTER")
+                                .claim("roles", List.of(Map.of(
+                                        "name", "MANAGED_SERVICE",
+                                        "authorities", List.of("INTERNAL.HEARTBEAT"),
+                                        "components", List.of()))),
+                        properties.signingKey())
+                .compact();
+        return Stream.of(
+                Arguments.of("1.1 legacy token", "1.1.0", legacyToken),
+                Arguments.of("1.2 legacy token", "1.2.0", legacyToken),
+                Arguments.of("1.3 technical-user token", "1.3.0-SNAPSHOT",
+                        serializer.serialize(TechUser.MANAGED_SERVICE)));
     }
 
     @Test

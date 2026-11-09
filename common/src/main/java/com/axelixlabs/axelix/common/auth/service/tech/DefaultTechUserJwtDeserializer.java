@@ -76,6 +76,11 @@ public class DefaultTechUserJwtDeserializer implements TechUserJwtDeserializer {
      * is not yet known. That token must be accepted by both older starters and starters from 1.3 onward.
      */
     private TechUser resolveTechUser(String subject) {
+        // Starters before 1.3 use this subject for registration and repeated registration heartbeats.
+        // Remove this alias in 1.6, when those starters leave the compatibility window.
+        if ("AXELIX.STARTER".equals(subject)) {
+            return TechUser.MANAGED_SERVICE;
+        }
         for (TechUser techUser : TechUser.values()) {
             if (techUser.getId().equals(subject)) {
                 return techUser;

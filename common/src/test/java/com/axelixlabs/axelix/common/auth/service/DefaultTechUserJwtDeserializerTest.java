@@ -26,6 +26,7 @@ import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
@@ -69,12 +70,34 @@ class DefaultTechUserJwtDeserializerTest {
     }
 
     @Test
-    void shouldRejectTokenWithInvalidSignature() {
+    void shouldDeserializeLegacyStarterToken() {
         // given.
-        TechUserJwtSerializer anotherSerializer = new DefaultTechUserJwtSerializer(
-                JwtAlgorithm.HMAC256,
-                "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437");
-        String token = anotherSerializer.serialize(TechUser.MASTER);
+        String token = Jwts.builder()
+                .subject("AXELIX.STARTER")
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plusSeconds(300)))
+                .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
+
+        // when.
+        TechUser deserialized = deserializer.deserialize(token);
+
+        // then.
+        assertThat(deserialized).isEqualTo(TechUser.MANAGED_SERVICE);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"AXELIX.MASTER", "AXELX.MANAGED_SERVICE", "AXELIX.STARTER"})
+    void shouldRejectTokenWithInvalidSignature(String subject) {
+        // given.
+        String otherKey =
+                "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
+        String token = Jwts.builder()
+                .subject(subject)
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plusSeconds(300)))
+                .signWith(Keys.hmacShaKeyFor(otherKey.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
 
         // when / then.
         assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(InvalidJwtTokenException.class);
@@ -94,11 +117,12 @@ class DefaultTechUserJwtDeserializerTest {
         assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
     }
 
-    @Test
-    void shouldRejectMissingIssuedAtClaim() {
+    @ParameterizedTest
+    @ValueSource(strings = {"AXELIX.MASTER", "AXELX.MANAGED_SERVICE", "AXELIX.STARTER"})
+    void shouldRejectMissingIssuedAtClaim(String subject) {
         // given.
         String token = Jwts.builder()
-                .subject(TechUser.MASTER.getId())
+                .subject(subject)
                 .expiration(Date.from(Instant.now().plusSeconds(300)))
                 .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
                 .compact();
@@ -107,11 +131,12 @@ class DefaultTechUserJwtDeserializerTest {
         assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
     }
 
-    @Test
-    void shouldRejectMissingExpirationClaim() {
+    @ParameterizedTest
+    @ValueSource(strings = {"AXELIX.MASTER", "AXELX.MANAGED_SERVICE", "AXELIX.STARTER"})
+    void shouldRejectMissingExpirationClaim(String subject) {
         // given.
         String token = Jwts.builder()
-                .subject(TechUser.MASTER.getId())
+                .subject(subject)
                 .issuedAt(Date.from(Instant.now()))
                 .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
                 .compact();
@@ -120,11 +145,12 @@ class DefaultTechUserJwtDeserializerTest {
         assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
     }
 
-    @Test
-    void shouldRejectMissingLifetimeClaims() {
+    @ParameterizedTest
+    @ValueSource(strings = {"AXELIX.MASTER", "AXELX.MANAGED_SERVICE", "AXELIX.STARTER"})
+    void shouldRejectMissingLifetimeClaims(String subject) {
         // given.
         String token = Jwts.builder()
-                .subject(TechUser.MASTER.getId())
+                .subject(subject)
                 .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
                 .compact();
 
@@ -132,12 +158,13 @@ class DefaultTechUserJwtDeserializerTest {
         assertThatThrownBy(() -> deserializer.deserialize(token)).isInstanceOf(JwtParsingException.class);
     }
 
-    @Test
-    void shouldRejectExpiredToken() {
+    @ParameterizedTest
+    @ValueSource(strings = {"AXELIX.MASTER", "AXELX.MANAGED_SERVICE", "AXELIX.STARTER"})
+    void shouldRejectExpiredToken(String subject) {
         // given.
         Instant now = Instant.now();
         String token = Jwts.builder()
-                .subject(TechUser.MASTER.getId())
+                .subject(subject)
                 .issuedAt(Date.from(now.minusSeconds(120)))
                 .expiration(Date.from(now.minusSeconds(60)))
                 .signWith(Keys.hmacShaKeyFor(SIGNING_KEY.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
