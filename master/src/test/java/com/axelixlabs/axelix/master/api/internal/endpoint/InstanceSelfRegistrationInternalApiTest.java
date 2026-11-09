@@ -452,7 +452,6 @@ public class InstanceSelfRegistrationInternalApiTest {
     @MethodSource("registrationTokens")
     void shouldRefreshExistingInstanceOnRegistration(String format, String starterVersion, String token) {
         // given. Older starters use repeated registration as their heartbeat.
-        instanceRegistry.register(TestInstanceFactory.withStarterVersion(TEST_INSTANCE_ID, starterVersion));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
