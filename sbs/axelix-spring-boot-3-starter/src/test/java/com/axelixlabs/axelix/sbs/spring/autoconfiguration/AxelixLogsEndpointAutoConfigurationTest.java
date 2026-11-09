@@ -17,24 +17,18 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.time.Duration;
-
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.axelixlabs.axelix.common.contract.logs.LogEntry;
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.logs.AxelixLogsEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Integration tests for {@link AxelixLogsEndpointAutoConfiguration}
@@ -124,15 +118,16 @@ class AxelixLogsEndpointAutoConfigurationTest {
     }
 
     @Test
-    void shouldFailValidationWhenTheAmountOfLogEntriesIsNotPositive() {
+    void shouldFailWhenTheAmountOfLogEntriesIsNotPositive() {
+        // given.
         contextRunner
-                .withConfiguration(AutoConfigurations.of(ValidationListenerAutoConfiguration.class))
                 .withPropertyValues(
                         "management.endpoints.web.exposure.include=axelix-logs", "axelix.sbs.logs.max-entries=0")
-                .run(context -> assertThatThrownBy(() -> context.getBean(ValidationListener.class)
-                                .onApplicationEvent(new ApplicationReadyEvent(
-                                        new SpringApplication(), new String[] {}, context, Duration.ZERO)))
-                        .isInstanceOf(IllegalArgumentException.class));
+                .run(context -> {
+                    // when / then.
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure()).hasRootCauseInstanceOf(IllegalArgumentException.class);
+                });
     }
 
     private static void fill(SlidingWindow<LogEntry> logEntries, int amount) {

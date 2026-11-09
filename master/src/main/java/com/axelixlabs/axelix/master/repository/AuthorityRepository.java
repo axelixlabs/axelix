@@ -41,7 +41,8 @@ public class AuthorityRepository {
     // TODO:
     // This method should not exist. We should use getAll in all cases. Currently we use it because the authority model
     // in the domain is not aware of the display name or description.
-    // This will be fixed when we introduce the mapping table that moves all references and interconnections between authorities
+    // This will be fixed when we introduce the mapping table that moves all references and interconnections between
+    // authorities
     // and endpoints into the database in the dedicated mapping table.
     public List<AuthorityProfile> findAllProfiles() {
         return jdbcClient
