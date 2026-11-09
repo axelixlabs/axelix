@@ -19,10 +19,10 @@ package com.axelixlabs.axelix.master.service.auth.jwt;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.NullMarked;
@@ -35,7 +35,6 @@ import com.axelixlabs.axelix.common.contract.jwt.AxelixJwtToken;
 import com.axelixlabs.axelix.common.contract.jwt.JwtRole;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.Role;
-import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
 import com.axelixlabs.axelix.master.domain.auth.User;
 
 /**
@@ -48,6 +47,8 @@ import com.axelixlabs.axelix.master.domain.auth.User;
  */
 @NullMarked
 public class DefaultUserJwtEncoderService implements UserJwtEncoderService {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final JwtSigningStrategy signingStrategy;
 
@@ -85,12 +86,8 @@ public class DefaultUserJwtEncoderService implements UserJwtEncoderService {
 
         try {
             Instant now = Instant.now();
-            JwtBuilder builder = Jwts.builder()
-                    .subject(token.getSub())
-                    .issuedAt(Date.from(now))
-                    .expiration(Date.from(now.plus(lifespan)))
-                    .claim(TokenClaim.USER_ID.getEncoding(), token.getUid())
-                    .claim(TokenClaim.ROLES.getEncoding(), token.getRoles());
+            token.iat(now.getEpochSecond()).exp(now.plus(lifespan).getEpochSecond());
+            JwtBuilder builder = Jwts.builder().content(OBJECT_MAPPER.writeValueAsBytes(token));
 
             return signingStrategy.signToken(builder, signingKey).compact();
         } catch (JwtTokenGenerationException e) {

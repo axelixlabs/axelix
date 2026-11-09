@@ -58,7 +58,6 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
                 schemaMappings.set(mapOf(
                     "JwtClaims" to "AxelixJwtToken",
                     "MasterJwtToken" to "AxelixJwtToken",
-                    "StarterJwtToken" to "AxelixJwtToken",
                 ))
                 forcedGenerateSchemas.set(listOf("JwtClaims"))
             }
