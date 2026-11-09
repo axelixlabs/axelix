@@ -49,8 +49,8 @@ import com.axelixlabs.axelix.master.filter.auth.requestcontext.McpRequestContext
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 
 /**
  * Filter that authenticates requests to MCP endpoints using either OAuth2 Bearer tokens

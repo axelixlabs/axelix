@@ -26,9 +26,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
-import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
+import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,7 +49,7 @@ class DefaultMcpEndpointAuthorityResolverTest {
         Optional<Authority> result = subject.resolve(endpoint);
 
         // then.
-        assertThat(result).contains(OssAuthority.CACHES_CLEAR);
+        assertThat(result.map(Authority::getName)).contains(TestAuthorities.CACHES_CLEAR.getName());
     }
 
     @Test

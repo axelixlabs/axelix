@@ -34,15 +34,15 @@ public interface Role {
      *
      * @return the name of the role.
      */
-    String getName();
+    String name();
 
     /**
      * Returns the direct role's authorities, i.e. authorities this role grants on its
-     * own, without the ones that are inherited from other {@link #getComponents()}.
+     * own, without the ones that are inherited from other {@link #components()}.
      *
      * @return immutable set of {@link Authority} objects associated with this role
      */
-    Set<Authority> getAuthorities();
+    Set<Authority> authorities();
 
     /**
      * Component roles that are included in this role.
@@ -53,18 +53,18 @@ public interface Role {
      *
      * @return immutable set of {@link Role} objects included in this role
      */
-    Set<Role> getComponents();
+    Set<Role> components();
 
     /**
-     * Everything this role grants: its own {@link #getAuthorities() authorities} combined with the ones of every role
-     * reachable through its {@link #getComponents() components}, however deep.
+     * Everything this role grants: its own {@link #authorities() authorities} combined with the ones of every role
+     * reachable through its {@link #components() components}, however deep.
      *
      * @return immutable set of every {@link Authority} the role grants, directly or through a component
      */
     default Set<Authority> getEffectiveAuthorities() {
-        Set<Authority> all = new HashSet<>(getAuthorities());
+        Set<Authority> all = new HashSet<>(authorities());
 
-        for (Role component : getComponents()) {
+        for (Role component : components()) {
             all.addAll(component.getEffectiveAuthorities());
         }
 

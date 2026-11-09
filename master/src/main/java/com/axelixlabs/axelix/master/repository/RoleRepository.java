@@ -39,13 +39,16 @@ public class RoleRepository {
     }
 
     public List<RoleWithAuthorityName> findAllWithAuthorities() {
-        return jdbcClient.sql("""
+        return jdbcClient
+                .sql("""
             SELECT r.id AS role_id, r.name AS role_name, a.codename AS authority_name
             FROM roles r
             LEFT JOIN roles_authorities ra ON ra.role_id = r.id
             LEFT JOIN authorities a ON a.id = ra.authority_id
-            """).query((rs, rowNum) -> new RoleWithAuthorityName(
-                    rs.getString("role_id"), rs.getString("role_name"), rs.getString("authority_name"))).list();
+            """)
+                .query((rs, rowNum) -> new RoleWithAuthorityName(
+                        rs.getString("role_id"), rs.getString("role_name"), rs.getString("authority_name")))
+                .list();
     }
 
     public List<RoleParentBond> findAllParentBonds() {
@@ -68,13 +71,19 @@ public class RoleRepository {
      * with a members count of zero.
      */
     public List<RoleProfile> findRolesFeed() {
-        return jdbcClient.sql("""
+        return jdbcClient
+                .sql("""
             SELECT r.id AS id, r.name AS name, COUNT(ur.user_id) AS members_count, r.description AS description
             FROM roles r
             LEFT JOIN users_roles ur ON ur.role_id = r.id
             GROUP BY r.id, r.name, r.description
-            """).query((rs, rowNum) -> new RoleProfile(
-                    rs.getString("id"), rs.getString("name"), rs.getInt("members_count"), rs.getString("description"))).list();
+            """)
+                .query((rs, rowNum) -> new RoleProfile(
+                        rs.getString("id"),
+                        rs.getString("name"),
+                        rs.getInt("members_count"),
+                        rs.getString("description")))
+                .list();
     }
 
     public record RoleWithAuthorityName(

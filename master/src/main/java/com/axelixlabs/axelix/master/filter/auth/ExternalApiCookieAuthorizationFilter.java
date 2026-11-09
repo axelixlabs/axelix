@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -50,6 +49,7 @@ import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebReques
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 
 /**
  * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#SET_COOKIE Set-Cookie} header.

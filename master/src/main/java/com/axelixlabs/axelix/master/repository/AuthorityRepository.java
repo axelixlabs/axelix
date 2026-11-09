@@ -15,32 +15,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth;
+package com.axelixlabs.axelix.master.repository;
 
-import java.util.Set;
+import java.util.List;
 
-import org.jspecify.annotations.Nullable;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
-import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultAuthority;
 
 /**
- * An abstraction that serves as the single accessor for all the {@link Authority authorities}
- * in the application.
+ * Read access to the authorities catalog.
  *
  * @author Mikhail Polivakha
  */
-public interface AuthoritiesManager {
+@Repository
+public class AuthorityRepository {
+    private final JdbcClient jdbcClient;
 
-    /**
-     * Constructs the necessary authority
-     *
-     * @return the authority associated with the given {@code name}, or {@code null}, if there is no.
-     */
-    @Nullable
-    Authority decode(String name);
+    public AuthorityRepository(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
+    }
 
-    /**
-     * @return all the authorities this accessor is aware about.
-     */
-    Set<Authority> getAll();
+    public List<DefaultAuthority> findAll() {
+        return jdbcClient
+                .sql("SELECT id, codename FROM authorities")
+                .query((rs, rowNum) -> new DefaultAuthority(rs.getString("id"), rs.getString("codename")))
+                .list();
+    }
 }

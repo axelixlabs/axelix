@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -42,6 +42,7 @@ import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
 
 /**
  * Default implementation of {@link UserJwtDecoderService}.
@@ -53,14 +54,15 @@ import com.axelixlabs.axelix.master.domain.auth.TokenClaim;
 public class DefaultUserJwtDecoderService implements UserJwtDecoderService {
 
     private final JwtVerificationStrategy verificationStrategy;
-    private final AuthoritiesManager authoritiesManager;
+    private final AuthoritiesService authoritiesService;
     private final String signingKey;
 
-    public DefaultUserJwtDecoderService(AuthoritiesManager authoritiesManager, JwtAlgorithm algorithm, String signingKey) {
+    public DefaultUserJwtDecoderService(
+            AuthoritiesService authoritiesService, JwtAlgorithm algorithm, String signingKey) {
         Assert.notNull(algorithm, "The jwt signing algorithm is not specified, although it is required");
         Assert.notNull(signingKey, "The jwt signing key is not specified, although it is required");
 
-        this.authoritiesManager = authoritiesManager;
+        this.authoritiesService = authoritiesService;
         this.verificationStrategy = JwtVerificationStrategyFactory.createVerificationStrategy(algorithm);
         this.signingKey = Objects.requireNonNull(signingKey);
     }
@@ -97,12 +99,15 @@ public class DefaultUserJwtDecoderService implements UserJwtDecoderService {
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> rolesClaim = claims.get(TokenClaim.ROLES.getEncoding(), List.class);
 
+        Map<String, Authority> catalog =
+                authoritiesService.getAll().stream().collect(Collectors.toMap(Authority::getName, Function.identity()));
+
         return Optional.ofNullable(rolesClaim).orElse(List.of()).stream()
-                .map(this::mapToRole)
+                .map(role -> mapToRole(role, catalog))
                 .collect(Collectors.toSet());
     }
 
-    private Role mapToRole(Map<String, Object> roleMap) {
+    private Role mapToRole(Map<String, Object> roleMap, Map<String, Authority> catalog) {
         String roleName = (String) roleMap.get(TokenClaim.ROLE_NAME.getEncoding());
 
         if (roleName == null) {
@@ -114,7 +119,7 @@ public class DefaultUserJwtDecoderService implements UserJwtDecoderService {
                 (List<String>) roleMap.getOrDefault(TokenClaim.AUTHORITIES.getEncoding(), List.of());
 
         Set<Authority> authorities = authoritiesList.stream()
-                .map(authoritiesManager::decode)
+                .map(catalog::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -122,7 +127,8 @@ public class DefaultUserJwtDecoderService implements UserJwtDecoderService {
         List<Map<String, Object>> components =
                 (List<Map<String, Object>>) roleMap.getOrDefault("components", List.of());
 
-        Set<Role> componentRoles = components.stream().map(this::mapToRole).collect(Collectors.toSet());
+        Set<Role> componentRoles =
+                components.stream().map(role -> mapToRole(role, catalog)).collect(Collectors.toSet());
 
         return new DefaultRole(roleName, authorities, componentRoles);
     }

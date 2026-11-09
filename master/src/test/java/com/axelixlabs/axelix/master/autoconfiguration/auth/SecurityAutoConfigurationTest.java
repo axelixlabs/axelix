@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth;
 import java.util.Map;
 import java.util.Optional;
 
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -52,13 +51,14 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHand
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
+import com.axelixlabs.axelix.master.service.auth.basic.DatabaseUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcAuthorizeEndpointAdditionalParametersProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
-import com.axelixlabs.axelix.master.service.auth.basic.DatabaseUserAuthenticator;
-import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 

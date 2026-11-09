@@ -33,11 +33,11 @@ import org.springframework.test.context.TestPropertySource;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.User;
-import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
-import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesManager;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * Integration tests for {@link SuperAdminUserAuthenticator}.
@@ -55,7 +55,7 @@ class SuperAdminUserAuthenticatorTest {
     void setup() {
         this.contextRunner = new ApplicationContextRunner()
                 .withBean(BCryptPasswordEncoder.class, BCryptPasswordEncoder::new)
-                .withBean(AuthoritiesManager.class, () -> new DefaultAuthoritiesManager(null))
+                .withBean(AuthoritiesService.class, () -> mock(AuthoritiesService.class))
                 .withConfiguration(
                         AutoConfigurations.of(SecurityAutoConfiguration.SuperAdminLoginAutoConfiguration.class));
     }
@@ -132,7 +132,7 @@ class SuperAdminUserAuthenticatorTest {
             assertThat(user).isNotNull();
             assertThat(user.getUsername()).isEqualTo(USERNAME);
             assertThat(user.getRoles())
-                    .extracting(Role::getName)
+                    .extracting(Role::name)
                     .containsExactly(SuperAdminUserAuthenticator.SUPER_ADMIN_ROLE_NAME);
         }
 

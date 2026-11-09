@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
-import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 
@@ -36,10 +35,18 @@ public class DefaultMcpEndpointAuthorityResolver implements McpEndpointAuthority
     private static final Map<McpEndpoint, Authority> MAPPING;
 
     // TODO: Static configuration like here is not extensible at all. That is not going to work for unified distro
+    /*
+    TODO:
+
+    using codenames of authorities here is purely wrong. The authorities are NOT identified by their codename, but rather
+    by an ID, so this reference is going to potentially break. We need to reference authorities by their IDs.
+
+    The ultimate solution for the problem I guess would be to store that kind of mapping in the database.
+    */
     static {
         MAPPING = new HashMap<>(2);
-        MAPPING.put(McpEndpoints.CLEAR_ALL_CACHES, OssAuthority.CACHES_CLEAR);
-        MAPPING.put(McpEndpoints.CLEAR_SPECIFIC_CACHE, OssAuthority.CACHES_CLEAR);
+        MAPPING.put(McpEndpoints.CLEAR_ALL_CACHES, () -> "caches:clear");
+        MAPPING.put(McpEndpoints.CLEAR_SPECIFIC_CACHE, () -> "caches:clear");
     }
 
     @Override

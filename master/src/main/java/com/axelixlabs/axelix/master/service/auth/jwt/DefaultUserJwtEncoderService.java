@@ -55,7 +55,8 @@ public class DefaultUserJwtEncoderService implements UserJwtEncoderService {
 
     private final Duration lifespan;
 
-    public DefaultUserJwtEncoderService(final JwtAlgorithm algorithm, final String signingKey, final Duration lifespan) {
+    public DefaultUserJwtEncoderService(
+            final JwtAlgorithm algorithm, final String signingKey, final Duration lifespan) {
         this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
         this.signingKey = signingKey;
         this.lifespan = lifespan;
@@ -115,11 +116,11 @@ public class DefaultUserJwtEncoderService implements UserJwtEncoderService {
 
     private JwtRole toJwtRole(Role role) {
         List<String> authorities =
-                role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList());
+                role.authorities().stream().map(Authority::getName).collect(Collectors.toList());
 
         List<JwtRole> components =
-                role.getComponents().stream().map(this::toJwtRole).collect(Collectors.toList());
+                role.components().stream().map(this::toJwtRole).collect(Collectors.toList());
 
-        return new JwtRole().name(role.getName()).authorities(authorities).components(components);
+        return new JwtRole().name(role.name()).authorities(authorities).components(components);
     }
 }

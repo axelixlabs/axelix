@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.ObjectMapper;
@@ -62,31 +60,33 @@ import com.axelixlabs.axelix.master.mcp.auth.McpEndpointResolver;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
-import com.axelixlabs.axelix.master.service.auth.AuthoritiesManager;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository;
+import com.axelixlabs.axelix.master.service.auth.AuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesManager;
-import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesManager.AuthoritiesContributor;
+import com.axelixlabs.axelix.master.service.auth.DefaultAuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.DefaultAuthorizer;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.auth.SuperAdminPasswordEncoder;
+import com.axelixlabs.axelix.master.service.auth.basic.CompositeUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.DatabaseUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathJsonInspector;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcAuthorizeEndpointAdditionalParametersProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
-import com.axelixlabs.axelix.master.service.auth.basic.CompositeUserAuthenticator;
-import com.axelixlabs.axelix.master.service.auth.basic.DatabaseUserAuthenticator;
-import com.axelixlabs.axelix.master.service.auth.basic.SuperAdminUserAuthenticator;
-import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
@@ -138,9 +138,9 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
-    public AuthoritiesManager authoritiesManager(ObjectProvider<AuthoritiesContributor> authoritiesContributor) {
+    public AuthoritiesService authoritiesService(AuthorityRepository authorityRepository) {
 
-        return new DefaultAuthoritiesManager(authoritiesContributor.getIfAvailable());
+        return new DefaultAuthoritiesService(authorityRepository);
     }
 
     @Bean
@@ -154,9 +154,10 @@ public class SecurityAutoConfiguration {
 
     @Bean
     public ExternalAuthenticationApiFilter externalAuthenticationApiFilter(
-        UserJwtDecoderService userJwtDecoderService, ObjectProvider<OnWebSuccessfulResult> onSuccessfulResultInterceptors) {
+            UserJwtDecoderService userJwtDecoderService,
+            ObjectProvider<OnWebSuccessfulResult> onSuccessfulResultInterceptors) {
         return new ExternalAuthenticationApiFilter(
-            userJwtDecoderService, onSuccessfulResultInterceptors.stream().toList());
+                userJwtDecoderService, onSuccessfulResultInterceptors.stream().toList());
     }
 
     /**
@@ -197,9 +198,10 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        public UserJwtDecoderService jwtDecoderService(JwtProperties jwtProperties, AuthoritiesManager authoritiesManager) {
+        public UserJwtDecoderService jwtDecoderService(
+                JwtProperties jwtProperties, AuthoritiesService authoritiesService) {
             return new DefaultUserJwtDecoderService(
-                    authoritiesManager, jwtProperties.algorithm(), jwtProperties.signingKey());
+                    authoritiesService, jwtProperties.algorithm(), jwtProperties.signingKey());
         }
     }
 
@@ -224,7 +226,7 @@ public class SecurityAutoConfiguration {
 
             return new ExternalApiCookieAuthorizationFilter(
                     securityContextExecutor,
-                userJwtDecoderService,
+                    userJwtDecoderService,
                     authorizer,
                     iamEvaluationInterceptors.orderedStream().toList());
         }
@@ -265,9 +267,9 @@ public class SecurityAutoConfiguration {
         public SuperAdminUserAuthenticator staticCredentialsUserAuthenticator(
                 SuperAdminConfigurationProperties staticCredentialsConfig,
                 PasswordEncoder passwordEncoder,
-                AuthoritiesManager authoritiesManager) {
+                AuthoritiesService authoritiesService) {
             return new SuperAdminUserAuthenticator(
-                    staticCredentialsConfig, new SuperAdminPasswordEncoder(passwordEncoder), authoritiesManager);
+                    staticCredentialsConfig, new SuperAdminPasswordEncoder(passwordEncoder), authoritiesService);
         }
     }
 

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +44,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
-import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
@@ -55,6 +53,7 @@ import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableExcept
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
@@ -62,6 +61,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
+import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
@@ -194,10 +194,10 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         assertThat(decodedTokenToUser.getUsername()).isEqualTo(username);
         assertThat(decodedTokenToUser.getRoles()).singleElement().satisfies(role -> {
-            assertThat(role.getName()).isEqualTo(TestRoles.EDITOR.getName());
-            assertThat(role.getAuthorities())
+            assertThat(role.name()).isEqualTo(TestRoles.EDITOR.name());
+            assertThat(role.authorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.getAuthorities().stream()
+                    .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.authorities().stream()
                             .map(Authority::getName)
                             .toList());
         });
@@ -210,13 +210,13 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 .asString()
                 .actual();
 
-        TestRoles.EDITOR.getAuthorities().stream()
+        TestRoles.EDITOR.authorities().stream()
                 .map(Authority::getName)
                 .forEach(name -> assertThat(decodedAuthorities).contains(name));
 
         assertThat(authoritiesCookie)
                 .doesNotContain(
-                        OssAuthority.ENV_VALUES_READ.getName(), OssAuthority.CONFIG_PROPS_VALUES_READ.getName());
+                        TestAuthorities.ENV_VALUES_READ.getName(), TestAuthorities.CONFIG_PROPS_VALUES_READ.getName());
 
         // Verify that the OIDC user was correctly provisioned and persisted in the database
         UserEntity userEntity = userRepository.findByUsername(username).get();
@@ -247,7 +247,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 "Name",
                 "original@gmail.com",
                 expectedOidcSubject(SUBJECT),
-                TestRoles.VIEWER.getName());
+                TestRoles.VIEWER.name());
 
         // and.
         String userInfoJson = "{\"email\": \"%s\"}".formatted(updatedEmail);
@@ -269,7 +269,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         assertThat(updated.firstName()).isEqualTo("Original");
         assertThat(updated.lastName()).isEqualTo("Name");
         assertThat(updated.email()).isEqualTo(updatedEmail);
-        assertThat(userService.findRoleNamesByUserId(updated.id())).containsOnly(TestRoles.EDITOR.getName());
+        assertThat(userService.findRoleNamesByUserId(updated.id())).containsOnly(TestRoles.EDITOR.name());
         assertThat(updated.userOrigin()).isEqualTo(UserOrigin.OIDC);
         assertThat(updated.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
         assertSuccessfulCallback(MasterWebEndpoints.OIDC_AUTH_COMPLETE, UserUtils.passwordless(username, Set.of()));
@@ -286,7 +286,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 "Doe",
                 "john@example.com",
                 expectedOidcSubject(SUBJECT),
-                TestRoles.VIEWER.getName());
+                TestRoles.VIEWER.name());
         UserEntity original = userRepository.findByUsername(originalUsername).orElseThrow();
 
         // and the provider now presents a DIFFERENT username for the SAME subject.

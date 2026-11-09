@@ -20,8 +20,6 @@ package com.axelixlabs.axelix.master.service.auth;
 import java.time.Duration;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,10 +33,14 @@ import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserial
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.master.domain.auth.DefaultSecurityContext;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link StarterAuthenticationTokenProvider}.
@@ -69,12 +71,12 @@ class StarterAuthenticationTokenProviderTest {
         // then.
         assertThat(token).isEqualTo(callerToken);
         PasswordlessUser decoded = new DefaultUserJwtDecoderService(
-                        new DefaultAuthoritiesManager(null), JwtAlgorithm.HMAC512, SIGNING_KEY)
+                        authoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY)
                 .decodeTokenToUser(token);
         assertThat(decoded.getId()).isEqualTo(caller.getId());
         assertThat(decoded.getRoles())
                 .flatExtracting(role -> role.getEffectiveAuthorities())
-                .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.getAuthorities());
+                .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.authorities());
     }
 
     @ParameterizedTest
@@ -114,7 +116,7 @@ class StarterAuthenticationTokenProviderTest {
 
         // then.
         PasswordlessUser legacyUser = new DefaultUserJwtDecoderService(
-                        new DefaultAuthoritiesManager(null), JwtAlgorithm.HMAC512, SIGNING_KEY)
+                        authoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY)
                 .decodeTokenToUser(token);
         assertThat(legacyUser.getId()).isEqualTo(TechUser.MASTER.getId());
         assertThat(legacyUser.getUsername()).isEqualTo(TechUser.MASTER.getId());
@@ -127,5 +129,11 @@ class StarterAuthenticationTokenProviderTest {
                 .isEqualTo(Duration.ofMinutes(5));
         assertThat(new DefaultTechUserJwtDeserializer(JwtAlgorithm.HMAC512, SIGNING_KEY).deserialize(token))
                 .isEqualTo(TechUser.MASTER);
+    }
+
+    private AuthoritiesService authoritiesService() {
+        AuthoritiesService service = mock(AuthoritiesService.class);
+        when(service.getAll()).thenReturn(TestRoles.EDITOR.authorities());
+        return service;
     }
 }

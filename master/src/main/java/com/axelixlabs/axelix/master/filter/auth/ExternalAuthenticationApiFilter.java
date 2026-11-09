@@ -41,8 +41,8 @@ import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebRequestContext;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 
 /**
  * Filter that is supposed to intercept the authentication-related external master apis.
@@ -61,7 +61,7 @@ public class ExternalAuthenticationApiFilter extends OncePerRequestFilter {
     private final List<OnWebSuccessfulResult> onSuccessInterceptors;
 
     public ExternalAuthenticationApiFilter(
-        UserJwtDecoderService userJwtDecoderService, List<OnWebSuccessfulResult> onSuccessInterceptors) {
+            UserJwtDecoderService userJwtDecoderService, List<OnWebSuccessfulResult> onSuccessInterceptors) {
         this.userJwtDecoderService = userJwtDecoderService;
         this.onSuccessInterceptors = onSuccessInterceptors;
     }
@@ -89,7 +89,8 @@ public class ExternalAuthenticationApiFilter extends OncePerRequestFilter {
 
         authCookie.ifPresentOrElse(
                 httpCookie -> {
-                    PasswordlessUser decodedTokenToUser = userJwtDecoderService.decodeTokenToUser(httpCookie.getValue());
+                    PasswordlessUser decodedTokenToUser =
+                            userJwtDecoderService.decodeTokenToUser(httpCookie.getValue());
                     onSuccessfulResult(request, currentRequestContext, decodedTokenToUser);
                 },
                 ExternalAuthenticationApiFilter::warning);
