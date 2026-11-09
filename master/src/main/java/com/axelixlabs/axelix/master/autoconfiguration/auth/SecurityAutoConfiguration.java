@@ -181,9 +181,10 @@ public class SecurityAutoConfiguration {
         public StarterAuthenticationTokenProvider starterAuthenticationTokenProvider(
                 SecurityContextExecutor securityContextExecutor,
                 UserJwtEncoderService userJwtEncoderService,
-                TechUserJwtSerializer techUserJwtSerializer) {
+                TechUserJwtSerializer techUserJwtSerializer,
+                UserJwtDecoderService userJwtDecoderService) {
             return new StarterAuthenticationTokenProvider(
-                    securityContextExecutor, userJwtEncoderService, techUserJwtSerializer);
+                    securityContextExecutor, userJwtEncoderService, techUserJwtSerializer, userJwtDecoderService);
         }
 
         private static final Logger log = LoggerFactory.getLogger(JwtAutoConfiguration.class);

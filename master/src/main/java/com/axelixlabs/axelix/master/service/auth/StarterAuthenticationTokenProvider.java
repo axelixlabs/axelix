@@ -18,12 +18,19 @@
 package com.axelixlabs.axelix.master.service.auth;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
+import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
+import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.utils.SemanticVersion;
 
@@ -47,17 +54,21 @@ public class StarterAuthenticationTokenProvider {
     private final UserJwtEncoderService userJwtEncoderService;
     private final TechUserJwtSerializer techUserJwtSerializer;
 
+    private final UserJwtDecoderService userJwtDecoderService;
+
     public StarterAuthenticationTokenProvider(
             SecurityContextExecutor securityContextExecutor,
             UserJwtEncoderService userJwtEncoderService,
-            TechUserJwtSerializer techUserJwtSerializer) {
+            TechUserJwtSerializer techUserJwtSerializer,
+            UserJwtDecoderService userJwtDecoderService) {
         this.securityContextExecutor = securityContextExecutor;
         this.userJwtEncoderService = userJwtEncoderService;
         this.techUserJwtSerializer = techUserJwtSerializer;
+        this.userJwtDecoderService = userJwtDecoderService;
     }
 
     /**
-     * Returns the caller's token for starters before 1.3, which still enforce RBAC locally,
+     * Reissues the caller's token with legacy authority names for starters before 1.3, which enforce RBAC locally,
      * or a master technical-user token for starters from 1.3, including prereleases.
      *
      * @throws IllegalArgumentException if the starter version cannot be parsed
@@ -69,7 +80,20 @@ public class StarterAuthenticationTokenProvider {
         }
         // Remove this legacy branch and the version check in 1.6, when starters before 1.3 leave the compatibility
         // window.
-        return securityContextExecutor.requireSecurityContext().token();
+        PasswordlessUser caller = userJwtDecoderService.decodeTokenToUser(
+                securityContextExecutor.requireSecurityContext().token());
+        Set<Role> roles = caller.getRoles().stream().map(this::legacyRole).collect(Collectors.toSet());
+        return userJwtEncoderService.generateToken(
+                new PasswordlessUser(caller.getId(), caller.getUsername(), roles), Duration.ofMinutes(5));
+    }
+
+    private Role legacyRole(Role role) {
+        Set<Authority> authorities = role.authorities().stream()
+                .flatMap(authority -> Arrays.stream(OssAuthority.values())
+                        .filter(legacy -> legacy.getCodename().equals(authority.getName())))
+                .collect(Collectors.toSet());
+        Set<Role> components = role.components().stream().map(this::legacyRole).collect(Collectors.toSet());
+        return new DefaultRole(role.name(), authorities, components);
     }
 
     /**

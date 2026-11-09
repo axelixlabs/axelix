@@ -18,24 +18,30 @@
 package com.axelixlabs.axelix.master.service.auth;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.HmacVerificationStrategy;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
+import com.axelixlabs.axelix.master.domain.auth.Authority;
+import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.DefaultSecurityContext;
+import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
-import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -55,13 +61,23 @@ class StarterAuthenticationTokenProviderTest {
     private final DefaultUserJwtEncoderService encoder =
             new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5));
     private final StarterAuthenticationTokenProvider tokenProvider = new StarterAuthenticationTokenProvider(
-            securityContextExecutor, encoder, new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY));
+            securityContextExecutor,
+            encoder,
+            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY),
+            new DefaultUserJwtDecoderService(modernAuthoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY));
 
     @ParameterizedTest
     @ValueSource(strings = {"1.1.0", "1.1.1", "1.2.0", "1.2.1", "1.2.2"})
     void shouldPreserveCallerIdentityAndAuthoritiesForLegacyStarters(String version) {
         // given.
-        PasswordlessUser caller = new PasswordlessUser("user-id", "operator", Set.of(TestRoles.EDITOR));
+        PasswordlessUser caller = new PasswordlessUser(
+                "user-id",
+                "operator",
+                Set.of(new DefaultRole(
+                        "operator",
+                        Set.of(() -> "caches:clear"),
+                        Set.of(new DefaultRole(
+                                "reader", Set.of(() -> "environment.values:read", () -> "custom:permission"))))));
         String callerToken = encoder.generateToken(caller);
 
         // when.
@@ -69,14 +85,19 @@ class StarterAuthenticationTokenProviderTest {
                 () -> tokenProvider.tokenFor(version), new DefaultSecurityContext(callerToken));
 
         // then.
-        assertThat(token).isEqualTo(callerToken);
         PasswordlessUser decoded = new DefaultUserJwtDecoderService(
-                        authoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY)
+                        legacyAuthoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY)
                 .decodeTokenToUser(token);
         assertThat(decoded.getId()).isEqualTo(caller.getId());
-        assertThat(decoded.getRoles())
-                .flatExtracting(role -> role.getEffectiveAuthorities())
-                .containsExactlyInAnyOrderElementsOf(TestRoles.EDITOR.authorities());
+        assertThat(decoded.getUsername()).isEqualTo(caller.getUsername());
+        assertThat(decoded.getRoles()).singleElement().satisfies(role -> {
+            assertThat(role.name()).isEqualTo("operator");
+            assertThat(role.authorities()).containsExactly(OssAuthority.CACHES_CLEAR);
+            assertThat(role.components()).singleElement().satisfies(component -> {
+                assertThat(component.name()).isEqualTo("reader");
+                assertThat(component.authorities()).containsExactly(OssAuthority.ENV_VALUES_READ);
+            });
+        });
     }
 
     @ParameterizedTest
@@ -116,7 +137,7 @@ class StarterAuthenticationTokenProviderTest {
 
         // then.
         PasswordlessUser legacyUser = new DefaultUserJwtDecoderService(
-                        authoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY)
+                        legacyAuthoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY)
                 .decodeTokenToUser(token);
         assertThat(legacyUser.getId()).isEqualTo(TechUser.MASTER.getId());
         assertThat(legacyUser.getUsername()).isEqualTo(TechUser.MASTER.getId());
@@ -131,9 +152,65 @@ class StarterAuthenticationTokenProviderTest {
                 .isEqualTo(TechUser.MASTER);
     }
 
-    private AuthoritiesService authoritiesService() {
+    @ParameterizedTest
+    @EnumSource(OssAuthority.class)
+    void shouldTranslateEveryLegacyAuthority(OssAuthority authority) {
+        // given.
+        PasswordlessUser caller =
+                new PasswordlessUser("id", "operator", Set.of(new DefaultRole("role", Set.of(authority::getCodename))));
+        String callerToken = encoder.generateToken(caller);
+
+        // when.
+        String token = securityContextExecutor.callWithinSecurityContext(
+                () -> tokenProvider.tokenFor("1.2.2"), new DefaultSecurityContext(callerToken));
+
+        // then.
+        PasswordlessUser decoded = new DefaultUserJwtDecoderService(
+                        legacyAuthoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY)
+                .decodeTokenToUser(token);
+        assertThat(decoded.getRoles())
+                .singleElement()
+                .satisfies(role -> assertThat(role.authorities()).containsExactly(authority));
+    }
+
+    @Test
+    void shouldPreserveCallerWithoutRoles() {
+        // given.
+        String callerToken = encoder.generateToken(new PasswordlessUser("id", "operator", Set.of()));
+
+        // when.
+        String token = securityContextExecutor.callWithinSecurityContext(
+                () -> tokenProvider.tokenFor("1.2.2"), new DefaultSecurityContext(callerToken));
+
+        // then.
+        PasswordlessUser decoded = new DefaultUserJwtDecoderService(
+                        legacyAuthoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY)
+                .decodeTokenToUser(token);
+        assertThat(decoded.getId()).isEqualTo("id");
+        assertThat(decoded.getRoles()).isEmpty();
+    }
+
+    @Test
+    void shouldRejectInvalidCallerToken() {
+        // when / then.
+        assertThatThrownBy(() -> securityContextExecutor.callWithinSecurityContext(
+                        () -> tokenProvider.tokenFor("1.2.2"), new DefaultSecurityContext("invalid")))
+                .isInstanceOf(InvalidJwtTokenException.class);
+    }
+
+    private AuthoritiesService modernAuthoritiesService() {
         AuthoritiesService service = mock(AuthoritiesService.class);
-        when(service.getAll()).thenReturn(TestRoles.EDITOR.authorities());
+        Set<Authority> authorities = Arrays.stream(OssAuthority.values())
+                .map(authority -> (Authority) authority::getCodename)
+                .collect(Collectors.toSet());
+        authorities.add(() -> "custom:permission");
+        when(service.getAll()).thenReturn(authorities);
+        return service;
+    }
+
+    private AuthoritiesService legacyAuthoritiesService() {
+        AuthoritiesService service = mock(AuthoritiesService.class);
+        when(service.getAll()).thenReturn(OssAuthority.asSet());
         return service;
     }
 }
