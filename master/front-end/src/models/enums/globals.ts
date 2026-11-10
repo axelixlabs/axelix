@@ -59,6 +59,7 @@ export enum EPlatformName {
 }
 
 export enum EAuthorities {
+    HEAP_DUMP_READ = "heap-dump:read",
     SCHEDULED_TASKS_MODIFY = "scheduled-tasks:write",
     CACHES_CLEAR = "caches:clear",
     CACHES_TOGGLE = "caches:toggle",

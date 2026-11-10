@@ -129,7 +129,7 @@ class ProxyingEndpointProberTest {
         // when.
         byte[] response = securityContextExecutor.callWithinSecurityContext(
                 () -> endEndpointProber.invoke(instance.id(), NoHttpPayload.INSTANCE),
-                new DefaultSecurityContext(callerToken));
+                new DefaultSecurityContext(callerToken, caller));
 
         // then.
         RecordedRequest request = server.takeRequest();
@@ -205,7 +205,7 @@ class ProxyingEndpointProberTest {
                     endEndpointProber.invoke(legacy.id(), NoHttpPayload.INSTANCE);
                     endEndpointProber.invoke(modern.id(), NoHttpPayload.INSTANCE);
                 },
-                new DefaultSecurityContext(callerToken));
+                new DefaultSecurityContext(callerToken, caller));
 
         // then.
         String legacyToken = server.takeRequest().getHeader("Authorization").substring("Bearer ".length());

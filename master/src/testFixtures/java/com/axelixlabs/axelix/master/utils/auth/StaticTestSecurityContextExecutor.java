@@ -18,10 +18,12 @@
 package com.axelixlabs.axelix.master.utils.auth;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.master.domain.auth.DefaultSecurityContext;
+import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.domain.auth.SecurityContext;
 import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.function.ThrowingCallable;
@@ -36,7 +38,8 @@ import com.axelixlabs.axelix.master.domain.function.ThrowingRunnable;
 @NullMarked
 public final class StaticTestSecurityContextExecutor implements SecurityContextExecutor {
 
-    private static final SecurityContext CONTEXT = new DefaultSecurityContext("test-token");
+    private static final SecurityContext CONTEXT =
+            new DefaultSecurityContext("test-token", new PasswordlessUser("test", "test", Set.of()));
 
     @Override
     public <T extends Exception> void runWithinSecurityContext(

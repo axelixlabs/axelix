@@ -31,6 +31,7 @@ import com.axelixlabs.axelix.master.domain.auth.Authority;
  */
 @Deprecated(forRemoval = true)
 public enum TestAuthorities implements Authority {
+    HEAP_DUMP_READ("heap-dump:read"),
     ENV_VALUES_READ("environment.values:read"),
     CONFIG_PROPS_VALUES_READ("config-properties.values:read"),
     SCHEDULED_TASKS_MODIFY("scheduled-tasks:write"),

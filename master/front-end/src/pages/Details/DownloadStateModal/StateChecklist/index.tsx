@@ -18,7 +18,8 @@
 import { Checkbox } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { EExportableComponent } from "@/models";
+import { useAuthority } from "@/hooks";
+import { EAuthorities, EExportableComponent } from "@/models";
 import { EXPORTABLE_COMPONENT_GROUPS } from "@/utils";
 
 import styles from "./styles.module.css";
@@ -37,20 +38,24 @@ interface IProps {
 
 export const StateChecklist = ({ selected, onToggle }: IProps) => {
     const { t } = useTranslation();
+    const canDownloadHeapDump = useAuthority(EAuthorities.HEAP_DUMP_READ);
 
     return (
         <>
             <div className={styles.Groups}>
                 {EXPORTABLE_COMPONENT_GROUPS.map(({ key, components }) => {
+                    const selectable = components.filter(
+                        (component) => component !== EExportableComponent.HEAP_DUMP || canDownloadHeapDump,
+                    );
                     const count = components.filter((component) => selected.includes(component)).length;
 
                     return (
                         <div key={key} className={styles.Group}>
                             <Checkbox
                                 className={styles.GroupHeader}
-                                checked={count === components.length}
-                                indeterminate={count > 0 && count < components.length}
-                                onChange={(e) => onToggle(components, e.target.checked)}
+                                checked={count === selectable.length}
+                                indeterminate={count > 0 && count < selectable.length}
+                                onChange={(e) => onToggle(selectable, e.target.checked)}
                             >
                                 <span className={`TextCaps ${styles.GroupTitle}`}>
                                     {t(`Details.DownloadState.groups.${key}`)}
@@ -68,6 +73,7 @@ export const StateChecklist = ({ selected, onToggle }: IProps) => {
                                     <div key={component} className={styles.ItemWrapper}>
                                         <Checkbox
                                             className={styles.Item}
+                                            disabled={isHeap && !canDownloadHeapDump}
                                             checked={checked}
                                             onChange={(e) => onToggle([component], e.target.checked)}
                                         >

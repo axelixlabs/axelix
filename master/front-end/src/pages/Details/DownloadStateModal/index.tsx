@@ -21,7 +21,9 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { downloadFile, extractFileName } from "@/helpers";
-import type { EExportableComponent, TStateExportStage } from "@/models";
+import { useAuthority } from "@/hooks";
+import { EAuthorities, EExportableComponent } from "@/models";
+import type { TStateExportStage } from "@/models";
 import { exportStateData } from "@/services";
 import { EXPORTABLE_COMPONENT_GROUPS } from "@/utils";
 
@@ -51,6 +53,7 @@ const DEFAULT_SELECTION = EXPORTABLE_COMPONENT_GROUPS.find((group) => group.key 
 export const DownloadStateModal = ({ open, onClose }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
+    const canDownloadHeapDump = useAuthority(EAuthorities.HEAP_DUMP_READ);
 
     const [selected, setSelected] = useState<EExportableComponent[]>(DEFAULT_SELECTION);
     const [stage, setStage] = useState<TStateExportStage>("pick");
@@ -67,7 +70,11 @@ export const DownloadStateModal = ({ open, onClose }: IProps) => {
     const toggle = (components: EExportableComponent[], on: boolean): void => {
         // Keep the selection in the dialog order, so the progress list matches the checklist
         setSelected((prev) =>
-            ALL_COMPONENTS.filter((component) => (components.includes(component) ? on : prev.includes(component))),
+            ALL_COMPONENTS.filter(
+                (component) =>
+                    (component !== EExportableComponent.HEAP_DUMP || canDownloadHeapDump) &&
+                    (components.includes(component) ? on : prev.includes(component)),
+            ),
         );
     };
 

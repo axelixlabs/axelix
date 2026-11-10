@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.3-010-sqlite-insert-heap-dump-authority" author="Axelix Team">
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a9"/>
+      <column name="codename" value="heap-dump:read"/>
+      <column name="display_name" value="Download Heap Dumps"/>
+      <column name="description" value="Download heap dumps, including in exported application state."/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a9"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>

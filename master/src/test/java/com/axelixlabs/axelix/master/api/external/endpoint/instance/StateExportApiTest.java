@@ -46,6 +46,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
@@ -367,7 +368,7 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         ResponseEntity<?> response = restTemplate
-                .asViewer()
+                .withRole(TestRoles.ADMIN)
                 .postForEntity(
                         "/api/external/export-state/{instanceId}",
                         new HttpEntity<>(HTTP_REQUEST_BODY, headers),
@@ -385,7 +386,7 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .withRole(TestRoles.ADMIN)
                 .postForEntity(
                         "/api/external/export-state/{instanceId}",
                         new HttpEntity<>(HTTP_REQUEST_BODY, headers),
@@ -393,6 +394,68 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
                         unknownInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldRejectHeapDumpExportForViewer() {
+        // given.
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRole(TestRoles.VIEWER)
+                .postForEntity(
+                        "/api/external/export-state/{instanceId}",
+                        new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                        Void.class,
+                        activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void shouldRejectHeapDumpExportForEditor() {
+        // given.
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRole(TestRoles.EDITOR)
+                .postForEntity(
+                        "/api/external/export-state/{instanceId}",
+                        new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                        Void.class,
+                        activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void shouldAllowViewerExportWithoutHeapDump() {
+        // given.
+        registry.register(
+                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String request = """
+                {"components": [{"component": "BEANS"}]}
+                """;
+
+        // when.
+        ResponseEntity<byte[]> response = restTemplate
+                .asViewer()
+                .postForEntity(
+                        "/api/external/export-state/{instanceId}",
+                        new HttpEntity<>(request, headers),
+                        byte[].class,
+                        activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Override
@@ -409,7 +472,7 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        var viewer = restTemplate.asViewer();
+        var viewer = restTemplate.withRole(TestRoles.ADMIN);
         ResponseEntity<byte[]> response = viewer.postForEntity(
                 "/api/external/export-state/{instanceId}",
                 new HttpEntity<>(HTTP_REQUEST_BODY, headers),
