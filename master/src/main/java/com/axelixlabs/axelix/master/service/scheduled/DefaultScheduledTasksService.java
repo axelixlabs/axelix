@@ -53,6 +53,12 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
     private static final Pattern METHOD_TASK_ID = Pattern.compile(
             "^([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*(?:\\.[\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)*)\\.([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)(?:#(?:cron|fixedDelay|fixedRate)[0-9]+)?$");
 
+    private static final Pattern LAMBDA_TASK_ID = Pattern.compile(
+            "^(.+)\\$\\$Lambda(?:\\$[0-9]+|/[0-9]+|/0x[0-9a-fA-F]+)(?:/0x[0-9a-fA-F]+)?(?:@[0-9a-fA-F]+)?$");
+
+    private static final Pattern CLASS_TASK_ID = Pattern.compile(
+            "^([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*(?:\\.[\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)*)@[0-9a-fA-F]+$");
+
     private final EndpointInvoker endpointInvoker;
     private final MessageDeserializationStrategy<ServiceScheduledTasks> scheduledTasksDeserializationStrategy;
     private final InstanceRegistry instanceRegistry;
@@ -126,17 +132,28 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                         .toList());
     }
 
-    private static @Nullable String className(ScheduledTaskRunnable runnable) {
+    private static String className(ScheduledTaskRunnable runnable) {
         if (runnable.getClassName() != null) {
             return runnable.getClassName();
         }
+        Matcher lambda = LAMBDA_TASK_ID.matcher(runnable.getTarget());
+        if (lambda.matches()) {
+            return lambda.group(1);
+        }
+        Matcher object = CLASS_TASK_ID.matcher(runnable.getTarget());
+        if (object.matches()) {
+            return object.group(1);
+        }
         Matcher matcher = METHOD_TASK_ID.matcher(runnable.getTarget());
-        return matcher.matches() ? matcher.group(1) : null;
+        return matcher.matches() ? matcher.group(1) : "unknown";
     }
 
     private static @Nullable String methodName(ScheduledTaskRunnable runnable) {
         if (runnable.getMethodName() != null) {
             return runnable.getMethodName();
+        }
+        if (LAMBDA_TASK_ID.matcher(runnable.getTarget()).matches()) {
+            return "lambda";
         }
         Matcher matcher = METHOD_TASK_ID.matcher(runnable.getTarget());
         return matcher.matches() ? matcher.group(2) : null;

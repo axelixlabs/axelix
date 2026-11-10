@@ -18,7 +18,7 @@
 
 export interface IScheduledTask {
     taskId: string;
-    className: string | null;
+    className: string;
     methodName: string | null;
 
     /**

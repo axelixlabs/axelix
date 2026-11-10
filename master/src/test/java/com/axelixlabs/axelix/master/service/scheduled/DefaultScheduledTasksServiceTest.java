@@ -44,8 +44,13 @@ class DefaultScheduledTasksServiceTest {
         "com.example.Jobs$Nested.run#cron0,com.example.Jobs$Nested,run",
         "com.example.Jobs.run#fixedDelay0,com.example.Jobs,run",
         "com.example.Jobs.run#fixedRate12,com.example.Jobs,run",
-        "com.example.Jobs$$Lambda$1/0x123@abc,,",
-        "unknown,,"
+        "com.example.Jobs$$Lambda$1/0x123@abc,com.example.Jobs,lambda",
+        "com.example.Jobs$$Lambda/0x123@abc,com.example.Jobs,lambda",
+        "com.example.Jobs$Nested$$Lambda$12@abc,com.example.Jobs$Nested,lambda",
+        "com.example.Jobs$$Lambda/123@abc,com.example.Jobs,lambda",
+        "com.example.Jobs@abc,com.example.Jobs,",
+        "com.example.Jobs$$Lambda$bad/0x123@abc,unknown,",
+        "unknown,unknown,"
     })
     void infersMissingMetadata(String taskId, String className, String methodName) {
         // given.
