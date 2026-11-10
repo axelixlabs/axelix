@@ -12,7 +12,7 @@ description: "The Details page provides information about a managed Spring Boot 
 
 ***Details page as presented in Axelix UI***
 
-The page is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open
+The page is available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open
 it and trigger the **Download state** export. Note that the environment-properties and configuration-properties files
 inside the exported archive are still subject to the per-page authority masking: callers without `environment.values:read` /
 `config-properties.values:read` get `******` for those values. See [Roles and
@@ -37,6 +37,14 @@ The download dialog allows you to select which components to include in the expo
 - **Environment** - Application environment
 - **Log File** - Current application log file
 - **Scheduled Tasks** - Information about scheduled jobs
+
+#### Heap dump access
+
+<UpcomingReleaseNotice />
+
+Starting with Axelix 1.3.0, exporting a heap dump as part of the application state requires the `heap-dump:read`
+authority. Without it, this option is disabled, but you can still export the other components. `ADMIN` and
+`SUPER_ADMIN` hold this authority by default.
 
 ## Git Information
 Displays source control metadata (when available):
@@ -93,11 +101,11 @@ System-level details:
   version="1.2.0"
   reason={<>If you are on Axelix 1.2.0 or later, none of this is required: the starter registers its custom actuator
     endpoints by itself, and Axelix no longer requires the <code>health</code>/<code>info</code> endpoints to be
-    enabled — it works perfectly well without them. No configuration is needed here.</>}
+    enabled: it works perfectly well without them. No configuration is needed here.</>}
 />
 
 The page is backed by the `axelix-details` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose it
-through the standard Spring Boot Actuator properties — see [Configuring Spring Boot
+through the standard Spring Boot Actuator properties: see [Configuring Spring Boot
 Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) for the full list
 of Axelix endpoints and surrounding setup:
 
