@@ -83,11 +83,13 @@ export const ProfileHeader = ({ user, displayName, onEdit, onSuspend }: IProps) 
                     </p>
                 </div>
                 <div className={styles.Actions}>
-                    <Button onClick={onEdit}>{t("Users.Profile.editUser")}</Button>
                     {user.userOrigin === EUserOrigin.LOCAL && (
-                        <Button danger={canSignIn} onClick={onSuspend}>
-                            {t(canSignIn ? "Users.Profile.suspend" : "Users.Profile.reactivate")}
-                        </Button>
+                        <>
+                            <Button onClick={onEdit}>{t("Users.Profile.editUser")}</Button>
+                            <Button danger={canSignIn} onClick={onSuspend}>
+                                {t(canSignIn ? "Users.Profile.suspend" : "Users.Profile.reactivate")}
+                            </Button>
+                        </>
                     )}
                 </div>
             </div>

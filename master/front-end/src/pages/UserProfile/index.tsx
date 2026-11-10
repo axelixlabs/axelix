@@ -20,7 +20,7 @@ import { useParams } from "react-router";
 
 import { EmptyHandler, Loader } from "@/components";
 import { fetchData, getUserFullName } from "@/helpers";
-import { type IRoleProfile, type IUser, type IUserAuthorities, StatefulRequest } from "@/models";
+import { EUserOrigin, type IRoleProfile, type IUser, type IUserAuthorities, StatefulRequest } from "@/models";
 import { getRolesFeed, getUserAuthorities, getUserById } from "@/services";
 
 import { ChangeRoles } from "./ChangeRoles";
@@ -87,7 +87,9 @@ const UserProfile = () => {
                     <ProfilePermissions authoritiesResponse={authoritiesResponse} />
                 </div>
             </div>
-            <EditUser user={user} open={editing} onClose={() => setEditing(false)} onSaved={loadUser} />
+            {user.userOrigin === EUserOrigin.LOCAL && (
+                <EditUser user={user} open={editing} onClose={() => setEditing(false)} onSaved={loadUser} />
+            )}
             <ChangeRoles
                 user={user}
                 roles={rolesResponse.response ?? []}

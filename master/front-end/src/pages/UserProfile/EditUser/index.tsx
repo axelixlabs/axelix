@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { emptyStringToNull, extractErrorCode, showErrorNotification } from "@/helpers";
-import { EUserOrigin, type IUser, StatelessRequest } from "@/models";
+import { type IUser, StatelessRequest } from "@/models";
 import { editUser } from "@/services";
 
 import { userUpdateFrom } from "../userUpdate";
@@ -29,7 +29,7 @@ import { EditUserForm, type IEditUserFields } from "./EditUserForm";
 
 interface IProps {
     /**
-     * User being edited
+     * Local user being edited
      */
     user: IUser;
 
@@ -56,7 +56,6 @@ export const EditUser = ({ user, open, onClose, onSaved }: IProps) => {
     const { message } = App.useApp();
     const [form] = Form.useForm<IEditUserFields>();
     const [requestData, setRequestData] = useState(StatelessRequest.inactive());
-    const isLocal = user.userOrigin === EUserOrigin.LOCAL;
 
     useEffect(() => {
         if (open) {
@@ -120,7 +119,7 @@ export const EditUser = ({ user, open, onClose, onSaved }: IProps) => {
             confirmLoading={requestData.loading}
             title={<span className="TextMedium">{t("Users.Profile.editTitle")}</span>}
         >
-            <EditUserForm user={user} form={form} isLocal={isLocal} />
+            <EditUserForm user={user} form={form} />
         </Modal>
     );
 };

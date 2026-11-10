@@ -33,7 +33,7 @@ export interface IEditUserFields {
 
 interface IProps {
     /**
-     * User being edited, used as the form's initial values
+     * Local user being edited, used as the form's initial values
      */
     user: IUser;
 
@@ -41,14 +41,9 @@ interface IProps {
      * Form instance owned by the dialog
      */
     form: FormInstance<IEditUserFields>;
-
-    /**
-     * Whether the password fields are shown. OIDC users sign in elsewhere.
-     */
-    isLocal: boolean;
 }
 
-export const EditUserForm = ({ user, form, isLocal }: IProps) => {
+export const EditUserForm = ({ user, form }: IProps) => {
     const { t } = useTranslation();
 
     const optionalLabel = (label: string) => (
@@ -99,34 +94,28 @@ export const EditUserForm = ({ user, form, isLocal }: IProps) => {
                 </Form.Item>
             </div>
 
-            {isLocal && (
-                <div className={styles.Row}>
-                    <Form.Item
-                        name="password"
-                        label={optionalLabel(t("password"))}
-                        extra={t("Users.Profile.passwordKeep")}
-                    >
-                        <Input.Password autoComplete="new-password" />
-                    </Form.Item>
-                    <Form.Item
-                        name="confirmPassword"
-                        label={optionalLabel(t("Users.Create.confirmPassword"))}
-                        dependencies={["password"]}
-                        rules={[
-                            ({ getFieldValue }) => ({
-                                validator: (_, value: string | undefined) =>
-                                    !value && !getFieldValue("password")
-                                        ? Promise.resolve()
-                                        : getFieldValue("password") === value
-                                          ? Promise.resolve()
-                                          : Promise.reject(new Error(t("Users.ValidationErrors.passwordsMismatch"))),
-                            }),
-                        ]}
-                    >
-                        <Input.Password autoComplete="new-password" />
-                    </Form.Item>
-                </div>
-            )}
+            <div className={styles.Row}>
+                <Form.Item name="password" label={optionalLabel(t("password"))} extra={t("Users.Profile.passwordKeep")}>
+                    <Input.Password autoComplete="new-password" />
+                </Form.Item>
+                <Form.Item
+                    name="confirmPassword"
+                    label={optionalLabel(t("Users.Create.confirmPassword"))}
+                    dependencies={["password"]}
+                    rules={[
+                        ({ getFieldValue }) => ({
+                            validator: (_, value: string | undefined) =>
+                                !value && !getFieldValue("password")
+                                    ? Promise.resolve()
+                                    : getFieldValue("password") === value
+                                      ? Promise.resolve()
+                                      : Promise.reject(new Error(t("Users.ValidationErrors.passwordsMismatch"))),
+                        }),
+                    ]}
+                >
+                    <Input.Password autoComplete="new-password" />
+                </Form.Item>
+            </div>
         </Form>
     );
 };
