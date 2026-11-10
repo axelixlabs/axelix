@@ -17,17 +17,18 @@
  */
 package com.axelixlabs.axelix.master.mcp.tools;
 
-import java.nio.charset.StandardCharsets;
-
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpTool.McpAnnotations;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
+import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -41,9 +42,13 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class ConfigPropsMcpServerTools {
 
     private final EndpointInvoker endpointInvoker;
+    private final Converter<ConfigurationPropertiesFeed, ConfigurationPropertiesFeedResponse> feedConverter;
 
-    public ConfigPropsMcpServerTools(EndpointInvoker endpointInvoker) {
+    public ConfigPropsMcpServerTools(
+            EndpointInvoker endpointInvoker,
+            Converter<ConfigurationPropertiesFeed, ConfigurationPropertiesFeedResponse> feedConverter) {
         this.endpointInvoker = endpointInvoker;
+        this.feedConverter = feedConverter;
     }
 
     @McpTool(
@@ -64,10 +69,10 @@ public class ConfigPropsMcpServerTools {
                             destructiveHint = false,
                             idempotentHint = true,
                             openWorldHint = false))
-    public String getInstanceConfigProps(@McpToolParam(description = "The instance ID") String instanceId) {
-        return new String(
-                endpointInvoker.invoke(
-                        InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE),
-                StandardCharsets.UTF_8);
+    public ConfigurationPropertiesFeedResponse getInstanceConfigProps(
+            @McpToolParam(description = "The instance ID") String instanceId) {
+        ConfigurationPropertiesFeed feed = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
+        return feedConverter.convertNonNull(feed);
     }
 }

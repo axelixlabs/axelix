@@ -26,7 +26,9 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.contract.details.InstanceDetails;
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.contract.masterping.MasterPing;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
@@ -228,9 +230,13 @@ public class EndpointProbersAutoConfiguration {
 
     // Environment Property
     @Bean
-    public EndpointProber<byte[]> getAllEnvironmentEndpointProver() {
-        return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, tokenProvider, httpClient);
+    public EndpointProber<EnvironmentFeed> getAllEnvironmentEndpointProver(ObjectMapper objectMapper) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry,
+                new DefaultJacksonMessageDeserializationStrategy<>(objectMapper, EnvironmentFeed.class),
+                tokenProvider,
+                ActuatorEndpoints.GET_ALL_ENV_PROPERTIES,
+                httpClient);
     }
 
     // HeapDump
@@ -325,9 +331,13 @@ public class EndpointProbersAutoConfiguration {
 
     // Configuration Properties
     @Bean
-    public EndpointProber<byte[]> getConfigPropsProber() {
-        return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, tokenProvider, httpClient);
+    public EndpointProber<ConfigurationPropertiesFeed> getConfigPropsProber(ObjectMapper objectMapper) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry,
+                new DefaultJacksonMessageDeserializationStrategy<>(objectMapper, ConfigurationPropertiesFeed.class),
+                tokenProvider,
+                ActuatorEndpoints.GET_CONFIG_PROPS,
+                httpClient);
     }
 
     // Dependencies (SBOM). To be removed in 1.6 together with ActuatorEndpoints.GET_DEPENDENCIES_SBOM.

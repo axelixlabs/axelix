@@ -17,12 +17,17 @@
  */
 package com.axelixlabs.axelix.master.service.export.collect;
 
+import tools.jackson.databind.ObjectMapper;
+
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.master.api.external.endpoint.instance.EnvironmentApi;
+import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedResponse;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -38,9 +43,16 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
+    private final Converter<EnvironmentFeed, EnvironmentFeedResponse> feedConverter;
+    private final ObjectMapper objectMapper;
 
-    public EnvironmentContributorJsonInstance(EndpointInvoker endpointInvoker) {
+    public EnvironmentContributorJsonInstance(
+            EndpointInvoker endpointInvoker,
+            ObjectMapper objectMapper,
+            Converter<EnvironmentFeed, EnvironmentFeedResponse> feedConverter) {
         this.endpointInvoker = endpointInvoker;
+        this.feedConverter = feedConverter;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -50,7 +62,8 @@ public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStat
 
     @Override
     protected byte[] collectByte(String instanceId) {
-        return endpointInvoker.invoke(
+        EnvironmentFeed feed = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
+        return objectMapper.writeValueAsBytes(feedConverter.convertNonNull(feed));
     }
 }

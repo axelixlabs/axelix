@@ -60,6 +60,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class EnvironmentApiTest extends AbstractProtectedEndpointTest {
 
+    // language=json
+    private static final String SENSITIVE_FEED_JSON = """
+            {
+              "activeProfiles": [],
+              "defaultProfiles": [],
+              "propertySources": [{
+                "name": "test",
+                "properties": [
+                  {"name": "app.secret", "value": "original-secret", "sensitive": true, "isPrimary": true},
+                  {"name": "app.public", "value": "visible", "sensitive": false, "isPrimary": true}
+                ]
+              }]
+            }
+            """;
+
     private static final String EXPECTED_ENV_JSON =
             // language=json
             """
@@ -288,6 +303,31 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
     @AfterEach
     void cleanup() {
         registry.deRegister(InstanceId.of(activeInstanceId));
+    }
+
+    @Test
+    void shouldMaskSensitiveValuesForViewer() {
+        // given.
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                return new MockResponse()
+                        .setBody(SENSITIVE_FEED_JSON)
+                        .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+            }
+        });
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity("/api/external/env/feed/{instanceId}", String.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).doesNotContain("original-secret");
+        assertThatJson(response.getBody())
+                .inPath("propertySources[0].properties[1].value")
+                .isEqualTo("visible");
     }
 
     @Test

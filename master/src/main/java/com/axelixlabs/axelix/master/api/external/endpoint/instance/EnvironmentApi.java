@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint.instance;
 
-import tools.jackson.databind.ObjectMapper;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,25 +44,21 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class EnvironmentApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final ObjectMapper objectMapper;
     private final Converter<EnvironmentFeed, EnvironmentFeedResponse> environmentFeedConverter;
 
     public EnvironmentApi(
             EndpointInvoker endpointInvoker,
-            ObjectMapper objectMapper,
             Converter<EnvironmentFeed, EnvironmentFeedResponse> environmentFeedConverter) {
         this.endpointInvoker = endpointInvoker;
-        this.objectMapper = objectMapper;
         this.environmentFeedConverter = environmentFeedConverter;
     }
 
     @GetMapping(path = ApiPaths.EnvironmentApi.FEED)
     public ResponseEntity<EnvironmentFeedResponse> getAllEnvironmentProperties(
             @PathVariable("instanceId") String instanceId) {
-        byte[] body = endpointInvoker.invoke(
+        EnvironmentFeed feed = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
 
-        EnvironmentFeed feed = objectMapper.readValue(body, EnvironmentFeed.class);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(environmentFeedConverter.convertNonNull(feed));
