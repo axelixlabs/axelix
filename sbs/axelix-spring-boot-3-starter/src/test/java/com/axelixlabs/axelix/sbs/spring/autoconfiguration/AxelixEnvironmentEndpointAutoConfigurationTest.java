@@ -23,7 +23,7 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
@@ -52,7 +52,7 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
         contextRunner.run(context -> {
             assertThat(context).hasSingleBean(PropertyNameNormalizer.class);
             assertThat(context).hasSingleBean(PropertyMetadataExtractor.class);
-            assertThat(context).hasSingleBean(SmartSanitizingFunction.class);
+            assertThat(context).hasSingleBean(PropertySensitivityMarker.class);
             assertThat(context).hasSingleBean(EnvPropertyEnricher.class);
             assertThat(context).hasSingleBean(AxelixEnvironmentEndpoint.class);
             assertThat(context).hasSingleBean(ValueInjectionTrackerBeanPostProcessor.class);

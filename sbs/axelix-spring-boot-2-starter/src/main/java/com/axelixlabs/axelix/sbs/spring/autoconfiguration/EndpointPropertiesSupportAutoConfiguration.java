@@ -25,7 +25,6 @@ import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
  * Auto-configuration for shared endpoint properties support beans.
@@ -45,14 +44,6 @@ public class EndpointPropertiesSupportAutoConfiguration {
     @Bean
     public PropertyNameNormalizer propertyNameNormalizer() {
         return new DefaultPropertyNameNormalizer();
-    }
-
-    @Bean
-    public SmartSanitizingFunction smartSanitizingFunction(
-            EndpointsConfigurationProperties endpointsConfigurationProperties,
-            PropertyNameNormalizer propertyNameNormalizer) {
-        return new SmartSanitizingFunction(
-                endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
     }
 
     @Bean

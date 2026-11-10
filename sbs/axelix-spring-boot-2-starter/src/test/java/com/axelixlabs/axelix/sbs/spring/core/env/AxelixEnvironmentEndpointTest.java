@@ -47,10 +47,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.contract.env.Property;
-import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -388,12 +386,6 @@ class AxelixEnvironmentEndpointTest {
         @Bean
         public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
             return new AxelixEnvironmentEndpoint(environmentService);
-        }
-
-        @Bean
-        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(
-                    List.of("axelix.env.test.toBeSanitized", "AXELIX_FOR_SANITIZATION"), propertyNameNormalizer);
         }
     }
 }

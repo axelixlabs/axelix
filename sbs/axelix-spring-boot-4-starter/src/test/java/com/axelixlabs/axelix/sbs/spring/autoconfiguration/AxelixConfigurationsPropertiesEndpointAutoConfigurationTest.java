@@ -27,7 +27,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationProp
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,7 +51,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             assertThat(context).hasSingleBean(ConfigurationPropertiesFlattener.class);
             assertThat(context).hasSingleBean(ConfigurationPropertiesConverter.class);
             assertThat(context).hasSingleBean(PropertyNameNormalizer.class);
-            assertThat(context).hasSingleBean(SmartSanitizingFunction.class);
+            assertThat(context).hasSingleBean(PropertySensitivityMarker.class);
             assertThat(context).hasSingleBean(ConfigurationPropertiesService.class);
             assertThat(context).hasSingleBean(AxelixConfigurationPropertiesEndpoint.class);
         });
@@ -80,7 +80,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(AxelixConfigurationsPropertiesEndpointAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(AxelixConfigurationPropertiesEndpoint.class);
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesService.class);
-            assertThat(context).doesNotHaveBean(SmartSanitizingFunction.class);
+            assertThat(context).doesNotHaveBean(PropertySensitivityMarker.class);
             assertThat(context).doesNotHaveBean(PropertyNameNormalizer.class);
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesConverter.class);
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesFlattener.class);

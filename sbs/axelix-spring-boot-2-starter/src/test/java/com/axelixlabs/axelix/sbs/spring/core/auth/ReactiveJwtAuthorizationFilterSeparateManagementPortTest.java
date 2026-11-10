@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +36,8 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
-import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
@@ -122,11 +118,6 @@ class ReactiveJwtAuthorizationFilterSeparateManagementPortTest {
         @Bean
         public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
             return new AxelixEnvironmentEndpoint(environmentService);
-        }
-
-        @Bean
-        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(List.of(), propertyNameNormalizer);
         }
     }
 }

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 
 /**
  * Identifies and marks sensitive properties.
@@ -37,7 +38,7 @@ public class PropertySensitivityMarker {
 
     public PropertySensitivityMarker(List<String> names, PropertyNameNormalizer normalizer) {
         this.normalizer = normalizer;
-        this.all = names.contains("*");
+        this.all = names.containsAll(EndpointsConfigurationProperties.SANITIZE_ALL);
         this.names = names.stream().map(normalizer::normalize).collect(Collectors.toSet());
     }
 

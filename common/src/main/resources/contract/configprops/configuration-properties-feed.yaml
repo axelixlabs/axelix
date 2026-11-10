@@ -68,7 +68,7 @@ components:
           x-axelix-introduced-in: 1.2.0
         sensitive:
           type: boolean
-          description: Whether the property's value should be sanitized.
+          description: Whether the property's value is considered sensitive or not.
           x-axelix-introduced-in: 1.3.0
         value:
           type: string
