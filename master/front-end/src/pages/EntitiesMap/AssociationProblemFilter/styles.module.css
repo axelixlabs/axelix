@@ -53,6 +53,10 @@
     --dot-color: var(--problem-unidirectional);
 }
 
+.ToString {
+    --dot-color: var(--problem-to-string);
+}
+
 .ActiveChip {
     color: var(--dot-color);
     border-color: var(--dot-color);

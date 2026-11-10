@@ -25,6 +25,7 @@ export const ASSOCIATION_PROBLEM_ORDER: EAssociationProblem[] = [
     EAssociationProblem.LIST_BACKED_MANY_TO_MANY,
     EAssociationProblem.CASCADE_REMOVE_OR_ALL,
     EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY,
+    EAssociationProblem.ACCESSED_IN_TO_STRING,
 ];
 
 /**
@@ -35,6 +36,7 @@ export const associationProblemLabelKey: Record<EAssociationProblem, string> = {
     [EAssociationProblem.LIST_BACKED_MANY_TO_MANY]: "EntitiesMap.problems.listManyToMany",
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL]: "EntitiesMap.problems.cascade",
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY]: "EntitiesMap.problems.unidirectional",
+    [EAssociationProblem.ACCESSED_IN_TO_STRING]: "EntitiesMap.problems.toString",
 };
 
 /**
@@ -45,6 +47,7 @@ export const associationProblemFixKey: Record<EAssociationProblem, string> = {
     [EAssociationProblem.LIST_BACKED_MANY_TO_MANY]: "EntitiesMap.problemFixes.listManyToMany",
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL]: "EntitiesMap.problemFixes.cascade",
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY]: "EntitiesMap.problemFixes.unidirectional",
+    [EAssociationProblem.ACCESSED_IN_TO_STRING]: "EntitiesMap.problemFixes.toString",
 };
 
 /**
@@ -52,12 +55,13 @@ export const associationProblemFixKey: Record<EAssociationProblem, string> = {
  */
 export const associationProblemClassToken: Record<
     EAssociationProblem,
-    "Eager" | "ListManyToMany" | "Cascade" | "Unidirectional"
+    "Eager" | "ListManyToMany" | "Cascade" | "Unidirectional" | "ToString"
 > = {
     [EAssociationProblem.EAGER_FETCHING]: "Eager",
     [EAssociationProblem.LIST_BACKED_MANY_TO_MANY]: "ListManyToMany",
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL]: "Cascade",
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY]: "Unidirectional",
+    [EAssociationProblem.ACCESSED_IN_TO_STRING]: "ToString",
 };
 
 /**
@@ -69,4 +73,5 @@ export const associationProblemColor: Record<EAssociationProblem, string> = {
     [EAssociationProblem.LIST_BACKED_MANY_TO_MANY]: "#7c3aed",
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL]: "#dc2626",
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY]: "#0891b2",
+    [EAssociationProblem.ACCESSED_IN_TO_STRING]: "#db2777",
 };

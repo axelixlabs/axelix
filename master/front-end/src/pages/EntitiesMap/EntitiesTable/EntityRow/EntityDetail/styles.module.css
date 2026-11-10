@@ -74,6 +74,10 @@
     --card-color: var(--problem-unidirectional);
 }
 
+.ToString {
+    --card-color: var(--problem-to-string);
+}
+
 .ProblemHeader {
     display: flex;
     align-items: center;

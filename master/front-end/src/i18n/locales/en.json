@@ -685,13 +685,15 @@
             "eager": "EAGER fetching",
             "listManyToMany": "List for @ManyToMany",
             "cascade": "Bad CascadeType",
-            "unidirectional": "Unidirectional @OneToMany"
+            "unidirectional": "Unidirectional @OneToMany",
+            "toString": "Read by toString()"
         },
         "problemFixes": {
             "eager": "Fetched on every load whether or not the data is used. Always use FetchType.LAZY and load relations explicitly with a JOIN FETCH when needed.",
             "listManyToMany": "A List-backed @ManyToMany makes Hibernate clear and re-insert the whole join table on any change. Model ManyToMany as a Set instead.",
             "cascade": "CascadeType.REMOVE (and thus CascadeType.ALL) force Hibernate to perform N + 1 when removing the relation (because Hibernate has to honor the entity Lifecycle callbacks). Manage removal manually.",
-            "unidirectional": "A @OneToMany with no 'mappedBy' needs an extra join table or per-row UPDATEs. Make it bidirectional or move ownership to the @ManyToOne side."
+            "unidirectional": "A @OneToMany with no 'mappedBy' needs an extra join table or per-row UPDATEs. Make it bidirectional or move ownership to the @ManyToOne side.",
+            "toString": "Reading an association from toString() can initialize a lazy relation unexpectedly, causing extra SQL queries or a LazyInitializationException. Exclude associations from toString()."
         },
         "detail": {
             "table": "Table",
@@ -700,7 +702,7 @@
         },
         "clean": {
             "title": "No mapping problems",
-            "description": "All {{count}} mapped entities are clean — no eager fetching, no List-backed @ManyToMany, no dangerous cascades, and no unidirectional @OneToMany."
+            "description": "All {{count}} mapped entities are clean — no eager fetching, no List-backed @ManyToMany, no dangerous cascades, no unidirectional @OneToMany, and no associations read by toString()."
         }
     },
     "DependenciesAnalyzer": {

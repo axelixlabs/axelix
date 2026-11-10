@@ -80,4 +80,9 @@ public class Pet extends NamedEntity {
 		getVisits().add(visit);
 	}
 
+	@Override
+	public String toString() {
+		return "Pet{id=" + getId() + ", type=" + type + "}";
+	}
+
 }

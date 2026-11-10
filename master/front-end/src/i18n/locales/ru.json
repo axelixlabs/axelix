@@ -691,13 +691,15 @@
             "eager": "Жадная загрузка (EAGER)",
             "listManyToMany": "List для @ManyToMany",
             "cascade": "Некорректный CascadeType",
-            "unidirectional": "Однонаправленный @OneToMany"
+            "unidirectional": "Однонаправленный @OneToMany",
+            "toString": "Читается в toString()"
         },
         "problemFixes": {
             "eager": "Загружается при каждом чтении независимо от того, используются ли данные. Всегда используйте FetchType.LAZY и загружайте связи явно через JOIN FETCH при необходимости.",
             "listManyToMany": "@ManyToMany на основе List заставляет Hibernate очищать и заново вставлять всю связующую таблицу при любом изменении. Моделируйте ManyToMany как Set.",
             "cascade": "CascadeType.REMOVE (а значит и CascadeType.ALL) заставляет Hibernate выполнять N + 1 при удалении связи (так как Hibernate обязан соблюдать колбэки жизненного цикла сущности). Управляйте удалением вручную.",
-            "unidirectional": "@OneToMany без 'mappedBy' требует дополнительной связующей таблицы или построчных UPDATE. Сделайте его двунаправленным или перенесите владение на сторону @ManyToOne."
+            "unidirectional": "@OneToMany без 'mappedBy' требует дополнительной связующей таблицы или построчных UPDATE. Сделайте его двунаправленным или перенесите владение на сторону @ManyToOne.",
+            "toString": "Чтение ассоциации в toString() может неожиданно инициализировать ленивую связь, вызывая дополнительные SQL-запросы или LazyInitializationException. Исключите ассоциации из toString()."
         },
         "detail": {
             "table": "Таблица",
@@ -706,7 +708,7 @@
         },
         "clean": {
             "title": "Проблем в маппинге нет",
-            "description": "Все {{count}} сопоставленных сущностей чисты — нет жадной загрузки, нет @ManyToMany на основе List, нет опасных каскадов и нет однонаправленных @OneToMany."
+            "description": "Все {{count}} сопоставленных сущностей чисты — нет жадной загрузки, нет @ManyToMany на основе List, нет опасных каскадов, нет однонаправленных @OneToMany и нет ассоциаций, читаемых в toString()."
         }
     },
     "DependenciesAnalyzer": {
