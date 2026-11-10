@@ -693,7 +693,7 @@
             "listManyToMany": "A List-backed @ManyToMany makes Hibernate clear and re-insert the whole join table on any change. Model ManyToMany as a Set instead.",
             "cascade": "CascadeType.REMOVE (and thus CascadeType.ALL) force Hibernate to perform N + 1 when removing the relation (because Hibernate has to honor the entity Lifecycle callbacks). Manage removal manually.",
             "unidirectional": "A @OneToMany with no 'mappedBy' needs an extra join table or per-row UPDATEs. Make it bidirectional or move ownership to the @ManyToOne side.",
-            "toString": "Reading an association from toString() can initialize a lazy relation unexpectedly, causing extra SQL queries or a LazyInitializationException. Exclude associations from toString()."
+            "toString": "Reading an association from toString() can initialize a lazy relation unexpectedly, causing extra SQL queries, a LazyInitializationException, or an OutOfMemoryError when a large part of the entity graph is loaded into memory. Exclude associations from toString()."
         },
         "detail": {
             "table": "Table",
