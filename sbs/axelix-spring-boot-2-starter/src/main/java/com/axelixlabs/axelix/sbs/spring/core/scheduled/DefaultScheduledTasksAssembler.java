@@ -95,7 +95,10 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
     private ScheduledCronTask assembleCronTask(
             CronTask task, ManagedScheduledTask managedScheduledTask, ScheduledAnnotationRunnable runnable) {
         return new ScheduledCronTask()
-                .runnable(new ScheduledTaskRunnable().target(runnable.getId()))
+                .runnable(new ScheduledTaskRunnable()
+                        .target(runnable.getId())
+                        .className(runnable.getClassName())
+                        .methodName(runnable.getMethodName()))
                 .expression(task.getExpression())
                 .enabled(managedScheduledTask.isEnabled());
     }
@@ -103,7 +106,10 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
     private ScheduledFixedRateTask assembleFixedRateTask(
             FixedRateTask task, ManagedScheduledTask managedScheduledTask, ScheduledAnnotationRunnable runnable) {
         return new ScheduledFixedRateTask()
-                .runnable(new ScheduledTaskRunnable().target(runnable.getId()))
+                .runnable(new ScheduledTaskRunnable()
+                        .target(runnable.getId())
+                        .className(runnable.getClassName())
+                        .methodName(runnable.getMethodName()))
                 .interval(task.getInterval())
                 .initialDelay(task.getInitialDelay())
                 .enabled(managedScheduledTask.isEnabled());
@@ -112,7 +118,10 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
     private ScheduledFixedDelayTask assembleFixedDelayMap(
             FixedDelayTask task, ManagedScheduledTask managedScheduledTask, ScheduledAnnotationRunnable runnable) {
         return new ScheduledFixedDelayTask()
-                .runnable(new ScheduledTaskRunnable().target(runnable.getId()))
+                .runnable(new ScheduledTaskRunnable()
+                        .target(runnable.getId())
+                        .className(runnable.getClassName())
+                        .methodName(runnable.getMethodName()))
                 .interval(task.getInterval())
                 .initialDelay(task.getInitialDelay())
                 .enabled(managedScheduledTask.isEnabled());
@@ -121,7 +130,10 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
     private ScheduledCustomTask assembleCustomMap(
             TriggerTask task, ManagedScheduledTask managedScheduledTask, ScheduledAnnotationRunnable runnable) {
         return new ScheduledCustomTask()
-                .runnable(new ScheduledTaskRunnable().target(runnable.getId()))
+                .runnable(new ScheduledTaskRunnable()
+                        .target(runnable.getId())
+                        .className(runnable.getClassName())
+                        .methodName(runnable.getMethodName()))
                 .trigger(task.getTrigger().toString())
                 .enabled(managedScheduledTask.isEnabled());
     }

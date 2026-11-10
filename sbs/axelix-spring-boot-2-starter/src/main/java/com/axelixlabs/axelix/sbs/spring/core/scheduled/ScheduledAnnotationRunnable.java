@@ -80,6 +80,14 @@ public final class ScheduledAnnotationRunnable extends ScheduledMethodRunnable i
         return null;
     }
 
+    public String getClassName() {
+        return getMethod().getDeclaringClass().getName();
+    }
+
+    public String getMethodName() {
+        return getMethod().getName();
+    }
+
     public String getId() {
         return id;
     }

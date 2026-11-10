@@ -18,6 +18,8 @@
 
 export interface IScheduledTask {
     taskId: string;
+    className: string | null;
+    methodName: string | null;
 
     /**
      * Whether the given runnable is enabled or not

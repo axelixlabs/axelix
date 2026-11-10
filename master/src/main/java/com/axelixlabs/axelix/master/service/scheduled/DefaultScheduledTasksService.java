@@ -20,11 +20,15 @@ package com.axelixlabs.axelix.master.service.scheduled;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskRunnable;
 import com.axelixlabs.axelix.common.contract.scheduledtask.ServiceScheduledTasks;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTasksResponse;
@@ -45,6 +49,9 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  */
 @Service
 public class DefaultScheduledTasksService implements ScheduledTasksService {
+
+    private static final Pattern METHOD_TASK_ID = Pattern.compile(
+            "^([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*(?:\\.[\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)*)\\.([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)(?:#(?:cron|fixedDelay|fixedRate)[0-9]+)?$");
 
     private final EndpointInvoker endpointInvoker;
     private final MessageDeserializationStrategy<ServiceScheduledTasks> scheduledTasksDeserializationStrategy;
@@ -82,6 +89,8 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                 tasks.getCron().stream()
                         .map(task -> new ScheduledTasksResponse.CronTask(
                                 task.getRunnable().getTarget(),
+                                className(task.getRunnable()),
+                                methodName(task.getRunnable()),
                                 task.getExpression(),
                                 task.getEnabled(),
                                 successRates.get(task.getRunnable().getTarget())))
@@ -89,6 +98,8 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                 tasks.getFixedDelay().stream()
                         .map(task -> new ScheduledTasksResponse.FixedDelayTask(
                                 task.getRunnable().getTarget(),
+                                className(task.getRunnable()),
+                                methodName(task.getRunnable()),
                                 task.getInterval(),
                                 task.getInitialDelay(),
                                 task.getEnabled(),
@@ -97,6 +108,8 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                 tasks.getFixedRate().stream()
                         .map(task -> new ScheduledTasksResponse.FixedRateTask(
                                 task.getRunnable().getTarget(),
+                                className(task.getRunnable()),
+                                methodName(task.getRunnable()),
                                 task.getInterval(),
                                 task.getInitialDelay(),
                                 task.getEnabled(),
@@ -105,10 +118,28 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                 tasks.getCustom().stream()
                         .map(task -> new ScheduledTasksResponse.CustomTask(
                                 task.getRunnable().getTarget(),
+                                className(task.getRunnable()),
+                                methodName(task.getRunnable()),
                                 task.getTrigger(),
                                 task.getEnabled(),
                                 successRates.get(task.getRunnable().getTarget())))
                         .toList());
+    }
+
+    private static @Nullable String className(ScheduledTaskRunnable runnable) {
+        if (runnable.getClassName() != null) {
+            return runnable.getClassName();
+        }
+        Matcher matcher = METHOD_TASK_ID.matcher(runnable.getTarget());
+        return matcher.matches() ? matcher.group(1) : null;
+    }
+
+    private static @Nullable String methodName(ScheduledTaskRunnable runnable) {
+        if (runnable.getMethodName() != null) {
+            return runnable.getMethodName();
+        }
+        Matcher matcher = METHOD_TASK_ID.matcher(runnable.getTarget());
+        return matcher.matches() ? matcher.group(2) : null;
     }
 
     @Override
