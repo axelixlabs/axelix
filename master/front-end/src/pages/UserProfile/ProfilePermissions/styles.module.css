@@ -1,0 +1,11 @@
+.Grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--axelix-space-5);
+}
+
+@media (width <= 640px) {
+    .Grid {
+        grid-template-columns: 1fr;
+    }
+}

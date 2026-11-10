@@ -1,0 +1,48 @@
+.Title {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-1);
+}
+
+.Subtitle {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Roles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-2);
+    margin-top: var(--axelix-space-1);
+}
+
+.RolesRequired {
+    margin-top: var(--axelix-space-2);
+    color: var(--axelix-red-700);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--axelix-space-3);
+    width: 100%;
+}
+
+.TakesEffect {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-2);
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-regular);
+    text-align: left;
+}
+
+.FooterActions {
+    display: flex;
+    flex: none;
+    gap: var(--axelix-space-2);
+}

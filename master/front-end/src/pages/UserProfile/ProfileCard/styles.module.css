@@ -1,0 +1,34 @@
+.Card {
+    padding: 14px 16px 6px;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.Card + .Card {
+    margin-top: var(--axelix-space-3);
+}
+
+.CardHead {
+    margin-bottom: var(--axelix-space-2);
+}
+
+.CardHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--axelix-space-3);
+}
+
+.CardTitle {
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: -0.01em;
+    line-height: var(--axelix-line-height-tight);
+}
+
+.CardHint {
+    margin-top: 2px;
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+    line-height: var(--axelix-line-height-tight);
+}

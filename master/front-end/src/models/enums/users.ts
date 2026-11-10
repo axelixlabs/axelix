@@ -40,9 +40,3 @@ export enum EUserDisplayStatus {
     DORMANT = "DORMANT",
     SUSPENDED = "SUSPENDED",
 }
-
-export enum EUserProfileEditableValueField {
-    USERNAME = "username",
-    EMAIL = "email",
-    PASSWORD = "password",
-}

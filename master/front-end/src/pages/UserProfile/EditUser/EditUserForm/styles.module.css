@@ -1,0 +1,19 @@
+.Form {
+    margin-top: var(--axelix-space-2);
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--axelix-space-3);
+}
+
+.Optional {
+    margin-left: var(--axelix-space-1);
+    color: var(--axelix-grey-500);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Username {
+    font-family: var(--axelix-font-family-code);
+}

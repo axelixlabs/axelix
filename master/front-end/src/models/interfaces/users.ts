@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ERoles, EUserDisplayStatus, EUserOrigin, EUserStatus } from "../enums/users";
+import type { ERoles, EUserDisplayStatus, EUserOrigin, EUserStatus } from "@/models";
 
 export interface IUser {
     /**
@@ -145,6 +145,16 @@ export interface IEditUserRequestData {
     username: string;
 
     /**
+     * First name of the user, which may be null
+     */
+    firstName: string | null;
+
+    /**
+     * Last name of the user, which may be null
+     */
+    lastName: string | null;
+
+    /**
      * Email address of the user, which may be null
      */
     email: string | null;
@@ -155,9 +165,31 @@ export interface IEditUserRequestData {
     password: string | null;
 
     /**
-     * The roles granted to this user
+     * The roles granted to this user. Names, as returned by the roles feed.
      */
-    roles: ERoles[];
+    roles: string[];
+}
+
+export interface IRoleProfile {
+    /**
+     * Unique identifier of the role
+     */
+    id: string;
+
+    /**
+     * Unique name of the role
+     */
+    name: string;
+
+    /**
+     * Number of users the role is assigned to
+     */
+    membersCount: number;
+
+    /**
+     * Human-readable description of what the role allows
+     */
+    description: string;
 }
 
 export interface IRoleUsersCount {
@@ -189,14 +221,32 @@ export interface IUsersFilters {
     userOrigins: EUserOrigin[];
 }
 
-export interface IEditableUser extends Omit<IUser, "email"> {
+export interface IAuthorityProfile {
     /**
-     * Email address of the user
+     * Unique identifier of the authority
      */
-    email: string;
+    id: string;
 
     /**
-     * Password of the user
+     * Unique codename of the authority
      */
-    password: string;
+    codename: string;
+
+    /**
+     * Human-readable name of the authority
+     */
+    displayName: string;
+
+    /**
+     * Description of what the authority allows
+     */
+    description: string;
+}
+
+export interface IUserAuthorities {
+    /** Authorities granted through any of the user's roles, including inherited roles. */
+    effectiveAuthorities: IAuthorityProfile[];
+
+    /** Catalog authorities not granted through any of the user's roles. */
+    ungrantedAuthorities: IAuthorityProfile[];
 }

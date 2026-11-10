@@ -1,15 +1,13 @@
-.BackwardWrapper {
-    display: inline-flex;
-    align-items: center;
-    column-gap: 8px;
-    font-weight: 500;
-    transition: color 0.3s;
+.Columns {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: var(--axelix-space-4);
+    align-items: start;
+    margin-top: var(--axelix-space-5);
 }
 
-.BackwardWrapper:hover {
-    color: var(--axelix-green-600);
-}
-
-.FirstSectionUsername {
-    margin-block: 10px 30px;
+@media (width <= 960px) {
+    .Columns {
+        grid-template-columns: 1fr;
+    }
 }

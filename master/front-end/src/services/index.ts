@@ -36,6 +36,8 @@ export * from "./metrics";
 export * from "./caches";
 export * from "./beans";
 export * from "./users";
+export * from "./roles";
 export * from "./auth";
 export * from "./MCP";
 export * from "./gc";
+export * from "./authorities";
