@@ -16,16 +16,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Pagination } from "antd";
-import dayjs from "dayjs";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler } from "@/components";
-import { formatTransactionDuration } from "@/helpers";
 import type { IScheduledTaskExecutionRecord } from "@/models";
 
-import shared from "../../shared.module.css";
-
+import { ExecutionRow } from "./ExecutionRow";
+import { ExecutionsHeader } from "./ExecutionsHeader";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -35,12 +33,6 @@ interface IProps {
 type TExecutionsFilter = "all" | "failed";
 
 const PAGE_SIZE = 8;
-
-const formatStartedAt = (startedAt: string): string => {
-    const started = dayjs(startedAt);
-
-    return started.format(started.isSame(dayjs(), "day") ? "HH:mm:ss" : "DD.MM HH:mm:ss");
-};
 
 export const ExecutionsTable = ({ executions }: IProps) => {
     const { t } = useTranslation();
@@ -61,26 +53,12 @@ export const ExecutionsTable = ({ executions }: IProps) => {
 
     return (
         <div className={styles.MainWrapper}>
-            <div className={styles.Header}>
-                <span className={styles.Title}>{t("ScheduledTasks.executions")}</span>
-
-                <div className={styles.Filter}>
-                    <button
-                        type="button"
-                        onClick={() => handleFilterChange("all")}
-                        className={`${styles.FilterOption} ${filter === "all" ? styles.FilterActive : ""}`}
-                    >
-                        {t("ScheduledTasks.all")} {executions.length}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => handleFilterChange("failed")}
-                        className={`${styles.FilterOption} ${styles.FilterFailed} ${filter === "failed" ? styles.FilterActive : ""}`}
-                    >
-                        {t("ScheduledTasks.failed")} {failedExecutions.length}
-                    </button>
-                </div>
-            </div>
+            <ExecutionsHeader
+                filter={filter}
+                total={executions.length}
+                failed={failedExecutions.length}
+                onFilterChange={handleFilterChange}
+            />
 
             <div className={styles.ColumnHeader}>
                 <span>{t("ScheduledTasks.started")}</span>
@@ -91,28 +69,7 @@ export const ExecutionsTable = ({ executions }: IProps) => {
 
             <EmptyHandler isEmpty={visibleExecutions.length === 0}>
                 {pageExecutions.map((execution) => (
-                    <div
-                        key={`${execution.startedAt}-${execution.instanceId}`}
-                        className={`${styles.Row} ${execution.success ? "" : styles.RowFailed}`}
-                    >
-                        <span className={shared.Mono}>{formatStartedAt(execution.startedAt)}</span>
-                        <span className={`${shared.Mono} ${styles.Instance}`}>{execution.instanceName}</span>
-                        <span className={`${shared.Mono} ${styles.Duration}`}>
-                            {formatTransactionDuration(execution.durationMillis)}
-                        </span>
-                        {execution.success ? (
-                            <span className={styles.ResultSucceeded}>✓ {t("ScheduledTasks.succeeded")}</span>
-                        ) : (
-                            <span className={styles.Result}>
-                                <span className={`${shared.Mono} ${styles.ResultFailed}`}>
-                                    ✕ {execution.errorType ?? t("ScheduledTasks.failed")}
-                                </span>
-                                {execution.errorMessage && (
-                                    <span className={styles.ResultMessage}>{execution.errorMessage}</span>
-                                )}
-                            </span>
-                        )}
-                    </div>
+                    <ExecutionRow key={`${execution.startedAt}-${execution.instanceId}`} execution={execution} />
                 ))}
             </EmptyHandler>
 
