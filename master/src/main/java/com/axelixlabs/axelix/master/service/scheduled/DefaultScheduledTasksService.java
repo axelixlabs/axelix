@@ -49,12 +49,23 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 @Service
 public class DefaultScheduledTasksService implements ScheduledTasksService {
 
+    // TODO:
+    //  to be removed in 1.6, this is here just because old starters
+    //  do not send the data we need (i.e. class name and method name)
+    @Deprecated(forRemoval = true, since = "1.3")
     private static final Pattern METHOD_TASK_ID = Pattern.compile(
             "^([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*(?:\\.[\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)*)\\.([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)(?:#(?:cron|fixedDelay|fixedRate)[0-9]+)?$");
-
+    // TODO:
+    //  to be removed in 1.6, this is here just because old starters
+    //  do not send the data we need (i.e. class name and method name)
+    @Deprecated(forRemoval = true, since = "1.3")
     private static final Pattern LAMBDA_TASK_ID = Pattern.compile(
             "^(.+)\\$\\$Lambda(?:\\$[0-9]+|/[0-9]+|/0x[0-9a-fA-F]+)(?:/0x[0-9a-fA-F]+)?(?:@[0-9a-fA-F]+)?$");
 
+    // TODO:
+    //  to be removed in 1.6, this is here just because old starters
+    //  do not send the data we need (i.e. class name and method name)
+    @Deprecated(forRemoval = true, since = "1.3")
     private static final Pattern CLASS_TASK_ID = Pattern.compile(
             "^([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*(?:\\.[\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)*)@[0-9a-fA-F]+$");
 
