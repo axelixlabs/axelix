@@ -26,6 +26,7 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
 
 /**
  * Default implementation of {@link EnvironmentService}
@@ -36,13 +37,18 @@ public class DefaultEnvironmentService implements EnvironmentService {
 
     private final EnvironmentEndpoint delegate;
     private final EnvPropertyEnricher envPropertyEnricher;
+    private final PropertySensitivityMarker propertySensitivityMarker;
 
-    public DefaultEnvironmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
+    public DefaultEnvironmentService(
+            Environment environment,
+            EnvPropertyEnricher envPropertyEnricher,
+            PropertySensitivityMarker propertySensitivityMarker) {
         this.envPropertyEnricher = envPropertyEnricher;
         this.delegate = new EnvironmentEndpoint(environment, List.of(), Show.ALWAYS);
+        this.propertySensitivityMarker = propertySensitivityMarker;
     }
 
     public EnvironmentFeed getEnvironmentFeed(@Nullable String pattern) {
-        return envPropertyEnricher.enrich(delegate.environment(pattern));
+        return propertySensitivityMarker.mark(envPropertyEnricher.enrich(delegate.environment(pattern)));
     }
 }

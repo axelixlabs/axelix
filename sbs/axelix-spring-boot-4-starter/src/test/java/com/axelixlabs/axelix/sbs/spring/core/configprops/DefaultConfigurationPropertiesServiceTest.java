@@ -56,5 +56,8 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
                 .collect(Collectors.toSet());
 
         assertThat(values).contains("toBeSanitized").doesNotContain("******");
+        assertThat(configProps.getBeans())
+                .flatExtracting(bean -> bean.getProperties())
+                .allSatisfy(property -> assertThat(property.getSensitive()).isTrue());
     }
 }

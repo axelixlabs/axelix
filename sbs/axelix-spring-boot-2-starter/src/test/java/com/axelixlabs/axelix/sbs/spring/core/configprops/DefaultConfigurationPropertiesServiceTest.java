@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,6 +71,9 @@ public class DefaultConfigurationPropertiesServiceTest {
                 .collect(Collectors.toSet());
 
         assertThat(values).contains("toBeSanitized").doesNotContain("******");
+        assertThat(configProps.getBeans())
+                .flatExtracting(bean -> bean.getProperties())
+                .allSatisfy(property -> assertThat(property.getSensitive()).isTrue());
     }
 
     @ConfigurationProperties(prefix = "axelix.prop.test")
@@ -102,7 +107,10 @@ public class DefaultConfigurationPropertiesServiceTest {
         public ConfigurationPropertiesService configurationPropertiesService(
                 ApplicationContext applicationContext,
                 ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
+            return new DefaultConfigurationPropertiesService(
+                    applicationContext,
+                    configurationPropertiesConverter,
+                    new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
         }
     }
 }

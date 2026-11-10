@@ -33,7 +33,7 @@ public class EndpointsConfigurationProperties {
 
     /**
      * List of properties whose values needs to be sanitized before being returned.
-     * Single value of {@code "*"} means all properties must be sanitized.
+     * If the list contains {@code "*"}, all properties must be sanitized.
      */
     private List<String> sanitizedProperties = List.of();
 
