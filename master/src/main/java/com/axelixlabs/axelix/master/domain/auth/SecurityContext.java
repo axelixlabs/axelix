@@ -18,7 +18,7 @@
 package com.axelixlabs.axelix.master.domain.auth;
 
 /**
- * The context that stores the authenticated and authorized user.
+ * The context that stores the authenticated user.
  *
  * @author Mikhail Polivakha
  */
@@ -30,7 +30,7 @@ public interface SecurityContext {
     String token();
 
     /**
-     * @return the authenticated and authorized user.
+     * @return authenticated user.
      */
     User user();
 }
