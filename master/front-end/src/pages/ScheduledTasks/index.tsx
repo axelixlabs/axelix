@@ -15,26 +15,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { CronTasks } from "./Cron/CronTasks";
-import { FixedTasks } from "./FixedTasks/FixedTask";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader, PageSearch } from "@/components";
-import { fetchData, filterScheduledTasks, isEmpty } from "@/helpers";
+import { EmptyHandler, Loader } from "@/components";
+import { fetchData, filterScheduledTasks, getScheduledTaskItems } from "@/helpers";
 import { type IScheduledTasksResponseBody, StatefulRequest } from "@/models";
 import { getScheduledTasksData } from "@/services";
 
+import { TaskDetail } from "./TaskDetail";
+import { TaskList } from "./TaskList";
+import styles from "./styles.module.css";
+
 const ScheduledTasks = () => {
     const { instanceId } = useParams();
-    const { t } = useTranslation();
 
     const [scheduledTasks, setScheduledTasks] = useState(StatefulRequest.loading<IScheduledTasksResponseBody>());
-    const [search, setSearch] = useState<string>("");
+    const [search, setSearch] = useState("");
+    const [selectedTaskId, setSelectedTaskId] = useState<string>();
+
+    const loadScheduledTasks = (): Promise<void> =>
+        fetchData(setScheduledTasks, () => getScheduledTasksData(instanceId!));
 
     useEffect(() => {
-        fetchData(setScheduledTasks, () => getScheduledTasksData(instanceId!));
+        loadScheduledTasks();
     }, []);
 
     if (scheduledTasks.loading) {
@@ -46,21 +50,24 @@ const ScheduledTasks = () => {
     }
 
     const scheduledTasksData = scheduledTasks.response!;
+    const items = getScheduledTaskItems(scheduledTasksData);
+    const selectedItem = items.find(({ task }) => task.taskId === selectedTaskId) ?? items[0];
 
     const effectiveScheduledTasks = search ? filterScheduledTasks(scheduledTasksData, search) : scheduledTasksData;
-    return (
-        <>
-            <PageSearch setSearch={setSearch} />
 
-            <EmptyHandler isEmpty={isEmpty(effectiveScheduledTasks)}>
-                <CronTasks cronTasks={effectiveScheduledTasks.cron} />
-                <FixedTasks
-                    taskTitle={t("ScheduledTasks.fixedDelay")}
-                    fixedTasks={effectiveScheduledTasks.fixedDelay}
-                />
-                <FixedTasks taskTitle={t("ScheduledTasks.fixedRate")} fixedTasks={effectiveScheduledTasks.fixedRate} />
-            </EmptyHandler>
-        </>
+    return (
+        <div className={styles.Layout}>
+            <TaskList
+                scheduledTasks={effectiveScheduledTasks}
+                selectedTaskId={selectedItem?.task.taskId}
+                onSelect={setSelectedTaskId}
+                setSearch={setSearch}
+            />
+
+            {selectedItem && (
+                <TaskDetail key={selectedItem.task.taskId} item={selectedItem} onChange={loadScheduledTasks} />
+            )}
+        </div>
     );
 };
 

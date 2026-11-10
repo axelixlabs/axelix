@@ -1,0 +1,12 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: var(--axelix-white);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.MainWrapperStretched {
+    align-self: stretch;
+}

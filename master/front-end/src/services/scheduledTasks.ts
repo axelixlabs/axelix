@@ -27,6 +27,10 @@ export const getScheduledTasksData = (instanceId: string) => {
     return apiFetch.get(`scheduled-tasks/${instanceId}`);
 };
 
+export const getScheduledTaskHistory = (instanceId: string, taskId: string) => {
+    return apiFetch.get(`scheduled-tasks/${instanceId}/history`, { params: { taskId: taskId } });
+};
+
 export const updateScheduledTasksStatus = (data: IUpdateScheduledTasksStatusRequestData) => {
     const { instanceId, statusType, trigger, force } = data;
 
