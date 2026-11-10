@@ -186,7 +186,7 @@ public final class MasterWebEndpoints {
 
     // Heap dump
     public static final MasterWebEndpoint HEAP_DUMP_READ =
-            register("heap-dump:read", HttpMethod.GET, ApiPaths.HeapDumpApi.INSTANCE_ID, null);
+            register("heap-dump:read", HttpMethod.GET, ApiPaths.HeapDumpApi.INSTANCE_ID, () -> "heap-dump:read");
 
     // Transaction monitoring
     public static final MasterWebEndpoint TRANSACTION_MONITORING_READ = register(

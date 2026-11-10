@@ -57,7 +57,8 @@ public final class TestRoles {
                     TestAuthorities.CACHES_TOGGLE,
                     TestAuthorities.GARBAGE_COLLECTOR,
                     TestAuthorities.ENV_VALUES_READ,
-                    TestAuthorities.CONFIG_PROPS_VALUES_READ));
+                    TestAuthorities.CONFIG_PROPS_VALUES_READ,
+                    TestAuthorities.HEAP_DUMP_READ));
 
     private TestRoles() {}
 }

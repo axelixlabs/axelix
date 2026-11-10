@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint.instance;
 
+import java.util.Set;
+
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -28,8 +30,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.request.state.StateExportComponent;
 import com.axelixlabs.axelix.master.api.external.request.state.StateExportRequest;
+import com.axelixlabs.axelix.master.domain.auth.AuthorizationRequest;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.service.auth.Authorizer;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.convert.request.StateExportRequestConverter;
 import com.axelixlabs.axelix.master.service.export.StateArchiveFileNameGenerator;
 import com.axelixlabs.axelix.master.service.export.StateExport;
@@ -44,6 +52,9 @@ import com.axelixlabs.axelix.master.service.export.ZipArchiveInstanceStateExport
 @ExternalApiRestController
 public class StateExportApi {
 
+    private final SecurityContextExecutor securityContextExecutor;
+    private final UserJwtDecoderService userJwtDecoderService;
+    private final Authorizer authorizer;
     private final ZipArchiveInstanceStateExporter exportService;
     private final StateArchiveFileNameGenerator stateArchiveFileNameGenerator;
     private final StateExportRequestConverter stateExportRequestConverter;
@@ -51,7 +62,13 @@ public class StateExportApi {
     public StateExportApi(
             ZipArchiveInstanceStateExporter exportService,
             StateArchiveFileNameGenerator stateArchiveFileNameGenerator,
-            StateExportRequestConverter stateExportRequestConverter) {
+            StateExportRequestConverter stateExportRequestConverter,
+            SecurityContextExecutor securityContextExecutor,
+            UserJwtDecoderService userJwtDecoderService,
+            Authorizer authorizer) {
+        this.securityContextExecutor = securityContextExecutor;
+        this.userJwtDecoderService = userJwtDecoderService;
+        this.authorizer = authorizer;
         this.exportService = exportService;
         this.stateArchiveFileNameGenerator = stateArchiveFileNameGenerator;
         this.stateExportRequestConverter = stateExportRequestConverter;
@@ -60,6 +77,14 @@ public class StateExportApi {
     @PostMapping(path = ApiPaths.StateExportApi.INSTANCE_ID)
     public ResponseEntity<Resource> exportInstanceState(
             @RequestBody StateExportRequest request, @PathVariable String instanceId) {
+
+        if (request.components().stream()
+                .anyMatch(component -> component.getComponent() == StateExportComponent.HEAP_DUMP)) {
+            authorizer.authorize(
+                    userJwtDecoderService.decodeTokenToUser(
+                            securityContextExecutor.requireSecurityContext().token()),
+                    new AuthorizationRequest(Set.of(MasterWebEndpoints.HEAP_DUMP_READ.authority())));
+        }
 
         InstanceId id = InstanceId.of(instanceId);
 

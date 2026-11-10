@@ -15,4 +15,5 @@
   <include file="db/changelog/postgres/changelog/1.3/007-insert-user-management-authorities.xml"/>
   <include file="db/changelog/postgres/changelog/1.3/008-rename-authority-name-to-codename-and-add-description.xml"/>
   <include file="db/changelog/postgres/changelog/1.3/009-add-authority-display-name.xml"/>
+  <include file="db/changelog/postgres/changelog/1.3/010-insert-heap-dump-authority.xml"/>
 </databaseChangeLog>
