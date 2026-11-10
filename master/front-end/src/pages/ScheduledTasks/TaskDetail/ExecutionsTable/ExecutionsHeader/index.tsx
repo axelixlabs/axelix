@@ -17,13 +17,15 @@
  */
 import { useTranslation } from "react-i18next";
 
+import type { TScheduledTaskExecutionsFilter } from "@/models";
+
 import styles from "../styles.module.css";
 
 interface IProps {
-    filter: "all" | "failed";
+    filter: TScheduledTaskExecutionsFilter;
     total: number;
     failed: number;
-    onFilterChange: (filter: "all" | "failed") => void;
+    onFilterChange: (filter: TScheduledTaskExecutionsFilter) => void;
 }
 
 export const ExecutionsHeader = ({ filter, total, failed, onFilterChange }: IProps) => {

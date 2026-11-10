@@ -20,7 +20,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler } from "@/components";
-import type { IScheduledTaskExecutionRecord } from "@/models";
+import type { IScheduledTaskExecutionRecord, TScheduledTaskExecutionsFilter } from "@/models";
 
 import { ExecutionRow } from "./ExecutionRow";
 import { ExecutionsHeader } from "./ExecutionsHeader";
@@ -30,14 +30,12 @@ interface IProps {
     executions: IScheduledTaskExecutionRecord[];
 }
 
-type TExecutionsFilter = "all" | "failed";
-
 const PAGE_SIZE = 8;
 
 export const ExecutionsTable = ({ executions }: IProps) => {
     const { t } = useTranslation();
 
-    const [filter, setFilter] = useState<TExecutionsFilter>("all");
+    const [filter, setFilter] = useState<TScheduledTaskExecutionsFilter>("all");
     const [page, setPage] = useState(1);
 
     // TODO: The filter and the table only cover the latest 30 executions, the default page of the history API
@@ -46,7 +44,7 @@ export const ExecutionsTable = ({ executions }: IProps) => {
     const firstIndex = (page - 1) * PAGE_SIZE;
     const pageExecutions = visibleExecutions.slice(firstIndex, firstIndex + PAGE_SIZE);
 
-    const handleFilterChange = (newFilter: TExecutionsFilter): void => {
+    const handleFilterChange = (newFilter: TScheduledTaskExecutionsFilter): void => {
         setFilter(newFilter);
         setPage(1);
     };

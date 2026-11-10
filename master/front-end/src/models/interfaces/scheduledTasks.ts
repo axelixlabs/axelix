@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import type { TScheduledTaskStatus } from "../types/scheduledTasks";
 
 export interface IScheduledTask {
     taskId: string;
@@ -201,22 +202,11 @@ export interface IScheduledTaskHistoryResponse {
     size: number;
 }
 
-/**
- * The trigger type of the scheduled task, named after the group of the response it comes from
- */
-export type TScheduledTaskType = keyof IScheduledTasksResponseBody;
-
-/**
- * A scheduled task together with its trigger type
- */
-export type TScheduledTaskItem =
-    { type: "cron"; task: ICron } | { type: "fixedDelay" | "fixedRate"; task: IFixedTasks };
-
 export interface IUpdateScheduledTasksStatusRequestData {
     instanceId: string;
     trigger: string;
     force: boolean;
-    statusType: "enable" | "disable";
+    statusType: TScheduledTaskStatus;
 }
 
 export interface IUpdateCronExpressionDataRequestData {

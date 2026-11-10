@@ -18,9 +18,10 @@
 import type { TFunction } from "i18next";
 
 import { formatInterval } from "@/helpers";
+import type { TFixedScheduledTaskType } from "@/models";
 
 export const getIntervalDescription = (
-    type: "fixedDelay" | "fixedRate",
+    type: TFixedScheduledTaskType,
     interval: number,
     language: string,
     t: TFunction,
