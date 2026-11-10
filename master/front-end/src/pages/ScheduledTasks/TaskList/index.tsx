@@ -91,7 +91,8 @@ export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, setSearch }
                                         <span className={styles.Labels}>
                                             <span className={`${shared.Mono} ${styles.Method}`}>{task.methodName}</span>
                                             <span className={`${shared.Mono} ${styles.ClassName}`}>
-                                                {task.className}.{task.methodName}
+                                                {task.className.slice(task.className.lastIndexOf(".") + 1)}.
+                                                {task.methodName}
                                             </span>
                                         </span>
                                         <span
