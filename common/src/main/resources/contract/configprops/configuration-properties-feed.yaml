@@ -66,6 +66,10 @@ components:
           type: string
           description: The flattened key, in the dot/bracket notation (e.g. 'servers[0].host').
           x-axelix-introduced-in: 1.2.0
+        sensitive:
+          type: boolean
+          description: Whether the property's value should be sanitized.
+          x-axelix-introduced-in: 1.3.0
         value:
           type: string
           description: The string representation of the value, or absent for an empty map or list.

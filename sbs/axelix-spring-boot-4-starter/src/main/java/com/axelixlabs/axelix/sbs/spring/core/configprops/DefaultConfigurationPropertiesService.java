@@ -37,17 +37,22 @@ public class DefaultConfigurationPropertiesService implements ConfigurationPrope
 
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
     private final ConfigurationPropertiesReportEndpoint delegate;
+    private final PropertySensitivityMarker propertySensitivityMarker;
 
     public DefaultConfigurationPropertiesService(
-            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
+            ApplicationContext applicationContext,
+            ConfigurationPropertiesConverter configurationPropertiesConverter,
+            PropertySensitivityMarker propertySensitivityMarker) {
         this.configurationPropertiesConverter = configurationPropertiesConverter;
 
         // ALWAYS is required here so that property values are included in the response.
         this.delegate = new ConfigurationPropertiesReportEndpoint(List.of(), Show.ALWAYS);
         this.delegate.setApplicationContext(applicationContext);
+        this.propertySensitivityMarker = propertySensitivityMarker;
     }
 
     public ConfigurationPropertiesFeed getConfigProps() {
-        return configurationPropertiesConverter.convert(delegate.configurationProperties());
+        return propertySensitivityMarker.mark(
+                configurationPropertiesConverter.convert(delegate.configurationProperties()));
     }
 }

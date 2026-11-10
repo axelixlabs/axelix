@@ -53,5 +53,8 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
                 .collect(Collectors.toSet());
 
         assertThat(values).contains("shouldBeSanitized", "toBeSanitized").doesNotContain("******");
+        assertThat(environmentFeed.getPropertySources())
+                .flatExtracting(source -> source.getProperties())
+                .allSatisfy(property -> assertThat(property.getSensitive()).isTrue());
     }
 }

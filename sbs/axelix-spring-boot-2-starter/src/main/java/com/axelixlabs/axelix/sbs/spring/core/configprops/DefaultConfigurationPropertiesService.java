@@ -37,13 +37,17 @@ public class DefaultConfigurationPropertiesService implements ConfigurationPrope
 
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
     private final ConfigurationPropertiesReportEndpoint delegate;
+    private final PropertySensitivityMarker propertySensitivityMarker;
 
     public DefaultConfigurationPropertiesService(
-            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
+            ApplicationContext applicationContext,
+            ConfigurationPropertiesConverter configurationPropertiesConverter,
+            PropertySensitivityMarker propertySensitivityMarker) {
 
         this.configurationPropertiesConverter = configurationPropertiesConverter;
         this.delegate = new ConfigurationPropertiesReportEndpoint(List.of());
         this.delegate.setApplicationContext(applicationContext);
+        this.propertySensitivityMarker = propertySensitivityMarker;
 
         // Spring Boot 2.7 has default sanitization keys (password, secret, key, token, etc.).
         // Clear them so that sanitization decisions can be made by Axelix Master.
@@ -51,6 +55,7 @@ public class DefaultConfigurationPropertiesService implements ConfigurationPrope
     }
 
     public ConfigurationPropertiesFeed getConfigProps() {
-        return configurationPropertiesConverter.convert(delegate.configurationProperties());
+        return propertySensitivityMarker.mark(
+                configurationPropertiesConverter.convert(delegate.configurationProperties()));
     }
 }

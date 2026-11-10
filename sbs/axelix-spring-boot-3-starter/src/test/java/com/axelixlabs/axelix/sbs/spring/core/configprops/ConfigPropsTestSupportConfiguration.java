@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SharedAxelixConfigurationProperties;
 
 /**
@@ -54,7 +55,10 @@ public class ConfigPropsTestSupportConfiguration {
     @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
             ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
-        return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
+        return new DefaultConfigurationPropertiesService(
+                applicationContext,
+                configurationPropertiesConverter,
+                new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
     }
 
     @Bean

@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationProperties
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
 
 /**
  * Auto-configuration for the {@link AxelixConfigurationPropertiesEndpoint}.
@@ -54,8 +55,11 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
-            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
-        return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
+            ApplicationContext applicationContext,
+            ConfigurationPropertiesConverter configurationPropertiesConverter,
+            PropertySensitivityMarker propertySensitivityMarker) {
+        return new DefaultConfigurationPropertiesService(
+                applicationContext, configurationPropertiesConverter, propertySensitivityMarker);
     }
 
     @Bean

@@ -65,6 +65,9 @@ class DefaultEnvironmentServiceTest {
                 .collect(Collectors.toSet());
 
         assertThat(values).contains("shouldBeSanitized", "toBeSanitized").doesNotContain("******");
+        assertThat(environmentFeed.getPropertySources())
+                .flatExtracting(source -> source.getProperties())
+                .allSatisfy(property -> assertThat(property.getSensitive()).isTrue());
     }
 
     @ConfigurationProperties(prefix = "axelix.prop.test")

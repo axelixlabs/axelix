@@ -26,6 +26,7 @@ import org.springframework.core.env.Environment;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvironmentService;
@@ -75,8 +76,11 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     }
 
     @Bean
-    public EnvironmentService environmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
-        return new DefaultEnvironmentService(environment, envPropertyEnricher);
+    public EnvironmentService environmentService(
+            Environment environment,
+            EnvPropertyEnricher envPropertyEnricher,
+            PropertySensitivityMarker propertySensitivityMarker) {
+        return new DefaultEnvironmentService(environment, envPropertyEnricher, propertySensitivityMarker);
     }
 
     @Bean

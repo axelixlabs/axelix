@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
+import java.util.List;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -32,6 +34,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationProperties
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
 
 /**
  * Environment test configuration.
@@ -55,13 +58,19 @@ public class EnvironmentTestConfig {
 
     @Bean
     public EnvironmentService environmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
-        return new DefaultEnvironmentService(environment, envPropertyEnricher);
+        return new DefaultEnvironmentService(
+                environment,
+                envPropertyEnricher,
+                new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
     }
 
     @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
             ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
-        return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
+        return new DefaultConfigurationPropertiesService(
+                applicationContext,
+                configurationPropertiesConverter,
+                new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
     }
 
     @Bean

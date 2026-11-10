@@ -42,6 +42,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationProperties
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
 
 /**
  * Shared test configuration backing a single, cached Spring context for all {@code env} integration tests.
@@ -91,7 +92,10 @@ public class EnvSharedTestConfig {
     @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
             ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
-        return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
+        return new DefaultConfigurationPropertiesService(
+                applicationContext,
+                configurationPropertiesConverter,
+                new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
     }
 
     @Bean
@@ -111,7 +115,10 @@ public class EnvSharedTestConfig {
 
     @Bean
     public EnvironmentService environmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
-        return new DefaultEnvironmentService(environment, envPropertyEnricher);
+        return new DefaultEnvironmentService(
+                environment,
+                envPropertyEnricher,
+                new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
     }
 
     @Bean

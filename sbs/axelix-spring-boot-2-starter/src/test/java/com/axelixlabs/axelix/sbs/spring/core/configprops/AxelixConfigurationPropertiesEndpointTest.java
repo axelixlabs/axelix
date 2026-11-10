@@ -41,6 +41,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
@@ -252,7 +253,10 @@ public class AxelixConfigurationPropertiesEndpointTest {
         public ConfigurationPropertiesService configurationPropertiesService(
                 ApplicationContext applicationContext,
                 ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new DefaultConfigurationPropertiesService(applicationContext, configurationPropertiesConverter);
+            return new DefaultConfigurationPropertiesService(
+                    applicationContext,
+                    configurationPropertiesConverter,
+                    new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
         }
 
         @Bean
