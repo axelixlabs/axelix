@@ -197,7 +197,10 @@ signature stops matching the new secret. Users land back on `/login`.
 
 ## Roles and authorities
 
-Starting with 1.3, authority codenames follow `resource:action` or `resource.sub-resource:action`.
+Axelix 1.3 introduces new RBAC authority names, inspired by the
+[Grafana RBAC model](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/access-control/).
+The `resource:action` and `resource.sub-resource:action` naming patterns apply only to Axelix 1.3 and later.
+Earlier versions use legacy names such as `CACHES_CLEAR`.
 For example, `caches:clear` permits clearing caches, and `environment.values:read` names access to property values.
 Roles still determine which actions users can perform. For starters older than 1.3, Master automatically translates
 codenames to legacy names such as `CACHES_CLEAR`; no service configuration change is needed.
