@@ -103,7 +103,11 @@ class AuthoritiesApiTest extends AbstractProtectedEndpointTest {
                     .extracting(UserAuthoritiesResponse.AuthorityProfileResponse::codename)
                     .isSorted()
                     .containsExactly(
-                            "config-properties.values:read", "environment.values:read", "users:manage", "users:read");
+                            "config-properties.values:read",
+                            "environment.values:read",
+                            "heap-dump:read",
+                            "users:manage",
+                            "users:read");
             assertSuccessfulCallback(MasterWebEndpoints.AUTHORITIES_READ, viewer.getActor());
         } finally {
             userService.deleteByIds(List.of(userId));
