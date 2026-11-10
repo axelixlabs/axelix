@@ -262,6 +262,77 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
         executionResultRepository.deleteAll();
     }
 
+    @ParameterizedTest
+    @MethodSource("infersMissingMetadata")
+    void infersMissingMetadata(String taskId, String className, String methodName) {
+        // given.
+        scheduledTasksFeed("{\"target\":\"" + taskId + "\"}");
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThatJson(response.getBody()).inPath("cron[0].className").isEqualTo(className);
+        assertThatJson(response.getBody()).inPath("cron[0].methodName").isEqualTo(methodName);
+        assertThatJson(response.getBody()).inPath("cron[0].taskId").isEqualTo(taskId);
+    }
+
+    @ParameterizedTest
+    @MethodSource("prefersExplicitMetadata")
+    void prefersExplicitMetadata(String taskId, String className, String methodName) {
+        // given.
+        scheduledTasksFeed("{\"target\":\"" + taskId + "\",\"className\":\"" + className + "\",\"methodName\":\""
+                + methodName + "\"}");
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThatJson(response.getBody()).inPath("cron[0].className").isEqualTo(className);
+        assertThatJson(response.getBody()).inPath("cron[0].methodName").isEqualTo(methodName);
+    }
+
+    private static Stream<Arguments> infersMissingMetadata() {
+        return Stream.of(
+                Arguments.of("com.example.Jobs.run", "com.example.Jobs", "run"),
+                Arguments.of("com.example.Jobs$Nested.run#cron0", "com.example.Jobs$Nested", "run"),
+                Arguments.of("com.example.Jobs.run#fixedDelay0", "com.example.Jobs", "run"),
+                Arguments.of("com.example.Jobs.run#fixedRate12", "com.example.Jobs", "run"),
+                Arguments.of("com.example.Jobs$$Lambda$1/0x123@abc", "com.example.Jobs", "lambda"),
+                Arguments.of("com.example.Jobs$$Lambda/0x123@abc", "com.example.Jobs", "lambda"),
+                Arguments.of("com.example.Jobs$Nested$$Lambda$12@abc", "com.example.Jobs$Nested", "lambda"),
+                Arguments.of("com.example.Jobs$$Lambda/123@abc", "com.example.Jobs", "lambda"),
+                Arguments.of("com.example.Jobs@abc", "com.example.Jobs", "unknown"),
+                Arguments.of("com.example.Jobs$$Lambda$bad/0x123@abc", "unknown", "unknown"),
+                Arguments.of("unknown", "unknown", "unknown"));
+    }
+
+    private static Stream<Arguments> prefersExplicitMetadata() {
+        return Stream.of(
+                Arguments.of("opaque", "com.example.ActualJobs", "execute"),
+                Arguments.of("com.example.OldJobs.run", "com.example.ActualJobs", "execute"));
+    }
+
+    private void scheduledTasksFeed(String runnable) {
+        String body = "{\"cron\":[{\"runnable\":" + runnable
+                + ",\"expression\":\"* * * * * *\",\"enabled\":true}],\"fixedDelay\":[],\"fixedRate\":[],\"custom\":[]}";
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                if (("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks").equals(request.getPath())) {
+                    return new MockResponse().setBody(body).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        });
+    }
+
     @Test
     void shouldReturnJSONScheduledTasksResponse() {
         // when.
