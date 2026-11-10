@@ -8,6 +8,8 @@
     --problem-cascade-bg: var(--axelix-red-50);
     --problem-unidirectional: #0891b2;
     --problem-unidirectional-bg: #ecfeff;
+    --problem-to-string: #db2777;
+    --problem-to-string-bg: #fdf2f8;
 
     display: flex;
     flex-direction: column;

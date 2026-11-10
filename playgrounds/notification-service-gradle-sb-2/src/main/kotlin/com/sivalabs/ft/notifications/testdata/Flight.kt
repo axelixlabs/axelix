@@ -21,4 +21,6 @@ class Flight {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "airport_id")
     var airport: Airport? = null
+
+    override fun toString(): String = "Flight(id=$id, flightNumber=$flightNumber, airport=$airport)"
 }

@@ -37,6 +37,11 @@
     background-color: var(--problem-unidirectional-bg);
 }
 
+.ToString {
+    color: var(--problem-to-string);
+    background-color: var(--problem-to-string-bg);
+}
+
 .Outlined {
     background-color: var(--axelix-white);
     border: 1px solid currentcolor;
