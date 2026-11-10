@@ -1,0 +1,183 @@
+---
+title: "Spring's Release Cycle in 2026. How AI Broke Everything"
+date: 2026-11-05
+authors: ["Mikhail Polivakha"]
+tags: ["Spring Boot", "Security"]
+heroImagePath: /posts/spring-release-cycle-2026/preview.png
+description: "How the Spring Boot release train, OSS support windows and the LTS label determine whether a security patch can reach your build, and why the surge of vulnerability reports delayed the May 2026 release train."
+metaDescription: "How the Spring release train, OSS support windows and Spring's LTS label work, why the May 2026 train was delayed by CVEs, and what to do when SCA fails on a closed Spring Boot line."
+---
+
+Hi everyone!
+
+My name is Mikhail Polivakha, and I am the technical lead of the [Axelix](https://github.com/axelixlabs/axelix) project. We recently passed the mark of [10,000 downloads per month](https://x.com/axelixlabs/status/2117567140689498229). We build a tool for working with Spring applications ourselves, so release cycles, version support and dependency upgrades are not abstract theory for me. I run into them both as a Spring user and as a developer of an Open Source project.
+
+I want to start with a situation that, I think, is familiar to many. The release is already planned, the feature is written, the tests are green, the build is assembled. All that's left is to run the last pipeline and roll out the changes. And then, at the SCA step, everything turns red: a vulnerability has been found in one of the dependencies.
+
+Well, it happens. We'll just bump the patch version, pick up the fix and move on. That's what patch releases are for, right?
+
+You open Maven Central, look at your Spring Boot line, and the next number isn't there. And, what's much worse, it never will be.
+
+Let's say you have Spring Boot `3.5.16`. This is the last open release of the `3.5` line, and it came out on June 25, 2026. The next number, `3.5.17`, is present in the [Spring calendar](https://api.spring.io/projects/spring-boot/generations), but it is marked as enterprise. So the patch exists. The problem is that your pipeline looks at Maven Central, and this patch will not end up there.
+
+At this moment, there is almost always a colleague who says: "But `3.5` is LTS! What do you mean there won't be a patch?"
+
+And this, friends, is where the most interesting part begins. Because your colleague is both right and wrong at the same time. To understand how this came about, we'll have to figure out three things at once: how the Release Train works, how long Spring Boot actually lives in OSS, and what Spring even means by LTS. And after that, we'll look at what AI has to do with all this, and why in 2026 even the Spring release train itself had to be delayed because of vulnerabilities.
+
+Let's start with the theory, as I like to do.
+
+### Release Train. Why you are upgrading more than just one Spring
+
+A Release Train is not some special version of a product. It is an agreement that a set of projects ships together, on a shared schedule. You don't get a random collection of libraries, but a train whose cars have been matched to one another.
+
+In the case of Spring Boot, this is especially important. When you write an application, you don't assemble Spring Framework, Spring Security, Spring Data and the other projects by hand, one at a time. Usually you add Spring Boot, and it manages the aligned versions of this whole portfolio.
+
+So if SCA has found a vulnerability in, say, Spring Framework, the question isn't simply "is there a new Framework?". It is far more important to understand which Spring Boot line will bring this fix into your application. The [Spring support policy](https://spring.io/support-policy) works the same way: a project's support dates are tied to the corresponding Boot line.
+
+A new major or minor Spring Boot version usually comes out twice a year, in May and November. In the [description of supported versions](https://github.com/spring-projects/spring-boot/wiki/Supported-Versions), the team gives a guideline: the Thursday after the third Monday. Between these trains, patch releases come out as needed. There is no separate hard rule like "a new patch strictly every first Tuesday" here.
+
+For example, Spring Boot `4.0` in November 2025 brought Spring Framework `7.0` and Spring Security `7.0`. The next train, Boot `4.1` in June 2026, brought Security `7.1`, while Framework stayed on the `7.0` line. And this is normal. Each project has its own amount of change, so not every Boot minor has to mean a new minor of every project inside it.
+
+While we're here, let's pin down a difference that will come in very handy when the build is already red.
+
+Moving from `4.1.1` to `4.1.2` is a patch upgrade. In theory it is backward compatible, and this is exactly the kind of update you expect to pick up shortly before a release. But moving from `4.0` to `4.1` is already the next minor, with new changes, deprecations and **potentially backward-incompatible changes**. Moving to the next major, all the more so, cannot be considered a simple replacement of one digit.
+
+***Important! When bumping a minor, expect that something may fall off and that there may be breaking changes - this has to be tested separately.***
+
+Now a few words about support and the Release Train schedule.
+
+### A year, and the train has left
+
+A Spring Boot release line has an open support window, during which fixes are published in OSS. And this window is about a year. Note: not three years, not the entire lifetime of a major version, but about a year for a specific line.
+
+The [support policy](https://spring.io/support-policy) states a minimum of 13 months of OSS support for a Spring Boot minor. The Boot wiki has a softer wording about a minimum of 12 months. If you look at the published calendar, for the current lines the picture is closer to thirteen: the May line receives open patches until roughly the end of June of the following year, and the November line until roughly the end of December.
+
+Look at how this plays out in practice:
+
+- Spring Boot `3.5` came out at the end of May 2025, and its OSS support ended on June 30, 2026.
+
+- Spring Boot `4.0`, which is a new major, came out at the end of November 2025, and its OSS window ends on December 31, 2026.
+
+- Spring Boot `4.1` came out in June 2026 and is open until July 31, 2027.
+
+Let's make this clear right away - **`4.0` does not get any special open window just because the "first digit" of the version changed**. For the release train, it is the same kind of separate line with its own limited lifetime.
+
+> *Wait, but the policy says that a major is supported for up to three years!*
+
+It does. Only that phrase reads differently. Three years of support for a generation do not mean three years of open patches specifically for `4.0`. To stay within the supported generation, you need to move to the following minor releases in time: from `4.0` to `4.1`, then to the next one, and so on.
+
+The windows of neighboring lines overlap by about half a year. So usually two lines have OSS support at the same time, and you have time to calmly plan the transition. If you missed one train, you can still catch the next one. If you missed several, there is no longer a free patch for your line.
+
+Now let's get back to our `3.5.16`. There is no anomaly here. The `3.5` line has lived out its open window, and `3.5.16` became the last OSS release on Maven Central. Expecting `3.5.17` to appear there a bit later is pointless. The policy doesn't promise that.
+
+After OSS ends, a regular line also has a commercial window, up to about 25 months from the start of the release. For example, for `4.0` it will last until December 31, 2027. But these builds are no longer published on Maven Central, but in a private enterprise repository. For a pipeline that can only work with Central, this commercial tail effectively doesn't exist.
+
+And now it's time to get back to our colleague's remark about LTS.
+
+### But we're on LTS!
+
+Strictly speaking, the last minor release within a major is called LTS, for example `3.5` or `2.7` - this is "LTS" in Spring's terminology. The problem is that many people automatically put into this word the meaning they know from Java. And those are two different stories.
+
+JDK feature releases also come out every six months (in September and in March). But among them there are LTS versions, for example Java 21 and Java 25. You choose such a version and for years you receive patches for it from your vendor **for free**, without moving to each next feature release.
+
+To put this in perspective, Java 25 still has OSS support, and Java 26 no longer does. That's why in the Java world the concept of LTS matters to everyone. Non-LTS Java versions are supported until the next feature version of Java (22 is supported until 23 comes out), and LTS ones much longer (even without vendor support, vendors are a story of their own). There would be nobody to fix [bugs like this one](https://axelix.io/blog/aot-cache-sigill) for you.
+
+And it is this very model that people often carry over to Spring: "We've settled on a stable line, it will be fixed, and we'll calmly pick up the fixes."
+
+Well, Spring OSS has nothing like that.
+
+What people call *"Spring LTS"* in conversation is the last minor within a large generation. It does indeed have long support, but almost all of it falls not on the open OSS window but on the commercial tail.
+
+In February 2025, [Michael Minella described this rule separately](https://spring.io/blog/2025/02/13/support-policy-updates). Before that, the team would sometimes extend support for the last minor manually, without any general guarantee. This is exactly why many people remember Spring Framework `5.3` as a classic LTS: the line appeared on October 31, 2020, and open releases kept coming out until August 31, 2024. **Almost four years!** But Minella explicitly stresses that this was a decision about a specific line, not a promise for the future.
+
+Unfortunately, because of this precedent with Spring Boot `2.7` and Spring Framework `5.3`, many people started putting into LTS a meaning that the concept of "LTS" never had at all - I regularly run into this myself.
+
+Now the guarantee looks different. The last minor of a generation gets five additional years of enterprise support. Together with the standard windows, this gives about seven years of life, but the vast majority of that period is commercial.
+
+Today, for example, two Spring Boot lines fall under this rule:
+
+- `2.7`: OSS ended back on June 30, 2023, and commercial support continues until June 30, 2029.
+
+- `3.5`: OSS ended on June 30, 2026, and commercial support continues until June 30, 2032.
+
+But `3.4` isn't in this club. Its commercial window ends on December 31, 2026. And `4.0` isn't in it either, even though it is a major. The five additional years will go to the minor that someday becomes the **last** in the fourth generation. At the moment, that is neither `4.0` nor `4.1`.
+
+*In short, the conclusion: in Spring, the concept of LTS only makes sense within Enterprise support. For ordinary people, Spring LTS is absolutely the same as non-LTS.*
+
+Commercial builds are now distributed as TrueSource Spring Enterprise. Before that, the name "Tanzu Spring" was used. But the point isn't the sign on the door. The point is where the artifact lives and on what terms you get it. If a line's open window has ended, the fix goes to the enterprise repository, not to Central. Since June 2026, subscribers also have access to CVE-only builds on day zero, even before the public advisory: such a build contains the vulnerability fix without the rest of the contents of a large patch release.
+
+So your colleague is right that patches for `3.5` will keep coming out for a long time. But if by "will" they meant "we'll download them for free from Maven Central", then they are wrong. For OSS, the `3.5` line ended on June 30, 2026. The long period until 2032 refers to commercial support.
+
+It would seem the picture is now clear. Keep an eye on your line, move to the next train in time, and if the business requires you to stay, sign up for commercial support. But in 2026, one more problem was added.
+
+*Now the train itself didn't arrive on schedule... What happened?*
+
+### May 2026. The train was delayed because of CVEs
+
+I've already written that the Spring Boot release train was supposed to come out once every six months - in May and in November.
+
+And so [on June 1, Michael Minella wrote](https://spring.io/blog/2026/06/01/spring_and_security_in_the_times_of_ai) that the May Release Train had been shifted and compressed into a window from June 8 to June 14. The reason wasn't that someone hadn't finished writing a new feature. The team needed to ship a large set of security fixes, and it didn't fit into the original date.
+
+In the end, Spring Boot `4.1.0` came out on June 10. The team preferred to delay the train rather than sit on already confirmed CVEs until the next major window in November.
+
+To understand the scale of what's going on, it's enough to compare a few numbers. Historically, the team received about 6.5 new security reports per month. For all of 2024, according to [SecurityWeek's count](https://www.securityweek.com/91-vulnerabilities-patched-in-spring-application-framework/), 22 vulnerabilities were closed. For 2025, even fewer, 16.
+
+And then 2026 began.
+
+In March alone, the community sent **55 CVE reports**! From this wave, 26 CVEs were announced in April. In that same April, the team turned on its own scanning, and within a month received 482 reports across 65 projects: 370 were found by internal scanning and another 112 were sent by the community. At the same time, 37% of the internal findings turned out to be duplicates or not vulnerabilities. In May, the community brought another 72 reports.
+
+Of course, you have to understand that 482 reports are not 482 confirmed holes, and certainly not 482 vulnerabilities in your production. A report still has to be triaged, reproduced, discussed with the reporter, and only then turned into a fix and an advisory. But for the maintenance team, the load appears already at the queue stage. Each such report takes a person's time, even if in the end it turns out to be a duplicate.
+
+Then came the wave that practically all scanner users noticed. On August 20, 2026, a large batch of fixes came out, in which [Sonatype counted 91 CVEs](https://www.sonatype.com/blog/91-spring-cves-highlight-the-growing-ai-vulnerability-consumption-problem). SecurityWeek wrote that by August 24, more than 200 vulnerabilities had been closed in Spring in 2026. For comparison, let me remind you: there were 16 in all of 2025.
+
+Broadcom called the June set the largest batch of security updates in the 23-year history of Spring. And by the end of August, it reported that over five months, more than 12 billion tokens had been spent on finding vulnerabilities with frontier models.
+
+So in the end, what is the Spring team doing about this?
+
+### AI helps search. Patches are still written by people
+
+The Spring team didn't just wait for the flow of reports to subside on its own. It turned on its own scanning to find problems before external reporters, and started shipping fixes in large coordinated batches. If such a batch doesn't fit into the date, the whole train moves. That is exactly what happened in May 2026.
+
+At the same time, triaging reports and preparing fixes remain with people, and Broadcom specifically stresses that a released patch is written and reviewed by a human. As an argument, the company cites a 1Password study: **of 6,000 patches generated by a model, only 26% actually eliminated the vulnerability and at the same time did not break the application**.
+
+In my opinion, this split is quite sensible. Refusing to use models when searching for potential vulnerabilities is already strange: they really do make it possible to cover a larger volume of code. But automatically shipping a generated diff into a project used in a huge number of applications is a completely different risk. AI found a candidate, great. A human still has to take responsibility for the fix.
+
+For you and me, this story has two practical sides.
+
+On the one hand, security releases have become larger and may not arrive on your convenient release Thursday. Sometimes you'll have to upgrade not one library, but a part of the portfolio at once.
+
+On the other hand, a fix is distributed according to the same support rules we talked about above. An open line gets a patch on Maven Central. A line outside the OSS window gets a build in the enterprise repository, sometimes even before the public advisory in the CVE-only format. The appearance of a new CVE does not by itself reopen an old line.
+
+At the same time, the team doesn't promise that everything will quickly go back to the quiet 2025. There are more and more duplicates, so the pace will probably drop from the April peak. But, by their estimate, it won't return to the former 6.5 reports per month. Planning your upgrade process on the assumption that security releases will be rare and small is no longer a good idea.
+
+### Back to our red pipeline
+
+So the release is still waiting, SCA is still red. What now?
+
+First, as I've already said, you need to understand whether your line is still supported in OSS. As of early November 2026, the situation for the main lines is as follows:
+
+- Spring Boot `4.1` is open until July 31, 2027. If you are already on this line, the next patch releases will arrive on Central.
+
+- Spring Boot `4.0` is open until December 31, 2026. Being a major does not by itself give it a longer OSS window. After this date, commercial support remains until December 31, 2027.
+
+- Spring Boot `3.5` is no longer supported in OSS. The commercial tail until June 30, 2032 means the enterprise repository, not Maven Central.
+
+- Spring Boot `3.4` loses even commercial support on December 31, 2026. Boot `2.7` remains only in the paid tail until June 30, 2029, and the `3.0`, `3.1`, `3.2` and `3.3` lines have already ended completely.
+
+And once more about the cars of the train. If you are using Boot `4.0`, you aren't saved by the fact that Spring Framework `7.0` as a whole is open until July 2027. This Framework line is also needed by Boot `4.1`. Your Boot `4.0` will not receive new open patch releases after December 31, 2026.
+
+So the fork in the road is pretty short.
+
+If your line is still open, you pick up the patch and, most likely, really do roll out the release without a big migration. If the line is already closed, there are two working options: move to a supported train, or get the fix through commercial support. But the option "let's wait until a free patch appears on the old line by itself" doesn't exist with this Release Train.
+
+That's why Spring Boot versions need to be managed in advance, not at the moment when the release is tomorrow and SCA is red today. **It's better to plan the move to the next minor as regular engineering work, while you still have the overlap of support windows**. Otherwise one day it will turn out that you have to choose between an urgent migration, buying enterprise support, and a release with a known vulnerability. Not a great set of options, to put it mildly.
+
+If you have one service, its state is visible from `pom.xml` or `build.gradle`. But if you have forty services, the picture quickly stops fitting in your head: one is already on `4.1`, another sits on `4.0` with a deadline in December, a third has stayed on `3.5` with no open patches, and a fourth, on `3.4`, will soon lose even the commercial window.
+
+This picture across all services is put together by [Spring Portfolio in Axelix](https://axelix.io/docs/ui-guide/dashboard/spring-portfolio). We built this dashboard for exactly the situation described above: instead of manually going through dozens of repositories, you see which Spring Boot and Spring Framework versions your applications actually use, how many applications are already outside OSS support, and how they are distributed across the `3.5.x`, `4.0.x`, `4.1.x` lines and so on.
+
+There is also a separate timeline for each line in use: when it came out, when OSS support ends, and how many applications run on it. Moreover, an application is considered supported only if both Boot and Framework are still receiving open updates. Remember our conversation about the cars of one train? Here, this connection is visible not on an abstract diagram, but on your own fleet of services.
+
+Of course, in this respect Axelix does not replace SCA and does not perform the migration for you. It answers a different question, one that's better asked in advance: where the next red pipeline can still be cured with a regular patch release, and where there will be no open patch anymore.
+
+Best of luck to everyone!
