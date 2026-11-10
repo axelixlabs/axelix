@@ -139,7 +139,7 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
                             onSuccessfulResult(request, mcpRequestContext.mcpEndpoint(), authenticatedUser);
                         }
                     },
-                    new DefaultSecurityContext(accessToken));
+                    new DefaultSecurityContext(accessToken, authenticatedUser));
         } catch (AuthenticationException e) {
             setResourceMetadataHeader(response);
             throw e;

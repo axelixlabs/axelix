@@ -28,4 +28,9 @@ public interface SecurityContext {
      * @return access token that has been provided by the user.
      */
     String token();
+
+    /**
+     * @return the authenticated and authorized user.
+     */
+    User user();
 }

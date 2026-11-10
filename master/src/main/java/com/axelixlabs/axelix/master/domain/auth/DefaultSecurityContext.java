@@ -25,9 +25,16 @@ package com.axelixlabs.axelix.master.domain.auth;
 public class DefaultSecurityContext implements SecurityContext {
 
     private final String token;
+    private final User user;
 
-    public DefaultSecurityContext(String token) {
+    public DefaultSecurityContext(String token, User user) {
         this.token = token;
+        this.user = user;
+    }
+
+    @Override
+    public User user() {
+        return user;
     }
 
     @Override

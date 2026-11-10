@@ -37,7 +37,6 @@ import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.Authorizer;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
-import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.convert.request.StateExportRequestConverter;
 import com.axelixlabs.axelix.master.service.export.StateArchiveFileNameGenerator;
 import com.axelixlabs.axelix.master.service.export.StateExport;
@@ -53,7 +52,6 @@ import com.axelixlabs.axelix.master.service.export.ZipArchiveInstanceStateExport
 public class StateExportApi {
 
     private final SecurityContextExecutor securityContextExecutor;
-    private final UserJwtDecoderService userJwtDecoderService;
     private final Authorizer authorizer;
     private final ZipArchiveInstanceStateExporter exportService;
     private final StateArchiveFileNameGenerator stateArchiveFileNameGenerator;
@@ -64,10 +62,8 @@ public class StateExportApi {
             StateArchiveFileNameGenerator stateArchiveFileNameGenerator,
             StateExportRequestConverter stateExportRequestConverter,
             SecurityContextExecutor securityContextExecutor,
-            UserJwtDecoderService userJwtDecoderService,
             Authorizer authorizer) {
         this.securityContextExecutor = securityContextExecutor;
-        this.userJwtDecoderService = userJwtDecoderService;
         this.authorizer = authorizer;
         this.exportService = exportService;
         this.stateArchiveFileNameGenerator = stateArchiveFileNameGenerator;
@@ -81,8 +77,7 @@ public class StateExportApi {
         if (request.components().stream()
                 .anyMatch(component -> component.getComponent() == StateExportComponent.HEAP_DUMP)) {
             authorizer.authorize(
-                    userJwtDecoderService.decodeTokenToUser(
-                            securityContextExecutor.requireSecurityContext().token()),
+                    securityContextExecutor.requireSecurityContext().user(),
                     new AuthorizationRequest(Set.of(MasterWebEndpoints.HEAP_DUMP_READ.authority())));
         }
 

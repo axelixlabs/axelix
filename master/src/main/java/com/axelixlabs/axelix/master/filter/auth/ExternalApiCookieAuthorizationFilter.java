@@ -121,7 +121,7 @@ public class ExternalApiCookieAuthorizationFilter extends OncePerRequestFilter {
                         filterChain.doFilter(request, response);
                         onSuccessfulResult(request, currentRequestContext, user);
                     },
-                    new DefaultSecurityContext(token));
+                    new DefaultSecurityContext(token, user));
         } catch (JwtProcessingException | ServletException | IOException e) {
             throw e;
         } catch (Exception e) {

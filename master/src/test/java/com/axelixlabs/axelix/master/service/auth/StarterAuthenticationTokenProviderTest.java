@@ -82,7 +82,7 @@ class StarterAuthenticationTokenProviderTest {
 
         // when.
         String token = securityContextExecutor.callWithinSecurityContext(
-                () -> tokenProvider.tokenFor(version), new DefaultSecurityContext(callerToken));
+                () -> tokenProvider.tokenFor(version), new DefaultSecurityContext(callerToken, caller));
 
         // then.
         PasswordlessUser decoded = new DefaultUserJwtDecoderService(
@@ -162,7 +162,7 @@ class StarterAuthenticationTokenProviderTest {
 
         // when.
         String token = securityContextExecutor.callWithinSecurityContext(
-                () -> tokenProvider.tokenFor("1.2.2"), new DefaultSecurityContext(callerToken));
+                () -> tokenProvider.tokenFor("1.2.2"), new DefaultSecurityContext(callerToken, caller));
 
         // then.
         PasswordlessUser decoded = new DefaultUserJwtDecoderService(
@@ -176,11 +176,12 @@ class StarterAuthenticationTokenProviderTest {
     @Test
     void shouldPreserveCallerWithoutRoles() {
         // given.
-        String callerToken = encoder.generateToken(new PasswordlessUser("id", "operator", Set.of()));
+        PasswordlessUser caller = new PasswordlessUser("id", "operator", Set.of());
+        String callerToken = encoder.generateToken(caller);
 
         // when.
         String token = securityContextExecutor.callWithinSecurityContext(
-                () -> tokenProvider.tokenFor("1.2.2"), new DefaultSecurityContext(callerToken));
+                () -> tokenProvider.tokenFor("1.2.2"), new DefaultSecurityContext(callerToken, caller));
 
         // then.
         PasswordlessUser decoded = new DefaultUserJwtDecoderService(
@@ -194,7 +195,8 @@ class StarterAuthenticationTokenProviderTest {
     void shouldRejectInvalidCallerToken() {
         // when / then.
         assertThatThrownBy(() -> securityContextExecutor.callWithinSecurityContext(
-                        () -> tokenProvider.tokenFor("1.2.2"), new DefaultSecurityContext("invalid")))
+                        () -> tokenProvider.tokenFor("1.2.2"),
+                        new DefaultSecurityContext("invalid", new PasswordlessUser("id", "operator", Set.of()))))
                 .isInstanceOf(InvalidJwtTokenException.class);
     }
 
