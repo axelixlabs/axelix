@@ -23,11 +23,6 @@
     overflow-wrap: anywhere;
 }
 
-.Suffix {
-    font-weight: var(--axelix-font-weight-regular);
-    color: var(--axelix-grey-500);
-}
-
 .ClassName {
     font-size: var(--axelix-font-size-caption);
     color: var(--axelix-grey-500);

@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { getCronDescription, parseTaskId } from "@/helpers";
+import { getCronDescription } from "@/helpers";
 import type { TScheduledTaskItem } from "@/models";
 
 import shared from "../../shared.module.css";
@@ -37,16 +37,13 @@ interface IProps {
 export const TaskHeader = ({ item, onChange }: IProps) => {
     const { t, i18n } = useTranslation();
 
-    const { method, suffix, qualifiedClassName } = parseTaskId(item.task.taskId);
-
     return (
         <div className={styles.Header}>
             <div className={styles.TitleBlock}>
-                <span className={`${shared.Mono} ${styles.Method}`}>
-                    {method}
-                    <span className={styles.Suffix}>{suffix}</span>
+                <span className={`${shared.Mono} ${styles.Method}`}>{item.task.methodName}</span>
+                <span className={`${shared.Mono} ${styles.ClassName}`}>
+                    {item.task.className}.{item.task.methodName}
                 </span>
-                <span className={`${shared.Mono} ${styles.ClassName}`}>{qualifiedClassName}</span>
                 <span className={styles.TriggerLine}>
                     <TriggerTypeBadge type={item.type} />
                     {item.type === "cron"

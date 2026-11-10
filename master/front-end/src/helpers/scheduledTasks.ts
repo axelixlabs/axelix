@@ -22,7 +22,7 @@ import "cronstrue/locales/ru";
 import dayjs from "dayjs";
 import type { TFunction } from "i18next";
 
-import type { IScheduledTasksResponseBody, TScheduledTaskItem, TScheduledTaskType } from "@/models";
+import type { IScheduledTask, IScheduledTasksResponseBody, TScheduledTaskItem, TScheduledTaskType } from "@/models";
 
 export const SCHEDULED_TASK_TYPE_LABEL_KEYS: Record<TScheduledTaskType, string> = {
     cron: "ScheduledTasks.cron",
@@ -36,41 +36,19 @@ export const filterScheduledTasks = (
 ): IScheduledTasksResponseBody => {
     const formattedSearch = search.toLowerCase().trim();
 
+    const matchesSearch = ({ className, methodName }: IScheduledTask): boolean =>
+        `${className}.${methodName}`.toLowerCase().includes(formattedSearch);
+
     return {
-        cron: scheduledTasksResponse.cron.filter((value) => value.taskId.toLowerCase().includes(formattedSearch)),
-
-        fixedDelay: scheduledTasksResponse.fixedDelay.filter((value) =>
-            value.taskId.toLowerCase().includes(formattedSearch),
-        ),
-
-        fixedRate: scheduledTasksResponse.fixedRate.filter((value) =>
-            value.taskId.toLowerCase().includes(formattedSearch),
-        ),
+        cron: scheduledTasksResponse.cron.filter(matchesSearch),
+        fixedDelay: scheduledTasksResponse.fixedDelay.filter(matchesSearch),
+        fixedRate: scheduledTasksResponse.fixedRate.filter(matchesSearch),
     };
 };
 
 export function isEmpty(resp: IScheduledTasksResponseBody): boolean {
     return resp.cron.length === 0 && resp.fixedDelay.length === 0 && resp.fixedRate.length === 0;
 }
-
-const getSimpleName = (qualifiedName: string): string => qualifiedName.slice(qualifiedName.lastIndexOf(".") + 1);
-
-export const parseTaskId = (
-    taskId: string,
-): { method: string; suffix: string; className: string; qualifiedClassName: string } => {
-    const [target, trigger] = taskId.split("#");
-    const lambdaIndex = target.indexOf("$$Lambda");
-    const methodSeparatorIndex = target.lastIndexOf(".");
-
-    const qualifiedClassName = target.slice(0, lambdaIndex !== -1 ? lambdaIndex : Math.max(methodSeparatorIndex, 0));
-
-    return {
-        method: target.slice(lambdaIndex !== -1 ? lambdaIndex + 2 : methodSeparatorIndex + 1),
-        suffix: trigger ? `#${trigger}` : "",
-        className: getSimpleName(qualifiedClassName),
-        qualifiedClassName,
-    };
-};
 
 export const getScheduledTaskItems = ({
     cron,

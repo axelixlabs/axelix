@@ -18,7 +18,7 @@
 import type { TFunction } from "i18next";
 import { describe, expect, it } from "vitest";
 
-import { formatInterval, getCronDescription, parseTaskId } from "@/helpers";
+import { filterScheduledTasks, formatInterval, getCronDescription } from "@/helpers";
 
 const t = ((key: string) => key) as TFunction;
 
@@ -63,53 +63,32 @@ describe("formatInterval", () => {
     });
 });
 
-describe("parseTaskId", () => {
-    it("Splits a method task id into the method and the simple class name", () => {
+describe("filterScheduledTasks", () => {
+    it.each([
+        ["heartbeat", true],
+        ["Scheduler", true],
+        ["com.example.Scheduler.heartbeat", true],
+        ["  HEARTBEAT  ", true],
+        ["", true],
+        ["unrelated", false],
+        ["opaque-id", false],
+    ])("Filters by class and method names for search '%s'", (search, matches) => {
+        // given.
+        const task = {
+            taskId: "opaque-id",
+            className: "com.example.Scheduler",
+            methodName: "heartbeat",
+            enabled: true,
+            successRate: null,
+        };
+        const cron = { ...task, expression: "*/3 * * * * *" };
+        const fixed = { ...task, interval: 1000, initialDelay: 0 };
+        const tasks = { cron: [cron], fixedDelay: [fixed], fixedRate: [fixed] };
+
         // when.
-        const result = parseTaskId("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive");
+        const result = filterScheduledTasks(tasks, search);
 
         // then.
-        expect(result).toEqual({
-            method: "alive",
-            suffix: "",
-            className: "SchedulerTestConfig",
-            qualifiedClassName: "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-        });
-    });
-
-    it("Separates the trigger suffix of the task id", () => {
-        // when.
-        const result = parseTaskId("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive#cron0");
-
-        // then.
-        expect(result).toEqual({
-            method: "alive",
-            suffix: "#cron0",
-            className: "SchedulerTestConfig",
-            qualifiedClassName: "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-        });
-    });
-
-    it("Keeps the lambda name and the simple class name of a lambda task id", () => {
-        // when.
-        const result = parseTaskId(
-            "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634",
-        );
-
-        // then.
-        expect(result).toEqual({
-            method: "Lambda$1969/0x000001ed01b91ca8@1e1c1634",
-            suffix: "",
-            className: "SchedulerTestConfig",
-            qualifiedClassName: "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-        });
-    });
-
-    it("Returns the whole task id as the method when it has no dots", () => {
-        // when.
-        const result = parseTaskId("heartbeat");
-
-        // then.
-        expect(result).toEqual({ method: "heartbeat", suffix: "", className: "", qualifiedClassName: "" });
+        expect(result).toEqual(matches ? tasks : { cron: [], fixedDelay: [], fixedRate: [] });
     });
 });

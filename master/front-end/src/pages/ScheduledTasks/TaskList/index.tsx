@@ -19,7 +19,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler, PageSearch } from "@/components";
-import { SCHEDULED_TASK_TYPE_LABEL_KEYS, isEmpty, parseTaskId } from "@/helpers";
+import { SCHEDULED_TASK_TYPE_LABEL_KEYS, isEmpty } from "@/helpers";
 import type { IScheduledTask, IScheduledTasksResponseBody, TScheduledTaskType } from "@/models";
 
 import shared from "../shared.module.css";
@@ -79,23 +79,20 @@ export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, setSearch }
                             </span>
 
                             {scheduledTasks[type].map((task) => {
-                                const { method, suffix, className } = parseTaskId(task.taskId);
-
                                 return (
                                     <button
                                         type="button"
                                         key={task.taskId}
-                                        title={task.taskId}
+                                        title={`${task.className}.${task.methodName}`}
                                         onClick={() => onSelect(task.taskId)}
                                         className={`${styles.Row} ${task.taskId === selectedTaskId ? styles.Selected : ""}`}
                                     >
                                         <span className={`${styles.Dot} ${getDotClass(task)}`} />
                                         <span className={styles.Labels}>
-                                            <span className={styles.MethodLine}>
-                                                <span className={`${shared.Mono} ${styles.Method}`}>{method}</span>
-                                                <span className={`${shared.Mono} ${styles.Suffix}`}>{suffix}</span>
+                                            <span className={`${shared.Mono} ${styles.Method}`}>{task.methodName}</span>
+                                            <span className={`${shared.Mono} ${styles.ClassName}`}>
+                                                {task.className}.{task.methodName}
                                             </span>
-                                            <span className={`${shared.Mono} ${styles.ClassName}`}>{className}</span>
                                         </span>
                                         <span
                                             className={`${shared.Mono} ${styles.Rate} ${getSuccessRateClass(getRoundedSuccessRate(task), task.enabled)}`}
