@@ -17,7 +17,7 @@
  */
 import { App, Button } from "antd";
 import type { AxiosError } from "axios";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
@@ -52,6 +52,7 @@ export const TriggerForm = ({ item, onChange, onClose }: IProps) => {
 
     const [value, setValue] = useState(currentValue);
     const [isCronValid, setIsCronValid] = useState(true);
+    const validationRequestId = useRef(0);
     const [updateRequest, setUpdateRequest] = useState(StatelessRequest.inactive());
 
     const normalizedValue = value.trim();
@@ -59,12 +60,19 @@ export const TriggerForm = ({ item, onChange, onClose }: IProps) => {
 
     const handleValueChange = (newValue: string): void => {
         if (isCron && newValue.trim() !== normalizedValue) {
+            const requestId = ++validationRequestId.current;
+            setIsCronValid(false);
+
             checkCronExpressionValid(newValue)
                 .then((response) => {
-                    setIsCronValid(response.data.valid);
+                    if (requestId === validationRequestId.current) {
+                        setIsCronValid(response.data.valid);
+                    }
                 })
                 .catch(() => {
-                    setIsCronValid(false);
+                    if (requestId === validationRequestId.current) {
+                        setIsCronValid(false);
+                    }
                 });
         }
 
