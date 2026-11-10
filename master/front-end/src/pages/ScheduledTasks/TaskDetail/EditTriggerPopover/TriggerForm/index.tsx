@@ -15,20 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App, Button, Input } from "antd";
+import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { extractErrorCode, getCronDescription } from "@/helpers";
-import { type IErrorResponse, StatelessRequest, type TScheduledTaskItem, type TScheduledTaskType } from "@/models";
+import { extractErrorCode } from "@/helpers";
+import { type IErrorResponse, StatelessRequest, type TScheduledTaskItem } from "@/models";
 import { changeCronExpression, changeScheduledTaskInterval, checkCronExpressionValid } from "@/services";
 
-import shared from "../../../shared.module.css";
-import { TriggerTypeBadge } from "../../TriggerTypeBadge";
-import { getIntervalDescription } from "../../getIntervalDescription";
-
+import { TriggerField } from "./TriggerField";
+import { TriggerPreview } from "./TriggerPreview";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -36,12 +34,6 @@ interface IProps {
     onChange: () => Promise<void>;
     onClose: () => void;
 }
-
-const TYPE_NOTE_KEY: Record<TScheduledTaskType, string> = {
-    cron: "ScheduledTasks.editCronNote",
-    fixedDelay: "ScheduledTasks.editDelayNote",
-    fixedRate: "ScheduledTasks.editRateNote",
-};
 
 const isIntervalValid = (value: string): boolean => /^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value));
 
@@ -51,7 +43,7 @@ const updateTrigger = (item: TScheduledTaskItem, instanceId: string, value: stri
         : changeScheduledTaskInterval({ instanceId, interval: Number(value), trigger: item.task.taskId });
 
 export const TriggerForm = ({ item, onChange, onClose }: IProps) => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
 
@@ -79,11 +71,6 @@ export const TriggerForm = ({ item, onChange, onClose }: IProps) => {
         setValue(newValue);
     };
 
-    const getPreview = (): string =>
-        item.type === "cron"
-            ? getCronDescription(normalizedValue, i18n.language, t)
-            : getIntervalDescription(item.type, Number(normalizedValue), i18n.language, t);
-
     const applyTrigger = (): void => {
         setUpdateRequest(StatelessRequest.loading());
 
@@ -105,38 +92,15 @@ export const TriggerForm = ({ item, onChange, onClose }: IProps) => {
 
     return (
         <div className={styles.Form}>
-            <div className={styles.TypeNote}>
-                <TriggerTypeBadge type={item.type} />
-                {t(TYPE_NOTE_KEY[item.type])}
-            </div>
+            <TriggerField
+                type={item.type}
+                value={value}
+                isValid={isValid}
+                loading={updateRequest.loading}
+                onChange={handleValueChange}
+            />
 
-            <div className={styles.Field}>
-                <span className={styles.Label}>
-                    {isCron ? t("ScheduledTasks.expression") : t("ScheduledTasks.interval")}
-                </span>
-                <Input
-                    className={shared.Mono}
-                    value={value}
-                    status={isValid ? undefined : "error"}
-                    disabled={updateRequest.loading}
-                    onChange={(event) => handleValueChange(event.target.value)}
-                />
-                {isCron && <span className={styles.Help}>{t("ScheduledTasks.editCronHelp")}</span>}
-            </div>
-
-            {isValid && (
-                <div className={`${styles.Preview} ${styles.PreviewOk}`}>
-                    <b>{t("ScheduledTasks.editPreviewRuns")}</b>
-                    {getPreview()}
-                </div>
-            )}
-
-            {!isValid && (
-                <div className={`${styles.Preview} ${styles.PreviewBad}`}>
-                    <b>{t("ScheduledTasks.editPreviewInvalid")}</b>
-                    {t(isCron ? "ScheduledTasks.editCronInvalidError" : "ScheduledTasks.editIntervalError")}
-                </div>
-            )}
+            <TriggerPreview type={item.type} value={normalizedValue} isValid={isValid} />
 
             <div className={styles.Footer}>
                 <Button size="small" onClick={onClose}>
