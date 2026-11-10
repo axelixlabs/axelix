@@ -34,8 +34,8 @@ RUN apk add --no-cache --upgrade \
     "openssl>=3.5.7-r0" \
     "libssl3>=3.5.7-r0" \
     "libcrypto3>=3.5.7-r0" \
-    "libexpat>=2.8.4-r0" \
-    "zlib>=1.3.2-r1" \
+    "libexpat>=2.10.0-r0" \
+    "zlib>=1.4-r0" \
     "libpng>=1.6.59-r0" \
     "brotli-libs>=1.2.1-r0" \
     "musl>=1.2.6-r3" \
