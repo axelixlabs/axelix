@@ -65,11 +65,11 @@ database schema on its own.
 Axelix checks only the value the application uses, so a dangerous value in a suppressed property source is not marked.
 The value must match as a whole, in any letter case: `management.endpoints.web.exposure.include=*` is marked,
 but `health,*` is not. Masked values are not checked either, so
-without the `ENV_VALUES_READ` authority you don't see the mark for keys that are masked (see [Value
+without the `environment.values:read` authority you don't see the mark for keys that are masked (see [Value
 sanitization](#value-sanitization)).
 
 :::info
-By default, every value is masked as `******` for callers that do not carry the `ENV_VALUES_READ` authority. See [Value
+By default, every value is masked as `******` for callers that do not carry the `environment.values:read` authority. See [Value
 sanitization](#value-sanitization) below for how to choose which keys are masked and who sees the originals.
 :::
 
@@ -78,7 +78,7 @@ sanitization](#value-sanitization) below for how to choose which keys are masked
 Axelix never relies on the Spring Boot `management.endpoint.env.show-values` switch. It always asks Spring Boot to
 return raw values (`Show.ALWAYS`) and applies its own masking on top, driven by an authority check.
 
-**Who sees raw values.** Callers carrying the `ENV_VALUES_READ` authority (granted by the built-in **ADMIN** and
+**Who sees raw values.** Callers carrying the `environment.values:read` authority (granted by the built-in **ADMIN** and
 **SUPER_ADMIN** roles) receive the originals. Everyone else gets values replaced with `******`. See [Roles and
 authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.

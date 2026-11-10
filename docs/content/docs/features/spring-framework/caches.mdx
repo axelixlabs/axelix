@@ -16,8 +16,8 @@ description: "The Caches page provides access to all configured caches in the Sp
 The page itself is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can
 all open it and inspect cache statistics. The destructive actions are gated by separate authorities:
 
-- **Clear cache** and **Clear All Caches** require the `CACHES_CLEAR` authority.
-- **Status** toggle (enable / disable a cache) requires the `CACHES_TOGGLE` authority.
+- **Clear cache** and **Clear All Caches** require the `caches:clear` authority.
+- **Status** toggle (enable / disable a cache) requires the `caches:toggle` authority.
 
 Both authorities are granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. **VIEWER** sees the
 controls but cannot interact with them. See [Roles and

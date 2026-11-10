@@ -82,7 +82,7 @@ delay**, **fixed rate** and **cron**, with a search function for scheduled tasks
 ## Interactive Features
 
 The actions below — running a task on demand, modifying its schedule, and toggling its status — require the
-`SCHEDULED_TASKS_MODIFY` authority, granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. Users
+`scheduled-tasks:write` authority, granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. Users
 without this authority see the same controls but cannot interact with them.
 
 When a control button is visible but your account lacks this authority, Axelix keeps it disabled and shows a tooltip with the

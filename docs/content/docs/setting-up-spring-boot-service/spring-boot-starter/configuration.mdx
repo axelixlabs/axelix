@@ -543,6 +543,12 @@ Every Axelix actuator endpoint is gated by `JwtAuthorizationFilter`. The filter 
 signed with the same key Master uses, so the two sides must agree on the algorithm and the secret. Use the same value
 you set for `axelix.master.auth.jwt.signing-key` on Master.
 
+Starting with starter 1.3, Master authorizes the signed-in user before calling the service. The starter receives a
+short-lived technical-user JWT with subject `AXELIX.MASTER`, without the user's roles or authorities. It verifies
+Master's identity, signature, and token expiry. Older starters still check the user's permissions, so Master reissues
+the user's token with legacy authority names for them. Initial discovery uses a compatibility token accepted by both
+versions; see [How discovery works](../../product/discovery.mdx).
+
 <Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
   <Tab value="application.yaml">
 
@@ -553,7 +559,6 @@ axelix:
       jwt:
         algorithm: HMAC512
         signing-key: ${AXELIX_JWT_SIGNING_KEY}
-        duration: 5m
 ```
 
   </Tab>
@@ -562,14 +567,15 @@ axelix:
 ```properties
 axelix.sbs.auth.jwt.algorithm=HMAC512
 axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
-axelix.sbs.auth.jwt.duration=5m
 ```
 
   </Tab>
 </Tabs>
 
-`duration` controls how long the starter-issued token used for self-registration heartbeats is valid, the default is five minutes,
-after which the starter rotates it automatically.
+Starting with Axelix 1.3, `axelix.sbs.auth.jwt.duration` is no longer used. You can remove it from your configuration.
+The starter issues a fresh technical-user JWT for every registration and heartbeat request.
+Each token has a fixed one-minute lifetime to limit the time a stolen token can be used.
+No replacement property is needed, and the lifetime is not configurable.
 
 :::warning
 A signing key shared between Master and every monitored service is a sensitive secret. Inject it through an environment
@@ -658,8 +664,8 @@ A few details that catch people out:
 ## Sanitize sensitive property values
 
 The Axelix `axelix-env` and `axelix-configprops` endpoints return property values to Master. To keep secrets out of
-casual reads, the starter masks values it returns to callers that lack the right authority. The mechanism is the same
-for both endpoints, controlled by a single starter property:
+casual reads, Master masks values for users who lack the relevant authority. The same rules apply to both endpoints.
+Configure the sensitive property keys in the starter:
 
 `axelix.sbs.endpoints.config.sanitized-properties`
 
@@ -670,8 +676,8 @@ for both endpoints, controlled by a single starter property:
 
 Authority is checked per-endpoint:
 
-- **`axelix-env`** — the `ENV_VALUES_READ` authority lets the caller see raw values.
-- **`axelix-configprops`** — the `CONFIG_PROPS_VALUES_READ` authority lets the caller see raw values.
+- **`axelix-env`**: the `environment.values:read` authority lets the caller see raw values.
+- **`axelix-configprops`**: the `config-properties.values:read` authority lets the caller see raw values.
 
 Both authorities are granted by Master's built-in **ADMIN** and **SUPER_ADMIN** roles. **VIEWER** and **EDITOR** always
 go through the sanitization function. See [Roles and
@@ -767,7 +773,7 @@ fail, and self-registration heartbeats stop, so the instance disappears from the
 |-----------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
 | `axelix.sbs.auth.jwt.algorithm`   | `HMAC512` (1.2.0+; required before) | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.        |
 | `axelix.sbs.auth.jwt.signing-key` | built-in key (1.2.0+; required before) | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
-| `axelix.sbs.auth.jwt.duration`    | `5m`                                                 | Validity of the self-registration token the starter issues itself. Tokens are rotated automatically before expiry.           |
+| `axelix.sbs.auth.jwt.duration`    | `5m`                                                 | Used only before 1.3 for the self-registration token lifetime. Since 1.3, this setting has no effect and can be removed. A fresh technical-user token is issued per request with a fixed one-minute lifetime. |
 </div>
 
 ### Self-registration
@@ -805,7 +811,7 @@ heartbeats are rejected with `401`.
 
 | Property                                           | Default        | Description                                                                                                                                                                                                                                                                                                            |
 |----------------------------------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.endpoints.config.sanitized-properties` | *(empty list)* | Property keys whose values are masked as `******` for callers without `ENV_VALUES_READ` (for `axelix-env`) or `CONFIG_PROPS_VALUES_READ` (for `axelix-configprops`). Empty list means **all** values are masked. See [Sanitize sensitive property values](#sanitize-sensitive-property-values) for the matching rules. |
+| `axelix.sbs.endpoints.config.sanitized-properties` | *(empty list)* | Property keys whose values are masked as `******` for callers without `environment.values:read` (for `axelix-env`) or `config-properties.values:read` (for `axelix-configprops`). Empty list means **all** values are masked. See [Sanitize sensitive property values](#sanitize-sensitive-property-values) for the matching rules. |
 
 </div>
 

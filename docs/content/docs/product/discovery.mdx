@@ -81,8 +81,15 @@ heartbeat.
 ```
 
 The first call returns the full registration: build coordinates, versions, and the insights Axelix collects. After
-it, the instance appears in Master. Master signs its calls with its own JWT, so the signing key on Master and on the
-service must match.
+it, the instance appears in Master. The signing key and algorithm on Master and the service must match.
+
+During this initial probe, Master does not yet know the starter version. It sends a compatibility JWT with subject
+`AXELIX.MASTER` and the legacy claims older starters require. Starters from 1.3 accept the Master identity and ignore
+those extra claims. This compatibility format is planned for removal in 1.6.
+
+For subsequent UI and MCP calls, Master checks the user's authorities first. With starters from 1.3, it then sends a
+short-lived `AXELIX.MASTER` technical-user JWT without user roles or authorities. Older starters receive a reissued
+user token with legacy authority names and still enforce permissions themselves.
 
 Each scan replaces the whole list of auto-discovered instances. As a result, a pod that Kubernetes no longer reports
 disappears at the next scan. A pod that Master cannot reach drops out too, and comes back on the next scan that
@@ -121,6 +128,11 @@ Master can lose an instance when it restarts with an empty database, or when it 
 heartbeats. In both cases the next heartbeat makes the service register again, so the whole fleet reappears within
 one heartbeat interval. The registration and the heartbeats are signed with the shared JWT signing key, and Master
 rejects them when the keys differ.
+
+A starter from 1.3 signs both requests with a technical-user JWT whose subject is `AXELX.MANAGED_SERVICE`
+(the spelling is the wire identifier). It carries no roles or authorities. Master accepts only the managed-service
+identity on these endpoints. It also accepts the legacy `AXELIX.STARTER` subject from older starters, with that
+compatibility alias planned for removal in 1.6.
 
 ## What Master needs in both cases
 

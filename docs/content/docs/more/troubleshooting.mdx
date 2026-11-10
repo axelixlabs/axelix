@@ -13,7 +13,11 @@ On the Master side, a 401 error is returned when communicating with the managed 
 
 In practice, the actuator endpoints exposed by the managed service (the microservice that includes the Axelix Spring Boot Starter and plugin) are almost never left open. It is very common — and generally recommended — to protect them with some authentication mechanism: HTTP Basic, an OIDC/OAuth2 resource server, or any other scheme wired into the application's Spring Security configuration.
 
-At the same time, Axelix ships with its own Identity & Access Management (IAM). When the Master communicates with the managed service, it calls the custom Axelix actuator endpoints (those that start with `/actuator/axelix-**`, but note that the actuator prefix may be different - it is configurable) and attaches its **own** Axelix-issued bearer token in the `Authorization` header. This token is meant to be understood by the Axelix components on the managed service, **not** by the managed service's own security stack.
+At the same time, Axelix ships with its own Identity & Access Management (IAM). When Master calls a starter from 1.3, it invokes the custom Axelix actuator endpoints
+(usually `/actuator/axelix-**`, with a configurable actuator prefix) with an `AXELIX.MASTER` technical bearer token in
+the `Authorization` header. For starters older than 1.3, it reissues the user's token with legacy authority names.
+Initial discovery uses a compatibility token identifying Master. In all cases, the token is intended for the Axelix
+components, rather than the application's own security stack.
 
 :::note[Custom actuator prefix]
 The `/actuator` part is the actuator base path, which is configurable via `management.endpoints.web.base-path` (it defaults to `/actuator`). If your managed service overrides this property, the Axelix endpoints live under the configured base path instead — for example, a base path of `/manage` means the endpoints are reachable at `/manage/axelix-**`. Keep this in mind for the request matcher in the solution below.

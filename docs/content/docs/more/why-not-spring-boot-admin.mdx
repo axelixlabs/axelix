@@ -59,7 +59,7 @@ Axelix Master is distributed as a **ready-to-run** product:
 Authentication is built in: either in local database for simple setups, or via **OAuth2/OIDC** (Keycloak, Auth0, Okta, Google, and
 other providers) with role mapping — documented in
 [Authentication](../setting-up-master-ui/authentication/authentication.mdx). Managed applications are protected by
-JWT between Master and the starter; operation-level authorities (for example `CACHES_TOGGLE`, `SCHEDULED_TASKS_MODIFY`)
+JWT between Master and the starter; operation-level authorities (for example `caches:toggle`, `scheduled-tasks:write`)
 gate destructive actions in the UI and via MCP.
 
 Another important note: **the solid, tested and maintained authentication channel between Axelix Master and starters is already built-in**. With

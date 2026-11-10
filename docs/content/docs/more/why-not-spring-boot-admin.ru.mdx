@@ -61,7 +61,7 @@ Axelix же специально дизайнился так, чтобы пос�
 Аутентификация встроена: для простых установок — локальная база пользователей, для production — **OAuth2/OIDC**
 (Keycloak, Auth0, Okta, Google и другие провайдеры) с сопоставлением ролей — см.
 [Аутентификация](../setting-up-master-ui/authentication/authentication.mdx). Управляемые приложения защищены JWT между Master и starter;
-authorities на уровне операций (например, `CACHES_TOGGLE`, `SCHEDULED_TASKS_MODIFY`) ограничивают опасные действия в UI
+authorities на уровне операций (например, `caches:toggle`, `scheduled-tasks:write`) ограничивают опасные действия в UI
 и через MCP.
 
 Ещё один важный момент: **надёжный, проверенный и поддерживаемый канал аутентификации между Axelix Master и starter'ами

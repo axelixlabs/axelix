@@ -94,7 +94,7 @@ BCrypt-verifies the password, and maps the stored role string (`admin`, `editor`
 roles. Unknown role strings raise `UserRoleNotFoundException` at sign-in time.
 
 Local users are managed through the **Users** screen in the UI — creating, updating, and deleting them requires the
-`USERS_MANAGEMENT` authority, which only `SUPER_ADMIN` holds by default.
+`users:manage` authority, which only `SUPER_ADMIN` holds by default.
 
 ### OAuth2 / OIDC
 
@@ -160,7 +160,7 @@ subsequent UI request.
   (default `12h`). `Secure` is gated by `axelix.master.auth.cookie.secure` — leave it `false` only over plain-HTTP
   localhost.
 - **`authorities`** — a Base64-encoded JSON array of the authority names the signed-in user holds, e.g.
-  `["ENV_VALUES_READ","SCHEDULED_TASKS_MODIFY"]`. *Not* `HttpOnly`, because the front-end reads it to know which buttons
+  `["environment.values:read","scheduled-tasks:write"]`. *Not* `HttpOnly`, because the front-end reads it to know which buttons
   to render. It is purely a UI hint. The backend re-derives authorities from the JWT on every request, so tampering with
   this cookie only changes what the UI offers, not what the server allows.
 
@@ -197,6 +197,14 @@ signature stops matching the new secret. Users land back on `/login`.
 
 ## Roles and authorities
 
+Axelix 1.3 introduces new RBAC authority names, inspired by the
+[Grafana RBAC model](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/access-control/).
+The `resource:action` and `resource.sub-resource:action` naming patterns apply only to Axelix 1.3 and later.
+Earlier versions use legacy names such as `CACHES_CLEAR`.
+For example, `caches:clear` permits clearing caches, and `environment.values:read` names access to property values.
+Roles still determine which actions users can perform. For starters older than 1.3, Master automatically translates
+codenames to legacy names such as `CACHES_CLEAR`; no service configuration change is needed.
+
 Master uses a fixed set of roles and a fixed set of authorities. Roles are bundles of authorities, the authorization
 check is always against authorities, never role names. This means a custom role wired in by the OIDC mapping or the
 database layer must resolve to one of the built-in names — there is no way today to define a new authority from
@@ -206,25 +214,25 @@ configuration.
 
 | Role          | Authorities granted                                                                                                            | Who gets it                                                                                         |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| `SUPER_ADMIN` | Every authority defined by Master, including `USERS_VIEW` and `USERS_MANAGEMENT`.                                              | The built-in super-admin account.                                                                   |
-| `ADMIN`       | `ENV_VALUES_READ`, `CONFIG_PROPS_VALUES_READ`, `SCHEDULED_TASKS_MODIFY`, `CACHES_CLEAR`, `CACHES_TOGGLE`, `GARBAGE_COLLECTOR`. | Local DB users with role `admin`. OIDC users whose `role-attribute-path` resolves to `admin`.       |
-| `EDITOR`      | `SCHEDULED_TASKS_MODIFY`, `CACHES_CLEAR`, `CACHES_TOGGLE`, `GARBAGE_COLLECTOR`.                                                | Local DB users with role `editor`. OIDC users whose `role-attribute-path` resolves to `editor`.     |
+| `SUPER_ADMIN` | Every authority defined by Master, including `users:read` and `users:manage`.                                              | The built-in super-admin account.                                                                   |
+| `ADMIN`       | `environment.values:read`, `config-properties.values:read`, `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`. | Local DB users with role `admin`. OIDC users whose `role-attribute-path` resolves to `admin`.       |
+| `EDITOR`      | `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`.                                                | Local DB users with role `editor`. OIDC users whose `role-attribute-path` resolves to `editor`.     |
 | `VIEWER`      | None — read-only view of everything not gated by an authority.                                                                 | Local DB users with role `viewer`. OIDC users with no `role-attribute-path` set or unmapped values. |
 
 </div>
 
 What each authority gates:
 
-- **`ENV_VALUES_READ`** — reveal property values on the **Environment** screen.
-- **`CONFIG_PROPS_VALUES_READ`** — reveal property values on the **Configuration Properties** screen.
-- **`SCHEDULED_TASKS_MODIFY`** — enable, disable, force-execute, and reschedule scheduled tasks.
-- **`CACHES_CLEAR`** — clear individual caches, cache managers, or the whole app cache.
-- **`CACHES_TOGGLE`** — enable and disable individual caches and cache managers at runtime.
-- **`GARBAGE_COLLECTOR`** — trigger GC, enable, and disable GC log monitoring.
-- **`USERS_VIEW`** — read the Users feed.
-- **`USERS_MANAGEMENT`** — create, update, and delete local users.
+- **`environment.values:read`**: reveal property values on the **Environment** screen.
+- **`config-properties.values:read`**: reveal property values on the **Configuration Properties** screen.
+- **`scheduled-tasks:write`**: enable, disable, force-execute, and reschedule scheduled tasks.
+- **`caches:clear`**: clear individual caches, cache managers, or the whole app cache.
+- **`caches:toggle`**: enable and disable individual caches and cache managers at runtime.
+- **`gc:manage`**: trigger GC, enable, and disable GC log monitoring.
+- **`users:read`**: read the Users feed.
+- **`users:manage`**: create, update, and delete local users.
 
-`USERS_VIEW` and `USERS_MANAGEMENT` are reserved for `SUPER_ADMIN` today — `ADMIN` cannot manage users without being
+`users:read` and `users:manage` are reserved for `SUPER_ADMIN` today, `ADMIN` cannot manage users without being
 escalated.
 
 ## MCP server authentication
