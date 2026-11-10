@@ -18,6 +18,7 @@
 import { Checkbox } from "antd";
 import { useTranslation } from "react-i18next";
 
+import { NoRequiredAuthorityTooltip } from "@/components";
 import { useAuthority } from "@/hooks";
 import { EAuthorities, EExportableComponent } from "@/models";
 import { EXPORTABLE_COMPONENT_GROUPS } from "@/utils";
@@ -71,24 +72,26 @@ export const StateChecklist = ({ selected, onToggle }: IProps) => {
 
                                 return (
                                     <div key={component} className={styles.ItemWrapper}>
-                                        <Checkbox
-                                            className={styles.Item}
-                                            disabled={isHeap && !canDownloadHeapDump}
-                                            checked={checked}
-                                            onChange={(e) => onToggle([component], e.target.checked)}
-                                        >
-                                            <span className={styles.ItemText}>
-                                                <span className={styles.ItemName}>
-                                                    {t(`Details.Components.${component}`)}
+                                        <NoRequiredAuthorityTooltip disabled={isHeap && !canDownloadHeapDump}>
+                                            <Checkbox
+                                                className={styles.Item}
+                                                disabled={isHeap && !canDownloadHeapDump}
+                                                checked={checked}
+                                                onChange={(e) => onToggle([component], e.target.checked)}
+                                            >
+                                                <span className={styles.ItemText}>
+                                                    <span className={styles.ItemName}>
+                                                        {t(`Details.Components.${component}`)}
+                                                    </span>
+                                                    <span className={styles.ItemDescription}>
+                                                        {t(`Details.DownloadState.descriptions.${component}`)}
+                                                    </span>
                                                 </span>
-                                                <span className={styles.ItemDescription}>
-                                                    {t(`Details.DownloadState.descriptions.${component}`)}
+                                                <span className={styles.ItemSize}>
+                                                    {t(`Details.DownloadState.itemSize.${isHeap ? "heap" : "small"}`)}
                                                 </span>
-                                            </span>
-                                            <span className={styles.ItemSize}>
-                                                {t(`Details.DownloadState.itemSize.${isHeap ? "heap" : "small"}`)}
-                                            </span>
-                                        </Checkbox>
+                                            </Checkbox>
+                                        </NoRequiredAuthorityTooltip>
                                         {isHeap && checked && (
                                             <div className={styles.Warning}>
                                                 <span className={styles.WarningTitle}>
