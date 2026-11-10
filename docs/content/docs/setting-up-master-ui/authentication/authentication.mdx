@@ -9,7 +9,7 @@ import signInOptionsStyles from './_signInOptionsTable.module.css';
 import rolesStyles from './_rolesTable.module.css';
 import oauth2Styles from './_oauth2PropertiesTable.module.css';
 
-The property keys themselves live in [Configuring Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx#configuration-reference) — the goal here is the mental model.
+The property keys themselves live in [Configuring Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx#configuration-reference): the goal here is the mental model.
 
 ## The three sign-in options
 
@@ -46,9 +46,10 @@ Super-admin exists for two moments, not for everyday operation:
 1. **Initial setup.** On a fresh Master there are no other accounts yet. Sign in as super-admin to do the first-run
    work: set up the license, create your first local users, and arrange the privileged roles that your team will use
    from then on.
-2. **Break-glass recovery.** When the accounts your team normally uses stop working — an OIDC role mapping that resolves
-   everyone to `VIEWER`, a mistyped `issuer-uri`, an admin accidentally got deleted — super-admin is the escape hatch. Because it never
-   depends on the database or an external identity provider, it keeps letting you in while you fix whatever broke.
+2. **Break-glass recovery.** When the accounts your team normally uses stop working, super-admin is the escape hatch.
+   For example, an OIDC role mapping may resolve everyone to `VIEWER`, or an admin may be accidentally deleted. Because
+   super-admin never depends on the database or an external identity provider, it keeps letting you in while you fix
+   whatever broke.
 
 For day-to-day work, sign in with a local or OIDC account instead. Reserve super-admin for setup and rescue.
 
@@ -57,8 +58,8 @@ For day-to-day work, sign in with a local or OIDC account instead. Reserve super
 The other two sign-in options leave a record in Master's database; super-admin does not.
 
 - **Local users** live entirely in Master's database and are managed from the **Users** screen.
-- **OIDC users** are owned by your identity provider, but Master still persists a record for each one — including the
-  role it resolved from `role-attribute-path` — so it can show them on the **Users** screen and reuse the mapping.
+- **OIDC users** are owned by your identity provider, but Master still persists a record for each one, including the
+  role it resolved from `role-attribute-path`, so it can show them on the **Users** screen and reuse the mapping.
 - **Super-admin** has no database record at all. Its credentials live only in configuration. It never appears on the
   **Users** screen, and its username is reserved: no local or OIDC user can be created, renamed, edited, or deleted into
   that username. As a result the super-admin account itself cannot be edited or deleted from the UI.
@@ -68,13 +69,13 @@ To change the super-admin username or password, edit `axelix.master.auth.options
 Master. There is no in-app way to do it, by design.
 :::
 
-Override the defaults before exposing Master to anyone — `admin / admin` grants full control over every monitored
+Override the defaults before exposing Master to anyone: `admin / admin` grants full control over every monitored
 service.
 
 The password can be provided in one of the following formats:
 
-* **Plaintext** — the raw password value.
-* **Encoded** — prefix the value with an identifier in curly braces to indicate how it should be verified: `{noop}`
+* **Plaintext**: the raw password value.
+* **Encoded**: prefix the value with an identifier in curly braces to indicate how it should be verified: `{noop}`
 for plaintext, `{bcrypt}` for a BCrypt hash.
 
 If no prefix is provided, the value is treated as plaintext.
@@ -93,7 +94,7 @@ Local users live in Master's own database (`UserEntity`). Passwords are hashed w
 BCrypt-verifies the password, and maps the stored role string (`admin`, `editor`, `viewer`) to one of the built-in
 roles. Unknown role strings raise `UserRoleNotFoundException` at sign-in time.
 
-Local users are managed through the **Users** screen in the UI — creating, updating, and deleting them requires the
+Local users are managed through the **Users** screen in the UI: creating, updating, and deleting them requires the
 `users:manage` authority, which only `SUPER_ADMIN` holds by default.
 
 ### OAuth2 / OIDC
@@ -116,7 +117,7 @@ The end-to-end flow:
 6. Master mints its own session JWT (same encoder as the password flows) and redirects the browser to `/wallboard` with
    the session cookies set.
 
-The Authorization Code Flow only fires through the browser. The OIDC tokens themselves are never stored — Master uses
+The Authorization Code Flow only fires through the browser. The OIDC tokens themselves are never stored: Master uses
 them once to identify the user and then issues its own session JWT.
 
 Each successful browser sign-in therefore leaves a durable `OIDC` account behind in the **Users** screen. If the same
@@ -124,7 +125,7 @@ username already belongs to a non-OIDC account, Master rejects the sign-in rathe
 
 **When `axelix.master.auth.options.oauth2.enabled=true`, these properties must be supplied:** `issuer-uri`, `client-id`,
 `client-secret`, `base-url`. `scopes` defaults to `openid` and only needs an override if your IdP requires extra scopes.
-`role-attribute-path` is optional — leave it unset to map every signed-in user to the `VIEWER` role.
+`role-attribute-path` is optional: leave it unset to map every signed-in user to the `VIEWER` role.
 
 <div className={oauth2Styles.ConfigTable}>
 
@@ -156,10 +157,10 @@ subsequent UI request.
 
 `POST /api/external/users/login` (and the OIDC callback) issue two cookies with `Set-Cookie`:
 
-- **`auth_token`** — the JWT itself. `HttpOnly`, `SameSite=Strict`, `Path=/`, `MaxAge=axelix.master.auth.jwt.lifespan`
-  (default `12h`). `Secure` is gated by `axelix.master.auth.cookie.secure` — leave it `false` only over plain-HTTP
+- **`auth_token`**: the JWT itself. `HttpOnly`, `SameSite=Strict`, `Path=/`, `MaxAge=axelix.master.auth.jwt.lifespan`
+  (default `12h`). `Secure` is gated by `axelix.master.auth.cookie.secure`: leave it `false` only over plain-HTTP
   localhost.
-- **`authorities`** — a Base64-encoded JSON array of the authority names the signed-in user holds, e.g.
+- **`authorities`**: a Base64-encoded JSON array of the authority names the signed-in user holds, e.g.
   `["environment.values:read","scheduled-tasks:write"]`. *Not* `HttpOnly`, because the front-end reads it to know which buttons
   to render. It is purely a UI hint. The backend re-derives authorities from the JWT on every request, so tampering with
   this cookie only changes what the UI offers, not what the server allows.
@@ -171,7 +172,7 @@ timestamps, and a `roles` claim that encodes each granted role together with its
 ### What every request goes through
 
 `CookieBasedJwtAuthorizationFilter` runs on every `/api/...` request except a small whitelist (the login endpoint
-itself, the OAuth2 callback, the public settings endpoint, the self-registration endpoint, and `/api/mcp/**` — those
+itself, the OAuth2 callback, the public settings endpoint, the self-registration endpoint, and `/api/mcp/**`: those
 have their own filters or are intentionally anonymous). For everything else:
 
 1. The filter reads the `auth_token` cookie. Missing or blank → `JwtProcessingException`, which surfaces as `401
@@ -188,7 +189,7 @@ have their own filters or are intentionally anonymous). For everything else:
 ### Logout and rotation
 
 `POST /api/external/users/logout` overwrites both cookies with empty values and `MaxAge=0`, so the browser drops them
-immediately. The JWT itself remains technically valid until its `exp` claim passes — Master does not maintain a
+immediately. The JWT itself remains technically valid until its `exp` claim passes: Master does not maintain a
 server-side blocklist.
 
 To force every active session to end (after a compromised key, a stale shared secret, or a quarterly rotation), change
@@ -207,17 +208,17 @@ codenames to legacy names such as `CACHES_CLEAR`; no service configuration chang
 
 Master uses a fixed set of roles and a fixed set of authorities. Roles are bundles of authorities, the authorization
 check is always against authorities, never role names. This means a custom role wired in by the OIDC mapping or the
-database layer must resolve to one of the built-in names — there is no way today to define a new authority from
+database layer must resolve to one of the built-in names: there is no way today to define a new authority from
 configuration.
 
 <div className={rolesStyles.RolesTable}>
 
-| Role          | Authorities granted                                                                                                            | Who gets it                                                                                         |
-|---------------|--------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| `SUPER_ADMIN` | Every authority defined by Master, including `users:read` and `users:manage`.                                              | The built-in super-admin account.                                                                   |
-| `ADMIN`       | `environment.values:read`, `config-properties.values:read`, `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`. | Local DB users with role `admin`. OIDC users whose `role-attribute-path` resolves to `admin`.       |
-| `EDITOR`      | `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`.                                                | Local DB users with role `editor`. OIDC users whose `role-attribute-path` resolves to `editor`.     |
-| `VIEWER`      | None — read-only view of everything not gated by an authority.                                                                 | Local DB users with role `viewer`. OIDC users with no `role-attribute-path` set or unmapped values. |
+| Role          | Authorities granted                                                                                                                           | Who gets it                                                                                         |
+|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `SUPER_ADMIN` | Every authority defined by Master, including `users:read` and `users:manage`.                                                                 | The built-in super-admin account.                                                                   |
+| `ADMIN`       | `environment.values:read`, `config-properties.values:read`, `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`, `heap-dump:read`. | Local DB users with role `admin`. OIDC users whose `role-attribute-path` resolves to `admin`.       |
+| `EDITOR`      | `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`.                                                                        | Local DB users with role `editor`. OIDC users whose `role-attribute-path` resolves to `editor`.     |
+| `VIEWER`      | None: read-only view of everything not gated by an authority.                                                                                 | Local DB users with role `viewer`. OIDC users with no `role-attribute-path` set or unmapped values. |
 
 </div>
 
@@ -229,6 +230,7 @@ What each authority gates:
 - **`caches:clear`**: clear individual caches, cache managers, or the whole app cache.
 - **`caches:toggle`**: enable and disable individual caches and cache managers at runtime.
 - **`gc:manage`**: trigger GC, enable, and disable GC log monitoring.
+- **`heap-dump:read`**: download heap dumps directly or include them in an exported application state.
 - **`users:read`**: read the Users feed.
 - **`users:manage`**: create, update, and delete local users.
 
@@ -241,15 +243,15 @@ The bundled MCP server at `/api/mcp` is gated by its own filter, `McpAuthorizati
 carried by MCP clients are not the browser session cookie. The filter parses the `Authorization` header and dispatches
 to the handler matching the scheme.
 
-- **`Basic`** — `BasicMcpAuthenticationHandler` decodes `Authorization: Basic <base64(user:pass)>` and delegates to the
+- **`Basic`**: `BasicMcpAuthenticationHandler` decodes `Authorization: Basic <base64(user:pass)>` and delegates to the
   same `CompositeUserAuthenticator` the UI uses. Super-admin and local accounts both work. The role mapping is identical
   to a browser sign-in.
-- **`Bearer`** — `BearerMcpAuthenticationHandler` treats the credential as an OIDC access token. It runs the token
+- **`Bearer`**: `BearerMcpAuthenticationHandler` treats the credential as an OIDC access token. It runs the token
   through `JmesPathOidcRoleExtractor` (same path as the browser OIDC flow) to derive a role, then issues a synthetic
   `PasswordlessUser` named `AI_AGENT` carrying that role. Only available when
   `axelix.master.auth.options.oauth2.enabled=true`.
 
-Once the user is identified, the filter performs the same authority check as the web filter — per-tool authority
+Once the user is identified, the filter performs the same authority check as the web filter: per-tool authority
 requirements are resolved via `McpEndpointResolver` + `McpEndpointAuthorityResolver`. A tool the caller is not entitled
 to execute returns `403 Forbidden`. An unknown or invalid credential returns `401 Unauthorized`.
 
@@ -264,8 +266,8 @@ the authorization flow on their own.
 
 ## Related
 
-- [Configuring Master — Authentication properties](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentication--jwt) —
+- [Configuring Master: Authentication properties](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentication--jwt):
   every property key and default referenced on this page.
-- [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) — the starter side of the
+- [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx): the starter side of the
   same JWT signing key.
-- [What is Master?](../what-is-master.mdx) — broader background on what Master does once the session is live.
+- [What is Master?](../what-is-master.mdx): broader background on what Master does once the session is live.
