@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedRes
 import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.env.DangerousPropertyDetector;
+import com.axelixlabs.axelix.master.service.transport.PropertySanitizer;
 
 /**
  * The {@link Converter} from {@link EnvironmentFeed} to {@link EnvironmentFeedResponse}. The dangerous values are
@@ -46,13 +47,17 @@ import com.axelixlabs.axelix.master.service.env.DangerousPropertyDetector;
 public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, EnvironmentFeedResponse> {
 
     private final DangerousPropertyDetector dangerousPropertyDetector;
+    private final PropertySanitizer propertySanitizer;
 
-    public EnvironmentFeedConverter(DangerousPropertyDetector dangerousPropertyDetector) {
+    public EnvironmentFeedConverter(
+            DangerousPropertyDetector dangerousPropertyDetector, PropertySanitizer propertySanitizer) {
         this.dangerousPropertyDetector = dangerousPropertyDetector;
+        this.propertySanitizer = propertySanitizer;
     }
 
     @Override
     public @NonNull EnvironmentFeedResponse convertNonNull(@NonNull EnvironmentFeed source) {
+        propertySanitizer.sanitize(source);
         Map<Property, DangerousValue> dangerousProperties = dangerousPropertyDetector.detect(source);
         List<EnvironmentFeedResponse.PropertySource> propertySources = new ArrayList<>();
 

@@ -76,9 +76,8 @@ public class EnvironmentMcpServerTools {
                             idempotentHint = true,
                             openWorldHint = false))
     public String getInstanceEnvironment(@McpToolParam(description = "The instance ID") String instanceId) {
-        byte[] body = endpointInvoker.invoke(
+        EnvironmentFeed feed = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
-        EnvironmentFeed feed = objectMapper.readValue(body, EnvironmentFeed.class);
         return objectMapper.writeValueAsString(environmentFeedConverter.convertNonNull(feed));
     }
 }

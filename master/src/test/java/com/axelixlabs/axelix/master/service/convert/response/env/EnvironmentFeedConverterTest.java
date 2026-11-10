@@ -29,8 +29,12 @@ import com.axelixlabs.axelix.common.contract.env.PropertySource;
 import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedResponse;
 import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
 import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
+import com.axelixlabs.axelix.master.service.transport.PropertySanitizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link EnvironmentFeedConverter}.
@@ -40,7 +44,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EnvironmentFeedConverterTest {
 
     private final Map<Property, DangerousValue> dangerousProperties = new IdentityHashMap<>();
-    private final EnvironmentFeedConverter subject = new EnvironmentFeedConverter(feed -> dangerousProperties);
+    private final PropertySanitizer sanitizer = mock(PropertySanitizer.class);
+    private final EnvironmentFeedConverter subject =
+            new EnvironmentFeedConverter(feed -> dangerousProperties, sanitizer);
 
     @Test
     void shouldSetDangerousValueOnlyForDetectedOccurrence() {
@@ -51,6 +57,7 @@ class EnvironmentFeedConverterTest {
         EnvironmentFeedResponse response = subject.convertNonNull(feed);
 
         // then.
+        verify(sanitizer).sanitize(same(feed));
         DangerousValue openInView = DangerousPropertyValue.OPEN_IN_VIEW
                 .getDangerousValues()
                 .iterator()

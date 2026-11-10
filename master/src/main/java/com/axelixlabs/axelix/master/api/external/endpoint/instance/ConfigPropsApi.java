@@ -22,11 +22,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
+import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -39,15 +42,20 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class ConfigPropsApi {
 
     private final EndpointInvoker endpointInvoker;
+    private final Converter<ConfigurationPropertiesFeed, ConfigurationPropertiesFeedResponse> feedConverter;
 
-    public ConfigPropsApi(EndpointInvoker endpointInvoker) {
+    public ConfigPropsApi(
+            EndpointInvoker endpointInvoker,
+            Converter<ConfigurationPropertiesFeed, ConfigurationPropertiesFeedResponse> feedConverter) {
         this.endpointInvoker = endpointInvoker;
+        this.feedConverter = feedConverter;
     }
 
     @GetMapping(path = ApiPaths.ConfigPropsApi.FEED)
-    public ResponseEntity<byte[]> getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
-        byte[] body = endpointInvoker.invoke(
+    public ResponseEntity<ConfigurationPropertiesFeedResponse> getConfigpropsFeed(
+            @PathVariable("instanceId") String instanceId) {
+        ConfigurationPropertiesFeed body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(feedConverter.convertNonNull(body));
     }
 }

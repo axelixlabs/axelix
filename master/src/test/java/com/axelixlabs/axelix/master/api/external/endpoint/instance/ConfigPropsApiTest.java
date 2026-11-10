@@ -49,6 +49,7 @@ import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
+import static net.javacrumbs.jsonunit.core.Option.TREATING_NULL_AS_ABSENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -57,6 +58,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 public class ConfigPropsApiTest extends AbstractProtectedEndpointTest {
+    // language=json
+    private static final String SENSITIVE_FEED_JSON = """
+            {
+              "beans": [{
+                "beanName": "test",
+                "prefix": "app",
+                "properties": [
+                  {"key": "secret", "value": "original-secret", "sensitive": true},
+                  {"key": "public", "value": "visible", "sensitive": false}
+                ],
+                "inputs": [{"key": "secret.value", "value": "original-secret", "sensitive": true}]
+              }]
+            }
+            """;
+
     // language=json
     private static final String EXPECTED_BEANS_FEED_JSON = """
             {
@@ -312,6 +328,31 @@ public class ConfigPropsApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
+    void shouldMaskSensitiveValuesForViewer() {
+        // given.
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                return new MockResponse()
+                        .setBody(SENSITIVE_FEED_JSON)
+                        .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+            }
+        });
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity("/api/external/configprops/feed/{instanceId}", String.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).doesNotContain("original-secret");
+        assertThatJson(response.getBody())
+                .inPath("beans[0].properties[1].value")
+                .isEqualTo("visible");
+    }
+
+    @Test
     void shouldReturnJSONConfigPropsFeed() {
         // when.
         IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
@@ -321,7 +362,9 @@ public class ConfigPropsApiTest extends AbstractProtectedEndpointTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_BEANS_FEED_JSON);
+        assertThatJson(response.getBody())
+                .when(IGNORING_ARRAY_ORDER, TREATING_NULL_AS_ABSENT)
+                .isEqualTo(EXPECTED_BEANS_FEED_JSON);
         assertSuccessfulCallback(MasterWebEndpoints.CONFIG_PROPS_READ, viewer.getActor());
     }
 
