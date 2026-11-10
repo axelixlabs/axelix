@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
@@ -148,7 +147,7 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
         return matcher.matches() ? matcher.group(1) : "unknown";
     }
 
-    private static @Nullable String methodName(ScheduledTaskRunnable runnable) {
+    private static String methodName(ScheduledTaskRunnable runnable) {
         if (runnable.getMethodName() != null) {
             return runnable.getMethodName();
         }
@@ -156,7 +155,7 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
             return "lambda";
         }
         Matcher matcher = METHOD_TASK_ID.matcher(runnable.getTarget());
-        return matcher.matches() ? matcher.group(2) : null;
+        return matcher.matches() ? matcher.group(2) : "unknown";
     }
 
     @Override
