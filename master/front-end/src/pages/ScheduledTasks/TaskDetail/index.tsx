@@ -46,33 +46,15 @@ export const TaskDetail = ({ item, onChange }: IProps) => {
         fetchData(setHistory, () => getScheduledTaskHistory(instanceId!, item.task.taskId));
     }, []);
 
-    const renderHistory = () => {
-        if (history.loading) {
-            return <Loader />;
-        }
+    if (history.loading) {
+        return <Loader />;
+    }
 
-        if (history.error) {
-            return <EmptyHandler isEmpty />;
-        }
+    if (history.error) {
+        return <EmptyHandler isEmpty />;
+    }
 
-        const { summary, failuresByErrorType, executions } = history.response!;
-
-        return (
-            <>
-                <TaskStats summary={summary} enabled={item.task.enabled} />
-
-                {summary ? (
-                    <>
-                        <DurationChart executions={executions} />
-                        <FailuresByType failures={failuresByErrorType} />
-                        <ExecutionsTable executions={executions} />
-                    </>
-                ) : (
-                    <EmptyExecutionHistory />
-                )}
-            </>
-        );
-    };
+    const { summary, failuresByErrorType, executions } = history.response!;
 
     return (
         <div
@@ -80,7 +62,17 @@ export const TaskDetail = ({ item, onChange }: IProps) => {
         >
             <TaskHeader item={item} onChange={onChange} />
 
-            {renderHistory()}
+            <TaskStats summary={summary} enabled={item.task.enabled} />
+
+            {summary ? (
+                <>
+                    <DurationChart executions={executions} />
+                    <FailuresByType failures={failuresByErrorType} />
+                    <ExecutionsTable executions={executions} />
+                </>
+            ) : (
+                <EmptyExecutionHistory />
+            )}
         </div>
     );
 };

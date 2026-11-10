@@ -41,9 +41,7 @@ export const TaskHeader = ({ item, onChange }: IProps) => {
         <div className={styles.Header}>
             <div className={styles.TitleBlock}>
                 <span className={`${shared.Mono} ${styles.Method}`}>{item.task.methodName}</span>
-                <span className={`${shared.Mono} ${styles.ClassName}`}>
-                    {item.task.className}.{item.task.methodName}
-                </span>
+                <span className={`${shared.Mono} ${styles.ClassName}`}>{item.task.className}</span>
                 <span className={styles.TriggerLine}>
                     <TriggerTypeBadge type={item.type} />
                     {item.type === "cron"
