@@ -133,6 +133,10 @@ class AxelixScheduledTasksEndpointTest {
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
+            assertThatJson(task)
+                    .node("runnable.className")
+                    .isEqualTo(AxelixScheduledTasksEndpointTestConfiguration.class.getName());
+            assertThatJson(task).node("runnable.methodName").isEqualTo("testCronTask");
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
     }

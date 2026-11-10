@@ -156,3 +156,11 @@ components:
           type: string
           description: The string representation of the executed target.
           x-axelix-introduced-in: 1.2.0
+        className:
+          x-axelix-introduced-in: 1.3.0
+          type: string
+          description: Fully qualified name of the class declaring the scheduled method.
+        methodName:
+          x-axelix-introduced-in: 1.3.0
+          type: string
+          description: Name of the scheduled method.

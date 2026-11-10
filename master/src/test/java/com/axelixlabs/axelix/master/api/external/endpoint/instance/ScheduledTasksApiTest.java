@@ -83,18 +83,24 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
           "cron": [
             {
               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive",
+              "className": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+              "methodName": "alive",
               "expression": "*/2 * * * * *",
               "enabled": true,
               "successRate": null
             },
             {
               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask",
+              "className": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+              "methodName": "cronTask",
               "expression": "*/5 * * * * *",
               "enabled": true,
               "successRate": null
             },
             {
               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask",
+              "className": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+              "methodName": "cronTask",
               "expression": "*/2 * * * * *",
               "enabled": true,
               "successRate": null
@@ -103,6 +109,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
           "fixedDelay": [
             {
               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask",
+              "className": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+              "methodName": "fixedDelayTask",
               "interval": 2000,
               "initialDelay": 0,
               "enabled": true,
@@ -112,6 +120,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
           "fixedRate": [
             {
               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask",
+              "className": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+              "methodName": "fixedRateTask",
               "interval": 2000,
               "initialDelay": 100,
               "enabled": false,
@@ -121,6 +131,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
           "custom": [
             {
               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634",
+              "className": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+              "methodName": "lambda",
               "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
               "enabled": false,
               "successRate": null
@@ -248,6 +260,77 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void cleanup() {
         registry.deRegister(InstanceId.of(activeInstanceId));
         executionResultRepository.deleteAll();
+    }
+
+    @ParameterizedTest
+    @MethodSource("infersMissingMetadata")
+    void infersMissingMetadata(String taskId, String className, String methodName) {
+        // given.
+        scheduledTasksFeed("{\"target\":\"" + taskId + "\"}");
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThatJson(response.getBody()).inPath("cron[0].className").isEqualTo(className);
+        assertThatJson(response.getBody()).inPath("cron[0].methodName").isEqualTo(methodName);
+        assertThatJson(response.getBody()).inPath("cron[0].taskId").isEqualTo(taskId);
+    }
+
+    @ParameterizedTest
+    @MethodSource("prefersExplicitMetadata")
+    void prefersExplicitMetadata(String taskId, String className, String methodName) {
+        // given.
+        scheduledTasksFeed("{\"target\":\"" + taskId + "\",\"className\":\"" + className + "\",\"methodName\":\""
+                + methodName + "\"}");
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThatJson(response.getBody()).inPath("cron[0].className").isEqualTo(className);
+        assertThatJson(response.getBody()).inPath("cron[0].methodName").isEqualTo(methodName);
+    }
+
+    private static Stream<Arguments> infersMissingMetadata() {
+        return Stream.of(
+                Arguments.of("com.example.Jobs.run", "com.example.Jobs", "run"),
+                Arguments.of("com.example.Jobs$Nested.run#cron0", "com.example.Jobs$Nested", "run"),
+                Arguments.of("com.example.Jobs.run#fixedDelay0", "com.example.Jobs", "run"),
+                Arguments.of("com.example.Jobs.run#fixedRate12", "com.example.Jobs", "run"),
+                Arguments.of("com.example.Jobs$$Lambda$1/0x123@abc", "com.example.Jobs", "lambda"),
+                Arguments.of("com.example.Jobs$$Lambda/0x123@abc", "com.example.Jobs", "lambda"),
+                Arguments.of("com.example.Jobs$Nested$$Lambda$12@abc", "com.example.Jobs$Nested", "lambda"),
+                Arguments.of("com.example.Jobs$$Lambda/123@abc", "com.example.Jobs", "lambda"),
+                Arguments.of("com.example.Jobs@abc", "com.example.Jobs", "unknown"),
+                Arguments.of("com.example.Jobs$$Lambda$bad/0x123@abc", "unknown", "unknown"),
+                Arguments.of("unknown", "unknown", "unknown"));
+    }
+
+    private static Stream<Arguments> prefersExplicitMetadata() {
+        return Stream.of(
+                Arguments.of("opaque", "com.example.ActualJobs", "execute"),
+                Arguments.of("com.example.OldJobs.run", "com.example.ActualJobs", "execute"));
+    }
+
+    private void scheduledTasksFeed(String runnable) {
+        String body = "{\"cron\":[{\"runnable\":" + runnable
+                + ",\"expression\":\"* * * * * *\",\"enabled\":true}],\"fixedDelay\":[],\"fixedRate\":[],\"custom\":[]}";
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                if (("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks").equals(request.getPath())) {
+                    return new MockResponse().setBody(body).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        });
     }
 
     @Test

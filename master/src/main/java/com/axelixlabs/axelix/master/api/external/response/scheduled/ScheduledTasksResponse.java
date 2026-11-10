@@ -31,6 +31,8 @@ public record ScheduledTasksResponse(
 
     public record CronTask(
             String taskId,
+            String className,
+            String methodName,
             String expression,
             boolean enabled,
             @Nullable Double successRate) {}
@@ -41,6 +43,8 @@ public record ScheduledTasksResponse(
      */
     public record FixedDelayTask(
             String taskId,
+            String className,
+            String methodName,
             long interval,
             long initialDelay,
             boolean enabled,
@@ -52,6 +56,8 @@ public record ScheduledTasksResponse(
      */
     public record FixedRateTask(
             String taskId,
+            String className,
+            String methodName,
             long interval,
             long initialDelay,
             boolean enabled,
@@ -59,6 +65,8 @@ public record ScheduledTasksResponse(
 
     public record CustomTask(
             String taskId,
+            String className,
+            String methodName,
             String trigger,
             boolean enabled,
             @Nullable Double successRate) {}

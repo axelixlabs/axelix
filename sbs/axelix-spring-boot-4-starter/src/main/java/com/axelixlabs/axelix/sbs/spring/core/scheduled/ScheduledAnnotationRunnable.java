@@ -109,6 +109,14 @@ public final class ScheduledAnnotationRunnable implements SchedulingAwareRunnabl
         return null;
     }
 
+    public String getClassName() {
+        return method.getDeclaringClass().getName();
+    }
+
+    public String getMethodName() {
+        return method.getName();
+    }
+
     public String getId() {
         return id;
     }

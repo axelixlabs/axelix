@@ -20,11 +20,14 @@ package com.axelixlabs.axelix.master.service.scheduled;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 
+import com.axelixlabs.axelix.common.contract.scheduledtask.ScheduledTaskRunnable;
 import com.axelixlabs.axelix.common.contract.scheduledtask.ServiceScheduledTasks;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTaskExecutionHistoryResponse;
 import com.axelixlabs.axelix.master.api.external.response.scheduled.ScheduledTasksResponse;
@@ -45,6 +48,26 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  */
 @Service
 public class DefaultScheduledTasksService implements ScheduledTasksService {
+
+    // TODO:
+    //  to be removed in 1.6, this is here just because old starters
+    //  do not send the data we need (i.e. class name and method name)
+    @Deprecated(forRemoval = true, since = "1.3")
+    private static final Pattern METHOD_TASK_ID = Pattern.compile(
+            "^([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*(?:\\.[\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)*)\\.([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)(?:#(?:cron|fixedDelay|fixedRate)[0-9]+)?$");
+    // TODO:
+    //  to be removed in 1.6, this is here just because old starters
+    //  do not send the data we need (i.e. class name and method name)
+    @Deprecated(forRemoval = true, since = "1.3")
+    private static final Pattern LAMBDA_TASK_ID = Pattern.compile(
+            "^(.+)\\$\\$Lambda(?:\\$[0-9]+|/[0-9]+|/0x[0-9a-fA-F]+)(?:/0x[0-9a-fA-F]+)?(?:@[0-9a-fA-F]+)?$");
+
+    // TODO:
+    //  to be removed in 1.6, this is here just because old starters
+    //  do not send the data we need (i.e. class name and method name)
+    @Deprecated(forRemoval = true, since = "1.3")
+    private static final Pattern CLASS_TASK_ID = Pattern.compile(
+            "^([\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*(?:\\.[\\p{javaJavaIdentifierStart}][\\p{javaJavaIdentifierPart}]*)*)@[0-9a-fA-F]+$");
 
     private final EndpointInvoker endpointInvoker;
     private final MessageDeserializationStrategy<ServiceScheduledTasks> scheduledTasksDeserializationStrategy;
@@ -82,6 +105,8 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                 tasks.getCron().stream()
                         .map(task -> new ScheduledTasksResponse.CronTask(
                                 task.getRunnable().getTarget(),
+                                className(task.getRunnable()),
+                                methodName(task.getRunnable()),
                                 task.getExpression(),
                                 task.getEnabled(),
                                 successRates.get(task.getRunnable().getTarget())))
@@ -89,6 +114,8 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                 tasks.getFixedDelay().stream()
                         .map(task -> new ScheduledTasksResponse.FixedDelayTask(
                                 task.getRunnable().getTarget(),
+                                className(task.getRunnable()),
+                                methodName(task.getRunnable()),
                                 task.getInterval(),
                                 task.getInitialDelay(),
                                 task.getEnabled(),
@@ -97,6 +124,8 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                 tasks.getFixedRate().stream()
                         .map(task -> new ScheduledTasksResponse.FixedRateTask(
                                 task.getRunnable().getTarget(),
+                                className(task.getRunnable()),
+                                methodName(task.getRunnable()),
                                 task.getInterval(),
                                 task.getInitialDelay(),
                                 task.getEnabled(),
@@ -105,10 +134,39 @@ public class DefaultScheduledTasksService implements ScheduledTasksService {
                 tasks.getCustom().stream()
                         .map(task -> new ScheduledTasksResponse.CustomTask(
                                 task.getRunnable().getTarget(),
+                                className(task.getRunnable()),
+                                methodName(task.getRunnable()),
                                 task.getTrigger(),
                                 task.getEnabled(),
                                 successRates.get(task.getRunnable().getTarget())))
                         .toList());
+    }
+
+    private static String className(ScheduledTaskRunnable runnable) {
+        if (runnable.getClassName() != null) {
+            return runnable.getClassName();
+        }
+        Matcher lambda = LAMBDA_TASK_ID.matcher(runnable.getTarget());
+        if (lambda.matches()) {
+            return lambda.group(1);
+        }
+        Matcher object = CLASS_TASK_ID.matcher(runnable.getTarget());
+        if (object.matches()) {
+            return object.group(1);
+        }
+        Matcher matcher = METHOD_TASK_ID.matcher(runnable.getTarget());
+        return matcher.matches() ? matcher.group(1) : "unknown";
+    }
+
+    private static String methodName(ScheduledTaskRunnable runnable) {
+        if (runnable.getMethodName() != null) {
+            return runnable.getMethodName();
+        }
+        if (LAMBDA_TASK_ID.matcher(runnable.getTarget()).matches()) {
+            return "lambda";
+        }
+        Matcher matcher = METHOD_TASK_ID.matcher(runnable.getTarget());
+        return matcher.matches() ? matcher.group(2) : "unknown";
     }
 
     @Override
