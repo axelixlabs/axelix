@@ -20,20 +20,20 @@ import { useTranslation } from "react-i18next";
 import { SCHEDULED_TASK_TYPE_LABEL_KEYS } from "@/helpers";
 import type { TScheduledTaskType } from "@/models";
 
-import shared from "../../shared.module.css";
+import styles from "./styles.module.css";
 
 interface IProps {
     type: TScheduledTaskType;
 }
 
 const TYPE_CLASS: Record<TScheduledTaskType, string> = {
-    cron: shared.TypeCron,
-    fixedDelay: shared.TypeFixedDelay,
-    fixedRate: shared.TypeFixedRate,
+    cron: styles.TypeCron,
+    fixedDelay: styles.TypeFixedDelay,
+    fixedRate: styles.TypeFixedRate,
 };
 
 export const TriggerTypeBadge = ({ type }: IProps) => {
     const { t } = useTranslation();
 
-    return <span className={`${shared.TypeBadge} ${TYPE_CLASS[type]}`}>{t(SCHEDULED_TASK_TYPE_LABEL_KEYS[type])}</span>;
+    return <span className={`${styles.TypeBadge} ${TYPE_CLASS[type]}`}>{t(SCHEDULED_TASK_TYPE_LABEL_KEYS[type])}</span>;
 };

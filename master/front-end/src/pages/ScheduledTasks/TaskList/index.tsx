@@ -22,7 +22,6 @@ import { EmptyHandler, PageSearch } from "@/components";
 import { SCHEDULED_TASK_TYPE_LABEL_KEYS, isEmpty } from "@/helpers";
 import type { IScheduledTask, IScheduledTasksResponseBody, TScheduledTaskType } from "@/models";
 
-import shared from "../shared.module.css";
 import { HEALTHY_SUCCESS_RATE, getSuccessRateClass } from "../taskStyles";
 
 import styles from "./styles.module.css";
@@ -89,13 +88,13 @@ export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, setSearch }
                                     >
                                         <span className={`${styles.Dot} ${getDotClass(task)}`} />
                                         <span className={styles.Labels}>
-                                            <span className={`${shared.Mono} ${styles.Method}`}>{task.methodName}</span>
-                                            <span className={`${shared.Mono} ${styles.ClassName}`}>
+                                            <span className={`${styles.Mono} ${styles.Method}`}>{task.methodName}</span>
+                                            <span className={`${styles.Mono} ${styles.ClassName}`}>
                                                 {task.className.slice(task.className.lastIndexOf(".") + 1)}
                                             </span>
                                         </span>
                                         <span
-                                            className={`${shared.Mono} ${styles.Rate} ${getSuccessRateClass(getRoundedSuccessRate(task), task.enabled)}`}
+                                            className={`${styles.Mono} ${styles.Rate} ${getSuccessRateClass(getRoundedSuccessRate(task), task.enabled)}`}
                                         >
                                             {getRateLabel(task)}
                                         </span>

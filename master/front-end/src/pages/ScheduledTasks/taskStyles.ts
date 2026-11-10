@@ -15,18 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import shared from "./shared.module.css";
+import successRateStyles from "@/pages/ScheduledTasks/successRate.module.css";
 
 export const HEALTHY_SUCCESS_RATE = 90;
 
 export const getSuccessRateClass = (successRate: number | null, enabled: boolean): string => {
     if (!enabled || successRate === null) {
-        return shared.RateOff;
+        return successRateStyles.RateOff;
     }
 
     if (successRate === 100) {
-        return shared.RateGood;
+        return successRateStyles.RateGood;
     }
 
-    return successRate >= HEALTHY_SUCCESS_RATE ? shared.RateWarn : shared.RateBad;
+    return successRate >= HEALTHY_SUCCESS_RATE ? successRateStyles.RateWarn : successRateStyles.RateBad;
 };

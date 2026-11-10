@@ -20,8 +20,6 @@ import { useTranslation } from "react-i18next";
 import { formatRelativeTime } from "@/helpers";
 import type { IScheduledTaskFailuresByErrorType } from "@/models";
 
-import shared from "../../shared.module.css";
-
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -41,9 +39,9 @@ export const FailuresByType = ({ failures }: IProps) => {
 
             {failures.map(({ errorType, count, lastErrorMessage, lastOccurredAt }) => (
                 <div className={styles.Row} key={errorType}>
-                    <span className={`${shared.Mono} ${styles.Count}`}>×{count}</span>
+                    <span className={`${styles.Mono} ${styles.Count}`}>×{count}</span>
                     <span className={styles.Details}>
-                        <span className={`${shared.Mono} ${styles.ErrorType}`}>{errorType}</span>
+                        <span className={`${styles.Mono} ${styles.ErrorType}`}>{errorType}</span>
                         {lastErrorMessage && <span className={styles.ErrorMessage}>{lastErrorMessage}</span>}
                     </span>
                     <span className={styles.Last}>

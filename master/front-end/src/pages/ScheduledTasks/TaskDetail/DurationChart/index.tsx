@@ -22,8 +22,6 @@ import { HintTooltip } from "@/components";
 import { formatTransactionDuration } from "@/helpers";
 import type { IScheduledTaskExecutionRecord } from "@/models";
 
-import shared from "../../shared.module.css";
-
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -60,7 +58,7 @@ export const DurationChart = ({ executions }: IProps) => {
                         <span className={styles.Question}>?</span>
                     </HintTooltip>
                 </span>
-                <span className={`${shared.Mono} ${styles.Max}`}>
+                <span className={`${styles.Mono} ${styles.Max}`}>
                     {t("ScheduledTasks.max")} {formatTransactionDuration(maxDurationMillis)}
                 </span>
             </div>
@@ -76,7 +74,7 @@ export const DurationChart = ({ executions }: IProps) => {
                 ))}
             </div>
 
-            <div className={`${shared.Mono} ${styles.Axis}`}>
+            <div className={`${styles.Mono} ${styles.Axis}`}>
                 <span>{firstStartedAt.format(axisFormat)}</span>
                 <span>{lastStartedAt.format(axisFormat)}</span>
             </div>

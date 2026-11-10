@@ -125,3 +125,7 @@
     font-size: var(--axelix-font-size-caption);
     font-weight: var(--axelix-font-weight-semibold);
 }
+
+.Mono {
+    font-family: var(--axelix-font-family-code);
+}

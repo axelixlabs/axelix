@@ -33,3 +33,7 @@
 .StatValueMuted {
     color: var(--axelix-grey-400);
 }
+
+.Mono {
+    font-family: var(--axelix-font-family-code);
+}

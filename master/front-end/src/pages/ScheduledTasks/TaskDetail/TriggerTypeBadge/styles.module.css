@@ -1,7 +1,3 @@
-.Mono {
-    font-family: var(--axelix-font-family-code);
-}
-
 /* TODO: Extract a shared chip component together with HealthStatusBadge */
 .TypeBadge {
     display: inline-flex;
@@ -30,20 +26,4 @@
     color: #c11574;
     background-color: #fdf2fa;
     border-color: #fbcfe8;
-}
-
-.RateGood {
-    color: var(--axelix-green-600);
-}
-
-.RateWarn {
-    color: var(--axelix-orange-700);
-}
-
-.RateBad {
-    color: var(--axelix-red-700);
-}
-
-.RateOff {
-    color: var(--axelix-grey-500);
 }

@@ -1,0 +1,42 @@
+.Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+}
+
+.Title {
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-900);
+}
+
+.Filter {
+    display: flex;
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.FilterOption {
+    padding: 4px 10px;
+    font: inherit;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-900);
+    cursor: pointer;
+    background-color: var(--axelix-white);
+    border: none;
+}
+
+.FilterOption + .FilterOption {
+    border-left: 1px solid var(--axelix-grey-300);
+}
+
+.FilterActive {
+    font-weight: var(--axelix-font-weight-semibold);
+    background-color: var(--axelix-grey-100);
+}
+
+.FilterFailed {
+    color: var(--axelix-red-700);
+}

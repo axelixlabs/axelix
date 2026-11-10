@@ -21,7 +21,8 @@ import { getCronDescription } from "@/helpers";
 import type { TScheduledTaskType } from "@/models";
 
 import { getIntervalDescription } from "../../../getIntervalDescription";
-import styles from "../styles.module.css";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     type: TScheduledTaskType;

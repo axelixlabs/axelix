@@ -1,0 +1,49 @@
+.Row {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr) 110px minmax(0, 1.5fr);
+    column-gap: 14px;
+    padding: 8px 20px;
+    border-top: 1px solid var(--axelix-grey-100);
+    align-items: baseline;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-900);
+}
+
+.RowFailed {
+    background-color: var(--axelix-red-50);
+}
+
+.Instance {
+    color: var(--axelix-grey-500);
+    overflow-wrap: anywhere;
+}
+
+.Result {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.ResultSucceeded {
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-green-700);
+}
+
+.ResultFailed {
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-red-700);
+}
+
+.ResultMessage {
+    color: var(--axelix-grey-600);
+}
+
+.Duration {
+    text-align: right;
+}
+
+.Mono {
+    font-family: var(--axelix-font-family-code);
+}

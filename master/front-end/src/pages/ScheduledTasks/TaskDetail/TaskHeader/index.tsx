@@ -20,7 +20,6 @@ import { useTranslation } from "react-i18next";
 import { getCronDescription } from "@/helpers";
 import type { TScheduledTaskItem } from "@/models";
 
-import shared from "../../shared.module.css";
 import { EditTriggerPopover } from "../EditTriggerPopover";
 import { TriggerTypeBadge } from "../TriggerTypeBadge";
 import { getIntervalDescription } from "../getIntervalDescription";
@@ -40,15 +39,15 @@ export const TaskHeader = ({ item, onChange }: IProps) => {
     return (
         <div className={styles.Header}>
             <div className={styles.TitleBlock}>
-                <span className={`${shared.Mono} ${styles.Method}`}>{item.task.methodName}</span>
-                <span className={`${shared.Mono} ${styles.ClassName}`}>{item.task.className}</span>
+                <span className={`${styles.Mono} ${styles.Method}`}>{item.task.methodName}</span>
+                <span className={`${styles.Mono} ${styles.ClassName}`}>{item.task.className}</span>
                 <span className={styles.TriggerLine}>
                     <TriggerTypeBadge type={item.type} />
                     {item.type === "cron"
                         ? getCronDescription(item.task.expression, i18n.language, t)
                         : getIntervalDescription(item.type, item.task.interval, i18n.language, t)}
                     {item.type === "cron" && (
-                        <span className={`${shared.Mono} ${shared.TypeBadge} ${styles.Expression}`}>
+                        <span className={`${styles.Mono} ${styles.TypeBadge} ${styles.Expression}`}>
                             {item.task.expression}
                         </span>
                     )}

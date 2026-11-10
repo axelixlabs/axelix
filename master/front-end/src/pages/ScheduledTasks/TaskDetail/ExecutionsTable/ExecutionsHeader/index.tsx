@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 
 import type { TScheduledTaskExecutionsFilter } from "@/models";
 
-import styles from "../styles.module.css";
+import styles from "./styles.module.css";
 
 interface IProps {
     filter: TScheduledTaskExecutionsFilter;

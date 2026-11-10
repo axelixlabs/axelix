@@ -53,3 +53,7 @@
     text-align: right;
     color: var(--axelix-grey-500);
 }
+
+.Mono {
+    font-family: var(--axelix-font-family-code);
+}

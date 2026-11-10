@@ -1,0 +1,18 @@
+.Preview {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 9px 11px;
+    font-size: var(--axelix-font-size-caption);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.PreviewOk {
+    color: var(--axelix-green-600);
+    background-color: var(--axelix-green-50);
+}
+
+.PreviewBad {
+    color: var(--axelix-red-700);
+    background-color: var(--axelix-red-50);
+}

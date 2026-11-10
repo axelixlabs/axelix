@@ -21,8 +21,7 @@ import { useTranslation } from "react-i18next";
 import { formatTransactionDuration } from "@/helpers";
 import type { IScheduledTaskExecutionRecord } from "@/models";
 
-import shared from "../../../shared.module.css";
-import styles from "../styles.module.css";
+import styles from "./styles.module.css";
 
 interface IProps {
     execution: IScheduledTaskExecutionRecord;
@@ -38,16 +37,16 @@ export const ExecutionRow = ({ execution }: IProps) => {
 
     return (
         <div className={`${styles.Row} ${execution.success ? "" : styles.RowFailed}`}>
-            <span className={shared.Mono}>{formatStartedAt(execution.startedAt)}</span>
-            <span className={`${shared.Mono} ${styles.Instance}`}>{execution.instanceName}</span>
-            <span className={`${shared.Mono} ${styles.Duration}`}>
+            <span className={styles.Mono}>{formatStartedAt(execution.startedAt)}</span>
+            <span className={`${styles.Mono} ${styles.Instance}`}>{execution.instanceName}</span>
+            <span className={`${styles.Mono} ${styles.Duration}`}>
                 {formatTransactionDuration(execution.durationMillis)}
             </span>
             {execution.success ? (
                 <span className={styles.ResultSucceeded}>✓ {t("ScheduledTasks.succeeded")}</span>
             ) : (
                 <span className={styles.Result}>
-                    <span className={`${shared.Mono} ${styles.ResultFailed}`}>
+                    <span className={`${styles.Mono} ${styles.ResultFailed}`}>
                         ✕ {execution.errorType ?? t("ScheduledTasks.failed")}
                     </span>
                     {execution.errorMessage && <span className={styles.ResultMessage}>{execution.errorMessage}</span>}

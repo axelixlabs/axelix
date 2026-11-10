@@ -20,9 +20,9 @@ import { useTranslation } from "react-i18next";
 
 import type { TScheduledTaskType } from "@/models";
 
-import shared from "../../../../shared.module.css";
 import { TriggerTypeBadge } from "../../../TriggerTypeBadge";
-import styles from "../styles.module.css";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     type: TScheduledTaskType;
@@ -54,7 +54,7 @@ export const TriggerField = ({ type, value, isValid, loading, onChange }: IProps
                     {isCron ? t("ScheduledTasks.expression") : t("ScheduledTasks.interval")}
                 </span>
                 <Input
-                    className={shared.Mono}
+                    className={styles.Mono}
                     value={value}
                     status={isValid ? undefined : "error"}
                     disabled={loading}

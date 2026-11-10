@@ -19,8 +19,8 @@ import { useTranslation } from "react-i18next";
 
 import { formatRelativeTime, formatTransactionDuration } from "@/helpers";
 import type { IScheduledTaskHistorySummary } from "@/models";
+import successRateStyles from "@/pages/ScheduledTasks/successRate.module.css";
 
-import shared from "../../shared.module.css";
 import { getSuccessRateClass } from "../../taskStyles";
 
 import styles from "./styles.module.css";
@@ -57,7 +57,7 @@ const getStats = (summary: IScheduledTaskHistorySummary, enabled: boolean, langu
         {
             labelKey: STAT_LABEL_KEYS.failed,
             value: String(summary.failedRuns),
-            valueClass: summary.failedRuns > 0 ? shared.RateBad : undefined,
+            valueClass: summary.failedRuns > 0 ? successRateStyles.RateBad : undefined,
         },
         { labelKey: STAT_LABEL_KEYS.avg, value: formatTransactionDuration(summary.averageDurationMillis) },
         { labelKey: STAT_LABEL_KEYS.p95, value: formatTransactionDuration(summary.p95DurationMillis) },
@@ -77,7 +77,7 @@ export const TaskStats = ({ summary, enabled }: IProps) => {
                 <div className={styles.Stat} key={labelKey}>
                     <span className={styles.StatLabel}>{t(labelKey)}</span>
                     <span
-                        className={`${shared.Mono} ${styles.StatValue} ${value ? (valueClass ?? "") : styles.StatValueMuted}`}
+                        className={`${styles.Mono} ${styles.StatValue} ${value ? (valueClass ?? "") : styles.StatValueMuted}`}
                     >
                         {value ?? "—"}
                     </span>

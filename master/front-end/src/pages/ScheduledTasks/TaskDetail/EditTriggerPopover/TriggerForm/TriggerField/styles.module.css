@@ -1,0 +1,30 @@
+.TypeNote {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-600);
+}
+
+.Field {
+    display: flex;
+    flex-direction: column;
+    row-gap: 6px;
+}
+
+.Label {
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+}
+
+.Help {
+    font-size: var(--axelix-font-size-caption);
+    color: var(--axelix-grey-500);
+}
+
+.Mono {
+    font-family: var(--axelix-font-family-code);
+}

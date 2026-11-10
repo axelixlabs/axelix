@@ -5,52 +5,6 @@
     width: 360px;
 }
 
-.TypeNote {
-    display: flex;
-    align-items: center;
-    column-gap: 8px;
-    font-size: var(--axelix-font-size-caption);
-    color: var(--axelix-grey-600);
-}
-
-.Field {
-    display: flex;
-    flex-direction: column;
-    row-gap: 6px;
-}
-
-.Label {
-    font-size: var(--axelix-font-size-caption);
-    font-weight: var(--axelix-font-weight-semibold);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--axelix-grey-500);
-}
-
-.Help {
-    font-size: var(--axelix-font-size-caption);
-    color: var(--axelix-grey-500);
-}
-
-.Preview {
-    display: flex;
-    align-items: center;
-    column-gap: 8px;
-    padding: 9px 11px;
-    font-size: var(--axelix-font-size-caption);
-    border-radius: var(--axelix-border-radius-large);
-}
-
-.PreviewOk {
-    color: var(--axelix-green-600);
-    background-color: var(--axelix-green-50);
-}
-
-.PreviewBad {
-    color: var(--axelix-red-700);
-    background-color: var(--axelix-red-50);
-}
-
 .Footer {
     display: flex;
     justify-content: flex-end;

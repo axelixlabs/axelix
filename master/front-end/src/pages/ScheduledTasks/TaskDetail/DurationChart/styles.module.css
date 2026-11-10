@@ -69,3 +69,7 @@
     font-size: var(--axelix-font-size-caption);
     color: var(--axelix-grey-500);
 }
+
+.Mono {
+    font-family: var(--axelix-font-family-code);
+}

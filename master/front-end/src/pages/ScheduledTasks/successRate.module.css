@@ -1,0 +1,15 @@
+.RateGood {
+    color: var(--axelix-green-600);
+}
+
+.RateWarn {
+    color: var(--axelix-orange-700);
+}
+
+.RateBad {
+    color: var(--axelix-red-700);
+}
+
+.RateOff {
+    color: var(--axelix-grey-500);
+}
