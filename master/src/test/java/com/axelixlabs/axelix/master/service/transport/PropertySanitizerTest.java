@@ -262,8 +262,8 @@ class PropertySanitizerTest {
 
     private void runAs(Role role, Runnable action) {
         Role inheritedRole = new DefaultRole("inherited", Set.of(), Set.of(role));
-        String token =
-                tokenEncoder.generateToken(new PasswordlessUser("test-user", "test-user", Set.of(inheritedRole)));
-        securityContextExecutor.runWithinSecurityContext(action::run, new DefaultSecurityContext(token));
+        PasswordlessUser testUser = new PasswordlessUser("test-user", "test-user", Set.of(inheritedRole));
+        String token = tokenEncoder.generateToken(testUser);
+        securityContextExecutor.runWithinSecurityContext(action::run, new DefaultSecurityContext(token, testUser));
     }
 }

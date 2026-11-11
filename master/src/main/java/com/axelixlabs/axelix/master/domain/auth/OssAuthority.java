@@ -80,7 +80,12 @@ public enum OssAuthority implements Authority {
      * Grants the right to manage users.
      * <p>Allows creating, updating, and deleting managed users at runtime.</p>
      */
-    USERS_MANAGEMENT("users:manage");
+    USERS_MANAGEMENT("users:manage"),
+
+    /**
+     * Grants the right to download heap dumps.
+     */
+    HEAP_DUMP_READ("heap-dump:read");
 
     private final String codename;
 
