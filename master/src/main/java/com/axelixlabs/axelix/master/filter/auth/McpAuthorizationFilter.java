@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.filter.auth;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -110,7 +109,7 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
-            throws IOException, ServletException {
+            throws ServletException {
 
         McpRequestContext mcpRequestContext = MasterRequestContextInitFilter.requireMcpRequestContext();
 

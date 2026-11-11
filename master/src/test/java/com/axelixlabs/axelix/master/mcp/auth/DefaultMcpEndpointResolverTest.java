@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.databind.json.JsonMapper;
 
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
@@ -41,6 +42,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class DefaultMcpEndpointResolverTest {
 
     private final DefaultMcpEndpointResolver subject = new DefaultMcpEndpointResolver(new JsonMapper());
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", "\t\r\n"})
+    void shouldReturnEmptyWhenRequestBodyIsBlank(String request) {
+        // when.
+        Optional<McpEndpoint> result = subject.resolve(request);
+
+        // then.
+        assertThat(result).isEmpty();
+    }
 
     @ParameterizedTest
     @MethodSource(value = "endpointMapping")
@@ -93,15 +104,26 @@ class DefaultMcpEndpointResolverTest {
         assertThatThrownBy(() -> subject.resolve(request)).isInstanceOf(AuthenticationException.class);
     }
 
-    @Test
-    void shouldThrowAuthenticationExceptionWhenMethodIsMissing() {
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "{\"jsonrpc\":\"2.0\",\"id\":1}",
+                "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{}}",
+                "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Internal error\"}}"
+            })
+    void shouldReturnEmptyWhenMethodIsMissing(String request) {
+        // when.
+        Optional<McpEndpoint> result = subject.resolve(request);
+
+        // then.
+        assertThat(result).isEmpty();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"null", "123", "true", "[]", "{}"})
+    void shouldThrowAuthenticationExceptionWhenMethodIsNotString(String method) {
         // given.
-        String request = """
-                {
-                  "jsonrpc": "2.0",
-                  "id": 1
-                }
-                """;
+        String request = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":" + method + "}";
 
         // when.
         // then.

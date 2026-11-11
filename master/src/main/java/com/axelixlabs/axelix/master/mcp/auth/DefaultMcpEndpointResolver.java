@@ -37,8 +37,7 @@ public class DefaultMcpEndpointResolver implements McpEndpointResolver {
     private static final String TOOLS_CALL_METHOD = "tools/call";
     private static final String METHOD_JSON_FIELD = "method";
 
-    private static final AuthenticationException PARSING_EXCEPTION =
-            new AuthenticationException("Unable to parse the incoming JSON-RPC request from the AI Agent");
+    private static final String PARSING_ERROR = "Unable to parse the incoming JSON-RPC request from the AI Agent";
 
     private static final Map<String, McpEndpoint> ENDPOINT_MAPPING = Map.ofEntries(
             Map.entry(McpEndpoints.BEANS_FEED_TOOL_NAME, McpEndpoints.BEANS_FEED),
@@ -61,19 +60,28 @@ public class DefaultMcpEndpointResolver implements McpEndpointResolver {
     }
 
     @Override
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     public Optional<McpEndpoint> resolve(String mcpJsonRpcRequest) throws AuthenticationException {
+        if (mcpJsonRpcRequest.isBlank()) {
+            return Optional.empty();
+        }
+
         final JsonNode root;
 
         try {
             root = jsonMapper.readTree(mcpJsonRpcRequest);
         } catch (RuntimeException e) {
-            throw PARSING_EXCEPTION;
+            throw new AuthenticationException(PARSING_ERROR);
         }
 
         JsonNode methodNode = root.path(METHOD_JSON_FIELD);
 
-        if (methodNode.isMissingNode() || !methodNode.isString()) {
-            throw PARSING_EXCEPTION;
+        if (methodNode.isMissingNode()) {
+            return Optional.empty();
+        }
+
+        if (!methodNode.isString()) {
+            throw new AuthenticationException(PARSING_ERROR);
         }
 
         String method = methodNode.asString();
@@ -83,7 +91,7 @@ public class DefaultMcpEndpointResolver implements McpEndpointResolver {
             JsonNode endpointNameNode = root.path("params").path("name");
 
             if (!endpointNameNode.isString()) {
-                throw PARSING_EXCEPTION;
+                throw new AuthenticationException(PARSING_ERROR);
             }
 
             return Optional.ofNullable(ENDPOINT_MAPPING.get(endpointNameNode.asString()));
