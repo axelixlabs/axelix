@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerStreamableHttpProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -327,6 +328,26 @@ abstract class AbstractMcpAuthorizationFilterTest {
                 "axelix.master.auth.options.oauth2.base-url=http://localhost:8080"
             })
     static class BearerAuthTest extends AbstractMcpAuthorizationFilterTest {
+
+        @ParameterizedTest
+        @ValueSource(strings = {"GET", "DELETE", "POST"})
+        void shouldAdvertiseOAuthForTransportRequestWithoutBody(String method) {
+            // given.
+            HttpHeaders headers = commonMcpHeaders();
+
+            // when.
+            ResponseEntity<String> response = restTemplate.exchange(
+                    mcpProperties.getMcpEndpoint(),
+                    org.springframework.http.HttpMethod.valueOf(method),
+                    new HttpEntity<>(headers),
+                    String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+            assertThat(response.getHeaders().getFirst(McpAuthorizationFilter.WWW_AUTHENTICATE_OAUTH2_HEADER))
+                    .isEqualTo(
+                            "Bearer resource_metadata=\"http://localhost:8080/api/external/mcp-oauth2/.well-known/oauth-protected-resource\"");
+        }
 
         private static final String OIDC_ISSUER_URI = "http://localhost:8999";
         private static final String OIDC_SUBJECT = "ai-agent-user";
