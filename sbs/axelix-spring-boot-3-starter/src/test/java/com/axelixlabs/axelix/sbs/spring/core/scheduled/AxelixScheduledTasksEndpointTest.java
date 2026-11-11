@@ -163,8 +163,7 @@ class AxelixScheduledTasksEndpointTest {
         });
 
         enableScheduledTask(taskId);
-        Thread.sleep(1200);
-        assertThat(cronFlag).isTrue();
+        await().atMost(Duration.ofSeconds(5)).until(() -> cronFlag);
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -204,8 +203,7 @@ class AxelixScheduledTasksEndpointTest {
         });
 
         enableScheduledTask(taskId);
-        Thread.sleep(200);
-        assertThat(fixedDelayFlag).isTrue();
+        await().atMost(Duration.ofSeconds(5)).until(() -> fixedDelayFlag);
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -245,8 +243,7 @@ class AxelixScheduledTasksEndpointTest {
         });
 
         enableScheduledTask(taskId);
-        Thread.sleep(200);
-        assertThat(fixedRateFlag).isTrue();
+        await().atMost(Duration.ofSeconds(5)).until(() -> fixedRateFlag);
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -286,8 +283,7 @@ class AxelixScheduledTasksEndpointTest {
                 .allSatisfy(task -> assertThatJson(task).node("runnable.target").isNotEqualTo(taskId));
 
         enableScheduledTask(taskId);
-        Thread.sleep(200);
-        assertThat(customTaskFlag).isTrue();
+        await().atMost(Duration.ofSeconds(5)).until(() -> customTaskFlag);
 
         assertThatJson(getScheduledTasks())
                 .node("custom")

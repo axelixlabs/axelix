@@ -48,6 +48,7 @@ import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 
 import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 /**
  * Integration tests for {@link ScheduledTaskService}
@@ -262,12 +263,15 @@ class ScheduledTaskServiceTest {
 
     @Test
     void shouldExecuteScheduledTask_testFixedRate() {
+        // given.
+        fixedRateFlagForExecute = false;
+
         // when.
         taskService.executeScheduledTask(FIXED_RATE_TASK_ID_FOR_EXECUTE);
 
-        // then task exists and was executed
+        // then.
         taskRegistry.find(FIXED_RATE_TASK_ID_FOR_EXECUTE).orElseThrow();
-        assertThat(fixedRateFlagForExecute).isTrue();
+        await().atMost(Duration.ofSeconds(5)).until(() -> fixedRateFlagForExecute);
     }
 
     @Test // GH-1497
@@ -350,7 +354,7 @@ class ScheduledTaskServiceTest {
         @Scheduled(fixedRate = 200)
         public void testFixedRateTaskForModify() {}
 
-        @Scheduled(fixedRate = 2000000000)
+        @Scheduled(fixedRate = 2000000000, initialDelay = 2000000000)
         public void testFixedDelayTaskForExecute() {
             fixedRateFlagForExecute = true;
         }
