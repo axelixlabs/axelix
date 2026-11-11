@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +59,7 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 // TODO: Revisit this test design.
 /**
@@ -109,6 +111,10 @@ class AxelixScheduledTasksEndpointTest {
     private static volatile boolean fixedDelayFlag = false;
 
     private static volatile boolean fixedRateFlag = false;
+
+    private static volatile boolean manualFixedDelayFlag = false;
+
+    private static volatile boolean manualFixedRateFlag = false;
 
     private static volatile boolean customTaskFlag = false;
 
@@ -394,38 +400,46 @@ class AxelixScheduledTasksEndpointTest {
 
     @Test
     void shouldExecuteWithDisableTask_testFixedDelay() {
+        // given.
+        manualFixedDelayFlag = false;
         forceDisableTask(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
         ScheduledTaskExecuteRequest request =
                 new ScheduledTaskExecuteRequest().trigger(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
 
+        // when.
         ResponseEntity<Void> response = restTemplate
                 .asMaster()
                 .postForEntity("/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
 
+        // then.
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
             assertThatJson(task).node("interval").isEqualTo(2000000000);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
-        assertThat(fixedDelayFlag).isTrue();
+        await().atMost(Duration.ofSeconds(5)).until(() -> manualFixedDelayFlag);
     }
 
     @Test
     void shouldExecuteTask_testFixedRate() {
+        // given.
+        manualFixedRateFlag = false;
         ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest().trigger(FIXED_RATE_TASK_ID_FOR_EXECUTE);
 
+        // when.
         ResponseEntity<Void> response = restTemplate
                 .asMaster()
                 .postForEntity("/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
 
+        // then.
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(FIXED_RATE_TASK_ID_FOR_EXECUTE);
             assertThatJson(task).node("interval").isEqualTo(2000000000);
             assertThatJson(task).node("enabled").isEqualTo(true);
         });
-        assertThat(fixedRateFlag).isTrue();
+        await().atMost(Duration.ofSeconds(5)).until(() -> manualFixedRateFlag);
     }
 
     @Test
@@ -611,9 +625,9 @@ class AxelixScheduledTasksEndpointTest {
         @Scheduled(fixedDelay = 20000000)
         public void testFixedDelayTaskForModify() {}
 
-        @Scheduled(fixedDelay = 2000000000)
+        @Scheduled(fixedDelay = 2000000000, initialDelay = 2000000000)
         public void testFixedDelayTaskForExecute() {
-            fixedDelayFlag = true;
+            manualFixedDelayFlag = true;
         }
 
         // FixedRate tasks
@@ -625,9 +639,9 @@ class AxelixScheduledTasksEndpointTest {
         @Scheduled(fixedRate = 20000000)
         public void testFixedRateTaskForModify() {}
 
-        @Scheduled(fixedRate = 2000000000)
+        @Scheduled(fixedRate = 2000000000, initialDelay = 2000000000)
         public void testFixedRateTaskForExecute() {
-            fixedRateFlag = true;
+            manualFixedRateFlag = true;
         }
 
         // Custom task
