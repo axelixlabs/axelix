@@ -35,7 +35,7 @@ public interface McpEndpointResolver {
      * @param mcpJsonRpcRequest the JSON-RPC request sent by AI Agent.
      *
      * @return the resolved {@link McpEndpoint}, or {@link Optional#empty()} if the provided json-rpc
-     *         call is correct and just does not represent the "tool/call".
+     *         request body is blank, has no method, or specifies a method other than "tools/call".
      *
      * @throws AuthenticationException in case it is impossible to understand what exactly resource
      *                                 the AI Agent wants to access.

@@ -60,18 +60,27 @@ public class DefaultMcpEndpointResolver implements McpEndpointResolver {
     }
 
     @Override
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     public Optional<McpEndpoint> resolve(String mcpJsonRpcRequest) throws AuthenticationException {
+        if (mcpJsonRpcRequest.isBlank()) {
+            return Optional.empty();
+        }
+
         final JsonNode root;
 
         try {
             root = jsonMapper.readTree(mcpJsonRpcRequest);
         } catch (RuntimeException e) {
-            throw new AuthenticationException(e);
+            throw new AuthenticationException(PARSING_ERROR);
         }
 
         JsonNode methodNode = root.path(METHOD_JSON_FIELD);
 
-        if (methodNode.isMissingNode() || !methodNode.isString()) {
+        if (methodNode.isMissingNode()) {
+            return Optional.empty();
+        }
+
+        if (!methodNode.isString()) {
             throw new AuthenticationException(PARSING_ERROR);
         }
 

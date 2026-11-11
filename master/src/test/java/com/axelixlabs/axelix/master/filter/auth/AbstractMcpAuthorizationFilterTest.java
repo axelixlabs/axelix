@@ -349,6 +349,26 @@ abstract class AbstractMcpAuthorizationFilterTest {
                             "Bearer resource_metadata=\"http://localhost:8080/api/external/mcp-oauth2/.well-known/oauth-protected-resource\"");
         }
 
+        @ParameterizedTest
+        @ValueSource(strings = {"Bearer expired-token", "Digest unsupported"})
+        void shouldAdvertiseOAuthForBlankPostWithInvalidAuthorization(String authorization) {
+            // given.
+            when(oidcClient.validateAccessTokenAndExtractUserInfo("expired-token"))
+                    .thenThrow(new OidcTokenExchangeException("Expired token"));
+            HttpHeaders headers = commonMcpHeaders();
+            headers.set(HttpHeaders.AUTHORIZATION, authorization);
+
+            // when.
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    mcpProperties.getMcpEndpoint(), new HttpEntity<>(" ", headers), String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+            assertThat(response.getHeaders().getFirst(McpAuthorizationFilter.WWW_AUTHENTICATE_OAUTH2_HEADER))
+                    .isEqualTo(
+                            "Bearer resource_metadata=\"http://localhost:8080/api/external/mcp-oauth2/.well-known/oauth-protected-resource\"");
+        }
+
         private static final String OIDC_ISSUER_URI = "http://localhost:8999";
         private static final String OIDC_SUBJECT = "ai-agent-user";
 

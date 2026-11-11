@@ -31,7 +31,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerStreamableHttpProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -100,19 +99,8 @@ public class MasterRequestContextInitFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
         if (mcpEndpointResolver != null) {
-            // Only POST carries JSON-RPC; transport requests must still pass through authentication.
-            if (!HttpMethod.POST.name().equals(request.getMethod())) {
-                executeInContext(request, response, filterChain, new McpRequestContext(null));
-                return;
-            }
-
             var wrapper = new ContentCachingServletRequest(request);
             var requestAsString = new String(wrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-
-            if (requestAsString.isBlank() && request.getHeader(HttpHeaders.AUTHORIZATION) == null) {
-                executeInContext(wrapper, response, filterChain, new McpRequestContext(null));
-                return;
-            }
 
             // Requests that do not target a concrete tool endpoint (e.g. the 'initialize' handshake
             // or 'tools/list') resolve to no endpoint, but must still be processed and authenticated.
