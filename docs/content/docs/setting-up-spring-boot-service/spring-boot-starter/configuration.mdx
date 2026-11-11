@@ -47,7 +47,7 @@ A few facts worth pinning down before you copy any of the snippets below.
 
 ### Reactive (WebFlux) applications
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.3.0" />
 
 Starting with Axelix 1.3.0, all three starters work in reactive applications built on Spring WebFlux, not only in
 servlet (Spring MVC) applications. The starter detects which web stack your application runs on, so there is nothing
@@ -255,7 +255,7 @@ Tests are not affected: `spring-boot-starter-test` brings in JsonPath on its own
 
 #### JSpecify is no longer included
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.3.0" />
 
 Up to and including Axelix 1.2.x, the starter also brought in `org.jspecify:jspecify`. The starter uses JSpecify only
 for its nullness annotations, and it needs them only at compile time. Starting with Axelix 1.3.0, the dependency is
@@ -424,7 +424,7 @@ list yourself when you need them, including the `health` endpoint that Spring Bo
 
 #### The `axelix-feign` endpoint is removed
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.3.0" />
 
 Up to and including Axelix 1.2.x, the Spring Boot 3 and Spring Boot 4 starters also contributed an `axelix-feign`
 endpoint that listed the Spring Cloud OpenFeign clients of the application. Axelix Master has never used it to
@@ -864,7 +864,7 @@ tools fail for it.
 
 ### Log entries
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.3.0" />
 
 The `axelix-logs` endpoint serves the most recent log entries of your application, so you can read them without
 access to the host. The starter keeps these entries in memory, starting from application startup. When the buffer is

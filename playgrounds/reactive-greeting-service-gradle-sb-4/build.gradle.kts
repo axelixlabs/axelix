@@ -3,7 +3,7 @@ plugins {
     id("org.springframework.boot") version "4.0.7"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.6.0"
-    id("com.axelixlabs.axelix") version "1.3.0-SNAPSHOT"
+    id("com.axelixlabs.axelix") version "1.3.0"
 }
 
 group = "com.axelixlabs.playground"
@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.3.0-SNAPSHOT")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.3.0")
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
