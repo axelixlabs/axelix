@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link DefaultConfigurationPropertiesFlattener}.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 class DefaultConfigurationPropertiesFlattenerTest {
 
@@ -73,6 +75,41 @@ class DefaultConfigurationPropertiesFlattenerTest {
                                                 "name", linkedMap("url", List.of(linkedMap("schema", "https")))))))));
 
         return Stream.of(
+                Arguments.of(
+                        linkedMap(
+                                "unset",
+                                null,
+                                "literal",
+                                "null",
+                                "nested",
+                                linkedMap("value", null),
+                                "items",
+                                Arrays.asList(null, "null")),
+                        List.of(
+                                new ConfigurationPropertiesEntry().key("unset"),
+                                new ConfigurationPropertiesEntry()
+                                        .key("literal")
+                                        .value("null"),
+                                new ConfigurationPropertiesEntry().key("nested.value"),
+                                new ConfigurationPropertiesEntry().key("items[0]"),
+                                new ConfigurationPropertiesEntry()
+                                        .key("items[1]")
+                                        .value("null"))),
+                Arguments.of(
+                        Map.of("originParents", new String[] {"parent", "ancestor"}),
+                        List.of(
+                                new ConfigurationPropertiesEntry()
+                                        .key("originParents[0]")
+                                        .value("parent"),
+                                new ConfigurationPropertiesEntry()
+                                        .key("originParents[1]")
+                                        .value("ancestor"))),
+                Arguments.of(
+                        linkedMap("map", Map.of(), "list", List.of(), "array", new String[0]),
+                        List.of(
+                                new ConfigurationPropertiesEntry().key("map"),
+                                new ConfigurationPropertiesEntry().key("list"),
+                                new ConfigurationPropertiesEntry().key("array"))),
                 Arguments.of((Map<String, Object>) null, List.of()),
                 Arguments.of(Map.of(), List.of()),
                 Arguments.of(

@@ -17,18 +17,24 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jpa.autoconfigure.JpaProperties;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Configuration;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SharedAxelixConfigurationProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 /**
  * Integration tests for {@link DefaultConfigurationPropertiesService}.
@@ -45,19 +51,102 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
     private ConfigurationPropertiesService configurationPropertiesService;
 
     @Test
-    void shouldReturnConfigurationPropertiesWithoutSanitization() {
+    void shouldReturnBeanValuesAndBindingInputs() {
         // when.
-        ConfigurationPropertiesFeed configProps = configurationPropertiesService.getConfigProps();
+        ConfigurationPropertiesFeed feed = configurationPropertiesService.getConfigProps();
 
         // then.
-        Set<@Nullable String> values = configProps.getBeans().stream()
-                .flatMap(bean -> bean.getProperties().stream())
-                .map(ConfigurationPropertiesEntry::getValue)
-                .collect(Collectors.toSet());
-
-        assertThat(values).contains("toBeSanitized").doesNotContain("******");
-        assertThat(configProps.getBeans())
-                .flatExtracting(bean -> bean.getProperties())
-                .allSatisfy(property -> assertThat(property.getSensitive()).isTrue());
+        assertThat(feed.getBeans())
+                .filteredOn(bean -> bean.getPrefix().equals("axelix.prop.test"))
+                .singleElement()
+                .satisfies(bean -> {
+                    assertThat(bean.getBeanName()).isEqualTo(SharedAxelixConfigurationProperties.class.getName());
+                    assertThat(bean.getProperties())
+                            .extracting(
+                                    ConfigurationPropertiesEntry::getKey,
+                                    ConfigurationPropertiesEntry::getValue,
+                                    ConfigurationPropertiesEntry::getSensitive)
+                            .contains(tuple("tags.forSanitization", "toBeSanitized", true));
+                    assertThat(bean.getInputs())
+                            .extracting(ConfigurationPropertiesEntry::getKey, ConfigurationPropertiesEntry::getValue)
+                            .contains(
+                                    tuple("httpClient.requests[0].baseUrl.value", "https://api.users.example.com/v1"),
+                                    tuple("enabledContexts[0].value", "user-service,payment-service"));
+                    assertThat(bean.getInputs())
+                            .filteredOn(entry -> entry.getKey().equals("httpClient.requests[0].baseUrl.origin"))
+                            .singleElement()
+                            .satisfies(entry -> assertThat(entry.getValue()).contains("Inlined Test Properties"));
+                });
     }
+
+    @Test
+    void shouldIncludeUnsetJpaProperties() {
+        // given.
+        new ApplicationContextRunner()
+                .withUserConfiguration(JpaConfiguration.class)
+                .run(context -> {
+                    ConfigurationPropertiesService service = new DefaultConfigurationPropertiesService(
+                            context,
+                            new DefaultConfigurationPropertiesFlattener(),
+                            new PropertySensitivityMarker(List.of(), new DefaultPropertyNameNormalizer()));
+
+                    // when.
+                    ConfigurationPropertiesFeed feed = service.getConfigProps();
+
+                    // then.
+                    assertThat(feed.getBeans())
+                            .filteredOn(bean -> bean.getPrefix().equals("spring.jpa"))
+                            .singleElement()
+                            .satisfies(bean -> assertThat(bean.getProperties())
+                                    .extracting(
+                                            ConfigurationPropertiesEntry::getKey,
+                                            ConfigurationPropertiesEntry::getValue)
+                                    .contains(
+                                            tuple("databasePlatform", null),
+                                            tuple("database", null),
+                                            tuple("openInView", null),
+                                            tuple("showSql", "false")));
+                });
+    }
+
+    @Test
+    void shouldKeepBoundEmptyCollectionWithoutInputValue() {
+        // given.
+        new ApplicationContextRunner()
+                .withUserConfiguration(JpaConfiguration.class)
+                .withPropertyValues("empty.values=")
+                .run(context -> {
+                    ConfigurationPropertiesService service = new DefaultConfigurationPropertiesService(
+                            context,
+                            new DefaultConfigurationPropertiesFlattener(),
+                            new PropertySensitivityMarker(List.of(), new DefaultPropertyNameNormalizer()));
+
+                    // when.
+                    ConfigurationPropertiesFeed feed = service.getConfigProps();
+
+                    // then.
+                    assertThat(feed.getBeans())
+                            .filteredOn(bean -> bean.getPrefix().equals("empty"))
+                            .singleElement()
+                            .satisfies(bean -> {
+                                assertThat(bean.getProperties())
+                                        .extracting(
+                                                ConfigurationPropertiesEntry::getKey,
+                                                ConfigurationPropertiesEntry::getValue)
+                                        .containsExactly(tuple("values", null));
+                                assertThat(bean.getInputs())
+                                        .extracting(
+                                                ConfigurationPropertiesEntry::getKey,
+                                                ConfigurationPropertiesEntry::getValue)
+                                        .containsExactly(tuple("values", null));
+                            });
+                });
+    }
+
+    @ConfigurationProperties("empty")
+    record EmptyCollectionProperties(List<String> values) {}
+
+    @Configuration(proxyBeanMethods = false)
+    @EnableConfigurationProperties({JpaProperties.class, EmptyCollectionProperties.class})
+    static class JpaConfiguration {}
 }
