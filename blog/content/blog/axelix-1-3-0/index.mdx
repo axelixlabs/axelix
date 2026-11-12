@@ -1,0 +1,197 @@
+---
+title: "Axelix 1.3.0: Scheduled task history, reactive apps, and Dependency Health"
+date: 2026-11-12
+authors: ["Sergey Cherkasov"]
+tags: ["Releases"]
+heroImagePath: /posts/axelix-1-3-0/preview.png
+description: "Axelix 1.3.0 adds scheduled task execution history, support for reactive Spring Boot applications, a fleet-wide Dependency Health dashboard, actions across multiple instances, and SBOM download — along with a few breaking changes worth reading before you upgrade."
+metaDescription: "Axelix 1.3.0 adds scheduled task execution history, support for reactive Spring Boot applications, a fleet-wide Dependency Health dashboard, actions across multiple instances, and SBOM download — along with a few breaking changes worth reading before you upgrade."
+---
+
+# Axelix 1.3.0
+
+On behalf of the core team and everyone who contributed, we're delighted to announce Axelix 1.3.0. It is a minor
+release that brings scheduled task execution history, support for reactive Spring Boot applications, and a new
+Dependency Health dashboard. It also makes managing multiple instances of the same application much easier.
+Like every Axelix release, it ships the whole fleet together: the Spring Boot starters, the build plugins, and Master
+(JAR / Docker image / Helm chart), all under the same version.
+
+This release contains a few breaking changes, so please read the section below before upgrading.
+
+## Breaking changes
+
+### Authority names and heap dump access have changed
+
+Authorities now use names such as `caches:clear`, `scheduled-tasks:write`, and `environment.values:read`.
+Downloading a heap dump, including one in a state export, requires the new `heap-dump:read` authority, granted to
+**ADMIN** and **SUPER_ADMIN**.
+
+Heap dumps may contain sensitive data — passwords, access tokens, and other secrets held in application memory —
+so downloading them now requires privileged access.
+
+**What you need to do.** Update integrations that inspect authority names. Users with **VIEWER** or **EDITOR** roles
+can no longer download heap dumps. Existing roles remain the basis for assigning permissions; you do not need to
+rewrite the permissions of older starters yourself.
+
+### The MCP `getWallboard` tool is now `getInstances`
+
+Update MCP prompts and integrations that explicitly call `getWallboard` to use `getInstances`. See the
+[MCP tools reference](https://axelix.io/docs/setting-up-master-ui/mcp/mcp-tools) for the full list.
+
+### The unused `axelix-feign` endpoint is removed
+
+The Spring Boot 3 and 4 starters no longer expose `axelix-feign`. Master never used it, so no UI feature goes away.
+If your own tooling calls that endpoint directly, it needs to stop doing so.
+
+### The starters no longer bring in JSpecify at runtime
+
+`org.jspecify:jspecify` is now a compile-time dependency rather than a transitive runtime dependency. If your
+application relies on the Axelix starter to supply JSpecify, declare `org.jspecify:jspecify` explicitly. Otherwise,
+no change is needed.
+
+### Release artifact filenames have changed
+
+The Master JAR and Helm chart archives are now named `axelix-1.3.0.jar` and `axelix-1.3.0.tgz`. Update download,
+deployment, or packaging scripts that expect the previous filenames.
+
+## New features
+
+### Scheduled tasks: see what actually ran
+
+The redesigned [Scheduled Tasks](https://axelix.io/docs/features/spring-framework/scheduled-tasks) page adds
+execution history, duration charts, execution summaries, and failure details. It distinguishes runs started by the
+schedule from runs triggered manually, and identifies tasks by their class and method.
+
+Execution recording is available across the Spring Boot 2, 3, and 4 starters. Upgrade the service's starter to 1.3
+to supply this data.
+
+### Support for reactive applications
+
+All three starters now support Spring WebFlux applications as well as servlet applications. Axelix detects the web
+stack automatically, including setups where Actuator runs on a separate management port.
+
+### Dependency Health dashboard
+
+A new fleet-wide [Dependency Health](https://axelix.io/docs/ui-guide/dashboard/dependency-health) dashboard
+highlights discontinued, dormant, and maintenance-only libraries, shows how versions are distributed, and helps you
+find applications that depend on projects no longer receiving regular updates.
+
+This is a dependency lifecycle view, not a CVE scanner. Services need a 1.3 starter to report their dependencies
+during registration.
+
+### Apply actions across application instances
+
+You can now apply an action to multiple instances of the same application in one operation. The action scope
+selector lets you choose whether a change affects only the current instance or all instances of that application:
+
+- **Change or reset [logger levels](https://axelix.io/docs/features/insights/loggers/loggers)** across instances, so
+  you can enable diagnostic logging without repeating the change on every replica.
+- **Clear [caches](https://axelix.io/docs/features/spring-framework/caches)** across instances, so stale entries are
+  removed from every replica rather than just the one you are viewing.
+- **Enable or disable scheduled tasks** across instances of the application.
+
+The sidebar also adds an instance switcher for moving between replicas.
+
+### Download a service's SBOM
+
+You can now download the raw Software Bill of Materials directly from the
+[Dependencies Analyzer](https://axelix.io/docs/features/insights/dependencies-analyzer). Export the service's
+dependency inventory in CycloneDX JSON format and feed it into external security scanners, dependency audits, or your
+own tooling.
+
+### Other additions
+
+- **Read application logs through MCP.** The new `getInstanceLogs` tool returns recent buffered log entries,
+  including exception stack traces. The in-memory log buffer size is configurable.
+- **Detect JPA associations accessed by `toString()`.** Entity analysis and the UI flag associations read by
+  `toString()`, including generated methods, across all three starter generations.
+- **User administration improvements.** Redesigned Users and Profile pages, bulk user deletion and status changes,
+  and a roles feed in the external API.
+- **Refreshed instance navigation and details.** Reorganized sidebar navigation, redesigned service details and state
+  export dialogs, plus process ID and process user information.
+- **Git worktree support in the Maven and Gradle plugins.** Project metadata generation now understands worktree
+  layouts.
+- **Installation instructions for AI agents** are available from the website and documentation.
+
+## Changes
+
+### The starter's JWT duration setting no longer has an effect
+
+`axelix.sbs.auth.jwt.duration` is no longer used, and you can remove it from your service configuration.
+Registration and heartbeat tokens now have a fixed one-minute lifetime.
+
+### Signed Helm charts and AOT cache in the Docker image
+
+Published Helm charts now include signatures for provenance verification. The AOT cache is restored for the Master
+Docker image, and security dependency updates landed across Master's UI, the Docker image, and the website build.
+
+## Bug fixes
+
+### Manually triggered scheduled tasks respect the application's scheduler
+
+Running a task manually from the UI used to bypass the application's scheduling setup. It now goes through the
+application's scheduler and preserves ShedLock behavior.
+
+### Bean metadata extraction no longer instantiates beans
+
+The starter no longer instantiates beans and `FactoryBean` products just to inspect them when it extracts bean
+metadata.
+
+### Actuator responses are isolated from application Jackson settings
+
+Axelix actuator endpoints now use isolated JSON serialization, so application-specific Jackson configuration no longer
+breaks their responses — on both servlet and reactive stacks.
+
+### Authorization with a separate management port
+
+Axelix authorization filters are applied in the context that serves Actuator, including when it runs on a separate
+management port. Reactive JWT authorization also no longer performs blocking work on the event loop.
+
+### Smaller fixes
+
+- Bulk operations validate that instances exist and belong to the same application before proceeding.
+- Unsupported remapping of Axelix actuator endpoints is detected at startup rather than causing discovery failures
+  later.
+- Wallboard instances are sorted alphabetically by name.
+- MCP OAuth discovery handles requests without a body correctly.
+- Token forwarding to older starters is corrected.
+
+Some of these fixes were also delivered in the 1.2.x patch releases.
+
+## Artifacts
+
+| Artifact | Link |
+|---|---|
+| JAR | [axelix-1.3.0.jar](https://github.com/axelixlabs/axelix/releases/download/v1.3.0/axelix-1.3.0.jar) |
+| Docker Hub | [axelixlabs/axelix](https://hub.docker.com/r/axelixlabs/axelix) — `docker pull axelixlabs/axelix:1.3.0` |
+| GHCR | `docker pull ghcr.io/axelixlabs/axelix:1.3.0` |
+| Helm chart | [axelix-1.3.0.tgz](https://github.com/axelixlabs/axelix/releases/download/v1.3.0/axelix-1.3.0.tgz) · [axelix-1.3.0.tgz.prov](https://github.com/axelixlabs/axelix/releases/download/v1.3.0/axelix-1.3.0.tgz.prov) · [Artifact Hub](https://artifacthub.io/packages/helm/axelix/axelix) |
+
+## Upgrading
+
+Review the breaking changes above first: authority names, the renamed MCP tool, JSpecify, and the new artifact
+filenames may require updates on your side. Then update the version of the Spring Boot starter and build plugin in
+your `pom.xml` or `build.gradle` to 1.3.0 — the new scheduled task history and Dependency Health data require 1.3
+starters — and pull the new Master image. See the
+[database migrations guide](https://axelix.io/docs/setting-up-master-ui/migrations/migrations) before upgrading Master.
+
+Refer to the [setup docs](https://axelix.io/docs/start/getting-started) if you are installing Axelix for the first
+time.
+
+## Full changelog
+
+**Full Changelog**: https://github.com/axelixlabs/axelix/compare/v1.2.0...v1.3.0
+
+Thanks to all contributors who made this release happen:
+[AshotSargsyan1](https://github.com/AshotSargsyan1),
+[CoolXaleX](https://github.com/CoolXaleX),
+[Darshan-A-S](https://github.com/Darshan-A-S),
+[NikitaKirilloff](https://github.com/NikitaKirilloff),
+[chrshnv](https://github.com/chrshnv),
+[dima-bzz](https://github.com/dima-bzz),
+[greatkaa](https://github.com/greatkaa),
+[mipo256](https://github.com/mipo256),
+[seregamorph](https://github.com/seregamorph),
+[sergeycherkasovv](https://github.com/sergeycherkasovv),
+[sygkanrt30](https://github.com/sygkanrt30), and
+[yasirbilir06](https://github.com/yasirbilir06)!
