@@ -35,6 +35,7 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-restclient")
     compileOnly("org.springframework.boot:spring-boot-cache")
     compileOnly("com.fasterxml.jackson.core:jackson-databind")
+    compileOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
@@ -43,6 +44,8 @@ dependencies {
     testImplementation(project(":sbs:starter-domain"))
     testImplementation(testFixtures(project(":sbs:starter-domain")))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa")

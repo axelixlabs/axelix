@@ -47,17 +47,11 @@ public class ConfigPropsTestSupportConfiguration {
     }
 
     @Bean
-    public ConfigurationPropertiesConverter configurationPropertiesConverter(
-            ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
-        return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
-    }
-
-    @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
-            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
+            ApplicationContext applicationContext, ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
         return new DefaultConfigurationPropertiesService(
                 applicationContext,
-                configurationPropertiesConverter,
+                configurationPropertiesFlattener,
                 new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
     }
 
