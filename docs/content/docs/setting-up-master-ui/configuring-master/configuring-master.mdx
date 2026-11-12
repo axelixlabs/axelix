@@ -584,6 +584,26 @@ but it is an additional remotely reachable surface. If no AI agent consumes it, 
 in production; if you keep it on, restrict `/api/mcp` to trusted clients the same way you would the UI.
 :::
 
+### Scheduled tasks history
+
+<ReleasedInNotice version="1.3.0" />
+
+Master stores every reported run of a `@Scheduled` task in its database, so the [Scheduled
+Tasks](../../features/spring-framework/scheduled-tasks.mdx#execution-history) page can show the success rate, durations,
+and failures of each task. A cleanup job removes runs that are older than `retention` and keeps only the latest
+`max-executions-per-task` runs of each task. The defaults work as they are, so override them only to keep more history
+or to save database space.
+
+<div className={styles.ConfigTable}>
+
+| Property                                                        | Default          | Description                                                                     |
+|-----------------------------------------------------------------|------------------|---------------------------------------------------------------------------------|
+| `axelix.master.scheduled-tasks.history.retention`               | `30d`            | How long Master keeps a run, as a Spring `Duration` (e.g. `7d`, `12h`).         |
+| `axelix.master.scheduled-tasks.history.max-executions-per-task` | `50`             | How many of the latest runs Master keeps for each task.                         |
+| `axelix.master.scheduled-tasks.history.cleanup.schedule`        | `0 */10 * * * *` | Cron expression that triggers the cleanup job. By default, it runs every 10 minutes. |
+
+</div>
+
 ### Structured logging
 
 <ReleasedInNotice version="1.1.0" />
@@ -703,7 +723,7 @@ not use containerization, then this options is for you.
 
 Grab the Axelix Master JAR attached to the release you want from the [Releases
 page](https://github.com/axelixlabs/axelix/releases). The JAR is named after the release version, for example
-`axelix-1.2.2.jar` for Axelix `1.2.2`, see [Artifact names](../../more/compatibility-and-versioning.mdx#artifact-names).
+`axelix-1.3.0.jar` for Axelix `1.3.0`, see [Artifact names](../../more/compatibility-and-versioning.mdx#artifact-names).
 The published artifact already bundles the UI, so there is nothing else to build.
 
 ### 2. Configure and start Master

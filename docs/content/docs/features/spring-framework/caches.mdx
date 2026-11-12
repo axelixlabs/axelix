@@ -1,8 +1,7 @@
 ---
 title: Caches
-description: "The Caches page provides access to all configured caches in the Spring Boot application. It displays a per-cache
-              hit/total ratio chart, hit and miss counts, the estimated number of entries, allows status management, and supports
-              clearing individual caches or all caches at once."
+description: "The Caches page lists every Spring cache of the application and shows how well each one works. You can
+              also clear a cache or turn it off at runtime, on one instance or on several at once."
 ---
 
 <ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
@@ -13,36 +12,24 @@ description: "The Caches page provides access to all configured caches in the Sp
 
 ***Caches page as presented in Axelix UI***
 
-The page itself is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can
-all open it and inspect cache statistics. The destructive actions are gated by separate authorities:
+A cache that returns stale data or rarely hits is hard to spot from the outside: the application keeps working, just
+wrongly or slowly. The Caches page shows how each cache performs and lets you clear it or turn it off without a
+restart.
 
-- **Clear cache** and **Clear All Caches** require the `caches:clear` authority.
-- **Status** toggle (enable / disable a cache) requires the `caches:toggle` authority.
-
-Both authorities are granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. **VIEWER** sees the
-controls but cannot interact with them. See [Roles and
-authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+The page is available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open
+it and inspect cache statistics. Clearing a cache requires the `caches:clear` authority, and turning a cache on or off
+requires `caches:toggle`. Both are granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. Users
+without them see the same controls, but Axelix keeps them disabled and explains why in a tooltip on hover. See [Roles
+and authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
 
-When a control button is visible but your account lacks the required authority, Axelix leaves it disabled and shows a tooltip
-with the corresponding message on hover.
+## What the page shows
 
-A scrollable list of all configured `Caches` in the application, grouped by their respective `Cache managers`.
-- **Search**:              Input that filters the list by cache name or cache manager name. (See **Interactive
-  Features**)
-- **Clear All Caches**:    Button to clear all caches. (See **Interactive Features**)
-- **Name**:                The name of the cache manager.
+The page lists the caches grouped by cache manager. For each cache, you see its name and the class of the native cache
+behind it, for example `java.util.concurrent.ConcurrentHashMap` for a `ConcurrentMapCache`. You can search
+the list by cache name or cache manager name.
 
-Each cache row also shows:
-- **Name**:      The name of the cache.
-- **Target**:    The fully qualified name of the native cache implementation, with a copy-to-clipboard control.
-- **Clear**:     Per-cache button to clear that cache. (See **Interactive Features**)
-- **Status**:    Toggle that enables or disables the cache at runtime. (See **Interactive Features**)
-
-Caches for which lookup statistics are available can be expanded to reveal the **Cache Details** section. Caches that do
-not report lookup statistics are still listed, but cannot be expanded.
-
-## The Cache Details
+## Cache details
 
 <ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
 
@@ -52,42 +39,56 @@ not report lookup statistics are still listed, but cannot be expanded.
 
 ***Cache details page as presented in Axelix UI***
 
-The details section contains a line chart of the **Hits/Total Ratio** — the share of hits within a sliding window over
-the recorded lookup history. The Y axis is always `0..1`. The X axis is the lookup timestamp; its tick granularity is
-selected automatically based on the displayed range (seconds, minutes, hours, days, or months).
+When the application has looked up a cache at least once, you can expand it to see how well it works. Caches without
+recorded lookups stay in the list but cannot be expanded.
 
-Hovering the chart shows the ratio at the corresponding timestamp.
+The **Hits/Total Ratio** chart shows the share of hits over time, from 0 to 1. A ratio that stays low means most
+lookups miss, so the cache costs memory without saving much work. Hover the chart to see the exact ratio at a point in
+time.
 
-Below the chart, the **Statistics** row summarizes the recorded lookups:
-- **Hits**:             The total number of cache hits, with the share of hits relative to all recorded lookups.
-- **Misses**:           The total number of cache misses, with the share of misses relative to all recorded lookups.
-- **Entries count**:    The estimated number of entries in the native cache. Only displayed when the cache reports a
-  size — currently this is supported for Caffeine `Cache` and `ConcurrentHashMap`-backed caches (such as
-  `ConcurrentMapCache`).
+Below the chart, **Statistics** sums up the recorded lookups:
 
-## **Interactive Features**
+- **Hits** and **Misses**: how many lookups found a value and how many did not, with their share of all lookups.
+- **Entries count**: the estimated number of entries in the cache. It appears only when the cache can report its size,
+  which is currently Caffeine `Cache` and caches backed by `ConcurrentHashMap`, such as `ConcurrentMapCache`.
 
-### Search
-Type into the search input above the list to filter the displayed cache managers. A cache manager is shown when either
-its name or the name of any cache it owns contains the entered text (case-insensitive).
+## Managing caches
 
-### Clear All Caches
-We provide a convenient way to clear all caches in the application. To do so, click the <Image
-src="/img/feature/icons/clear-all-caches-icon.png" alt="clear-all-caches-icon" width={80} height={20}/>
+Each action below asks for confirmation before it changes the running application.
 
-### Clear cache
-To clear an individual cache, click <Image src="/img/feature/icons/clear-single-cache-icon.png"
-alt="clear-single-cache-icon" width={20} height={20}/> next to the desired cache.
+### Clear a cache
 
-### Status
-We provide the ability to manage the state of a specific cache. The initial state of each cache is (on) <Image
-src="/img/feature/icons/switch-on-icon.png" alt="switch-on-icon" width={32} height={15}/>, meaning the cache is enabled.
-To disable it, switch the Status to (off) <Image src="/img/feature/icons/switch-off-icon.png" alt="switch-off-icon"
-width={32} height={15}/>.
+Clear a cache when it holds stale data, for example after you changed a record directly in the database. Click
+**Clear** next to a cache to remove all its entries, or **Clear All Caches** to empty every cache of the application.
+The application fills the caches again on the next lookups.
+
+### Enable or disable a cache
+
+Use the **Status** switch to turn a cache off at runtime. While a cache is off, every lookup misses and new values are
+not stored, so the application gets the data from the source on every call. This helps to check whether a bug comes
+from cached data. Switch the cache back on to resume caching.
+
+## Manage caches on several instances
+
+<ReleasedInNotice version="1.3.0" />
+
+Each replica of an application keeps its own copy of a cache, so clearing it on one replica leaves stale entries on
+the others. Open **Instances** next to the search field to choose which instances of the application an action
+applies to. The list shows each instance with its commit and status.
+
+The instance you opened is always included and cannot be deselected. Check other instances one by one, or use
+**Select all other instances**. The button shows how many instances are selected, or **All** when every instance is.
+
+The selection applies to every action on the page: **Clear All Caches**, clearing a single cache, and the **Status**
+switch. If some of the selected instances cannot be reached, the action still applies to the rest. The statistics on
+the page always belong to the instance you opened.
+
+The selector appears only when the application has more than one instance. It resets to the current instance when you
+switch to another instance.
 
 ## MCP Tools
 
-Caches can also be inspected and cleared by an AI agent through MCP — see the [MCP Tools
+Caches can also be inspected and cleared by an AI agent through MCP. See the [MCP Tools
 catalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#caches).
 
 ## Properties
@@ -102,11 +103,11 @@ details.
   version="1.2.0"
   reason={<>If you are on Axelix 1.2.0 or later, none of this is required: the starter registers its custom actuator
     endpoints by itself, and Axelix no longer requires the <code>health</code>/<code>info</code> endpoints to be
-    enabled — it works perfectly well without them. No configuration is needed here.</>}
+    enabled. It works perfectly well without them. No configuration is needed here.</>}
 />
 
 The page is backed by the `axelix-caches` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose it
-through the standard Spring Boot Actuator properties — see [Configuring Spring Boot
+through the standard Spring Boot Actuator properties. See [Configuring Spring Boot
 Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) for the full list
 of Axelix endpoints and surrounding setup:
 

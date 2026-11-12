@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 export const PLACEHOLDER = "AXELIX_VERSION_PLACEHOLDER";
 
 /** Used when no release tag can be read, e.g. a shallow clone or sources without `.git`. */
-export const FALLBACK_VERSION = "1.2.2";
+export const FALLBACK_VERSION = "1.3.0";
 
 let latestVersion: string | undefined;
 

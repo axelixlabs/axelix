@@ -41,6 +41,25 @@ The reset button <Image src="/img/feature/loggers/reset.svg" alt="reset icon" wi
 runtime: on this page, through MCP, or with a direct request to the `axelix-loggers` actuator endpoint. Logger groups
 cannot be reset.
 
+## Change levels on several instances
+
+<ReleasedInNotice version="1.3.0" />
+
+When the application runs as several replicas, the same problem usually shows up on all of them, and raising a level
+on one replica at a time is slow. Open **Instances** next to the search field to choose which instances of the
+application a change applies to. The list shows each instance with its commit and status, so you can pick, for
+example, only the replicas that run the same build.
+
+The instance you opened is always included and cannot be deselected. Check other instances one by one, or use
+**Select all other instances**. The button shows how many instances are selected, or **All** when every instance is.
+
+The selection applies to every change on the page: a logger level, a temporary level, a logger group level, and a
+reset. If some of the selected instances cannot be reached, the change still applies to the rest. The page itself
+always shows the levels of the instance you opened.
+
+The selector appears only when the application has more than one instance. It resets to the current instance when you
+switch to another instance.
+
 ## Temporary logging level
 
 <ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
