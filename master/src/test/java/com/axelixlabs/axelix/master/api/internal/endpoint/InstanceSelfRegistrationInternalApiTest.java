@@ -90,7 +90,7 @@ public class InstanceSelfRegistrationInternalApiTest {
     private static final String JSON_REQUEST = """
         {
            "basicRegistrationMetadata" : {
-             "version" : "1.0.0-SNAPSHOT",
+             "version" : "1.4.0-SNAPSHOT",
              "serviceVersion" : "3.5.0-SNAPSHOT",
              "groupId" : "org.springframework.samples",
              "artifactId" : "petclinic",
@@ -257,7 +257,7 @@ public class InstanceSelfRegistrationInternalApiTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
-        String request = JSON_REQUEST.replace("1.0.0-SNAPSHOT", starterVersion);
+        String request = JSON_REQUEST.replace("1.4.0-SNAPSHOT", starterVersion);
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -370,7 +370,7 @@ public class InstanceSelfRegistrationInternalApiTest {
     void shouldRejectRegistrationWhenStarterVersionIsOutsideTheCompatibilityWindow() {
         // given.
         String requestWithIncompatibleStarter =
-                JSON_REQUEST.replace("\"version\" : \"1.0.0-SNAPSHOT\"", "\"version\" : \"1.99.0\"");
+                JSON_REQUEST.replace("\"version\" : \"1.4.0-SNAPSHOT\"", "\"version\" : \"1.99.0\"");
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -391,7 +391,7 @@ public class InstanceSelfRegistrationInternalApiTest {
     void shouldStoreTheFeaturesDetectedByTheInstance() {
         // given. only the starters since 1.3 detect their features.
         String requestWithDetectedFeatures = JSON_REQUEST
-                .replace("\"version\" : \"1.0.0-SNAPSHOT\"", "\"version\" : \"1.3.0\"")
+                .replace("\"version\" : \"1.4.0-SNAPSHOT\"", "\"version\" : \"1.3.0\"")
                 .replace(
                         "\"insights\" : {",
                         "\"detectedFeatures\" : [ \"caches\", \"entities-map\" ],\n\"insights\" : {");
@@ -456,7 +456,7 @@ public class InstanceSelfRegistrationInternalApiTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
-        String request = JSON_REQUEST.replace("1.0.0-SNAPSHOT", starterVersion);
+        String request = JSON_REQUEST.replace("1.4.0-SNAPSHOT", starterVersion);
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -668,7 +668,7 @@ public class InstanceSelfRegistrationInternalApiTest {
     void shouldStoreThatTheInstanceDetectedNoFeatures() {
         // given. unlike the starters before 1.3, which do not report the field at all.
         String requestWithNoFeatures = JSON_REQUEST
-                .replace("\"version\" : \"1.0.0-SNAPSHOT\"", "\"version\" : \"1.3.0\"")
+                .replace("\"version\" : \"1.4.0-SNAPSHOT\"", "\"version\" : \"1.3.0\"")
                 .replace("\"insights\" : {", "\"detectedFeatures\" : [ ],\n\"insights\" : {");
 
         // when.
