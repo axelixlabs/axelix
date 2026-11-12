@@ -4,8 +4,6 @@ name: install-axelix
 description: "Install Axelix into a Spring Boot service: the Axelix Spring Boot starter, the Axelix build plugin, and, for a local trial, Axelix Master itself. Use when the user asks to install, add, set up, try, or connect Axelix."
 ---
 
-<!-- Maintainers: when Axelix 1.3.0 (reactive support) is released, add the WebFlux steps and remove the WebFlux stop in Step 1. -->
-
 > **For people reading this page:** this page is an instruction for AI coding agents. To install Axelix, give
 > your agent this command:
 >
@@ -56,10 +54,11 @@ STARTER        = axelix-spring-boot-2-starter (Boot 2.7.x) | axelix-spring-boot-
 BUILD          = Maven | Gradle
 BOOT_MODULE    = the module with the @SpringBootApplication class
 ACTUATOR       = yes | no (spring-boot-starter-actuator)
-SECURITY       = yes | no (Spring Security is in the app: any spring-security dependency, direct or transitive, or a SecurityFilterChain / @EnableWebSecurity in the code)
+SECURITY       = yes | no (Spring Security is in the app: any spring-security dependency, direct or transitive, or a SecurityFilterChain / SecurityWebFilterChain / @EnableWebSecurity / @EnableWebFluxSecurity in the code)
+WEB            = servlet | reactive (reactive if the app has spring-boot-starter-webflux and no spring-boot-starter-web)
 PORT           = management.server.port, else server.port, else 8080
 BASE           = management.endpoints.web.base-path, else /actuator
-PREFIX         = management.server.base-path if management.server.port is set, else server.servlet.context-path, else empty
+PREFIX         = management.server.base-path if management.server.port is set, else server.servlet.context-path (servlet) or spring.webflux.base-path (reactive), else empty
 NAME           = spring.application.name, else the artifactId
 APP_IN_COMPOSE = yes | no (the app has its own service in the project's Compose file)
 LOCAL_PROFILE  = the name of an existing local profile (local for application-local.*, dev for application-dev.*), or none
@@ -76,8 +75,8 @@ curl -s https://repo1.maven.org/maven2/com/axelixlabs/axelix-spring-boot-3-start
 access), use `AXELIX_VERSION_PLACEHOLDER` and say so in Step 2. All versions: https://github.com/axelixlabs/axelix/releases
 
 **Stop** if Spring Boot is older than 2.7 or Java is older than 11 ("Axelix needs Spring Boot 2.7+ and Java 11+"),
-or if the app uses only `spring-boot-starter-webflux` and `VERSION` is lower than 1.3.0 ("Reactive services are
-supported starting with Axelix 1.3.0").
+or if `WEB` is reactive and `VERSION` is lower than 1.3.0 ("Reactive services are supported starting with Axelix
+1.3.0").
 
 If Axelix is already set up, don't add anything twice: in the next steps do only what is missing. If everything is
 in place, tell the user and go to Step 5.
@@ -98,7 +97,8 @@ Send **one** message:
    May I exclude only `BASE/axelix-*/**` from it? These endpoints stay protected by Master's token."
 
 Wait for the user to confirm. For (b), use the Master's version as `VERSION`: a Master accepts starters of its own minor version
-and the three before it, never newer ones.
+and the three before it, never newer ones. If `WEB` is reactive and the Master is older than 1.3.0, stop with the
+message from Step 1.
 
 ## Step 3: Add the starter and the build plugin
 
@@ -155,7 +155,8 @@ authentication. What to know:
 - Master's actions are `POST` and `DELETE` requests, so CSRF must not apply to these paths.
 - The endpoints stay protected: the starter checks Master's token itself.
 
-Add the exclusion the way the project already configures Security. If there is no fitting place, add this bean:
+Add the exclusion the way the project already configures Security. If there is no fitting place, add this bean to
+a servlet app:
 
 ```java
 @Bean
@@ -164,7 +165,28 @@ public WebSecurityCustomizer axelixWebSecurityCustomizer() {
 }
 ```
 
+For a reactive app (`WEB` is reactive), there is no `WebSecurityCustomizer`. Add a separate chain that runs first:
+
+```java
+@Bean
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public SecurityWebFilterChain axelixSecurityWebFilterChain(ServerHttpSecurity http) {
+    return http
+        .securityMatcher(ServerWebExchangeMatchers.pathMatchers("BASE/axelix-*/**"))
+        .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
+        .csrf(csrf -> csrf.disable())
+        .build();
+}
+```
+
+If the app has no `SecurityWebFilterChain` of its own and relies on the default one, adding this bean turns the default
+off. Then also add a chain for the rest of the app that keeps its current protection, and say so in the plan.
+
 ## Step 4a: Local trial
+
+**Turn on local users in the trial Master** with `axelix.master.auth.options.local.enabled=true` (the
+`AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED` variable in the commands below). It is off by default. With it, the user
+can create user accounts in Master and try the roles, not only sign in as `admin`.
 
 **Start Master the same way the app runs.** If `APP_IN_COMPOSE` is yes, add Master to that Compose file. Otherwise
 run Master with `docker run`, and don't add it to a Compose file that doesn't run the app.
@@ -176,6 +198,8 @@ If `APP_IN_COMPOSE` is yes:
     image: ghcr.io/axelixlabs/axelix:VERSION
     ports:
       - "2935:2935"
+    environment:
+      AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED: "true"
 ```
 
 If the app's service lists `networks:`, add Master to the same networks. Then start it with
@@ -191,6 +215,7 @@ taken by another container, use a different name.
 ```bash
 docker run -d --name axelix-master -p 2935:2935 \
   --add-host=host.docker.internal:host-gateway \
+  -e AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED=true \
   ghcr.io/axelixlabs/axelix:VERSION
 ```
 
@@ -280,6 +305,10 @@ Finish with a short report, one list item each:
 - **Next for the user:** the commands still to run, if any.
 - **To undo:** what to remove.
 - **To stop Master** (local trial): the command.
+- **Local users** (local trial): `axelix.master.auth.options.local.enabled=true` is on, so user accounts created in
+  Master can sign in. Turn it on in a real environment only if you want such accounts there.
 - **Warning** (local trial): `admin` / `admin` and the built-in key are public and fine only on this machine.
+- **Note** (only if `WEB` is reactive): the Transaction Control and Entities Map pages are not available for
+  reactive apps.
 - **Read next:** a real environment (https://axelix.io/docs/start/getting-started), and AI access through MCP at
   http://localhost:2935/api/mcp (https://axelix.io/docs/setting-up-master-ui/mcp/mcp-tools).

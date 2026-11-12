@@ -3,8 +3,6 @@ title: Установка с помощью ИИ
 description: "Установка Axelix в Spring Boot сервис: Axelix Spring Boot starter, плагин сборки Axelix и, для локальной пробы, сам Axelix Master. Используется, когда пользователь просит установить, добавить, настроить, попробовать или подключить Axelix."
 ---
 
-<!-- Maintainers: when Axelix 1.3.0 (reactive support) is released, add the WebFlux steps and remove the WebFlux stop in Step 1. -->
-
 > **Для людей, читающих эту страницу:** это инструкция для ИИ-агентов. Чтобы установить Axelix, дайте вашему агенту
 > эту команду:
 >
@@ -57,10 +55,11 @@ STARTER        = axelix-spring-boot-2-starter (Boot 2.7.x) | axelix-spring-boot-
 BUILD          = Maven | Gradle
 BOOT_MODULE    = модуль с классом @SpringBootApplication
 ACTUATOR       = да | нет (spring-boot-starter-actuator)
-SECURITY       = да | нет (в приложении есть Spring Security: любая зависимость spring-security, прямая или транзитивная, или SecurityFilterChain / @EnableWebSecurity в коде)
+SECURITY       = да | нет (в приложении есть Spring Security: любая зависимость spring-security, прямая или транзитивная, или SecurityFilterChain / SecurityWebFilterChain / @EnableWebSecurity / @EnableWebFluxSecurity в коде)
+WEB            = servlet | reactive (reactive, если в приложении есть spring-boot-starter-webflux и нет spring-boot-starter-web)
 PORT           = management.server.port, иначе server.port, иначе 8080
 BASE           = management.endpoints.web.base-path, иначе /actuator
-PREFIX         = management.server.base-path, если задан management.server.port, иначе server.servlet.context-path, иначе пусто
+PREFIX         = management.server.base-path, если задан management.server.port, иначе server.servlet.context-path (servlet) или spring.webflux.base-path (reactive), иначе пусто
 NAME           = spring.application.name, иначе artifactId
 APP_IN_COMPOSE = да | нет (у приложения есть свой сервис в Compose-файле проекта)
 LOCAL_PROFILE  = имя существующего локального профиля (local для application-local.*, dev для application-dev.*), или нет
@@ -77,8 +76,7 @@ curl -s https://repo1.maven.org/maven2/com/axelixlabs/axelix-spring-boot-3-start
 сети), используй `AXELIX_VERSION_PLACEHOLDER` и скажи об этом в шаге 2. Все версии: https://github.com/axelixlabs/axelix/releases
 
 **Остановись**, если Spring Boot ниже 2.7 или Java ниже 11 («Axelix требует Spring Boot 2.7+ и Java 11+»), или
-если приложение использует только `spring-boot-starter-webflux`, а `VERSION` ниже 1.3.0 («Реактивные сервисы
-поддерживаются начиная с Axelix 1.3.0»).
+если `WEB` — reactive, а `VERSION` ниже 1.3.0 («Реактивные сервисы поддерживаются начиная с Axelix 1.3.0»).
 
 Если Axelix уже настроен, ничего не добавляй дважды: в следующих шагах делай только недостающее. Если всё на месте,
 скажи об этом пользователю и переходи к шагу 5.
@@ -99,7 +97,8 @@ curl -s https://repo1.maven.org/maven2/com/axelixlabs/axelix-spring-boot-3-start
    `401`/`403`. Можно исключить из него только `BASE/axelix-*/**`? Эти эндпоинты остаются защищены токеном Master».
 
 Дождись подтверждения пользователя. Для (b) используй версию Master как `VERSION`: Master принимает стартеры своей минорной версии и трёх
-предыдущих, но никогда не более новые.
+предыдущих, но никогда не более новые. Если `WEB` — reactive, а Master старше 1.3.0, остановись с сообщением из
+шага 1.
 
 ## Шаг 3: добавь стартер и плагин сборки
 
@@ -157,7 +156,8 @@ Gradle:
 - Действия Master — это запросы `POST` и `DELETE`, поэтому CSRF не должен применяться к этим путям.
 - Эндпоинты остаются защищены: стартер сам проверяет токен Master.
 
-Встрой исключение так, как в проекте уже настроена Security. Если подходящего места нет, добавь этот бин:
+Встрой исключение так, как в проекте уже настроена Security. Если подходящего места нет, добавь этот бин в
+servlet-приложение:
 
 ```java
 @Bean
@@ -166,7 +166,29 @@ public WebSecurityCustomizer axelixWebSecurityCustomizer() {
 }
 ```
 
+В реактивном приложении (`WEB` — reactive) нет `WebSecurityCustomizer`. Добавь отдельную цепочку, которая
+срабатывает первой:
+
+```java
+@Bean
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public SecurityWebFilterChain axelixSecurityWebFilterChain(ServerHttpSecurity http) {
+    return http
+        .securityMatcher(ServerWebExchangeMatchers.pathMatchers("BASE/axelix-*/**"))
+        .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
+        .csrf(csrf -> csrf.disable())
+        .build();
+}
+```
+
+Если в приложении нет своего `SecurityWebFilterChain` и оно полагается на цепочку по умолчанию, этот бин её отключит.
+Тогда добавь ещё и цепочку для остального приложения с его текущей защитой и скажи об этом в плане.
+
 ## Шаг 4a: локальная проба
+
+**Включи локальных пользователей в пробном Master** свойством `axelix.master.auth.options.local.enabled=true`
+(переменная `AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED` в командах ниже). По умолчанию оно выключено. С ним
+пользователь может создавать учётные записи в Master и пробовать роли, а не только входить как `admin`.
 
 **Запусти Master так же, как работает приложение.** Если `APP_IN_COMPOSE` — да, добавь Master в этот Compose-файл.
 Иначе запусти Master через `docker run` и не добавляй его в Compose-файл, который не запускает приложение.
@@ -178,6 +200,8 @@ public WebSecurityCustomizer axelixWebSecurityCustomizer() {
     image: ghcr.io/axelixlabs/axelix:VERSION
     ports:
       - "2935:2935"
+    environment:
+      AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED: "true"
 ```
 
 Если у сервиса приложения указаны `networks:`, добавь Master в те же сети. Затем запусти его:
@@ -193,6 +217,7 @@ public WebSecurityCustomizer axelixWebSecurityCustomizer() {
 ```bash
 docker run -d --name axelix-master -p 2935:2935 \
   --add-host=host.docker.internal:host-gateway \
+  -e AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED=true \
   ghcr.io/axelixlabs/axelix:VERSION
 ```
 
@@ -283,7 +308,12 @@ Master и стартер используют один и тот же встро
 - **Осталось сделать пользователю:** команды, которые ещё нужно выполнить, если есть.
 - **Как откатить:** что удалить.
 - **Как остановить Master** (локальная проба): команда.
+- **Локальные пользователи** (локальная проба): включено `axelix.master.auth.options.local.enabled=true`, поэтому
+  учётные записи, созданные в Master, могут входить. В реальном окружении включай это, только если такие учётные
+  записи там нужны.
 - **Предупреждение** (локальная проба): `admin` / `admin` и встроенный ключ публично известны и годятся только на
   этой машине.
+- **Примечание** (только если `WEB` — reactive): страницы Transaction Control и Entities Map для реактивных
+  приложений недоступны.
 - **Что почитать дальше:** реальное окружение (https://axelix.io/docs/start/getting-started) и доступ ИИ через MCP
   по адресу http://localhost:2935/api/mcp (https://axelix.io/docs/setting-up-master-ui/mcp/mcp-tools).
