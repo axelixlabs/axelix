@@ -82,13 +82,13 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Pinned to the released 1.2.0 (compatibility window playground). 1.2.0 is the first version
-             whose starter + build plugin ship the dependency SBOM that Axelix's dependency health
-             check reads, which the Spring Statemachine dependency below is here to demonstrate. -->
+        <!-- Tracks the current Axelix snapshot. The starter and build plugin ship the dependency SBOM
+             that Axelix's dependency health check reads, which the Spring Statemachine dependency
+             below is here to demonstrate. -->
         <dependency>
             <groupId>com.axelixlabs</groupId>
             <artifactId>axelix-spring-boot-3-starter</artifactId>
-            <version>1.2.0</version>
+            <version>1.4.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Deliberately a discontinued dependency (demo): Spring Statemachine was moved to the Spring
@@ -223,11 +223,11 @@
                     </image>
                 </configuration>
             </plugin>
-            <!-- Pinned to the released 1.2.0, in lockstep with the starter above -->
+            <!-- Tracks the current Axelix snapshot, in lockstep with the starter above. -->
             <plugin>
                 <groupId>com.axelixlabs</groupId>
                 <artifactId>axelix-maven-plugin</artifactId>
-                <version>1.2.0</version>
+                <version>1.4.0-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <goals>
