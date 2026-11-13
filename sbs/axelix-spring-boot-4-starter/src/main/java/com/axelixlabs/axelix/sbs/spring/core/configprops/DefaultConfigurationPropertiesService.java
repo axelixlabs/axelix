@@ -57,7 +57,7 @@ public class DefaultConfigurationPropertiesService implements ConfigurationPrope
     private final ApplicationContext applicationContext;
     private final ConfigurationPropertiesFlattener flattener;
     private final PropertySensitivityMarker propertySensitivityMarker;
-    private final ConfigurationPropertiesBeanSerializer serializer = getBeanSerializer();
+    private final ConfigurationPropertiesBeanSerializer serializer;
 
     public DefaultConfigurationPropertiesService(
             ApplicationContext applicationContext,
@@ -66,6 +66,7 @@ public class DefaultConfigurationPropertiesService implements ConfigurationPrope
         this.applicationContext = applicationContext;
         this.flattener = flattener;
         this.propertySensitivityMarker = propertySensitivityMarker;
+        this.serializer = getBeanSerializer();
     }
 
     @Override
@@ -113,6 +114,8 @@ public class DefaultConfigurationPropertiesService implements ConfigurationPrope
                     return safeSerialize(target, prefix);
                 } finally {
                     if (target != null) {
+                        // Tell Spring we have finished using the target object behind the proxy.
+                        // The TargetSource decides what to do with it next.
                         advised.getTargetSource().releaseTarget(target);
                     }
                 }
