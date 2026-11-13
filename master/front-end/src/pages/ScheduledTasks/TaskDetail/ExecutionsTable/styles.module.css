@@ -150,3 +150,15 @@
 .Footer .Pagination :global(.ant-pagination-disabled svg) {
     color: var(--axelix-grey-300);
 }
+
+.Rows {
+    position: relative;
+}
+
+.Measurement {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    visibility: hidden;
+    pointer-events: none;
+}
