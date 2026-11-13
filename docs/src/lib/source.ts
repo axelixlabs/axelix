@@ -24,7 +24,8 @@ const docs = defineDocs({
 });
 
 const contentSource = docs.toFumadocsSource();
-const siteOrigin = new URL(process.env.SITE_URL ?? "https://axelix.io").origin;
+/** Origin of the deployed site, without `basePath`. */
+export const siteOrigin = new URL(process.env.SITE_URL ?? "https://axelix.io").origin;
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({

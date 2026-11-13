@@ -3,13 +3,13 @@ import { createGetUrl } from "fumadocs-core/source";
 import { BASE_PATH } from "./constants.mjs";
 import { i18n } from "./i18n";
 
-/** Site name, shown in the navbar and in generated OG images. */
-export const APP_NAME = "Axelix";
-
 export { BASE_PATH };
 
 /** Route handler that renders a page as an OG image. */
 export const DOCS_IMAGE_ROUTE = "/og/docs";
+
+/** Font family of OG images, as registered with `ImageResponse`. */
+export const OG_FONT_NAME = "Golos";
 
 /** Route handler that serves the Markdown source of a page. */
 export const DOCS_CONTENT_ROUTE = "/llms.mdx/docs";
