@@ -39,6 +39,14 @@ public record ConfigurationPropertiesFeedResponse(List<Bean> beans) {
     /**
      * @param key The flattened key in dot/bracket notation.
      * @param value The value, if available.
+     * @param dangerousValue The dangerous value details, if any.
      */
-    public record Entry(String key, @Nullable String value) {}
+    public record Entry(
+            String key, @Nullable String value, @Nullable DangerousValue dangerousValue) {}
+
+    /**
+     * @param rationale The reason the value is dangerous.
+     * @param alternativeExample A safer example, if available.
+     */
+    public record DangerousValue(String rationale, String alternativeExample) {}
 }
