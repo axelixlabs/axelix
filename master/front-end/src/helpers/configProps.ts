@@ -19,7 +19,11 @@ import type { IConfigPropsBean } from "@/models";
 
 import { canonicalize } from "./globals";
 
-export const filterConfigPropsBeans = (beans: IConfigPropsBean[], search: string): IConfigPropsBean[] => {
+export const filterConfigPropsBeans = (
+    beans: IConfigPropsBean[],
+    search: string,
+    dangerousOnly = false,
+): IConfigPropsBean[] => {
     const formattedSearch = canonicalize(search);
 
     return beans.reduce<IConfigPropsBean[]>((result, bean) => {
@@ -27,13 +31,15 @@ export const filterConfigPropsBeans = (beans: IConfigPropsBean[], search: string
 
         const isBeanNameMatch = beanName.includes(search.trim());
 
-        if (isBeanNameMatch) {
+        if (isBeanNameMatch && !dangerousOnly) {
             result.push(bean);
             return result;
         }
 
-        const filteredProperties = properties.filter(({ key }) => {
-            return `${canonicalize(prefix)}${canonicalize(key)}`.includes(formattedSearch);
+        const filteredProperties = properties.filter(({ key, dangerousValue }) => {
+            const matchesSearch =
+                isBeanNameMatch || `${canonicalize(prefix)}${canonicalize(key)}`.includes(formattedSearch);
+            return matchesSearch && (!dangerousOnly || !!dangerousValue);
         });
 
         if (filteredProperties.length) {

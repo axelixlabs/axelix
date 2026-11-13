@@ -20,12 +20,17 @@ package com.axelixlabs.axelix.master.service.convert.response.configprops;
 import java.util.List;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse.DangerousValue;
+import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse.Entry;
+import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.PropertySanitizer;
 
@@ -39,9 +44,12 @@ public class ConfigurationPropertiesFeedConverter
         implements Converter<ConfigurationPropertiesFeed, ConfigurationPropertiesFeedResponse> {
 
     private final PropertySanitizer propertySanitizer;
+    private final PropertyNameNormalizer propertyNameNormalizer;
 
-    public ConfigurationPropertiesFeedConverter(PropertySanitizer propertySanitizer) {
+    public ConfigurationPropertiesFeedConverter(
+            PropertySanitizer propertySanitizer, PropertyNameNormalizer propertyNameNormalizer) {
         this.propertySanitizer = propertySanitizer;
+        this.propertyNameNormalizer = propertyNameNormalizer;
     }
 
     @Override
@@ -51,14 +59,27 @@ public class ConfigurationPropertiesFeedConverter
                 .map(bean -> new ConfigurationPropertiesFeedResponse.Bean(
                         bean.getBeanName(),
                         bean.getPrefix(),
-                        convertEntries(bean.getProperties()),
-                        convertEntries(bean.getInputs())))
+                        convertEntries(bean.getProperties(), bean.getPrefix()),
+                        convertEntries(bean.getInputs(), null)))
                 .toList());
     }
 
-    private List<ConfigurationPropertiesFeedResponse.Entry> convertEntries(List<ConfigurationPropertiesEntry> entries) {
+    private List<Entry> convertEntries(List<ConfigurationPropertiesEntry> entries, @Nullable String prefix) {
         return entries.stream()
-                .map(entry -> new ConfigurationPropertiesFeedResponse.Entry(entry.getKey(), entry.getValue()))
+                .map(entry -> new Entry(
+                        entry.getKey(), entry.getValue(), prefix == null ? null : detectDangerousValue(prefix, entry)))
                 .toList();
+    }
+
+    private @Nullable DangerousValue detectDangerousValue(String prefix, ConfigurationPropertiesEntry entry) {
+        String entryKey = entry.getKey();
+        String name = prefix.isEmpty() ? entryKey : prefix + "." + entryKey;
+        // Match collection elements against the dictionary entry without the index, e.g. include[0] -> include.
+        String normalizedName = propertyNameNormalizer.normalize(name.replaceAll("\\[\\d+\\]", ""));
+        DangerousPropertyValue.DangerousValue dangerousValue =
+                DangerousPropertyValue.resolve(normalizedName, entry.getValue());
+        return dangerousValue == null
+                ? null
+                : new DangerousValue(dangerousValue.rationale(), dangerousValue.alternative());
     }
 }

@@ -48,16 +48,32 @@ interface IProps {
 }
 
 export const EnvironmentTriageFilters = ({ propertySources, selectedTags, onSelectedTagsChange }: IProps) => {
-    const { t } = useTranslation();
+    const counts = environmentTriageTags.map((triageTag) => {
+        return {
+            triageTag: triageTag,
+            count: countTriageTag(propertySources, triageTag),
+        };
+    });
 
-    const availableTags = environmentTriageTags
-        .map((triageTag) => {
-            return {
-                triageTag: triageTag,
-                count: countTriageTag(propertySources, triageTag),
-            };
-        })
-        .filter(({ count }) => count > 0);
+    return (
+        <PropertyTriageFilters
+            counts={counts}
+            selectedTags={selectedTags}
+            onSelectedTagsChange={onSelectedTagsChange}
+        />
+    );
+};
+
+interface IPropertyTriageFiltersProps extends Omit<IProps, "propertySources"> {
+    /**
+     * The number of properties matching each triage tag in the full, unfiltered feed
+     */
+    counts: { triageTag: EPropertyTriageTag; count: number }[];
+}
+
+export const PropertyTriageFilters = ({ counts, selectedTags, onSelectedTagsChange }: IPropertyTriageFiltersProps) => {
+    const { t } = useTranslation();
+    const availableTags = counts.filter(({ count }) => count > 0);
 
     if (!availableTags.length) {
         return null;
