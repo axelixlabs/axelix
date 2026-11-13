@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Pagination } from "antd";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler } from "@/components";
@@ -30,19 +30,59 @@ interface IProps {
     executions: IScheduledTaskExecutionRecord[];
 }
 
-const PAGE_SIZE = 8;
+const BOTTOM_SPACING = 24;
+const sumHeights = (sum: number, height: number): number => sum + height;
 
 export const ExecutionsTable = ({ executions }: IProps) => {
     const { t } = useTranslation();
 
     const [filter, setFilter] = useState<TScheduledTaskExecutionsFilter>("all");
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(1);
+    const measurementRef = useRef<HTMLDivElement>(null);
+    const footerRef = useRef<HTMLDivElement>(null);
 
     // TODO: The filter and the table only cover the latest 30 executions, the default page of the history API
     const failedExecutions = executions.filter((execution) => !execution.success);
     const visibleExecutions = filter === "failed" ? failedExecutions : executions;
-    const firstIndex = (page - 1) * PAGE_SIZE;
-    const pageExecutions = visibleExecutions.slice(firstIndex, firstIndex + PAGE_SIZE);
+    const currentPage = Math.min(page, Math.max(1, Math.ceil(visibleExecutions.length / pageSize)));
+    const firstIndex = (currentPage - 1) * pageSize;
+    const pageExecutions = visibleExecutions.slice(firstIndex, firstIndex + pageSize);
+
+    useLayoutEffect(() => {
+        const measurement = measurementRef.current!;
+        const footer = footerRef.current!;
+        const updatePageSize = (): void => {
+            // Document coordinates keep pagination stable while scrolling.
+            const availableHeight =
+                window.innerHeight -
+                (measurement.getBoundingClientRect().top + window.scrollY) -
+                Math.max(footer.getBoundingClientRect().height, 44) -
+                BOTTOM_SPACING;
+            const heights = Array.from(measurement.children, (row) => row.getBoundingClientRect().height);
+            let nextPageSize = 1;
+            // Choose a consistent size that fits every page, including wrapped errors.
+            for (let size = 1; size <= heights.length; size++) {
+                const fits = heights.every(
+                    (_, start) =>
+                        start % size !== 0 ||
+                        heights.slice(start, start + size).reduce(sumHeights, 0) <= availableHeight,
+                );
+                if (fits) nextPageSize = size;
+            }
+            setPageSize(nextPageSize);
+        };
+        const observer = new ResizeObserver(updatePageSize);
+        observer.observe(measurement.parentElement!.parentElement!.parentElement!);
+        observer.observe(measurement);
+        observer.observe(footer);
+        window.addEventListener("resize", updatePageSize);
+        updatePageSize();
+        return () => {
+            observer.disconnect();
+            window.removeEventListener("resize", updatePageSize);
+        };
+    }, [executions, filter]);
 
     const handleFilterChange = (newFilter: TScheduledTaskExecutionsFilter): void => {
         setFilter(newFilter);
@@ -65,13 +105,20 @@ export const ExecutionsTable = ({ executions }: IProps) => {
                 <span>{t("ScheduledTasks.result")}</span>
             </div>
 
-            <EmptyHandler isEmpty={visibleExecutions.length === 0}>
-                {pageExecutions.map((execution) => (
-                    <ExecutionRow key={`${execution.startedAt}-${execution.instanceId}`} execution={execution} />
-                ))}
-            </EmptyHandler>
+            <div className={styles.Rows}>
+                <div ref={measurementRef} className={styles.Measurement} aria-hidden="true" inert>
+                    {visibleExecutions.map((execution) => (
+                        <ExecutionRow key={`${execution.startedAt}-${execution.instanceId}`} execution={execution} />
+                    ))}
+                </div>
+                <EmptyHandler isEmpty={visibleExecutions.length === 0}>
+                    {pageExecutions.map((execution) => (
+                        <ExecutionRow key={`${execution.startedAt}-${execution.instanceId}`} execution={execution} />
+                    ))}
+                </EmptyHandler>
+            </div>
 
-            <div className={styles.Footer}>
+            <div ref={footerRef} className={styles.Footer}>
                 <span>
                     {visibleExecutions.length > 0
                         ? t("ScheduledTasks.executionsShown", {
@@ -84,8 +131,8 @@ export const ExecutionsTable = ({ executions }: IProps) => {
                 <Pagination
                     className={styles.Pagination}
                     size="small"
-                    current={page}
-                    pageSize={PAGE_SIZE}
+                    current={currentPage}
+                    pageSize={pageSize}
                     total={visibleExecutions.length}
                     showSizeChanger={false}
                     hideOnSinglePage
