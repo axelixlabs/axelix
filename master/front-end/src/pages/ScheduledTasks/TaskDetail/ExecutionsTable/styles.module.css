@@ -153,6 +153,7 @@
 
 .Rows {
     position: relative;
+    overflow: clip;
 }
 
 .Measurement {
