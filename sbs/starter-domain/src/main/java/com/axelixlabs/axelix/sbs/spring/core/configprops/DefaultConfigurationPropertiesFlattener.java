@@ -18,8 +18,11 @@
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 
@@ -27,6 +30,7 @@ import com.axelixlabs.axelix.common.contract.configprops.ConfigurationProperties
  * Default implementation {@link ConfigurationPropertiesFlattener}.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 public class DefaultConfigurationPropertiesFlattener implements ConfigurationPropertiesFlattener {
 
@@ -44,7 +48,15 @@ public class DefaultConfigurationPropertiesFlattener implements ConfigurationPro
     }
 
     @SuppressWarnings("unchecked")
-    private List<ConfigurationPropertiesEntry> flattenEntry(String key, Object value) {
+    private List<ConfigurationPropertiesEntry> flattenEntry(String key, @Nullable Object value) {
+        // Null values and empty containers are represented by entries without a value.
+        if (value == null) {
+            return List.of(new ConfigurationPropertiesEntry().key(key));
+        }
+
+        if (value instanceof Object[]) {
+            return flattenList(key, Arrays.asList((Object[]) value));
+        }
 
         if (value instanceof Map) {
             Map<?, ?> map = (Map<?, ?>) value;

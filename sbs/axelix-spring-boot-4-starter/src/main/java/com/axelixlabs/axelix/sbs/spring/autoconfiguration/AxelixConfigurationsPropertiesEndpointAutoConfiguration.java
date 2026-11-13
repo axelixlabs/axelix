@@ -23,10 +23,8 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
@@ -37,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMark
  * @since 13.11.2025
  * @author Sergey Cherkasov
  * @author Ilya Naumov
+ * @author Nikita Kirillov
  */
 @AxelixAutoConfiguration(after = EndpointPropertiesSupportAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConfigurationPropertiesEndpoint.class)
@@ -48,18 +47,12 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
     }
 
     @Bean
-    public ConfigurationPropertiesConverter configurationPropertiesConverter(
-            ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
-        return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
-    }
-
-    @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
             ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
+            ConfigurationPropertiesFlattener configurationPropertiesFlattener,
             PropertySensitivityMarker propertySensitivityMarker) {
         return new DefaultConfigurationPropertiesService(
-                applicationContext, configurationPropertiesConverter, propertySensitivityMarker);
+                applicationContext, configurationPropertiesFlattener, propertySensitivityMarker);
     }
 
     @Bean
