@@ -18,6 +18,7 @@
 export { AboutPage } from "./AboutPage";
 export { Capabilities } from "./Capabilities";
 export { CommunityPage } from "./CommunityPage";
+export { CompanyCarousel } from "./CompanyCarousel";
 export { ContactPage } from "./ContactPage";
 export { EditionsBanner } from "./EditionsBanner";
 export { Enterprise } from "./Enterprise";

@@ -15,7 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { EditionsBanner, FAQ, Hero, Install, LiveDebugging, QualityGate, Reveal, WhyNow } from "@/components";
+import {
+    CompanyCarousel,
+    EditionsBanner,
+    FAQ,
+    Hero,
+    Install,
+    LiveDebugging,
+    QualityGate,
+    Reveal,
+    WhyNow,
+} from "@/components";
 
 export default function Page() {
     return (
@@ -23,6 +33,7 @@ export default function Page() {
             <Reveal>
                 <Hero />
             </Reveal>
+            <CompanyCarousel />
             <Reveal>
                 <WhyNow />
             </Reveal>

@@ -1,0 +1,86 @@
+.Section {
+    padding-block: 24px;
+    border-block: 1px solid var(--axelix-line);
+}
+
+.Container {
+    max-width: 1480px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 2vw, 32px);
+}
+
+.Title {
+    margin-bottom: 24px;
+    color: var(--axelix-ink-3);
+    font-size: 16px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.Viewport {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+}
+
+.Track {
+    display: flex;
+    width: max-content;
+    animation: company-scroll 40s linear infinite;
+}
+
+.Logos {
+    display: flex;
+    align-items: center;
+    gap: 64px;
+    padding: 0 64px 0 0;
+    list-style: none;
+}
+
+.Logo {
+    position: relative;
+    flex: 0 0 var(--logo-width);
+    width: var(--logo-width);
+    height: var(--logo-height);
+    overflow: hidden;
+}
+
+.Image {
+    position: absolute;
+    max-width: none;
+    filter: grayscale(1);
+    opacity: 0.8;
+}
+
+.Viewport:hover .Track {
+    animation-play-state: paused;
+}
+
+@keyframes company-scroll {
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Viewport {
+        mask-image: none;
+    }
+
+    .Track {
+        width: 100%;
+        animation: none;
+    }
+
+    .Logos {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
+        justify-items: center;
+        gap: 24px;
+        padding: 0;
+
+        &[aria-hidden="true"] {
+            display: none;
+        }
+    }
+}
