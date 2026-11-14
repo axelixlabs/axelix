@@ -128,8 +128,15 @@ public final class ScheduledTaskService implements AutoCloseable {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
+            boolean wasEnabled = task.isEnabled();
+
             CronTask cronTask =
                     new CronTask(runnable(task), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
+
+            if (!wasEnabled && task.getTrigger() != null) {
+                task.replaceScheduledState(null, cronTask);
+                return;
+            }
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
@@ -152,7 +159,14 @@ public final class ScheduledTaskService implements AutoCloseable {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
+            boolean wasEnabled = task.isEnabled();
+
             IntervalTask updatedTask = recreateIntervalTask(task.getTask(), runnable(task), newInterval);
+
+            if (!wasEnabled) {
+                task.replaceScheduledState(null, updatedTask);
+                return;
+            }
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
