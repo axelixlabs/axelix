@@ -20,6 +20,8 @@ import { useAxelixVersion } from "@/hooks/useAxelixVersion";
 
 import { useRef, useState } from "react";
 
+import { BuildSnippet } from "../Snippets/BuildSnippet";
+
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -97,7 +99,9 @@ export const PluginMini = ({ activeSnippetRef }: IProps) => {
                                 )}
                             </button>
                         </div>
-                        <pre className={styles.MiniCode}>{b.code}</pre>
+                        <pre className={styles.MiniCode}>
+                            <BuildSnippet code={b.code} language={b.label === "Maven" ? "xml" : "gradle"} />
+                        </pre>
                     </div>
                 ))}
             </div>
