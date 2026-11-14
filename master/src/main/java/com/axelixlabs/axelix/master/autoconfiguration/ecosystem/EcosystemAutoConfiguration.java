@@ -25,6 +25,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.axelixlabs.axelix.master.repository.ApplicationDependenciesRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardCache;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardService;
+import com.axelixlabs.axelix.master.service.dashboard.InMemoryMapDashboardCache;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultDependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultLanguagesProfileService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultSpringPortfolioService;
@@ -38,6 +41,7 @@ import com.axelixlabs.axelix.master.service.ecosystem.projects.DefaultSoftwarePr
 import com.axelixlabs.axelix.master.service.ecosystem.projects.SoftwareProjectsCatalog;
 import com.axelixlabs.axelix.master.service.ecosystem.projects.SoftwareProjectsManifestLoader;
 import com.axelixlabs.axelix.master.service.ecosystem.sbom.SbomParser;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -47,6 +51,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * the boot instead of surfacing at request time.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @AutoConfiguration
 public class EcosystemAutoConfiguration {
@@ -108,5 +113,25 @@ public class EcosystemAutoConfiguration {
     @Bean
     public LanguagesProfileService languagesProfileService(HistoricalApplicationSnapshotRepository snapshotRepository) {
         return new DefaultLanguagesProfileService(snapshotRepository);
+    }
+
+    @Bean
+    public DashboardCache dashboardCache() {
+        return new InMemoryMapDashboardCache();
+    }
+
+    @Bean
+    public DashboardService dashboardService(
+            DashboardCache dashboardCache,
+            SpringPortfolioService springPortfolioService,
+            LanguagesProfileService languagesProfileService,
+            DatabaseHistoricalApplicationSnapshotService snapshotService,
+            DependencyAnalysisService dependencyAnalysisService) {
+        return new DashboardService(
+                dashboardCache,
+                springPortfolioService,
+                languagesProfileService,
+                snapshotService,
+                dependencyAnalysisService);
     }
 }

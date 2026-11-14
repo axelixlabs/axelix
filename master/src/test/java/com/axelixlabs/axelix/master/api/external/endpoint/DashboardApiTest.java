@@ -54,6 +54,7 @@ import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardCache;
 import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -72,6 +73,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link DashboardApi}.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public class DashboardApiTest extends AbstractProtectedEndpointTest {
 
@@ -94,8 +96,13 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     @Autowired
     private DependencyAnalysisService dependencyAnalysisService;
 
+    @Autowired
+    private DashboardCache dashboardCache;
+
     @BeforeEach
     void prepare() {
+        dashboardCache.clear();
+
         // clear instanceRegistry before test
         deRegisterAll();
 
