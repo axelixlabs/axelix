@@ -39,6 +39,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
@@ -259,6 +260,72 @@ class ScheduledTaskServiceTest {
         ManagedScheduledTask task =
                 taskRegistry.find(FIXED_RATE_TASK_ID_FOR_MODIFY).orElseThrow();
         assertThat(((IntervalTask) task.getTask()).getIntervalDuration()).isEqualTo(newInterval);
+    }
+
+    @Test // GH-1980
+    void shouldKeepTaskDisabledWhenCronExpressionModified() {
+        String newCronExpression = "*/5 * * * * *";
+
+        taskService.disableTask(CRON_TASK_ID_FOR_MODIFY, false);
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, newCronExpression);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.isEnabled()).isFalse();
+        assertThat((Object) task.getFuture()).isNull();
+        assertThat(((CronTrigger) task.getTrigger()).getExpression()).isEqualTo(newCronExpression);
+    }
+
+    @Test // GH-1980
+    void shouldKeepTaskDisabledWhenIntervalModified_testFixedDelay() {
+        Duration newInterval = Duration.ofMillis(555555L);
+
+        taskService.disableTask(FIXED_DELAY_TASK_ID_FOR_MODIFY, false);
+        taskService.modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, newInterval);
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.isEnabled()).isFalse();
+        assertThat((Object) task.getFuture()).isNull();
+        assertThat(((IntervalTask) task.getTask()).getIntervalDuration()).isEqualTo(newInterval);
+    }
+
+    @Test // GH-1980
+    void shouldKeepTaskDisabledWhenIntervalModified_testFixedRate() {
+        Duration newInterval = Duration.ofMillis(777777L);
+
+        taskService.disableTask(FIXED_RATE_TASK_ID_FOR_MODIFY, false);
+        taskService.modifyInterval(FIXED_RATE_TASK_ID_FOR_MODIFY, newInterval);
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_RATE_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.isEnabled()).isFalse();
+        assertThat((Object) task.getFuture()).isNull();
+        assertThat(((IntervalTask) task.getTask()).getIntervalDuration()).isEqualTo(newInterval);
+    }
+
+    @Test // GH-1980
+    void shouldEnableTaskWithCronExpressionModifiedWhileDisabled() {
+        String newCronExpression = "*/5 * * * * *";
+
+        taskService.disableTask(CRON_TASK_ID_FOR_MODIFY, false);
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, newCronExpression);
+        taskService.enableTask(CRON_TASK_ID_FOR_MODIFY);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.isEnabled()).isTrue();
+        assertThat(((CronTrigger) task.getTrigger()).getExpression()).isEqualTo(newCronExpression);
+    }
+
+    @Test // GH-1980
+    void shouldNotReplaceDisabledIntervalTaskWhenCronExpressionModified() {
+        taskService.disableTask(FIXED_DELAY_TASK_ID_FOR_MODIFY, false);
+        taskService.modifyCronExpression(FIXED_DELAY_TASK_ID_FOR_MODIFY, "*/5 * * * * *");
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getTrigger()).isNull();
+        assertThat(task.getTask()).isInstanceOf(FixedDelayTask.class);
     }
 
     @Test

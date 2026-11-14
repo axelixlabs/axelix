@@ -71,6 +71,7 @@ import static org.awaitility.Awaitility.await;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  * @author Dmitry Mazurov
+ * @author Vyacheslav Yanin
  * @since 14.10.2025
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -84,12 +85,17 @@ class AxelixScheduledTasksEndpointTest {
             AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTask#cron0";
     private static final String CRON_TASK_ID_FOR_MODIFY =
             AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTaskForModify#cron0";
+    private static final String CRON_TASK_ID_FOR_MODIFY_WHILE_DISABLED =
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTaskForModifyWhileDisabled#cron0";
 
     // FixedDelay
     private static final String FIXED_DELAY_TASK_ID =
             AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTask#fixedDelay0";
     private static final String FIXED_DELAY_TASK_ID_FOR_MODIFY =
             AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForModify#fixedDelay0";
+    private static final String FIXED_DELAY_TASK_ID_FOR_MODIFY_WHILE_DISABLED =
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName()
+                    + ".testFixedDelayTaskForModifyWhileDisabled#fixedDelay0";
     private static final String FIXED_DELAY_TASK_ID_FOR_EXECUTE =
             AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForExecute#fixedDelay0";
 
@@ -98,6 +104,9 @@ class AxelixScheduledTasksEndpointTest {
             AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTask#fixedRate0";
     private static final String FIXED_RATE_TASK_ID_FOR_MODIFY =
             AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForModify#fixedRate0";
+    private static final String FIXED_RATE_TASK_ID_FOR_MODIFY_WHILE_DISABLED =
+            AxelixScheduledTasksEndpointTestConfiguration.class.getName()
+                    + ".testFixedRateTaskForModifyWhileDisabled#fixedRate0";
     private static final String FIXED_RATE_TASK_ID_FOR_EXECUTE =
             AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForExecute#fixedRate0";
 
@@ -388,6 +397,104 @@ class AxelixScheduledTasksEndpointTest {
         });
     }
 
+    @Test // GH-1980
+    void shouldKeepTaskDisabledWhenCronExpressionModified() {
+        String taskId = CRON_TASK_ID_FOR_MODIFY_WHILE_DISABLED;
+        String newCronExpression = "*/5 * * * * *";
+
+        forceDisableTask(taskId);
+
+        ScheduledTaskCronExpressionModifyRequest request =
+                new ScheduledTaskCronExpressionModifyRequest().trigger(taskId).cronExpression(newCronExpression);
+
+        ResponseEntity<Void> response = restTemplate
+                .asMaster()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/cron-expression",
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+        assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("expression").isEqualTo(newCronExpression);
+            assertThatJson(task).node("enabled").isEqualTo(false);
+        });
+    }
+
+    @Test // GH-1980
+    void shouldEnableTaskWithCronExpressionModifiedWhileDisabled() {
+        String taskId = CRON_TASK_ID_FOR_MODIFY_WHILE_DISABLED;
+        String newCronExpression = "*/5 * * * * *";
+
+        forceDisableTask(taskId);
+
+        ScheduledTaskCronExpressionModifyRequest request =
+                new ScheduledTaskCronExpressionModifyRequest().trigger(taskId).cronExpression(newCronExpression);
+
+        ResponseEntity<Void> response = restTemplate
+                .asMaster()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/cron-expression",
+                        defaultJsonEntity(request),
+                        Void.class);
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+
+        enableScheduledTask(taskId);
+
+        assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("expression").isEqualTo(newCronExpression);
+            assertThatJson(task).node("enabled").isEqualTo(true);
+        });
+    }
+
+    @Test // GH-1980
+    void shouldKeepTaskDisabledWhenIntervalModified_testFixedDelay() {
+        String taskId = FIXED_DELAY_TASK_ID_FOR_MODIFY_WHILE_DISABLED;
+        Long newInterval = 555555L;
+
+        forceDisableTask(taskId);
+
+        ScheduledTaskIntervalModifyRequest request =
+                new ScheduledTaskIntervalModifyRequest().trigger(taskId).interval(newInterval);
+
+        ResponseEntity<Void> response = restTemplate
+                .asMaster()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+        assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("interval").isEqualTo(newInterval);
+            assertThatJson(task).node("enabled").isEqualTo(false);
+        });
+    }
+
+    @Test // GH-1980
+    void shouldKeepTaskDisabledWhenIntervalModified_testFixedRate() {
+        String taskId = FIXED_RATE_TASK_ID_FOR_MODIFY_WHILE_DISABLED;
+        Long newInterval = 777777L;
+
+        forceDisableTask(taskId);
+
+        ScheduledTaskIntervalModifyRequest request =
+                new ScheduledTaskIntervalModifyRequest().trigger(taskId).interval(newInterval);
+
+        ResponseEntity<Void> response = restTemplate
+                .asMaster()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+        assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("interval").isEqualTo(newInterval);
+            assertThatJson(task).node("enabled").isEqualTo(false);
+        });
+    }
+
     @Test
     void shouldReturnBadRequest_modifyIntervalForFixedRate_toInvalidValue() {
         // language=json
@@ -654,6 +761,9 @@ class AxelixScheduledTasksEndpointTest {
         @Scheduled(cron = "*/2 * * * * *")
         public void testCronTaskForModify() {}
 
+        @Scheduled(cron = "*/2 * * * * *")
+        public void testCronTaskForModifyWhileDisabled() {}
+
         // FixedDelay tasks
         @Scheduled(fixedDelay = 100)
         public void testFixedDelayTask() {
@@ -662,6 +772,9 @@ class AxelixScheduledTasksEndpointTest {
 
         @Scheduled(fixedDelay = 20000000)
         public void testFixedDelayTaskForModify() {}
+
+        @Scheduled(fixedDelay = 20000000)
+        public void testFixedDelayTaskForModifyWhileDisabled() {}
 
         @Scheduled(fixedDelay = 2000000000, initialDelay = 2000000000)
         public void testFixedDelayTaskForExecute() {
@@ -676,6 +789,9 @@ class AxelixScheduledTasksEndpointTest {
 
         @Scheduled(fixedRate = 20000000)
         public void testFixedRateTaskForModify() {}
+
+        @Scheduled(fixedRate = 20000000)
+        public void testFixedRateTaskForModifyWhileDisabled() {}
 
         @Scheduled(fixedRate = 2000000000, initialDelay = 2000000000)
         public void testFixedRateTaskForExecute() {
