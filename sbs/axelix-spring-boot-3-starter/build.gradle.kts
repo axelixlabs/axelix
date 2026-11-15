@@ -16,7 +16,16 @@ val jsonUnitAssertJVersion = "2.40.1"
 val lombokVersion = "1.18.48"
 val shedLockVersion = "5.16.0"
 
+// Kept out of the starter's runtime dependencies: instrumentation is opt-in via -javaagent.
+val profileAgentLibraries by configurations.creating
+val profileAgentPackage = "com/axelixlabs/axelix/sbs/spring/core/conditions/profile/**"
+
+configurations.compileOnly {
+    extendsFrom(profileAgentLibraries)
+}
+
 dependencies {
+    profileAgentLibraries("net.bytebuddy:byte-buddy:1.17.8")
     // Self
     compileOnly(project(":sbs:starter-domain"))
 
@@ -63,6 +72,45 @@ dependencies {
         exclude(group = "org.springframework")
     }
     testImplementation("org.awaitility:awaitility")
+}
+
+val profileAgentJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("profile-agent")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.main.get().output) {
+        include(profileAgentPackage)
+    }
+    from(profileAgentLibraries.map { zipTree(it) }) {
+        exclude("META-INF/MANIFEST.MF", "META-INF/*.SF", "META-INF/*.RSA", "META-INF/*.DSA")
+    }
+    manifest.attributes(
+        "Premain-Class" to "com.axelixlabs.axelix.sbs.spring.core.conditions.profile.ProfileDecisionAgent",
+        "Multi-Release" to "true"
+    )
+}
+
+tasks.assemble {
+    dependsOn(profileAgentJar)
+}
+
+// Separate process: the agent must be installed before Spring's condition classes are loaded.
+val profileAgentTest by tasks.registering(Test::class) {
+    description = "Tests actual Spring profile decisions with the startup agent installed."
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    useJUnitPlatform()
+    include("**/ProfileDecisionAgentTest.class")
+    dependsOn(profileAgentJar)
+    inputs.file(profileAgentJar.flatMap { it.archiveFile }).withPropertyName("profileAgent")
+    jvmArgs("-javaagent:${profileAgentJar.get().archiveFile.get().asFile.absolutePath}")
+}
+
+tasks.test {
+    exclude("**/ProfileDecisionAgentTest.class")
+}
+
+tasks.check {
+    dependsOn(profileAgentTest)
 }
 
 tasks.withType<JavaCompile>().configureEach {
