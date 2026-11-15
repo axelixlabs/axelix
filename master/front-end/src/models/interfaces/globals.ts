@@ -177,3 +177,15 @@ export interface ISiderMenuItem {
      */
     feature?: EInstanceFeature;
 }
+
+export interface IDangerousValue {
+    /**
+     * The reason the resolved value is considered dangerous.
+     */
+    rationale: string;
+
+    /**
+     * A safer value to use instead, when one can be suggested.
+     */
+    alternativeExample?: string;
+}
