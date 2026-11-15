@@ -15,13 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Copy } from "@/components";
+import { Copy, RiskChip } from "@/components";
 import { type TPropertyRiskKind, propertyRisks } from "@/helpers";
 import { EPropertyTriageTag, type IEnvProperty } from "@/models";
 
 import { EnvironmentPropertyValue } from "../../EnvironmentPropertyValue";
 
-import { RiskChip } from "./RiskChip";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -32,7 +31,7 @@ interface IProps {
 }
 
 const RISK_ROW_STYLES: Record<TPropertyRiskKind, string> = {
-    [EPropertyTriageTag.DANGEROUS]: styles.DangerousRow,
+    [EPropertyTriageTag.DANGEROUS]: "DangerousRow",
     [EPropertyTriageTag.DEPRECATED_ERROR]: styles.DeprecatedErrorRow,
     [EPropertyTriageTag.DEPRECATED_WARNING]: styles.DeprecatedWarningRow,
 };

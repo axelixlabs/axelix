@@ -15,12 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Accordion, Copy, EmptyHandler } from "@/components";
+import { Accordion, Copy, EmptyHandler, RiskChip } from "@/components";
 import { normalizeHtmlElementId } from "@/helpers";
 import { EPropertyTriageTag, type IConfigPropsProperty } from "@/models";
-
-import { RiskChip } from "../../Environment/EnvironmentModifiableTable/EnvironmentProperty/RiskChip";
-import riskStyles from "../../Environment/EnvironmentModifiableTable/EnvironmentProperty/styles.module.css";
 
 import styles from "./styles.module.css";
 
@@ -61,7 +58,7 @@ export const ConfigPropsModifiableTable = ({ headerName, prefix, properties }: I
                     >
                         <EmptyHandler isEmpty={!properties.length}>
                             {properties.map(({ key, value, dangerousValue }) => (
-                                <div key={key} className={`TableRow ${dangerousValue ? riskStyles.DangerousRow : ""}`}>
+                                <div key={key} className={`TableRow ${dangerousValue ? "DangerousRow" : ""}`}>
                                     <div className={`RowChunk ${styles.KeyChunk}`}>
                                         {key} <Copy text={key} />
                                         {dangerousValue && (

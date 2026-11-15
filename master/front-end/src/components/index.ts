@@ -34,6 +34,7 @@ export { HintTooltip } from "./HintTooltip";
 export { PageSearch } from "./PageSearch";
 export { StyledLink } from "./StyledLink";
 export { Accordion } from "./Accordion";
+export { RiskChip } from "./RiskChip";
 export { StyledTag } from "./StyledTag";
 export { AppAlert } from "./AppAlert";
 export { default } from "./Loadable";
