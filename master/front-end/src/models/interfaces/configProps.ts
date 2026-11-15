@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type { IDangerousValue } from "./environment";
-import type { IKeyValuePair } from "./globals";
 
 export interface IConfigPropsBean {
     /**
@@ -43,9 +42,13 @@ export interface IConfigPropsResponseBody {
     beans: IConfigPropsBean[];
 }
 
-export interface IConfigPropsProperty extends IKeyValuePair {
+export interface IConfigPropsProperty {
     /**
      * The dangerous value details detected by the master for the bound property, if any
      */
     dangerousValue?: IDangerousValue;
+
+    key: string;
+
+    value: string;
 }
