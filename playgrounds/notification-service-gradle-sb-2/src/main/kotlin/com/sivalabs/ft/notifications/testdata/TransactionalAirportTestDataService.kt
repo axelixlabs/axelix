@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
  * Transactions declared on the class itself.
  */
 @Service
-@Profile("default", "local")
+@Profile("default", "local", "dev", "test")
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 class TransactionalAirportTestDataService(
     private val airportRepository: AirportRepository,

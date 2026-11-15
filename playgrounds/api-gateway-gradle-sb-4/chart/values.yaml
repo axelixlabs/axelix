@@ -9,7 +9,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-profiles: ""
+profiles: "dev"
 
 # Axelix starter settings. The signing key is injected at deploy time (helm --set), see
 # .github/actions/deploy-playground.

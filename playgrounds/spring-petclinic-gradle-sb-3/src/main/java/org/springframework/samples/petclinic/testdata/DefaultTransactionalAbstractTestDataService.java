@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile({"default", "local"})
+@Profile({"default", "local", "dev", "test"})
 public class DefaultTransactionalAbstractTestDataService extends TransactionalAbstractTestDataService {
 
     private final EmployeeRepository employeeRepository;

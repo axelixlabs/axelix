@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile({"default", "local"})
+@Profile({"default", "local", "dev", "test"})
 public class DefaultTransactionalInterfaceTestDataService implements TransactionalInterfaceTestDataService {
 
     private final EmployeeRepository employeeRepository;

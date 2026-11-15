@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Transactions declared on methods: of the class itself, of its interface and of its abstract parent.
  */
 @Service
-@Profile({"default", "local"})
+@Profile({"default", "local", "dev", "test"})
 public class DefaultBookTestDataService extends AbstractBookTestDataService implements InterfaceBookTestDataService {
 
     private final PublisherRepository publisherRepository;

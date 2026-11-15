@@ -13,7 +13,7 @@ import java.util.List;
  * abstract parent.
  */
 @Service
-@Profile({ "default", "local" })
+@Profile({ "default", "local", "dev", "test" })
 public class DefaultRestaurantTestDataService extends AbstractRestaurantTestDataService
 		implements InterfaceRestaurantTestDataService {
 

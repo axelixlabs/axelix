@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
  * abstract parent.
  */
 @Service
-@Profile({ "default", "local" })
+@Profile({ "default", "local", "dev", "test" })
 public class DefaultTestDataService extends AbstractTestDataService implements InterfaceTestDataService {
 
 	private final CompanyRepository companyRepository;

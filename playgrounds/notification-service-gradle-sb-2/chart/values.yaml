@@ -9,7 +9,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-profiles: ""
+profiles: "dev,test"
 
 podLabels: {}
 

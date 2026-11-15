@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile({ "default", "local" })
+@Profile({ "default", "local", "dev", "test" })
 public class RestaurantTestDataQueryRunner {
 
 	private final DefaultRestaurantTestDataService restaurantTestDataService;
