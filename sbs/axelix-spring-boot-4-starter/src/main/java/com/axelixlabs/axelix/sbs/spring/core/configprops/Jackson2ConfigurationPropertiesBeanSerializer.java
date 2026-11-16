@@ -17,22 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-/*
- * Copyright 2012-present the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -78,10 +62,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.unit.DataSize;
 
 /**
- * Similar to Spring Boot {@code Jackson2BeanSerializer}, but uses {@link Include#ALWAYS}
+ * Adapted from Spring Boot's <a href="https://github.com/spring-projects/spring-boot/blob/v4.0.6/module/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/context/properties/Jackson2BeanSerializer.java">
+ * {@code Jackson2BeanSerializer}</a>, but uses {@link Include#ALWAYS}
  * instead of {@link Include#NON_NULL} to retain null values.
  *
- * <p>Original author: Phillip Webb.</p>
+ * <p>Original code copyright 2012-present the original author or authors,
+ * licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.
+ * Original author: Phillip Webb.</p>
  *
  * @author Nikita Kirillov
  */

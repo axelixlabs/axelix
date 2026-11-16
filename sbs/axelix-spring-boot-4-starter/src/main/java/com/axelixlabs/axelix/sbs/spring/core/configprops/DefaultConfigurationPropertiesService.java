@@ -103,8 +103,9 @@ public class DefaultConfigurationPropertiesService implements ConfigurationPrope
                     return safeSerialize(target, prefix);
                 } finally {
                     if (target != null) {
-                        // Tell Spring we have finished using the target object behind the proxy.
-                        // The TargetSource decides what to do with it next.
+                        // Pair getTarget() with releaseTarget() even if serialization fails.
+                        // A pooled TargetSource may lend us an instance that must be returned
+                        // to the pool; a singleton TargetSource simply ignores this call.
                         advised.getTargetSource().releaseTarget(target);
                     }
                 }
