@@ -39,6 +39,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
+import com.axelixlabs.axelix.master.api.external.response.RoleProfileResponse;
+import com.axelixlabs.axelix.master.api.external.response.UserAuthoritiesResponse;
+import com.axelixlabs.axelix.master.api.external.response.UserProfileResponse;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
@@ -77,7 +80,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserApiTest extends AbstractProtectedEndpointTest {
 
     private static final String USERS_FEED_PATH = "/api/external/users/feed";
-    private static final String USER_BY_ID_PATH = "/api/external/users/feed/{userId}";
+    private static final String USER_PROFILE_PATH = "/api/external/users/{userId}/profile";
     private static final String ROLE_USER_COUNTS_PATH = "/api/external/users/role-counts";
 
     @Autowired
@@ -362,7 +365,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnUserByHisId() {
+    void shouldReturnUserProfile() {
         // given.
         userService.createLocal("alice", "Alice", "Smith", "alice@example.com", "aliceSecret", Set.of("ADMIN"));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
@@ -385,14 +388,23 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.asUsersFeedViewer();
-        ResponseEntity<String> response = superAdmin.getForEntity(USER_BY_ID_PATH, String.class, alice.id());
+        ResponseEntity<String> response = superAdmin.getForEntity(USER_PROFILE_PATH, String.class, alice.id());
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).isEqualTo(expectedUser);
+        assertThatJson(response.getBody()).node("user").isEqualTo(expectedUser);
+        assertThatJson(response.getBody()).node("roles").isArray().isNotEmpty();
+        assertThatJson(response.getBody())
+                .node("authorities.effectiveAuthorities")
+                .isArray()
+                .isNotEmpty();
+        assertThatJson(response.getBody())
+                .node("authorities.ungrantedAuthorities")
+                .isArray()
+                .hasSize(2);
         assertThat(response.getBody()).doesNotContain("password");
-        assertSuccessfulCallback(MasterWebEndpoints.USER_READ_ONE, superAdmin.getActor());
+        assertSuccessfulCallback(MasterWebEndpoints.USER_PROFILE, superAdmin.getActor());
     }
 
     @Test
@@ -402,7 +414,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response =
-                restTemplateBuilder.asUsersFeedViewer().getForEntity(USER_BY_ID_PATH, String.class, unknownUserId);
+                restTemplateBuilder.asUsersFeedViewer().getForEntity(USER_PROFILE_PATH, String.class, unknownUserId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -448,10 +460,50 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         assertSuccessfulCallback(MasterWebEndpoints.USERS_READ_ROLE_COUNTS, viewer.getActor());
     }
 
+    @Test
+    void shouldReturnUserAuthorityPartition() {
+        // given.
+        String username = "authority-feed-" + UUID.randomUUID();
+        userService.createLocal(username, null, null, null, "password", Set.of("EDITOR"));
+        String userId = userRepository.findByUsername(username).orElseThrow().id();
+        IdentityAwareTestRestTemplate viewer = restTemplateBuilder.asUsersFeedViewer();
+
+        try {
+            // when.
+            ResponseEntity<UserProfileResponse> response =
+                    viewer.getForEntity(USER_PROFILE_PATH, UserProfileResponse.class, userId);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+            assertThat(response.getBody().user().id()).isEqualTo(userId);
+            assertThat(response.getBody().roles())
+                    .extracting(RoleProfileResponse::name)
+                    .contains("ADMIN", "EDITOR", "VIEWER");
+            assertThat(response.getBody().authorities().effectiveAuthorities())
+                    .extracting(UserAuthoritiesResponse.AuthorityProfileResponse::codename)
+                    .isSorted()
+                    .containsExactly("caches:clear", "caches:toggle", "gc:manage", "scheduled-tasks:write");
+            assertThat(response.getBody().authorities().ungrantedAuthorities())
+                    .extracting(UserAuthoritiesResponse.AuthorityProfileResponse::codename)
+                    .isSorted()
+                    .containsExactly(
+                            "config-properties.values:read",
+                            "environment.values:read",
+                            "heap-dump:read",
+                            "users:manage",
+                            "users:read");
+            assertSuccessfulCallback(MasterWebEndpoints.USER_PROFILE, viewer.getActor());
+        } finally {
+            userService.deleteByIds(List.of(userId));
+        }
+    }
+
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
         return Set.of(
                 new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ, USERS_FEED_PATH),
+                new TestableMasterWebEndpoint(MasterWebEndpoints.USER_PROFILE, "/api/external/users/missing/profile"),
                 new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ_ROLE_COUNTS, ROLE_USER_COUNTS_PATH));
     }
 

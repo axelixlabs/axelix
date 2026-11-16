@@ -250,3 +250,14 @@ export interface IUserAuthorities {
     /** Catalog authorities not granted through any of the user's roles. */
     ungrantedAuthorities: IAuthorityProfile[];
 }
+
+export interface IUserProfile {
+    /** Managed user details. */
+    user: IUser;
+
+    /** Effective and ungranted authorities. */
+    authorities: IUserAuthorities;
+
+    /** Available roles for display and assignment. */
+    roles: IRoleProfile[];
+}
