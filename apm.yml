@@ -5,16 +5,23 @@ dependencies:
   apm:
   # Custom
   - ./.agents/skills/backlog-refiner
+  - ./.agents/skills/config-breaking-changes
   - ./.agents/skills/docs-writer
   - ./.agents/skills/external-contributor-issues
   - ./.agents/skills/housekeeper
+  - ./.agents/skills/prepare-minor-release
+  - ./.agents/skills/refactoring-ui
+  - ./.agents/skills/release-blog-post
   - ./.agents/skills/security-vulnerabilities-patcher
+  - ./.agents/skills/skill-creator
   - ./.agents/skills/test-reviewer
+  - ./.agents/skills/test-writer
   - ./.agents/skills/starter-domain-reviewer
-  # External
-  - anthropics/skills/skills/skill-creator
-  - wondelai/skills/refactoring-ui
   mcp:
+  - name: doop
+    registry: false
+    transport: http
+    url: https://doop.design/mcp
   - name: github
     registry: false
     transport: stdio
