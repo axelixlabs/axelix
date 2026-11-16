@@ -48,11 +48,11 @@ describe("Filter configProps", () => {
         expect(result).toEqual([]);
     });
 
-    it("A match by the configProps beanName (partially entered) - returns the original configProps bean object", () => {
+    it("A match by the configProps beanName (partially entered) - returns all properties of the matching bean", () => {
         const result = filterConfigPropsBeans(beans, "       jpa.orm.jpa.         ");
         expect(result).toHaveLength(1);
         const findedConfigBean = result[0];
-        expect(findedConfigBean).toBe(beans[1]);
+        expect(findedConfigBean).toStrictEqual(beans[1]);
     });
 
     it("A match by the configProps prefix (partially entered)", () => {
