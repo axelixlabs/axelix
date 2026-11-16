@@ -6,8 +6,10 @@ description: "Axelix Master (or simply \"Master\") is the central hub of the Axe
 
 ## Core Purpose
 
-Axelix Master serves as a **centralized management console** that automatically discovers, registers, and monitors
-Spring Boot applications, providing real-time insights and control.
+Axelix Master is the central application of Axelix, the open-source, AI-native platform for developing and evolving
+Java Spring Boot microservice ecosystems. It discovers, registers, and monitors services, and serves both the web UI
+for engineers and the built-in MCP server for AI agents. This gives both kinds of users access to application analysis
+and debugging, with the available MCP capabilities listed in the [tool catalog](./mcp/mcp-tools.mdx).
 
 ## Key Capabilities
 
@@ -16,7 +18,7 @@ Master learns about Spring Boot applications through two complementary mechanism
 
 **Self-registration (any environment):**
 Applications that include the Axelix Spring Boot Starter announce themselves to Master and send periodic heartbeats. This
-works anywhere the app can reach Master — Docker Compose, bare-metal, VMs, Kubernetes, etc. It is **opt-in per
+works anywhere the app can reach Master, including Docker Compose, bare-metal, VMs, Kubernetes, etc. It is **opt-in per
 application**: enable it on in your application with `axelix.sbs.discovery.self-registration=true` (it is off by default). Master
 accepts these registrations out of the box (`axelix.master.discovery.self-registration.enabled` setting in Master on by default).
 

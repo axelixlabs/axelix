@@ -1,12 +1,23 @@
 ---
 title: Introduction
-description: "Welcome to Axelix! We're glad you're here."
+description: "The open-source, AI-native platform for developing and evolving Java Spring Boot microservice ecosystems."
 ---
 
-Axelix is a monitoring and runtime-debugging tool for Spring Boot applications written in Java or Kotlin. It connects to
-your running services and exposes the live state of each application — its beans, configuration sources, transactions,
-scheduled tasks, caches, threads, and metrics — through a web UI for human engineers, and through a bundled MCP server
-for AI agents. Parts of that state can be changed on the fly without a redeploy.
+Axelix is the open-source, AI-native platform for developing and evolving Java Spring Boot microservice ecosystems.
+Built for developers, by developers, it helps teams understand individual applications and manage change across their services.
+
+Axelix helps you:
+
+- **Inspect and debug running applications.** Explore beans, configuration sources, transactions, logs, and other runtime state.
+- **Detect common problems.** Find Spring Boot misconfigurations and anti-patterns that affect performance, stability, and security.
+- **Assess dependency health.** Review library versions and maintenance status in individual services and across the ecosystem.
+- **Track migrations.** Follow the adoption of Java and Spring Boot generations across your services.
+- **Monitor and control `@Scheduled` executions.** Inspect tasks, trigger runs, pause schedules, and change cron expressions at runtime.
+
+AI-native means that Axelix is designed for both human engineers and AI agents. Humans work through the web UI,
+while agents use the built-in Model Context Protocol (MCP) server to inspect application state, investigate detected
+problems, and perform supported runtime actions. Both interfaces enforce configured access permissions.
+See the [MCP tool catalog](../setting-up-master-ui/mcp/mcp-tools.mdx) for the capabilities currently available to agents.
 
 We care about how quickly you can get Axelix running. [Installation](../start/getting-started.mdx) walks you
 through bringing Master up, and the [Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx)
@@ -16,7 +27,7 @@ guide covers adding the starter to your application.
 
 This documentation covers both **Axelix OSS**, released under LGPL 3.0 with sources at
 [github.com/axelixlabs/axelix](https://github.com/axelixlabs/axelix), and the upcoming paid **Axelix Enterprise**
-edition with additional features (in development — stay tuned for news).
+edition with additional features (in development, stay tuned for news).
 
 ## Where to go next
 

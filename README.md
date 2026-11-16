@@ -6,15 +6,25 @@
 [![Security Check](https://github.com/axelixlabs/axelix/actions/workflows/nightly-security-check.yaml/badge.svg)](https://github.com/axelixlabs/axelix/actions/workflows/nightly-security-check.yaml)
 [![Nightly Master E2E](https://github.com/axelixlabs/axelix/actions/workflows/nightly-master-e2e.yaml/badge.svg?branch=master)](https://github.com/axelixlabs/axelix/actions/workflows/nightly-master-e2e.yaml)
 
-**Axelix is an open-source tool that surfaces the production problems your Spring Boot app hides from
-you, then lets you inspect and change any running service from a web console or an AI agent.**
+**Axelix is the open-source, AI-native platform for developing and evolving Java Spring Boot microservice ecosystems.**
 
-You know the drill. The app passes every test on your laptop and still falls over in staging. A
-property resolves to a value nobody remembers setting. A `@ConditionalOnMissingBean` quietly wires in
-the wrong implementation. A `Pageable` query with a `JOIN FETCH` pulls the whole table into heap.
-`open-in-view` is still `true` in production. Axelix catches this class of problem before it pages
-you, and when something is already broken it shows you the live beans, properties, transactions, and
-logs of the running JVM, with no redeploy and no SSH.
+Built for developers, by developers, Axelix helps teams understand running applications, diagnose problems,
+and manage change across their services. It is designed for both human engineers and AI agents:
+the web UI and built-in Model Context Protocol (MCP) server make runtime analysis and debugging part
+of both human and agent workflows. Agents can inspect application state, investigate detected problems,
+and perform supported runtime actions directly through MCP, subject to configured permissions.
+
+Axelix helps you:
+
+- **Inspect and debug running applications.** Look inside beans, configuration, transactions, logs,
+  and other runtime state to understand what your services are doing.
+- **Detect common problems.** Find Spring Boot misconfigurations and anti-patterns that affect
+  performance, stability, and security.
+- **Assess dependency health.** Review library versions and maintenance status in individual services
+  and across the ecosystem.
+- **Track migrations.** See which Java and Spring Boot generations your services run as your ecosystem evolves.
+- **Monitor and control `@Scheduled` executions.** Inspect tasks, trigger runs, pause schedules,
+  and change cron expressions at runtime.
 
 ## What Axelix does
 
@@ -37,9 +47,10 @@ Axelix analyses your app on every layer, from the JVM up through the framework a
 https://github.com/user-attachments/assets/81a884f0-a04e-4800-a683-5ed54f4ce8eb
 
 Beyond detection, Axelix lets you inspect the live state of a running Spring Boot application, which
-is what advanced runtime debugging really comes down to. Every capability below is available in the
-web console and as an MCP tool, so the same information is avaialble to a human and an AI agent (according 
-to configured RBAC policies, of course):
+is what advanced runtime debugging really comes down to. The web console exposes the capabilities below. The built-in MCP server gives AI agents access to
+application inspection, diagnostics, and supported runtime actions; see the
+[MCP tool catalog](docs/content/docs/setting-up-master-ui/mcp/mcp-tools.mdx) for current coverage.
+Both interfaces enforce configured access permissions:
 
 - **Configuration properties.** The effective value of every `@Value` and bound prefix, and the exact
   source it actually came from.
