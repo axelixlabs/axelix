@@ -28,10 +28,8 @@ import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
@@ -51,12 +49,6 @@ public class EnvironmentTestConfig {
     }
 
     @Bean
-    public ConfigurationPropertiesConverter configurationPropertiesConverter(
-            ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
-        return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
-    }
-
-    @Bean
     public EnvironmentService environmentService(Environment environment, EnvPropertyEnricher envPropertyEnricher) {
         return new DefaultEnvironmentService(
                 environment,
@@ -66,10 +58,10 @@ public class EnvironmentTestConfig {
 
     @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
-            ApplicationContext applicationContext, ConfigurationPropertiesConverter configurationPropertiesConverter) {
+            ApplicationContext applicationContext, ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
         return new DefaultConfigurationPropertiesService(
                 applicationContext,
-                configurationPropertiesConverter,
+                configurationPropertiesFlattener,
                 new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
     }
 

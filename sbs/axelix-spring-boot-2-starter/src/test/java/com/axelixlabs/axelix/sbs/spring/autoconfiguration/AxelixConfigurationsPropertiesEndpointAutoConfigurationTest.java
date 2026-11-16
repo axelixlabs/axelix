@@ -24,7 +24,6 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.PropertySensitivityMarker;
@@ -49,7 +48,6 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
     void shouldCreateAllBeansInDefaultScenario() {
         contextRunner.run(context -> {
             assertThat(context).hasSingleBean(ConfigurationPropertiesFlattener.class);
-            assertThat(context).hasSingleBean(ConfigurationPropertiesConverter.class);
             assertThat(context).hasSingleBean(PropertyNameNormalizer.class);
             assertThat(context).hasSingleBean(PropertySensitivityMarker.class);
             assertThat(context).hasSingleBean(ConfigurationPropertiesService.class);
@@ -65,7 +63,6 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(AxelixConfigurationsPropertiesEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(AxelixConfigurationPropertiesEndpoint.class);
                     assertThat(context).doesNotHaveBean(ConfigurationPropertiesService.class);
-                    assertThat(context).doesNotHaveBean(ConfigurationPropertiesConverter.class);
                     assertThat(context).doesNotHaveBean(ConfigurationPropertiesFlattener.class);
                 });
     }
@@ -82,7 +79,6 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesService.class);
             assertThat(context).doesNotHaveBean(PropertySensitivityMarker.class);
             assertThat(context).doesNotHaveBean(PropertyNameNormalizer.class);
-            assertThat(context).doesNotHaveBean(ConfigurationPropertiesConverter.class);
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesFlattener.class);
         });
     }

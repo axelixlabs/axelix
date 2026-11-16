@@ -17,45 +17,99 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.aop.framework.Advised;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeedBean;
+import com.axelixlabs.axelix.sbs.spring.core.utils.BeanNameUtils;
 
 /**
  * Default implementation of {@link ConfigurationPropertiesService}.
+ * Reads configuration properties beans directly, without Spring Actuator sanitization.
  *
  * @since 13.11.2025
- *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
 public class DefaultConfigurationPropertiesService implements ConfigurationPropertiesService {
 
-    private final ConfigurationPropertiesConverter configurationPropertiesConverter;
-    private final ConfigurationPropertiesReportEndpoint delegate;
+    private final ApplicationContext applicationContext;
+    private final ConfigurationPropertiesFlattener flattener;
     private final PropertySensitivityMarker propertySensitivityMarker;
+    private final ConfigurationPropertiesBeanSerializer serializer;
 
     public DefaultConfigurationPropertiesService(
             ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
+            ConfigurationPropertiesFlattener flattener,
             PropertySensitivityMarker propertySensitivityMarker) {
-
-        this.configurationPropertiesConverter = configurationPropertiesConverter;
-        this.delegate = new ConfigurationPropertiesReportEndpoint(List.of());
-        this.delegate.setApplicationContext(applicationContext);
+        this.applicationContext = applicationContext;
+        this.flattener = flattener;
         this.propertySensitivityMarker = propertySensitivityMarker;
-
-        // Spring Boot 2.7 has default sanitization keys (password, secret, key, token, etc.).
-        // Clear them so that sanitization decisions can be made by Axelix Master.
-        this.delegate.setKeysToSanitize();
+        this.serializer = getBeanSerializer();
     }
 
+    @Override
     public ConfigurationPropertiesFeed getConfigProps() {
-        return propertySensitivityMarker.mark(
-                configurationPropertiesConverter.convert(delegate.configurationProperties()));
+        List<ConfigurationPropertiesFeedBean> beans = new ArrayList<>();
+        for (ApplicationContext context = applicationContext; context != null; context = context.getParent()) {
+            for (ConfigurationPropertiesBean bean :
+                    ConfigurationPropertiesBean.getAll(context).values()) {
+                beans.add(describeBean(bean));
+            }
+        }
+        return propertySensitivityMarker.mark(new ConfigurationPropertiesFeed().beans(beans));
+    }
+
+    private static ConfigurationPropertiesBeanSerializer getBeanSerializer() {
+        ClassLoader classLoader = DefaultConfigurationPropertiesService.class.getClassLoader();
+        if (ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", classLoader)) {
+            return new Jackson2ConfigurationPropertiesBeanSerializer();
+        }
+        return bean -> {
+            throw new IllegalStateException("Jackson is required for the 'configprops' endpoint");
+        };
+    }
+
+    @SuppressWarnings("NullAway")
+    private ConfigurationPropertiesFeedBean describeBean(ConfigurationPropertiesBean bean) {
+        String prefix = bean.getAnnotation().prefix();
+        Map<String, @Nullable Object> serialized = safeSerialize(bean.getInstance(), prefix);
+        return new ConfigurationPropertiesFeedBean()
+                .beanName(BeanNameUtils.stripConfigPropsPrefix(bean.getName()))
+                .prefix(prefix)
+                .properties(flattener.flatten(serialized));
+    }
+
+    private Map<String, @Nullable Object> safeSerialize(@Nullable Object bean, String prefix) {
+        try {
+            if (bean instanceof Advised) {
+                Advised advised = (Advised) bean;
+                Object target = advised.getTargetSource().getTarget();
+                try {
+                    return safeSerialize(target, prefix);
+                } finally {
+                    if (target != null) {
+                        // Pair getTarget() with releaseTarget() even if serialization fails.
+                        // A pooled TargetSource may lend us an instance that must be returned
+                        // to the pool; a singleton TargetSource simply ignores this call.
+                        advised.getTargetSource().releaseTarget(target);
+                    }
+                }
+            }
+            return new HashMap<>(serializer.serialize(bean));
+        } catch (Exception ex) {
+            return new HashMap<>(Map.of("error", "Cannot serialize '" + prefix + "'"));
+        }
     }
 }

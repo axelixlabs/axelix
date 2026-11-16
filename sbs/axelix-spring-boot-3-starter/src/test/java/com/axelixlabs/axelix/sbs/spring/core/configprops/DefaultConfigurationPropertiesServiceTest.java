@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,16 +25,21 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.support.GenericApplicationContext;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SharedAxelixConfigurationProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 /**
  * Integration tests for {@link DefaultConfigurationPropertiesService}.
  *
- * @since 13.11.2025
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
@@ -43,6 +49,46 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
 
     @Autowired
     private ConfigurationPropertiesService configurationPropertiesService;
+
+    @Test
+    void includesParentContextPropertiesAndUnsetValues() {
+        // given.
+        try (GenericApplicationContext parent = new GenericApplicationContext()) {
+            parent.registerBean("parent", NullableProperties.class);
+            parent.refresh();
+            new ApplicationContextRunner().withParent(parent).run(context -> {
+                ConfigurationPropertiesService service = new DefaultConfigurationPropertiesService(
+                        context,
+                        new DefaultConfigurationPropertiesFlattener(),
+                        new PropertySensitivityMarker(List.of(), new DefaultPropertyNameNormalizer()));
+
+                // when.
+                ConfigurationPropertiesFeed feed = service.getConfigProps();
+
+                // then.
+                assertThat(feed.getBeans())
+                        .filteredOn(bean -> bean.getBeanName().equals("parent"))
+                        .singleElement()
+                        .satisfies(bean -> {
+                            assertThat(bean.getPrefix()).isEqualTo("nullable");
+                            assertThat(bean.getProperties())
+                                    .extracting(
+                                            ConfigurationPropertiesEntry::getKey,
+                                            ConfigurationPropertiesEntry::getValue)
+                                    .contains(tuple("unset", null));
+                        });
+            });
+        }
+    }
+
+    @ConfigurationProperties("nullable")
+    public static class NullableProperties {
+        public @Nullable String getUnset() {
+            return null;
+        }
+
+        public void setUnset(@Nullable String unset) {}
+    }
 
     @Test
     void shouldReturnConfigurationPropertiesWithoutSanitization() {
@@ -59,5 +105,102 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         assertThat(configProps.getBeans())
                 .flatExtracting(bean -> bean.getProperties())
                 .allSatisfy(property -> assertThat(property.getSensitive()).isTrue());
+    }
+
+    @Test
+    void shouldReturnConfigurationPropertiesFeed() {
+        // when.
+        ConfigurationPropertiesFeed axelixConfPropDescriptor = configurationPropertiesService.getConfigProps();
+
+        // then.
+
+        assertThat(axelixConfPropDescriptor.getBeans()).isNotEmpty();
+
+        assertThat(axelixConfPropDescriptor.getBeans())
+                .filteredOn(beans -> beans.getPrefix().equals("axelix.prop.test"))
+                .singleElement()
+                .satisfies(bean -> {
+
+                    // Bean Name
+                    assertThat(bean.getBeanName()).isEqualTo(SharedAxelixConfigurationProperties.class.getName());
+
+                    // prefix
+                    assertThat(bean.getPrefix()).isEqualTo("axelix.prop.test");
+
+                    // properties
+                    assertThat(bean.getProperties())
+                            .containsOnly(
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[0].methods[1].retries"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("tags.environment")
+                                            .value("test"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("tags.version")
+                                            .value("1.0.0"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("tags.forSanitization")
+                                            .value("toBeSanitized"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("tags.FOR_SANITIZATION")
+                                            .value("toBeSanitized"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("enabledContexts[0]")
+                                            .value("user-service"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("enabledContexts[1]")
+                                            .value("payment-service"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[0].name")
+                                            .value("user-api"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[0].baseUrl")
+                                            .value("https://api.users.example.com/v1"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[0].methods[0].type")
+                                            .value("GET"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[0].methods[0].retries[0].count")
+                                            .value("3"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[0].methods[0].retries[0].parameters.timeout")
+                                            .value("5000"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[0].methods[1].type")
+                                            .value("POST"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[1].name")
+                                            .value("payment-api"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[1].baseUrl")
+                                            .value("https://api.payments.example.com/v2"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[1].methods[0].type")
+                                            .value("PUT"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[1].methods[0].retries[0].count")
+                                            .value("2"),
+                                    new ConfigurationPropertiesEntry()
+                                            .sensitive(true)
+                                            .key("httpClient.requests[1].methods[0].retries[0].parameters.log-level")
+                                            .value("DEBUG"));
+                });
     }
 }
