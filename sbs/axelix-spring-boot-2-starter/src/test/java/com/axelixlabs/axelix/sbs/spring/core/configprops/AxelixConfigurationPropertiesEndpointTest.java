@@ -244,18 +244,12 @@ public class AxelixConfigurationPropertiesEndpointTest {
         }
 
         @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter(
-                ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
-            return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
-        }
-
-        @Bean
         public ConfigurationPropertiesService configurationPropertiesService(
                 ApplicationContext applicationContext,
-                ConfigurationPropertiesConverter configurationPropertiesConverter) {
+                ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
             return new DefaultConfigurationPropertiesService(
                     applicationContext,
-                    configurationPropertiesConverter,
+                    configurationPropertiesFlattener,
                     new PropertySensitivityMarker(List.of("*"), new DefaultPropertyNameNormalizer()));
         }
 

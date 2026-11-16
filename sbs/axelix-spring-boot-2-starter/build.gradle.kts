@@ -31,6 +31,8 @@ dependencies {
     compileOnly("io.micrometer:micrometer-core")
     compileOnly("org.springframework.boot:spring-boot-starter-log4j2")
 
+    compileOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 
