@@ -38,7 +38,7 @@ class ConfigPropsMcpServerToolsTest extends AbstractInstanceMcpServerToolsTest {
         // given.
         instance.respondWith("/axelix-configprops", """
                 {"beans":[{"beanName":"client","prefix":"app","properties":[
-                {"key":"secret","value":"original","sensitive":true}],"inputs":[]}]}
+                {"key":"secret","value":"original","sensitive":true}],"inputs":[{"key":"secret.value","value":"original","sensitive":true}]}]}
                 """);
 
         // when.
@@ -47,6 +47,7 @@ class ConfigPropsMcpServerToolsTest extends AbstractInstanceMcpServerToolsTest {
         // then.
         assertThatJson(result).inPath("beans[0].properties[0].value").isEqualTo("original");
         assertThatJson(result).inPath("beans[0].properties[0].sensitive").isAbsent();
+        assertThatJson(result).inPath("beans[0].inputs").isAbsent();
         assertThat(instance.takeRequest().getPath()).isEqualTo(ACTUATOR_PATH + "/axelix-configprops");
     }
 }

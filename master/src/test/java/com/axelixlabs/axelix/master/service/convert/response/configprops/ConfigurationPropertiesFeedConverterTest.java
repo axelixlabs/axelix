@@ -47,7 +47,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class ConfigurationPropertiesFeedConverterTest {
 
     @Test
-    void convertsSanitizedPropertiesAndInputsToResponse() {
+    void convertsSanitizedPropertiesToResponse() {
         // given.
         ConfigurationPropertiesEntry property =
                 new ConfigurationPropertiesEntry().key("secret").value("original");
@@ -66,7 +66,6 @@ class ConfigurationPropertiesFeedConverterTest {
         PropertySanitizer sanitizer = mock(PropertySanitizer.class);
         doAnswer(invocation -> {
                     property.setValue("sanitized");
-                    input.setValue("sanitized");
                     return null;
                 })
                 .when(sanitizer)
@@ -84,10 +83,7 @@ class ConfigurationPropertiesFeedConverterTest {
                         "app",
                         List.of(
                                 new ConfigurationPropertiesFeedResponse.Entry("secret", "sanitized", null),
-                                new ConfigurationPropertiesFeedResponse.Entry("empty", null, null)),
-                        List.of(
-                                new ConfigurationPropertiesFeedResponse.Entry("secret.value", "sanitized", null),
-                                new ConfigurationPropertiesFeedResponse.Entry("secret.origin", "config.yml", null))));
+                                new ConfigurationPropertiesFeedResponse.Entry("empty", null, null))));
         verify(sanitizer).sanitize(same(feed));
         verifyNoMoreInteractions(sanitizer);
     }
@@ -145,6 +141,5 @@ class ConfigurationPropertiesFeedConverterTest {
         } else {
             assertThat(bean.properties().get(0).dangerousValue()).isNull();
         }
-        assertThat(bean.inputs().get(0).dangerousValue()).isNull();
     }
 }

@@ -57,17 +57,13 @@ public class ConfigurationPropertiesFeedConverter
         propertySanitizer.sanitize(source);
         return new ConfigurationPropertiesFeedResponse(source.getBeans().stream()
                 .map(bean -> new ConfigurationPropertiesFeedResponse.Bean(
-                        bean.getBeanName(),
-                        bean.getPrefix(),
-                        convertEntries(bean.getProperties(), bean.getPrefix()),
-                        convertEntries(bean.getInputs(), null)))
+                        bean.getBeanName(), bean.getPrefix(), convertEntries(bean.getProperties(), bean.getPrefix())))
                 .toList());
     }
 
-    private List<Entry> convertEntries(List<ConfigurationPropertiesEntry> entries, @Nullable String prefix) {
+    private List<Entry> convertEntries(List<ConfigurationPropertiesEntry> entries, String prefix) {
         return entries.stream()
-                .map(entry -> new Entry(
-                        entry.getKey(), entry.getValue(), prefix == null ? null : detectDangerousValue(prefix, entry)))
+                .map(entry -> new Entry(entry.getKey(), entry.getValue(), detectDangerousValue(prefix, entry)))
                 .toList();
     }
 

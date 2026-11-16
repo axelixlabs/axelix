@@ -32,9 +32,8 @@ public record ConfigurationPropertiesFeedResponse(List<Bean> beans) {
      * @param beanName The bean name.
      * @param prefix The prefix applied to the bean's property names.
      * @param properties The bound properties of the bean.
-     * @param inputs The binding input values and their origins.
      */
-    public record Bean(String beanName, String prefix, List<Entry> properties, List<Entry> inputs) {}
+    public record Bean(String beanName, String prefix, List<Entry> properties) {}
 
     /**
      * @param key The flattened key in dot/bracket notation.

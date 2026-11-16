@@ -203,7 +203,7 @@ class PropertySanitizerTest {
 
         @ParameterizedTest
         @CsvSource({"VIEWER," + SANITIZED_VALUE, "ADMIN,secret"})
-        void appliesUserPermissionsToPropertiesAndInputs(String roleName, String expectedSecret) {
+        void appliesUserPermissionsToProperties(String roleName, String expectedSecret) {
             // given.
             Role role = roleService.findByName(roleName).orElseThrow();
 
@@ -212,9 +212,6 @@ class PropertySanitizerTest {
 
             // then.
             assertThat(feed.getBeans().get(0).getProperties())
-                    .extracting(ConfigurationPropertiesEntry::getValue)
-                    .containsExactly(expectedSecret, "public", "legacy", null);
-            assertThat(feed.getBeans().get(0).getInputs())
                     .extracting(ConfigurationPropertiesEntry::getValue)
                     .containsExactly(expectedSecret, "public", "legacy", null);
         }
@@ -226,9 +223,6 @@ class PropertySanitizerTest {
 
             // then.
             assertThat(feed.getBeans().get(0).getProperties())
-                    .extracting(ConfigurationPropertiesEntry::getValue)
-                    .containsExactly(SANITIZED_VALUE, "public", "legacy", null);
-            assertThat(feed.getBeans().get(0).getInputs())
                     .extracting(ConfigurationPropertiesEntry::getValue)
                     .containsExactly(SANITIZED_VALUE, "public", "legacy", null);
         }
@@ -243,9 +237,6 @@ class PropertySanitizerTest {
 
             // then.
             assertThat(feed.getBeans().get(0).getProperties())
-                    .extracting(ConfigurationPropertiesEntry::getValue)
-                    .containsExactly(SANITIZED_VALUE, "public", "legacy", null);
-            assertThat(feed.getBeans().get(0).getInputs())
                     .extracting(ConfigurationPropertiesEntry::getValue)
                     .containsExactly(SANITIZED_VALUE, "public", "legacy", null);
         }

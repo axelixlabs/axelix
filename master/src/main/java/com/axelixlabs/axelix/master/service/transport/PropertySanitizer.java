@@ -71,10 +71,7 @@ public class PropertySanitizer {
         if (canRead(OssAuthority.CONFIG_PROPS_VALUES_READ)) {
             return;
         }
-        feed.getBeans().forEach(bean -> {
-            mask(bean.getProperties());
-            mask(bean.getInputs());
-        });
+        feed.getBeans().forEach(bean -> mask(bean.getProperties()));
     }
 
     private boolean canRead(OssAuthority permission) {
