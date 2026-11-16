@@ -20,8 +20,8 @@ import { useParams } from "react-router";
 
 import { EmptyHandler, Loader } from "@/components";
 import { fetchData, getUserFullName } from "@/helpers";
-import { EUserOrigin, type IRoleProfile, type IUser, type IUserAuthorities, StatefulRequest } from "@/models";
-import { getRolesFeed, getUserAuthorities, getUserById } from "@/services";
+import { EUserOrigin, type IUserProfile, StatefulRequest } from "@/models";
+import { getUserProfile } from "@/services";
 
 import { ChangeRoles } from "./ChangeRoles";
 import { EditUser } from "./EditUser";
@@ -34,27 +34,19 @@ import styles from "./styles.module.css";
 
 const UserProfile = () => {
     const { userId } = useParams();
-    const [userResponse, setUserResponse] = useState(StatefulRequest.loading<IUser>());
-    const [rolesResponse, setRolesResponse] = useState(StatefulRequest.loading<IRoleProfile[]>());
-    const [authoritiesResponse, setAuthoritiesResponse] = useState(StatefulRequest.loading<IUserAuthorities>());
+    const [userResponse, setUserResponse] = useState(StatefulRequest.loading<IUserProfile>());
     const [editing, setEditing] = useState(false);
     const [changingRoles, setChangingRoles] = useState(false);
     const [suspending, setSuspending] = useState(false);
 
     const loadUser = useCallback((): void => {
-        setUserResponse(StatefulRequest.loading<IUser>());
-        setAuthoritiesResponse(StatefulRequest.loading<IUserAuthorities>());
-        fetchData(setAuthoritiesResponse, () => getUserAuthorities(userId!));
-        fetchData(setUserResponse, () => getUserById(userId!));
+        setUserResponse(StatefulRequest.loading<IUserProfile>());
+        fetchData(setUserResponse, () => getUserProfile(userId!));
     }, [userId]);
 
     useEffect(() => {
         loadUser();
     }, [loadUser]);
-
-    useEffect(() => {
-        fetchData(setRolesResponse, () => getRolesFeed());
-    }, []);
 
     if (userResponse.loading) {
         return <Loader />;
@@ -64,7 +56,7 @@ const UserProfile = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const user = userResponse.response;
+    const { user, roles, authorities } = userResponse.response;
     const displayName = getUserFullName(user) ?? user.username;
     const givenName = user.firstName?.trim() || displayName;
 
@@ -79,12 +71,8 @@ const UserProfile = () => {
             <div className={styles.Columns}>
                 <ProfileDetails user={user} />
                 <div>
-                    <ProfileRoles
-                        user={user}
-                        roles={rolesResponse.response}
-                        onChangeRoles={() => setChangingRoles(true)}
-                    />
-                    <ProfilePermissions authoritiesResponse={authoritiesResponse} />
+                    <ProfileRoles user={user} roles={roles} onChangeRoles={() => setChangingRoles(true)} />
+                    <ProfilePermissions authorities={authorities} />
                 </div>
             </div>
             {user.userOrigin === EUserOrigin.LOCAL && (
@@ -92,7 +80,7 @@ const UserProfile = () => {
             )}
             <ChangeRoles
                 user={user}
-                roles={rolesResponse.response ?? []}
+                roles={roles}
                 displayName={displayName}
                 givenName={givenName}
                 open={changingRoles}

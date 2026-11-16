@@ -40,4 +40,3 @@ export * from "./roles";
 export * from "./auth";
 export * from "./MCP";
 export * from "./gc";
-export * from "./authorities";

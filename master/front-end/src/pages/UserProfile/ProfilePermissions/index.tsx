@@ -17,8 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { EmptyHandler, Loader } from "@/components";
-import type { IUserAuthorities, StatefulRequest } from "@/models";
+import type { IUserAuthorities } from "@/models";
 
 import { ProfileCard } from "../ProfileCard";
 
@@ -27,29 +26,22 @@ import styles from "./styles.module.css";
 
 interface IProps {
     /** User-specific authority catalog from the backend. */
-    authoritiesResponse: StatefulRequest<IUserAuthorities>;
+    authorities: IUserAuthorities;
 }
 
-export const ProfilePermissions = ({ authoritiesResponse }: IProps) => {
+export const ProfilePermissions = ({ authorities }: IProps) => {
     const { t } = useTranslation();
-    const authorities = authoritiesResponse.response;
 
     return (
         <ProfileCard title={t("Users.Profile.permissions")} hint={t("Users.Profile.permissionsHint")}>
-            {authoritiesResponse.loading ? (
-                <Loader />
-            ) : authoritiesResponse.error || !authorities ? (
-                <EmptyHandler isEmpty />
-            ) : (
-                <div className={styles.Grid}>
-                    {authorities.effectiveAuthorities.map((authority) => (
-                        <PermissionRow key={authority.id} authority={authority} granted />
-                    ))}
-                    {authorities.ungrantedAuthorities.map((authority) => (
-                        <PermissionRow key={authority.id} authority={authority} granted={false} />
-                    ))}
-                </div>
-            )}
+            <div className={styles.Grid}>
+                {authorities.effectiveAuthorities.map((authority) => (
+                    <PermissionRow key={authority.id} authority={authority} granted />
+                ))}
+                {authorities.ungrantedAuthorities.map((authority) => (
+                    <PermissionRow key={authority.id} authority={authority} granted={false} />
+                ))}
+            </div>
         </ProfileCard>
     );
 };

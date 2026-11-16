@@ -15,9 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { apiFetch } from "@/api";
-import type { IUserAuthorities } from "@/models";
+package com.axelixlabs.axelix.master.api.external.response;
 
-export const getUserAuthorities = (userId: string) => {
-    return apiFetch.get<IUserAuthorities>("authorities/feed", { params: { userId } });
-};
+import java.util.List;
+
+/**
+ * A managed user's details, authority partition and available roles.
+ */
+public record UserProfileResponse(
+        UserResponse user, UserAuthoritiesResponse authorities, List<RoleProfileResponse> roles) {}
