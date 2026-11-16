@@ -240,17 +240,14 @@ public final class MasterWebEndpoints {
             register("users:read", HttpMethod.GET, ApiPaths.UsersApi.USERS_FEED, () -> "users:read");
     public static final MasterWebEndpoint USERS_READ_ROLE_COUNTS =
             register("users:read-role-counts", HttpMethod.GET, ApiPaths.UsersApi.ROLE_USER_COUNTS, () -> "users:read");
-    public static final MasterWebEndpoint USER_READ_ONE =
-            register("users:read-one", HttpMethod.GET, ApiPaths.UsersApi.GET_USER_BY_ID, null);
+    public static final MasterWebEndpoint USER_PROFILE =
+            register("users:profile", HttpMethod.GET, ApiPaths.UsersApi.USER_PROFILE, () -> "users:read");
     public static final MasterWebEndpoint LOCAL_LOGIN =
             register("auth:login", HttpMethod.POST, ApiPaths.UsersApi.LOGIN, null);
     public static final MasterWebEndpoint LOGOUT =
             register("auth:logout", HttpMethod.POST, ApiPaths.UsersApi.LOGOUT, null);
 
     // Roles
-    public static final MasterWebEndpoint AUTHORITIES_READ =
-            register("authorities:read", HttpMethod.GET, ApiPaths.AuthoritiesApi.AUTHORITIES_FEED, () -> "users:read");
-
     public static final MasterWebEndpoint ROLES_READ =
             register("roles:read", HttpMethod.GET, ApiPaths.RolesApi.ROLES_FEED, () -> "users:read");
 

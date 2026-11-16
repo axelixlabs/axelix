@@ -36,13 +36,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
+import com.axelixlabs.axelix.master.api.external.response.RoleProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.RoleUsersCountResponse;
+import com.axelixlabs.axelix.master.api.external.response.UserAuthoritiesResponse;
+import com.axelixlabs.axelix.master.api.external.response.UserProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
+import com.axelixlabs.axelix.master.service.auth.UserAuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**
@@ -61,6 +66,8 @@ public class UserApi {
     private final UserAuthenticator userAuthenticator;
     private final UserJwtEncoderService userJwtEncoderService;
     private final UserService userService;
+    private final RoleService roleService;
+    private final UserAuthoritiesService userAuthoritiesService;
 
     private static final InvalidCredentialsException INVALID_CREDENTIALS_EXCEPTION = new InvalidCredentialsException();
 
@@ -68,11 +75,15 @@ public class UserApi {
             CookieService cookieService,
             UserAuthenticator userAuthenticator,
             UserJwtEncoderService userJwtEncoderService,
-            UserService userService) {
+            UserService userService,
+            RoleService roleService,
+            UserAuthoritiesService userAuthoritiesService) {
         this.cookieService = cookieService;
         this.userAuthenticator = userAuthenticator;
         this.userJwtEncoderService = userJwtEncoderService;
         this.userService = userService;
+        this.roleService = roleService;
+        this.userAuthoritiesService = userAuthoritiesService;
     }
 
     @GetMapping(path = ApiPaths.UsersApi.USERS_FEED)
@@ -99,11 +110,16 @@ public class UserApi {
         return ResponseEntity.ok(counts);
     }
 
-    @GetMapping(path = ApiPaths.UsersApi.GET_USER_BY_ID)
-    public ResponseEntity<UserResponse> getUser(@PathVariable("userId") String userId) {
+    @GetMapping(path = ApiPaths.UsersApi.USER_PROFILE)
+    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable("userId") String userId) {
         return userService
                 .findUserById(userId)
-                .map(user -> UserResponse.from(user, userService.findRoleNamesByUserId(user.id())))
+                .map(user -> new UserProfileResponse(
+                        UserResponse.from(user, userService.findRoleNamesByUserId(user.id())),
+                        UserAuthoritiesResponse.from(userAuthoritiesService.getAuthorities(user.id())),
+                        roleService.getRolesFeed().stream()
+                                .map(RoleProfileResponse::from)
+                                .toList()))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> {
                     log.warn("User with ID was not found {}", userId);
