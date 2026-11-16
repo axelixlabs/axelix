@@ -1,0 +1,140 @@
+---
+title: Propiedades
+description: "La página Properties muestra de dónde procede cada propiedad de una instancia de Spring Boot, qué valor utiliza realmente la aplicación, qué propiedades están obsoletas y qué beans las leen."
+---
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal de propiedades](/img/feature/properties/properties-main-page.png)
+
+</ScreenshotsNotice>
+
+***Properties tal como aparece en la interfaz de Axelix***
+
+Una misma propiedad puede proceder de muchos lugares: `application.yaml`, archivos específicos de un perfil, variables de entorno, propiedades del sistema y argumentos de la línea de comandos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+La página enumera todas las propiedades agrupadas por origen. Los orígenes aparecen de mayor a menor precedencia, en el orden en que Spring Boot los consulta (consulte [Configuración externa](https://docs.spring.io/spring-boot/reference/features/external-config.html)). Cuando varios orígenes definen la misma propiedad, la aplicación utiliza el valor del origen situado más arriba en la lista.
+
+Para cada propiedad se puede ver:
+
+- Si su valor tiene efecto:
+  - **Active** cuando la aplicación utiliza ese valor.
+  - **Suppressed** cuando un origen con mayor precedencia también la define, de modo que ese valor nunca llega a la aplicación.
+- Todos los orígenes que la definen, de mayor a menor precedencia, con el valor que prevalece marcado.
+- El bean `@ConfigurationProperties` que la enlaza y los beans que la inyectan mediante `@Value`, con enlaces a las páginas [Configuration Properties](./configuration-properties.mdx) y [Beans](./beans.mdx).
+- Su descripción en `spring-configuration-metadata.json`, cuando está disponible.
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Detalles de una propiedad](/img/feature/properties/properties-details-page.png)
+
+</ScreenshotsNotice>
+
+***Desplegable de Properties tal como aparece en la interfaz de Axelix***
+
+Las propiedades obsoletas se destacan y muestran el mensaje de obsolescencia, para poder identificar los ajustes que se deben migrar antes de actualizar.
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Propiedad marcada como obsoleta](/img/feature/properties/properties-deprecated-page.png)
+
+</ScreenshotsNotice>
+
+***Propiedad obsoleta tal como aparece en la interfaz de Axelix***
+
+La página también muestra los perfiles activos y predeterminados de la instancia (`spring.profiles.active` y `spring.profiles.default`).
+
+## Valores de propiedades peligrosos [#dangerous-property-values]
+
+Algunos valores son adecuados en el equipo de un desarrollador, pero suelen causar problemas en producción: pérdida de datos, exposición de detalles internos o consultas lentas. Axelix marca las propiedades establecidas con esos valores. Para cada una explica por qué el valor es arriesgado y cuál conviene utilizar en su lugar. Por ejemplo, `spring.jpa.hibernate.ddl-auto=update` permite a Hibernate cambiar el esquema de la base de datos por su cuenta.
+
+Axelix solo comprueba el valor que utiliza la aplicación, de modo que no marca los valores peligrosos de un origen de propiedades suprimido. El valor debe coincidir en su totalidad, sin distinguir mayúsculas y minúsculas: se marca `management.endpoints.web.exposure.include=*`, pero no `health,*`. Los valores enmascarados tampoco se comprueban, por lo que, sin el permiso `environment.values:read`, no se muestra la marca en las claves enmascaradas (consulte [Enmascaramiento de valores](#value-sanitization)).
+
+:::info
+De forma predeterminada, todos los valores se enmascaran como `******` para quienes no tienen el permiso `environment.values:read`. Consulte [Enmascaramiento de valores](#value-sanitization) más abajo para elegir qué claves se enmascaran y quién ve los originales.
+:::
+
+## Enmascaramiento de valores [#value-sanitization]
+
+Axelix nunca se basa en la opción de Spring Boot `management.endpoint.env.show-values`. Siempre solicita a Spring Boot los valores originales (`Show.ALWAYS`) y aplica su propio enmascaramiento mediante una comprobación de permisos.
+
+**Quién ve los valores originales.** Quienes tienen el permiso `environment.values:read`, concedido por los roles integrados **ADMIN** y **SUPER_ADMIN**, reciben los originales. Los demás reciben los valores sustituidos por `******`. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+**Qué claves se enmascaran.** Una única propiedad del starter, `axelix.sbs.endpoints.config.sanitized-properties`, controla el conjunto. Se aplica tanto a `axelix-env` (esta página) como a `axelix-configprops` (la página [Configuration Properties](./configuration-properties.mdx)):
+
+- **Lista vacía (predeterminada)**: todos los valores se enmascaran para quienes no tienen el permiso.
+- **Lista no vacía**: solo se enmascaran las claves enumeradas; las demás se devuelven tal cual.
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+```
+
+  </Tab>
+</Tabs>
+
+Consulte [Enmascarar valores de propiedades sensibles](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#sanitize-sensitive-property-values) en la guía de configuración de Spring Boot Starter para ver esta misma propiedad junto con el resto de la configuración del starter.
+
+:::note
+No se consultan las propiedades estándar de Spring Boot Actuator para el enmascaramiento, `management.endpoint.env.show-values`, `management.endpoint.env.keys-to-sanitize` ni sus equivalentes de `configprops`. Utilice `axelix.sbs.endpoints.config.sanitized-properties` en su lugar.
+:::
+
+## Herramientas MCP [#mcp-tools]
+
+El entorno completo de una instancia gestionada (propiedades de la aplicación, propiedades del sistema y variables de entorno del sistema operativo) también está disponible para agentes de IA mediante MCP. Consulte el [catálogo de herramientas MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
+
+## Habilitar el endpoint dedicado de Actuator [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>En Axelix 1.2.0 o posterior, nada de esto es necesario: el starter registra por sí mismo sus endpoints personalizados de Actuator y Axelix ya no requiere habilitar los endpoints <code>health</code>/<code>info</code>. Funciona correctamente sin ellos. No se necesita ninguna configuración aquí.</>}
+/>
+
+La página utiliza el endpoint de Actuator `axelix-env`, aportado por Axelix Spring Boot Starter. Expóngalo mediante las propiedades estándar de Spring Boot Actuator. Consulte [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) para ver la lista completa de endpoints de Axelix y el resto de la configuración:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-env
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-env
+```
+
+  </Tab>
+</Tabs>
+
+## Véase también [#see-also]
+
+- [Configuración de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

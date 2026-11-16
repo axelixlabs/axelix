@@ -1,0 +1,96 @@
+---
+title: Loggers
+description: "La página Loggers muestra el nivel de registro de cada logger y grupo de loggers de una instancia de Spring Boot y permite cambiarlo en tiempo de ejecución, de forma permanente o durante un tiempo limitado."
+---
+
+import {TargetThemeIcon} from './TargetThemeIcon';
+import { INFO, DEBUG, WARN } from './StatePaletteForLoggingLevel';
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal de loggers](/img/feature/loggers/loggers-main-page.png)
+
+</ScreenshotsNotice>
+
+***Página Loggers tal como aparece en la interfaz de Axelix***
+
+Para investigar un problema en un servicio en ejecución, a menudo se necesitan registros más detallados de una parte de él. La página Loggers permite aumentar el detalle de un logger de inmediato, sin cambiar la configuración ni reiniciar el servicio, y después restaurar el nivel anterior.
+
+La página está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla, cambiar niveles y restablecerlos. Consulte [Roles y permisos](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+La página enumera todos los loggers y grupos de loggers de la instancia con su nivel actual. Una marca de objetivo <TargetThemeIcon alt="Icono de nivel objetivo" /> junto a un nivel indica que se ha establecido explícitamente para ese logger o grupo, en la configuración de la aplicación o en Axelix. Un nivel sin la marca se hereda de un logger padre.
+
+Se puede cambiar el nivel:
+
+- De un logger. Sus hijos sin nivel propio heredan el nuevo nivel: al cambiar `com.axelixlabs.axelix` de <INFO /> a <DEBUG />, `com.axelixlabs.axelix.sbs` también cambia a <DEBUG />.
+- De un grupo de loggers. El nivel se aplica a todos los loggers del grupo: establecer <WARN /> en el grupo `web` establece <WARN /> en todos sus loggers.
+
+El botón de restablecimiento <Image src="/img/feature/loggers/reset.svg" alt="Icono de restablecimiento" width={20} height={20}/> devuelve un logger al nivel que tenía antes del primer cambio realizado en Axelix. Funciona para los loggers modificados en tiempo de ejecución: en esta página, mediante MCP o con una petición directa al endpoint de Actuator `axelix-loggers`. Los grupos de loggers no se pueden restablecer.
+
+## Cambiar niveles en varias instancias [#change-levels-on-several-instances]
+
+<ReleasedInNotice version="1.3.0" />
+
+Cuando la aplicación se ejecuta con varias réplicas, el mismo problema suele aparecer en todas, y cambiar el nivel réplica por réplica resulta lento. Abra **Instances**, junto al campo de búsqueda, para elegir a qué instancias de la aplicación se aplica un cambio. La lista muestra cada instancia con su commit y estado, para poder elegir, por ejemplo, solo las réplicas de la misma compilación.
+
+La instancia abierta siempre está incluida y no se puede desmarcar. Marque otras instancias una a una o utilice **Select all other instances**. El botón muestra cuántas instancias están seleccionadas, o **All** cuando lo están todas.
+
+La selección se aplica a todos los cambios de la página: un nivel de logger, un nivel temporal, un nivel de grupo y un restablecimiento. Si no se puede acceder a algunas instancias seleccionadas, el cambio se sigue aplicando a las demás. La página siempre muestra los niveles de la instancia abierta.
+
+El selector solo aparece cuando la aplicación tiene más de una instancia. La selección vuelve a la instancia actual al cambiar a otra instancia.
+
+## Nivel de registro temporal [#temporary-logging-level]
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+<Image src="/img/feature/loggers/loggers-edit-time-level-page.png" alt="Cuadro de nivel de registro temporal" width={304} height={380}/>
+
+</ScreenshotsNotice>
+
+***Establecer un nivel de registro temporal en la interfaz de Axelix***
+
+Cuando se necesitan registros detallados solo durante un tiempo, por ejemplo para detectar un error, se puede establecer un nivel temporal sin tener que acordarse de desactivarlo. Pulse el icono del temporizador junto al logger y elija el nivel y la hora a la que debe terminar. Si esa hora ya ha pasado hoy, el nivel se mantiene hasta esa hora de mañana.
+
+Cuando vence el plazo, el logger vuelve al nivel anterior. Para terminar antes el nivel temporal, restablezca el logger. Los niveles temporales no están disponibles para grupos de loggers.
+
+## Herramientas MCP [#mcp-tools]
+
+La lectura del árbol de loggers y los cambios de nivel en tiempo de ejecución (para un logger, un grupo o el restablecimiento de un logger individual) también están disponibles para agentes de IA mediante MCP. Consulte el [catálogo de herramientas MCP](../../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers).
+
+## Habilitar el endpoint dedicado de Actuator [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>En Axelix 1.2.0 o posterior, nada de esto es necesario: el starter registra por sí mismo sus endpoints personalizados de Actuator y Axelix ya no requiere habilitar los endpoints <code>health</code>/<code>info</code>. Funciona correctamente sin ellos. No se necesita ninguna configuración aquí.</>}
+/>
+
+La página utiliza el endpoint de Actuator `axelix-loggers`, aportado por Axelix Spring Boot Starter. Expóngalo mediante las propiedades estándar de Spring Boot Actuator. Consulte [Configuración de Spring Boot Starter](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) para ver la lista completa de endpoints de Axelix y el resto de la configuración:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-loggers
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-loggers
+```
+
+  </Tab>
+</Tabs>
+
+## Véase también [#see-also]
+
+- [Configuración de Master](../../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuración de Spring Boot Starter](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

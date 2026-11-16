@@ -1,0 +1,10 @@
+{
+    "title": "Información de ejecución",
+    "defaultOpen": false,
+    "pages": [
+        "details",
+        "metrics",
+        "...loggers",
+        "dependencies-analyzer"
+    ]
+}

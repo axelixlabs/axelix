@@ -1,0 +1,148 @@
+---
+title: Cómo funciona el descubrimiento
+description: "Cómo Axelix Master descubre qué instancias Spring Boot existen y mantiene su estado actualizado, ya sea encontrándolas en Kubernetes o permitiendo que cada instancia se registre."
+---
+
+Master solo puede mostrar y gestionar las instancias que conoce. Descubre las instancias de dos maneras: las encuentra
+por sí mismo (descubrimiento automático) o la instancia se anuncia a Master (autorregistro).
+
+## Dos formas de ser descubierto [#two-ways-to-be-discovered]
+
+```text
+┌─ Kubernetes cluster ─────────────────────────────┐
+│                                                  │
+│  ┌──────────────────┐    ┌──────────────────┐    │
+│  │  orders-service  │    │ billing-service  │    │
+│  └────────▲─────────┘    └─────────▲────────┘    │
+│           │                        │             │     ┌────────────────────┐
+│           └────────────┬───────────┘             │     │ inventory-service  │
+│                        │                         │     │ (VM, Docker, ...)  │
+│                        │  auto-discovery:        │     └─────────┬──────────┘
+│                        │  Master finds the pods  │               │
+│                        │  and polls them         │               │  self-registration:
+│                ┌───────┴───────┐                 │               │  the service registers
+│                │ Axelix Master │◀────────────────┼───────────────┘  once, then heartbeats
+│                └───────────────┘                 │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
+Todos los servicios de estos diagramas son aplicaciones Spring Boot compiladas con el plugin de compilación de Axelix y que ejecutan su
+starter.
+
+| | Descubrimiento automático | Autorregistro |
+|---|---|---|
+| Quién inicia la llamada | Master llama al servicio | El servicio llama a Master |
+| Dónde funciona | Solo en Kubernetes | En cualquier lugar desde el que el servicio pueda acceder a Master |
+| Cómo activarlo | `axelix.master.discovery.auto.enabled` en Master | `axelix.sbs.discovery.self-registration` en el servicio |
+
+Cuando Master se ejecuta en el mismo clúster de Kubernetes que los servicios, el descubrimiento automático no requiere configuración en estos.
+El autorregistro cubre el resto de casos, como máquinas virtuales, Docker Compose o redes que Master no puede explorar.
+
+:::note[Ambas vías funcionan al mismo tiempo]
+La elección se hace por servicio, no para todo el conjunto. Un mismo Master puede descubrir automáticamente los servicios de su clúster de Kubernetes
+ y, al mismo tiempo, aceptar el autorregistro de servicios que se ejecutan en otros lugares. Por ejemplo, tres aplicaciones en máquinas virtuales
+pueden autorregistrarse mientras todos los servicios del clúster se descubren automáticamente.
+:::
+
+## Estado completo una vez y después pequeñas actualizaciones [#full-state-once-then-small-updates]
+
+<ReleasedInNotice version="1.3.0" />
+
+A partir de Axelix 1.3.0, ambas vías siguen la misma idea. Master recibe el estado completo de una instancia una sola vez:
+en la solicitud de registro cuando se usa autorregistro, o en la primera llamada a `axelix-metadata` cuando se usa descubrimiento automático. Después,
+la instancia solo envía pequeñas actualizaciones frecuentes: un mensaje de actividad con autorregistro o una respuesta a
+`axelix-ping` con descubrimiento automático.
+
+Cada actualización cumple dos funciones. Primero, indica a Master que la instancia sigue activa. Segundo, incluye los pocos datos que
+cambian con el tiempo: el estado de salud de la instancia, su uso del heap y sus estadísticas de transacciones, de modo que una nueva transacción
+problemática aparece en Master sin otro registro. Los diagramas siguientes muestran este comportamiento.
+
+Antes de la versión 1.3.0, Master recibía el estado completo cada vez: en cada exploración de descubrimiento automático y en cada mensaje de actividad
+del autorregistro.
+
+## Descubrimiento automático [#auto-discovery]
+
+```text
+ Axelix Master                  Kubernetes API                orders-service
+       │                              │                              │
+       │  which pods are there?       │                              │
+       │─────────────────────────────▶│                              │
+       │◀─────────────────────────────│                              │
+       │                                                             │
+       │  first scan: axelix-metadata                                │
+       │────────────────────────────────────────────────────────────▶│
+       │◀──────────────────────────────────────── full registration ─│
+       │                                                             │
+       │  every next scan (each minute by default): axelix-ping      │
+       │────────────────────────────────────────────────────────────▶│
+       │◀─────────────────────────────── health, heap, transactions ─│
+```
+
+La primera llamada devuelve el registro completo: coordenadas de compilación, versiones y la información de análisis que recopila Axelix. Después,
+la instancia aparece en Master. La clave de firma y el algoritmo de Master y del servicio deben coincidir.
+
+Durante esta comprobación inicial, Master aún no conoce la versión del starter. Envía un JWT de compatibilidad con el sujeto
+`AXELIX.MASTER` y las declaraciones heredadas que necesitan los starters anteriores. Los starters desde la versión 1.3 aceptan la identidad de Master e ignoran
+esas declaraciones adicionales. Está previsto eliminar este formato de compatibilidad en la versión 1.6.
+
+En las llamadas posteriores de la interfaz y MCP, Master comprueba primero los permisos del usuario. Con starters desde la versión 1.3, envía después
+un JWT de usuario técnico `AXELIX.MASTER` de corta duración, sin roles ni permisos del usuario. Los starters anteriores reciben un token de usuario
+emitido de nuevo con nombres de permisos heredados y siguen aplicando los permisos por sí mismos.
+
+Cada exploración sustituye toda la lista de instancias descubiertas automáticamente. Por eso, un pod que Kubernetes deja de devolver
+desaparece en la siguiente exploración. Un pod al que Master no puede acceder también desaparece y vuelve a aparecer en la siguiente exploración que
+consiga acceder a él.
+
+Las instancias con un starter anterior a 1.3.0 no tienen `axelix-ping`, por lo que Master obtiene su `axelix-metadata` completo
+en cada exploración.
+
+## Autorregistro [#self-registration]
+
+```text
+ inventory-service                                     Axelix Master
+         │                                                   │
+         │  on startup: register (full description,          │
+         │  actuator URL, instance name)                     │
+         │──────────────────────────────────────────────────▶│  the instance appears
+         │                                                   │
+         │  every 15 s: heartbeat (health, heap,             │
+         │  transactions)                                    │
+         │──────────────────────────────────────────────────▶│
+         │──────────────────────────────────────────────────▶│
+         │                                                   │
+         │  heartbeat after Master lost the instance         │
+         │──────────────────────────────────────────────────▶│
+         │◀─────────────────────────────── unknown instance ─│
+         │  register again                                   │
+         │──────────────────────────────────────────────────▶│
+         │                                                   │
+         ╳  the service stops, heartbeats stop               │
+                                                             │  removed after 45 s
+```
+
+Con un starter anterior a 1.3.0, cada mensaje de actividad es un registro completo.
+
+Master puede perder una instancia cuando se reinicia con una base de datos vacía o cuando la ha eliminado tras no recibir sus
+mensajes de actividad. En ambos casos, el siguiente mensaje hace que el servicio vuelva a registrarse, por lo que todo el conjunto reaparece en
+un intervalo de actividad. El registro y los mensajes de actividad se firman con la clave JWT compartida, y Master
+los rechaza si las claves no coinciden.
+
+Un starter desde la versión 1.3 firma ambas solicitudes con un JWT de usuario técnico cuyo sujeto es `AXELX.MANAGED_SERVICE`
+(esa grafía es el identificador del protocolo). No contiene roles ni permisos. Master solo acepta la identidad de servicio gestionado
+en estos endpoints. También acepta el sujeto heredado `AXELIX.STARTER` de los starters anteriores; está previsto eliminar este
+alias de compatibilidad en la versión 1.6.
+
+## Qué necesita Master en ambos casos [#what-master-needs-in-both-cases]
+
+El descubrimiento solo indica a Master que una instancia existe. Cada página de la interfaz, herramienta MCP y acción (como cambiar un nivel de
+registro) sigue siendo una llamada de Master al servicio. Por eso, Master debe poder acceder por HTTP a los endpoints de Actuator del servicio,
+independientemente de cómo se haya descubierto. Si la aplicación protege sus endpoints de Actuator con su propia
+seguridad, consulte [solución de problemas](../more/troubleshooting.mdx) para permitir las llamadas de Master.
+
+## Véase también [#see-also]
+
+- [Arquitectura](./architecture.mdx)
+- [Configuración de Master: descubrimiento automático](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery)
+- [Configuración de Master: autorregistro](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--self-registration)
+- [Configuración del starter de Spring Boot: permitir que Master encuentre la instancia](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#let-master-find-the-instance)

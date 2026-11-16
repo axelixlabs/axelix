@@ -1,0 +1,42 @@
+---
+title: Spring Portfolio
+description: "El panel Spring Portfolio muestra qué versiones de Spring Boot y Spring Framework utilizan las aplicaciones del conjunto gestionado y cuántas ya han quedado fuera del soporte OSS."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Panel de Spring Portfolio](/img/feature/dashboard/dashboard-spring-portfolio.png)
+
+</ScreenshotsNotice>
+
+***Spring Portfolio tal como aparece en la interfaz de Axelix***
+
+Cada línea de Spring Boot y Spring Framework (una rama de versión menor como `3.5.x`) tiene un periodo limitado de [soporte OSS](https://spring.io/support-policy). Cuando termina, la línea deja de recibir versiones de la comunidad, incluidas las correcciones de seguridad: las nuevas [CVE](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) solo se corrigen con una suscripción comercial. En un conjunto de decenas de aplicaciones es difícil saber cuáles ya han superado esa fecha y cuáles serán las siguientes. Spring Portfolio responde para todo el conjunto a la vez.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+Un resumen en la parte superior indica cuántas aplicaciones tiene el conjunto y para cuántas ya ha terminado el periodo de soporte OSS. Una aplicación solo se considera con soporte cuando tanto su Spring Boot como su Spring Framework siguen recibiendo actualizaciones OSS.
+
+Debajo se muestran Spring Boot y Spring Framework por separado. Para cada uno se puede ver:
+
+- Cuántas aplicaciones utilizan una línea con soporte OSS.
+- Cómo se distribuyen las aplicaciones entre versiones principales y líneas, por ejemplo `3.5.x`.
+- Si cada línea sigue recibiendo actualizaciones OSS.
+
+La última parte muestra en una línea temporal el periodo de soporte OSS de cada línea utilizada: cuándo se publicó, cuándo termina o terminó el soporte y cuántas aplicaciones la utilizan. Permite ver cuánto falta para que las siguientes líneas queden sin soporte.
+
+## Cómo funciona [#how-it-works]
+
+Master registra las versiones de Spring Boot y Spring Framework de cada aplicación una vez al día y utiliza el último registro. Cada aplicación cuenta una vez, independientemente del número de instancias que ejecute. Una aplicación que deja de enviar información permanece en la página con las últimas versiones que comunicó.
+
+Las fechas de soporte proceden de los calendarios publicados por el equipo de Spring, por ejemplo el [periodo de soporte de Spring Boot](https://spring.io/projects/spring-boot#support).
+
+## Véase también [#see-also]
+
+- [Dependencies Analyzer](../../features/insights/dependencies-analyzer.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Actualización de Axelix](../../more/upgrading.mdx)

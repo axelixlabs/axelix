@@ -1,0 +1,33 @@
+---
+title: Vista general
+description: "El panel Overview muestra qué versiones de Spring Boot, Spring Framework, Java y Kotlin utilizan las aplicaciones del conjunto gestionado."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>El panel Overview se elimina en Axelix 1.2.0. Las versiones de Spring Boot y Spring Framework del conjunto de aplicaciones se muestran en su lugar en el panel Spring Portfolio.</>}
+/>
+
+En un conjunto de decenas de aplicaciones es difícil saber qué versiones de los componentes principales se utilizan y cuál es la más común. El panel Overview responde para todo el conjunto a la vez y permite pasar de una versión a la lista de instancias que la utilizan.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+La página muestra qué versiones de Spring Boot, Spring Framework, Java y Kotlin utiliza el conjunto y qué proporción de instancias ejecuta cada una:
+
+- **Spring Boot** y **Spring Framework**: por línea, por ejemplo `3.5`.
+- **Java**: por número de versión, por ejemplo `21`.
+- **Kotlin**: por línea, solo entre las instancias que tienen Kotlin en el classpath. Si ninguna lo tiene, no se muestra Kotlin.
+
+Para cada componente se destaca por separado la versión más común.
+
+## Abrir aplicaciones en Wallboard [#opening-applications-on-the-wallboard]
+
+Pulse una versión para abrir [Wallboard](../wallboard.mdx) filtrado por las instancias que la utilizan, por ejemplo `Spring Boot = 3.5`. Mantenga pulsado Ctrl, Cmd o Shift al hacer clic para abrirlo en una pestaña nueva.
+
+## Véase también [#see-also]
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Actualización de Axelix](../../more/upgrading.mdx)

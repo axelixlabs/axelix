@@ -1,0 +1,170 @@
+---
+title: Motivación
+description: "Este documento explica los principales problemas que Axelix resuelve para los desarrolladores de Spring Boot y las organizaciones. Mediante ejemplos reales, se presentan las dificultades que inspiraron la creación de Axelix."
+---
+
+Axelix reúne el análisis en tiempo de ejecución, la depuración y la evolución del ecosistema en una plataforma de código abierto y nativa de IA.
+Los equipos necesitan comprender tanto lo que sucede dentro de un servicio como la manera en que sus servicios evolucionan juntos.
+Esto incluye encontrar errores de configuración, evaluar el estado de las dependencias, seguir las migraciones de Java y Spring Boot
+ y controlar el trabajo programado. Axelix permite que ingenieros y agentes de IA participen en estos procesos
+mediante su interfaz web y su servidor MCP integrado. Consulte la [introducción](./introduction.mdx) para obtener una visión general.
+
+## Motivación: prólogo [#motivation-prologue]
+
+Una empresa típica dispone de mucho software desarrollado internamente. Este software resuelve distintos problemas y suele
+estar escrito en varios lenguajes, como JavaScript, Java o Go. Una de las opciones más populares para las aplicaciones
+de servidor/backend en grandes empresas [es Java](https://en.wikipedia.org/wiki/Programming_languages_used_in_most_popular_websites).
+Esto es especialmente habitual en el sector bancario.
+
+Por su parte, el framework más popular para desarrollar aplicaciones backend en Java [es, sin duda,
+Spring Boot](https://en.wikipedia.org/wiki/Spring_Boot). Es una capa adicional sobre [Spring Framework](https://spring.io/)
+que simplifica su configuración. Es, con diferencia, la opción más popular en las empresas por diversos motivos.
+Por ejemplo, Netflix [ha migrado su ecosistema (más de 3000 aplicaciones) a Spring Boot 3](https://www.youtube.com/watch?v=IMGcD08rdVw).
+La idea es que Spring Boot es una opción muy popular para desarrollar aplicaciones backend en Java.
+
+## Motivación: el problema [#motivation-pain-point]
+
+Como ya se ha explicado, Spring Boot comenzó como una capa adicional de abstracción sobre Spring Framework, pero hoy
+es mucho más. Todas las aplicaciones Java que se ejecutan con Spring Boot utilizan las mismas abstracciones de Spring Boot.
+
+Por ejemplo:
+- Cada aplicación Java con Spring Boot está formada por varios _beans_, que son objetos Java gestionados, en cierta medida, por Spring Framework.
+- Cada aplicación Spring Boot tiene un `ApplicationContext`, cuya función principal es gestionar los beans de la aplicación y el estado general de la aplicación Spring Boot en ejecución.
+- Cada aplicación Spring Boot tiene numerosas propiedades que pueden proceder de distintas fuentes (el archivo `application.properties`, el entorno del proceso del sistema operativo, las propiedades del sistema de Java, etc.).
+
+La idea es que Spring es bastante grande y crea muchas piezas interdependientes: cada una afecta a las demás (por ejemplo,
+las propiedades afectan a la creación de beans y los beans creados pueden incorporar más propiedades).
+
+**Una de las principales razones de la existencia de este proyecto es que, aunque una aplicación Spring Boot funcione localmente
+como se espera y todas las pruebas pasen, eso no significa que esa misma aplicación vaya a funcionar perfectamente al
+desplegarla en producción o en un entorno de pruebas. Todos sabemos que dar por hecho que todo irá bien no es correcto.**
+
+Por tanto, cuando quienes desarrollamos en Java con Spring Boot desplegamos nuestras aplicaciones en cualquier entorno,
+nos encontramos a menudo con los mismos problemas una y otra vez. Veamos algunos ejemplos que muestran el problema.
+
+### Ejemplo 1: registro detallado [#example-1-fine-grained-logging]
+
+Para comprender qué intenta resolver Axelix, veamos algunos ejemplos de código Java. Imaginemos que tenemos la siguiente
+clase Java en nuestra aplicación. Es un bean de Spring que utilizamos para resolver el conjunto de permisos de un
+cliente hipotético:
+
+```java
+@Slf4j
+@Service
+public class PermissionsResolver {
+
+    @Value("${permission.caching.enabled:true}")
+    private boolean cacheLookupsEnabled;
+
+    @Autowired
+    private ExternalPermissionsResolver delegate;
+
+    @Autowired
+    private PermissionsCache cache;
+
+    @PostConstruct
+    void init() {
+        log.debug("Permissions cache lookup enabled: {}", cacheLookupsEnabled);
+    }
+
+    public Set<Permission> resolveClientPermissions(Client client) {
+        log.debug("Resolving permissions for the client {}", client.getId());
+
+        try {
+            return delegate.resolve(client);
+        } catch (SomeExpectedException e) {
+            // if we can, we do a cache lookup
+            if (featureFlag && client.getStatus() == ClientStatus.EXISTING) {
+                return cache.get(client.getId());
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+```
+
+Hemos escrito este código. También hemos escrito sus pruebas. Lo hemos probado localmente y ha funcionado. Ahora desplegamos
+este código en nuestro entorno de pruebas aislado.
+
+Pero, por la ley de Murphy:\ ***Todo lo que pueda salir mal saldrá mal***\ Algo no funciona correctamente en nuestro
+entorno de pruebas. Lo hemos probado localmente y funcionaba, pero en el entorno de pruebas deja de hacerlo.
+Aunque la clase contiene mensajes de registro que ayudarían a entender lo que ocurre dentro de la aplicación desplegada,
+esos mensajes tienen nivel `DEBUG` y solo tenemos activado `INFO`. **Sería estupendo cambiar el nivel de registro temporalmente,
+en caliente, solo para esa clase Java o ese paquete Java concreto.** ¿Podemos cambiar el nivel de registro en la configuración
+de la aplicación y volver a desplegarla? Sí, sin duda, pero ¿queremos pasar por todo el proceso de recompilación y despliegue
+solo para comprobar los registros? ¿Y si los registros no ayudan? ¿Compilar y desplegar de nuevo?
+
+**En Axelix conocemos muy bien este problema.** Y queremos ofrecer una forma de resolverlo.
+
+### Ejemplo 2: fuentes de configuración [#example-2-sources-of-configuration]
+
+Supongamos que hemos resuelto el primer problema y hemos conseguido activar el registro mediante la interfaz de Axelix para
+esa clase Java concreta. Ahora tenemos otro problema. Supongamos que hemos descubierto que el fallo se produce porque se ha
+inyectado un valor incorrecto en la propiedad `cacheLookupsEnabled`. Esperábamos obtener los datos de la caché para el cliente
+_XYZ_, pero no ha sido así. Y no lo ha sido porque `cacheLookupsEnabled` estaba establecido en `false`.
+
+¿Qué hacemos ahora? Lo único que sabemos es que esta propiedad está en `false` y que no la hemos configurado así.
+Eso significa que, _en algún lugar_, alguna fuente de configuración de nuestra aplicación la ha establecido en `false`.
+Pero ¿dónde exactamente?
+
+**Seamos sinceros: quienes desarrollamos en grandes empresas no siempre entendemos exactamente cómo se despliega nuestra aplicación
+en el entorno.** No siempre comprendemos por completo cómo se empaqueta la aplicación en un contenedor Docker,
+cómo se despliega después mediante un chart de Helm en nuestros clústeres K8S o qué fuentes de configuración adicionales se aplican.
+**Tenemos _cierta_ comprensión del despliegue de nuestra aplicación, pero es incompleta: ese es el problema principal.**
+
+En Axelix no solo ofrecemos formas de ver de qué fuente de configuración procede exactamente el valor de una propiedad,
+sino también de cambiarlo en caliente en una aplicación Java en ejecución, recargando el contexto de la aplicación en la JVM activa,
+sin necesidad de recompilar ni volver a desplegar.
+
+### Ejemplo 3: estado de la aplicación [#example-3-applications-state]
+
+Ahora hemos cambiado `cacheLookupsEnabled` a `true` y todo debería funcionar, ¿verdad? **No.** Sigue sin funcionar.
+Y no funciona porque `PermissionsCache` es en realidad una interfaz:
+
+```java
+
+public interface PermissionsCache {
+
+    Set<Permission> get(UUID clientId);
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "in-memory", matchIfMissing = true)
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class InMemoryPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "redis")
+@ConditionalOnRedisPresent
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class RedisPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+```
+
+Creo que todos estaremos de acuerdo en que es muy habitual tener una `interface` que define el contrato y varias
+implementaciones de esa interfaz Java, cada una de ellas un bean de Spring. Esperamos que esos beans solo se creen
+cuando se cumplan determinadas condiciones. Los conocidos `ConditionalOnProperty`, `ConditionalOnMissingBean`, etc.
+resultan familiares a prácticamente cualquier desarrollador de Spring.
+
+Supongamos que, en nuestro caso, esperábamos obtener los permisos de un cliente de una caché Redis y no de una estructura
+en memoria. Pero, en realidad, se ha consultado `InMemoryPermissionsCache`. ¿Estamos siquiera seguros de que era
+`InMemoryPermissionsCache`? Quizá alguna biblioteca corporativa que importamos como dependencia incorpora su propio
+`ThreadSafeInMemoryPermissionsCache`. En otras palabras, queremos responder a estas preguntas:
+
+- ¿***Qué*** beans están activos actualmente en la aplicación Spring?
+- ¿***Por qué*** están activos esos beans concretos y no otros?
+
+**Axelix también ayuda a responderlas.**

@@ -1,0 +1,52 @@
+---
+title: MCP
+description: "La pantalla MCP enumera todas las herramientas que Axelix Master expone mediante su servidor Model Context Protocol integrado. Cada tarjeta representa una herramienta que un agente de IA conectado mediante MCP puede invocar sobre cualquier instancia registrada de Spring Boot."
+---
+
+## Cuándo aparece la pestaña MCP [#when-the-mcp-tab-appears]
+
+El enlace **MCP** de la barra de navegación solo se muestra cuando el servidor MCP está habilitado en Master. Lo controla la propiedad `axelix.master.mcp-server.enabled`, cuyo valor predeterminado es `true`. En despliegues con el servidor deshabilitado, el enlace está oculto y `/mcp-server` no es accesible. Consulte la propiedad en [Configuración del servidor MCP](../setting-up-master-ui/configuring-master/configuring-master.mdx#mcp-server).
+
+El servidor MCP autentica a los agentes de IA por separado de la sesión del navegador. Las credenciales, los esquemas admitidos `Basic` y `Bearer` y los permisos por herramienta se describen en [Autenticación del servidor MCP](../setting-up-master-ui/authentication/authentication.mdx#mcp-server-authentication). Esta página solo describe el catálogo de solo lectura de la interfaz; no cambia qué herramientas puede invocar un agente.
+
+## El catálogo de herramientas [#the-tool-catalog]
+
+El catálogo es una cuadrícula de tarjetas. El campo de búsqueda superior filtra por título y el contador de la derecha muestra `<matches> / <total>`. La búsqueda coincide con cualquier parte del título y no distingue mayúsculas y minúsculas.
+
+Cada tarjeta tiene las mismas tres partes:
+
+- **Cabecera** con el título de la herramienta y un punto de estado de color: verde cuando la herramienta está registrada en el servidor MCP, rojo cuando no está disponible.
+- **Descripción**: el breve texto que la herramienta anuncia a los clientes MCP. Las descripciones largas se recortan a una altura fija; pase el cursor sobre ellas para ver el texto completo.
+- **Pie** con etiquetas de anotaciones; consulte [Anotaciones de las herramientas](#tool-annotations) más abajo.
+
+## Anotaciones de las herramientas [#tool-annotations]
+
+Cada herramienta declara cuatro indicaciones booleanas que informan a los clientes MCP de los posibles efectos secundarios al invocarla. El pie de la tarjeta muestra dos directamente y las cuatro en un panel emergente.
+
+**Etiquetas directas** (siempre visibles):
+
+- **Read-only**: la herramienta no cambia ningún estado de la instancia Spring Boot de destino.
+- **Idempotent**: invocarla varias veces con los mismos argumentos tiene el mismo efecto que invocarla una vez.
+
+Cada etiqueta es verde cuando la indicación es <code style={{color: 'green'}}>true</code> y naranja cuando es <code style={{color: 'orange'}}>false</code>. El valor visible es una afirmación de la propia herramienta, no una garantía sobre lo que hace realmente el endpoint subyacente.
+
+**Panel con todas las anotaciones**: pulse el botón de menú a la derecha del pie para abrir un panel con las cuatro indicaciones y sus valores booleanos:
+
+- **Read-only**: la herramienta no cambia ningún estado de la instancia Spring Boot de destino.
+- **Idempotent**: invocarla varias veces con los mismos argumentos tiene el mismo efecto que invocarla una vez.
+- **Destructive**: la herramienta puede eliminar datos o aplicar otros cambios que no se pueden deshacer desde la interfaz.
+- **Open-world**: la herramienta accede a recursos fuera de Master y de las instancias Spring Boot registradas (por ejemplo, una llamada HTTP externa).
+
+## Qué no ofrece esta pantalla [#what-is-missing-from-this-screen]
+
+La página MCP permite descubrir herramientas, pero no ejecutarlas. Desde aquí no se puede:
+
+- Invocar una herramienta sobre una instancia Spring Boot: esto se hace desde el cliente MCP (Claude Desktop, Cursor, un agente propio, etc.).
+- Habilitar o deshabilitar herramientas individuales: el catálogo refleja lo que Master registró durante el arranque.
+- Ver invocaciones anteriores ni métricas por herramienta.
+
+Para utilizar el catálogo, dirija el cliente MCP a `<master-base-url>/api/mcp` y autentíquese como se describe en [Autenticación del servidor MCP](../setting-up-master-ui/authentication/authentication.mdx#mcp-server-authentication).
+
+:::info
+Un **Access Log** de invocaciones de herramientas MCP está previsto y llegará con Axelix Enterprise. Tanto Access Log como el propio Axelix Enterprise siguen en desarrollo, por lo que actualmente la pantalla MCP sigue siendo un catálogo de solo lectura sin historial ni métricas por herramienta.
+:::

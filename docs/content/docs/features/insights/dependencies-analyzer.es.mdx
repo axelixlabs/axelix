@@ -1,0 +1,57 @@
+---
+title: Análisis de dependencias
+description: "Dependencies Analyzer muestra todas las bibliotecas con las que se ejecuta una instancia de Spring Boot, señala los proyectos que ya no se desarrollan activamente y muestra si la línea de Spring Boot de la instancia sigue recibiendo actualizaciones OSS."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal de análisis de dependencias](/img/feature/dependencies-analyzer/dependencies-analyzer-main-page.png)
+
+</ScreenshotsNotice>
+
+***Dependencies Analyzer tal como aparece en la interfaz de Axelix***
+
+Una aplicación incorpora decenas de bibliotecas, la mayoría de forma transitiva. El archivo de compilación no indica cuáles están abandonadas o en modo de mantenimiento y dejarán de recibir correcciones de seguridad. Tampoco indica si la línea de Spring Boot (una rama de versión menor, como `3.5.x`) que utiliza la aplicación sigue recibiendo actualizaciones OSS. Dependencies Analyzer muestra ambas cosas para una instancia concreta.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+Primero aparece el [periodo de soporte de Spring Boot](https://spring.io/projects/spring-boot#support). Muestra qué línea de Spring Boot utiliza la instancia, cuándo termina o terminó su [soporte OSS](https://spring.io/support-policy), si existe soporte comercial, cuánto tiempo lleva sin soporte OSS y cuál es la línea más cercana que aún tiene soporte. Una vez finalizado el soporte OSS, la línea deja de recibir versiones OSS, incluidos los parches de seguridad: las [CVE](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) solo se corrigen con una suscripción comercial.
+
+Debajo se enumeran todas las bibliotecas del classpath de ejecución con su versión y se indica si están declaradas directamente en el archivo de compilación o si se incorporan de forma transitiva. Se señalan los proyectos que ya no se desarrollan activamente:
+
+- **Maintenance mode**: el desarrollo de funcionalidades se ha detenido y solo se publican versiones para correcciones críticas.
+- **Dormant**: no se publican versiones desde hace mucho tiempo, pero los autores no han anunciado nada. A diferencia de los otros estados, esto es lo que observa Axelix, no lo que han dicho los autores.
+- **Discontinued**: el proyecto ha finalizado. No se esperan versiones de ningún tipo, incluidas las correcciones de seguridad.
+
+Despliegue una biblioteca para ver:
+
+- La ruta desde la aplicación hasta esta biblioteca, es decir, qué dependencia directa la incorporó.
+- El estado de su proyecto.
+- Un enlace a la página del proyecto que respalda ese estado.
+
+## Cómo funciona [#how-it-works]
+
+Durante la compilación, el [plugin de compilación de Axelix](../../setting-up-spring-boot-service/build-plugin/configuration.mdx) escribe el grafo de dependencias de ejecución de la aplicación en su archivo empaquetado como una SBOM CycloneDX. Axelix Spring Boot Starter proporciona este archivo a Master. Al abrir la página, Master compara las bibliotecas con su catálogo de proyectos y sus datos sobre las líneas de versiones de Spring Boot.
+
+Una biblioteca cuyo proyecto no figura en el catálogo se muestra sin estado. Esto significa que Axelix no hace ninguna afirmación sobre ella, no que el proyecto goce de buena salud.
+
+La página se muestra para instancias con el [starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) de Axelix 1.2.0 o posterior. Con starters anteriores no aparece en el menú lateral de [Service Profile](../../ui-guide/service-profile.mdx). La SBOM procede del [plugin de compilación](../../setting-up-spring-boot-service/build-plugin/configuration.mdx) 1.2.0 o posterior. Para actualizar, consulte [Actualización de Axelix](../../more/upgrading.mdx).
+
+## Descargar la SBOM [#download-the-sbom]
+
+<ReleasedInNotice version="1.3.0" />
+
+A partir de Master 1.3.0, se puede descargar la SBOM CycloneDX de la instancia como `dependencies.cdx.json`. La instancia debe utilizar el starter de Axelix 1.2.0 o posterior y la aplicación debe compilarse con el plugin de compilación de Axelix 1.2.0 o posterior. No es necesario actualizar el starter a 1.3.0. Los módulos propios del sistema de compilación (Maven / Gradle) se excluyen del grafo.
+
+Una compilación normal de Gradle o Maven empaqueta la SBOM automáticamente, por lo que no se requiere configuración adicional.
+
+El documento aún no contiene datos de licencias, por lo que no es adecuado para auditorías de licencias o cumplimiento normativo. [SBOM de dependencias](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx#dependency-sbom-gradle) describe el contenido del archivo.
+
+## Véase también [#see-also]
+
+- [Configuración del plugin de compilación de Axelix](../../setting-up-spring-boot-service/build-plugin/configuration.mdx)
+- [Service Profile](../../ui-guide/service-profile.mdx)

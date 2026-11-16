@@ -1,0 +1,41 @@
+---
+title: ¿Qué es Axelix Spring Boot Starter?
+description: "Axelix Starter (también conocido como ASBS, Axelix Spring Boot Starter) es una dependencia de tipo starter de Spring Boot que permite
+              integrar las aplicaciones Spring Boot con la plataforma Axelix. Es el puente entre sus aplicaciones y
+              la consola de gestión Axelix Master."
+---
+
+## Visión general [#overview]
+
+Axelix Starter transforma una aplicación Spring Boot estándar en un "servicio gestionado" que se puede supervisar,
+depurar y controlar mediante la interfaz de Axelix Master. Amplía las funciones nativas de Spring Boot
+y proporciona endpoints y funciones adicionales.
+
+## Funciones principales [#key-capabilities]
+
+### **Descubrimiento y registro automáticos de servicios** [#automatic-service-discovery--registration]
+- **Descubrimiento automático**: Axelix Master registra automáticamente las instancias
+- **Compatibilidad con varios entornos**: funciona en Kubernetes y Docker Compose
+- **Registro con recuperación automática**: vuelve a registrarse automáticamente si se interrumpen las conexiones
+
+### **Supervisión y depuración ampliadas** [#enhanced-monitoring--debugging]
+- **Análisis de beans en tiempo real**: permite ver todos los beans de Spring.
+- **Inspección de propiedades de configuración**: muestra los valores de las propiedades y sus orígenes
+- **Métricas de ejecución**: métricas de rendimiento y estado de la aplicación
+- **Exportación de estado**: exporta el estado de una instancia de aplicación (incluidos volcado del heap, volcado de hilos, entorno, etc.)
+
+## Cuándo utilizar Axelix Starter [#when-to-use-axelix-starter]
+
+### **Desarrollo y pruebas** [#development--testing]
+- **Depurar problemas de configuración** en distintos entornos (local, preproducción y producción)
+- **Comprender la conexión de beans y sus dependencias** sin inspeccionar el código en profundidad
+- **Probar cambios de configuración** sin volver a desplegar ni reiniciar
+- **Validar la resolución de propiedades** entre varias fuentes de configuración
+- **Activar y desactivar tareas programadas**: probar distintos escenarios de programación activando o desactivando métodos `@Scheduled`
+- **Gestionar cachés**: verificar el comportamiento de las cachés vaciándolas o desactivándolas durante las pruebas
+
+### **Operaciones en producción** [#production-operations]
+- **Supervisar el estado de la aplicación** en varios entornos e instancias
+- **Realizar depuración de emergencia** durante incidentes en producción
+- **Gestionar la configuración** en varias instancias de aplicación
+- **Auditar el estado y la configuración de la aplicación** para resolver problemas

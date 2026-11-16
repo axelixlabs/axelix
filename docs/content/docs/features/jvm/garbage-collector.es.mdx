@@ -1,0 +1,94 @@
+---
+title: Recolector de basura
+description: "La página Garbage Collector permite activar el registro de GC de la JVM en una instancia gestionada de Spring Boot, iniciar una recolección bajo demanda y descargar el archivo de registro resultante. El registro de GC suele estar desactivado en producción. La página permite activarlo para una investigación concreta y volver a desactivarlo después."
+---
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal del recolector de basura](/img/feature/garbage-collector/gc-main-page.png)
+
+</ScreenshotsNotice>
+
+***Garbage Collector tal como aparece en la interfaz de Axelix***
+
+## Acceso [#access]
+
+Cualquier usuario autenticado puede leer el archivo de registro de GC y consultar el estado del registro: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrir la página y descargar un registro existente. Los controles que realizan cambios requieren un permiso independiente:
+
+- **Trigger GC**, **Enable GC Logging** y **Disable GC Logging** requieren el permiso `gc:manage`.
+
+`gc:manage` se concede a los roles integrados **EDITOR**, **ADMIN** y **SUPER_ADMIN**. **VIEWER** ve los botones, pero los destructivos permanecen deshabilitados. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+Cuando un botón de control es visible, pero la cuenta no tiene este permiso, Axelix lo mantiene deshabilitado y muestra un mensaje explicativo al pasar el cursor.
+
+## Activar el registro de GC [#enabling-gc-logging]
+
+El registro de GC está desactivado de forma predeterminada. Hasta que se activa, la página muestra un estado vacío con un botón **Enable GC Logging**. Al pulsarlo se abre un cuadro de diálogo para elegir el nivel de registro de la JVM:
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+<Image src="/img/feature/garbage-collector/enable-gc-logging.png" alt="Activar el registro de GC" width={490} height={280}/>
+
+</ScreenshotsNotice>
+
+La lista de niveles se obtiene en tiempo de ejecución de `jcmd VM.log list` en la instancia de destino; normalmente incluye `error`, `warning`, `info`, `debug` y `trace`.
+
+## Trabajar con los registros [#working-with-logs]
+
+Una vez activado el registro, la cabecera de la página ofrece tres acciones:
+
+1. **Trigger GC** <Image src="/img/feature/icons/play-icon.png" width={20} height={20}/>: fuerza una recolección invocando `System.gc()` en la instancia, sin tener que esperar a un evento de GC natural para generar entradas. Requiere `gc:manage`.
+2. **Download GC Log** <Image src="/img/feature/icons/download-icon.png" width={25} height={27}/>: transmite el archivo de registro de GC actual al navegador como `text/plain`. Es de solo lectura y está disponible para todos.
+3. **Disable GC Logging** <Image src="/img/feature/icons/disable-icon.png" width={25} height={27}/>: vuelve a desactivar el registro de GC sin modificar el archivo ya escrito. Requiere `gc:manage`.
+
+Una línea representativa de un registro de GC descargado, con anotaciones:
+
+```
+[2026-03-02T17:38:55.009+0000][info][gc] GC(428) Pause Full (System.gc()) 29M->28M(97M) 82.955ms
+              │                  │    │    │               │               │    │   │       │
+              │                  │    │    │               │               │    │   │       └─ GC pause duration
+              │                  │    │    │               │               │    │   └─ Total heap
+              │                  │    │    │               │               │    └─ After heap
+              │                  │    │    │               │               └─ Before heap
+              │                  │    │    │               └─ GC event description
+              │                  │    │    └─ GC event ID
+              │                  │    └─ Log tag (subsystem)
+              │                  └─ Log level
+              └─ Timestamp (ISO-8601 with timezone)
+```
+
+## Habilitar el endpoint dedicado de Actuator [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>En Axelix 1.2.0 o posterior, nada de esto es necesario: el starter registra por sí mismo sus endpoints personalizados de Actuator y Axelix ya no requiere habilitar los endpoints <code>health</code>/<code>info</code>. Funciona correctamente sin ellos. No se necesita ninguna configuración aquí.</>}
+/>
+
+La página utiliza el endpoint de Actuator `axelix-gc`, aportado por Axelix Spring Boot Starter. Expóngalo mediante las propiedades estándar de Spring Boot Actuator. Consulte [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) para ver la lista completa de endpoints de Axelix y el resto de la configuración:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-gc
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-gc
+```
+
+  </Tab>
+</Tabs>
+
+## Véase también [#see-also]
+
+- [Configuración de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

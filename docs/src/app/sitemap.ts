@@ -42,7 +42,7 @@ function languageAlternates(slug: string[] | undefined) {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    // `getPages()` yields a page per locale (en + ru), so every localized URL is a
+    // `getPages()` yields a page per locale, so every localized URL is a
     // first-class entry; `languageAlternates` makes their hreflang sets reciprocal.
     return source.getPages().map((page) => ({
         url: toAbsolute(page.url),

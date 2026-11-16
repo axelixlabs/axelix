@@ -1,0 +1,54 @@
+---
+title: Mapa de entidades
+description: "La página Entities Map comprueba el mapeo JPA de cada entidad de una instancia de Spring Boot y muestra las asociaciones cuyo mapeo provoca consultas adicionales: carga anticipada, @ManyToMany respaldadas por List, cascadas REMOVE o ALL y @OneToMany unidireccionales."
+---
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal del mapa de entidades](/img/feature/entity/entity-main-page.png)
+
+</ScreenshotsNotice>
+
+***Entities Map tal como aparece en la interfaz de Axelix***
+
+Los errores en el mapeo de asociaciones JPA no impiden que la aplicación funcione. En cambio, provocan consultas y cargas adicionales cada vez que se utiliza la entidad, y es fácil pasarlos por alto en una revisión de código. Entities Map comprueba el mapeo de todas las entidades y muestra dónde están esos errores.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+Un resumen en la parte superior indica cuántas entidades mapea la instancia, cuántas tienen [problemas](#detected-problems) y cuántas no. Debajo se enumeran las entidades con problemas.
+
+Despliegue una entidad para ver:
+
+- El nombre de la tabla de `@Table`, o el nombre de la entidad cuando `@Table` no establece ninguno.
+- Cada asociación problemática, por ejemplo `Owner.pets`, con sus problemas.
+- El mapeo de la asociación con los valores efectivos, incluidos los predeterminados, por ejemplo `@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL) @JoinColumn(name = "owner_id") List<Pet>`.
+
+Si ninguna entidad tiene problemas, la página lo indica en lugar de mostrar la lista.
+
+## Problemas detectados [#detected-problems]
+
+- **EAGER fetching**: la asociación se carga cada vez que se lee la entidad, se utilicen o no los datos. Esto incluye `@ManyToOne` y `@OneToOne` sin un `fetch` explícito, ya que JPA utiliza carga anticipada de forma predeterminada para ellas.
+- **List for @ManyToMany**: una `@ManyToMany` respaldada por una `List` hace que Hibernate vacíe y vuelva a insertar toda la tabla de unión ante cualquier cambio.
+- **Bad CascadeType**: en una `@OneToMany` o `@ManyToMany`, `CascadeType.REMOVE` o `CascadeType.ALL` hace que Hibernate elimine los registros relacionados uno a uno, lo que genera consultas N+1.
+- **Unidirectional @OneToMany**: una `@OneToMany` sin `mappedBy` necesita una tabla de unión adicional o un `UPDATE` independiente para cada registro.
+
+## Cómo funciona [#how-it-works]
+
+Axelix Spring Boot Starter lee el metamodelo JPA de la aplicación y comprueba cada asociación. A diferencia de [Transaction Control](./transaction-control.mdx), el resultado no depende del tráfico: Axelix comprueba cómo se mapean las entidades, no qué consultas se han ejecutado. La página requiere Hibernate en la aplicación.
+
+## Herramientas MCP [#mcp-tools]
+
+Los agentes de IA pueden obtener mediante MCP las entidades y sus problemas de mapeo, tanto de toda la aplicación como de una entidad. Consulte el [catálogo de herramientas MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights).
+
+## Propiedades [#properties]
+
+Entities Map funciona junto con la monitorización de transacciones y está activado de forma predeterminada. Para desactivarlo, establezca `axelix.sbs.transaction.monitoring.enabled=false`. Consulte [Monitorización de transacciones](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#transaction-monitoring) para más información.
+
+Entities Map no está disponible en aplicaciones reactivas (WebFlux), porque la monitorización de transacciones no se ejecuta en ellas. Consulte [Aplicaciones reactivas (WebFlux)](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#reactive-webflux-applications).
+
+## Véase también [#see-also]
+
+- [Transaction Control](./transaction-control.mdx)
+- [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

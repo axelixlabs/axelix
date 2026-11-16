@@ -1,0 +1,98 @@
+---
+title: Publicación de versiones
+description: "Esta página describe el procedimiento exacto de publicación de Axelix."
+---
+
+Hay dos tipos de publicación con la misma estructura: ambos distribuyen **todos los componentes** a la vez bajo una versión:
+
+- Una versión **menor** se publica desde `master` y abre una nueva línea `X.Y`.
+- Una versión **de parche** se publica desde la **rama de parches** de esa línea (`X.Y.x`) y lleva todos los componentes a
+  `X.Y.Z`.
+
+Por supuesto, también publicaremos versiones principales. Cuando llegue el momento, documentaremos su procedimiento.
+
+Para conocer la organización de las ramas, consulte [modelo de ramas](./branching-model.mdx).
+
+## Versiones menores [#minor-releases]
+
+Una versión menor publica todos los componentes juntos bajo una versión `X.Y.0` y la marca con una
+etiqueta `vX.Y.0` en `master` (consulte
+[una versión para cada componente](../compatibility-and-versioning.mdx#one-version-for-every-component)). El
+procedimiento, por orden:
+
+### 1. Preparación [#1-housekeeping]
+
+La preparación consiste en los **cambios manuales** previos a la publicación. Todos se incluyen en **un único commit en
+`master`**, para poder revertir o aplicar selectivamente la publicación de forma limpia si es necesario posponerla.
+
+- **Establecer la versión del conjunto.** Entre publicaciones, `axelixVersion` en el `gradle.properties` de la **raíz** contiene
+  la próxima versión con el sufijo `-SNAPSHOT`, por ejemplo `3.1.0-SNAPSHOT` mientras `3.1.0` está en desarrollo.
+  La preparación elimina el sufijo y establece la versión exacta que se va a publicar: para `3.1.0`, se establece
+  `3.1.0`. El proceso de publicación lee este valor y lo utiliza para nombrar la etiqueta resultante;
+  el proceso **rechaza** publicar una versión `-SNAPSHOT`. El `gradle.properties` de la raíz es el **único** lugar
+  donde se define la versión: todos los componentes la heredan de ahí.
+- **Actualizar los playgrounds.** Las aplicaciones de ejemplo de `playgrounds/` son, por diseño, **proyectos independientes**:
+  **no** heredan `axelixVersion`, sino que fijan explícitamente las versiones del starter y el plugin de Axelix que utilizan.
+  Actualice esas versiones a la que se va a publicar.
+- **Actualizar la documentación.** Solo mantenemos documentación versionada por línea **principal**. Por ejemplo, durante el desarrollo de una versión menor,
+  añadimos avisos de «próxima versión» para sus funciones; al publicar la versión menor que las incluye, sustituimos esos avisos por
+  los correspondientes avisos de «disponible desde».
+
+### 2. Iniciar el proceso de publicación [#2-launch-the-release-pipeline]
+
+**No creamos la etiqueta manualmente.** El proceso de publicación lee la versión de `gradle.properties`, ejecuta
+sus comprobaciones previas y, solo si todas pasan, crea la etiqueta `vX.Y.0` y publica todos
+los componentes: tanto los artefactos Maven (starters y plugins) como la imagen Docker de Master.
+
+:::info[Las notas de la versión se redactan manualmente]
+El proceso crea la **etiqueta**, pero **no** redacta las notas de la versión. El **desarrollador** que realiza la publicación
+redacta manualmente las notas correspondientes a la etiqueta `vX.Y.0` recién creada.
+:::
+
+## Versiones de parche [#patch-releases]
+
+Una versión de parche, como cualquier versión de Axelix, publica **todos los componentes** bajo una versión: no hay
+parches por componente. El procedimiento es similar al de una versión menor, con una diferencia estructural: se publica desde
+la **rama de parches** de la línea de versiones menores en lugar de `master`. Se omite el paso de documentación: los parches no
+cambian la documentación.
+
+1. **Cambiar a la rama de parches.** El trabajo de parches se mantiene en la única rama de la línea, llamada `X.Y.x`.
+   La letra `x` representa toda la línea de parches y, a diferencia de una etiqueta, el nombre de la rama **no** lleva
+   prefijo `v`. Se crea a partir de la etiqueta `vX.Y.0` de la versión menor (consulte
+   [modelo de ramas → dónde se desarrollan los parches](./branching-model.mdx#where-patch-work-lives)). Créela desde
+   la etiqueta si es el primer parche de la línea; en otro caso, ya existe.
+
+2. **Incorporar las correcciones a esa rama.** Una corrección suele incorporarse primero a `master` y después se adapta a la rama
+   de parches; solo cambia lo que el parche corrige realmente.
+
+3. **Preparación en la rama (un único commit).**
+   - **Establecer la versión del conjunto.** Establezca `axelixVersion` en el `gradle.properties` de la **raíz** con la nueva versión de parche
+     `X.Y.Z`. A diferencia de `master`, la rama de parches no tiene sufijo `-SNAPSHOT` entre publicaciones:
+     conserva la última versión publicada de su línea hasta que el siguiente parche la actualiza.
+   - **Actualizar los playgrounds.** Actualice las aplicaciones de ejemplo a la nueva versión de parche, por el mismo motivo que en una
+     menor: fijan explícitamente sus versiones de Axelix y no heredan `axelixVersion`.
+
+4. **Iniciar el proceso de publicación.** Es el **mismo proceso** que para una versión menor, iniciado desde la
+   rama de parches en lugar de `master`. Ejecuta las mismas comprobaciones previas, publica todos los componentes bajo
+   `X.Y.Z` y crea la etiqueta conjunta `vX.Y.Z`. Como todas las etiquetas de Axelix, lleva el prefijo `v`.
+   Al igual que en una versión menor, el proceso crea la etiqueta pero **no** las notas de la versión: el desarrollador las redacta
+   manualmente para la nueva etiqueta.
+
+### Ejemplo completo [#worked-example]
+
+Supongamos que la versión `3.1.0` necesita una corrección en el **Axelix Spring Boot 3 Starter**:
+
+1. El parche se mantiene en la rama `3.1.x`, creada a partir de la etiqueta `v3.1.0`. Si la línea `3.1` ya recibió un parche,
+   esa rama existe; en otro caso, la creamos desde `v3.1.0`.
+2. Adaptamos la corrección de `master` a esa rama.
+3. En el `gradle.properties` de la raíz establecemos `axelixVersion` en `3.1.1`, la versión de parche que queremos
+   publicar, y actualizamos los playgrounds a `3.1.1`.
+4. Iniciamos el proceso de publicación desde la rama `3.1.x`. Crea la etiqueta conjunta `v3.1.1` y publica
+   **todos** los componentes —starters, plugins y Master— bajo `3.1.1`, aunque solo haya cambiado realmente un starter.
+
+El resultado cumple lo que promete
+[una versión para cada componente](../compatibility-and-versioning.mdx#one-version-for-every-component):
+tras la publicación, `3.1.1` existe para todos los componentes. Puede actualizar todos los componentes desplegados
+a la vez o solo el que se ha corregido:
+[la compatibilidad se garantiza por `major.minor`](../compatibility-and-versioning.mdx#compatibility-between-components),
+por lo que las diferencias de versión de parche entre componentes desplegados siempre son seguras.

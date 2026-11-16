@@ -1,0 +1,62 @@
+---
+title: Modelo de ramas
+description: "Axelix se desarrolla abiertamente como monorepositorio; comprender la evolución del código también explica cómo se publican las versiones."
+---
+
+Esta página describe las ramas que utilizamos, cómo se incorporan los cambios y cómo se relaciona esto con las [versiones](../compatibility-and-versioning.mdx) que utiliza.
+
+## La rama principal [#the-trunk]
+
+Axelix sigue un modelo de **desarrollo basado en trunk**, con un par de excepciones deliberadas. Hay una
+rama principal: **`master`**.
+
+- Cada vez que desarrollamos una función o corrección, creamos una rama _a partir de_ `master`.
+- La fusionamos _de nuevo en_ `master` mediante una Pull Request.
+
+`master` es siempre la fuente de referencia de «qué es Axelix en este momento». **Las versiones menores y principales se publican
+directamente desde ella, etiquetando la rama principal** con una etiqueta de la forma `vX.Y.0`, por ejemplo `v3.1.0`. La versión de parche
+de esa etiqueta es **siempre `0`**.
+
+En cambio, las versiones de parche se publican como etiquetas de las ramas de parches específicas que siguen el patrón `X.Y.x` (más información a continuación).
+
+Estas etiquetas (creadas desde `master` o desde una rama de parches) marcan la publicación coordinada de todos los
+componentes, que se distribuyen juntos bajo [una versión compartida](../compatibility-and-versioning.mdx#one-version-for-every-component).
+
+## Cambios incompatibles [#breaking-changes]
+
+No todos los cambios terminados se fusionan inmediatamente. Si un cambio introduce **incompatibilidades**, no lo fusionamos
+en `master` como parte del flujo normal. En su lugar:
+
+1. Posponemos la Pull Request.
+2. Le asignamos la etiqueta `breaking-changes`.
+3. La fusionamos más adelante, cuando corresponde; normalmente al comenzar el trabajo de la siguiente versión **principal**.
+
+Así, `master` se mantiene **lista para publicarse como versión menor o de parche en cualquier momento**, mientras que el trabajo incompatible espera a una
+versión principal. Esto contribuye a que una nueva versión **menor** nunca introduzca un cambio incompatible de forma inesperada.
+
+## Dónde se desarrollan los parches [#where-patch-work-lives]
+
+Las correcciones para una línea de versiones menores ya publicada **no** se distribuyen directamente desde `master`: cuando se necesita una corrección,
+la rama principal normalmente ya ha avanzado y contiene trabajo para la *siguiente* menor. En su lugar, cada
+línea de versiones menores publicada tiene una única **rama de parches de larga duración** que convive con `master`.
+
+La rama de parches se crea a partir de la etiqueta `vX.Y.0` de la versión menor y se nombra con el patrón `X.Y.x`: la letra
+`x` representa toda la línea de parches y, a diferencia de la etiqueta de origen, el nombre de la rama **no** lleva el prefijo `v`.
+Por ejemplo, la línea de parches de `1.0.0` es la rama `1.0.x`, creada a partir de la etiqueta `v1.0.0`.
+Puede consultarla en el repositorio para ver el modelo en funcionamiento.
+
+Una corrección suele incorporarse primero a `master` (mediante el flujo normal de Pull Request) y después se **adapta**
+a la rama de parches de la línea afectada. Cada versión de parche del conjunto de componentes —`vX.Y.1`, `vX.Y.2`, etc.—
+se publica desde esa rama y, como todas las versiones de Axelix, distribuye **todos los componentes juntos** bajo la
+misma versión (consulte
+[una versión para cada componente](../compatibility-and-versioning.mdx#one-version-for-every-component)).
+
+:::note[Una rama de parches por línea de versiones menores, no por componente]
+Hay exactamente **una** rama de parches por línea de versiones menores publicada, compartida por todos los componentes. Los parches de la
+línea `3.1`, tanto si modifican un starter, un plugin o Master, se mantienen en la única rama `3.1.x`,
+creada a partir de la etiqueta `v3.1.0`. No existen ramas por componente, porque tampoco hay versiones por componente:
+el conjunto se versiona y publica como una unidad.
+:::
+
+Los pasos exactos de publicación —preparación, establecimiento de la versión y ejecución del proceso— están en
+la página de [publicación de versiones](./releases.mdx).

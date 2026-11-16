@@ -1,0 +1,161 @@
+---
+title: Solución de problemas
+description: "Esta página describe los problemas más habituales durante la instalación y configuración de Axelix."
+---
+
+## 1. Error de autenticación (401) al acceder a los endpoints de Axelix [#1-authentication-error-401-when-accessing-axelix-endpoints]
+
+### Síntoma [#symptom]
+
+Master recibe un error 401 al comunicarse con el servicio gestionado, aunque el acceso a los endpoints de Axelix está activado en el `application.yaml` del servicio y Spring Security está configurado correctamente.
+
+### Causa más probable [#most-likely-cause]
+
+En la práctica, los endpoints de Actuator expuestos por el servicio gestionado (el microservicio que incluye el starter y el plugin de Spring Boot de Axelix) casi nunca se dejan abiertos. Es muy habitual, y generalmente recomendable, protegerlos con algún mecanismo de autenticación: HTTP Basic, un servidor de recursos OIDC/OAuth2 o cualquier otro esquema integrado en la configuración de Spring Security de la aplicación.
+
+Al mismo tiempo, Axelix incluye su propia gestión de identidades y acceso (IAM). Cuando Master llama a un starter desde la versión 1.3, invoca los endpoints personalizados de Actuator de Axelix
+(normalmente `/actuator/axelix-**`, con un prefijo de Actuator configurable) con un token bearer técnico `AXELIX.MASTER` en
+la cabecera `Authorization`. Para starters anteriores a 1.3, vuelve a emitir el token del usuario con nombres de permisos heredados.
+El descubrimiento inicial utiliza un token de compatibilidad que identifica a Master. En todos los casos, el token está destinado a los
+componentes de Axelix, no a la seguridad propia de la aplicación.
+
+:::note[Prefijo personalizado de Actuator]
+La parte `/actuator` es la ruta base de Actuator, configurable mediante `management.endpoints.web.base-path` (su valor predeterminado es `/actuator`). Si el servicio gestionado cambia esta propiedad, los endpoints de Axelix quedan bajo la ruta configurada: por ejemplo, con `/manage` se accede a ellos en `/manage/axelix-**`. Téngalo en cuenta al definir el patrón de solicitudes de la solución siguiente.
+:::
+
+El 401 se debe al conflicto entre estos dos sistemas de autenticación independientes: el filtro de seguridad del servicio intercepta la solicitud antes de que llegue a los componentes de Axelix, detecta un token bearer e intenta validarlo con el IAM propio del servicio, donde el token de Axelix es desconocido y se rechaza.
+
+### Solución: [#the-solution]
+
+La solución es excluir del IAM de la aplicación los endpoints personalizados de Actuator de Axelix (los que tienen el prefijo `/actuator/axelix-**`, teniendo en cuenta que el prefijo de Actuator es configurable) y confiar en el IAM de Axelix:
+
+```
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+}
+```
+
+## 2. Módulo de starter incorrecto para la versión de Spring Boot [#2-wrong-starter-module-for-your-spring-boot-version]
+
+### Síntoma [#symptom-1]
+
+La aplicación no arranca justo después de añadir una dependencia del starter de Spring Boot de Axelix y muestra un
+`NoClassDefFoundError` o `ClassNotFoundException` que menciona una clase `javax.servlet.*` o `jakarta.servlet.*`, por
+ ejemplo `javax/servlet/FilterChain` en un proyecto Spring Boot 4.x o `jakarta/servlet/FilterChain` en un proyecto Spring Boot
+2.x.
+
+### Causa más probable [#most-likely-cause-1]
+
+Axelix distribuye un artefacto de starter independiente por versión principal de Spring Boot:
+
+- `axelix-spring-boot-2-starter` para Spring Boot 2.7+
+- `axelix-spring-boot-3-starter` para Spring Boot 3
+- `axelix-spring-boot-4-starter` para Spring Boot 4
+
+Son artefactos Maven distintos, distribuidos por separado (aunque siguen el mismo esquema de versiones). Por eso, al añadir el starter,
+debe asegurarse de elegir el correspondiente a la versión principal de Spring Boot de su aplicación.
+
+### Solución: [#the-solution-1]
+
+Elija el starter que corresponda a la versión **principal** de Spring Boot de la aplicación. Consulte [un starter específico por versión principal de Spring Boot](./compatibility-and-versioning.mdx#a-dedicated-starter-per-spring-boot-major-version)
+y las coordenadas exactas en [configuración del starter de Spring Boot](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency).
+
+## 3. Un servicio iniciado localmente no se registra en un Master local [#3-a-locally-started-service-doesnt-register-with-a-locally-started-master]
+
+### Síntoma [#symptom-2]
+
+Ejecuta Axelix Master localmente, añade el starter a su servicio e inicia el servicio desde el IDE. Arranca sin
+errores, pero nunca aparece en Master: no hay errores en ninguno de los lados ni entradas en la barra lateral.
+
+### Causa más probable [#most-likely-cause-2]
+
+Faltan dos requisitos previos, fáciles de pasar por alto cuando el botón «Run» predeterminado del IDE solo compila e
+inicia la clase principal.
+
+**El plugin de compilación no se ha ejecutado.** Axelix tiene plugins de compilación para Maven y Gradle.
+Estos generan `META-INF/axelix-info.properties` (que contiene `groupId`/`artifactId`/
+`version` del servicio) en la salida de compilación, y el starter necesita ese archivo para identificar el servicio ante Master.
+
+En Maven, el objetivo que hace ese trabajo (`axelix-generate-project-info`) está asociado a la fase `prepare-package`:
+una simple compilación y ejecución desde el IDE nunca llega a ella. La tarea de Gradle está conectada a `processResources` para que las
+ejecuciones del IDE también la incluyan, pero solo si el IDE la invoca realmente, lo que exige delegar las acciones de compilación y ejecución
+a Gradle en lugar de utilizar el compilador incremental propio del IDE.
+
+**Master no puede encontrar la instancia por sí mismo.** El descubrimiento automático basado en Kubernetes no tiene nada que explorar en una máquina
+local, por lo que el servicio debe autorregistrarse.
+
+### Solución: [#the-solution-2]
+
+Ejecute una compilación completa al menos una vez antes de depender del botón Run del IDE: `mvn package` (o `mvn install`) o
+`./gradlew build`. Consulte [qué es el plugin de compilación de Axelix](../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx)
+para conocer qué genera y por qué es necesario.
+
+Después, configure el starter para que se autorregistre en el Master local y haga coincidir la clave de firma JWT en ambos lados:
+el mismo valor debe configurarse en Master y en cada instancia, porque se utiliza un algoritmo HMAC simétrico:
+
+```properties
+server.port=9444
+axelix.sbs.auth.jwt.algorithm=HMAC256
+axelix.sbs.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
+axelix.sbs.discovery.self-registration=true
+axelix.sbs.discovery.instance-name=your-application-name
+axelix.sbs.discovery.instance-actuator-url=http://localhost:9444/actuator
+axelix.sbs.discovery.master-url=http://localhost:2935/api/internal/service/register
+```
+
+`2935` es el puerto predeterminado de Master desde Axelix `1.2.0`. Antes era `8080`, así que utilice `8080` en
+`master-url` si su Master es anterior; consulte [general](../setting-up-master-ui/configuring-master/configuring-master.mdx#general).
+
+En versiones de Axelix anteriores a 1.2.0 (sin incluirla), hace falta otra propiedad: los starters antiguos no exponen sus
+endpoints por sí mismos y, sin `axelix-metadata`, Master no puede comprobar la instancia:
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata
+```
+
+Por último, inicie Master como JAR con el **mismo** algoritmo y la misma clave de firma:
+
+```bash
+java \
+  -Daxelix.master.auth.jwt.algorithm=HMAC256 \
+  -Daxelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Si las claves no coinciden, el mensaje de actividad se rechaza con `401` en lugar de registrar la instancia. Consulte [configuración del starter de Spring Boot](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#let-master-find-the-instance)
+para ver la referencia completa de autorregistro y [ejecución como JAR](../setting-up-master-ui/configuring-master/configuring-master.mdx#run-as-a-jar)
+para la configuración de Master.
+
+:::warning
+Nunca reutilice la clave de firma anterior ni ninguna clave de ejemplo de esta página en un despliegue real.
+:::
+
+## 4. Algunas secciones de la barra lateral siguen vacías tras el registro [#4-some-sidebar-sections-stay-empty-after-registration]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Si utiliza Axelix 1.2.0 o posterior, nada de esto es necesario: el starter registra sus endpoints personalizados de Actuator
+    por sí mismo y Axelix ya no requiere que los endpoints <code>health</code>/<code>info</code> estén
+    activados; funciona perfectamente sin ellos. Aquí no hace falta ninguna configuración.</>}
+/>
+
+### Síntoma [#symptom-3]
+
+La instancia aparece en Master y su estado parece correcto, pero algunas secciones de la barra lateral —Beans, Caches, Loggers y
+similares— permanecen vacías o no cargan.
+
+![Sección lateral con error inesperado del servidor](/img/feature/troubleshooting/troubleshooting-actuator-endpoint-error.png)
+***Sección lateral (Details) seleccionada, pero con «No data» y una notificación «Unexpected server error» en lugar de los datos reales***
+
+### Causa más probable [#most-likely-cause-3]
+
+Spring Boot no expone por web los endpoints personalizados de Actuator de forma predeterminada, y cada sección de la interfaz de Axelix consulta
+su endpoint específico (`axelix-beans`, `axelix-caches`, `axelix-loggers`, etc.). Solo `axelix-metadata` es necesario
+para que la instancia aparezca en Master. Los demás endpoints deben activarse explícitamente, por lo que una sección sin su endpoint correspondiente
+en `management.endpoints.web.exposure.include` simplemente no tiene de dónde leer.
+
+### Solución: [#the-solution-3]
+
+Añada los identificadores de los endpoints que faltan a `management.endpoints.web.exposure.include` del servicio gestionado. Consulte [qué expone el starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#what-the-starter-exposes)
+para ver la lista completa.

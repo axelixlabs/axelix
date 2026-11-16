@@ -1,0 +1,19 @@
+{
+    "pagesIndex": "index",
+    "pages": [
+        "---Producto---",
+        "...product",
+        "---Primeros pasos---",
+        "...start",
+        "---Guía de la interfaz---",
+        "...ui-guide",
+        "---Funciones---",
+        "...features",
+        "---Master---",
+        "...setting-up-master-ui",
+        "---Sus servicios---",
+        "...setting-up-spring-boot-service",
+        "---Más información---",
+        "...more"
+    ]
+}
