@@ -122,7 +122,14 @@ public class ConfigPropsApiTest extends AbstractProtectedEndpointTest {
               "prefix": "management.endpoints.web",
               "properties": [
                 { "key": "pathMapping", "value": null },
-                { "key": "exposure.include[0]", "value": "*" },
+                {
+                  "key": "exposure.include[0]",
+                  "value": "*",
+                  "dangerousValue": {
+                    "rationale": "Every actuator endpoint present on the classpath is exposed over HTTP, including the ones that dump the heap, the thread stacks, the environment and the configuration properties. The endpoints that are actually needed are better listed explicitly.",
+                    "alternativeExample": "health,info"
+                  }
+                },
                 { "key": "exposure.exclude", "value": null },
                 { "key": "basePath", "value": "/actuator" },
                 { "key": "discovery.enabled", "value": "true" }

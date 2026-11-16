@@ -18,9 +18,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { EmptyHandler, HashNavigable, Loader, PageSearch } from "@/components";
+import { EmptyHandler, HashNavigable, Loader, PageSearch, PropertyTriageFilters } from "@/components";
 import { fetchData, filterConfigPropsBeans, getPropertiesCount } from "@/helpers";
-import { type IConfigPropsBean, type IConfigPropsResponseBody, StatefulRequest } from "@/models";
+import { EPropertyTriageTag, type IConfigPropsBean, type IConfigPropsResponseBody, StatefulRequest } from "@/models";
 import { getConfigPropsData } from "@/services";
 
 import { ConfigPropsTables } from "./ConfigPropsTables";
@@ -28,6 +28,7 @@ import { ConfigPropsTables } from "./ConfigPropsTables";
 const ConfigProps = () => {
     const { instanceId } = useParams();
 
+    const [triageTags, setTriageTags] = useState<EPropertyTriageTag[]>([]);
     const [search, setSearch] = useState<string>("");
     const [configProps, setConfigProps] = useState(StatefulRequest.loading<IConfigPropsResponseBody>());
 
@@ -49,7 +50,15 @@ const ConfigProps = () => {
 
     const configPropsBeansFeed = configProps.response!.beans;
 
-    const effectiveConfigProps = search ? filterConfigPropsBeans(configPropsBeansFeed, search) : configPropsBeansFeed;
+    const dangerousOnly = triageTags.includes(EPropertyTriageTag.DANGEROUS);
+    const effectiveConfigProps =
+        search || dangerousOnly
+            ? filterConfigPropsBeans(configPropsBeansFeed, search, dangerousOnly)
+            : configPropsBeansFeed;
+    const dangerousCount = configPropsBeansFeed.reduce(
+        (count, bean) => count + bean.properties.filter((property) => !!property.dangerousValue).length,
+        0,
+    );
 
     const totalPropertiesCount = getPropertiesCount<IConfigPropsBean>(configPropsBeansFeed);
     const filteredPropertiesCount = getPropertiesCount<IConfigPropsBean>(effectiveConfigProps);
@@ -58,7 +67,14 @@ const ConfigProps = () => {
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+            <div className="PropertyToolbar">
+                <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+                <PropertyTriageFilters
+                    counts={[{ triageTag: EPropertyTriageTag.DANGEROUS, count: dangerousCount }]}
+                    selectedTags={triageTags}
+                    onSelectedTagsChange={setTriageTags}
+                />
+            </div>
             <HashNavigable>
                 <ConfigPropsTables effectiveConfigProps={effectiveConfigProps} />
             </HashNavigable>

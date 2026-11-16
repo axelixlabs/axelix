@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EDeprecationLevel, EPropertyInjectionType } from "@/models";
+import type { EDeprecationLevel, EPropertyInjectionType, IDangerousValue } from "@/models";
 
 export interface IDeprecation {
     /**
@@ -33,18 +33,6 @@ export interface IDeprecation {
      * The name of the property that supersedes the deprecated one, when any.
      */
     replacedBy?: string;
-}
-
-export interface IDangerousValue {
-    /**
-     * The reason the resolved value is considered dangerous.
-     */
-    rationale: string;
-
-    /**
-     * A safer value to use instead, when one can be suggested.
-     */
-    alternativeExample?: string;
 }
 
 export interface IInjectionPoint {

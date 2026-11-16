@@ -112,3 +112,48 @@ describe("Filter configProps", () => {
         expect(result).toEqual([]);
     });
 });
+
+describe("Dangerous configProps filter", () => {
+    const dangerous = {
+        key: "openInView",
+        value: "true",
+        dangerousValue: { rationale: "OSIV is enabled", alternativeExample: "false" },
+    };
+    const beans: IConfigPropsBean[] = [
+        { beanName: "jpa", prefix: "spring.jpa", properties: [dangerous, { key: "showSql", value: "false" }] },
+        { beanName: "server", prefix: "server", properties: [{ key: "port", value: "8080" }] },
+    ];
+
+    it("Keeps only dangerous properties and removes beans without matches", () => {
+        // given.
+        const search = "";
+
+        // when.
+        const result = filterConfigPropsBeans(beans, search, true);
+
+        // then.
+        expect(result).toEqual([{ ...beans[0], properties: [dangerous] }]);
+    });
+
+    it("Applies the risk filter even when the bean name matches", () => {
+        // given.
+        const search = "jpa";
+
+        // when.
+        const result = filterConfigPropsBeans(beans, search, true);
+
+        // then.
+        expect(result).toEqual([{ ...beans[0], properties: [dangerous] }]);
+    });
+
+    it("Combines the search and dangerous filter", () => {
+        // given.
+        const search = "showSql";
+
+        // when.
+        const result = filterConfigPropsBeans(beans, search, true);
+
+        // then.
+        expect(result).toEqual([]);
+    });
+});

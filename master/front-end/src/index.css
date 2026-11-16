@@ -119,6 +119,21 @@ a {
     text-transform: uppercase;
 }
 
+.DangerousRow:nth-child(n) {
+    background-color: var(--axelix-red-50);
+    border-left: 3px solid var(--axelix-red-700);
+
+    &:hover {
+        background-color: var(--axelix-red-100);
+    }
+}
+
+.PropertyToolbar {
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--axelix-grey-300);
+}
+
 .AccordionsWrapper {
     border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);

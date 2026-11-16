@@ -8,15 +8,6 @@
     border-left: 3px solid transparent;
 }
 
-.DangerousRow {
-    background-color: var(--axelix-red-50);
-    border-left-color: var(--axelix-red-700);
-
-    &:hover {
-        background-color: #fee4e2;
-    }
-}
-
 .DeprecatedErrorRow {
     background-color: var(--axelix-orange-50);
     border-left-color: var(--axelix-orange-700);

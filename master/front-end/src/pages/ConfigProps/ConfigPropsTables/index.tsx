@@ -35,13 +35,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
                     <ConfigPropsModifiableTable
                         headerName={beanName}
                         prefix={prefix}
-                        properties={properties.map((property) => {
-                            return {
-                                key: `${prefix}.${property.key}`,
-                                displayKey: property.key,
-                                displayValue: property.value,
-                            };
-                        })}
+                        properties={properties}
                         key={beanName}
                     />
                 ))}

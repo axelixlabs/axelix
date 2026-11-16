@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Accordion, Copy, EmptyHandler } from "@/components";
+import { Accordion, Copy, EmptyHandler, RiskChip } from "@/components";
 import { normalizeHtmlElementId } from "@/helpers";
-import type { ITableRow } from "@/models";
+import { EPropertyTriageTag, type IConfigPropsProperty } from "@/models";
 
 import styles from "./styles.module.css";
 
@@ -35,7 +35,7 @@ interface IProps {
     /**
      * Table rows data
      */
-    properties: ITableRow[];
+    properties: IConfigPropsProperty[];
 }
 
 export const ConfigPropsModifiableTable = ({ headerName, prefix, properties }: IProps) => {
@@ -57,13 +57,22 @@ export const ConfigPropsModifiableTable = ({ headerName, prefix, properties }: I
                         accordionExpanded
                     >
                         <EmptyHandler isEmpty={!properties.length}>
-                            {properties.map(({ key, displayKey, displayValue }) => (
-                                <div key={key} className="TableRow">
+                            {properties.map(({ key, value, dangerousValue }) => (
+                                <div key={key} className={`TableRow ${dangerousValue ? "DangerousRow" : ""}`}>
                                     <div className={`RowChunk ${styles.KeyChunk}`}>
-                                        {displayKey} <Copy text={displayKey} />
+                                        {key} <Copy text={key} />
+                                        {dangerousValue && (
+                                            <RiskChip
+                                                risk={{
+                                                    kind: EPropertyTriageTag.DANGEROUS,
+                                                    reason: dangerousValue.rationale,
+                                                    hint: dangerousValue.alternativeExample ?? null,
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                     <div className={`RowChunk ${styles.ValueChunk}`}>
-                                        <div>{displayValue || "null"}</div>
+                                        <div>{value || "null"}</div>
                                     </div>
                                 </div>
                             ))}

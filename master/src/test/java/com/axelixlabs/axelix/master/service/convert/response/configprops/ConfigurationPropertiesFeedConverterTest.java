@@ -18,12 +18,17 @@
 package com.axelixlabs.axelix.master.service.convert.response.configprops;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeedBean;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse;
 import com.axelixlabs.axelix.master.service.transport.PropertySanitizer;
 
@@ -66,7 +71,8 @@ class ConfigurationPropertiesFeedConverterTest {
                 })
                 .when(sanitizer)
                 .sanitize(feed);
-        ConfigurationPropertiesFeedConverter subject = new ConfigurationPropertiesFeedConverter(sanitizer);
+        ConfigurationPropertiesFeedConverter subject =
+                new ConfigurationPropertiesFeedConverter(sanitizer, new DefaultPropertyNameNormalizer());
 
         // when.
         ConfigurationPropertiesFeedResponse response = subject.convertNonNull(feed);
@@ -77,11 +83,11 @@ class ConfigurationPropertiesFeedConverterTest {
                         "client",
                         "app",
                         List.of(
-                                new ConfigurationPropertiesFeedResponse.Entry("secret", "sanitized"),
-                                new ConfigurationPropertiesFeedResponse.Entry("empty", null)),
+                                new ConfigurationPropertiesFeedResponse.Entry("secret", "sanitized", null),
+                                new ConfigurationPropertiesFeedResponse.Entry("empty", null, null)),
                         List.of(
-                                new ConfigurationPropertiesFeedResponse.Entry("secret.value", "sanitized"),
-                                new ConfigurationPropertiesFeedResponse.Entry("secret.origin", "config.yml"))));
+                                new ConfigurationPropertiesFeedResponse.Entry("secret.value", "sanitized", null),
+                                new ConfigurationPropertiesFeedResponse.Entry("secret.origin", "config.yml", null))));
         verify(sanitizer).sanitize(same(feed));
         verifyNoMoreInteractions(sanitizer);
     }
@@ -91,7 +97,8 @@ class ConfigurationPropertiesFeedConverterTest {
         // given.
         ConfigurationPropertiesFeed feed = new ConfigurationPropertiesFeed();
         PropertySanitizer sanitizer = mock(PropertySanitizer.class);
-        ConfigurationPropertiesFeedConverter subject = new ConfigurationPropertiesFeedConverter(sanitizer);
+        ConfigurationPropertiesFeedConverter subject =
+                new ConfigurationPropertiesFeedConverter(sanitizer, new DefaultPropertyNameNormalizer());
 
         // when.
         ConfigurationPropertiesFeedResponse response = subject.convertNonNull(feed);
@@ -99,5 +106,45 @@ class ConfigurationPropertiesFeedConverterTest {
         // then.
         assertThat(response.beans()).isEmpty();
         verify(sanitizer).sanitize(same(feed));
+    }
+
+    private static Stream<Arguments> dangerousBoundValues() {
+        return Stream.of(
+                Arguments.of("spring.jpa", "openInView", "true", true),
+                Arguments.of("spring.jpa", "openInView", null, true),
+                Arguments.of("spring.jpa", "open-in-view", "false", false),
+                Arguments.of("", "spring.jpa.showSql", "TRUE", true),
+                Arguments.of("management.endpoints.web", "exposure.include[2]", "*", true));
+    }
+
+    @ParameterizedTest
+    @MethodSource("dangerousBoundValues")
+    void detectsDangerousBoundValues(String prefix, String key, String value, boolean dangerous) {
+        // given.
+        ConfigurationPropertiesFeed feed = new ConfigurationPropertiesFeed()
+                .beans(List.of(new ConfigurationPropertiesFeedBean()
+                        .beanName("config")
+                        .prefix(prefix)
+                        .properties(List.of(
+                                new ConfigurationPropertiesEntry().key(key).value(value)))
+                        .inputs(List.of(new ConfigurationPropertiesEntry()
+                                .key(key + ".value")
+                                .value(value)))));
+        ConfigurationPropertiesFeedConverter subject = new ConfigurationPropertiesFeedConverter(
+                mock(PropertySanitizer.class), new DefaultPropertyNameNormalizer());
+
+        // when.
+        ConfigurationPropertiesFeedResponse response = subject.convertNonNull(feed);
+
+        // then.
+        ConfigurationPropertiesFeedResponse.Bean bean = response.beans().get(0);
+        if (dangerous) {
+            assertThat(bean.properties().get(0).dangerousValue().rationale()).isNotBlank();
+            assertThat(bean.properties().get(0).dangerousValue().alternativeExample())
+                    .isNotBlank();
+        } else {
+            assertThat(bean.properties().get(0).dangerousValue()).isNull();
+        }
+        assertThat(bean.inputs().get(0).dangerousValue()).isNull();
     }
 }
