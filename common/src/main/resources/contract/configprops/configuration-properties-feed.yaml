@@ -4,7 +4,7 @@ info:
   version: ""
   description: |
     Schemas for the @ConfigurationProperties beans of a Spring Boot app, including their prefixes,
-    flattened properties and binding inputs.
+    flattened properties.
 components:
   schemas:
     ConfigurationPropertiesFeed:
@@ -30,7 +30,6 @@ components:
         - beanName
         - prefix
         - properties
-        - inputs
       properties:
         beanName:
           type: string
@@ -43,14 +42,6 @@ components:
         properties:
           type: array
           description: The properties of the bean as name-value pairs.
-          items:
-            $ref: '#/components/schemas/ConfigurationPropertiesEntry'
-          x-axelix-introduced-in: 1.2.0
-        inputs:
-          type: array
-          description: >-
-            The origin and value of each configuration parameter, i.e. which value was applied and
-            from which source, to configure a specific property.
           items:
             $ref: '#/components/schemas/ConfigurationPropertiesEntry'
           x-axelix-introduced-in: 1.2.0

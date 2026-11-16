@@ -38,7 +38,7 @@ class ConfigPropsMcpServerToolsTest extends AbstractInstanceMcpServerToolsTest {
         // given.
         instance.respondWith("/axelix-configprops", """
                 {"beans":[{"beanName":"client","prefix":"app","properties":[
-                {"key":"secret","value":"original","sensitive":true}],"inputs":[{"key":"secret.value","value":"original","sensitive":true}]}]}
+                {"key":"secret","value":"original","sensitive":true}]}]}
                 """);
 
         // when.

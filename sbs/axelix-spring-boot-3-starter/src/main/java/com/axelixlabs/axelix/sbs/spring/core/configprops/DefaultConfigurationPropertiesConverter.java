@@ -53,8 +53,7 @@ public class DefaultConfigurationPropertiesConverter implements ConfigurationPro
                         .forEach((beanName, bean) -> configurationProperties.add(new ConfigurationPropertiesFeedBean()
                                 .beanName(BeanNameUtils.stripConfigPropsPrefix(beanName))
                                 .prefix(bean.getPrefix())
-                                .properties(configPropsFlattener.flatten(bean.getProperties()))
-                                .inputs(configPropsFlattener.flatten(bean.getInputs()))));
+                                .properties(configPropsFlattener.flatten(bean.getProperties()))));
             }
         });
 

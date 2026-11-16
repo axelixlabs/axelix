@@ -56,7 +56,7 @@ public class PropertySensitivityMarker {
     }
 
     /**
-     * Marks sensitive configuration properties and binding inputs.
+     * Marks sensitive configuration properties.
      *
      * @param feed the configuration properties feed
      * @return the feed with sensitivity flags set
@@ -66,11 +66,6 @@ public class PropertySensitivityMarker {
             bean.getProperties()
                     .forEach(
                             property -> property.setSensitive(isSensitive(bean.getPrefix() + "." + property.getKey())));
-            bean.getInputs().forEach(property -> {
-                String key = property.getKey();
-                property.setSensitive(key.endsWith(".value")
-                        && isSensitive(bean.getPrefix() + "." + key.substring(0, key.length() - ".value".length())));
-            });
         });
         return feed;
     }

@@ -101,23 +101,6 @@ class PropertySanitizerTest {
                       "value": null,
                       "sensitive": true
                     }
-                  ],
-                  "inputs": [
-                    {
-                      "value": "secret",
-                      "sensitive": true
-                    },
-                    {
-                      "value": "public",
-                      "sensitive": false
-                    },
-                    {
-                      "value": "legacy"
-                    },
-                    {
-                      "value": null,
-                      "sensitive": true
-                    }
                   ]
                 }
               ]

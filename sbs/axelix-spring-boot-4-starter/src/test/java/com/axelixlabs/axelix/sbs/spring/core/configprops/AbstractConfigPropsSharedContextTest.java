@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
@@ -40,7 +39,6 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 @SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
-            "management.endpoint.configprops.show-values=always",
             "axelix.prop.test.tags.environment=test",
             "axelix.prop.test.tags.version=1.0.0",
             "axelix.prop.test.tags.forSanitization=toBeSanitized",
@@ -59,8 +57,4 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG"
         })
 @Import({ConfigPropsTestSupportConfiguration.class, JwtAuthTestConfiguration.class})
-public abstract class AbstractConfigPropsSharedContextTest {
-
-    @Autowired
-    protected ConfigurationPropertiesConverter converter;
-}
+public abstract class AbstractConfigPropsSharedContextTest {}
