@@ -98,6 +98,24 @@ void returnsEmptyForBlankInput(String input) {
 }
 ```
 
+For JUnit parameterized tests:
+
+- Use `@MethodSource` with typed `Arguments.of(...)` rows for mixed types, complex objects, collections, or more than two values per case. Keep values in their native Java types.
+- Allow `@CsvSource` only for simple cases with exactly two string values per row (for example, an input string and an expected string).
+- Keep `@ValueSource`, `@NullSource`, and `@EmptySource` for simple single-argument cases where appropriate.
+
+CSV forces readers to mentally parse strings and infer conversions. Method sources keep complex inputs typed and make the cases easier to understand.
+
+For example, connect this typed provider to the test with `@ParameterizedTest` and `@MethodSource("requestCases")`:
+
+```java
+static Stream<Arguments> requestCases() {
+    return Stream.of(
+            Arguments.of("/beans", HttpMethod.GET, true),
+            Arguments.of("/beans", HttpMethod.POST, false));
+}
+```
+
 Each parameterized invocation is still a single given/when/then scenario. Reference the driving issue with a `// GH-NNNN` comment when there is one, as the codebase does.
 
 ### 6. Isolation — every test cleans up after itself
@@ -131,6 +149,8 @@ Do not introduce a single `@Nested` class holding only one category — nesting 
 
 ## Project conventions (Axelix)
 
+Tests for Java/Kotlin production code must be written in **Java using JUnit Jupiter (JUnit 5)**, including when production code is Kotlin. Frontend tests continue to use the module's TypeScript/JavaScript tooling.
+
 - **Assertions:** AssertJ (`import static org.assertj.core.api.Assertions.assertThat;`) and `assertThatThrownBy`. Match whatever the neighboring tests use.
 - **Comments:** `// given.` / `// when.` / `// then.` with trailing periods.
 - **Naming:** either plain intent (`decodesUserFromValidToken`) or the `shouldX_whenY` form — follow the file you're adding to.
@@ -149,6 +169,8 @@ Do not introduce a single `@Nested` class holding only one category — nesting 
 ## Self-check before finishing
 
 ```
+- [ ] Added JVM tests use Java with JUnit Jupiter
+- [ ] Mixed/complex/multi-value cases use @MethodSource; @CsvSource is limited to simple pairs of strings
 - [ ] Every documented behavior (success + each exception/edge) has a test
 - [ ] Only public/exported API is exercised; no reflection into internals
 - [ ] Each test is a single given → when → then; no act/assert/act/assert

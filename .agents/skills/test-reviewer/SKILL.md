@@ -24,7 +24,7 @@ If the PR has **no** test changes, do not apply this skill unless the user expli
    - **Java/Kotlin:** `public` methods on interfaces or classes; prefer interface Javadoc as the contract source.
    - **TypeScript/JavaScript:** exported functions, classes, hooks, or components from the module under test.
 3. **Map contract → cases** — From Javadoc/TSDoc and declared behavior, list required positive and negative test cases before reading assertions.
-4. **Review each test method** against the five standards below.
+4. **Review each test method** against the six standards below.
 5. **Report** using the output format at the end. **Block merge** on any 🔴 finding.
 6. **If blocked** — add the `blocked-by-ai-reviewer` label and post **one** brief PR comment outlining why (see [Blocking a PR](#blocking-a-pr)).
 
@@ -171,11 +171,25 @@ For example, in the JwtDecoderService's case, checking for the exception's messa
 
 **Flag as 🔴 when:** Tests assert exception message strings or human-readable descriptions.
 
+### 6. Java/JUnit and readable parameter sources
+
+Tests for Java/Kotlin production code must be written in **Java using JUnit Jupiter (JUnit 5)**, including when production code is Kotlin. Frontend tests continue to use the module's TypeScript/JavaScript tooling.
+
+For JUnit parameterized tests:
+
+- Use `@MethodSource` with typed `Arguments.of(...)` rows for mixed types, complex objects, collections, or more than two values per case. Keep values in their native Java types.
+- Allow `@CsvSource` only for simple cases with exactly two string values per row (for example, an input string and an expected string).
+- Keep `@ValueSource`, `@NullSource`, and `@EmptySource` for simple single-argument cases where appropriate.
+
+CSV forces readers to mentally parse strings and infer conversions. Method sources keep complex inputs typed and make the cases easier to understand.
+
+**Flag as 🔴 when:** Added JVM tests use a language/framework other than Java/JUnit Jupiter, or added/modified `@CsvSource` cases contain non-string types, complex inputs, or more than two values per row. Request Java/JUnit tests or a typed `@MethodSource`, respectively. Do not request unrelated rewrites of untouched legacy tests.
+
 ## Severity
 
 | Level | Meaning | Merge |
 |-------|---------|-------|
-| 🔴 **Blocking** | Violates isolation, tests internals, broken AAA, missing contract cases, or asserts exception messages | **Do not approve** until fixed |
+| 🔴 **Blocking** | Violates isolation, tests internals, broken AAA, missing contract cases, asserts exception messages, or violates Java/JUnit or parameter-source requirements | **Do not approve** until fixed |
 | 🟡 **Suggestion** | Style, naming, optional implementation-guarantee coverage, clearer arrange setup | Approve with comments optional |
 | 🟢 **Note** | Minor polish, unrelated to standards | Informational |
 
@@ -256,6 +270,8 @@ For inline GitHub comments on specific lines, one finding per comment is fine; t
 Copy and complete when reviewing:
 
 ```
+- [ ] Added JVM tests use Java with JUnit Jupiter
+- [ ] Mixed/complex/multi-value cases use @MethodSource; @CsvSource is limited to simple pairs of strings
 - [ ] All changed tests are isolated (DB + shared state cleaned per test)
 - [ ] Only public/exported API is exercised; no private/internal testing
 - [ ] Each test: single given → when → then (one act, one assert phase)
