@@ -31,11 +31,6 @@ export const filterConfigPropsBeans = (
 
         const isBeanNameMatch = beanName.includes(search.trim());
 
-        if (isBeanNameMatch && !dangerousOnly) {
-            result.push(bean);
-            return result;
-        }
-
         const filteredProperties = properties.filter(({ key, dangerousValue }) => {
             const matchesSearch =
                 isBeanNameMatch || `${canonicalize(prefix)}${canonicalize(key)}`.includes(formattedSearch);
