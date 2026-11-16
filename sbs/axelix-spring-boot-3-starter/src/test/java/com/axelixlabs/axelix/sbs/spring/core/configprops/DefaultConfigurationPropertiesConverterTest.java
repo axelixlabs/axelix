@@ -115,13 +115,6 @@ public class DefaultConfigurationPropertiesConverterTest extends AbstractConfigP
                                     new ConfigurationPropertiesEntry()
                                             .key("httpClient.requests[1].methods[0].retries[0].parameters.log-level")
                                             .value("DEBUG"));
-
-                    // inputs
-                    assertThat(bean.getInputs())
-                            .hasSize(34)
-                            .anyMatch(input -> input.getKey()
-                                    .equals("httpClient.requests[0].methods[0].retries[0].parameters.timeout.value"))
-                            .anyMatch(p -> p.getKey().equals("httpClient.requests[0].baseUrl.origin"));
                 });
     }
 }

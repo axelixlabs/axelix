@@ -231,10 +231,6 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
                   "properties": [
                         { "key": "allowedOrigins", "value": null },
                         { "key": "maxAge", "value": "PT30M" }
-                      ],
-                      "inputs": [
-                        { "key": "allowedOrigins", "value": null },
-                        { "key": "maxAge", "value": null }
                       ]
                 }
               }

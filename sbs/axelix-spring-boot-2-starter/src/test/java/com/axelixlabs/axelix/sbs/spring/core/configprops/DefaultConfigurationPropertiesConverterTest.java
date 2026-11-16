@@ -121,13 +121,6 @@ public class DefaultConfigurationPropertiesConverterTest {
                                     new ConfigurationPropertiesEntry()
                                             .key("httpClient.requests[0].methods[1].type")
                                             .value("POST"));
-
-                    // inputs
-                    assertThat(bean.getInputs())
-                            .hasSize(20)
-                            .anyMatch(input -> input.getKey()
-                                    .equals("httpClient.requests[0].methods[0].retries[0].parameters.timeout.value"))
-                            .anyMatch(p -> p.getKey().equals("httpClient.requests[0].baseUrl.origin"));
                 });
     }
 

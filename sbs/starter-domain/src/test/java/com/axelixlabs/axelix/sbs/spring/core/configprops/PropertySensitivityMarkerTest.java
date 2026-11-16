@@ -94,29 +94,21 @@ class PropertySensitivityMarkerTest {
     }
 
     @Test
-    void marksFullNamesAndBindingValuesButPreservesOrigins() {
+    void marksFullPropertyNames() {
         // given.
         PropertySensitivityMarker subject =
                 new PropertySensitivityMarker(List.of("app.client.secret"), new DefaultPropertyNameNormalizer());
         ConfigurationPropertiesEntry secret =
                 new ConfigurationPropertiesEntry().key("client.secret").value("original");
-        ConfigurationPropertiesEntry input =
-                new ConfigurationPropertiesEntry().key("client.secret.value").value("original");
-        ConfigurationPropertiesEntry origin =
-                new ConfigurationPropertiesEntry().key("client.secret.origin").value("file:config.yml");
         ConfigurationPropertiesFeed feed = new ConfigurationPropertiesFeed()
                 .beans(List.of(new ConfigurationPropertiesFeedBean()
                         .beanName("test")
                         .prefix("app")
-                        .properties(List.of(secret))
-                        .inputs(List.of(input, origin))));
+                        .properties(List.of(secret))));
         // when.
         subject.mark(feed);
         // then.
         assertThat(secret.getSensitive()).isTrue();
-        assertThat(input.getSensitive()).isTrue();
-        assertThat(origin.getSensitive()).isFalse();
         assertThat(secret.getValue()).isEqualTo("original");
-        assertThat(input.getValue()).isEqualTo("original");
     }
 }

@@ -51,18 +51,11 @@ class ConfigurationPropertiesFeedConverterTest {
         // given.
         ConfigurationPropertiesEntry property =
                 new ConfigurationPropertiesEntry().key("secret").value("original");
-        ConfigurationPropertiesEntry input =
-                new ConfigurationPropertiesEntry().key("secret.value").value("original");
         ConfigurationPropertiesFeed feed = new ConfigurationPropertiesFeed()
                 .beans(List.of(new ConfigurationPropertiesFeedBean()
                         .beanName("client")
                         .prefix("app")
-                        .properties(List.of(property, new ConfigurationPropertiesEntry().key("empty")))
-                        .inputs(List.of(
-                                input,
-                                new ConfigurationPropertiesEntry()
-                                        .key("secret.origin")
-                                        .value("config.yml")))));
+                        .properties(List.of(property, new ConfigurationPropertiesEntry().key("empty")))));
         PropertySanitizer sanitizer = mock(PropertySanitizer.class);
         doAnswer(invocation -> {
                     property.setValue("sanitized");
@@ -122,10 +115,7 @@ class ConfigurationPropertiesFeedConverterTest {
                         .beanName("config")
                         .prefix(prefix)
                         .properties(List.of(
-                                new ConfigurationPropertiesEntry().key(key).value(value)))
-                        .inputs(List.of(new ConfigurationPropertiesEntry()
-                                .key(key + ".value")
-                                .value(value)))));
+                                new ConfigurationPropertiesEntry().key(key).value(value)))));
         ConfigurationPropertiesFeedConverter subject = new ConfigurationPropertiesFeedConverter(
                 mock(PropertySanitizer.class), new DefaultPropertyNameNormalizer());
 

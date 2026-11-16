@@ -51,7 +51,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
     private ConfigurationPropertiesService configurationPropertiesService;
 
     @Test
-    void shouldReturnBeanValuesAndBindingInputs() {
+    void shouldReturnBeanValues() {
         // when.
         ConfigurationPropertiesFeed feed = configurationPropertiesService.getConfigProps();
 
@@ -67,15 +67,6 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
                                     ConfigurationPropertiesEntry::getValue,
                                     ConfigurationPropertiesEntry::getSensitive)
                             .contains(tuple("tags.forSanitization", "toBeSanitized", true));
-                    assertThat(bean.getInputs())
-                            .extracting(ConfigurationPropertiesEntry::getKey, ConfigurationPropertiesEntry::getValue)
-                            .contains(
-                                    tuple("httpClient.requests[0].baseUrl.value", "https://api.users.example.com/v1"),
-                                    tuple("enabledContexts[0].value", "user-service,payment-service"));
-                    assertThat(bean.getInputs())
-                            .filteredOn(entry -> entry.getKey().equals("httpClient.requests[0].baseUrl.origin"))
-                            .singleElement()
-                            .satisfies(entry -> assertThat(entry.getValue()).contains("Inlined Test Properties"));
                 });
     }
 
@@ -110,7 +101,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
     }
 
     @Test
-    void shouldKeepBoundEmptyCollectionWithoutInputValue() {
+    void shouldKeepBoundEmptyCollection() {
         // given.
         new ApplicationContextRunner()
                 .withUserConfiguration(JpaConfiguration.class)
@@ -128,18 +119,11 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
                     assertThat(feed.getBeans())
                             .filteredOn(bean -> bean.getPrefix().equals("empty"))
                             .singleElement()
-                            .satisfies(bean -> {
-                                assertThat(bean.getProperties())
-                                        .extracting(
-                                                ConfigurationPropertiesEntry::getKey,
-                                                ConfigurationPropertiesEntry::getValue)
-                                        .containsExactly(tuple("values", null));
-                                assertThat(bean.getInputs())
-                                        .extracting(
-                                                ConfigurationPropertiesEntry::getKey,
-                                                ConfigurationPropertiesEntry::getValue)
-                                        .containsExactly(tuple("values", null));
-                            });
+                            .satisfies(bean -> assertThat(bean.getProperties())
+                                    .extracting(
+                                            ConfigurationPropertiesEntry::getKey,
+                                            ConfigurationPropertiesEntry::getValue)
+                                    .containsExactly(tuple("values", null)));
                 });
     }
 
