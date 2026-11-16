@@ -148,26 +148,28 @@ final class Jackson2ConfigurationPropertiesBeanSerializer implements Configurati
         @Override
         public void serializeAsField(
                 Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
-            if (writer instanceof BeanPropertyWriter) {
-                BeanPropertyWriter beanPropertyWriter = (BeanPropertyWriter) writer;
-                try {
-                    if (pojo == beanPropertyWriter.get(pojo)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Skipping '" + writer.getFullName() + "' on '"
-                                    + pojo.getClass().getName() + "' as it is self-referential");
-                        }
-                        return;
-                    }
-                } catch (Exception ex) {
+            if (!(writer instanceof BeanPropertyWriter)) {
+                super.serializeAsField(pojo, jgen, provider, writer);
+                return;
+            }
+            BeanPropertyWriter beanPropertyWriter = (BeanPropertyWriter) writer;
+            try {
+                if (pojo == beanPropertyWriter.get(pojo)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(
-                                "Skipping '" + writer.getFullName() + "' on '"
-                                        + pojo.getClass().getName()
-                                        + "' as an exception was thrown when retrieving its value",
-                                ex);
+                        logger.debug("Skipping '" + writer.getFullName() + "' on '"
+                                + pojo.getClass().getName() + "' as it is self-referential");
                     }
                     return;
                 }
+            } catch (Exception ex) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                            "Skipping '" + writer.getFullName() + "' on '"
+                                    + pojo.getClass().getName()
+                                    + "' as an exception was thrown when retrieving its value",
+                            ex);
+                }
+                return;
             }
             super.serializeAsField(pojo, jgen, provider, writer);
         }

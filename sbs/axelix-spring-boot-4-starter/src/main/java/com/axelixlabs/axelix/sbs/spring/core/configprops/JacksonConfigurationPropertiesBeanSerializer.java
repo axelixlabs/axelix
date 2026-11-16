@@ -140,25 +140,27 @@ final class JacksonConfigurationPropertiesBeanSerializer implements Configuratio
         @Override
         public void serializeAsProperty(
                 Object pojo, JsonGenerator jgen, SerializationContext context, PropertyWriter writer) throws Exception {
-            if (writer instanceof BeanPropertyWriter beanPropertyWriter) {
-                try {
-                    if (pojo == beanPropertyWriter.get(pojo)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Skipping '" + writer.getFullName() + "' on '"
-                                    + pojo.getClass().getName() + "' as it is self-referential");
-                        }
-                        return;
-                    }
-                } catch (Exception ex) {
+            if (!(writer instanceof BeanPropertyWriter beanPropertyWriter)) {
+                super.serializeAsProperty(pojo, jgen, context, writer);
+                return;
+            }
+            try {
+                if (pojo == beanPropertyWriter.get(pojo)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(
-                                "Skipping '" + writer.getFullName() + "' on '"
-                                        + pojo.getClass().getName()
-                                        + "' as an exception was thrown when retrieving its value",
-                                ex);
+                        logger.debug("Skipping '" + writer.getFullName() + "' on '"
+                                + pojo.getClass().getName() + "' as it is self-referential");
                     }
                     return;
                 }
+            } catch (Exception ex) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                            "Skipping '" + writer.getFullName() + "' on '"
+                                    + pojo.getClass().getName()
+                                    + "' as an exception was thrown when retrieving its value",
+                            ex);
+                }
+                return;
             }
             super.serializeAsProperty(pojo, jgen, context, writer);
         }
