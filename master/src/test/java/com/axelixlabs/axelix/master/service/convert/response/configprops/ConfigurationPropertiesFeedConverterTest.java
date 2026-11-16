@@ -18,10 +18,12 @@
 package com.axelixlabs.axelix.master.service.convert.response.configprops;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
@@ -106,14 +108,17 @@ class ConfigurationPropertiesFeedConverterTest {
         verify(sanitizer).sanitize(same(feed));
     }
 
+    private static Stream<Arguments> dangerousBoundValues() {
+        return Stream.of(
+                Arguments.of("spring.jpa", "openInView", "true", true),
+                Arguments.of("spring.jpa", "openInView", null, true),
+                Arguments.of("spring.jpa", "open-in-view", "false", false),
+                Arguments.of("", "spring.jpa.showSql", "TRUE", true),
+                Arguments.of("management.endpoints.web", "exposure.include[2]", "*", true));
+    }
+
     @ParameterizedTest
-    @CsvSource({
-        "spring.jpa, openInView, true, true",
-        "spring.jpa, openInView, , true",
-        "spring.jpa, open-in-view, false, false",
-        "'', spring.jpa.showSql, TRUE, true",
-        "management.endpoints.web, exposure.include[2], *, true"
-    })
+    @MethodSource("dangerousBoundValues")
     void detectsDangerousBoundValues(String prefix, String key, String value, boolean dangerous) {
         // given.
         ConfigurationPropertiesFeed feed = new ConfigurationPropertiesFeed()

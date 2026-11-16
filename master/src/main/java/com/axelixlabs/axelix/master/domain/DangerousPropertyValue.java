@@ -36,14 +36,21 @@ import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 public enum DangerousPropertyValue {
     OPEN_IN_VIEW(
             "spring.jpa.open-in-view",
-            Set.of(new DangerousValue(
-                    "true",
-                    true,
-                    "Open Session In View keeps the persistence context open for the whole duration of the request, which "
-                            + "hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a "
-                            + "consequence, leads to the N+1 problem and to the database connections being held much longer "
-                            + "than necessary.",
-                    "false"))),
+            Set.of(
+                    new DangerousValue(
+                            "true",
+                            "Open Session In View keeps the persistence context open for the whole duration of the request, which "
+                                    + "hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a "
+                                    + "consequence, leads to the N+1 problem and to the database connections being held much longer "
+                                    + "than necessary.",
+                            "false"),
+                    new DangerousValue(
+                            null,
+                            "Open Session In View keeps the persistence context open for the whole duration of the request, which "
+                                    + "hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a "
+                                    + "consequence, leads to the N+1 problem and to the database connections being held much longer "
+                                    + "than necessary.",
+                            "false"))),
 
     DDL_AUTO_CREATE(
             "spring.jpa.hibernate.ddl-auto",
@@ -132,8 +139,8 @@ public enum DangerousPropertyValue {
         }
 
         for (DangerousValue dangerousValue : candidate.getDangerousValues()) {
-            boolean matches = value == null
-                    ? dangerousValue.matchesNull()
+            boolean matches = dangerousValue.value() == null
+                    ? value == null
                     : dangerousValue.value().equalsIgnoreCase(value);
             if (matches) {
                 return dangerousValue;
@@ -155,15 +162,10 @@ public enum DangerousPropertyValue {
     }
 
     /**
-     * @param value the explicit value considered dangerous, matched without regard to case
-     * @param matchesNull whether a null value is also considered dangerous for this property
+     * @param value the value considered dangerous, matched without regard to case. May be {@code null}
+     *              when null itself is dangerous.
      * @param rationale the rationale behind why this is dangerous
      * @param alternative the alternative value to be used instead
      */
-    public record DangerousValue(String value, boolean matchesNull, String rationale, String alternative) {
-
-        public DangerousValue(String value, String rationale, String alternative) {
-            this(value, false, rationale, alternative);
-        }
-    }
+    public record DangerousValue(@Nullable String value, String rationale, String alternative) {}
 }

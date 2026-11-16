@@ -51,10 +51,10 @@ class DefaultDangerousPropertyValueDetectorTest {
         Map<Property, DangerousValue> result = subject.detect(feed);
 
         // then.
-        DangerousValue openInView = DangerousPropertyValue.OPEN_IN_VIEW
-                .getDangerousValues()
-                .iterator()
-                .next();
+        DangerousValue openInView = DangerousPropertyValue.OPEN_IN_VIEW.getDangerousValues().stream()
+                .filter(value -> "true".equals(value.value()))
+                .findFirst()
+                .orElseThrow();
         assertThat(result).containsExactly(Map.entry(property, openInView));
     }
 
