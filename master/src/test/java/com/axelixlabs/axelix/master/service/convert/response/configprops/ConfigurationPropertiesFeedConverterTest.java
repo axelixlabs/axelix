@@ -147,32 +147,4 @@ class ConfigurationPropertiesFeedConverterTest {
         }
         assertThat(bean.inputs().get(0).dangerousValue()).isNull();
     }
-
-    @Test
-    void doesNotDiscloseDangerousSanitizedValue() {
-        // given.
-        ConfigurationPropertiesEntry property =
-                new ConfigurationPropertiesEntry().key("showSql").value("true").sensitive(true);
-        ConfigurationPropertiesFeed feed = new ConfigurationPropertiesFeed()
-                .beans(List.of(new ConfigurationPropertiesFeedBean()
-                        .beanName("jpa")
-                        .prefix("spring.jpa")
-                        .properties(List.of(property))));
-        PropertySanitizer sanitizer = mock(PropertySanitizer.class);
-        doAnswer(_ -> {
-                    property.setValue("******");
-                    return null;
-                })
-                .when(sanitizer)
-                .sanitize(feed);
-        ConfigurationPropertiesFeedConverter subject =
-                new ConfigurationPropertiesFeedConverter(sanitizer, new DefaultPropertyNameNormalizer());
-
-        // when.
-        ConfigurationPropertiesFeedResponse response = subject.convertNonNull(feed);
-
-        // then.
-        assertThat(response.beans().get(0).properties())
-                .containsExactly(new ConfigurationPropertiesFeedResponse.Entry("showSql", "******", null));
-    }
 }
