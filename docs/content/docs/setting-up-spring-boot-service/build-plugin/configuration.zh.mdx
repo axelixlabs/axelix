@@ -1,0 +1,130 @@
+---
+title: 配置 Axelix 构建插件
+description: "应用 Axelix 构建插件会将构建坐标写入构件，以便 Axelix Master 识别实例。"
+---
+
+应用 Axelix 构建插件是让服务对
+[Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) 可见的两个步骤之一，另一步是
+[接入 Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)。插件本身无需配置：应用插件后，
+它会将构建坐标写入构件，以便 Master 识别实例。有关插件生成的内容及其必要性，请参阅[什么是 Axelix
+构建插件？](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx)。
+
+:::warning[注册所必需]
+Master 通过每个应用程序的 `groupId` + `artifactId` 来识别它。如果没有该插件，
+`META-INF/axelix-info.properties` 文件就不会存在，坐标为空，**Master 会拒绝注册**，
+实例也永远不会出现在 UI 中。这些坐标还用作[持久化
+洞察](../../setting-up-master-ui/mcp/mcp-tools.mdx)（N+1 和实体映射分析）的键。请为每个
+希望由 Axelix 管理的服务应用该插件。
+:::
+
+:::note
+目前，插件仅发布到 **Maven Central**。发布到 Gradle Plugin Portal 已列入路线图；
+在此之前，Gradle 构建必须从 Maven Central 解析插件（请参阅下方的 `pluginManagement` 块）。请让
+插件版本与 Starter 版本保持同步。
+:::
+
+## 应用插件
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+由于该插件尚未发布到 Gradle Plugin Portal，请在
+`settings.gradle.kts` 的 `pluginManagement` 中添加 `mavenCentral()`：
+
+```kotlin title="settings.gradle.kts"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+然后在 `build.gradle.kts` 中应用插件：
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "AXELIX_VERSION_PLACEHOLDER"
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+由于该插件尚未发布到 Gradle Plugin Portal，请在
+`settings.gradle` 的 `pluginManagement` 中添加 `mavenCentral()`：
+
+```groovy title="settings.gradle"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+然后在 `build.gradle` 中应用插件：
+
+```groovy title="build.gradle"
+plugins {
+    id 'com.axelixlabs.axelix' version 'AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>AXELIX_VERSION_PLACEHOLDER</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+`axelix-generate-project-info` 目标默认绑定到 `prepare-package` 阶段，因此会在常规的
+`package`/`install` 构建期间自动运行，无需额外配置阶段。
+
+  </Tab>
+</Tabs>
+
+两个插件都不提供任何配置选项。Gradle 插件只需设置标准的项目 `version`
+（在 Axelix `1.2.0` 之前，如果 `group` 为空，它还会导致构建失败——请参阅下一节）；Maven 始终具有
+GAV 坐标，因此无需其他配置。
+
+## 可选的 `group` 坐标
+
+<ReleasedInNotice version="1.2.0" />
+
+早期，Axelix 要求其管理的所有 Java 应用程序都具有 `groupId`（即 GAV 中的 G）。但
+自 `1.2.0` 版本起，这不再是必需条件。
+
+从技术上说，每个打包并部署的 Java 应用程序都应是一个 Maven 构件。不过，在某些情况下，
+应用程序实际上并不需要部署到兼容 Maven 的二进制仓库。例如，应用程序可能只是即时组装为
+Docker 镜像并部署到 K8S 集群。
+
+在这种情况下，Java 应用程序不必是完整的 Maven 构件（因为它在技术上并未部署
+到 Nexus/Artifactory），尤其是不必具有 `groupId`。正因如此，
+Gradle 允许不打算作为 Maven 构件部署的 Java 应用程序省略 `groupId`。
+
+因此，Axelix 现在能够处理没有 groupId 的项目。在这种情况下，Axelix 会直接假定
+此类应用程序的 `groupId` 为空（即 `""`）。因此，如果你的组织在
+Java 微服务中不使用 `groupId`，则必须确保微服务的名称（即
+`build.gradle.kts` 文件中的 `name` 属性，它会解析为 `artifactId`）是唯一的。
+如果名称不唯一，Axelix Master 对这些 Spring Boot 应用程序的行为将是不确定的。
+
+## 相关内容
+
+- [什么是 Axelix 构建插件？](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx)——插件生成的内容，以及注册为何依赖于它。
+- [配置 Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)——读取生成的坐标并将其报告给 Master 的运行时部分。

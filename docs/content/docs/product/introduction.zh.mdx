@@ -1,0 +1,39 @@
+---
+title: 简介
+description: "用于开发和演进 Java Spring Boot 微服务生态系统的开源 AI 原生平台。"
+---
+
+Axelix 是一个用于开发和演进 Java Spring Boot 微服务生态系统的开源 AI 原生平台。
+它由开发者打造、为开发者服务，帮助团队了解各个应用程序，并管理服务中的变更。
+
+Axelix 可以帮助你：
+
+- **检查并调试正在运行的应用程序。** 查看 Bean、配置来源、事务、日志和其他运行时状态。
+- **检测常见问题。** 发现影响性能、稳定性和安全性的 Spring Boot 配置错误与反模式。
+- **评估依赖的健康状况。** 检查各个服务以及整个生态系统中的库版本和维护状态。
+- **跟踪迁移进度。** 了解各个服务采用不同 Java 和 Spring Boot 版本的情况。
+- **监视和控制 `@Scheduled` 执行。** 查看任务、触发运行、暂停调度，并在运行时更改 cron 表达式。
+
+AI 原生意味着 Axelix 同时面向人类工程师和 AI 智能体而设计。人类通过 Web UI 开展工作，
+而智能体使用内置的 Model Context Protocol（MCP）服务器检查应用程序状态、调查检测到的问题，
+并执行受支持的运行时操作。两种接口都会执行配置的访问权限控制。
+有关智能体目前可使用的功能，请参阅 [MCP 工具目录](../setting-up-master-ui/mcp/mcp-tools.mdx)。
+
+我们非常重视让你快速运行 Axelix。[安装指南](../start/getting-started.mdx)将引导你
+启动 Master，[Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx)
+指南则介绍如何将 Starter 添加到你的应用程序中。
+
+## Axelix OSS 与 Enterprise
+
+本文档同时涵盖 **Axelix OSS** 和即将推出的付费版 **Axelix Enterprise**。前者依据 LGPL 3.0 发布，
+源代码位于 [github.com/axelixlabs/axelix](https://github.com/axelixlabs/axelix)；
+后者提供额外功能（目前正在开发，敬请关注最新消息）。
+
+## 后续阅读
+
+- [UI 指南](../ui-guide/dashboard/spring-portfolio.mdx)：Axelix Web UI 导览。
+- [功能](../features/insights/details.mdx)：各实例的功能参考。
+- [安装](../start/getting-started.mdx)：安装并运行 Axelix Master。
+- [Master](../setting-up-master-ui/what-is-master.mdx)：配置 Axelix Master。
+- [Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx)：将 Starter 添加到你的
+  应用程序中。

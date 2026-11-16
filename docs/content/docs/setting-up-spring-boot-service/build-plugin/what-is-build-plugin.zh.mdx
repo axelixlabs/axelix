@@ -1,0 +1,99 @@
+---
+title: 什么是 Axelix 构建插件？
+description: "Axelix 构建插件是一个小型 Gradle 或 Maven 插件，可应用于每个希望由 Axelix 管理的服务。它在构建时运行，
+              并将 `META-INF/axelix-info.properties` 文件写入应用程序的构件。该文件包含 Master 用于区分不同应用程序的身份信息。"
+---
+
+它是 [Axelix Spring Boot Starter](../spring-boot-starter/what-is-spring-boot-starter.mdx) 的配套组件：
+Starter 是与 Master 通信的运行时组件，而构建插件是在构建时为 Starter 提供可报告信息的组件。
+两者都是必需的——只有 Starter 而没有插件的服务**无法注册**。
+
+## 生成的内容
+
+在构建时，插件会生成 `META-INF/axelix-info.properties` 并记录：
+
+- **构建坐标**——`groupId`、`artifactId` 和 `version`。Master 以这些身份信息作为所有数据的键。
+- **构建时间戳**——构件的组装时间。
+- **Git 元数据**——当构建在 Git 仓库中运行时，记录当前提交、分支和作者。
+
+在运行时，[Starter](../spring-boot-starter/what-is-spring-boot-starter.mdx) 会读取此文件，并将
+坐标作为实例注册元数据的一部分发送给 Master。
+
+## Git 工作树
+
+<ReleasedInNotice version="1.3.0" />
+
+当构建在[链接工作树](https://git-scm.com/docs/git-worktree)（通过 `git worktree add`
+创建的工作目录）中运行时，插件会读取 Git 元数据。记录的提交、分支和作者属于运行构建的工作树，
+而不是主检出目录。如果工作树处于分离 `HEAD` 状态，则记录提交 ID 来代替分支名称。
+Gradle 插件和 Maven 插件的行为相同。
+
+## 依赖 SBOM（Gradle）
+
+<ReleasedInNotice version="1.2.0" />
+
+除了身份文件，Gradle 插件还会生成**依赖 SBOM**——一份描述应用程序运行时依赖图的
+[CycloneDX](https://cyclonedx.org/) 1.6 JSON 文档。它被打包到构件中的
+`META-INF/axelix/dependencies.cdx.json`，与构建信息相邻。Master 读取该文档，以了解应用程序
+实际包含哪些库，以及每个库如何进入类路径。
+
+该文档由 `generateAxelixDependenciesSbom` 任务生成。**你不应手动运行此任务**：`jar`、`bootJar` 和
+`processResources` 都依赖于它，因此常规构建会自动打包 SBOM，而 `test` 或 `bootRun` 也能在类路径中
+看到它。该任务仅在解析后的依赖图发生变化时重新运行。
+
+SBOM 描述的是完全解析后的 `runtimeClasspath`，即实际随应用程序发布的精确库集合，而不是你
+声明的版本：
+
+- **仅记录解析后的版本。** 当两个依赖要求同一库的不同版本时，文档会记录 Gradle 选择的版本。
+  `2.0.+` 等动态声明会显示为解析到的具体版本，由 BOM（`platform(...)`）锁定的版本会显示为锁定后的版本。
+- **运行时范围。** 包含 `runtimeOnly` 依赖。`compileOnly` 依赖永远不会随应用程序发布，因此会被排除。
+- **解析路径。** 每个库都带有指向其引入库的 `dependsOn` 边，因此会保留从应用程序到每个
+  传递依赖的完整链条。
+- **不纳入你自己的模块。** 在多项目构建中，应用程序依赖的子项目不会作为库列出——它们引入的库
+  会直接归属于应用程序。每个应用插件的项目都会获得自己的 SBOM，描述其自己的运行时类路径。
+
+与插件的其他部分一样，SBOM 无需配置。**Maven 插件**会在同一位置生成相同的文档：
+它没有单独的任务，其 `axelix-generate-project-info` 目标会在生成身份文件的同时生成 SBOM。
+
+## 生成的构件属于内部实现
+
+构建插件写入应用程序构件的所有内容——`META-INF/axelix-info.properties`、
+[依赖 SBOM](#依赖-sbom-gradle)，以及未来版本添加的任何文件——都只供一个使用方使用：
+[Axelix Spring Boot Starter](../spring-boot-starter/what-is-spring-boot-starter.mdx)。Starter 读取这些文件
+并将其内容报告给 Master。这就是完整的约定。
+
+:::warning[依赖生成的构件时请谨慎]
+请将生成的文件视为 Axelix 的内部实现。它们的名称、位置、格式和内容可能会在次要版本或
+主要版本中更改，且不会提前太多通知；此类更改不被视为破坏性变更。如果你自己的工具会从构件中解析
+`axelix-info.properties` 或 `dependencies.cdx.json`，请做好升级后工具失效的准备。
+:::
+
+这尤其适用于依赖 SBOM。它使用标准的 CycloneDX 格式，但是为满足 Master 的需求而生成的——
+例如，你自己的模块会从依赖图中移除。它不是合规级 SBOM，因此不要将其输入供应链或审计工具。
+
+## 为何必需
+
+Master 通过每个应用程序的 `groupId` + `artifactId` 来识别它。这些坐标用于对实例进行分组、
+归属状态，并作为[持久化洞察](../../setting-up-master-ui/mcp/mcp-tools.mdx)（N+1 和
+实体映射分析）的键。
+
+如果没有插件，属性文件就不会存在，坐标为空，**Master 会拒绝注册**——无论 Starter 如何配置，
+实例都永远不会出现在 UI 中。因此，应用插件是每个受管服务的必要前提，而不是可选的增强功能。
+
+## Gradle 和 Maven
+
+插件按构建工具分为两种版本：
+
+- **Gradle**——`com.axelixlabs.axelix` 插件。它只需设置标准的项目 `version`。在
+  Axelix `1.2.0` 之前，如果 `group` 为空，它还会导致构建失败；自 `1.2.0` 起，`group` 是可选的——
+  请参阅[可选的 `group` 坐标](./configuration.mdx#可选的-group-坐标)。
+- **Maven**——`axelix-maven-plugin`，其 `axelix-generate-project-info` 目标绑定到 `prepare-package` 阶段。
+  Maven 始终具有 GAV 坐标，因此无需额外配置。
+
+两个版本都不提供任何配置选项——应用插件后，它就会完成自己的工作。两个版本也都会生成
+[依赖 SBOM](#依赖-sbom-gradle)。有关准确的代码片段，请参阅[配置构建插件](./configuration.mdx)。
+
+## 相关内容
+
+- [配置构建插件](./configuration.mdx)——如何使用 Gradle 或 Maven 应用插件。
+- [什么是 Axelix Spring Boot Starter？](../spring-boot-starter/what-is-spring-boot-starter.mdx)——读取并报告生成的坐标的运行时部分。

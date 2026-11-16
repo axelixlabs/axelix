@@ -1,0 +1,167 @@
+---
+title: 设计初衷
+description: "本文介绍 Axelix 为 Spring Boot 开发者和组织解决的核心问题，并通过实际示例探讨促成 Axelix 诞生的痛点。"
+---
+
+Axelix 将运行时分析、调试和生态系统演进整合到一个开源的 AI 原生平台中。
+团队既需要了解服务内部发生了什么，也需要了解各个服务如何共同演进。
+这包括发现配置错误、评估依赖的健康状况、跟踪 Java 和 Spring Boot 迁移，以及控制定时工作。
+Axelix 让工程师和 AI 智能体能够通过其 Web UI 和内置 MCP 服务器参与这些工作流程。
+有关概述，请参阅[简介](./introduction.mdx)。
+
+## 设计初衷：背景
+
+典型的企业拥有大量内部开发的软件。这些软件用于解决各种问题，通常使用多种编程语言编写，
+例如 JavaScript、Java、Go 等。在大型企业的服务端/后端应用程序中，
+[Java](https://en.wikipedia.org/wiki/Programming_languages_used_in_most_popular_websites) 是最流行的选择之一。
+在银行业尤其如此。
+
+除此之外，使用 Java 编写后端应用程序时，最流行的框架无疑是
+[Spring Boot](https://en.wikipedia.org/wiki/Spring_Boot)。它是构建在
+[Spring Framework](https://spring.io/) 之上的一个附加层，可简化后者的配置。
+出于种种原因，它是迄今为止最受企业欢迎的选择。例如，Netflix
+[已将其生态系统（3000 多个应用程序）迁移到 Spring Boot 3](https://www.youtube.com/watch?v=IMGcD08rdVw)。
+因此，Spring Boot 是使用 Java 编写后端应用程序时非常流行的选择。
+
+## 设计初衷：痛点
+
+如前所述，Spring Boot 最初只是 Spring Framework 之上的一个附加抽象层，但如今它已远不止于此。
+所有基于 Spring Boot 运行的 Java 应用程序都使用相同的 Spring Boot 抽象。
+
+例如：
+
+- 每个 Spring Boot Java 应用程序都由若干 _Bean_ 组成，它们只是由 Spring Framework 在一定程度上管理的 Java 对象。
+- 每个 Spring Boot 应用程序都有一个 `ApplicationContext`，其主要用途是管理应用程序的 Bean
+  以及正在运行的 Spring Boot 应用程序的整体状态。
+- 每个 Spring Boot 应用程序都有大量属性，这些属性可以来自各种来源
+  （`application.properties` 文件、操作系统进程环境或 Java System 属性等）。
+
+Spring 非常庞大，会产生许多相互关联的活动部件，每个部件都会影响其他部件（例如，
+属性会影响 Bean 的创建，而创建的 Bean 又可能引入更多属性）。
+
+**这个项目存在的核心原因之一是：即使 Spring Boot 应用程序在本地按预期运行、所有测试用例均已通过，
+也完全不意味着同一个应用程序部署到生产或测试环境后就能完美运行。我们都知道，一厢情愿地认为一切顺利并不现实。**
+
+因此，作为使用 Spring Boot 的 Java 开发者，我们将应用程序部署到任何环境时，
+往往会反复遇到同样的问题。下面通过几个示例来说明这些痛点。
+
+### 示例 1：细粒度日志控制
+
+为了深入了解 Axelix 究竟要解决什么问题，我们来看几个 Java 代码示例。
+假设应用程序中有以下 Java 类。它是一个 Spring Bean，用于解析假设客户端所拥有的权限集：
+
+```java
+@Slf4j
+@Service
+public class PermissionsResolver {
+
+    @Value("${permission.caching.enabled:true}")
+    private boolean cacheLookupsEnabled;
+
+    @Autowired
+    private ExternalPermissionsResolver delegate;
+
+    @Autowired
+    private PermissionsCache cache;
+
+    @PostConstruct
+    void init() {
+        log.debug("Permissions cache lookup enabled: {}", cacheLookupsEnabled);
+    }
+
+    public Set<Permission> resolveClientPermissions(Client client) {
+        log.debug("Resolving permissions for the client {}", client.getId());
+
+        try {
+            return delegate.resolve(client);
+        } catch (SomeExpectedException e) {
+            // if we can, we do a cache lookup
+            if (featureFlag && client.getStatus() == ClientStatus.EXISTING) {
+                return cache.get(client.getId());
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+```
+
+我们编写了这段代码，也为它编写了测试，并在本地完成了测试。一切正常。现在，我们将这段代码部署到沙箱环境。
+
+但是，根据墨菲定律：\***任何可能出错的事情，终会出错***\。沙箱/测试环境中的某些功能无法正常工作。
+我们已经在本地测试过，明明可以运行，但到了测试环境却突然不行了。
+虽然类中的日志可以帮助我们了解已部署应用程序内部的实际情况，但这些日志语句使用 `DEBUG` 级别，
+而我们只启用了 `INFO` 级别。**如果能仅针对某个特定的 Java 类或 Java 包，临时（！）动态更改日志级别，
+那将非常有帮助。** 我们当然可以更改应用程序配置中的日志级别并重新部署应用程序，但难道真的要为了查看日志，
+就经历整个重新构建和重新部署的过程吗？如果日志没有帮助呢？再构建并重新部署一次？
+
+**在 Axelix，我们对此深有体会。** 因此，我们希望提供一种解决这一问题的方法。
+
+### 示例 2：配置来源
+
+假设第一个问题已经解决，我们已经通过 Axelix UI 为那个特定的 Java 类启用了日志。
+现在，又遇到了另一个问题。假设我们已经明白，当前问题的原因是错误的值被注入到了
+`cacheLookupsEnabled` 属性中。我们原本以为对于客户端 _XYZ_，会从缓存中获取数据，但实际情况并非如此。
+之所以没有这样做，是因为 `cacheLookupsEnabled` 被设置成了 `false`。
+
+那么接下来该怎么办？我们唯一知道的是，这个属性被设置成了 `false`，而且不是我们设置的。
+这意味着，在应用程序的某个配置来源中的_某个位置_，它被设置成了 `false`。但具体是哪里呢？
+
+**坦率地说，作为大型企业中的开发者，我们并不总是完全了解自己的应用程序究竟如何部署到环境中。**
+我们并不总是完全了解应用程序如何打包到 Docker 容器中，随后如何通过 Helm Chart 部署到 K8S 集群，
+以及应用程序还应用了哪些额外的配置来源等。**我们对应用程序的部署方式有_一定的_了解，
+但这种了解并不完整，这正是核心问题所在。**
+
+Axelix 不仅可以让你查看属性值究竟来自哪个配置来源，还可以让你无需重新构建或重新部署，
+通过在正在运行的 JVM 中重新加载应用程序上下文，动态更改实时 Java 应用程序中的属性值。
+
+### 示例 3：应用程序状态
+
+现在，我们已经将 `cacheLookupsEnabled` 的值更改为 `true`，一切应该正常了吧？**并非如此**。
+它仍然无法工作，原因是 `PermissionsCache` 实际上是一个接口：
+
+```java
+
+public interface PermissionsCache {
+
+    Set<Permission> get(UUID clientId);
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "in-memory", matchIfMissing = true)
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class InMemoryPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "redis")
+@ConditionalOnRedisPresent
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class RedisPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+```
+
+用 `interface` 定义契约，再为这个 Java 接口提供多种实现，并让每种实现都成为一个 Spring Bean，
+这种情况非常常见。我们希望这些 Spring Bean 仅在满足某些条件时才初始化。
+`ConditionalOnProperty`、`ConditionalOnMissingBean` 等注解，几乎每个 Spring 开发者都很熟悉。
+
+假设在这个示例中，我们希望给定客户端的权限来自 Redis 缓存，而不是内存数据结构。
+但实际上，系统查询的是 `InMemoryPermissionsCache`。我们甚至能确定它一定是
+`InMemoryPermissionsCache` 吗？也可能是我们作为依赖引入的某个公司内部的库自带了
+`ThreadSafeInMemoryPermissionsCache`。换句话说，我们希望回答以下问题：
+
+- Spring 应用程序中当前激活的是***哪些*** Bean？
+- ***为什么***激活的恰好是这些 Bean，而不是其他 Bean？
+
+**Axelix 也能帮助你回答这些问题。**

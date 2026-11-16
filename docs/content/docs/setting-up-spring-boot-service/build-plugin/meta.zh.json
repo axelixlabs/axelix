@@ -1,0 +1,5 @@
+{
+    "title": "构建插件",
+    "defaultOpen": false,
+    "pages": ["what-is-build-plugin", "configuration"]
+}

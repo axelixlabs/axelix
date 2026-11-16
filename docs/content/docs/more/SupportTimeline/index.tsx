@@ -24,6 +24,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const LABELS = {
     en: { supported: "OSS support", expected: "Until the next minor (expected)", ended: "Ended" },
     ru: { supported: "Поддержка OSS", expected: "До следующего минора (ожидается)", ended: "Завершена" },
+    zh: { supported: "OSS 支持", expected: "直至下一个次要版本（预计）", ended: "已结束" },
 };
 
 const toTime = (date: string) => new Date(`${date}T00:00:00Z`).getTime();
@@ -31,7 +32,7 @@ const toTime = (date: string) => new Date(`${date}T00:00:00Z`).getTime();
 /**
  * Spring-style Gantt chart of the OSS support window of each Axelix minor line.
  */
-export const SupportTimeline = ({ locale = "en" }: { locale?: "en" | "ru" }) => {
+export const SupportTimeline = ({ locale = "en" }: { locale?: "en" | "ru" | "zh" }) => {
     const labels = LABELS[locale];
     const bars = LINES.map((line) => {
         const start = toTime(line.released);

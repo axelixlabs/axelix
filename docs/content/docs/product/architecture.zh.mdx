@@ -1,0 +1,144 @@
+---
+title: 架构
+description: "Axelix 有一个中央应用程序——**Axelix Master**，它通过服务端的 **Axelix Starter** 依赖与你希望管理的每个 Spring Boot 服务通信。Web UI 和 MCP 服务器均位于 Master 内，因此同一个进程可以同时向浏览器和 AI 智能体提供相同的数据。"
+---
+
+
+```
+                                         ┌───────────────────────┐
+                                         │ Spring Boot 2 Service │
+                         ┌──────────────▶│  + Axelix Starter     │
+                         │               └───────────────────────┘
+┌──────────┐         ┌───┴────────┐      ┌───────────────────────┐
+│    UI    │─REST───▶│            │─────▶│ Spring Boot 3 Service │
+└──────────┘         │   Axelix   │      │  + Axelix Starter     │
+                     │   Master   │      └───────────────────────┘
+                     │ (UI + MCP) │      ┌───────────────────────┐
+┌──────────┐         │            │─────▶│ Spring Boot 2 Service │
+│ AI Agent │─MCP────▶│            │      │  + Axelix Starter     │
+└──────────┘         └───┬────────┘      └───────────────────────┘
+                         │               ┌───────────────────────┐
+                         └──────────────▶│ Spring Boot 3 Service │
+                                         │  + Axelix Starter     │
+                                         └───────────────────────┘
+```
+
+## 组件
+
+- **[Axelix Master](../setting-up-master-ui/what-is-master.mdx)**：提供 UI，公开 UI 所使用的 REST API，
+  运行内置 MCP 服务器，通过 HTTP 与每个受管服务通信，并维护实例注册表。
+- **[Axelix Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx)**：针对
+  [Spring Boot 2](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency)、
+  [Spring Boot 3](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency)
+  和 [Spring Boot 4](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency)
+  提供独立的 Starter 模块，请选择与应用程序匹配的模块。Starter 公开 Master 所需的端点
+  （Bean、环境、缓存、定时任务等），还可以选择在启动时向 Master 自注册。
+
+## 通信方式
+
+- **浏览器 ⇄ Master**：通过 Master 提供静态前端的同一来源使用 REST/JSON 通信。
+- **AI 智能体 ⇄ Master**：通过 HTTP 使用 [Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro)。
+  有关凭据方案，请参阅 [MCP 服务器身份验证](../setting-up-master-ui/authentication/authentication.mdx#mcp-server-authentication)。
+- **Master → 受管服务**：通过 HTTP 调用服务上的 Axelix Starter 端点。每次读取（Bean、环境、定时任务等）
+  和每次变更操作（设置日志记录器级别、清除缓存、触发任务）都是同步 HTTP 调用。
+- **受管服务 → Master**：仅在启用自注册时使用。Starter 在启动时提交注册信息并发送心跳，
+  其负载中包含 Master 访问该服务时应使用的 URL。
+
+## 服务发现
+
+服务通过以下两种途径之一显示在 Master 的实例注册表中：
+
+- [Master 端自动发现](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery)：Master
+  轮询平台 API，以查找包含 Axelix Starter 的服务。目前仅支持在
+  [Kubernetes](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery) 中自动发现，
+  并且在[官方 Axelix Helm Chart](https://artifacthub.io/packages/helm/axelix/axelix) 中默认启用。
+- [Starter 端自注册](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#option-b--self-registration)：
+  Axelix Starter 在启动时向 Master 发送注册请求，并按一定时间间隔发送心跳。
+
+有关每种途径的具体过程，请参阅[服务发现的工作原理](./discovery.mdx)。
+
+## 部署与扩展
+
+- **Master 是中央进程。** 它是接收所有 UI 传入请求的中枢，随后将请求路由到特定服务。
+- **数据库是持久化边界。** Axelix Master 需要维护特定状态，因此需要数据库。默认使用 SQLite。
+  对于小型部署，SQLite 已经足够，但请注意，如果未挂载卷，SQLite 数据库文件无法在容器重启后保留。
+  对于更大规模的部署，应配置 PostgreSQL 或 MySQL——请参阅[数据库](../setting-up-master-ui/configuring-master/configuring-master.mdx#database)。
+- **网络可达性由运维人员负责。** Master 必须能够通过自身网络使用 HTTP 调用每个受管服务，
+  所有读取和变更操作都通过这条链路执行。自注册心跳是唯一方向相反的调用。
+
+## 多 Master 部署
+
+可以部署多个 Axelix Master 实例。在这种情况下，最终用户需要负责配置共享数据库
+（例如，同一个挂载的 SQLite 文件或共同的 PostgreSQL 数据库）：
+
+```
+              ┌──────────────┐                  ┌──────────────┐
+              │      UI      │                  │  AI Agents   │
+              └──────┬───────┘                  └──────┬───────┘
+                     │REST                             │MCP
+                     │                                 │
+ ┌───────────────────┴─────────────────────────────────┴───────────────────┐
+ │                         Load Balancer (K8S Service)                     │
+ └──────────┬───────────────────────────────────────────────────┬──────────┘
+            │                                                   │
+            │                                                   │
+ ┌──────────┴──────────┐                             ┌──────────┴──────────┐
+ │    Axelix Master    │                             │    Axelix Master    │
+ │       pod "A"       │                             │       pod "B"       │
+ └──┬─────────────┬────┘                             └─┬─────────────┬─────┘
+    │             │                                    │             │
+    │             │                                    │             │
+    │     ┌───────┴────────────────────────────────────┴────────┐    │
+    │     │                      Shared DB                      │    │
+    │     │                                                     │    │
+    │     └─────────────────────────────────────────────────────┘    │
+    │                                                                │
+┌───┴──────────────────────┐                       ┌─────────────────┴─────┐
+│ Spring Boot Services     │                       │ Spring Boot Services  │
+│ (Spring Boot 2 - 4)      │                       │ (Spring Boot 2 - 4)   │
+└──────────────────────────┘                       └───────────────────────┘
+```
+
+## 安全模型
+
+AI 智能体使用 MCP 以及人类使用 UI 时，均可通过 [Basic 身份验证](https://datatracker.ietf.org/doc/html/rfc7617)
+或 [OAuth2/OIDC](https://datatracker.ietf.org/doc/html/rfc7617) 进行身份验证。
+以下仅作简要概述；有关完整的凭据模型，请参阅[身份验证](../setting-up-master-ui/authentication/authentication.mdx)。
+
+### Basic 身份验证
+
+在这种情况下，假定用户将在 Axelix Master 所连接的数据库中创建。用户配置文件将存储在
+Axelix Master 数据库中，这适用于小型部署。
+
+:::note
+目前，只能由工程师通过 UI 手动创建用户。Terraform Provider 正在开发中。
+:::
+
+登录时，系统会要求用户或 AI 智能体提供凭据，随后根据数据库检查这些凭据。
+如果通过 UI 表单登录，后端会发送一个专用的身份验证 Cookie，其中包含 JWT 访问令牌。
+
+使用 AI 智能体时，只需按照 [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617) 的定义，
+通过自定义 <code>"Basic ..."</code> 标头提供这些凭据。
+
+:::important
+由于目前尚无针对 AI 智能体通过 MCP 服务器使用 <code>"Basic"</code> 身份验证方案的标准，
+如果智能体使用 Basic 身份验证，AI 智能体必须**在每个请求**的 <code>"Basic"</code> 标头中提供凭据。
+:::
+
+### OAuth2 和 OIDC
+
+在现代企业中，SSO（单点登录）是一种常见的 IAM 模式，通常通过 OAuth2 和 OIDC 实现。
+
+可以将 Axelix Master 配置为通过外部 OIDC 身份提供程序对用户进行身份验证。在这种情况下，
+Axelix Master 将信任 OIDC 提供程序的令牌，并且_可能_会向 OIDC 提供程序请求当前用户的额外信息
+（例如，通过查询 <code>/userinfo</code> 端点，如果可用）。
+
+### IAM：重要注意事项
+
+- **共享 JWT 签名密钥。** Master 和每个 Axelix Starter 必须使用相同的签名密钥和 HMAC 算法。
+  Master 会检查已登录用户对 UI 和 MCP 请求的权限。从 1.3 开始，Master 调用 Starter 时会发送一个短期有效的 JWT，
+  将自身标识为 `AXELIX.MASTER`，其中不包含用户的角色或权限。Starter 会验证签名、过期时间和 Master 身份。
+  对于较早版本的 Starter，Master 会使用旧版权限名称重新签发用户令牌，因为这些 Starter 仍会自行检查权限。
+  Starter 还使用共享密钥对注册和心跳请求进行签名。密钥不匹配会返回 `401`。
+- **TLS 由运维人员负责。** Master 默认监听纯 HTTP。在任何非本地部署中，都应将其置于终止 TLS 的代理之后，
+  并设置 `axelix.master.auth.cookie.secure=true`。

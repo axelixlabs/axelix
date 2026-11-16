@@ -1,0 +1,269 @@
+---
+title: 身份验证
+description: "本页介绍 Axelix Master 登录的实际工作方式：有哪些身份验证选项、浏览器会话如何建立并在每次请求时验证、
+              控制 UI 访问的角色/权限模型，以及 MCP 服务器如何验证 AI 智能体的身份。"
+---
+
+import signInOptionsStyles from './_signInOptionsTable.module.css';
+import rolesStyles from './_rolesTable.module.css';
+import oauth2Styles from './_oauth2PropertiesTable.module.css';
+
+属性键本身列在[配置 Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx#配置参考)中；本页旨在帮助你理解其背后的模型。
+
+## 三种登录选项
+
+Master 提供三个相互独立的身份验证提供程序。可以同时启用任意组合；`/login` 上的登录
+界面会为当前启用的选项显示相应控件。
+
+<div className={signInOptionsStyles.SignInOptionsTable}>
+
+| 选项          | 默认值       | 开关属性                                                                                   | 适用场景                                                                                 |
+|---------------|--------------|--------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| 超级管理员    | 始终启用     | （由 `axelix.master.auth.options.super-admin.credentials.{username,password}` 控制）       | 首次设置、恢复账户、单操作员部署。                                                       |
+| 本地用户      | 关闭         | `axelix.master.auth.options.local.enabled=true`                                            | 由 Master 负责存储密码。                                                                 |
+| OAuth2 / OIDC | 关闭         | `axelix.master.auth.options.oauth2.enabled=true`                                           | 生产环境。通过 Keycloak、Auth0、Okta、Google 或任何符合 OIDC 规范的提供程序实现 SSO。 |
+
+</div>
+
+启用多个选项时，界面会依次显示这些选项：先显示用于超级管理员和本地用户的用户名/密码表单；
+如果启用了 OIDC，随后显示一个 **Sign in with OAuth2/OIDC Provider** 按钮。
+
+### 超级管理员
+
+内置超级管理员是唯一始终启用的账户。你可以将超级管理员视为 Axelix 中的_“上帝模式”_用户：
+
+1. 它拥有所有可能的权限。
+2. 它是内置账户，并且_始终_启用。无法将其关闭或删除（原因见下文）。
+3. 它无法编辑或修改，但你可以（也应该！）通过
+`axelix.master.auth.options.super-admin.credentials.username` / `.password` 设置更改其用户名/密码。请注意，**这些设置会在
+Axelix Master 每次启动时重新应用**，而不只是在初始设置期间应用！
+
+#### 何时使用
+
+超级管理员用于两种情形，而非日常操作：
+
+1. **初始设置。** 全新的 Master 中还没有其他账户。以超级管理员身份登录，完成首次运行
+   工作：设置许可证、创建第一批本地用户，并配置团队此后将使用的特权角色。
+2. **紧急恢复。** 当团队通常使用的账户停止工作时，超级管理员就是应急入口。
+   例如，OIDC 角色映射可能将所有人都解析为 `VIEWER`，或者管理员可能被意外删除。由于
+   超级管理员从不依赖数据库或外部身份提供程序，因此你始终可以登录并修复
+   出现的问题。
+
+日常工作请改用本地账户或 OIDC 账户登录。超级管理员仅用于设置和紧急恢复。
+
+#### 与其他账户的区别
+
+另外两种登录选项会在 Master 的数据库中留下记录；超级管理员则不会。
+
+- **本地用户**完全存储在 Master 的数据库中，并通过 **Users** 界面进行管理。
+- **OIDC 用户**由你的身份提供程序管理，但 Master 仍会持久化每个用户的记录，包括
+  从 `role-attribute-path` 解析出的角色，以便在 **Users** 界面中显示这些用户并重用该映射。
+- **超级管理员**完全没有数据库记录。其凭据只存在于配置中。它永远不会出现在
+  **Users** 界面中，而且其用户名是保留的：任何本地或 OIDC 用户都不能在创建、重命名、编辑或删除时
+  使用该用户名。因此，超级管理员账户本身也无法通过 UI 编辑或删除。
+
+:::tip
+要更改超级管理员的用户名或密码，请编辑 `axelix.master.auth.options.super-admin.credentials` 并重启
+Master。按照设计，无法在应用内完成此操作。
+:::
+
+在向任何人开放 Master 之前，请覆盖默认凭据：`admin / admin` 会授予对每个受监控
+服务的完全控制权。
+
+密码可以采用以下格式之一：
+
+* **明文**：原始密码值。
+* **编码**：在值前加上花括号中的标识符，以指示验证方式：`{noop}`
+表示明文，`{bcrypt}` 表示 BCrypt 哈希。
+
+如果未提供前缀，该值将被视为明文。
+出于安全考虑，强烈建议使用哈希密码格式（例如 `{bcrypt}`），而不是
+明文。
+
+编码密码的示例如下：
+
+* `{bcrypt}$2a$10$KjkxE0Tt8L4B2kDYlSWcme0o/AjKE7LqyDaTqPr0sESbF85e3bDTC`——bcrypt 编码密码
+* `{noop}password`——明文编码（与仅使用 `password` 相同）。
+
+### 本地用户
+
+本地用户存储在 Master 自己的数据库（`UserEntity`）中。密码使用 BCrypt 进行哈希处理。当
+`axelix.master.auth.options.local.enabled=true` 时，`DatabaseUserAuthenticator` 会查找提交的用户名，
+使用 BCrypt 验证密码，并将存储的角色字符串（`admin`、`editor`、`viewer`）映射到一个内置
+角色。登录时，未知的角色字符串会引发 `UserRoleNotFoundException`。
+
+本地用户通过 UI 中的 **Users** 界面进行管理：创建、更新和删除本地用户需要
+`users:manage` 权限，默认情况下只有 `SUPER_ADMIN` 拥有此权限。
+
+### OAuth2 / OIDC
+
+Master 实现标准的授权码流程。通过 `axelix.master.auth.options.oauth2.enabled=true` 启用它，
+并提供 `issuer-uri`、`client-id`、`client-secret` 以及此 Master 部署的公共 `base-url`。
+
+端到端流程如下：
+
+1. 用户在 `/login` 上点击 **Sign in with OAuth2/OIDC Provider**。浏览器会重定向到 IdP 的授权
+   端点，并携带 `client-id`，同时将 `redirect_uri` 设置为 `<base-url>/api/external/oauth2/callback`。
+2. IdP 验证用户身份，然后携带 `code` 重定向回回调地址。
+3. `OAuth2CallbackController` 通过 IdP 的令牌端点用授权码交换 ID 令牌和访问令牌，验证
+   ID 令牌，并提取用户名。
+4. 通过对 userinfo 响应求值 `axelix.master.auth.options.oauth2.role-attribute-path`
+   中的 JMESPath 表达式来解析角色。结果会映射到 `admin`、`editor` 或 `viewer`。如果未设置
+   `role-attribute-path`，每个 OIDC 用户都会获得 `VIEWER` 角色。
+5. 在生成会话 Cookie 之前，Master 会在自己的数据库中新增或更新来源为 `OIDC` 的用户；
+   如果 userinfo 中包含电子邮件地址，则刷新存储的电子邮件地址，并更新 `Last login`。
+6. Master 生成自己的会话 JWT（使用与密码流程相同的编码器），设置会话 Cookie，并将浏览器重定向到 `/wallboard`。
+
+授权码流程只会通过浏览器触发。OIDC 令牌本身永远不会被存储：Master 只使用它们一次来识别
+用户，然后签发自己的会话 JWT。
+
+因此，每次浏览器登录成功后，都会在 **Users** 界面中留下一个持久的 `OIDC` 账户。如果同一
+用户名已属于非 OIDC 账户，Master 会拒绝登录，而不会合并这两个身份。
+
+**当 `axelix.master.auth.options.oauth2.enabled=true` 时，必须提供以下属性：**`issuer-uri`、`client-id`、
+`client-secret`、`base-url`。`scopes` 默认为 `openid`，只有 IdP 需要额外作用域时才需要覆盖它。
+`role-attribute-path` 是可选的：不设置它即可将每个已登录用户映射到 `VIEWER` 角色。
+
+<div className={oauth2Styles.ConfigTable}>
+
+| 属性                                                      | 默认值                                              | 描述                                                                                                                                                         |
+|-----------------------------------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled`               | `false`                                             | 启用 OIDC 登录。                                                                                                                                             |
+| `axelix.master.auth.options.oauth2.issuer-uri`            | *（未设置）* <span className="Required">必需</span> | OIDC 签发方基础 URL。Master 从此处读取 `/.well-known/openid-configuration` 以发现端点。只要 `oauth2.enabled=true`，就必须提供此属性。                  |
+| `axelix.master.auth.options.oauth2.client-id`             | *（未设置）* <span className="Required">必需</span> | 在 OIDC 提供程序中注册的客户端标识符。只要 `oauth2.enabled=true`，就必须提供此属性。                                                                       |
+| `axelix.master.auth.options.oauth2.client-secret`         | *（未设置）* <span className="Required">必需</span> | 在 OIDC 提供程序中注册的客户端密钥。只要 `oauth2.enabled=true`，就必须提供此属性。                                                                         |
+| `axelix.master.auth.options.oauth2.base-url`              | *（未设置）* <span className="Required">必需</span> | 此 Master 实例的公共基础 URL。用于构建 OAuth2 回调重定向 URI。只要 `oauth2.enabled=true`，就必须提供此属性。                                             |
+| `axelix.master.auth.options.oauth2.scopes`                | `openid`                                            | 授权码流程期间请求的、以空格分隔的作用域。如果缺少 `openid`，则会自动追加。                                                                                |
+| `axelix.master.auth.options.oauth2.role-attribute-path`   | *（未设置）*                                        | 对 userinfo 响应求值以解析 Axelix 角色的 JMESPath 表达式。如果未设置，每个 OIDC 用户都会成为 `VIEWER`。                                                  |
+
+</div>
+
+:::warning
+将每个已登录用户映射到 `VIEWER` 便于初次体验，但在生产环境中，这意味着**任何能通过你的 IdP
+验证身份的人，都可以读取每个已发现服务的所有监控数据**。除非 IdP 中的用户恰好就是
+应该查看 Master 的全部人员，否则请设置 `role-attribute-path`，避免没有明确 Axelix 角色的用户
+在无提示的情况下获得 `VIEWER` 权限。
+:::
+
+## 会话：Cookie 和 JWT
+
+每种登录路径最终都以相同方式结束：Master 生成一个 JWT，并通过 Cookie 将其返回。之后的每个
+UI 请求都使用同一 Cookie 进行访问控制。
+
+### 登录会生成什么
+
+`POST /api/external/users/login`（以及 OIDC 回调）通过 `Set-Cookie` 签发两个 Cookie：
+
+- **`auth_token`**：JWT 本身。`HttpOnly`、`SameSite=Strict`、`Path=/`、`MaxAge=axelix.master.auth.jwt.lifespan`
+  （默认为 `12h`）。`Secure` 由 `axelix.master.auth.cookie.secure` 控制：只有在使用纯 HTTP 的
+  localhost 上，才应将其保留为 `false`。
+- **`authorities`**：一个 Base64 编码的 JSON 数组，包含已登录用户拥有的权限名称，例如
+  `["environment.values:read","scheduled-tasks:write"]`。它*不是* `HttpOnly`，因为前端需要读取它以确定
+  要显示哪些按钮。它只是 UI 提示。后端会在每次请求时根据 JWT 重新推导权限，因此篡改
+  此 Cookie 只会改变 UI 提供的功能，不会改变服务器允许的操作。
+
+JWT 本身使用 `axelix.master.auth.jwt.signing-key` 中的密钥进行 HMAC 签名（`HMAC256`、`HMAC384` 或
+`HMAC512`，通过 `axelix.master.auth.jwt.algorithm` 设置）。其声明包括用户名（`sub`）、签发时间和到期
+时间戳，以及一个 `roles` 声明；后者对每个已授予角色及其权限和嵌套组件进行编码。
+
+### 每个请求都要经过什么
+
+`CookieBasedJwtAuthorizationFilter` 会处理每个 `/api/...` 请求，但少量白名单地址除外（登录端点
+本身、OAuth2 回调、公共设置端点、自注册端点和 `/api/mcp/**`：这些地址
+有自己的过滤器，或有意允许匿名访问）。对于其他所有请求：
+
+1. 过滤器读取 `auth_token` Cookie。缺失或为空 → `JwtProcessingException`，并表现为 `401
+   Unauthorized`。
+2. `DefaultJwtDecoderService` 使用 `axelix.master.auth.jwt.signing-key` 验证签名和到期时间。
+   被篡改、未签名或已过期的令牌 → `401`。
+3. `MasterAuthorityResolver` 在“此端点需要此权限”规则的内置表中查找请求路径和 HTTP 方法。
+   未出现在该表中的端点只需要有效令牌。
+4. `DefaultAuthorizer` 将用户角色展开为完整权限集，并检查它是否涵盖所需
+   权限。缺少任一权限 → `AuthorizationException`，并表现为 `403 Forbidden`。
+5. 成功后，请求在携带已验证 `User` 和原始令牌的 `DefaultSecurityContext` 中运行，因此
+   下游代码无需重新解析即可读取调用方。
+
+### 注销和轮换
+
+`POST /api/external/users/logout` 会用空值和 `MaxAge=0` 覆盖这两个 Cookie，使浏览器
+立即删除它们。JWT 本身在其 `exp` 声明指定的时间到期前，技术上仍然有效：Master 不维护
+服务器端阻止列表。
+
+要强制结束所有活动会话（例如在密钥泄露、共享密钥过时或季度轮换后），请更改
+`axelix.master.auth.jwt.signing-key`。由于签名与新密钥不再匹配，每个已签发令牌都会在下一次请求时
+立即无法通过验证。用户会回到 `/login`。
+
+## 角色和权限
+
+Axelix 1.3 引入了新的 RBAC 权限名称，其灵感来自
+[Grafana RBAC 模型](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/access-control/)。
+`resource:action` 和 `resource.sub-resource:action` 命名模式仅适用于 Axelix 1.3 及更高版本。
+早期版本使用 `CACHES_CLEAR` 等旧式名称。
+例如，`caches:clear` 允许清除缓存，`environment.values:read` 表示对属性值的访问权限。
+角色仍决定用户可以执行哪些操作。对于低于 1.3 的 Starter，Master 会自动将
+代号转换为 `CACHES_CLEAR` 等旧式名称；无需更改服务配置。
+
+Master 使用一组固定的角色和一组固定的权限。角色是权限的集合，授权
+检查始终针对权限，而不是角色名称。这意味着，通过 OIDC 映射或
+数据库层接入的自定义角色必须解析为一个内置名称：目前无法通过
+配置定义新权限。
+
+<div className={rolesStyles.RolesTable}>
+
+| 角色          | 授予的权限                                                                                                                                     | 谁拥有此角色                                                                                       |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `SUPER_ADMIN` | Master 定义的所有权限，包括 `users:read` 和 `users:manage`。                                                                                 | 内置超级管理员账户。                                                                               |
+| `ADMIN`       | `environment.values:read`、`config-properties.values:read`、`scheduled-tasks:write`、`caches:clear`、`caches:toggle`、`gc:manage`、`heap-dump:read`。 | 角色为 `admin` 的本地数据库用户。`role-attribute-path` 解析为 `admin` 的 OIDC 用户。             |
+| `EDITOR`      | `scheduled-tasks:write`、`caches:clear`、`caches:toggle`、`gc:manage`。                                                                       | 角色为 `editor` 的本地数据库用户。`role-attribute-path` 解析为 `editor` 的 OIDC 用户。           |
+| `VIEWER`      | 无：以只读方式查看所有不受权限控制的内容。                                                                                                   | 角色为 `viewer` 的本地数据库用户。未设置 `role-attribute-path` 或值未映射的 OIDC 用户。           |
+
+</div>
+
+各权限控制的操作如下：
+
+- **`environment.values:read`**：在 **Environment** 界面中显示属性值。
+- **`config-properties.values:read`**：在 **Configuration Properties** 界面中显示属性值。
+- **`scheduled-tasks:write`**：启用、禁用、强制执行定时任务，以及重新安排定时任务。
+- **`caches:clear`**：清除单个缓存、缓存管理器或整个应用缓存。
+- **`caches:toggle`**：在运行时启用和禁用单个缓存及缓存管理器。
+- **`gc:manage`**：触发 GC，以及启用和禁用 GC 日志监控。
+- **`heap-dump:read`**：直接下载堆转储，或将其包含在导出的应用程序状态中。
+- **`users:read`**：读取 Users 信息流。
+- **`users:manage`**：创建、更新和删除本地用户。
+
+目前，`users:read` 和 `users:manage` 仅保留给 `SUPER_ADMIN`；`ADMIN` 若不提升权限，则无法管理用户。
+
+## MCP 服务器身份验证
+
+`/api/mcp` 上的内置 MCP 服务器由自己的过滤器 `McpAuthorizationFilter` 控制，因为 MCP 客户端
+携带的凭据不是浏览器会话 Cookie。该过滤器解析 `Authorization` 标头，并分派给
+与方案匹配的处理程序。
+
+- **`Basic`**：`BasicMcpAuthenticationHandler` 解码 `Authorization: Basic <base64(user:pass)>`，并委托给
+  UI 使用的同一个 `CompositeUserAuthenticator`。超级管理员和本地账户均可使用。角色映射与
+  浏览器登录完全相同。
+- **`Bearer`**：`BearerMcpAuthenticationHandler` 将凭据视为 OIDC 访问令牌。它通过
+  `JmesPathOidcRoleExtractor`（与浏览器 OIDC 流程相同的路径）处理令牌以推导角色，然后签发一个
+  名为 `AI_AGENT`、携带该角色的合成 `PasswordlessUser`。仅在
+  `axelix.master.auth.options.oauth2.enabled=true` 时可用。
+
+识别用户后，过滤器会执行与 Web 过滤器相同的权限检查：通过 `McpEndpointResolver` 和
+`McpEndpointAuthorityResolver` 解析每个工具的权限要求。调用方无权执行的工具会返回
+`403 Forbidden`。未知或无效凭据会返回 `401 Unauthorized`。
+
+启用 OIDC 后，如果请求到达时不带 `Authorization` 标头，`401` 响应还会携带：
+
+```
+WWW-Authenticate: Bearer resource_metadata="<base-url>/api/external/mcp-oauth2/.well-known/oauth-protected-resource"
+```
+
+实现 RFC 9728 的 MCP 客户端使用该标头发现 Master 的 OAuth2 配置，并自行引导用户完成
+授权流程。
+
+## 相关内容
+
+- [配置 Master：身份验证属性](../../setting-up-master-ui/configuring-master/configuring-master.mdx#身份验证--jwt)：
+  本页引用的每个属性键和默认值。
+- [配置 Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)：同一 JWT
+  签名密钥的 Starter 端配置。
+- [什么是 Master？](../what-is-master.mdx)：会话建立后 Master 所执行功能的更广泛背景。

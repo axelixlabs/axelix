@@ -54,8 +54,11 @@ type VersionProps = {
  */
 export const ReleasedInNotice = ({ version }: VersionProps) => {
     const { locale } = useI18n();
-    const label = translate({ en: "Released", ru: "Выпущено" }, locale);
-    const detail = translate({ en: "Available since release", ru: "Доступно начиная с релиза" }, locale);
+    const label = translate({ en: "Released", ru: "Выпущено", zh: "已发布" }, locale);
+    const detail = translate(
+        { en: "Available since release", ru: "Доступно начиная с релиза", zh: "自以下版本起可用" },
+        locale,
+    );
 
     return (
         // Green reads as "shipped", against the purple "future" of its sibling.
@@ -79,9 +82,13 @@ export const ReleasedInNotice = ({ version }: VersionProps) => {
 /** Marks a section as not yet released. */
 export const UpcomingReleaseNotice = () => {
     const { locale } = useI18n();
-    const label = translate({ en: "Upcoming", ru: "Ожидается" }, locale);
+    const label = translate({ en: "Upcoming", ru: "Ожидается", zh: "即将推出" }, locale);
     const detail = translate(
-        { en: "Available in an upcoming minor release", ru: "Появится в ближайшем минорном релизе" },
+        {
+            en: "Available in an upcoming minor release",
+            ru: "Появится в ближайшем минорном релизе",
+            zh: "将在后续次要版本中提供",
+        },
         locale,
     );
 
@@ -109,7 +116,7 @@ type ScreenshotsNoticeProps = {
 /** Frames the screenshot passed as children, with the notice line as its header. */
 export const ScreenshotsNotice = ({ text, children }: ScreenshotsNoticeProps) => {
     const { locale } = useI18n();
-    const label = translate({ en: "Screenshots", ru: "Скриншоты" }, locale);
+    const label = translate({ en: "Screenshots", ru: "Скриншоты", zh: "截图" }, locale);
 
     // Slate blue reads as neutral context, apart from the green, purple and amber notices.
     const accent = "[--accent:#4a6a8a] dark:[--accent:#9db7d1]";
@@ -143,10 +150,17 @@ type LegacyNoticeProps = VersionProps & {
 /** Marks a section as no longer applicable from a given release onwards. */
 export const LegacyNotice = ({ version, reason }: LegacyNoticeProps) => {
     const { locale } = useI18n();
-    const label = translate({ en: "Legacy", ru: "Устарело" }, locale);
-    const detail = translate({ en: "Only needed before release", ru: "Актуально только до релиза" }, locale);
+    const label = translate({ en: "Legacy", ru: "Устарело", zh: "旧版" }, locale);
+    const detail = translate(
+        { en: "Only needed before release", ru: "Актуально только до релиза", zh: "仅在以下版本之前需要" },
+        locale,
+    );
     const skip = translate(
-        { en: "On later versions, skip this section.", ru: "На более поздних версиях пропустите этот раздел." },
+        {
+            en: "On later versions, skip this section.",
+            ru: "На более поздних версиях пропустите этот раздел.",
+            zh: "使用更高版本时，请跳过本节。",
+        },
         locale,
     );
 
