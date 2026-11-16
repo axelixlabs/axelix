@@ -4,6 +4,7 @@ description: APM project for axelix
 dependencies:
   apm:
   # Custom
+  - ./.agents/skills/axelix-localization
   - ./.agents/skills/backlog-refiner
   - ./.agents/skills/config-breaking-changes
   - ./.agents/skills/docs-writer
