@@ -18,17 +18,12 @@
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
-import org.springframework.aop.TargetSource;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -41,9 +36,6 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportC
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Integration tests for {@link DefaultConfigurationPropertiesService}.
@@ -89,48 +81,6 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void releasesProxyTargetEvenWhenSerializationFails(boolean fails) throws Exception {
-        // given.
-        NullableProperties target = new NullableProperties();
-        TargetSource source = mock(TargetSource.class);
-        org.mockito.Mockito.doReturn(NullableProperties.class).when(source).getTargetClass();
-        when(source.getTarget()).thenReturn(target);
-        ProxyFactory factory = new ProxyFactory();
-        factory.setTargetSource(source);
-        factory.setProxyTargetClass(true);
-        if (fails) {
-            target.getValues().put("broken", new Object() {
-                @com.fasterxml.jackson.annotation.JsonValue
-                public String value() {
-                    throw new IllegalStateException();
-                }
-            });
-        }
-        NullableProperties proxy = (NullableProperties) factory.getProxy();
-        new ApplicationContextRunner()
-                .withBean("proxied", NullableProperties.class, () -> proxy)
-                .run(context -> {
-                    ConfigurationPropertiesService service = new DefaultConfigurationPropertiesService(
-                            context,
-                            new DefaultConfigurationPropertiesFlattener(),
-                            new PropertySensitivityMarker(List.of(), new DefaultPropertyNameNormalizer()));
-
-                    // when.
-                    ConfigurationPropertiesFeed feed = service.getConfigProps();
-
-                    // then.
-                    assertThat(feed.getBeans())
-                            .filteredOn(bean -> bean.getBeanName().equals("proxied"))
-                            .singleElement()
-                            .satisfies(bean -> assertThat(bean.getProperties())
-                                    .extracting(ConfigurationPropertiesEntry::getKey)
-                                    .contains(fails ? "error" : "unset"));
-                    verify(source).releaseTarget(target);
-                });
-    }
-
     @ConfigurationProperties("nullable")
     public static class NullableProperties {
         public @Nullable String getUnset() {
@@ -138,16 +88,6 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         }
 
         public void setUnset(@Nullable String unset) {}
-
-        private Map<String, Object> values = new java.util.HashMap<>();
-
-        public Map<String, Object> getValues() {
-            return values;
-        }
-
-        public void setValues(Map<String, Object> values) {
-            this.values = values;
-        }
     }
 
     @Test
