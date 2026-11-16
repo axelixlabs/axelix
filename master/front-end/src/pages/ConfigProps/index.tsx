@@ -18,13 +18,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { EmptyHandler, HashNavigable, Loader, PageSearch } from "@/components";
+import { EmptyHandler, HashNavigable, Loader, PageSearch, PropertyTriageFilters } from "@/components";
 import { fetchData, filterConfigPropsBeans, getPropertiesCount } from "@/helpers";
 import { EPropertyTriageTag, type IConfigPropsBean, type IConfigPropsResponseBody, StatefulRequest } from "@/models";
 import { getConfigPropsData } from "@/services";
-
-import { PropertyTriageFilters } from "../Environment/EnvironmentTables/EnvironmentTriageFilters";
-import toolbarStyles from "../Environment/EnvironmentTables/styles.module.css";
 
 import { ConfigPropsTables } from "./ConfigPropsTables";
 
@@ -70,7 +67,7 @@ const ConfigProps = () => {
 
     return (
         <>
-            <div className={toolbarStyles.MainWrapper}>
+            <div className="PropertyToolbar">
                 <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
                 <PropertyTriageFilters
                     counts={[{ triageTag: EPropertyTriageTag.DANGEROUS, count: dangerousCount }]}

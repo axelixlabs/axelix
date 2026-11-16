@@ -62,7 +62,7 @@ export const EnvironmentTables = ({ propertySources, profiles }: IProps) => {
 
     return (
         <>
-            <div className={styles.MainWrapper}>
+            <div className="PropertyToolbar">
                 <div className={styles.ToolbarRow}>
                     {profiles.length !== 0 && <EnvironmentProfiles profiles={profiles} />}
 

@@ -1,9 +1,3 @@
-.MainWrapper {
-    padding-bottom: 16px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--axelix-grey-300);
-}
-
 .ToolbarRow {
     display: flex;
     align-items: center;

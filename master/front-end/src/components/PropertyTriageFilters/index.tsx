@@ -1,0 +1,91 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+import { useTranslation } from "react-i18next";
+
+import { EPropertyTriageTag } from "@/models";
+
+import styles from "./styles.module.css";
+
+const TAG_STYLES: Record<EPropertyTriageTag, string> = {
+    [EPropertyTriageTag.DANGEROUS]: styles.Dangerous,
+    [EPropertyTriageTag.DEPRECATED_ERROR]: styles.DeprecatedError,
+    [EPropertyTriageTag.DEPRECATED_WARNING]: styles.DeprecatedWarning,
+    [EPropertyTriageTag.SUPPRESSED]: styles.Suppressed,
+};
+
+interface IPropertyTriageFiltersProps {
+    /**
+     * The triage tags that are currently selected
+     */
+    selectedTags: EPropertyTriageTag[];
+
+    /**
+     * Replaces the current selection with the given one
+     */
+    onSelectedTagsChange: (triageTags: EPropertyTriageTag[]) => void;
+
+    /**
+     * The number of properties matching each triage tag in the full, unfiltered feed
+     */
+    counts: { triageTag: EPropertyTriageTag; count: number }[];
+}
+
+export const PropertyTriageFilters = ({ counts, selectedTags, onSelectedTagsChange }: IPropertyTriageFiltersProps) => {
+    const { t } = useTranslation();
+    const availableTags = counts.filter(({ count }) => count > 0);
+
+    if (!availableTags.length) {
+        return null;
+    }
+
+    const toggleTag = (triageTag: EPropertyTriageTag): void => {
+        onSelectedTagsChange(
+            selectedTags.includes(triageTag)
+                ? selectedTags.filter((selectedTag) => selectedTag !== triageTag)
+                : [...selectedTags, triageTag],
+        );
+    };
+
+    return (
+        <>
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+                {availableTags.map(({ triageTag, count }) => {
+                    const isSelected = selectedTags.includes(triageTag);
+
+                    return (
+                        <div
+                            className={`${styles.Chip} ${TAG_STYLES[triageTag]} ${isSelected ? styles.Selected : ""}`}
+                            onClick={() => toggleTag(triageTag)}
+                            key={triageTag}
+                        >
+                            <span className={styles.Dot} />
+                            {t(`Environments.triageTags.${triageTag}`)}
+                            <span className={styles.Count}>{count}</span>
+                        </div>
+                    );
+                })}
+
+                {selectedTags.length > 0 && (
+                    <div className={styles.Clear} onClick={() => onSelectedTagsChange([])}>
+                        {t("Environments.clearFilters")}
+                    </div>
+                )}
+            </div>
+        </>
+    );
+};

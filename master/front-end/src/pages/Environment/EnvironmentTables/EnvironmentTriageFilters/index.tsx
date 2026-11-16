@@ -15,20 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
-
+import { PropertyTriageFilters } from "@/components";
 import { countTriageTag } from "@/helpers";
-import { EPropertyTriageTag, type IEnvironmentPropertySource } from "@/models";
+import type { EPropertyTriageTag, IEnvironmentPropertySource } from "@/models";
 import { environmentTriageTags } from "@/utils";
-
-import styles from "./styles.module.css";
-
-const TAG_STYLES: Record<EPropertyTriageTag, string> = {
-    [EPropertyTriageTag.DANGEROUS]: styles.Dangerous,
-    [EPropertyTriageTag.DEPRECATED_ERROR]: styles.DeprecatedError,
-    [EPropertyTriageTag.DEPRECATED_WARNING]: styles.DeprecatedWarning,
-    [EPropertyTriageTag.SUPPRESSED]: styles.Suppressed,
-};
 
 interface IProps {
     /**
@@ -61,57 +51,5 @@ export const EnvironmentTriageFilters = ({ propertySources, selectedTags, onSele
             selectedTags={selectedTags}
             onSelectedTagsChange={onSelectedTagsChange}
         />
-    );
-};
-
-interface IPropertyTriageFiltersProps extends Omit<IProps, "propertySources"> {
-    /**
-     * The number of properties matching each triage tag in the full, unfiltered feed
-     */
-    counts: { triageTag: EPropertyTriageTag; count: number }[];
-}
-
-export const PropertyTriageFilters = ({ counts, selectedTags, onSelectedTagsChange }: IPropertyTriageFiltersProps) => {
-    const { t } = useTranslation();
-    const availableTags = counts.filter(({ count }) => count > 0);
-
-    if (!availableTags.length) {
-        return null;
-    }
-
-    const toggleTag = (triageTag: EPropertyTriageTag): void => {
-        onSelectedTagsChange(
-            selectedTags.includes(triageTag)
-                ? selectedTags.filter((selectedTag) => selectedTag !== triageTag)
-                : [...selectedTags, triageTag],
-        );
-    };
-
-    return (
-        <>
-            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-                {availableTags.map(({ triageTag, count }) => {
-                    const isSelected = selectedTags.includes(triageTag);
-
-                    return (
-                        <div
-                            className={`${styles.Chip} ${TAG_STYLES[triageTag]} ${isSelected ? styles.Selected : ""}`}
-                            onClick={() => toggleTag(triageTag)}
-                            key={triageTag}
-                        >
-                            <span className={styles.Dot} />
-                            {t(`Environments.triageTags.${triageTag}`)}
-                            <span className={styles.Count}>{count}</span>
-                        </div>
-                    );
-                })}
-
-                {selectedTags.length > 0 && (
-                    <div className={styles.Clear} onClick={() => onSelectedTagsChange([])}>
-                        {t("Environments.clearFilters")}
-                    </div>
-                )}
-            </div>
-        </>
     );
 };

@@ -42,3 +42,4 @@ export { Loader } from "./Loader";
 export { Copy } from "./Copy";
 
 export { ActionInstancesSelector } from "./ActionInstancesSelector";
+export { PropertyTriageFilters } from "./PropertyTriageFilters";
