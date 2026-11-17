@@ -1,0 +1,123 @@
+---
+title: Mimari
+description: "Axelix'in merkezinde Axelix Master bulunur. Master, yönetmek istediğiniz her Spring Boot servisiyle servis tarafındaki Axelix Starter bağımlılığı üzerinden iletişim kurar. Web arayüzü ve MCP sunucusu Master içinde çalışır; böylece tek bir süreç hem tarayıcıya hem yapay zekâ ajanına aynı verileri sunar."
+---
+
+```
+                                         ┌───────────────────────┐
+                                         │ Spring Boot 2 Service │
+                         ┌──────────────▶│  + Axelix Starter     │
+                         │               └───────────────────────┘
+┌──────────┐         ┌───┴────────┐      ┌───────────────────────┐
+│    UI    │─REST───▶│            │─────▶│ Spring Boot 3 Service │
+└──────────┘         │   Axelix   │      │  + Axelix Starter     │
+                     │   Master   │      └───────────────────────┘
+                     │ (UI + MCP) │      ┌───────────────────────┐
+┌──────────┐         │            │─────▶│ Spring Boot 2 Service │
+│ AI Agent │─MCP────▶│            │      │  + Axelix Starter     │
+└──────────┘         └───┬────────┘      └───────────────────────┘
+                         │               ┌───────────────────────┐
+                         └──────────────▶│ Spring Boot 3 Service │
+                                         │  + Axelix Starter     │
+                                         └───────────────────────┘
+```
+
+## Bileşenler [#components]
+
+- **[Axelix Master](../setting-up-master-ui/what-is-master.mdx)**: Arayüzü sunar, arayüzün kullandığı REST API'yi sağlar,
+  paketlenmiş MCP sunucusunu çalıştırır, yönetilen her servisle HTTP üzerinden iletişim kurar ve örnek kayıtlarını tutar.
+- **[Axelix Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx)**:
+  [Spring Boot 2](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency),
+  [Spring Boot 3](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency) ve
+  [Spring Boot 4](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency) için ayrı starter
+  modülleri vardır; uygulamanıza uygun olanı seçin. Starter, Master'ın ihtiyaç duyduğu uç noktaları (bean'ler, ortam,
+  önbellekler, zamanlanmış görevler ve diğerleri) sunar ve isteğe bağlı olarak başlangıçta Master'a kendini kaydedebilir.
+
+## İletişim [#communication]
+
+- **Tarayıcı ⇄ Master**: Master'ın statik ön yüzü sunduğu aynı origin üzerinden REST/JSON.
+- **Yapay zekâ ajanı ⇄ Master**: HTTP üzerinden [Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro).
+  Kimlik bilgisi yöntemleri için [MCP sunucusu kimlik doğrulamasına](../setting-up-master-ui/authentication/authentication.mdx#mcp-server-authentication) bakın.
+- **Master → yönetilen servis**: Servisteki Axelix Starter uç noktalarına HTTP çağrıları. Her okuma (bean'ler, ortam,
+  zamanlanmış görevler ve diğerleri) ve durumu değiştiren her eylem (günlük düzeyi ayarlama, önbellek temizleme, görev
+  tetikleme) eşzamanlı bir HTTP çağrısıdır.
+- **Yönetilen servis → Master**: Yalnızca kendiliğinden kayıt etkin olduğunda kullanılır. Starter başlangıçta kayıt gönderir
+  ve düzenli yaşam sinyalleri ile kaydı güncel tutar; istek gövdesi Master'ın servise erişmek için kullanacağı URL'yi içerir.
+
+## Servis keşfi [#service-discovery]
+
+Bir servis, Master'ın örnek kayıtlarında iki yoldan biriyle görünür:
+
+- [Master tarafında otomatik keşif](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery):
+  Master, Axelix Starter içeren servisleri bulmak için platform API'sini düzenli olarak sorgular. Şu anda otomatik keşif
+  yalnızca [Kubernetes'te](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery)
+  mümkündür ve [resmî Axelix Helm chart'ında](https://artifacthub.io/packages/helm/axelix/axelix) varsayılan olarak etkindir.
+- [Starter tarafında kendiliğinden kayıt](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#option-b--self-registration):
+  Axelix Starter başlangıçta Master'a kayıt isteği ve ardından belirli aralıklarla yaşam sinyalleri gönderir.
+
+Her yöntemde neler olduğunu öğrenmek için [Keşif nasıl çalışır?](./discovery.mdx) sayfasına bakın.
+
+## Dağıtım ve ölçeklendirme [#deployment--scaling]
+
+- **Master merkezi süreçtir.** Arayüzden gelen tüm istekleri kabul eden ve bunları ilgili servise yönlendiren beyin görevi görür.
+- **Veritabanı kalıcılık sınırıdır.** Axelix Master'ın belirli durum bilgilerini tutması gerekir ve bunun için bir veritabanına
+  ihtiyaç duyar. Varsayılan olarak SQLite kullanılır. SQLite küçük dağıtımlar için yeterli olsa da bağlı bir birim olmadan
+  SQLite veritabanı dosyasının kapsayıcı yeniden başlatıldığında korunmadığını unutmayın. Daha büyük dağıtımlar için
+  PostgreSQL veya MySQL kullanın; [Veritabanı](../setting-up-master-ui/configuring-master/configuring-master.mdx#database) bölümüne bakın.
+- **Ağ erişilebilirliği operatörün sorumluluğundadır.** Master kendi ağından her yönetilen servisi HTTP üzerinden çağırabilmelidir;
+  her okuma ve değişiklik bu bağlantı üzerinden gerçekleştirilir. Ters yöndeki tek çağrılar kendiliğinden kayıt yaşam sinyalleridir.
+
+## Birden fazla Master ile dağıtım [#multi-master-deployments]
+
+Aynı anda **yalnızca bir etkin Master kopyası** çalıştırın. Master'ın arka plan işleri ve bellek içi önbellekleri şu anda
+tek örnek varsayar; paylaşılan veritabanı birden fazla etkin kopyayı güvenli hâle getirmez. Otomatik keşif kapsamları
+farklı olduğunda her kopya, taraması sırasında diğer kopyanın otomatik keşfedilen kayıtlarını silebilir.
+
+[Axelix'i yükseltme](../more/upgrading.mdx#invariants) sayfasındaki tek örnek dağıtımı ve yükseltme kısıtlamalarına uyun.
+Yüksek erişilebilirlik sağlayan, birden fazla kopyalı Master şu anda desteklenmez.
+
+## Güvenlik modeli [#security-model]
+
+MCP kullanan yapay zekâ ajanları ve arayüzü kullanan insanlar için kimlik doğrulama,
+[Basic kimlik doğrulaması](https://datatracker.ietf.org/doc/html/rfc7617) veya
+[OAuth2/OIDC](../setting-up-master-ui/authentication/authentication.mdx) ile mümkündür. Aşağıda kısa bir özet verilmiştir;
+tam kimlik bilgisi modeli için [Kimlik doğrulama](../setting-up-master-ui/authentication/authentication.mdx) sayfasına bakın.
+
+### Basic kimlik doğrulaması [#basic-authentication]
+
+Bu durumda kullanıcıların Axelix Master'ın bağlı olduğu veritabanında oluşturulduğu varsayılır. Kullanıcı profili,
+küçük dağıtımlar için uygun olan Axelix Master veritabanında saklanır.
+
+:::note
+Şu anda kullanıcılar yalnızca bir insan mühendis tarafından arayüzden elle oluşturulabilir. Terraform Provider geliştirilmektedir.
+:::
+
+Oturum açarken kullanıcı veya yapay zekâ ajanından kimlik bilgileri istenir ve bunlar veritabanına göre denetlenir.
+Arayüz formundan oturum açıldığında backend, JWT erişim belirtecini içeren özel bir kimlik doğrulama çerezi gönderir.
+
+Basic kimlik doğrulaması kullanan yapay zekâ ajanları, [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617) ile tanımlandığı gibi
+kimlik bilgilerini standart HTTP `Authorization` başlığında gönderir:
+<code>Authorization: Basic &lt;base64(username:password)&gt;</code>.
+
+:::important
+MCP sunucusuyla Basic kimlik doğrulaması kullanıldığında yapay zekâ ajanı bu `Authorization` başlığını **her istekte** göndermelidir.
+:::
+
+### OAuth2 ve OIDC [#oauth2-and-oidc]
+
+Modern kurumlarda SSO (Single Sign-On, tek oturum açma) yaygın bir IAM kalıbıdır. Genellikle OAuth2 ve OIDC ile uygulanır.
+
+Axelix Master, kullanıcının kimliğini haricî bir OIDC kimlik sağlayıcısıyla doğrulayacak şekilde yapılandırılabilir.
+Bu durumda Axelix Master, OIDC sağlayıcısının belirtecine güvenir ve mevcut kullanıcı hakkında ek bilgiler de
+isteyebilir (örneğin varsa <code>/userinfo</code> uç noktasını sorgulayarak).
+
+### IAM: önemli ayrıntılar [#iam-important-nuances]
+
+- **Paylaşılan JWT imzalama anahtarı.** Master ve her Axelix Starter aynı imzalama anahtarını ve HMAC algoritmasını kullanmalıdır.
+  Master, arayüz ve MCP isteklerinde oturum açmış kullanıcının yetkilerini denetler. 1.3 ve üzeri starter'lara çağrı yaparken,
+  kullanıcı rolleri veya yetkileri olmadan kendini `AXELIX.MASTER` olarak tanımlayan kısa ömürlü bir JWT gönderir.
+  Starter imzayı, süre sonunu ve Master kimliğini doğrular. Eski starter'lar izinleri kendileri denetlemeye devam ettiğinden
+  Master, bunlar için kullanıcının belirtecini eski yetki adlarıyla yeniden düzenler.
+  Starter, kayıt ve yaşam sinyali isteklerini de paylaşılan anahtarla imzalar. Anahtar uyuşmazlığı `401` sonucunu doğurur.
+- **TLS operatörün sorumluluğundadır.** Master varsayılan olarak düz HTTP dinler. Yerel olmayan tüm dağıtımlarda önüne
+  TLS sonlandıran bir proxy yerleştirin ve `axelix.master.auth.cookie.secure=true` ayarlayın.

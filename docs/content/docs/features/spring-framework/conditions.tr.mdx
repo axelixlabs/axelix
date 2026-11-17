@@ -1,0 +1,94 @@
+---
+title: Koşullar
+description: "Koşullar sayfası, yönetilen örneğin Spring Boot otomatik yapılandırma raporunu gösterir: Spring’in başlangıçta yaptığı tüm @Conditional değerlendirmeleri, sonuçlarına göre iki sekmeye ayrılır."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Koşullar sayfasının ana görünümü](/img/feature/conditions/conditions-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Conditions sayfası***
+
+Sayfa salt okunurdur ve kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açabilir. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+Üstte **Negative Matches** (varsayılan) ve **Positive Matches** sekmeleri bulunur. Bunların üstünde tek bir arama alanı ve etkin sekmeyi yansıtan `<matching> / <total>` biçiminde bir sayaç vardır.
+
+Her sekme aynı şekilde düzenlenir: yapılandırma sınıfları ve varsa içlerindeki ilgili `@Bean` metotları listelenir. Her girdinin başlığı şunları gösterir:
+
+- **Class:** koşullu anotasyonu taşıyan tam nitelikli sınıf. Yanındaki kopyalama kontrolü tam adı kopyalar.
+- **Method:** `@Bean` metodunun adı; yalnızca koşul sınıfın kendisine değil bir metoda uygulanmışsa gösterilir.
+
+Başlığın altında koşullar listelenir. Her koşul, etiketi koşulun kısa adı olan (örneğin `OnClassCondition`, `OnPropertyCondition`) bir akordeon satırıdır. Genişletildiğinde Spring'in değerlendirme sırasında ürettiği açıklayıcı **message** gösterilir. Her satırın solundaki durum simgesi sonucu belirtir:
+
+- <span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span> — koşul sağlandı.
+- <span style={{color: '#FF000A', fontWeight: 'bold'}}>✗</span> — koşul sağlanmadı.
+
+## Negative Matches sekmesi [#negative-matches-tab]
+
+Spring'in değerlendirdiği ve genel sonucu *eşleşmedi* olan yapılandırmaların kaydırılabilir listesidir; yani gerekli koşullardan en az biri sağlanmamıştır. Her yapılandırma için **hem** sağlanmayan koşullar (<span style={{color: '#FF000A', fontWeight: 'bold'}}>✗</span>) **hem de** sağlanan koşullar (<span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>) listelenir; böylece sonucu hangi denetimin belirlediğini tam olarak görebilirsiniz.
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Sağlanmayan koşulların ayrıntı sayfası](/img/feature/conditions/conditions-not-matches-details-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde sağlanmayan koşullar***
+
+## Positive Matches sekmesi [#positive-matches-tab]
+
+Genel sonucu *eşleşti* olan, yani gerekli tüm koşulları sağlanan yapılandırmaların kaydırılabilir listesidir. Her girdi, sağlanan koşulları (<span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>) ve her birinin neden sağlandığını açıklayan mesajı gösterir.
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Sağlanan koşulların ayrıntı sayfası](/img/feature/conditions/conditions-matches-details-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde sağlanan koşullar***
+
+## MCP araçları [#mcp-tools]
+
+Otomatik yapılandırma raporu MCP aracılığıyla yapay zekâ ajanlarına da sunulur. [MCP araçları kataloğuna](../../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection) bakın.
+
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-conditions` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-conditions
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-conditions
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Bean’ler](./beans.mdx) — bean satırları **`@AutoConfiguration class`** / **Who defines this bean?** üzerinden buraya bağlanır.
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

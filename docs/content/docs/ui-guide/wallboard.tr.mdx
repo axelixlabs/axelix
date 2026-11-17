@@ -1,0 +1,65 @@
+---
+title: Wallboard
+description: "Wallboard, Axelix'in varsayılan açılış sayfasıdır."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix'in en son minör sürümünü gösterir.">
+
+![Wallboard ana sayfası](/img/feature/wallboard/wallboard-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzündeki Wallboard***
+
+Axelix Master'ın keşfettiği her Spring Boot örneğini, canlı sağlık durumunu ve çalıştırdığı bileşenlerin kısa özetini içeren
+kompakt kartlar hâlinde gösterir. Bir karta tıklamak o örneğin [servis profilini](./service-profile.mdx) açar.
+
+## Servis kartları [#service-cards]
+
+Her kart keşfedilen bir örneği temsil eder. Kart başlığında servis adı ve sağda bir durum göstergesi bulunur:
+
+- Düz **yeşil** nokta: örnek **UP** durumundadır.
+- Yanıp sönen **kırmızı** nokta: örnek **DOWN** durumundadır.
+- **Soru simgesi**: Axelix Master örneğin durumunu belirleyememiştir (**UNKNOWN**).
+
+**UP** olmayan kartlar, ızgarada öne çıkmaları için durum rengiyle boyanmış bir arka planla gösterilir.
+
+Kartın gövdesi, örnek kaydolduğunda Axelix'in topladığı çalışma zamanı ayrıntılarını listeler:
+
+- **Version**: servisin kendi sürümü (Maven/Gradle artifact sürümü).
+- **Spring Boot**: örneğin derlendiği Spring Boot sürümü.
+- **Java**: çalışan JVM'in Java sürümü; örneğin `21.0.10`.
+
+Kartın alt satırının solunda, derlemenin kısa Git SHA'sı **Commit: 315897f** biçiminde gösterilir (uygulama sunuyorsa
+`git-commit-id` tarzı meta verilerden alınır). Sağda örneğin ne kadar süredir Master'a kayıtlı olduğu gösterilir; örneğin `27d 4h`.
+
+Kartın herhangi bir yerine tıklamak, örneğin [servis profilindeki](./service-profile.mdx) **Details** ekranına götürür.
+
+## Arama ve filtreler [#search-and-filters]
+
+Izgaranın üzerindeki arama alanı kartları servis adına göre filtreler (büyük/küçük harfe duyarsız alt dize eşleşmesi).
+Sağdaki sayaç `<matches> / <total>` gösterir.
+
+Aramanın yanındaki **+ Add filter** düğmesi üç alan içeren bir panel açar:
+
+- **Field**: **Spring Boot**, **Java**, **Spring Framework**, **Kotlin** seçeneklerinden biri.
+- **Comparison**: **Equal**, **Less than or equal** veya **Greater than or equal**. Karşılaştırma semver uyumludur;
+  bu nedenle `<= 3.2`, eksik yama numarasını sıfır kabul eder: `3.1.x` ve `3.2.0` ile eşleşir, ancak `3.2.1` veya sonraki sürümlerle eşleşmez.
+- **Value**: mevcut servislerde bulunan sürümlerden biri. Yalnızca en az bir kartta bulunan sürümler sunulduğundan
+  hiçbir şeyle eşleşmeyen bir filtre oluşturamazsınız.
+
+Filtreyi kaydetmek, arama ile ızgara arasına kaldırılabilir bir etiket ekler, gösterilen kartları daraltır ve filtreyi URL'ye
+`?f=Field:Operator:Value` sorgu parametresi olarak yazar. Filtrelenmiş Wallboard URL'leri yer imlerine eklenebilir ve paylaşılabilir.
+İşlemi tekrarlayarak daha fazla filtre ekleyin; bir kartın gösterilmesi için etkin filtrelerin tümü eşleşmelidir.
+
+## MCP erişimi [#mcp-access]
+
+Wallboard verileri bir MCP aracı olarak sunulur. Böylece Axelix Master'ın yerleşik MCP sunucusuna bağlı bir yapay zekâ ajanı,
+yönetilen tüm örnekleri kartlarda gösterilen alanlarla listeleyebilir.
+[MCP kataloğuna bakın.](../setting-up-master-ui/mcp/mcp-tools.mdx#instances)
+
+## İlgili sayfalar [#related]
+
+- [Servis profili](./service-profile.mdx)
+- [Spring Portfolio](./dashboard/spring-portfolio.mdx)
+- [MCP](./mcp.mdx)

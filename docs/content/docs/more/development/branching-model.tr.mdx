@@ -1,0 +1,59 @@
+---
+title: Dal modeli
+description: "Axelix açık bir monorepo olarak geliştirilir; kod tabanının nasıl geliştiğini anlamak, sürümlerin neden bu şekilde yayımlandığını da açıklar."
+---
+
+Bu sayfa kullandığımız dalları, değişikliklerin nasıl birleştirildiğini ve bunun kullandığınız
+[sürümlerle](../compatibility-and-versioning.mdx) nasıl ilişkili olduğunu açıklar.
+
+## Ana geliştirme dalı [#the-trunk]
+
+Axelix, birkaç bilinçli istisnayla **trunk tabanlı geliştirme** modelini izler. Tek bir ana dal vardır: **`master`**.
+
+- Yeni özellik veya düzeltme geliştirirken `master`'dan bir dal oluştururuz.
+- Pull Request aracılığıyla bunu `master`'a geri birleştiririz.
+
+`master`, “Axelix şu anda nedir?” sorusunun her zaman esas kaynağıdır. **Minör ve ana sürümler doğrudan bu dal,
+`vX.Y.0` biçiminde etiketlenerek oluşturulur**; örneğin `v3.1.0`. Böyle bir etiketin yama sürümü **her zaman `0`** olur.
+
+Yama sürümleri ise `X.Y.x` düzenini izleyen özel yama dallarından etiketlenerek oluşturulur (ayrıntılar aşağıda).
+
+Bu etiketler (ister ana master dalından ister yama dalından oluşturulsun), tüm bileşenlerin
+[tek ortak sürüm](../compatibility-and-versioning.mdx#one-version-for-every-component) altında birlikte sunulduğu koordineli yayımı işaretler.
+
+## Uyumluluğu bozan değişiklikler [#breaking-changes]
+
+Tamamlanan her değişiklik hemen birleştirilmez. Bir değişiklik **uyumluluğu bozan değişiklikler** içeriyorsa normal akışta
+`master`'a birleştirmeyiz. Bunun yerine:
+
+1. Pull Request'i erteleriz.
+2. `breaking-changes` etiketi ekleriz.
+3. Zamanı geldiğinde, genellikle bir sonraki **ana** sürüm için çalışmaya başlarken birleştiririz.
+
+Bu, uyumluluğu bozan işler ana sürüm sınırını beklerken `master`'ın **her an minör veya yama sürümü olarak yayımlanabilir**
+kalmasını sağlar. Yeni bir **minör** sürümün gizlice uyumluluk bozan değişiklik getirmeyeceğine güvenebilmenizin önemli bir nedenidir.
+
+## Yama çalışmaları nerede yapılır? [#where-patch-work-lives]
+
+Yayımlanmış bir minör seri için düzeltmeler doğrudan `master`'dan **yayımlanmaz**; düzeltme gerektiğinde ana dal genellikle
+ilerlemiş ve bir sonraki minör sürüme yönelik çalışmalar içermektedir. Bunun yerine her yayımlanan minör seri için `master`
+yanında yaşayan tek bir **uzun ömürlü yama dalı** oluşturulur.
+
+Yama dalı, minör sürümün `vX.Y.0` etiketinden ayrılır ve `X.Y.x` biçiminde adlandırılır.
+Buradaki gerçek `x`, tüm yama serisini işaretler; ayrıldığı etiketin aksine dal adında `v` ön eki **yoktur**.
+Örneğin `1.0.0` sürümünün yama serisi, `v1.0.0` etiketinden ayrılan `1.0.x` dalıdır.
+Modeli görmek için depoda inceleyebilirsiniz.
+
+Düzeltme genellikle önce `master`'a normal Pull Request akışıyla girer; ardından etkilenen serinin yama dalına
+**geri taşınır**. Tüm bileşenlerin her yama sürümü (`vX.Y.1`, `vX.Y.2` vb.) bu daldan oluşturulur ve her Axelix sürümü
+gibi **tüm bileşenleri birlikte**, aynı sürüm altında sunar
+([tüm bileşenler için tek sürüm](../compatibility-and-versioning.mdx#one-version-for-every-component) bölümüne bakın).
+
+:::note[Her bileşen için değil, her minör seri için bir yama dalı]
+Yayımlanan her minör seri için tüm bileşenlerin paylaştığı tam olarak **bir** yama dalı vardır.
+Düzeltme starter'ı, eklentiyi veya Master'ı etkilese de `3.1` serisinin tüm yamaları, `v3.1.0` etiketinden ayrılmış tek
+`3.1.x` dalında bulunur. Bileşen başına dal yoktur, çünkü bileşen başına sürüm yoktur; tüm bileşenler tek bir bütün olarak
+sürümlendirilir ve yayımlanır.
+:::
+
+Sürüm oluşturmanın tam adımları (hazırlık, sürüm ayarlama ve işlem hattını başlatma), [Sürümler](./releases.mdx) sayfasındadır.

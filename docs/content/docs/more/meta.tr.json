@@ -1,0 +1,14 @@
+{
+    "title": "Diğer",
+    "pages": [
+        "glossary",
+        "why-not-spring-boot-admin",
+        "compatibility-and-versioning",
+        "upgrading",
+        "support-policy",
+        "licensing",
+        "versions-in-docs",
+        "troubleshooting",
+        "development"
+    ]
+}

@@ -1,0 +1,38 @@
+---
+title: Genel bakış
+description: "Overview panosu, uygulamaların hangi Spring Boot, Spring Framework, Java ve Kotlin sürümlerini kullandığını gösterir."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Overview panosu Axelix 1.2.0'da kaldırılmıştır. Servislerdeki Spring Boot ve Spring Framework sürümleri bunun yerine Spring Portfolio panosunda gösterilir.</>}
+/>
+
+Düzinelerce uygulamada temel bileşenlerin hangi sürümlerinin kullanıldığını ve en yaygın sürümün hangisi olduğunu anlamak
+zordur. Overview panosu bu soruyu tüm uygulamalar için tek seferde yanıtlar ve bir sürümden o sürümü çalıştıran örneklerin
+listesine geçmenizi sağlar.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış her kullanıcıya açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN**
+sayfayı açabilir. Tam rol/yetki matrisi için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfa neleri gösterir? [#what-the-page-shows]
+
+Sayfa, servislerde kullanılan Spring Boot, Spring Framework, Java ve Kotlin sürümlerini ve örneklerin ne kadarının her birini
+çalıştırdığını gösterir:
+
+- **Spring Boot** ve **Spring Framework**: seriye göre, örneğin `3.5`.
+- **Java**: sürüm numarasına göre, örneğin `21`.
+- **Kotlin**: yalnızca classpath'inde Kotlin bulunan örneklerde, seriye göre. Böyle örnek yoksa Kotlin gösterilmez.
+
+Her bileşen için en yaygın sürüm ayrıca vurgulanır.
+
+## Uygulamaları Wallboard'da açma [#opening-applications-on-the-wallboard]
+
+Örneğin `Spring Boot = 3.5` olacak şekilde, bu sürümü çalıştıran örneklere filtrelenmiş [Wallboard'u](../wallboard.mdx)
+açmak için bir sürüme tıklayın. Yeni sekmede açmak için tıklarken Ctrl, Cmd veya Shift tuşunu basılı tutun.
+
+## Ayrıca bakın [#see-also]
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Axelix'i yükseltme](../../more/upgrading.mdx)

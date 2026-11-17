@@ -1,0 +1,10 @@
+{
+    "title": "Arayüz kılavuzu",
+    "pages": [
+        "dashboard",
+        "wallboard",
+        "service-profile",
+        "users",
+        "mcp"
+    ]
+}

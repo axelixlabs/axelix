@@ -1,0 +1,12 @@
+{
+    "title": "Panolar",
+    "defaultOpen": false,
+    "pages": [
+        "legacy-dashboard",
+        "overview",
+        "spring-portfolio",
+        "languages-profile",
+        "dependency-health",
+        "technologies"
+    ]
+}

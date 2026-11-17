@@ -1,0 +1,62 @@
+---
+title: İşlem denetimi
+description: "İşlem denetimi sayfası, veritabanı bağlantısını gereğinden uzun süre meşgul eden @Transactional metotlarını bulur: işlem içindeki bloklayan ağ çağrıları, N+1 sorguları ve bellekte sayfalama. Her sorunun nerede gerçekleştiğini göstererek ilgili kodu bulmanızı sağlar."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![İşlem denetiminin ana sayfası](/img/feature/transaction/transaction-control-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Transaction Control***
+
+Bir işlem açık olduğu sürece havuzdan aldığı veritabanı bağlantısını tutar. İşlem başka bir servisi çağırmak, her kayıt için bir sorgu çalıştırmak veya tek bir sayfayı göstermek için tüm tabloyu yüklemek gibi ek işler yaptığında bağlantılar tükenir ve uygulama yük altında yavaşlar. Bu durum kodda nadiren belirgindir. İşlem denetimi, bunu hangi `@Transactional` metotlarının yaptığını ve tam olarak nerede gerçekleştiğini gösterir.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açabilir. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfada gösterilenler [#what-the-page-shows]
+
+Sayfa, örneğin çalıştırdığı her `@Transactional` metodunu ortalama, en hızlı ve en yavaş çalışma süreleriyle ve tespit edilen [sorunlarla](#detected-problems) birlikte listeler. Üstteki özet, kaç işlemde sorun olduğunu ve kaçının sorunsuz olduğunu gösterir; listeyi tek bir sorun türüyle sınırlayabilirsiniz.
+
+Bir işlemi genişleterek şunları görebilirsiniz:
+
+- Her sorunun gerçekleştiği yer: çağrılan URL, varlık ve ilişki veya bellekte sayfalanan varlık.
+- İşlemin yayılım ve yalıtım düzeyi.
+- Erişim türü: salt okunur veya okuma-yazma.
+
+Hiçbir işlemde sorun yoksa sayfa liste göstermek yerine bunu belirtir.
+
+## Tespit edilen sorunlar [#detected-problems]
+
+- **Blocking network call**: İşlem bir HTTP çağrısı yapar ve yanıt beklerken bağlantısını tutar. Axelix istek metodunu ve URL'yi gösterir. Axelix şu anda `RestTemplate` aracılığıyla yapılan çağrıları tespit eder.
+- **N+1 queries**: Tembel yüklenen bir ilişki her kayıt için ayrı bir sorguyla yüklenir. Axelix varlığı ve ilişkiyi gösterir; yalnızca ilişki birden fazla kez yüklendiğinde bunu sayar.
+- **In-memory pagination**: `Pageable`, `JOIN FETCH` ile birlikte kullanıldığından Hibernate tüm sonuç kümesini yükler ve sayfayı bellekte ayırır. Axelix varlığı veya tabloyu gösterir.
+
+## Nasıl çalışır? [#how-it-works]
+
+Axelix Spring Boot Starter, uygulama içindeki her `@Transactional` metot çağrısını izler ve süresini ölçer. İşlem açıkken `RestTemplate` aracılığıyla yapılan HTTP çağrılarını ve Hibernate ilişkilerinin tembel yüklemelerini kaydeder; uygulama günlüklerinde (Logback veya Log4j2) Hibernate'in bellekte sayfalama uyarısını yakalar. Ajan veya APM aracı gerekmez.
+
+## MCP araçları [#mcp-tools]
+
+Yapay zekâ ajanları, bir uygulamanın işlemlerinde bulunan N+1 sorgularını ve bellekte sayfalamayı MCP aracılığıyla tüm uygulama ya da tek bir sınıf veya metot için alabilir. Bloklayan ağ çağrıları dâhil değildir. [MCP araçları kataloğuna](../../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights) bakın.
+
+## Özellikler [#properties]
+
+İşlem izleme varsayılan olarak etkindir. Tamamen kapatmak için `axelix.sbs.transaction.monitoring.enabled=false` ayarını kullanın. Ayrıntılar için [İşlem izleme](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#transaction-monitoring) bölümüne bakın.
+
+İşlem izleme ve dolayısıyla bu sayfa reaktif (WebFlux) uygulamalarda kullanılamaz. [Reaktif (WebFlux) uygulamalar](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#reactive-webflux-applications) bölümüne bakın.
+
+## Meta veri uç noktasını erişime açma [#expose-the-metadata-endpoint]
+
+İşleme özel bir Actuator uç noktası yoktur. İlk işlem bulguları, Master örneği keşfettiğinde `axelix-metadata` üzerinden sunulan örnek kayıt meta verilerine dâhildir.
+
+1.3.0 ve sonraki starter sürümlerinde Master, sonraki işlem güncellemeleri için `axelix-ping` uç noktasını düzenli olarak sorgular. Kendini kaydeden örnekler bu güncellemeleri bunun yerine kalp atışlarıyla gönderir. Eski starter sürümlerinde Master tüm kayıt meta verilerini okumaya devam eder.
+
+Düzenli sorgulama için `axelix-metadata` ve 1.3.0 ve sonraki starter sürümlerinde `axelix-ping` uç noktalarını erişime açın. Starter, 1.2.0'dan itibaren kendi uç noktalarını otomatik olarak erişime açar; eski sürümler için [1.2.0 öncesi Axelix sürümlerinde uç noktaları erişime açma](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposing-the-endpoints-on-axelix-below-120) bölümüne bakın. İşleme özel ek bir uç noktası gerekmez.
+
+
+## Ayrıca bkz. [#see-also]
+
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

@@ -1,0 +1,196 @@
+---
+title: Uyumluluk ve sürümlendirme
+description: "Bu sayfa Axelix'in nasıl sürümlendirildiğini; servislerinizin Java sürümü, derlendikleri Spring Boot ana sürümü ve Axelix bileşenlerinin birbirleriyle uyumluluğunu nasıl koruduğunu açıklar."
+---
+
+## Tüm bileşenler için tek sürüm [#one-version-for-every-component]
+
+Axelix tek ve koordineli bir dağıtım olarak yayımlanır. Tüm bileşenler **tam olarak aynı sürümü** paylaşır.
+
+Yeni bir Axelix dağıtımı (örneğin **Axelix OSS 3.1.2**) yayımlandığında yayımlanan her bileşen aynı `3.1.2` sürümünü taşır:
+
+- **Spring Boot Starter'ları** (Maven artifact'ları olarak yayımlanır).
+- **Eklentiler** (bunlar da Maven artifact'ları olarak yayımlanır).
+- Bağımsız **Axelix Master** JAR dosyası.
+- **Axelix Master** Docker imajı.
+- **Axelix Master** Helm chart.
+
+Bileşenlerin bağımsız sürümlendirmesi yoktur. Bir Axelix artifact'ının sürümünü biliyorsanız o dağıtımdaki tüm bileşenlerin
+sürümünü bilirsiniz.
+
+Bu, **yama sürümleri için de** geçerlidir: yama, minör serinin yama dalından oluşturularak tüm bileşenleri `X.Y.Z` ile
+tekrar yayımlar. Bu sürümlerin nasıl oluşturulduğu için [Dal modeli](./development/branching-model.mdx) ve
+[Sürümler](./development/releases.mdx) sayfalarına bakın.
+
+### Artifact adları [#artifact-names]
+
+Her sürüm depoda `v<version>` ile etiketlenir; örneğin `v1.3.0`. Master JAR, Docker imajı ve Helm chart olarak sunulur;
+üçünün adı da `axelix` ve ardından sürüm numarasıdır. Dolayısıyla sürümü biliyorsanız her dosyanın ve etiketin adını bilirsiniz.
+Axelix `1.3.0` için artifact'lar şunlardır:
+
+| Artifact | Adı | Nereden edinilir? |
+|---|---|---|
+| Master JAR | `axelix-1.3.0.jar` | [`v1.3.0` sürümünün](https://github.com/axelixlabs/axelix/releases/tag/v1.3.0) **Assets** bölümü |
+| Master Docker imajı | `axelix:1.3.0` | `ghcr.io/axelixlabs/axelix` ve `docker.io/axelixlabs/axelix` |
+| Master Helm chart | `axelix` chart'ı, `1.3.0` sürümü, `axelix-1.3.0.tgz` olarak paketlenir | Axelix Helm deposu; [Kubernetes'te çalıştırma](../setting-up-master-ui/configuring-master/configuring-master.mdx#run-on-kubernetes) bölümüne bakın. Arşiv ve köken dosyası `axelix-1.3.0.tgz.prov`, sürümün **Assets** bölümünde de bulunur. |
+| Spring Boot starter'ları | `com.axelixlabs:axelix-spring-boot-4-starter:1.3.0`; `2` ve `3` için de aynı biçim | Maven Central |
+| Maven eklentisi | `com.axelixlabs:axelix-maven-plugin:1.3.0` | Maven Central |
+| Gradle eklentisi | Eklenti kimliği `com.axelixlabs.axelix`, sürüm `1.3.0` | Maven Central |
+
+## Sürüm numarası ne anlama gelir? [#what-the-version-number-means]
+
+Axelix sürümü `MAJOR.MINOR.PATCH` biçiminde üç parçadan oluşur; örneğin `1.4.2`.
+[Anlamsal Sürümlemeye](https://semver.org/) benzer, ancak Axelix buna katı biçimde uymaz. Semver'de yalnızca ana sürüm
+uyumluluğu bozabilir; minör sürüm yalnızca özellik ekler. Axelix bunun yerine, minör sürümün de uyumluluğu bozan değişiklikler
+içerebildiği [Spring Boot sürümlendirme yaklaşımını](https://github.com/spring-projects/spring-boot/wiki/Team-Practices#versioning)
+izler. Spring Boot'un [Desteklenen Sürümler](https://github.com/spring-projects/spring-boot/wiki/Supported-Versions)
+politikası bunu açıkça belirtir: “Minör ve ana sürümler, geriye dönük uyumsuz API değişiklikleri içerebilir.”
+
+### Neden katı anlamsal sürümleme kullanılmıyor? [#why-not-strict-semantic-versioning]
+
+Nedeni herkese açık API'nin büyüklüğüdür. Axelix, Spring Boot gibi büyük bir projedir. Starter'ları uygulamanızın içinde
+çalışır, Master'ın birçok yapılandırma özelliği vardır ve bileşenler kendi protokolleri üzerinden iletişim kurar.
+Bu kadar geniş bir yüzeyde neredeyse her değişiklik, bir kullanıcının bağlı olabileceği bir şeye dokunur.
+Katı semver altında neredeyse her sürümün ana sürüm olması gerekir; böylece ana sürüm numarası yararlı bilgi veremez hâle gelir.
+
+Spring Boot ekibi aynı sorunu [ekip uygulamalarında](https://github.com/spring-projects/spring-boot/wiki/Team-Practices#versioning)
+şöyle açıklar: “Her sürümün ana sürüm olması gerekeceğinden Spring Boot'un anlamsal sürümleme kullanması pek mümkün değildir.”
+
+### Zahmet göstergesi [#the-pain-index]
+
+Axelix, “hiç uyumluluk bozan değişiklik yok” sözü vermek yerine sürüm numarasını bir **zahmet göstergesi** olarak kullanır.
+Değişen parça, yükseltmenin ne kadar iş gerektirebileceğini belirtir. Spring Boot'un kendi sürümleri için
+[açıkladığı](https://github.com/spring-projects/spring-boot/wiki/Team-Practices#versioning) fikir de aynıdır:
+“Sürüm numarasını, yükseltmenin yaratacağı zahmetin göstergesi olarak kullanmaya çalışıyoruz.”
+
+| Yükseltme | Örnek | Beklentiler |
+|---|---|---|
+| Yama | `1.4.2` → `1.4.3` | Doğrudan yerine kullanılabilir. Hata düzeltmeleri, güvenlik düzeltmeleri veya performans iyileştirmeleri içerir; hiçbir şeyi değiştirmeniz gerekmez. |
+| Minör | `1.4.x` → `1.5.0` | Yeni özellikler ve olası birkaç uyumluluk bozan değişiklik. Çoğu durumda sizin tarafınızda değişiklik gerekmez. Gerekirse de uyarlama küçüktür. |
+| Ana | `1.x.x` → `2.0.0` | Birçok yeni özellik ve kurulumunuzu etkileyen, neredeyse kesin uyumluluk bozan değişiklikler. Geçiş için zaman ayırın; her ana sürümün özel bir geçiş kılavuzu vardır. |
+
+Axelix'in hangi bölümlerinin minör sürümde değişebileceği ve hangilerinin bir sonraki ana sürüme kadar sabit kalacağı aşağıdaki
+[Bileşenler arası uyumluluk](#compatibility-between-components) ve
+[Sürümler arası geriye dönük uyumluluk garantileri](#backward-compatibility-guarantees-between-releases) bölümlerinde açıklanır.
+Yükseltme işlemi için [Axelix'i yükseltme](./upgrading.mdx) sayfasına bakın.
+
+## Her Spring Boot ana sürümü için ayrı starter [#a-dedicated-starter-per-spring-boot-major-version]
+
+Axelix, **her Spring Boot ana sürümü için özel bir starter** sunar. Desteklenen her ana sürüm için bağımsız ve ayrı bir artifact vardır:
+
+- `axelix-spring-boot-2-starter`: Spring Boot **2.x** servisleri için.
+- `axelix-spring-boot-3-starter`: Spring Boot **3.x** servisleri için.
+- `axelix-spring-boot-4-starter`: Spring Boot **4.x** servisleri için.
+
+Axelix şu anda Spring Boot **2 ila 4 ana sürümlerini** destekler. Servisinizin Spring Boot ana sürümüne uygun starter'ı seçin.
+
+**Eklentiler** farklıdır: geniş uyumluluk için tasarlandıklarından seçilecek sürüme özel eklenti artifact'ı yoktur:
+
+- **Gradle eklentisinin**, Gradle **5 ila 9** ana sürümlerinde çalıştığı test edilir.
+- **Maven eklentisi**, bugün neredeyse tüm Maven projelerinin kullandığı **Maven 3** ile uyumludur.
+
+:::info[En düşük Spring Boot 2 sürümü 2.7.x'tir]
+`axelix-spring-boot-2-starter`, tüm 2.x serisini değil **2.7** ve üzeri Spring Boot 2 sürümlerini destekler.
+Servisiniz daha eski bir Spring Boot 2.x sürümündeyse (bazı servisler **2.5.15** kadar eski sürümlerde çalışır),
+Axelix eklemeden önce en az **Spring Boot 2.7** sürümüne yükseltmelisiniz.
+:::
+
+## Java sürüm uyumluluğu [#java-version-compatibility]
+
+**Axelix Master** da **Java 25** ile yazılmış bir Spring Boot uygulamasıdır. Bu yalnızca Axelix Master'ı JAR olarak
+çalıştırmak isterseniz önemlidir. Diğer durumlarda fark yaratmaz.
+
+**Starter'lar**, hedefledikleri Spring Boot sürümünün Java uyumluluğunu izler. Her starter, **Spring Boot ana sürümünün
+desteklediği tüm Java sürümleriyle** uyumludur. Örneğin Spring Boot 3, kullandığınız minör sürüme bağlı olarak en az
+**Java 17** ve **Java 25'e** kadar (Spring Boot 3.5 ile) destek verir; `axelix-spring-boot-3-starter` da tam olarak aynı aralığı izler.
+
+:::info[En düşük Java sürümü 11'dir]
+“Spring Boot'un Java desteğini izleme” kuralının tek istisnası, Axelix **starter'ları ve eklentileri** için kesin alt sınırın
+**Java 11** olmasıdır. Teorik olarak hâlâ **Java 8** kullanabilen Spring Boot 2 kullanıcıları Axelix kullanamaz;
+en az **Java 11** sürümüne yükseltmelidirler.
+:::
+
+## Bileşenler arası uyumluluk [#compatibility-between-components]
+
+Axelix [birlikte sürümlendirilerek yayımlanır](#one-version-for-every-component), ancak bileşenleri farklı zamanlarda
+**yükseltebilirsiniz**. İki uyumluluk kuralı geçerlidir:
+
+- **Master ve starter:** aynı ana sürüm içinde Master, **kendi minör sürümü dahil son 4 minör sürümün** starter'larını
+  destekler. Starter'ın minör sürümü Master'dan yeni olmamalıdır. Bu aralık Axelix 1.1'den itibaren geçerlidir;
+  [Axelix'i yükseltme](./upgrading.mdx) sayfasına bakın.
+- **Starter ve derleme eklentisi:** bir servis içinde ikisi de aynı `major.minor` sürümünü paylaşmalıdır.
+
+**Her iki kuralda da yama sürümleri önemsizdir.**
+
+- ✅ Master `1.4.2`, starter `1.4.5`, eklenti `1.4.0`: uyumluluk garantilidir.
+- ✅ Starter `1.4.3` ile eklenti `1.4.0`: aynı `1.4` sürümü, uyumluluk garantilidir.
+- ✅ Master `1.4.2` ile starter `1.3.4`: Master'ın `1.1`–`1.4` aralığı içinde, uyumluluk garantilidir.
+- ⚠️ Master `1.4.x` ile starter `1.0.x` veya `1.5.x`: desteklenen aralığın dışında.
+- ⚠️ Starter `3.1.x` ile eklenti `3.3.x`: minör sürümler farklıdır; uyumluluk garantisi yoktur ve desteklenmez.
+- ⚠️ Master ve starter farklı ana sürümlerde: uyumluluk aralığının dışında; ana sürüm geçiş kılavuzunu izleyin.
+
+Her şeyi tam olarak aynı `X.Y.Z` sürümünde tutmak en basit politikadır. Bileşenleri ayrı ayrı yükseltiyorsanız her starter'ı
+Master'ın desteklediği aralıkta ve kendi eklentisiyle aynı sürümde tutun.
+
+### Yama sürümü farkı neden güvenlidir, minör/ana sürüm farkı neden değildir? [#why-patch-drift-is-safe-but-minormajor-drift-is-not]
+
+Starter ile derleme eklentisinin sözleşmeleri minör sürümler arasında değişebilir; bu nedenle yalnızca eşleşen `major.minor`
+sürümleri desteklenir. Master-starter iletişimi yukarıdaki daha geniş, dört minör sürümlük uyumluluk aralığına sahiptir.
+
+Yama sürümleri **kritik CVE düzeltmesi, hata düzeltmesi veya performans iyileştirmesi** içerebilir.
+Gerçek düzeltme genellikle yalnızca bazı bileşenleri etkilese de yama **tüm bileşenleri** yeniden yayımlar.
+Yalnızca etkilenen bileşeni yükseltmek ve diğerlerini eski yamada bırakmak, yukarıdaki iki kurala göre uyumlu kalır.
+
+:::warning[Her eşleşmeyi desteklenen aralıkta tutun]
+Master'dan daha yeni minör sürümde veya ondan üçten fazla minör sürüm geride olan starter çalıştırmayın;
+Master ile starter arasında ana sürümleri karıştırmayın. Master-starter aralığı starter-eklenti uyumluluğuna uygulanmaz:
+bu ikisini aynı `major.minor` sürümünde tutun.
+:::
+
+## Sürümler arası geriye dönük uyumluluk garantileri [#backward-compatibility-guarantees-between-releases]
+
+### Axelix Master [#axelix-master]
+
+Axelix Master, Kubernetes'te, Docker'da veya düz JAR olarak **bağımsız bir süreç şeklinde çalıştırılmak** için tasarlanmış
+bir Java uygulamasıdır. Kütüphane olarak tüketilmek için tasarlanmamıştır. Bu nedenle herkese açık Java yüzeyini herkese açık
+bir sözleşme olarak değerlendirmeyiz: **public sınıflar, public metotlar, yapıcılar, alanlar, enum'lar ve sabitlerin tümü iç ayrıntı sayılır**.
+
+Bu, herkese açık Java API'sini **minör veya hatta yama** sürümlerinde değiştirebileceğimiz anlamına gelir.
+Varsayım, kimsenin Master'a kütüphane olarak bağımlı olmadığıdır; bu nedenle Java API'sini serbestçe değiştirmek
+**geliştirmeyi hızlandırır**. Bu bilinçli bir tercihtir; gerçekte neredeyse kimseyi etkilemez ve projenin hızı için büyük kazanç sağlar.
+
+Master'ın herkese açık sözleşmesi olarak değerlendirdiğimiz şey **yapılandırmasıdır**:
+
+- Hem Axelix Master **Helm chart** hem de **bağımsız JAR** olarak çalışan Master için özelliklerin **adları**.
+- **Varsayılan değerleri**.
+- **Türleri**.
+
+Bunlar **yalnızca ana sürümlerde** değişir.
+
+:::info[Master için genel kural]
+Master'ın **özelliklerine** (adlar, varsayılanlar, türler) güvenin: bunlar ana sürüm içinde kararlıdır.
+Master'ın Java sınıflarına, metotlarına veya diğer kod düzeyindeki üyelerine bağımlı olmayın; bunlar herhangi bir sürümde değişebilir.
+:::
+
+### Starter'lar [#starters]
+
+Starter'lar kütüphane olarak kullanılır. Spring Boot starter'ları olduklarından uygulamanıza bean'ler içeren otomatik
+yapılandırmalar getirirler (başlatma bağlantıları, iç proxy stratejisi vb.). Bu durum iki kuralı belirler.
+
+**Axelix bean'lerini geçersiz kılmayın.** Son kullanıcıların başlatma süreci, proxy stratejisi veya benzeri iç ayrıntılarla
+oynamak için Axelix'in tanımladığı iç bean'leri geçersiz kılmasına bilinçli olarak izin vermiyoruz.
+Axelix uygulamanıza **ölçülebilir ek yük getirmemek** ve olabildiğince verimli, hatasız çalışmak için çaba gösterir;
+`BeanPostProcessor` veya `ProxyFactoryBean` örnekleri gibi bean'leri geçersiz kılmak, fark edilmesi güç hatalara ve
+performans kaybına kapı açar. Bu nedenle Axelix bean'lerini değiştirmeye çalışmayın.
+
+**Starter'ın herkese açık Java API'sine bağımlı olmayın.** Starter'ların gerçek uygulamaların içinde çalıştığını kabul
+ediyoruz; dolayısıyla herkese açık Java API'lerine kodunuzdan teknik olarak erişilebilir. Ancak bu **amaçlanan kullanım
+değildir** ve kesinlikle önermiyoruz. Hızlı ilerlemek ve rekabetçi kalmak için starter'ların herkese açık Java API'sini de
+**değiştirebiliriz**. Bundan kaçınmak için elimizden geleni yaparız, ancak gerekli görürsek **minör** sürüm artışında değiştirebiliriz.
+
+:::tip[Bir özellik eksik mi? İç ayrıntıları değiştirmek yerine issue açın]
+Genel kural basittir: bir şeye ihtiyaç duyuyorsanız veya özellik eksikse **starter'ın içini kurcalamayın**.
+[GitHub issue takipçimizde](https://github.com/axelixlabs/axelix/issues) bir issue açın. İnceleyeceğimize söz veriyoruz.
+İstediğiniz özelliği eklediğimizde davranışı denetlemeniz için bir **özellik** sunarız: bean geçersiz kılma veya kod düzeyinde
+bağımlılık yerine kararlı ve desteklenen bir ayar.
+:::

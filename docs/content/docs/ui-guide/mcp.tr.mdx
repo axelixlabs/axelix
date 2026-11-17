@@ -1,0 +1,64 @@
+---
+title: MCP
+description: "MCP ekranı, Axelix Master'ın yerleşik Model Context Protocol sunucusu üzerinden sunduğu tüm araçları listeler. Her kart, MCP üzerinden bağlı bir yapay zekâ ajanının kayıtlı herhangi bir Spring Boot örneğinde çağırabileceği bir aracı temsil eder."
+---
+
+## MCP sekmesi ne zaman görünür? [#when-the-mcp-tab-appears]
+
+Gezinme çubuğundaki **MCP** bağlantısı yalnızca Master'da MCP sunucusu etkin olduğunda gösterilir. Bunu,
+varsayılan değeri `true` olan `axelix.master.mcp-server.enabled` özelliği belirler. Sunucunun devre dışı bırakıldığı
+dağıtımlarda bağlantı gizlenir ve `/mcp-server` erişilemez. Özellik için
+[MCP sunucusu yapılandırmasına](../setting-up-master-ui/configuring-master/configuring-master.mdx#mcp-server) bakın.
+
+MCP sunucusu, yapay zekâ ajanlarının kimliğini tarayıcı oturumundan ayrı doğrular. Kimlik bilgileri, desteklenen `Basic` ve
+`Bearer` yöntemleri ve araç başına yetki denetimleri [MCP sunucusu kimlik doğrulamasında](../setting-up-master-ui/authentication/authentication.mdx#mcp-server-authentication)
+açıklanır. Bu sayfa yalnızca salt okunur katalog arayüzünü açıklar; ajanın hangi araçları çağırabileceğini değiştirmez.
+
+## Araç kataloğu [#the-tool-catalog]
+
+Katalog, kartlardan oluşan bir ızgaradır. Üstteki arama alanı kartları başlığa göre filtreler; sağdaki sayaç
+`<matches> / <total>` gösterir. Arama, araç başlığının herhangi bir yerinde eşleşir ve büyük/küçük harfe duyarsızdır.
+
+Her kart aynı üç bölüme sahiptir:
+
+- Araç başlığını ve renkli durum noktasını içeren **başlık**: araç MCP sunucusuna kayıtlıysa yeşil, o anda kullanılamıyorsa kırmızı.
+- **Açıklama**: aracın MCP istemcilerine sunduğu kısa tanıtım. Uzun açıklamalar sabit yükseklikte kesilir;
+  tam metni ipucunda görmek için açıklamanın üzerine gelin.
+- Açıklama etiketlerini içeren **alt bölüm**: aşağıdaki [Araç açıklamaları](#tool-annotations) bölümüne bakın.
+
+## Araç açıklamaları [#tool-annotations]
+
+Her araç, MCP istemcilerine çağrı sırasında ne tür yan etkiler beklemeleri gerektiğini bildiren dört boolean ipucu tanımlar.
+Kartın alt bölümünde bunlardan ikisi doğrudan gösterilir; dördüne de bir açılır panelden erişilir.
+
+**Satır içi etiketler** (her zaman görünür):
+
+- **Read-only**: araç, hedef Spring Boot örneğindeki hiçbir durumu değiştirmez.
+- **Idempotent**: aracı aynı argümanlarla birden fazla kez çağırmak, bir kez çağırmakla aynı etkiyi yaratır.
+
+İpucu <code style={{color: 'green'}}>true</code> olduğunda etiket yeşil,
+<code style={{color: 'orange'}}>false</code> olduğunda turuncudur. Gösterilen değer aracın kendi beyanıdır;
+alttaki uç noktanın gerçekte ne yaptığının garantisi değildir.
+
+**Tüm açıklamalar paneli**: alt bölümün sağındaki menü düğmesine tıklayarak dört ipucunu boolean değerleriyle gösteren paneli açın:
+
+- **Read-only**: araç, hedef Spring Boot örneğindeki hiçbir durumu değiştirmez.
+- **Idempotent**: aracı aynı argümanlarla birden fazla kez çağırmak, bir kez çağırmakla aynı etkiyi yaratır.
+- **Destructive**: araç verileri silebilir veya arayüzden geri alınamayan değişiklikler uygulayabilir.
+- **Open-world**: araç Master'ın ve kayıtlı Spring Boot örneklerinin dışına erişir (örneğin haricî bir HTTP çağrısı).
+
+## Bu ekranda bulunmayanlar [#what-is-missing-from-this-screen]
+
+MCP sayfası keşif içindir, araç çalıştırma ekranı değildir. Buradan şunları yapamazsınız:
+
+- Bir Spring Boot örneğinde araç çağırmak: bu işlem MCP istemcinizden (Claude Desktop, Cursor, özel bir ajan vb.) yapılır.
+- Tek tek araçları etkinleştirmek veya devre dışı bırakmak: katalog, Master'ın başlangıçta kaydettiklerini yansıtır.
+- Geçmiş çağrıları veya araç başına metrikleri görmek.
+
+Kataloğu kullanmak için MCP istemcinizi `<master-base-url>/api/mcp` adresine yönlendirin ve
+[MCP sunucusu kimlik doğrulamasında](../setting-up-master-ui/authentication/authentication.mdx#mcp-server-authentication) açıklandığı gibi kimliğinizi doğrulayın.
+
+:::info
+MCP araç çağrıları için **Access Log** yol haritasındadır ve Axelix Enterprise ile sunulacaktır. Hem Access Log hem de
+Axelix Enterprise geliştirme aşamasında olduğundan MCP ekranı şimdilik geçmiş veya araç başına metrik içermeyen salt okunur bir katalogdur.
+:::

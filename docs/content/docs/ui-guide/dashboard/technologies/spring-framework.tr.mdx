@@ -1,0 +1,31 @@
+---
+title: Spring Framework
+description: "Spring Framework panosu, kaç servisin Open Session in View etkin olarak çalıştığını gösterir."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Spring Framework panosu Axelix 1.2.0'da kaldırılmıştır.</>}
+/>
+
+Open Session in View (OSIV), tüm HTTP yanıtı oluşturulana kadar Hibernate oturumunu ve veritabanı bağlantısını açık tutar.
+Lazy ilişkiler daha sonra işlemin dışında sessizce yüklenir ve her istek bağlantıyı gerekenden uzun süre tutar.
+Spring Boot, JPA kullanan web uygulamalarında OSIV'i varsayılan olarak etkinleştirdiğinden çoğunlukla yanlışlıkla açık kalır.
+Spring Framework panosu bunun servisler genelinde ne kadar yaygın olduğunu gösterir.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış her kullanıcıya açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN**
+sayfayı açabilir. Tam rol/yetki matrisi için [Roller ve yetkiler](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfa neleri gösterir? [#what-the-page-shows]
+
+Sayfa, OSIV etkin ve devre dışı olarak çalışan servislerin oranlarını gösterir.
+
+## Nasıl çalışır? [#how-it-works]
+
+Uygulama Open Session in View interceptor'ını veya filtresini kaydettiğinde OSIV etkin sayılır. Master bunu günde bir kez
+kaydeder ve en son kaydı kullanır. Kaç örneği olursa olsun her servis bir kez sayılır.
+
+## Ayrıca bakın [#see-also]
+
+- [Persistence](./persistence.mdx)
+- [Transaction Control](../../../features/spring-framework/transaction-control.mdx)

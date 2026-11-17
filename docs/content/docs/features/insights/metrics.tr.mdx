@@ -1,0 +1,121 @@
+---
+title: Metrikler
+description: "Metrikler sayfası, yönetilen bir Spring Boot örneğinin sunduğu tüm Micrometer ölçüm araçlarını listeler; her metrik için canlı grafik ve etiket filtrelemesi sağlar."
+---
+
+Metrikler öneklerine göre otomatik olarak genişletilebilir açılır bölümlerde gruplanır. Her grup JVM, HTTP veya JDBC gibi ilişkili metriklerin mantıksal bir kategorisini temsil eder. Bu düzen, aynı işlev alanına ait metrikleri hızla bulup analiz etmenizi sağlar.
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Metrikler sayfasının ana görünümü](/img/feature/metrics/metrics-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Metrics***
+
+Sayfa salt okunurdur ve kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açabilir. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Axelix'in yayımladığı ölçüm araçları [#axelix-published-meters]
+
+Axelix, uygulamanızın zaten sunduğu ölçüm araçlarını göstermenin yanı sıra kendi Micrometer ölçüm araçlarını da ekleyebilir. Bu, `axelix-spring-boot-X-starter` (yani Axelix starter) kullanıldığında ve uygulamada zaten bir `MeterRegistry` bean'i bulunduğunda gerçekleşir.
+
+`MeterRegistry` kayıtlıysa Axelix kayıt defterine şu ölçüm araçlarını ekler:
+
+- `axelix_transaction_duration` — `class` ve `method` etiketli `Timer`.
+- `axelix_transaction_queries` — `class` ve `method` etiketli `Counter`.
+- `axelix_transaction_external_calls` — `class` ve `method` etiketli `Counter`.
+- `axelix_cache_requests` — `cache` ve `result=hit|miss` etiketli `Counter`.
+- `axelix_cache_enabled` — `cache` etiketli `Gauge`; etkin önbellekler için `1`, devre dışı olanlar için `0` bildirir.
+
+`/actuator/prometheus` uç noktası da bu metrikleri sunar (Prometheus Actuator uç noktası etkinse). Böylece bunları örneğin Grafana gibi çeşitli sistemlerde kendi özel panolarınızı oluşturmak için kullanabilirsiniz.
+
+Her metrik hakkında daha fazla ayrıntıyı [ilgili sayfada](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#export-axelix-metrics-through-micrometer) bulabilirsiniz.
+
+## Metrik ayrıntıları [#metric-details]
+
+Metrik ayrıntıları sayfası, etkileşimli grafikler, gerçek zamanlı değerler ve akıllı etiket filtreleme özellikleriyle tek tek metrikleri ayrıntılı olarak analiz etmenizi sağlar.
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Bir metriğin ayrıntı sayfası](/img/feature/metrics/metrics-details-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde JVM bellek metriği ayrıntıları***
+
+## Sayfa düzeni [#page-layout]
+
+### Açılır bölüm başlığı [#dropdown-header]
+- **Metric Name**: tam metrik tanımlayıcısı (örneğin `jvm.memory.max`).
+- **Description**: bu metriğin neyi ölçtüğünü görmek için imleci ![metrik açıklaması simgesi](/img/feature/icons/question-icon.png) simgesinin üzerine getirin.
+
+### Sol panel: geçerli metrik bilgileri [#left-panel-current-metric-information]
+Seçilen metrik hakkında gerçek zamanlı bilgiler gösterir:
+- **Value**: en son ölçüm.
+- **Base Unit**: ölçüm birimi (bayt, milisaniye, yüzde, skaler miktar vb.).
+- **Tags**: ölçümleri etiket boyutlarına göre filtreleyen açılır seçiciler. Yalnızca örnekte gerçekten bulunan birleşimler sunulur; geçersiz birleşimler görünür kalır ancak devre dışı bırakılır.
+
+### Sağ panel: zaman serisi grafiği [#right-panel-time-series-chart]
+Metrik değerinin kayan bir zaman penceresindeki çizgi grafiği. Sayfa örneği düzenli olarak sorgular ve pencere süresi dolunca pencereyi sıfırlar; grafik örneğin başlangıcından itibaren tüm geçmişi değil, yakın zamandaki davranışı yansıtır.
+
+## Etiket filtreleme (ayrıntıya inme) [#tag-filtering-drilling-down]
+
+Geçerli etiket birleşimleri listesi örneğin Micrometer `MeterRegistry` bileşeninden gelir; Axelix bunları üretmez veya kısıtlamaz. Bir açılır listede değer seçtiğinizde diğerleri yalnızca hâlâ geçerli seçenekleri gösterecek şekilde güncellenir; geçersiz olanlar görünür fakat devre dışı kalır ve *"This tag value is not valid, considering the values selected for other tags"* araç ipucunu gösterir. Temel mekanizma için Spring Boot başvurusundaki [Drilling Down](https://docs.spring.io/spring-boot/api/rest/actuator/metrics.html) bölümüne bakın.
+
+### Nasıl çalışır? [#how-it-works]
+Bir etiket değeri seçtiğinizde diğer etiketlerin kullanılabilir seçenekleri çalışan örnekte gerçekten var olan birleşimlerle sınırlanır.
+
+### Örnek: JVM bellek metrikleri [#example-jvm-memory-metrics]
+`area` ve `id` etiketlerini içeren `jvm.memory.used` metriği için:
+
+| `area` | `id` | Sunulur |
+|--------|------|---------|
+| heap | G1 Eden Space | ✅ |
+| heap | G1 Survivor Space | ✅ |
+| heap | G1 Old Gen | ✅ |
+| nonheap | Metaspace | ✅ |
+| nonheap | Compressed Class Space | ✅ |
+| nonheap | CodeHeap profiled nmethods | ✅ |
+| nonheap | CodeHeap non-nmethods | ✅ |
+| nonheap | CodeHeap nonprofiled-nmethods | ✅ |
+| heap | Metaspace | ❌ |
+| nonheap | G1 Old Gen | ❌ |
+
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-metrics` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metrics
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metrics
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

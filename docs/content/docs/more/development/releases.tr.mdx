@@ -1,0 +1,94 @@
+---
+title: Sürümler
+description: "Bu sayfa, Axelix'i yayımlamak için izlediğimiz süreci ayrıntılı olarak açıklar."
+---
+
+İki sürüm türü vardır ve aynı biçimi paylaşırlar: ikisi de **tüm bileşenleri** aynı anda, tek sürüm altında sunar:
+
+- **Minör** sürüm, `master`'dan oluşturulur ve yeni bir `X.Y` serisi açar.
+- **Yama** sürümü, serinin **yama dalından** (`X.Y.x`) oluşturulur ve tüm bileşenleri `X.Y.Z` sürümüne taşır.
+
+Elbette ana sürümlerimiz de olacak. Ana sürüm zamanı geldiğinde onu da belgeleyeceğiz.
+
+Bunların temelindeki dal yapısı için [Dal modeli](./branching-model.mdx) sayfasına bakın.
+
+## Minör sürümler [#minor-releases]
+
+Minör sürüm tüm bileşenleri tek `X.Y.0` sürümü altında birlikte yayımlar ve `master` üzerinde `vX.Y.0` etiketiyle işaretler
+([tüm bileşenler için tek sürüm](../compatibility-and-versioning.mdx#one-version-for-every-component) bölümüne bakın).
+Süreç sırasıyla şöyledir:
+
+### 1. Hazırlık [#1-housekeeping]
+
+Hazırlık, sürümden önce yapılan **elle değişiklikler** kümesidir. Hepsi **`master` üzerinde tek commit'e** girer;
+böylece ertelememiz gerekirse tüm sürüm temizce geri alınabilir veya cherry-pick edilebilir.
+
+- **Tüm bileşenlerin sürümünü ayarlayın.** Sürümler arasında **kök** `gradle.properties` içindeki `axelixVersion`,
+  gelecek sürümü `-SNAPSHOT` son ekiyle taşır; örneğin `3.1.0` geliştirilirken `3.1.0-SNAPSHOT`.
+  Hazırlıkta bu son ek kaldırılır ve yayımladığımız tam sürüm ayarlanır; `3.1.0` için `3.1.0` yapın.
+  Yayım işlem hattının okuduğu ve oluşan etiketin adını aldığı değer budur; işlem hattı `-SNAPSHOT` sürümünü yayımlamayı
+  **reddeder**. Kök `gradle.properties`, sürümün bulunduğu **tek** yerdir; tüm bileşenler onu buradan devralır.
+- **Playground sürümlerini artırın.** `playgrounds/` altındaki örnek uygulamalar tasarım gereği **ayrı projelerdir**;
+  `axelixVersion` değerini **devralmaz**, kullandıkları Axelix starter ve eklenti sürümlerini açıkça sabitlerler.
+  Bu sabit sürümleri yayımlanacak sürüme yükseltin.
+- **Dokümantasyonu güncelleyin.** Dokümantasyonu yalnızca **ana** seri başına sürümlendiririz. Örneğin minör sürüm
+  geliştirilirken sunacağı özelliklere “yakında” bildirimleri ekleriz; bunları sunan minör sürümü yayımladığımızda ilgili
+  “yayımlandı” bildirimleriyle değiştiririz.
+
+### 2. Yayım işlem hattını başlatın [#2-launch-the-release-pipeline]
+
+**Etiketi elle oluşturmayız.** Yayım işlem hattı `gradle.properties` dosyasından sürümü okur ve yayım öncesi denetimleri
+çalıştırır. Ardından Maven artifact'larını (starter ve eklentiler) yayımlar, Master Docker imajını derleyip gönderir,
+Helm chart'ı paketleyip imzalar. Ancak bundan sonra `vX.Y.0` etiketini oluşturup gönderir ve Helm chart deposunu günceller.
+Bu nedenle işlem hattı etiket oluşturmadan önce başarısız olursa artifact'lar zaten yayımlanmış olabilir.
+
+:::info[Sürüm notları elle yazılır]
+İşlem hattı **etiketi** ve JAR ile Helm varlıklarının eklendiği bir **taslak GitHub sürümü** oluşturur.
+Sürümü hazırlayan geliştirici, taslağın `vX.Y.0` notlarını düzenlemeli ve ardından **taslak sürümü** elle **yayımlamalıdır**.
+Yalnızca notları yazmak sürümü yayımlamaz.
+:::
+
+## Yama sürümleri [#patch-releases]
+
+Her Axelix sürümü gibi yama sürümü de **tüm bileşenleri** tek sürüm altında sunar; bileşen başına yama yoktur.
+Süreç minör sürüme benzer, tek yapısal fark `master` yerine minör serinin **yama dalından** oluşturulmasıdır.
+Dokümantasyon adımı atlanır; yamalar dokümantasyonu değiştirmez.
+
+1. **Yama dalına geçin.** Yama çalışmaları serinin `X.Y.x` adlı tek dalında bulunur. Gerçek `x`, tüm yama serisini işaretler;
+   etiketin aksine dal adında `v` ön eki **yoktur**. Minör sürümün `vX.Y.0` etiketinden ayrılır
+   ([Dal modeli → Yama çalışmaları nerede yapılır?](./branching-model.mdx#where-patch-work-lives) bölümüne bakın).
+   Serinin ilk yamasıysa etiketten oluşturun; değilse zaten vardır.
+
+2. **Düzeltmeleri bu dala alın.** Düzeltme genellikle önce `master`'a girer ve yama dalına geri taşınır;
+   yalnızca yamanın gerçekten düzelttiği şey değişir.
+
+3. **Dal üzerinde hazırlık (tek commit).**
+   - **Tüm bileşenlerin sürümünü ayarlayın.** **Kök** `gradle.properties` içindeki `axelixVersion` değerini yeni yama sürümü
+     `X.Y.Z` yapın. `master`'ın aksine yama dalı sürümler arasında `-SNAPSHOT` son eki taşımaz; bir sonraki yama artırana
+     kadar serisinin son yayımlanan sürümünde kalır.
+   - **Playground sürümlerini artırın.** Minör sürümle aynı nedenle örnek uygulamaları yeni yama sürümüne güncelleyin:
+     playground'lar Axelix sürümlerini açıkça sabitler ve `axelixVersion` değerini devralmaz.
+
+4. **Yayım işlem hattını başlatın.** Minör sürümdeki **aynı işlem hattıdır**, ancak `master` yerine yama dalından başlatılır.
+   Yukarıdaki denetim, yayımlama, paketleme ve etiketleme sırasını `X.Y.Z` sürümü ve `vX.Y.Z` etiketiyle izler.
+   Her Axelix etiketi gibi `v` ön eki taşır. Minör sürümde olduğu gibi JAR ve Helm varlıkları içeren taslak GitHub sürümü
+   oluşturur. Geliştirici yeni etiketin taslak notlarını düzenlemeli ve ardından **taslak sürümü** elle **yayımlamalıdır**.
+
+### Uygulamalı örnek [#worked-example]
+
+`3.1.0` sürümünde **Axelix Spring Boot 3 Starter** için düzeltme gerektiğini varsayalım:
+
+1. Yama, `v3.1.0` etiketinden ayrılan `3.1.x` dalında bulunur. `3.1` serisine daha önce yama yapılmışsa dal zaten vardır;
+   değilse `v3.1.0` etiketinden oluştururuz.
+2. Düzeltmeyi `master`'dan bu dala geri taşırız.
+3. Kök `gradle.properties` içinde `axelixVersion` değerini yayımlamak istediğimiz yama sürümü `3.1.1` yapar ve
+   playground'ları `3.1.1` sürümüne yükseltiriz.
+4. Yayım işlem hattını `3.1.x` dalından başlatırız. Maven artifact'larını ve Master imajını `3.1.1` ile yayımlar,
+   Helm chart'ı paketler, ardından tüm bileşenlerin `v3.1.1` etiketini oluşturup gönderir. Sonra chart deposunu günceller.
+   Gerçekte yalnızca bir starter değişmiş olsa da **her** bileşen `3.1.1` sürümünü alır.
+
+Sonuç, [tüm bileşenler için tek sürüm](../compatibility-and-versioning.mdx#one-version-for-every-component) sözünün
+karşılığıdır: yayımdan sonra `3.1.1` tüm bileşenler için vardır. Dağıtılmış her bileşeni aynı anda mı yoksa yalnızca
+düzeltileni mi yükselteceğiniz size kalmıştır;
+[uyumluluk `major.minor` ile garanti edilir](../compatibility-and-versioning.mdx#compatibility-between-components),
+bu nedenle dağıtılmış bileşenler arasındaki yama düzeyi farkı her zaman güvenlidir.

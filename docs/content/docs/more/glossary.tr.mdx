@@ -1,0 +1,27 @@
+---
+title: Sözlük
+description: "Bu belge, Axelix dokümantasyonu ve kod tabanında kullanılan temel terimleri ve kısaltmaları tanımlar."
+---
+
+## Terimler [#terms]
+
+### Axelix [#axelix]
+Projenin adı. Ayrıca tüm sistemi bir bütün olarak ifade eden genel bir terim olarak kullanılır.
+
+### Axelix Master [#axelix-master]
+Ayrı olarak dağıtılan bağımsız bir uygulamadır ve:
+- Axelix web arayüzünü sağlar
+- Yönetilen servislerle etkileşir
+- Merkezi yönetim noktası görevi görür
+- Servis keşfi ve kaydını yönetir
+- Yerleşik bir MCP sunucusu içerir
+
+### Axelix Spring Boot Starter [#axelix-spring-boot-starter]
+Axelix entegrasyonunu etkinleştirmek için Spring Boot uygulamalarına eklenen bir Spring Boot starter'dır.
+Axelix Master tarafından çağrılan gerekli yetenekleri sağlar.
+
+### Yönetilen servis [#managed-service]
+Şu özellikleri taşıyan bir Spring Boot uygulamasıdır:
+- Axelix Spring Boot Starter entegre edilmiştir
+- Axelix Master'a kayıtlıdır ve Master tarafından bilinir
+- Axelix üzerinden izlenebilir ve yönetilebilir

@@ -1,0 +1,37 @@
+---
+title: Axelix Spring Boot Starter nedir?
+description: "Axelix Starter (ASBS — Axelix Spring Boot Starter olarak da bilinir), Spring Boot uygulamalarınızın Axelix platformuyla sorunsuz biçimde bütünleşmesini sağlayan bir Spring Boot starter bağımlılığıdır. Uygulamalarınız ile Axelix Master yönetim konsolu arasındaki köprüdür."
+---
+
+## Genel bakış [#overview]
+
+Axelix Starter, standart Spring Boot uygulamanızı Axelix Master arayüzü üzerinden izlenebilen, hata ayıklaması yapılabilen ve denetlenebilen bir "yönetilen servis"e dönüştürür. Spring Boot'un yerleşik özelliklerini genişletir ve ek uç noktalar ile işlevler sağlar.
+
+## Temel özellikler [#key-capabilities]
+
+### **Otomatik servis keşfi ve kaydı** [#automatic-service-discovery--registration]
+- **Otomatik keşif**: Axelix Master örnekleri otomatik olarak kaydeder.
+- **Birden fazla ortam desteği**: Kubernetes ve Docker Compose ortamlarında çalışır.
+- **Kendini onaran kayıt**: Bağlantı kesintilerinde otomatik olarak yeniden kaydolur.
+
+### **Gelişmiş izleme ve hata ayıklama** [#enhanced-monitoring--debugging]
+- **Gerçek zamanlı bean analizi**: Tüm Spring bean'lerini görüntüleyin.
+- **Yapılandırma özelliklerini inceleme**: Özellik değerlerini ve kaynaklarını görün.
+- **Çalışma zamanı metrikleri**: Uygulama performansı ve sağlık metrikleri.
+- **Durum dışa aktarımı**: Uygulama örneğinin durumunu (heap-dump, thread-dump, env vb. dâhil) dışa aktarın.
+
+## Axelix Starter ne zaman kullanılır? [#when-to-use-axelix-starter]
+
+### **Geliştirme ve test** [#development--testing]
+- Farklı ortamlardaki (yerel, hazırlık, üretim) **yapılandırma sorunlarında hata ayıklayın**.
+- Kodu derinlemesine incelemeden **bean bağlantılarını ve bağımlılıklarını anlayın**.
+- Yeniden dağıtım veya yeniden başlatma olmadan **yapılandırma değişikliklerini test edin**.
+- Birden fazla yapılandırma kaynağında **özellik çözümlemesini doğrulayın**.
+- **Zamanlanmış görevleri açıp kapatın**: `@Scheduled` metotlarını etkinleştirerek veya devre dışı bırakarak farklı zamanlama senaryolarını test edin.
+- **Önbellek yönetimi**: Test sırasında önbellekleri temizleyerek veya devre dışı bırakarak önbellek davranışını doğrulayın.
+
+### **Üretim ortamı operasyonları** [#production-operations]
+- Birden fazla ortam ve örnekte **uygulama sağlığını izleyin**.
+- Üretim olaylarında **acil hata ayıklama yapın**.
+- Birden fazla uygulama örneğinde **yapılandırmayı yönetin**.
+- Sorun giderme amacıyla **uygulama durumunu ve yapılandırmasını denetleyin**.

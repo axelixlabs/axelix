@@ -1,0 +1,143 @@
+---
+title: Özellikler
+description: "Özellikler sayfası, bir Spring Boot örneğindeki her özelliğin nereden geldiğini, uygulamanın gerçekte hangi değeri kullandığını, hangi özelliklerin kullanımdan kaldırıldığını ve bunları hangi bean’lerin okuduğunu gösterir."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Özellikler sayfasının ana görünümü](/img/feature/properties/properties-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Properties***
+
+Aynı özellik birçok kaynaktan gelebilir: `application.yaml`, profile özel dosyalar, ortam değişkenleri, sistem özellikleri ve komut satırı argümanları.
+
+## Sayfada gösterilenler [#what-the-page-shows]
+
+Sayfa tüm özellikleri özellik kaynağına göre gruplar. Kaynaklar, Spring Boot'un başvurduğu sırayla en yüksek öncelikten en düşüğe doğru sıralanır (bkz. [Harici yapılandırma](https://docs.spring.io/spring-boot/reference/features/external-config.html)). Birden fazla kaynak aynı özelliği tanımladığında uygulama listede daha yukarıda bulunan kaynağın değerini kullanır.
+
+Her özellik için şunları görebilirsiniz:
+
+- Değerinin etkili olup olmadığı:
+  - **Active**: uygulama bu değeri kullanır.
+  - **Suppressed**: daha yüksek öncelikli bir kaynak da aynı özelliği tanımladığından bu değer uygulamaya ulaşmaz.
+- Özelliği tanımlayan tüm kaynaklar, en yüksek öncelikten en düşüğe doğru ve kullanılan değer işaretlenmiş olarak.
+- Özelliği bağlayan `@ConfigurationProperties` bean'i ve `@Value` aracılığıyla enjekte eden bean'ler; [Yapılandırma özellikleri](./configuration-properties.mdx) ve [Bean’ler](./beans.mdx) sayfalarına bağlantılarla.
+- Varsa `spring-configuration-metadata.json` içindeki açıklaması.
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Özellik ayrıntılarının açılır görünümü](/img/feature/properties/properties-details-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde özelliklerin açılır bölümü***
+
+Kullanımdan kaldırılan özellikler vurgulanır ve kullanımdan kaldırma mesajını gösterir; böylece yükseltmeden önce taşımanız gereken ayarları bulabilirsiniz.
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Kullanımdan kaldırılan bir özellik](/img/feature/properties/properties-deprecated-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde kullanımdan kaldırılan özellik***
+
+Sayfa ayrıca örneğin etkin ve varsayılan profillerini (`spring.profiles.active` ve `spring.profiles.default`) gösterir.
+
+## Tehlikeli özellik değerleri [#dangerous-property-values]
+
+Bazı özellik değerleri geliştiricinin makinesinde uygundur ancak üretimde sıklıkla sorun çıkarır: veri kaybı, dahili bilgilerin sızması veya yavaş sorgular. Axelix bu değerlere ayarlanmış özellikleri işaretler. Her biri için değerin neden riskli olduğunu ve yerine hangi değerin kullanılması gerektiğini gösterir. Örneğin `spring.jpa.hibernate.ddl-auto=update`, Hibernate'in veritabanı şemasını kendi başına değiştirmesine izin verir.
+
+Axelix yalnızca uygulamanın kullandığı değeri denetler; dolayısıyla bastırılmış bir özellik kaynağındaki tehlikeli değer işaretlenmez. Büyük/küçük harfe bakılmaksızın değerin tamamı eşleşmelidir: `management.endpoints.web.exposure.include=*` işaretlenir, ancak `health,*` işaretlenmez. Maskelenmiş değerler de denetlenmez; bu nedenle `environment.values:read` yetkiniz yoksa maskelenen anahtarların işaretlerini göremezsiniz (bkz. [Değer maskeleme](#value-sanitization)).
+
+:::info
+Varsayılan olarak `environment.values:read` yetkisine sahip olmayan çağıranlar için tüm değerler `******` olarak maskelenir. Hangi anahtarların maskeleneceğini ve asıl değerleri kimlerin görebileceğini seçmek için aşağıdaki [Değer maskeleme](#value-sanitization) bölümüne bakın.
+:::
+
+## Değer maskeleme [#value-sanitization]
+
+Axelix, Spring Boot'un `management.endpoint.env.show-values` ayarına dayanmaz. Spring Boot'tan her zaman ham değerleri (`Show.ALWAYS`) döndürmesini ister ve yetki denetimine bağlı olarak kendi maskelemesini uygular.
+
+**Ham değerleri kim görür?** Yerleşik **ADMIN** ve **SUPER_ADMIN** rollerinin sağladığı `environment.values:read` yetkisine sahip çağıranlar asıl değerleri alır. Diğer herkese değerler `******` olarak döndürülür. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+**Hangi anahtarlar maskelenir?** Tek bir starter özelliği, `axelix.sbs.endpoints.config.sanitized-properties`, bu kümeyi denetler ve hem `axelix-env` (bu sayfa) hem de `axelix-configprops` ([Yapılandırma özellikleri](./configuration-properties.mdx) sayfası) için geçerlidir:
+
+- **Boş liste (varsayılan)**: yetkisi olmayan çağıranlar için tüm değerler maskelenir.
+- **Boş olmayan liste**: yalnızca listelenen anahtarlar maskelenir; diğerleri olduğu gibi döndürülür.
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+```
+
+  </Tab>
+</Tabs>
+
+Aynı özelliğin diğer starter ayarlarıyla birlikte açıklaması için Spring Boot Starter yapılandırma kılavuzundaki [Hassas özellik değerlerini maskeleme](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#sanitize-sensitive-property-values) bölümüne bakın.
+
+:::note
+Maskeleme için standart Spring Boot Actuator özellikleri (`management.endpoint.env.show-values`, `management.endpoint.env.keys-to-sanitize` ve bunların `configprops` karşılıkları) dikkate alınmaz. Bunun yerine `axelix.sbs.endpoints.config.sanitized-properties` kullanın.
+:::
+
+## MCP araçları [#mcp-tools]
+
+Yönetilen bir örneğin tüm ortamı (uygulama özellikleri, sistem özellikleri ve işletim sistemi ortam değişkenleri) MCP aracılığıyla yapay zekâ ajanlarına da sunulur. [MCP araçları kataloğuna](../../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection) bakın.
+
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-env` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-env
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-env
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

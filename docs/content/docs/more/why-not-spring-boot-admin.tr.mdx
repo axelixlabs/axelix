@@ -1,0 +1,163 @@
+---
+title: Neden yalnızca Spring Boot Admin değil?
+description: "Spring Boot Admin, Axelix'e ilham verdi. Axelix'in yerleşik RBAC, daha derin çalışma zamanı tanılaması, ekosistem dönüşümü ve yapay zekâ odaklı iş akışlarıyla tanıdık uygulama yönetimini nasıl genişlettiğini keşfedin."
+---
+
+[Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) (SBA), Axelix'in ilk ilham kaynaklarından biridir.
+Axelix'i geliştiren mühendisler SBA'yı gerçek ortamlarda yıllardır kullanmıştır. Spring Boot Actuator için merkezi bir
+arayüz yararlı bir başlangıçtır, ancak ekiplerin çözmesi gereken sorunlar Actuator verilerini göstermekten çok daha kapsamlıdır.
+
+Bu deneyim daha geniş bir kapsama yol açtı: **Axelix, Java Spring Boot mikroservis ekosistemlerini geliştirmek ve dönüştürmek
+için açık kaynaklı, yapay zekâ odaklı bir platformdur.** Tanıdık uygulama yönetimi iş akışlarını yerleşik rol tabanlı erişim
+denetimiyle kapsar, daha derin inceleme ve çalışma zamanı denetimi ekler, ekiplerin servisler arası değişiklikleri yönetmesine
+yardımcı olur. Hem insan mühendisler hem de yapay zekâ ajanları platformun hedef kullanıcılarıdır.
+
+## Yerleşik RBAC ile tanıdık yönetim iş akışları [#familiar-management-workflows-with-rbac-built-in]
+
+Axelix, ekiplerin SBA için başvurduğu günlük iş akışlarını kapsar: uygulama durumunu incelemek, metrikleri görüntülemek,
+logger düzeylerini değiştirmek, yapılandırmayı incelemek ve önbelleklerle çalışmak.
+Bu yetenekler yerleşik bir kimlik ve izin modeliyle sunulur.
+
+Master yerel kullanıcılar, OAuth2/OIDC oturum açma, rol eşleme ve işlem düzeyinde yetkiler sağlar.
+Örneğin izinler, önbellek temizlemeyi, zamanlanmış görevleri değiştirmeyi ve hassas özellik değerlerini okumayı denetler.
+Master, insan ve MCP istemcilerinin kimliğini doğrular, erişimi denetler ve yönetilen servisleri çağırırken imzalı JWT kullanır.
+İzin modeli için [Kimlik doğrulama](../setting-up-master-ui/authentication/authentication.mdx) sayfasına bakın.
+
+SBA, Spring Security için entegrasyon noktaları sunar; ancak **ekibiniz, dağıtımı için IAM entegrasyonunu ve yetkilendirme
+kurallarını uygulamak ve sürdürmek zorundadır**. Bu; güvenlik yapılandırması yazmak, kullanıcı kimliklerini rollere bağlamak
+ve kimin hassas verileri okuyabileceğine veya yönetim eylemlerini çağırabileceğine karar veren denetimleri bağlamak demektir.
+Yönetilen uygulamaların Actuator uç noktalarını da güvenli hâle getirmelisiniz.
+SBA'nın [güvenlik dokümantasyonu](https://docs.spring-boot-admin.com/4.1.4/docs/security/) gereken yapılandırmayı ve kodu gösterir.
+
+Güvenlik entegrasyonu ayrıntılı bir iştir ve doğru yapmak her zaman kolay değildir. Atlanan bir yetkilendirme denetimi veya
+yanlış rol eşlemesi hassas bilgileri açığa çıkarabilir ya da çalışan servislerde istenmeyen değişikliklere izin verebilir.
+Bu denetimlerin uygulanması, test edilmesi ve sürekli bakımı ekibinizin sorumluluğundadır.
+
+**Axelix bu güvenlik modelini ürünün parçası olarak sunar.** Kullanıcı yönetimi, kimlik sağlayıcısı entegrasyonu, rol eşleme
+ve işlem düzeyinde erişim denetimleri Master'a zaten bağlanmıştır. Yetkilendirme entegrasyonunu kendiniz yazıp sürdürmek
+yerine sunulan mekanizmalarla kimlik sağlayıcınızı ve erişim politikanızı yapılandırırsınız.
+
+Axelix Master, arayüz ve MCP sunucusunu içeren bağımsız JAR, resmî Docker imajı veya resmî Helm chart olarak da dağıtıma hazırdır.
+[Master yapılandırmasına](../setting-up-master-ui/configuring-master/configuring-master.mdx) bakın.
+Yönetilen her uygulamaya Axelix starter ve derleme eklentisini eklersiniz.
+
+## Her uygulamada daha derin inceleme ve denetim [#deeper-inspection-and-control-inside-each-application]
+
+SBA öncelikle standart Spring Boot ve Spring Cloud Actuator uç noktalarının sunduğu yönetim yeteneklerini gösterir.
+[Kurulum kılavuzu](https://docs.spring-boot-admin.com/3.5.1/docs/installation-and-setup/) bu modeli açıklar.
+**Bu durum SBA'nın hazır sunduğu inceleme ve denetim derinliğini belirgin biçimde sınırlar:** yalnızca yerel uç noktaların
+sunduğu bilgileri gösterebilir ve eylemleri sağlayabilir.
+
+Bir olay sırasında bu bilgiler uygulama içinde ne olduğunu açıklamaya çoğu zaman yetmez. Örneğin görev listesi, belirli
+bir çalıştırmanın neden başarısız olduğunu açıklamaz ve ilgili zamanlanmış görevi isteğe bağlı çalıştırmaya izin vermez.
+Özel uzantılar bu boşlukları doldurabilir; ancak ekibiniz ek uygulama ve konsol kodunu yazıp sürdürmelidir.
+
+Axelix'in [Spring Boot Starter'ı](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx),
+ek çalışma zamanı bilgileri toplar ve bu standart uç noktaların ötesinde eylemler uygular.
+Bazı toplayıcılar Actuator verilerini zenginleştirir; diğerleri uygulama davranışını doğrudan enstrümante eder.
+Bu, Axelix'in aynı hata ayıklama akışında daha ayrıntılı soruları yanıtlamasını ve daha fazla denetim sağlamasını mümkün kılar.
+
+:::note[Özel Actuator uç noktalarından ayrılma planı]
+Bugün starter, Axelix'in kendi `axelix-*` Actuator uç noktalarını sunar. Bunlar standart Actuator API'sinin ötesinde
+yetenekler taşır. [Issue #1858](https://github.com/axelixlabs/axelix/issues/1858), yapılandırma etkileşimi, güvenlik kaygıları,
+Actuator soyutlamalarının kısıtları ve taşınabilirlik nedeniyle bağımsız Axelix API'lerine planlanan geçişi takip eder.
+Yeni API tasarımı hâlâ tartışılmaktadır. Bu, mevcut iletişim yöntemi değil planlanan bir değişikliktir.
+:::
+
+### Zamanlanmış görevler ve çalıştırmaları [#scheduled-tasks-and-their-executions]
+
+Cron ifadesini listelemek, zamanlanmış bir işi anlamanın yalnızca başlangıcıdır. Axelix, süre ve hatalar dahil görev
+çalıştırmalarını kaydeder; böylece iş çalıştığında ne olduğunu araştırabilirsiniz. Ayrıca görevi isteğe bağlı çalıştırabilir,
+etkinleştirip devre dışı bırakabilir ve yeniden dağıtmadan cron ifadesini, sabit gecikmesini veya sabit hızını değiştirebilirsiniz.
+[Scheduled Tasks](../features/spring-framework/scheduled-tasks.mdx) sayfasına bakın.
+
+### Kopyalar arasında geçici günlük değişiklikleri [#temporary-logging-changes-across-replicas]
+
+Sorun herhangi bir kopyada oluşabiliyorsa örnekleri tek tek değiştirmek araştırmayı zorlaştırır.
+Axelix, aynı uygulamanın seçili örneklerinde logger düzeyini sınırlı süre için değiştirmenizi sağlar.
+Süre dolduğunda önceki düzey otomatik geri yüklenir. Logger grupları da örnekler arasında değiştirilebilir;
+geçici düzeyler ise tek tek logger'lara uygulanır.
+[Loggers](../features/insights/loggers/loggers.mdx) sayfasına bakın.
+
+### Geçerli özellik değerleri ve bunları kullanan bean'ler [#effective-property-values-and-the-beans-that-use-them]
+
+`application.yaml` içindeki bir özellik, çalışan uygulamanın kullandığı değeri her zaman belirlemez.
+Axelix kazanan özellik kaynağını ve daha yüksek öncelikli kaynaklar tarafından bastırılan değerleri gösterir.
+Özellikleri `@Value` tüketicileri ve `@ConfigurationProperties` bean'leriyle ilişkilendirir, bağlanmış yapılandırma değerlerini gösterir.
+
+İnceleme hataları bulmaya da yardımcı olmalıdır; bu nedenle Axelix, bilinen tehlikeli geçerli değerleri ve Spring Boot
+yapılandırma meta verilerinde kullanımdan kaldırılmış olarak işaretlenen özellikleri belirtir.
+Hassas değerler erişim izinlerine ve maskelemeye tabi olmaya devam eder.
+[Properties](../features/spring-framework/properties.mdx) ve
+[Configuration Properties](../features/spring-framework/configuration-properties.mdx) sayfalarına bakın.
+
+### Bean'ler ve var olma nedenleri [#beans-and-why-they-exist]
+
+Axelix bean listesine bağlam ekler: bağımlılıklar, kaynak, niteleyiciler, proxy türü ve ilgili otomatik yapılandırmaya bağlantılar.
+Koşul raporuyla birlikte bunlar, Spring'in bir bean'i neden oluşturduğunu ve uygulamadaki yerini açıklamaya yardımcı olur.
+[Beans](../features/spring-framework/beans.mdx) ve [Conditions](../features/spring-framework/conditions.mdx) sayfalarına bakın.
+
+### İşlem çalıştırmaları ve hatalı uygulama kalıpları [#transaction-executions-and-anti-patterns]
+
+Axelix işlem çalıştırmalarını izler; ortalama, en hızlı ve en yavaş süreleri toplar.
+İşlemler içindeki engelleyici `RestTemplate` çağrılarını, N+1 lazy-loading sorgularını ve Hibernate bellek içi sayfalamasını,
+sorunun kodda bulunmasına yardımcı olan ayrıntılarla tespit eder. Bunlar standart Actuator incelemesinin ötesinde
+uygulama düzeyinde tanılamalardır. [Transaction Control](../features/spring-framework/transaction-control.mdx) sayfasına bakın.
+
+## Tek tek servislerden ekosistem dönüşümüne [#from-individual-services-to-ecosystem-evolution]
+
+Çalışma zamanı hata ayıklaması, Axelix kapsamının bir parçasıdır. Ekipler ekosistemlerinin nelere bağımlı olduğunu ve
+nasıl geliştiğini de anlamalıdır.
+
+- **Java ve Spring Boot geçişleri.** [Spring Portfolio](../ui-guide/dashboard/spring-portfolio.mdx) ve
+  [Languages Profile](../ui-guide/dashboard/languages-profile.mdx), uygulamalarda kullanılan Spring ve Java sürümlerini
+  gösterir; böylece ekipler geçiş ilerlemesini takip edebilir.
+- **Bağımlılık sağlığı.** [Dependency Health panosu](../ui-guide/dashboard/dependency-health.mdx), ekosistem genelinde
+  kütüphane kullanımını, sürümleri ve bakım durumunu gösterir. Örnek bazında
+  [bağımlılık analizi](../features/insights/dependencies-analyzer.mdx), tek uygulamanın kütüphanelerini araştırmaya yardımcı olur.
+
+Bu görünümler, bir servisteki sorunu, bakımı yapılmayan kütüphaneyi değiştirmek veya uygulamaları desteklenen bir Spring Boot
+nesline taşımak gibi tüm ekosistemdeki çalışmalarla ilişkilendirir.
+
+## Yapay zekâ odaklı iş akışları [#ai-native-workflows]
+
+Axelix, mühendislerin ve yapay zekâ ajanlarının uygulama tanılamalarıyla doğrudan çalışması için tasarlanmıştır.
+Yerleşik MCP sunucusu, Master'a entegre erişim denetimleriyle çalışma zamanı incelemesini, uygulama meta verilerini,
+kalıcılık bulgularını ve desteklenen çalışma zamanı eylemlerini ajanlara sunar. Ajan, araçlar aracılığıyla servis bulabilir,
+bean'lerini ve yapılandırmasını inceleyebilir, tespit edilen kalıcılık sorunlarını araştırabilir veya logger düzeyini değiştirebilir.
+
+[MCP araç kataloğu](../setting-up-master-ui/mcp/mcp-tools.mdx) mevcut kapsamı listeler. Henüz her arayüz işlemini içermez.
+Platformun yapay zekâ odaklı yönü, analiz ve denetim yeteneklerini insanlar kadar ajanların da kullanabilmesini sağlamaktır.
+
+SBA da artık [deneysel MCP entegrasyonunu](https://docs.spring-boot-admin.com/4.1.4/docs/mcp/) belgeliyor.
+Dolayısıyla fark; sunulan bilgi ve eylemlerin derinliği ve kapsamı, Axelix'in entegre izin modeli ve daha geniş ekosistem
+yetenekleridir.
+
+## Özellik karşılaştırması [#feature-comparison]
+
+Bu tablo, standart SBA iş akışlarını Axelix OSS'te sunulan yeteneklerle karşılaştırır. SBA genişletilebilir ve özellikler
+sürüme göre değişir. Yeni MCP entegrasyonu yok sayılmak yerine açıkça belirtilmiştir.
+
+| Alan | Spring Boot Admin | Axelix |
+|---|---|---|
+| Uygulama durumu, metrikler, yapılandırma, logger'lar | Standart Actuator tabanlı yönetim | Ek çalışma zamanı bilgileri ve denetimleriyle dahil |
+| Kullanıcı yönetimi ve işlem düzeyinde RBAC | Spring Security ile IAM entegrasyonu ve yetkilendirme kurallarını uygulama ve sürdürme | Yerleşik yerel kullanıcılar, OIDC rol eşleme ve yetkiler |
+| Yönetilen servislere kimlik doğrulama | Actuator güvenliğini ve kimlik bilgilerini yapılandırma | Entegre Master-starter JWT kimlik doğrulaması |
+| Kopyalar arasında otomatik geri yüklemeli geçici logger düzeyleri | — | Dahil ([Loggers](../features/insights/loggers/loggers.mdx)) |
+| Özellik incelemesi | Actuator ortam ve yapılandırma özellikleri | Geçerli ve bastırılan değerler, bean bağlantıları, kullanımdan kaldırma meta verileri, tehlikeli değer denetimleri |
+| Bean incelemesi | Actuator bean tanımlayıcıları | Zenginleştirilmiş kaynak, niteleyiciler, proxy bilgileri ve otomatik yapılandırma bağlantıları |
+| Zamanlanmış görevler | Actuator görev listesi | Çalıştırma geçmişi, süreler, hatalar, isteğe bağlı çalıştırma, etkinleştirme/devre dışı bırakma, yeniden zamanlama |
+| İşlem tanılaması | — | Çalıştırma istatistikleri ve tespit edilen hatalı uygulama kalıpları |
+| Önbellek yönetimi | Standart Actuator incelemesi ve temizleme | İnceleme, temizleme ve çalışma zamanında etkinleştirme/devre dışı bırakma ([Caches](../features/spring-framework/caches.mdx)) |
+| Java / Spring Boot geçiş takibi | — | Ekosistem genelinde Spring Portfolio ve Languages Profile |
+| Bağımlılık bakım sağlığı | — | Örnek bazında analiz ve ekosistem panosu |
+| Yapay zekâ ajanı erişimi | Yeni SBA sürümlerinde deneysel MCP modülü | Uygulama incelemesi, tanılama ve desteklenen eylemlerle yerleşik MCP sunucusu |
+| Çalıştırmaya hazır dağıtım | SBA uygulaması oluşturma ve yapılandırma | Bağımsız JAR, resmî Docker imajı, resmî Helm chart |
+
+## İlgili sayfalar [#related]
+
+- [Giriş](../product/introduction.mdx): Axelix nedir?
+- [Gerekçe](../product/motivation.mdx): Axelix'in çözmek için oluşturulduğu sorunlar.
+- [Master nedir?](../setting-up-master-ui/what-is-master.mdx): keşif ve yönetim konsolu.
+- [Master yapılandırması](../setting-up-master-ui/configuring-master/configuring-master.mdx): JAR, Docker, Helm, Compose.
+- [Özellikler](../features/insights/details.mdx): örnek bazında özellik başvurusu.

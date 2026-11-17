@@ -1,0 +1,110 @@
+---
+title: Önbellekler
+description: "Önbellekler sayfası, uygulamanın tüm Spring önbelleklerini listeler ve her birinin ne kadar iyi çalıştığını gösterir. Bir önbelleği çalışma zamanında tek bir örnekte veya aynı anda birden fazla örnekte temizleyebilir ya da kapatabilirsiniz."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Önbellekler sayfasının ana görünümü](/img/feature/caches/caches-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Caches sayfası***
+
+Eski veri döndüren veya nadiren isabet sağlayan bir önbelleği dışarıdan fark etmek zordur: uygulama çalışmaya devam eder, ancak yanlış veya yavaş çalışır. Önbellekler sayfası, her önbelleğin performansını gösterir ve yeniden başlatmadan temizlemenizi veya kapatmanızı sağlar.
+
+Sayfa kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açıp önbellek istatistiklerini inceleyebilir. Önbelleği temizlemek `caches:clear`, açıp kapatmak ise `caches:toggle` yetkisi gerektirir. Her iki yetki de yerleşik **EDITOR**, **ADMIN** ve **SUPER_ADMIN** rollerine verilir. Bu yetkilere sahip olmayan kullanıcılar aynı kontrolleri görür, ancak Axelix bunları devre dışı tutar ve üzerine gelindiğinde araç ipucunda nedenini açıklar. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfada gösterilenler [#what-the-page-shows]
+
+Sayfa önbellekleri önbellek yöneticisine göre gruplar. Her önbelleğin adını ve arkasındaki yerel önbelleğin sınıfını görürsünüz; örneğin `ConcurrentMapCache` için `java.util.concurrent.ConcurrentHashMap`. Listede önbellek adına veya önbellek yöneticisi adına göre arama yapabilirsiniz.
+
+## Önbellek ayrıntıları [#cache-details]
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Önbellek ayrıntılarının sayfa görünümü](/img/feature/caches/caches-details-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde önbellek ayrıntıları***
+
+Uygulama bir önbellekte en az bir kez arama yaptığında önbelleği genişleterek ne kadar iyi çalıştığını görebilirsiniz. Kayıtlı araması olmayan önbellekler listede kalır ancak genişletilemez.
+
+**Hits/Total Ratio** grafiği, isabetlerin zaman içindeki oranını 0 ile 1 arasında gösterir. Oranın sürekli düşük olması çoğu aramanın sonuç bulamadığı, dolayısıyla önbelleğin fazla iş tasarrufu sağlamadan bellek tükettiği anlamına gelir. Belirli bir andaki kesin oranı görmek için grafiğin üzerine gelin.
+
+Grafiğin altında **Statistics**, kayıtlı aramaları özetler:
+
+- **Hits** ve **Misses**: kaç aramanın değer bulduğu ve kaçının bulamadığı; tüm aramalar içindeki oranlarıyla birlikte.
+- **Entries count**: önbellekteki tahmini girdi sayısı. Yalnızca önbellek boyutunu bildirebiliyorsa görünür; şu anda Caffeine `Cache` ve `ConcurrentMapCache` gibi `ConcurrentHashMap` tabanlı önbellekler bunu yapabilir.
+
+## Önbellekleri yönetme [#managing-caches]
+
+Aşağıdaki her eylem, çalışan uygulamayı değiştirmeden önce onay ister.
+
+### Bir önbelleği temizleme [#clear-a-cache]
+
+Önbellek eski veriler içeriyorsa, örneğin veritabanındaki bir kaydı doğrudan değiştirdiyseniz önbelleği temizleyin. Tüm girdilerini silmek için önbelleğin yanındaki **Clear** düğmesine, uygulamanın tüm önbelleklerini boşaltmak için **Clear All Caches** düğmesine tıklayın. Uygulama sonraki aramalarda önbellekleri yeniden doldurur.
+
+### Bir önbelleği etkinleştirme veya devre dışı bırakma [#enable-or-disable-a-cache]
+
+Çalışma zamanında bir önbelleği kapatmak için **Status** anahtarını kullanın. Önbellek kapalıyken tüm aramalar sonuçsuz kalır ve yeni değerler depolanmaz; uygulama her çağrıda veriyi kaynağından alır. Bu, bir hatanın önbelleğe alınmış verilerden kaynaklanıp kaynaklanmadığını denetlemeyi sağlar. Önbelleğe almayı sürdürmek için önbelleği yeniden açın.
+
+## Birden fazla örnekte önbellekleri yönetme [#manage-caches-on-several-instances]
+
+<ReleasedInNotice version="1.3.0" />
+
+Uygulamanın her replikası kendi önbellek kopyasını tutar; bu yüzden bir replikadaki önbelleği temizlemek diğerlerindeki eski girdileri bırakır. Bir eylemin uygulamanın hangi örneklerine uygulanacağını seçmek için arama alanının yanındaki **Instances** düğmesini açın. Liste her örneği commit bilgisi ve durumuyla gösterir.
+
+Açtığınız örnek her zaman seçilidir ve seçimi kaldırılamaz. Diğer örnekleri tek tek işaretleyin veya **Select all other instances** seçeneğini kullanın. Düğme seçili örnek sayısını, tüm örnekler seçiliyse **All** ifadesini gösterir.
+
+Seçim sayfadaki tüm eylemler için geçerlidir: **Clear All Caches**, tek bir önbelleği temizleme ve **Status** anahtarı. Seçili örneklerden bazılarına ulaşılamazsa eylem yine diğerlerine uygulanır. Sayfadaki istatistikler her zaman açtığınız örneğe aittir.
+
+Seçici yalnızca uygulamanın birden fazla örneği varsa görünür. Başka bir örneğe geçtiğinizde seçim geçerli örneğe sıfırlanır.
+
+## MCP araçları [#mcp-tools]
+
+Önbellekler MCP aracılığıyla bir yapay zekâ ajanı tarafından da incelenebilir ve temizlenebilir. [MCP araçları kataloğuna](../../setting-up-master-ui/mcp/mcp-tools.mdx#caches) bakın.
+
+## Özellikler [#properties]
+
+Önbellek yönetimi varsayılan olarak etkindir. Tamamen kapatmak için `axelix.sbs.cache.management.enabled=false` ayarını kullanın. Ayrıntılar için [Önbellek yönetimi](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#cache-management) bölümüne bakın.
+
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-caches` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-caches
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-caches
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

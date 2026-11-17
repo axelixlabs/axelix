@@ -1,0 +1,220 @@
+---
+title: Veritabanı şema geçişleri
+description: "Master, veritabanı şemasını yönetir ve çalışan sürümle uyumlu tutar."
+---
+
+Her başlatmada, geçerli sürümün gerektirdiği şema değişikliklerini uygulamak için [Liquibase](https://www.liquibase.com/) çalıştırılır.
+Şema geçişlerini elle çalıştırmanız gerekmez.
+
+## Şema geçişleri nasıl çalışır [#how-migrations-run]
+
+Şema geçişleri, ayrıca başlattığınız bir adım değil, başlatma sürecinin bir parçasıdır.
+
+- **Her başlatmada.** Master, kullanıcı arayüzünü ve API'yi sunmaya başlamadan önce Liquibase veritabanını inceler ve
+  eksik değişiklik kümelerini uygular.
+- **Yapılandırılan veritabanında.** Şema geçişleri, Master'ın çalışma zamanında kullandığı motor üzerinde çalışır:
+  JDBC URL ön ekine göre seçilen SQLite, PostgreSQL veya MySQL. Motorun nasıl seçildiğini öğrenmek için
+  [Veritabanı](../configuring-master/configuring-master.mdx#database) bölümüne bakın.
+- **Her değişiklik için yalnızca bir kez.** Liquibase, uygulanan her değişiklik kümesini kendi kayıt tablosuna
+  (`DATABASECHANGELOG`) kaydeder. Daha önce çalıştırılmış bir değişiklik kümesi atlanır; bu nedenle Master'ı yeniden
+  başlatmak güvenlidir ve düşük maliyetlidir.
+- **Hatada hemen durur.** Bir şema geçişi uygulanamazsa, kısmen güncellenmiş bir şemayla çalışmak yerine başlatma
+  işlemi bir hatayla sonlandırılır.
+
+## Şema geçişlerinde hangi kimlik bilgileri kullanılır [#which-credentials-run-the-migrations]
+
+Varsayılan olarak şema geçişleri, **Master'ın bağlanırken kullandığı kimlik bilgilerini** kullanır:
+`axelix.master.database.username` ve `axelix.master.database.password`. Şema geçişleri tablo oluşturduğu ve değiştirdiği
+ için bu veritabanı kullanıcısının, Master'ın çalışma zamanında kullandığı okuma ve yazma erişiminin yanı sıra şema
+ değiştirme (DDL) yetkilerine de sahip olması gerekir.
+
+### Şema geçişleri için ayrı bir kullanıcı kullanma [#using-a-dedicated-migration-user]
+
+<ReleasedInNotice version="1.1.0" />
+
+Bazı ekipler uygulamayı günlük kullanımda yalnızca satır okuyup yazabilen, asgari yetkilere sahip bir kullanıcıyla
+çalıştırır; şema değişikliklerini ise daha yetkili, ayrı bir kullanıcıyla uygular. Master bunu iki özellikle destekler:
+
+| Özellik                             | Varsayılan                          | Açıklama                                                                                        |
+|-------------------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------|
+| `axelix.master.migrations.username` | `axelix.master.database.username`   | Liquibase’in şema geçişlerini uygularken bağlantı kurmak için kullandığı kullanıcı hesabı. Şema değiştirme (DDL) yetkileri gerekir. |
+| `axelix.master.migrations.password` | `axelix.master.database.password`   | Şema geçişi kullanıcısının parolası.                                                                |
+
+Her ikisi de varsayılan olarak ilgili `axelix.master.database.*` değerini kullanır. Bunları ayarlamazsanız şema
+geçişleri, yukarıda açıklandığı gibi uygulamanın geri kalanıyla aynı kullanıcı altında çalışır. Ayarladığınızda Master
+**aynı veritabanına** bağlanır; `axelix.master.database.url` üzerinden belirlenen JDBC URL'si ve sürücüsü yeniden
+kullanılır, ancak şema geçişi çalıştırılırken geçiş kullanıcısıyla kimlik doğrulanır. Başlatmadan sonraki tüm işlemler
+`axelix.master.database.*` altında çalışmaya devam eder.
+
+:::note[SQLite kullanıcı kavramına sahip değildir]
+SQLite verileri yerel bir dosyada saklar ve veritabanı kullanıcısı kavramına sahip değildir. Bu nedenle
+`axelix.master.database.url`, `jdbc:sqlite:` ile başladığında `axelix.master.migrations.*` yok sayılır. Bu özellikler
+yalnızca PostgreSQL ve MySQL için geçerlidir.
+:::
+
+## Şema geçişi kimlik bilgilerini ayarlama [#setting-the-migration-credentials]
+
+Şema geçişi özellikleri sıradan Master ayarlarıdır; dolayısıyla bunları diğer ayarlarla aynı şekilde sağlarsınız.
+Aşağıdaki örnekler PostgreSQL kullanır; MySQL de `jdbc:mysql://` URL'siyle aynı şekilde çalışır.
+
+### JAR olarak çalıştırma [#run-as-a-jar]
+
+Bunları `-D` sistem özellikleri olarak iletin veya JAR dosyasının yanındaki bir yapılandırma dosyasına ekleyin.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  master:
+    database:
+      url: jdbc:postgresql://db.internal:5432/axelix
+      username: axelix_app        # runtime user (DML only)
+      password: ${AXELIX_DB_PASSWORD}
+    migrations:
+      username: axelix_migrator    # migration user (DDL)
+      password: ${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix
+axelix.master.database.username=axelix_app
+axelix.master.database.password=${AXELIX_DB_PASSWORD}
+axelix.master.migrations.username=axelix_migrator
+axelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </Tab>
+</Tabs>
+
+Ya da tümünü komut satırından sağlayın:
+
+```bash
+java \
+  -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+  -Daxelix.master.database.username=axelix_app \
+  -Daxelix.master.database.password=... \
+  -Daxelix.master.migrations.username=axelix_migrator \
+  -Daxelix.master.migrations.password=... \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+:::warning
+Bir işlemin tam komut satırı, makinedeki diğer tüm kullanıcılar tarafından okunabilir (`ps -ef`, `/proc/<pid>/cmdline`).
+Bu nedenle yukarıdaki `-D` biçimindeki parolalar tüm yerel işlemlere görünür. Bunu yalnızca yerel bir deneme için
+kullanın; diğer durumlarda parolaları, değerlerini ortamdan alan bir yapılandırma dosyasında tutun (yukarıdaki
+`application.yaml` örneğinde olduğu gibi) veya ortam değişkenleri olarak iletin. Bkz.
+[Gizli bilgileri güvenli sağlama](../configuring-master/configuring-master.mdx#supplying-properties).
+:::
+
+### Docker ile çalıştırma [#run-with-docker]
+
+İmaj, `JAVA_TOOL_OPTIONS` değerini JVM'ye otomatik olarak uygular; dolayısıyla `-D` özelliklerini konteynere
+iletmek için bu değişken kullanılır.
+
+:::warning
+`JAVA_TOOL_OPTIONS`, başlatma sırasında bütünüyle stderr'e yazılır (`Picked up JAVA_TOOL_OPTIONS: ...`). Bu nedenle
+veritabanı ve şema geçişi parolaları da dahil olmak üzere içindeki tüm `-D` değerleri `docker logs` çıktısına ve günlük
+toplayıcılarına aktarılır. Buraya yalnızca gizli bilgi içermeyen `-D` seçeneklerini koyun; parolaları ise aynı esnek
+bağlama kurallarına uygun ayrı `-e` ortam değişkenleriyle sağlayın
+(`AXELIX_MASTER_DATABASE_PASSWORD`, `AXELIX_MASTER_MIGRATIONS_PASSWORD`). Bkz.
+[Gizli bilgileri güvenli sağlama](../configuring-master/configuring-master.mdx#supplying-properties).
+:::
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_PASSWORD="${AXELIX_DB_PASSWORD}" \
+  -e AXELIX_MASTER_MIGRATIONS_PASSWORD="${AXELIX_MIGRATIONS_PASSWORD}" \
+  -e JAVA_TOOL_OPTIONS="\
+    -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+    -Daxelix.master.database.username=axelix_app \
+    -Daxelix.master.migrations.username=axelix_migrator" \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_PASSWORD="${AXELIX_DB_PASSWORD}" \
+  -e AXELIX_MASTER_MIGRATIONS_PASSWORD="${AXELIX_MIGRATIONS_PASSWORD}" \
+  -e JAVA_TOOL_OPTIONS="\
+    -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+    -Daxelix.master.database.username=axelix_app \
+    -Daxelix.master.migrations.username=axelix_migrator" \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+:::note
+Axelix `1.2.0` sürümünden itibaren Master varsayılan olarak `2935` portunu dinler. Bu sürümden önce varsayılan port
+`8080` olduğundan, eski bir imaj çalıştırırken `8080` portunu dışa açın. Bkz.
+[Genel](../configuring-master/configuring-master.mdx#general).
+:::
+
+### Docker Compose ile çalıştırma [#run-with-docker-compose]
+
+Gizli bilgi içermeyen veritabanı ve şema geçişi ayarlarını `master` servisinin `JAVA_TOOL_OPTIONS` değişkenine ekleyin.
+Veritabanı ve şema geçişi parolalarını aşağıda gösterildiği gibi ayrı ortam değişkenleriyle iletin.
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```yaml title="docker-compose.yaml"
+services:
+  master:
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    ports:
+      - "2935:2935"
+    environment:
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_MIGRATIONS_PASSWORD: ${AXELIX_MIGRATIONS_PASSWORD}
+      JAVA_TOOL_OPTIONS: >-
+        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
+        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
+        -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+services:
+  master:
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    ports:
+      - "2935:2935"
+    environment:
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_MIGRATIONS_PASSWORD: ${AXELIX_MIGRATIONS_PASSWORD}
+      JAVA_TOOL_OPTIONS: >-
+        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
+        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
+        -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
+```
+
+  </Tab>
+</Tabs>
+
+Değerleri Compose dosyasının yanındaki bir `.env` dosyasıyla sağlayın:
+
+```bash title=".env"
+AXELIX_DB_USERNAME=axelix_app
+AXELIX_DB_PASSWORD=...
+AXELIX_MIGRATIONS_USERNAME=axelix_migrator
+AXELIX_MIGRATIONS_PASSWORD=...
+```
+
+## İlgili sayfalar [#related]
+
+- [Master yapılandırması](../configuring-master/configuring-master.mdx) — `axelix.master.database.*` bağlantı ayarları
+  dahil tüm özelliklerin başvuru kaynağı.

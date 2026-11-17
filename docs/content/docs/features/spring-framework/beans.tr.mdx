@@ -1,0 +1,113 @@
+---
+title: Bean’ler
+description: "Bean’ler sayfası, yönetilen örneğin ApplicationContext bağlamında kayıtlı tüm Spring bean’lerini listeler. Genişletilebilir her satır bean’in sınıfını, kapsamını, bağımlılıklarını, niteleyicilerini, proxy stratejisini ve Spring’in onu oluşturmak için kullandığı kaynağı gösterir."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Bean listesinin ana sayfası](/img/feature/beans/beans-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Beans sayfası***
+
+Sayfa salt okunurdur ve kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açabilir. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+Tüm bean'leri içeren kaydırılabilir listenin üstünde bir arama alanı ve `<matching> / <total>` biçiminde bir sayaç bulunur.
+
+Her satırın başlığında yan yana üç bilgi gösterilir:
+
+- **Bean Name** — Spring bağlamındaki bean tanımlayıcısı.
+- **Class Name** — tam nitelikli sınıf (örneğin `org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor`).
+- **Scope** — başlığın sağında, kapsama göre renklendirilmiş bir `Tag`. Axelix, Spring'in bildirdiği kapsam dizesini şu renklerden biriyle eşler:
+    - <span style={{color: '#1677ff', fontWeight: 'bold'}}>singleton</span>
+    - <span style={{color: '#fa8c16', fontWeight: 'bold'}}>prototype</span>
+    - <span style={{color: '#13c2c2', fontWeight: 'bold'}}>request</span>
+    - <span style={{color: '#a0d911', fontWeight: 'bold'}}>session</span>
+    - <span style={{color: '#faad14', fontWeight: 'bold'}}>application</span>
+    - <span style={{color: '#722ed1', fontWeight: 'bold'}}>websocket</span>
+    - <span style={{color: '#fa541c', fontWeight: 'bold'}}>refresh</span> (Spring Cloud)
+    - <span style={{color: '#eb2f96', fontWeight: 'bold'}}>custom scopes</span> (Kullanıcı tanımlı kapsamlar)
+
+## Bean ayrıntıları açılır bölümü [#bean-details-dropdown]
+
+Bir satırı genişlettiğinizde bean'in ayrıntıları gösterilir. Bölümler yalnızca veri içeriyorsa görünür; örneğin niteleyicisi olmayan bir bean için Qualifiers satırı gösterilmez.
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Bean ayrıntılarının açılır bölümü](/img/feature/beans/beans-details-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde bean ayrıntıları***
+
+- **Dependencies** — bu bean'in bağımlı olduğu diğer bean'lerin adları. Bağımlılığın kendisi kayıtlı bir bean ise adına tıklamak listedeki o bean'e götürür.
+- **Aliases** — varsa bu bean için kayıtlı alternatif adlar.
+- **Qualifiers** — varsa bean'e uygulanan `@Qualifier` değerleri.
+- **Proxying Strategy** — Spring'in bean örneğini nasıl sarmaladığı. Şunlardan biridir:
+    - **CGLIB** — CGLIB alt sınıf tabanlı proxy.
+    - **JDK Dynamic Proxy** — JDK arayüz tabanlı proxy.
+    - **No Proxying** — bean olduğu gibi kullanılır.
+    - **Unknown** — Axelix bean tanımından proxy türünü belirleyememiştir.
+- **Lazily Initialized** — boolean değer. Başlangıçta değil, ilk kullanımda oluşturulan bean'ler için `true`.
+- **Primary** — boolean değer. `@Primary` ile işaretlenmiş bean'ler için `true`.
+- **Origin** — Spring'in bean'i nasıl oluşturduğu. Aşağıdaki [Bean'in kaynağı](#bean-origin) bölümüne bakın.
+
+### Bean'in kaynağı [#bean-origin]
+
+Origin bölümü, Spring'in bean için bildirdiği kaynağa bağlı olarak tek bir etiket veya küçük bir genişletilebilir ağaç gösterir:
+
+- **`@Component` or variants** — bean, `@Component` / `@Service` / `@Repository` / `@Controller` veya özel bir stereotype anotasyonundan gelmiştir. Tanımlayan sınıf [Koşullar](./conditions.mdx) sayfasında izleniyorsa etiket **`@AutoConfiguration class`** olarak değişir ve bu sayfaya bağlantı olur.
+- **`@Bean` method** — bean bir `@Bean` fabrika metodundan gelmiştir. Ağaç şunları gösterir:
+    - **`@Bean` method** adı.
+    - **Declaring class** — `@Bean` metodunu tanımlayan sınıf; eşleşen sınıfa sahip bir bean kayıtlıysa tıklayarak o bean'e gidebilirsiniz. Tanımlayan sınıf [Koşullar](./conditions.mdx) sayfasında izleniyorsa etiket **Declaring AutoConfiguration class** olarak değişir.
+    - **Who defines this bean?** — aynı durumda, yani tanımlayan sınıf orada izleniyorsa gösterilen [Koşullar](./conditions.mdx) sayfası bağlantısı.
+    - **`@ConfigurationProperties` bean** — [Yapılandırma özellikleri](./configuration-properties.mdx) sayfasına bağlantı (yalnızca bean `@ConfigurationProperties` ile işaretlenmişse).
+- **Produced by the `FactoryBean`** — bean bir `FactoryBean` tarafından oluşturulmuştur. Ağaç **Factory Bean** sınıfının adını gösterir.
+- **Synthetic bean** — Spring'in dahili bean'i (örneğin framework veya Spring Data gibi kütüphaneler tarafından kaydedilen altyapı nesneleri).
+- **Unknown** — Spring kaynağı sınıflandırmak için yeterli meta veri bildirmemiştir. `BeanDefinitionRegistry` aracılığıyla programatik olarak kaydedilen bean'lerde genellikle bu sonuç alınır. Böyle bir bean aynı zamanda `@ConfigurationProperties` ile işaretlenmişse Origin etiketi **`@ConfigurationProperties` bean** olarak değişir ve [Yapılandırma özellikleri](./configuration-properties.mdx) sayfasına bağlanır.
+
+## MCP araçları [#mcp-tools]
+
+Yönetilen bir örneğin bean kataloğu MCP aracılığıyla yapay zekâ ajanlarına da sunulur. [MCP araçları kataloğuna](../../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection) bakın.
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-beans` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-beans
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-beans
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Özellikler](./properties.mdx) — **Injected in** üzerinden buradaki bir bean'e bağlanır.
+- [Yapılandırma özellikleri](./configuration-properties.mdx) — Origin içindeki **`@ConfigurationProperties` bean** bağlantısıyla ulaşılır.
+- [Koşullar](./conditions.mdx) — Origin içindeki **`@AutoConfiguration class`** / **Who defines this bean?** bağlantılarıyla ulaşılır.
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

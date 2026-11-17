@@ -1,0 +1,98 @@
+---
+title: Bağımlılık sağlığı
+description: "Dependency Health panosu, uygulamaların kullandığı tüm kütüphaneleri, sürüm dağılımlarını ve hangilerinin artık etkin geliştirilmediğini gösterir."
+---
+
+<ReleasedInNotice version="1.3.0" />
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix'in en son minör sürümünü gösterir.">
+
+![Dependency Health panosu](/img/feature/dashboard/dashboard-dependency-health.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzündeki Dependency Health***
+
+Dependency Health, uygulamalarınızın kullandığı kütüphanelerin durumunu gösterir: hangilerinin etkin geliştirmesinin sona
+erdiğini, hangilerinin yalnızca kritik düzeltmeler aldığını ve hangilerinin muhtemelen hiç düzeltme almadığını.
+Böylece yarın bir [CVE](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) ortaya çıkarsa nerede yama
+alamayabileceğinizi önceden bilirsiniz. Sayfa güvenlik açığı aramaz veya uygulamalarınızda değişiklik yapmaz.
+Amacı, bu risk bir soruna dönüşmeden önce sizi haberdar etmektir.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış her kullanıcıya açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN**
+sayfayı açabilir. Tam rol/yetki matrisi için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfa neleri gösterir? [#what-the-page-shows]
+
+Üstteki özet, kaç uygulamanın bağımlılıklarını bildirdiğini ve her riskli durumda bir kütüphane kullanan uygulama sayısını gösterir:
+
+- **Discontinued**: proje geliştirmenin sona erdiğini duyurmuş veya deposunu arşivlemiştir. Güvenlik düzeltmeleri dahil
+  yeni sürümler planlanmamaktadır.
+- **Maintenance mode**: proje yalnızca kritik hata ve güvenlik düzeltmeleri yayımladığını belirtmiştir. Yeni özellik
+  eklenmez ve genellikle bir ardıl proje önerilir.
+- **Dormant**: uzun süredir sürüm yayımlanmamıştır ve proje bakım ya da kullanım ömrünün sonu durumu açıklamamıştır.
+  Hâlâ çalışabilir, ancak düzeltmeler yapan birinin olduğu bilinmemektedir.
+
+Alt bölümde aynı risk iki açıdan ele alınır. İlki uygulamalardır: kaçının riskli bağımlılık kullandığı, toplamın ne kadarının
+her duruma girdiği ve kaçının **None of these** olduğu. Uygulama sahip olduğu her durum altında görünür; hem geliştirilmesi
+sonlandırılmış hem de uzun süredir etkin olmayan bir kütüphane kullanan uygulama iki kez sayılır.
+Bu nedenle yüzdelerin toplamı %100'ü aşabilir.
+
+İkinci açı kütüphanelerdir: kullanılan kütüphanelerden kaçının riskli olduğu ve en çok hangilerinin Persistence, Logging
+veya Security gibi kategorilerde bulunduğu. Sayfa, en fazla riskli kütüphaneye sahip beş kategoriyi grafikle gösterir.
+
+## Kütüphane bulma [#finding-a-library]
+
+Kütüphane listesi riskli olanlarla başlar; her grup içinde en yaygın kullanılanlar önce gelir. Böylece en çok uygulamayı
+etkileyen sorunlar üstte yer alır. Her kütüphane için şunları görebilirsiniz:
+
+- Riskliyse durumu.
+- Riskliyse projenin ardılı olup olmadığı.
+- Kategorisi.
+- Kaç uygulamanın kullandığı ve bunun toplam uygulamaların ne kadarı olduğu.
+
+Listeyi kategoriye ve duruma göre daraltabilirsiniz. Örneğin artık düzeltme almayan güvenlik kütüphanelerini görmek için
+**Discontinued** ve Security kategorisini seçin. Grafikte bir kategoriye tıklamak aynı kategori filtresini listeye uygular.
+
+Listede durumu olmayan kütüphane ya etkin geliştiriliyordur ya da Axelix tarafından tanınmıyordur;
+[Nasıl çalışır?](#how-it-works) bölümüne bakın. Axelix'in tanımadığı kütüphanelerin kategorisi veya durumu yoktur;
+bu nedenle herhangi bir kategori veya durum filtresi bunları gizler.
+
+## Kütüphane ayrıntıları [#library-details]
+
+Ne yapacağınıza karar vermek için bir kütüphaneyi genişletin. Riskli bir kütüphane için şunları görebilirsiniz:
+
+- Projenin durumunun özeti.
+- Varsa yerini alan proje veya önerilen alternatif.
+- Durumu destekleyen asıl proje sayfasına bağlantı.
+
+Her kütüphane için uygulamaların kullandığı sürümleri yeniden eskiye, her sürümü çalıştıran uygulama sayısını ve bunun
+kütüphaneyi kullanan uygulamaların ne kadarı olduğunu da görebilirsiniz. Bu, sağlıklı bir kütüphanede bile uygulamaların
+ne kadar geride olduğunu ve yükseltmenin kaç uygulamayı etkileyeceğini gösterir.
+
+## Nasıl çalışır? [#how-it-works]
+
+Derleme sırasında [Axelix derleme eklentisi](../../setting-up-spring-boot-service/build-plugin/configuration.mdx),
+uygulamanın çalışma zamanı bağımlılık grafiğini uygulama arşivine bir
+[CycloneDX SBOM](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx#dependency-sbom-gradle) olarak yazar.
+Uygulama bu SBOM'u kaydolurken bir kez Master'a bildirir. Aynı uygulamadan gelen sonraki bildirim öncekinin yerini alır;
+böylece sayfa en son kaydolan derlemeyi yansıtır. Sayfayı açtığınızda Master sayıları saklanan raporlardan hesaplar.
+
+Kaç örneği olursa olsun her uygulama bir kez sayılır. Raporlamayı durduran uygulama, son bildirdiği bağımlılıklarla sayfada kalır.
+
+Yalnızca Axelix [starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) 1.3.0 veya üzerini
+kullanan uygulamalar kayıt sırasında bağımlılıklarını bildirir; eski sürümlerdeki uygulamalar sayılmaz.
+Hiçbir uygulama bunları bildirmemişse sayfa gösterilecek veri olmadığını belirtir.
+Yükseltmek için [Axelix'i yükseltme](../../more/upgrading.mdx) sayfasına bakın.
+
+Master, kütüphaneleri proje kataloğuyla eşleştirir. Durum belirli bir sürüme değil, kütüphanenin arkasındaki projeye aittir;
+bu nedenle geliştirilmesi sonlandırılmış bir kütüphaneyi en son sürümüne yükseltmek durumunu değiştirmez.
+Kuruluşunuzun iç kütüphanesi gibi kataloğunda bulunmayan bir projeye ait kütüphane de toplam kütüphane sayısına dahildir.
+Bu, projenin sağlıklı olduğu değil, Axelix'in proje hakkında bir iddiada bulunmadığı anlamına gelir.
+
+## Ayrıca bakın [#see-also]
+
+- [Dependencies Analyzer](../../features/insights/dependencies-analyzer.mdx)
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Derleme eklentisi yapılandırması](../../setting-up-spring-boot-service/build-plugin/configuration.mdx)
+- [Axelix'i yükseltme](../../more/upgrading.mdx)

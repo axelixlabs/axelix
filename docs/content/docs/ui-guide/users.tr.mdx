@@ -1,0 +1,94 @@
+---
+title: Kullanıcılar
+description: "Users ekranında Axelix Master'da kimlerin oturum açabileceğini ve her hesabın rollerini görebilirsiniz. Yerel kimlik doğrulama etkinse hesap oluşturabilir, düzenleyebilir ve silebilirsiniz. Sayfaya üst gezinme çubuğundaki Users bağlantısından erişilir."
+---
+
+## Bu sayfayı kimler açabilir? [#who-can-open-this-page]
+
+**Users** bağlantısı yalnızca `users:read` yetkisine sahip hesaplarda görünür. Varsayılan olarak bu yetki yalnızca yerleşik
+`SUPER_ADMIN` rolüne dahildir; `ADMIN`, `EDITOR` ve `VIEWER` bağlantıyı göremez veya sayfayı yükleyemez.
+Tam yetki tablosu için [Roller ve yetkiler](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+**Create User** düğmesi ile profil ekranındaki düzenleme ve silme denetimleri ayrıca yine yalnızca `SUPER_ADMIN` için ayrılan
+`users:manage` yetkisini gerektirir.
+
+## Kullanıcı listesi [#the-users-list]
+
+Üst bölüm, tabloyu daraltmak için üç yol sunar:
+
+- **Search**, kullanıcı adına veya e-postaya göre filtreler. Arama alanının sağındaki sayaç `<matches> / <total>` gösterir;
+  böylece tam listeye kıyasla kaç kullanıcının görünür olduğunu görebilirsiniz.
+- **Roles**, çoklu seçimli bir açılır listedir. Bir veya daha fazla rol seçildiğinde yalnızca seçilen rollerden en az birine
+  sahip kullanıcılar kalır.
+- **Origin**, `LOCAL` ve `OIDC` değerlerine sahip çoklu seçimli bir açılır listedir. Master'da oluşturulan hesaplar `LOCAL`
+  olarak görünür. OIDC üzerinden oturum açan hesaplar, tarayıcıda ilk başarılı oturum açmalarından sonra `OIDC` olarak görünür;
+  dolayısıyla filtre yalnızca en az bir kez oturum açmış OIDC kullanıcılarını döndürür.
+
+Filtrelerin altındaki tablo, görünür her kullanıcıyı şu sütunlarla listeler:
+
+- **Username**: oturum açma ekranında kullanılan kullanıcı adı.
+- **Email**: hesaba bağlı e-posta adresi. Boş olabilir.
+- **Last login**: en son başarılı oturum açmanın `DD.MM.YYYY HH:mm` biçimindeki zamanı. Hiç oturum açmamış hesaplarda
+  **Not logged in** gösterilir.
+- **Origin**: Master'da oluşturulan hesaplar için `LOCAL`, OIDC oturum açma akışıyla oluşturulan hesaplar için `OIDC`.
+- **Roles**: kullanıcıya verilen her rol (`ADMIN`, `EDITOR`, `VIEWER`) için renkli etiketler.
+
+Hesabın [Kullanıcı profilini](#user-profile) açmak için herhangi bir satıra tıklayın.
+
+## Kullanıcı oluşturma [#creating-a-user]
+
+**Create User** düğmesi yalnızca Master'da yerel kimlik doğrulama etkin olduğunda
+(`axelix.master.auth.options.local.enabled=true`) gösterilir. Yalnızca OIDC kullanılan dağıtımlarda yeni hesaplar Axelix
+arayüzünden değil kimlik sağlayıcısından geldiği için düğme gizlidir.
+
+Düğmeye tıklandığında şu alanları içeren bir iletişim kutusu açılır:
+
+- **Username**: kullanıcı adı. Benzersiz olmalıdır.
+- **Email**: isteğe bağlıdır. Boş bırakılırsa hesap e-posta olmadan saklanır.
+- **Password**: başlangıç parolası. Kullanıcı bunu daha sonra profilinden değiştirebilir.
+- **Roles**: `ADMIN`, `EDITOR` ve `VIEWER` arasından bir veya daha fazla rol seçin. Seçimi daha sonra profilden değiştirebilirsiniz.
+
+Başarılı oluşturma, iletişim kutusunu kapatır, **User created successfully** bildirimini gösterir ve listeyi yeniler.
+
+## Kullanıcı profili [#user-profile]
+
+Kullanıcı listesinden bir satır seçildiğinde hesabın ayrıntılarını ve rollerini içeren profil açılır.
+
+Yerel bir hesapta düzenleme iletişim kutusunu açmak için **Edit user** seçin. Adı, soyadı, kullanıcı adını, e-postayı ve
+parolayı değiştirebilirsiniz. **Confirm** alanları birlikte kaydeder; **Cancel** değişiklikleri iptal eder.
+
+- **Username**: kullanıcı adı. Düzenlemek, kullanıcının oturum açma biçimini değiştirir.
+- **Email**: e-posta adresi. Boş değer kaydetmek hesaptaki e-postayı temizler.
+- **Password**: mevcut parolayı değiştirmek için yeni parolayı girip onaylayın. Mevcut parolayı korumak için boş bırakın.
+  Master parolayı hiçbir zaman açık metin olarak saklamadığından mevcut parola görüntülenemez.
+
+Atanan rolleri güncellemek için **Roles** bölümünde **Change roles** seçin. `ADMIN`, `EDITOR` ve `VIEWER` rollerinden bir
+veya daha fazlasını seçip **Confirm** seçin. Kullanıcının geçerli izinleri, bu rollerin verdiği yetkilerin birleşimidir.
+
+Kartın altında iki eylem düğmesi bulunur:
+
+- **Delete user**, bir onay iletişim kutusu açar (**Are you sure you want to delete this user?**). Onaylamak hesabı hemen
+  kaldırır; sayfa kullanıcı listesine döner ve **User deleted successfully** bildirimi görünür. Geri alma yoktur.
+- **Access Log**, şu anda devre dışıdır. Bu denetim, Axelix Enterprise ile sunulacak bir özellik için ayrılmıştır.
+  Hem Access Log hem de Axelix Enterprise geliştirme aşamasında olduğundan düğmeye şu anda tıklanamaz.
+
+:::warning
+**Delete user** eylemi geri alınamaz. Hesap veritabanından kaldırılır; geçici silme veya geri yükleme yoktur.
+:::
+
+## OIDC oturumları [#oidc-sessions]
+
+OIDC etkin olduğunda tarayıcıda başarılı oturum açma, Master veritabanında bir `OIDC` kullanıcı satırı oluşturur veya günceller.
+Master **Last login** değerini günceller, varsa OIDC `userinfo` verisindeki e-postayı saklar ve hesabı bu tabloda `OIDC`
+kaynağıyla gösterir.
+
+Her OIDC oturum açmasında Master, `axelix.master.auth.options.oauth2.role-attribute-path` değerini yeniden değerlendirir ve
+saklanan rol atamasını sonuca göre yeniler. Dolayısıyla OIDC hesapları bu ekranda görünür, ancak geçerli rolleri yine kimlik
+sağlayıcınızdaki eşlemeden gelir.
+
+:::warning
+OIDC kullanıcı adı mevcut bir OIDC dışı hesapla eşleşirse Master kimlikleri birleştirmek yerine oturum açmayı reddeder.
+Önce kimlik sağlayıcısındaki çakışmayı çözün veya yerel hesabı yeniden adlandırın.
+:::
+
+Kimlik doğrulamanın nasıl bağlandığını ayrıntılı öğrenmek için [Kimlik doğrulama](../setting-up-master-ui/authentication/authentication.mdx) sayfasına bakın.

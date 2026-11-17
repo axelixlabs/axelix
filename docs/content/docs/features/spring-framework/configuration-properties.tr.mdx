@@ -1,0 +1,122 @@
+---
+title: Yapılandırma özellikleri
+description: "Yapılandırma özellikleri sayfası, Spring Boot örneğinde kayıtlı tüm @ConfigurationProperties bean’lerini sınıflarına göre gruplar; özellik öneklerini ve Spring’in bean’e o anda bağladığı değerleri gösterir."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Yapılandırma özelliklerinin ana sayfası](/img/feature/configprops/configprops-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Configuration Properties***
+
+Tüm etkin `@ConfigurationProperties` bean'lerinin kaydırılabilir listesi, varsayılan olarak açık genişletilebilir akordeonlar şeklinde düzenlenir. Listenin üstündeki arama alanı bean'leri ve girdileri filtreler; `<matching> / <total>` biçiminde bir sayaç bulunur.
+
+## Yapılandırma özelliklerinin ayrıntıları [#configuration-properties-details]
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Yapılandırma özelliklerinin ayrıntı sayfası](/img/feature/configprops/configprops-details-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Configuration Properties ayrıntıları***
+
+Her akordeon başlığı bean'in sınıfını ve önekini, içindeki her satır ise bir özelliği ve Spring'in onun için çözümlediği değeri gösterir.
+
+- **Bean Name**: `@ConfigurationProperties` ile işaretlenen sınıf.
+- **Prefix**: bu bean'e bağlanan özellik öneki (örneğin `spring.jpa`).
+- **Properties**: her bean alanı için bir satır. Gösterilen anahtar alanın adıdır (örneğin `showSql`).
+- **Value**: Spring'in alan için çözümlediği değer. Değeri olmayan özellikler `null` olarak gösterilir.
+
+:::info
+Varsayılan olarak `config-properties.values:read` yetkisine sahip olmayan çağıranlar için tüm değerler `******` olarak maskelenir. Hangi anahtarların maskeleneceğini ve asıl değerleri kimlerin görebileceğini seçmek için aşağıdaki [Değer maskeleme](#value-sanitization) bölümüne bakın.
+:::
+
+## Değer maskeleme [#value-sanitization]
+
+Axelix, Spring Boot'un `management.endpoint.configprops.show-values` ayarına hiçbir zaman dayanmaz; Spring Boot'tan her zaman ham değerleri (`Show.ALWAYS`) döndürmesini ister ve yetki denetimine bağlı olarak kendi maskelemesini uygular.
+
+**Ham değerleri kim görür?** Yerleşik **ADMIN** ve **SUPER_ADMIN** rollerinin sağladığı `config-properties.values:read` yetkisine sahip çağıranlar asıl değerleri alır. Diğer herkese değerler `******` olarak döndürülür. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+**Hangi anahtarlar maskelenir?** Tek bir starter özelliği, `axelix.sbs.endpoints.config.sanitized-properties`, bu kümeyi denetler ve hem `axelix-configprops` (bu sayfa) hem de `axelix-env` ([Özellikler](./properties.mdx) sayfası) için geçerlidir:
+
+- **Boş liste (varsayılan)** — yetkisi olmayan çağıranlar için tüm değerler maskelenir.
+- **Boş olmayan liste** — yalnızca listelenen anahtarlar maskelenir; diğerleri olduğu gibi döndürülür.
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+```
+
+  </Tab>
+</Tabs>
+
+Aynı özelliğin diğer starter ayarlarıyla birlikte açıklaması için Spring Boot Starter yapılandırma kılavuzundaki [Hassas özellik değerlerini maskeleme](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#sanitize-sensitive-property-values) bölümüne bakın.
+
+:::note
+Maskeleme için standart Spring Boot Actuator özellikleri — `management.endpoint.configprops.show-values`, `management.endpoint.configprops.keys-to-sanitize` ve bunların `env` karşılıkları — dikkate alınmaz. Bunun yerine `axelix.sbs.endpoints.config.sanitized-properties` kullanın.
+:::
+
+## MCP araçları [#mcp-tools]
+
+Tüm `@ConfigurationProperties` bean'lerinin ve bağlı değerlerinin listelenmesi MCP aracılığıyla yapay zekâ ajanlarına da sunulur. [MCP araçları kataloğuna](../../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection) bakın.
+
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-configprops` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-configprops
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-configprops
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Özellikler](./properties.mdx) — bu sayfayla ortak maskeleme yapılandırması dâhil, çözümlenen tüm özelliklerin çalışma zamanı görünümü.
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

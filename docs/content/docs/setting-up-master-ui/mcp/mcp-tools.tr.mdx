@@ -1,0 +1,135 @@
+---
+title: MCP araçları
+description: "Bu sayfa, Axelix Master ile birlikte gelen MCP sunucusunun yapay zekâ ajanlarına sunduğu tüm araçların başvuru listesidir."
+---
+
+import styles from './styles.module.css';
+
+Her kayıt; aracın adını, bildirdiği ek açıklama etiketlerini, etkinlik durumunu, aracı çağırabilen rolleri ve ne yaptığını açıklayan bir satırı içerir. Aynı katalog tarayıcıdaki [MCP ekranında](../../ui-guide/mcp.mdx) da görülebilir. Bu sayfa, kimlerin hangi araçları çağırabilmesi gerektiğini planlayan operatörler için esas alınan listedir.
+
+Listede MCP sunucusunun etkin olduğu varsayılır (`axelix.master.mcp-server.enabled=true`, varsayılan). Özellik `false` olarak ayarlandığında sunucu hiç kaydedilmez; aşağıdaki araçların hiçbirine erişilemez ve **MCP** bağlantısı arayüzden gizlenir. Bkz. [MCP sunucusu yapılandırması](../configuring-master/configuring-master.mdx#mcp-server).
+
+## Araç durumu [#tool-state]
+
+Aşağıdaki tüm araçlar Master ile birlikte gelir ve başlangıçta MCP sunucusuna kaydedilir. Araç başına etkinleştirme/devre dışı bırakma anahtarı yoktur; katalog derleme sırasında sabitlenir. Bir araç yalnızca MCP sunucusunun kendisi devre dışı bırakıldığında veya Master süreci çalışmadığında erişilemez olur. [Arayüz kataloğunda](../../ui-guide/mcp.mdx#the-tool-catalog) her karttaki durum noktası bu anlık kayıt durumunu yansıtır: sunucu aracı kaydetmişse yeşil, araç o anda kullanılamıyorsa kırmızıdır.
+
+## Araç etiketleri [#tool-tags]
+
+Her araç, MCP istemcilerine hangi yan etkileri beklemeleri gerektiğini bildiren dört boole ek açıklama etiketi tanımlar. Aşağıdaki etiketler Axelix araçlarının beyan ettiği değerlerdir; çağıran ajan için ipuçlarıdır, Master tarafından uygulanan yetkilendirme denetimleri değildir.
+
+- **read-only** — araç, hedef Spring Boot örneğinde hiçbir durumu değiştirmez.
+- **idempotent** — aracı aynı argümanlarla birden fazla kez çağırmak, bir kez çağırmakla aynı etkiye sahiptir.
+- **destructive** — araç verileri silebilir veya arayüzden geri alınamayan değişiklikler uygulayabilir.
+- **open-world** — araç, Master ve kayıtlı Spring Boot örneklerinin dışına erişir.
+
+## Rol tabanlı erişim [#role-gating]
+
+MCP filtresi (`McpAuthorizationFilter`), ajanın kimliğini arayüzün tarayıcı oturumunu doğruladığı şekilde doğrular. Kimlik bilgisi yöntemleri için [MCP sunucusunda kimlik doğrulama](../authentication/authentication.mdx#mcp-server-authentication) bölümüne bakın.
+
+## Katalog [#catalog]
+
+:::info
+Aşağıdaki katalog, Master ile dağıtılan güncel MCP araçları kümesidir. Yeni araçlar etkin olarak geliştirilmektedir ve liste gelecek sürümlerde büyüyecektir; burada yeni kayıtların görünmesini bekleyin.
+:::
+
+**İlk sürüm** sütunu, bir aracın ilk kez dağıtıldığı Axelix Master sürümünü belirtir. `1.0.0` ilk Axelix sürümüdür; dolayısıyla `1.0.0` olarak işaretlenen bir araç en başından beri vardır. _Yakında_ olarak işaretlenen bir sürüm henüz yayımlanmamıştır: araç, minör veya majör olmasına bakılmaksızın sonraki Axelix sürümünde kullanılabilir hâle gelecektir.
+
+### Örnekler [#instances]
+
+Bu gruptaki tek araç, Master'ın yönetilen Spring Boot örneklerine ilişkin tam kaydını döndürür. "Servisi adına göre bul ve `instanceId` değerini al" ile başlayan her görevin giriş noktasıdır; diğer tüm araçlar bu `instanceId` değerine ihtiyaç duyar.
+
+İlgili: [Wallboard arayüz kılavuzu](../../ui-guide/wallboard.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Başlık | Araç adı | İlk sürüm | Etiketler | İzin verilen roller | Açıklama |
+|----------------|----------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Örnek listesi | `getInstances` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Yönetilen her örneğin anlık görüntüsü: okunabilir servis adlarının `instanceId` ile eşlemesi, gerçek zamanlı durum (UP/DOWN), Spring Boot/Java sürümleri, dağıtım süresi ve Git commit SHA değeri. |
+
+</div>
+
+#### `getWallboard`, `getInstances` olarak yeniden adlandırıldı [#getwallboard-is-renamed-to-getinstances]
+
+<ReleasedInNotice version="1.3.0" />
+
+Axelix 1.2.x dâhil bu sürüme kadar aracın adı `getWallboard` idi. Axelix 1.3.0 itibarıyla adı `getInstances` olmuştur ve `getWallboard` artık yoktur. Aracın davranışı, parametreleri ve yanıtı değişmemiştir.
+
+Yapay zekâ ajanları bağlandıklarında araçları MCP sunucusundan keşfeder; dolayısıyla yeni adı kendiliğinden alırlar. Aracı doğrudan adıyla çağırıyorsanız, örneğin kendi betiklerinizden veya ajan talimatlarından, `getWallboard` yerine `getInstances` kullanın.
+
+### Örneği inceleme [#instance-introspection]
+
+Tek bir Spring Boot örneğinin salt okunur görünümleri: Spring bean'leri, ortam özellikleri, `@ConfigurationProperties` bean'leri, otomatik yapılandırma raporu ve kayıtlı zamanlanmış görevler. Bu gruptaki her araç, `getInstances` üzerinden çözümlenen bir `instanceId` alır.
+
+İlgili: [Bean'ler](../../features/spring-framework/beans.mdx), [Ortam özellikleri](../../features/spring-framework/properties.mdx), [Yapılandırma özellikleri](../../features/spring-framework/configuration-properties.mdx), [Koşullar](../../features/spring-framework/conditions.mdx), [Zamanlanmış görevler](../../features/spring-framework/scheduled-tasks.mdx), [Servis profili arayüz kılavuzu](../../ui-guide/service-profile.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Başlık | Araç adı | İlk sürüm | Etiketler | İzin verilen roller | Açıklama |
+|----------------------|-----------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Bean listesi | `getInstanceBeans`          | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Örnekteki tüm Spring bean'lerini türleri ve bağımlılıklarıyla listeler. |
+| Özellikler | `getInstanceEnvironment`    | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Tam ortamı döndürür: uygulama özellikleri, sistem özellikleri ve ortam değişkenleri; `@Value` ve `@ConditionalOnProperty` soruları için yararlıdır. |
+| Yapılandırma özelliği bean'leri | `getInstanceConfigProps`    | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Örnekteki tüm `@ConfigurationProperties` bean'lerini bağlanan değerleriyle döndürür. |
+| `@Conditional` listesi | `getInstanceConditions`     | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Yapılandırma raporu: hangi Spring Boot ve özel yapılandırmaların uygulandığı veya atlandığı ve her kararın nedeni. |
+| Zamanlanmış görevler | `getInstanceScheduledTasks` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Örnekte kayıtlı `@Scheduled` cron, sabit hızlı, sabit gecikmeli ve özel görevleri listeler. |
+| Günlükler | `getInstanceLogs`           | `1.3.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Örneğin en son günlük kayıtlarını (arabellektekilerin tümünü veya yalnızca istenen sayıda kaydı), günlüğe yazılan istisnaların yığın izleriyle birlikte döndürür. |
+
+</div>
+
+### Önbellekler [#caches]
+
+Bir Spring Boot örneğindeki tüm önbellek yöneticilerini ve önbellekleri inceleyin; tüm yöneticilerdeki bütün önbelleklerden aynı anda veya seçilen bir yöneticideki belirli adlı bir önbellekten kayıtları çıkarın.
+
+İlgili: [Önbellekler özelliği](../../features/spring-framework/caches.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Başlık | Araç adı | İlk sürüm | Etiketler | İzin verilen roller | Açıklama |
+|----------------------|----------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Önbellek listesi | `getAllCaches`             | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Örnekteki tüm önbellek yöneticilerini ve her birinin sahip olduğu önbellekleri, önbellek başına `enabled` bayrağıyla birlikte listeler. Ad-yönetici eşlemesi, durum denetimleri ve belirsizlik giderme dâhil tüm önbellek görevlerinin başlangıç noktasıdır. |
+| Tüm önbellekleri temizleme | `clearAllCaches`           | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`              | Verilen örnekteki tüm önbellek yöneticilerinin bütün önbelleklerinden tüm kayıtları çıkarır. Kapsamlı, yıkıcı bir işlemdir; yalnızca açıkça yapılan "tüm önbellekleri temizle" isteği için tasarlanmıştır. |
+| Belirli önbelleği temizleme | `clearSpecificCacheEntity` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`              | Belirtilen önbellek yöneticisindeki adlı önbelleğin tamamını temizleyerek tüm kayıtlarını kaldırır. Diğer önbellekler değişmeden kalır. |
+
+</div>
+
+### Logger'lar [#loggers]
+
+Bir Spring Boot örneğinin logger ağacını (tek tek logger'ları, logger gruplarını ve kullanılabilir günlük seviyeleri kümesini) okuyun ve çalışma zamanında seviyeleri değiştirin: tek bir logger için, bir logger grubunun tamamı için veya bir logger'ı uygulamada tanımlanan varsayılanına sıfırlamak için.
+
+İlgili: [Logger'lar özelliği](../../features/insights/loggers/loggers.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Başlık | Araç adı | İlk sürüm | Etiketler | İzin verilen roller | Açıklama |
+|----------------------------|----------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Kullanılabilir günlük seviyeleri | `getAvailableLoggingLevels`      | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Örneğin kabul ettiği günlük seviyelerini (ör. `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `OFF`) döndürür. Bir seviyeyi değiştirmeden önce girdileri doğrulamak için kullanılır. |
+| Logger grubu listesi | `getLoggerGroupsFeed`            | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Yapılandırılmış tüm logger gruplarını üyeleriyle ve gruba atanmış geçerli seviyeyle listeler. |
+| Logger listesi | `getLoggersFeed`                 | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Örnekte yapılandırılmış her logger'ı o anda geçerli olan günlük seviyesiyle birlikte listeler. |
+| Logger bulma | `findLoggersByName`              | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Tam veya kısmi ada göre bir ya da daha fazla logger arar. Her eşleşme için yapılandırılan ve geçerli olan seviyeleri döndürür. |
+| Logger grubu bulma | `findGroupsByName`               | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Tam veya kısmi ada göre bir ya da daha fazla logger grubu arar. Her grubun adını, seviyesini ve üye logger'larını döndürür. |
+| Logger seviyesini değiştirme | `changeLoggingLevelByLoggerName` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Belirli bir logger'ın günlük seviyesini ayarlar. Logger adı kesin değilse önce [Logger bulma](#loggers) aracını kullanın. |
+| Grup logger seviyesini değiştirme | `changeLoggingLevelByGroupName`  | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Bir logger grubundaki tüm logger'ların günlük seviyesini ayarlar. Grup adı kesin değilse önce [Logger grubu bulma](#loggers) aracını kullanın. |
+| Logger seviyesini sıfırlama | `resetLoggingLevelByLoggerName`  | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Bir logger'ın seviyesini uygulama yapılandırmasında bildirilen varsayılana sıfırlar. Grup düzeyinde sıfırlama kullanılamaz. |
+
+</div>
+
+### Kalıcılık analizleri [#persistence-insights]
+
+Axelix'in bir uygulamanın veri erişim katmanında tespit ettiği kalıcılık sorunları. Yukarıdaki tüm araçlardan farklı olarak bunlar bir `instanceId` yerine uygulamanın derleme koordinatlarıyla — her ikisi de gerekli olan `groupId` ve `artifactId` (GAV koordinatının G ve A bölümleri) — ilişkilendirilir ve canlı bir örneği yoklamak yerine kaydedilmiş uygulama anlık görüntüsünü okur.
+
+İlgili: [Transaction Control](../../features/spring-framework/transaction-control.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Başlık | Araç adı | İlk sürüm | Etiketler | İzin verilen roller | Açıklama |
+|----------------------|--------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| İşlem profili | `getApplicationTransactionsProfile`  | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Uygulamanın işlem yürüten metotlarında (`@Transactional`, `TransactionTemplate` vb.) tespit edilen N+1 tembel yükleme ve bellekte sayfalama sorunları. İsteğe bağlı olarak tek bir sınıfa (`className`) veya tek bir metoda (`className` + `methodName`) daraltılabilir. |
+| Varlık profili | `getApplicationEntitiesProfile`      | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Axelix'in uygulamada eşlediği JPA varlıkları ve her birinde tespit edilen ilişki eşleme sorunları (hemen yükleme, liste tabanlı `@ManyToMany`, cascade REMOVE/ALL, tek yönlü `@OneToMany`). İsteğe bağlı olarak `entityName` ile tek bir varlığa daraltılabilir. |
+
+</div>
+
+## İlgili konular [#related]
+
+- [MCP katalog ekranı](../../ui-guide/mcp.mdx) — aynı kataloğun araç başına durum noktaları ve ek açıklama açılır penceresi içeren salt okunur tarayıcı görünümü.
+- [MCP sunucusunda kimlik doğrulama](../authentication/authentication.mdx#mcp-server-authentication) — MCP kimlik bilgilerinin (`Basic`, `Bearer`) nasıl kabul edildiği ve kimliğin bir rolle nasıl eşlendiği.
+- [Roller ve yetkiler](../authentication/authentication.mdx#roles-and-authorities) — her yetkinin neyi denetlediği ve hangi yerleşik rolün bu yetkiye sahip olduğu.
+- [MCP sunucusu yapılandırması](../configuring-master/configuring-master.mdx#mcp-server) — `axelix.master.mcp-server.*` özellik anahtarları.

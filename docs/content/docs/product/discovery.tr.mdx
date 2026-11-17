@@ -1,0 +1,152 @@
+---
+title: Keşif nasıl çalışır?
+description: "Axelix Master'ın Spring Boot örneklerini Kubernetes'te kendisi bularak veya örneklerin kendilerini kaydetmesine izin vererek nasıl öğrendiği ve durumlarını nasıl güncel tuttuğu."
+---
+
+Master yalnızca bildiği örnekleri gösterebilir ve yönetebilir. Örnekleri iki yoldan biriyle öğrenir: Master bunları kendisi
+bulur (otomatik keşif) veya örnek kendisini Master'a bildirir (kendiliğinden kayıt).
+
+## Keşfedilmenin iki yolu [#two-ways-to-be-discovered]
+
+```text
+┌─ Kubernetes cluster ─────────────────────────────┐
+│                                                  │
+│  ┌──────────────────┐    ┌──────────────────┐    │
+│  │  orders-service  │    │ billing-service  │    │
+│  └────────▲─────────┘    └─────────▲────────┘    │
+│           │                        │             │     ┌────────────────────┐
+│           └────────────┬───────────┘             │     │ inventory-service  │
+│                        │                         │     │ (VM, Docker, ...)  │
+│                        │  auto-discovery:        │     └─────────┬──────────┘
+│                        │  Master finds the pods  │               │
+│                        │  and polls them         │               │  self-registration:
+│                ┌───────┴───────┐                 │               │  the service registers
+│                │ Axelix Master │◀────────────────┼───────────────┘  once, then heartbeats
+│                └───────────────┘                 │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
+Bu diyagramlardaki her servis, Axelix derleme eklentisiyle derlenmiş ve Axelix starter çalıştıran bir Spring Boot uygulamasıdır.
+
+| | Otomatik keşif | Kendiliğinden kayıt |
+|---|---|---|
+| Çağrıyı kim başlatır? | Master servisi çağırır | Servis Master'ı çağırır |
+| Nerede çalışır? | Yalnızca Kubernetes | Servisin Master'a erişebildiği her yer |
+| Nasıl etkinleştirilir? | Master'da `axelix.master.discovery.auto.enabled` | Serviste `axelix.sbs.discovery.self-registration` |
+
+Kendiliğinden kayıt Master'da da etkinleştirilmelidir. `axelix.master.discovery.self-registration.enabled` uygulama özelliği
+varsayılan olarak `true` olsa da resmî Helm chart bunu varsayılan olarak devre dışı bırakır. Helm dağıtımlarında,
+iki keşif yöntemini birlikte kullanırken de chart değerlerinde `axelix.master.discovery.selfRegistration.enabled=true` ayarlayın.
+
+Master servislerinizle aynı Kubernetes kümesinde çalışıyorsa otomatik keşif için servis tarafında ek kurulum gerekmez.
+Kendiliğinden kayıt, düz sanal makineler, Docker Compose veya Master'ın tarayamadığı ağlar gibi diğer durumları kapsar.
+
+:::note[İki yöntem aynı anda çalışabilir]
+Seçim tüm servisler için topluca değil, her servis için ayrı yapılır. Bir Master, Kubernetes kümesindeki servisleri otomatik
+keşfederken başka yerlerde çalışan servislerin kendiliğinden kayıtlarını da kabul edebilir. Örneğin sanal makinelerdeki üç
+uygulama kendiliğinden kayıt olurken kümedeki her servis otomatik keşfedilebilir.
+:::
+
+## Bir kez tam durum, ardından küçük güncellemeler [#full-state-once-then-small-updates]
+
+<ReleasedInNotice version="1.3.0" />
+
+Axelix 1.3.0'dan itibaren her iki yöntem de aynı yaklaşımı izler. Master, bir örneğin tam durumunu yalnızca bir kez alır:
+kendiliğinden kayıtta kayıt isteğinde, otomatik keşifte ise ilk `axelix-metadata` çağrısında. Bundan sonra örnek yalnızca
+küçük ve sık güncellemeler gönderir: kendiliğinden kayıtta yaşam sinyali, otomatik keşifte `axelix-ping` yanıtı.
+
+Her güncellemenin iki görevi vardır. Birincisi, örneğin hâlâ çalıştığını Master'a bildirir. İkincisi, zamanla değişen sınırlı
+bilgileri taşır: örneğin sağlık durumu, heap kullanımı ve işlem istatistikleri. Böylece yeni bir sorunlu işlem, yeniden kayıt
+gerektirmeden Master'da görünür. Aşağıdaki diyagramlar bu davranışı gösterir.
+
+1.3.0'dan önce Master tam durumu her seferinde alıyordu: her otomatik keşif taramasında ve her kendiliğinden kayıt yaşam sinyalinde.
+
+## Otomatik keşif [#auto-discovery]
+
+```text
+ Axelix Master                  Kubernetes API                orders-service
+       │                              │                              │
+       │  which pods are there?       │                              │
+       │─────────────────────────────▶│                              │
+       │◀─────────────────────────────│                              │
+       │                                                             │
+       │  first scan: axelix-metadata                                │
+       │────────────────────────────────────────────────────────────▶│
+       │◀──────────────────────────────────────── full registration ─│
+       │                                                             │
+       │  every next scan (each minute by default): axelix-ping      │
+       │────────────────────────────────────────────────────────────▶│
+       │◀─────────────────────────────── health, heap, transactions ─│
+```
+
+İlk çağrı tam kayıt bilgilerini döndürür: derleme koordinatları, sürümler ve Axelix'in topladığı analizler. Ardından örnek
+Master'da görünür. Master ve servisteki imzalama anahtarı ve algoritma aynı olmalıdır.
+
+Bu ilk yoklamada Master henüz starter sürümünü bilmez. `AXELIX.MASTER` öznesine ve eski starter'ların gerektirdiği eski
+taleplere sahip bir uyumluluk JWT'si gönderir. 1.3 ve üzeri starter'lar Master kimliğini kabul eder ve bu ek talepleri yok sayar.
+Bu uyumluluk biçiminin 1.6'da kaldırılması planlanmaktadır.
+
+Sonraki arayüz ve MCP çağrılarında Master önce kullanıcının yetkilerini denetler. 1.3 ve üzeri starter'lara kullanıcı rolleri
+veya yetkileri içermeyen kısa ömürlü bir `AXELIX.MASTER` teknik kullanıcı JWT'si gönderir. Eski starter'lar eski yetki adlarıyla
+yeniden düzenlenmiş bir kullanıcı belirteci alır ve izinleri kendileri uygulamaya devam eder.
+
+Her tarama, otomatik keşfedilen örneklerin tüm listesini değiştirir. Bu nedenle Kubernetes'in artık bildirmediği pod bir sonraki
+taramada kaybolur. Master'ın erişemediği pod da listeden çıkar ve erişilebildiği bir sonraki taramada geri gelir.
+
+1.3.0'dan eski starter kullanan örneklerde `axelix-ping` bulunmadığından Master, her taramada bunların tam `axelix-metadata`
+bilgilerini okur.
+
+## Kendiliğinden kayıt [#self-registration]
+
+```text
+ inventory-service                                     Axelix Master
+         │                                                   │
+         │  on startup: register (full description,          │
+         │  actuator URL, instance name)                     │
+         │──────────────────────────────────────────────────▶│  the instance appears
+         │                                                   │
+         │  every 15 s: heartbeat (health, heap,             │
+         │  transactions)                                    │
+         │──────────────────────────────────────────────────▶│
+         │──────────────────────────────────────────────────▶│
+         │                                                   │
+         │  heartbeat after Master lost the instance         │
+         │──────────────────────────────────────────────────▶│
+         │◀─────────────────────────────── unknown instance ─│
+         │  register again                                   │
+         │──────────────────────────────────────────────────▶│
+         │                                                   │
+         ╳  the service stops, heartbeats stop               │
+                                                             │  removed on next eviction run
+                                                             │  after 45 s without a heartbeat
+```
+
+Varsayılan yaşam sinyali zaman aşımı 45 saniyedir. Master, güncelliğini yitiren örnekleri zaman aşımı dolduğu anda değil,
+varsayılan olarak dakikada bir çalışan bir sonraki çıkarma işleminde kaldırır.
+
+1.3.0'dan eski starter kullanıldığında her yaşam sinyali tam bir kayıttır.
+
+Master, boş bir veritabanıyla yeniden başlatıldığında veya kaçırılan yaşam sinyallerinin ardından örneği kaldırdığında bir
+örneği kaybedebilir. Her iki durumda da bir sonraki yaşam sinyali servisin yeniden kaydolmasını sağlar; böylece tüm servisler
+bir yaşam sinyali aralığı içinde yeniden görünür. Kayıt ve yaşam sinyalleri paylaşılan JWT imzalama anahtarıyla imzalanır;
+anahtarlar farklıysa Master bunları reddeder.
+
+1.3 ve üzeri starter her iki isteği de öznesi `AXELX.MANAGED_SERVICE` olan bir teknik kullanıcı JWT'siyle imzalar
+(bu yazım iletişim protokolündeki tanımlayıcıdır). JWT rol veya yetki taşımaz. Master bu uç noktalarda yalnızca yönetilen servis
+kimliğini kabul eder. Eski starter'lardan gelen eski `AXELIX.STARTER` öznesini de kabul eder; bu uyumluluk takma adının 1.6'da
+kaldırılması planlanmaktadır.
+
+## Her iki durumda Master'ın ihtiyaç duydukları [#what-master-needs-in-both-cases]
+
+Keşif, Master'a yalnızca bir örneğin var olduğunu bildirir. Her arayüz sayfası, MCP aracı ve eylem (günlük düzeyini değiştirmek gibi)
+hâlâ Master'dan servise yapılan bir çağrıdır. Bu nedenle servis hangi yöntemle keşfedilmiş olursa olsun Master, servisin actuator
+uç noktalarına HTTP üzerinden erişebilmelidir. Uygulama actuator uç noktalarını kendi güvenliğiyle koruyorsa Master çağrılarına
+nasıl izin verileceğini öğrenmek için [Sorun giderme](../more/troubleshooting.mdx) sayfasına bakın.
+
+## Ayrıca bakın [#see-also]
+
+- [Mimari](./architecture.mdx)
+- [Master yapılandırması: otomatik keşif](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery)
+- [Master yapılandırması: kendiliğinden kayıt](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--self-registration)
+- [Spring Boot Starter yapılandırması: Master'ın örneği bulmasını sağlayın](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#let-master-find-the-instance)

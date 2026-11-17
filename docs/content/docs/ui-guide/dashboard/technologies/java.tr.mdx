@@ -1,0 +1,38 @@
+---
+title: Java
+description: "Java panosu, servislerin hangi JVM özelliklerini kullandığını gösterir: Project Leyden, çöp toplayıcılar, GC günlük kaydı ve Project Lilliput."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Java panosu Axelix 1.2.0'da kaldırılmıştır.</>}
+/>
+
+Düzinelerce serviste hangilerinin AppCDS veya AOT önbelleğiyle daha hızlı başlatma kullandığını, hangi çöp toplayıcının
+çalıştığını ve GC günlük kaydının nerede açık olduğunu anlamak zordur. Java panosu bunu tüm servisler için tek seferde yanıtlar.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış her kullanıcıya açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN**
+sayfayı açabilir. Tam rol/yetki matrisi için [Roller ve yetkiler](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfa neleri gösterir? [#what-the-page-shows]
+
+Sayfa, her JVM özelliğini kullanan servislerin oranını gösterir:
+
+- **Project Leyden**: AppCDS (`-XX:SharedArchiveFile`) veya AOT önbelleği (`-XX:AOTCache`) ile başlayan servisler;
+  ayrı ayrı ve birlikte.
+- **Çöp toplayıcılar**: servislerin hangi oranının hangi çöp toplayıcıyı çalıştırdığı; örneğin G1, Parallel veya ZGC.
+  En yaygın olan ayrıca vurgulanır.
+- **GC günlük kaydı**: Axelix'ten açılanlar dahil, şu anda GC günlük kaydı açık olan servisler.
+  [GC günlük kaydını etkinleştirme](../../../features/jvm/garbage-collector.mdx#enabling-gc-logging) bölümüne bakın.
+- **Project Lilliput**: kompakt nesne başlıkları (`-XX:+UseCompactObjectHeaders`) kullanan servisler.
+
+## Nasıl çalışır? [#how-it-works]
+
+Pano, her servisin JVM'i hakkında bildirdiklerini sayar. Master bunları günde bir kez kaydeder ve en son kaydı kullanır.
+Kaç örneği olursa olsun her servis bir kez sayılır.
+
+## Ayrıca bakın [#see-also]
+
+- [Garbage Collector](../../../features/jvm/garbage-collector.mdx)
+- [Languages Profile](../languages-profile.mdx)
+- [Persistence](./persistence.mdx)

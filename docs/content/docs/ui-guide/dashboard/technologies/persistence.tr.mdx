@@ -1,0 +1,48 @@
+---
+title: Kalıcılık
+description: "Persistence panosu, servisler arasında hangilerinde en fazla N+1 sorgusu ve bellek içi sayfalama bulunduğunu gösterir."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix'in en son minör sürümünü gösterir.">
+
+![Persistence panosu](/img/feature/dashboard/dashboard-persistance.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzündeki Persistence panosu***
+
+N+1 sorguları ve bellek içi sayfalama uygulamayı bozmaz, ancak fazladan sorgu ve bellek maliyeti yaratır.
+[Transaction Control](../../../features/spring-framework/transaction-control.mdx) bunları tek bir servis için gösterir.
+Persistence panosu ise en çok hangi servislerde bulunduklarını gösterir; böylece önce hangi servislere bakmanız gerektiğini anlayabilirsiniz.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış her kullanıcıya açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN**
+sayfayı açabilir. Tam rol/yetki matrisi için [Roller ve yetkiler](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfa neleri gösterir? [#what-the-page-shows]
+
+Sayfa iki sorunu yan yana gösterir:
+
+- **N+1**: lazy bir ilişki her kayıt için ayrı bir sorguyla yüklenir.
+- **In-Memory Pagination**: Hibernate tüm sonuç kümesini yükler ve sayfayı bellekte ayırır.
+
+Her sorun için şunları görebilirsiniz:
+
+- Tüm servislerde kaç vaka olduğu.
+- En fazla vakanın hangi serviste olduğu.
+- Vakaların servislere dağılımı.
+
+Vaka bulunmayan servisler gösterilmez. Her sorun hakkında ayrıntılar için Transaction Control sayfasındaki
+[Tespit edilen sorunlar](../../../features/spring-framework/transaction-control.mdx#detected-problems) bölümüne bakın.
+
+## Nasıl çalışır? [#how-it-works]
+
+Pano, Transaction Control'ün her serviste bulduklarını sayar. Master bunları günde bir kez kaydeder ve en son kaydı kullanır.
+Kaç örneği olursa olsun her servis bir kez sayılır.
+
+Veriler yalnızca Hibernate ve işlem izleme etkin olan servislerde görünür.
+Transaction Control sayfasındaki [Özellikler](../../../features/spring-framework/transaction-control.mdx#properties) bölümüne bakın.
+
+## Ayrıca bakın [#see-also]
+
+- [Transaction Control](../../../features/spring-framework/transaction-control.mdx)
+- [Entities Map](../../../features/spring-framework/entities-map.mdx)

@@ -1,0 +1,69 @@
+---
+title: Axelix derleme eklentisi nedir?
+description: "Axelix derleme eklentisi, Axelix'in yönetmesini istediğiniz her servise uyguladığınız küçük bir Gradle veya Maven eklentisidir. Derleme sırasında çalışarak uygulama çıktısına META-INF/axelix-info.properties dosyasını yazar. Bu dosya, Master'ın uygulamaları birbirinden ayırmak için kullandığı kimliği taşır."
+---
+
+[Axelix Spring Boot Starter](../spring-boot-starter/what-is-spring-boot-starter.mdx) ile birlikte çalışır: starter, Master ile iletişim kuran çalışma zamanı bileşenidir; derleme eklentisi ise starter'ın bildireceği bilgileri sağlayan derleme zamanı bileşenidir. İkisi de gereklidir; starter içeren ancak eklentiyi kullanmayan bir servis **kaydolamaz**.
+
+## Neler üretir? [#what-it-produces]
+
+Eklenti, derleme sırasında `META-INF/axelix-info.properties` dosyasını üretir ve şunları kaydeder:
+
+- **Derleme koordinatları** — `groupId`, `artifactId` ve `version`. Bunlar, Master'ın tüm verileri ilişkilendirdiği kimliktir.
+- **Derleme zaman damgası** — çıktının ne zaman oluşturulduğu.
+- **Git meta verileri** — derleme bir Git deposunda çalışıyorsa geçerli commit, dal ve yazar.
+
+Çalışma zamanında [starter](../spring-boot-starter/what-is-spring-boot-starter.mdx) bu dosyayı okur ve koordinatları örneğin kayıt meta verilerinin bir parçası olarak Master'a gönderir.
+
+## Git worktree desteği [#git-worktrees]
+
+<ReleasedInNotice version="1.3.0" />
+
+Eklenti, derleme `git worktree add` ile oluşturulan bir çalışma dizininde, yani [bağlı worktree](https://git-scm.com/docs/git-worktree) içinde çalıştığında Git meta verilerini okur. Kaydedilen commit, dal ve yazar ana çalışma kopyasına değil, derlemenin çalıştığı worktree'ye aittir. Worktree ayrık bir `HEAD` üzerindeyse dal adı yerine commit kimliği kaydedilir. Gradle ve Maven eklentileri bu konuda aynı şekilde çalışır.
+
+## Bağımlılık SBOM'u (Gradle) [#dependency-sbom-gradle]
+
+<ReleasedInNotice version="1.2.0" />
+
+Gradle eklentisi, kimlik dosyasına ek olarak bir **bağımlılık SBOM'u** üretir: uygulamanın çalışma zamanı bağımlılık grafiğini açıklayan [CycloneDX](https://cyclonedx.org/) 1.6 biçiminde bir JSON belgesi. Bu belge, derleme bilgilerinin yanında `META-INF/axelix/dependencies.cdx.json` yolunda uygulama çıktısına eklenir. Master, uygulamayla gerçekte hangi kütüphanelerin dağıtıldığını ve her birinin classpath'e nasıl dâhil olduğunu görmek için bu belgeyi okur.
+
+Belgeyi `generateAxelixDependenciesSbom` görevi üretir. **Bu görevi elle çalıştırmayın**: `jar`, `bootJar` ve `processResources` görevlerinin tümü buna bağımlıdır; dolayısıyla normal bir derleme SBOM'u otomatik olarak paketler, `test` ve `bootRun` da onu classpath'te görür. Görev yalnızca çözümlenmiş bağımlılık grafiği değiştiğinde yeniden çalışır.
+
+SBOM, tam olarak çözümlenmiş `runtimeClasspath`'i, yani bildirdiğiniz sürümleri değil, dağıtılan kütüphanelerin tam kümesini açıklar:
+
+- **Yalnızca çözümlenmiş sürümler.** İki bağımlılık aynı kütüphanenin farklı sürümlerini istediğinde belge Gradle'ın seçtiği sürümü kaydeder. `2.0.+` gibi dinamik bildirimler çözümlendikleri somut sürümle, BOM (`platform(...)`) tarafından sabitlenen sürümler ise sabitlenmiş hâlleriyle görünür.
+- **Çalışma zamanı kapsamı.** `runtimeOnly` bağımlılıkları dâhildir. `compileOnly` bağımlılıkları dağıtılmadıkları için hariç tutulur.
+- **Çözümleme yolları.** Her kütüphane, beraberinde getirdiği kütüphanelere yönelen `dependsOn` kenarlarını taşır; böylece uygulamanızdan her geçişli bağımlılığa uzanan zincir korunur.
+- **Kendi modülleriniz hariç tutulur.** Çok projeli bir derlemede, uygulamanın bağımlı olduğu alt projeler kütüphane olarak listelenmez; bunların getirdiği kütüphaneler doğrudan uygulamayla ilişkilendirilir. Eklentiyi uygulayan her proje, kendi çalışma zamanı classpath'ini açıklayan ayrı bir SBOM alır.
+
+Eklentinin diğer işlevleri gibi SBOM da yapılandırma gerektirmez. **Maven eklentisi** aynı belgeyi aynı konumda üretir: ayrı bir görev yoktur; `axelix-generate-project-info` hedefi SBOM'u kimlik dosyasıyla birlikte oluşturur.
+
+## Üretilen çıktılar iç kullanıma yöneliktir [#the-generated-artifacts-are-internal]
+
+Derleme eklentisinin uygulama çıktısına yazdığı her şey — `META-INF/axelix-info.properties`, [bağımlılık SBOM'u](#dependency-sbom-gradle) ve gelecekteki sürümlerde eklenecek dosyalar — tek bir tüketici için vardır: [Axelix Spring Boot Starter](../spring-boot-starter/what-is-spring-boot-starter.mdx). Starter bu dosyaları okur ve içeriklerini Master'a bildirir. Aralarındaki sözleşme bundan ibarettir.
+
+:::warning[Üretilen çıktılara bağımlıysanız dikkat edin]
+Üretilen dosyaları Axelix'in iç uygulama ayrıntıları olarak değerlendirin. Adları, konumları, biçimleri ve içerikleri bir minör veya majör sürümde fazla ön bildirim yapılmadan değişebilir; böyle bir değişiklik uyumluluğu bozan değişiklik sayılmaz. Kendi araçlarınız uygulama çıktısından `axelix-info.properties` veya `dependencies.cdx.json` dosyalarını ayrıştırıyorsa yükseltme sırasında bozulmalarını bekleyin.
+:::
+
+Bu durum özellikle bağımlılık SBOM'u için geçerlidir. Standart CycloneDX biçimini kullanır ancak Master'ın ihtiyaçları için üretilir; örneğin kendi modülleriniz grafikten çıkarılır. Mevzuata uyumluluk amacıyla kullanılabilecek nitelikte bir SBOM değildir; bu nedenle tedarik zinciri veya denetim araçlarına girdi olarak vermeyin.
+
+## Neden gereklidir? [#why-it-is-required]
+
+Master her uygulamayı `groupId` + `artifactId` ile tanımlar. Örnekleri gruplandırmak, durumu uygulamalara atfetmek ve [kalıcılık analizlerini](../../setting-up-master-ui/mcp/mcp-tools.mdx) (N+1 ve varlık eşleme analizi) ilişkilendirmek için bu koordinatları kullanır.
+
+Eklenti olmadan özellik dosyası bulunmaz, koordinatlar boş kalır ve **Master kaydı reddeder**; starter nasıl yapılandırılmış olursa olsun örnek arayüzde görünmez. Bu nedenle eklentiyi uygulamak, yönetilen her servis için zorunlu bir ön koşuldur; isteğe bağlı bir iyileştirme değildir.
+
+## Gradle ve Maven [#gradle-and-maven]
+
+Her derleme aracı için bir tane olmak üzere eklentinin iki türü vardır:
+
+- **Gradle** — `com.axelixlabs.axelix` eklentisi. Yalnızca standart proje `version` değerinin ayarlanması gerekir. Axelix `1.2.0` öncesinde `group` boşsa derleme de başarısız olurdu; `1.2.0` itibarıyla `group` isteğe bağlıdır — bkz. [İsteğe bağlı `group` koordinatı](./configuration.mdx#optional-group-coordinate).
+- **Maven** — `axelix-maven-plugin`; `axelix-generate-project-info` hedefi `prepare-package` aşamasına bağlanır. Maven her zaman GAV koordinatlarına sahip olduğundan ek bir şey gerekmez.
+
+İki tür de herhangi bir yapılandırma seçeneği sunmaz; eklentiyi uygularsınız ve görevini yapar. İkisi de [bağımlılık SBOM'u](#dependency-sbom-gradle) üretir. Tam kod örnekleri için [Derleme eklentisini yapılandırma](./configuration.mdx) sayfasına bakın.
+
+## İlgili konular [#related]
+
+- [Derleme eklentisini yapılandırma](./configuration.mdx) — Gradle veya Maven ile nasıl uygulanır?
+- [Axelix Spring Boot Starter nedir?](../spring-boot-starter/what-is-spring-boot-starter.mdx) — üretilen koordinatları okuyup bildiren çalışma zamanı bileşeni.

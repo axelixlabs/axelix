@@ -1,0 +1,8 @@
+{
+    "title": "Geliştirme",
+    "defaultOpen": false,
+    "pages": [
+        "branching-model",
+        "releases"
+    ]
+}

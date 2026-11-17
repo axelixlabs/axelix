@@ -1,0 +1,90 @@
+---
+title: Servis profili
+description: "Servis profili, Axelix'in örnek bazındaki alanıdır. Bir Spring Boot örneğinin tüm tanılama ve inceleme ekranlarını tek kenar çubuğunda toplar; böylece baktığınız örneğin bağlamını kaybetmeden Beans, Loggers, Thread Dumps ve diğerleri arasında geçiş yapabilirsiniz."
+---
+
+[Wallboard](./wallboard.mdx) üzerindeki bir servis kartına tıklayarak servis profiline girersiniz. İlk açılan ekran her zaman
+[Details](../features/insights/details.mdx) ekranıdır.
+
+## Düzen [#layout]
+
+Servis profili iki bölgeden oluşur:
+
+- **Sol kenar çubuğu**, örnek için kullanılabilir tüm özellik sayfalarını listeler.
+- **Ana içerik alanı**, seçili özellik sayfasını gösterir.
+
+## Kenar çubuğu grupları [#sidebar-groups]
+
+Kenar çubuğu üç gruba ayrılır. Her grup bağımsız olarak genişletilebilir veya daraltılabilir ve açık sayfa vurgulanır.
+
+### Insights [#insights]
+
+Örnek hakkında genel amaçlı çalışma zamanı bilgileri.
+
+- [Details](../features/insights/details.mdx): örneğin kimlik kartı. Derleme koordinatlarını, Git revizyonunu, JDK sağlayıcısını
+  ve çalışma zamanı meta verilerini gösterir. Ayrıca çevrimdışı analiz için seçili tanılamaları (heap dökümü, iş parçacığı
+  dökümü, günlükler, bean'ler, önbellekler ve diğerleri) ZIP paketi olarak dışa aktaran **Download state** eylemini sunar.
+- [Metrics](../features/insights/metrics.mdx): örneğin sunduğu canlı Micrometer metrikleri; ön eklerine göre JVM, HTTP ve JDBC
+  gibi mantıksal kategorilere otomatik gruplanır. Her metriğin güncel değeri ve etiket boyutları ayrıntılı incelenebilir.
+- [Loggers](../features/insights/loggers/loggers.mdx): uygulamadaki yapılandırılmış tüm logger'ları ve logger gruplarını güncel
+  düzeyleriyle listeler. Düzeyi anında değiştirebilir (örneğin hatayı yeniden üretirken bir paketi DEBUG düzeyine alabilir),
+  yalnızca seçilen zamana kadar ayarlayabilir ve işiniz bittiğinde özgün değerine döndürebilirsiniz.
+  [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#loggers)
+- [Dependencies Analyzer](../features/insights/dependencies-analyzer.mdx): uygulamanın çözümlenmiş bağımlılıklarını ekosisteme
+  (kalıcılık, web, güvenlik ve diğerleri) göre gruplar; her projenin bakım durumunu ve uygulamanın kullandığı Spring Boot
+  serisinin OSS destek süresini gösterir. Giriş yalnızca örneğin starter'ı desteklediğinde görünür.
+
+### Spring Framework [#spring-framework]
+
+Spring'e özgü iç durum incelemesi.
+
+- [Properties](../features/spring-framework/properties.mdx): örneğin çözümlenmiş Spring `Environment` bilgisi. Etkin özellikler
+  kaynaklarına (sistem özellikleri, `application.yaml`, komut satırı argümanları vb.) göre gruplanır. Böylece geçerli değerin
+  yanında değeri sağlayan kaynağı, daha yüksek öncelikli kaynak tarafından bastırılan değerleri ve kullanımdan kaldırılan
+  özellikleri de görebilirsiniz. [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection)
+- [Beans](../features/spring-framework/beans.mdx): uygulama bağlamındaki her bean'i kapsamı (Singleton, Prototype, Request,
+  Session ve diğerleri), bağımlılıkları, takma adları, niteleyicileri ve kaynağıyla (`@Component`, `@Bean` metodu,
+  `FactoryBean`, sentetik) gösterir. `@ConfigurationProperties` tabanlı bean'ler, Configuration Properties sayfasındaki
+  eşleşen girişe doğrudan bağlanır. [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection)
+- [Configuration Properties](../features/spring-framework/configuration-properties.mdx): `@ConfigurationProperties` ile
+  işaretlenmiş tüm bean'leri ve her alanın güncel değerini gösterir. Türlenmiş yapılandırma nesnelerinizin çalışma zamanında
+  gerçekte ne içerdiğini YAML'dan çıkarmak yerine görmenizi sağlar.
+  [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection)
+- [Scheduled Tasks](../features/spring-framework/scheduled-tasks.mdx): uygulamadaki her `@Scheduled` görevini tetikleyici türüne
+  (**cron**, **fixed delay**, **fixed rate**) göre gruplar. Görevi duraklatabilir veya sürdürebilir, zamanlamasını düzenleyebilir
+  ve elle tek seferlik çalıştırma tetikleyebilirsiniz.
+  [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection)
+- [Conditions](../features/spring-framework/conditions.mdx): Spring'in her aday bean için `@Conditional` değerlendirme sonucunu
+  **olumlu** ve **olumsuz** eşleşmeler olarak gösterir. Sayfa, bir otomatik yapılandırmanın beklediğiniz bean'i eklemesini hangi
+  koşulun engellediğini bulmanın en hızlı yoludur.
+  [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection)
+- [Caches](../features/spring-framework/caches.mdx): örneğe kayıtlı Spring önbelleklerini `CacheManager`'larına göre gruplar.
+  İsabet ve kaçırma oranlarını, tahmini kayıt sayılarını gösterir; tek tek veya tüm önbellekleri bir kerede temizlemenizi sağlar.
+  [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#caches)
+- [Transaction Control](../features/spring-framework/transaction-control.mdx): uygulamanın çalıştırdığı her `@Transactional`
+  metodu, yürütme süresi ve işlem içinde bulunan sorunlarla gösterir: engelleyici ağ çağrıları, N+1 sorguları ve bellek içi
+  sayfalama. [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights)
+- [Entities Map](../features/spring-framework/entities-map.mdx): her entity'nin JPA eşlemesini denetler ve ek sorgu maliyeti
+  yaratan ilişkileri gösterir: eager fetching, `List` tabanlı `@ManyToMany`, `REMOVE` veya `ALL` cascade ve tek yönlü
+  `@OneToMany`. [MCP aracı olarak da kullanılabilir.](../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights)
+
+### JVM [#jvm]
+
+JVM düzeyinde tanılama.
+
+- [Thread Dump](../features/jvm/thread-dump.mdx): tüm canlı JVM iş parçacıklarının durumlarını, yığın izlerini, engellenme/bekleme
+  sayaçlarını ve kilit sahibi bilgilerini içeren anlık görüntü. Sayfa, çalışan JVM'de iş parçacığı çekişme izlemesini açıp kapatmanızı da sağlar.
+- [Garbage Collector](../features/jvm/garbage-collector.mdx): örnekten akış hâlinde gelen çöp toplama günlükleri. Üretim JVM'lerinde
+  GC günlük kaydı genellikle varsayılan olarak devre dışıdır; bu nedenle sayfa, uygulamayı yeniden başlatmadan etkinleştiren
+  **Enable GC Logging** eylemini sunar.
+
+## MCP erişimi [#mcp-access]
+
+Yukarıdaki özelliklerin birkaçı Axelix Master'ın yerleşik MCP sunucusunda araç olarak da sunulur; böylece MCP üzerinden bağlı
+bir yapay zekâ ajanı aynı verileri okuyabilir. Kayıtlı araçların tam kataloğuna [MCP ekranından](./mcp.mdx) göz atılabilir;
+adları, etiketleri ve rol gereksinimlerini içeren güncel başvuru listesi [MCP Araçları](../setting-up-master-ui/mcp/mcp-tools.mdx) sayfasındadır.
+
+## İlgili sayfalar [#related]
+
+- [Wallboard](./wallboard.mdx)
+- [Spring Portfolio](./dashboard/spring-portfolio.mdx)

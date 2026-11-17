@@ -1,0 +1,36 @@
+---
+title: Master nedir?
+description: "Axelix Master (veya kısaca Master), Axelix ekosisteminin merkezi bileşenidir. Çeşitli ortamlardaki Spring Boot uygulamalarını yönetmek ve izlemek için gelişmiş özellikler sunar."
+---
+
+## Temel amaç [#core-purpose]
+
+Axelix Master, Java Spring Boot mikroservis ekosistemlerini geliştirmeye ve dönüştürmeye yönelik, açık kaynaklı ve yapay zekâyı temel alan Axelix platformunun merkezi uygulamasıdır. Servisleri keşfeder, kaydeder ve izler; mühendislere web arayüzünü, yapay zekâ ajanlarına ise yerleşik MCP sunucusunu sunar. Böylece her iki kullanıcı grubu da uygulama analizi ve hata ayıklama özelliklerine erişebilir. Kullanılabilir MCP özellikleri [araç kataloğunda](./mcp/mcp-tools.mdx) listelenir.
+
+## Temel özellikler [#key-capabilities]
+
+### 🔍 **Servis keşfi** [#-service-discovery]
+Master, Spring Boot uygulamalarını birbirini tamamlayan iki mekanizmayla tanır:
+
+**Kendi kendine kayıt (tüm ortamlar):**
+Axelix Spring Boot Starter içeren uygulamalar kendilerini Master'a bildirir ve düzenli yaşam sinyalleri gönderir. Uygulamanın Master'a erişebildiği Docker Compose, fiziksel sunucular, sanal makineler, Kubernetes ve benzeri tüm ortamlarda çalışır. Bu özellik **her uygulamada ayrıca etkinleştirilir**: uygulamanızda `axelix.sbs.discovery.self-registration=true` ayarını kullanın (varsayılan olarak kapalıdır). Master bu kayıtları ek ayar gerektirmeden kabul eder (Master'daki `axelix.master.discovery.self-registration.enabled` ayarı varsayılan olarak açıktır).
+
+**Otomatik keşif (yalnızca Kubernetes):**
+Etkinleştirildiğinde (`axelix.master.discovery.auto.enabled` özelliğiyle denetlenir), Master uygun servisleri bulmak için platformu etkin biçimde tarar. Platform taraması şu anda yalnızca **Kubernetes** için uygulanmıştır. Master'ın kendi yapılandırmasında varsayılan olarak kapalıdır; ancak resmî [Helm chart](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) bunu varsayılan olarak açar.
+
+**Keşfin işleyişi:**
+1. **Kendi kendine kayıt**: Axelix Starter içeren uygulamalar kendilerini kaydeder ve yaşam sinyali gönderir.
+2. **Platform taraması** (Kubernetes): Master, Axelix SBS uç noktalarını sunan servisleri bulmak için kümeyi yoklar.
+3. **Listenin güncel tutulması**: Master, otomatik keşfedilen örnekleri her taramada yeniler; kendi kendine kaydolup yaşam sinyali göndermeyi bırakan örnekleri ise listeden çıkarır.
+
+Ayrıntılar için [Keşif nasıl çalışır?](../product/discovery.mdx) sayfasına bakın.
+
+### 🖥️ **Birleşik web arayüzü** [#️-unified-web-interface]
+Tüm Spring Boot uygulamalarınız için tek bir yönetim arayüzü:
+
+**Sunulan özellikler:**
+- Kayıtlı tüm uygulamaları gösteren gösterge paneli
+- Bu bilgileri yapay zekâ ajanlarına sunan yerleşik MCP sunucusu
+- Yapılandırma özellikleri ve Environment incelemesi
+- Ayrıntılı bean analizi
+- Diğer özellikler için Özellikler bölümüne bakın
