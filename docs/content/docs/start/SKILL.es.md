@@ -158,10 +158,21 @@ autenticación de la aplicación. Tenga en cuenta:
 Añada la exclusión de la misma forma en que el proyecto ya configura la seguridad. Si no hay un lugar apropiado, añada este bean
 a una aplicación servlet:
 
+Para Spring Boot 3/4 (Spring Security 6/7):
+
 ```java
 @Bean
 public WebSecurityCustomizer axelixWebSecurityCustomizer() {
     return (web) -> web.ignoring().requestMatchers("BASE/axelix-*/**");
+}
+```
+
+Para Spring Boot 2.7 (Spring Security 5.7), use `antMatchers`:
+
+```java
+@Bean
+public WebSecurityCustomizer axelixWebSecurityCustomizer() {
+    return (web) -> web.ignoring().antMatchers("BASE/axelix-*/**");
 }
 ```
 
@@ -197,7 +208,7 @@ Si `APP_IN_COMPOSE` es yes:
   axelix-master:
     image: ghcr.io/axelixlabs/axelix:VERSION
     ports:
-      - "2935:2935"
+      - "127.0.0.1:2935:2935"
     environment:
       AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED: "true"
 ```
@@ -213,7 +224,7 @@ ocupado por otra cosa, inicie Master en otro puerto y utilícelo en `MASTER`. Si
 elija un nombre distinto.
 
 ```bash
-docker run -d --name axelix-master -p 2935:2935 \
+docker run -d --name axelix-master -p 127.0.0.1:2935:2935 \
   --add-host=host.docker.internal:host-gateway \
   -e AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED=true \
   ghcr.io/axelixlabs/axelix:VERSION

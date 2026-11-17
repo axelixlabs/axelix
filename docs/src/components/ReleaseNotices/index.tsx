@@ -54,9 +54,18 @@ type VersionProps = {
  */
 export const ReleasedInNotice = ({ version }: VersionProps) => {
     const { locale } = useI18n();
-    const label = translate({en: "Released",ru: "Выпущено",fr: "Publié",de: "Veröffentlicht",es:"Publicado"}, locale);
+    const label = translate(
+        { en: "Released", ru: "Выпущено", fr: "Publié", de: "Veröffentlicht", es: "Publicado" },
+        locale,
+    );
     const detail = translate(
-        {en: "Available since release",ru: "Доступно начиная с релиза",fr: "Disponible depuis la version",de: "Verfügbar seit Version",es:"Disponible desde la versión"},
+        {
+            en: "Available since release",
+            ru: "Доступно начиная с релиза",
+            fr: "Disponible depuis la version",
+            de: "Verfügbar seit Version",
+            es: "Disponible desde la versión",
+        },
         locale,
     );
 
@@ -82,9 +91,18 @@ export const ReleasedInNotice = ({ version }: VersionProps) => {
 /** Marks a section as not yet released. */
 export const UpcomingReleaseNotice = () => {
     const { locale } = useI18n();
-    const label = translate({en: "Upcoming",ru: "Ожидается",fr: "À venir",de: "Demnächst",es:"Próximamente"}, locale);
+    const label = translate(
+        { en: "Upcoming", ru: "Ожидается", fr: "À venir", de: "Demnächst", es: "Próximamente" },
+        locale,
+    );
     const detail = translate(
-        {en: "Available in an upcoming minor release",ru: "Появится в ближайшем минорном релизе",fr: "Disponible dans une prochaine version mineure",de: "Verfügbar in einer kommenden Minor-Version",es:"Disponible en una próxima versión menor"},
+        {
+            en: "Available in an upcoming minor release",
+            ru: "Появится в ближайшем минорном релизе",
+            fr: "Disponible dans une prochaine version mineure",
+            de: "Verfügbar in einer kommenden Minor-Version",
+            es: "Disponible en una próxima versión menor",
+        },
         locale,
     );
 
@@ -112,7 +130,10 @@ type ScreenshotsNoticeProps = {
 /** Frames the screenshot passed as children, with the notice line as its header. */
 export const ScreenshotsNotice = ({ text, children }: ScreenshotsNoticeProps) => {
     const { locale } = useI18n();
-    const label = translate({en: "Screenshots",ru: "Скриншоты",fr: "Captures d’écran",de: "Screenshots",es:"Capturas de pantalla"}, locale);
+    const label = translate(
+        { en: "Screenshots", ru: "Скриншоты", fr: "Captures d’écran", de: "Screenshots", es: "Capturas de pantalla" },
+        locale,
+    );
 
     // Slate blue reads as neutral context, apart from the green, purple and amber notices.
     const accent = "[--accent:#4a6a8a] dark:[--accent:#9db7d1]";
@@ -146,13 +167,28 @@ type LegacyNoticeProps = VersionProps & {
 /** Marks a section as no longer applicable from a given release onwards. */
 export const LegacyNotice = ({ version, reason }: LegacyNoticeProps) => {
     const { locale } = useI18n();
-    const label = translate({en: "Legacy",ru: "Устарело",fr: "Obsolète",de: "Veraltet",es:"Versiones anteriores"}, locale);
+    const label = translate(
+        { en: "Legacy", ru: "Устарело", fr: "Obsolète", de: "Veraltet", es: "Versiones anteriores" },
+        locale,
+    );
     const detail = translate(
-        {en: "Only needed before release",ru: "Актуально только до релиза",fr: "Nécessaire uniquement avant la version",de: "Nur vor dieser Version erforderlich",es:"Solo necesario antes de la versión"},
+        {
+            en: "Only needed before release",
+            ru: "Актуально только до релиза",
+            fr: "Nécessaire uniquement avant la version",
+            de: "Nur vor dieser Version erforderlich",
+            es: "Solo necesario antes de la versión",
+        },
         locale,
     );
     const skip = translate(
-        {en: "On later versions, skip this section.",ru: "На более поздних версиях пропустите этот раздел.",fr: "Dans les versions ultérieures, ignorez cette section.",de: "Überspringen Sie diesen Abschnitt ab dieser Version.",es:"En versiones posteriores, omita esta sección."},
+        {
+            en: "On later versions, skip this section.",
+            ru: "На более поздних версиях пропустите этот раздел.",
+            fr: "Dans les versions ultérieures, ignorez cette section.",
+            de: "Überspringen Sie diesen Abschnitt ab dieser Version.",
+            es: "En versiones posteriores, omita esta sección.",
+        },
         locale,
     );
 

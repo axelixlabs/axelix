@@ -71,42 +71,19 @@ Consulte [cómo funciona el descubrimiento](./discovery.mdx) para conocer cada v
 
 ## Despliegues con varios Master [#multi-master-deployments]
 
-Es posible desplegar varias instancias de Axelix Master. En ese caso, corresponde a los usuarios
-configurar la base de datos compartida (por ejemplo, el mismo archivo SQLite montado o una base de datos PostgreSQL común):
+Ejecute **una sola réplica activa de Master a la vez**. Los trabajos en segundo plano y las cachés en memoria de Master
+presuponen una única instancia; una base de datos compartida no hace segura la ejecución de varias réplicas activas.
+Si sus ámbitos de descubrimiento automático difieren, cada réplica puede eliminar del registro las instancias de servicios
+descubiertas automáticamente por la otra durante su exploración.
 
-```
-              ┌──────────────┐                  ┌──────────────┐
-              │      UI      │                  │  AI Agents   │
-              └──────┬───────┘                  └──────┬───────┘
-                     │REST                             │MCP
-                     │                                 │
- ┌───────────────────┴─────────────────────────────────┴───────────────────┐
- │                         Load Balancer (K8S Service)                     │
- └──────────┬───────────────────────────────────────────────────┬──────────┘
-            │                                                   │
-            │                                                   │
- ┌──────────┴──────────┐                             ┌──────────┴──────────┐
- │    Axelix Master    │                             │    Axelix Master    │
- │       pod "A"       │                             │       pod "B"       │
- └──┬─────────────┬────┘                             └─┬─────────────┬─────┘
-    │             │                                    │             │
-    │             │                                    │             │
-    │     ┌───────┴────────────────────────────────────┴────────┐    │
-    │     │                      Shared DB                      │    │
-    │     │                                                     │    │
-    │     └─────────────────────────────────────────────────────┘    │
-    │                                                                │
-┌───┴──────────────────────┐                       ┌─────────────────┴─────┐
-│ Spring Boot Services     │                       │ Spring Boot Services  │
-│ (Spring Boot 2 - 4)      │                       │ (Spring Boot 2 - 4)   │
-└──────────────────────────┘                       └───────────────────────┘
-```
+Siga las restricciones de despliegue y actualización con una sola instancia de [Actualización de Axelix](../more/upgrading.mdx#invariants).
+Actualmente no se admite un Master de alta disponibilidad con varias réplicas.
 
 ## Modelo de seguridad [#security-model]
 
 La autenticación de agentes de IA mediante MCP y de personas mediante la interfaz puede realizarse con [autenticación
 Basic](https://datatracker.ietf.org/doc/html/rfc7617) o con
-[OAuth2/OIDC](https://datatracker.ietf.org/doc/html/rfc7617). A continuación se ofrece un breve resumen; consulte
+[OAuth2/OIDC](../setting-up-master-ui/authentication/authentication.mdx). A continuación se ofrece un breve resumen; consulte
 [autenticación](../setting-up-master-ui/authentication/authentication.mdx) para conocer el modelo completo de credenciales.
 
 ### Autenticación Basic [#basic-authentication]
@@ -115,19 +92,19 @@ En este caso, se presupone que los usuarios se crearán en la base de datos a la
 del usuario se almacena en la base de datos de Axelix Master, algo adecuado para despliegues pequeños.
 
 :::note
-Actualmente, solo un ingeniero puede crear usuarios manualmente a través de la interfaz. El proveedor de Terraform está en desarrollo.
+Actualmente, los usuarios solo pueden crearse manualmente a través de la interfaz, con la intervención de un ingeniero. El proveedor de Terraform está en desarrollo.
 :::
 
 Al iniciar sesión, se solicitan las credenciales a la persona o al agente de IA y se comprueban con la base de datos.
 Cuando el inicio de sesión se realiza mediante el formulario de la interfaz, el backend envía una cookie de autenticación específica
 que contiene el token de acceso JWT.
 
-En el caso de los agentes de IA, estas credenciales se envían en la cabecera <code>"Basic ..."</code>,
-tal como define [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
+Los agentes de IA que utilizan autenticación Basic envían las credenciales en la cabecera HTTP estándar `Authorization`:
+<code>Authorization: Basic &lt;base64(username:password)&gt;</code>, tal como define
+[RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
 
 :::important
-Como no existe un estándar para el esquema de autenticación <code>"Basic"</code> de agentes de IA mediante un servidor MCP, el agente
- debe presentar las credenciales en la cabecera <code>"Basic"</code> **en cada solicitud** cuando utilice autenticación Basic.
+Al utilizar autenticación Basic con el servidor MCP, el agente de IA debe enviar esta cabecera `Authorization` **en cada solicitud**.
 :::
 
 ### OAuth2 y OIDC [#oauth2-and-oidc]

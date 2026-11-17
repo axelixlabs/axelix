@@ -46,15 +46,15 @@ Una línea representativa de un registro de GC descargado, con anotaciones:
 ```
 [2026-03-02T17:38:55.009+0000][info][gc] GC(428) Pause Full (System.gc()) 29M->28M(97M) 82.955ms
               │                  │    │    │               │               │    │   │       │
-              │                  │    │    │               │               │    │   │       └─ GC pause duration
-              │                  │    │    │               │               │    │   └─ Total heap
-              │                  │    │    │               │               │    └─ After heap
-              │                  │    │    │               │               └─ Before heap
-              │                  │    │    │               └─ GC event description
-              │                  │    │    └─ GC event ID
-              │                  │    └─ Log tag (subsystem)
-              │                  └─ Log level
-              └─ Timestamp (ISO-8601 with timezone)
+              │                  │    │    │               │               │    │   │       └─ Duración de la pausa de GC
+              │                  │    │    │               │               │    │   └─ Heap total
+              │                  │    │    │               │               │    └─ Heap después
+              │                  │    │    │               │               └─ Heap antes
+              │                  │    │    │               └─ Descripción del evento de GC
+              │                  │    │    └─ ID del evento de GC
+              │                  │    └─ Etiqueta del registro (subsistema)
+              │                  └─ Nivel de registro
+              └─ Marca de tiempo (ISO-8601 con zona horaria)
 ```
 
 ## Habilitar el endpoint dedicado de Actuator [#enable-dedicated-actuator-endpoint]

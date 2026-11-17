@@ -80,36 +80,12 @@ For what happens on each path, see [How discovery works](./discovery.mdx).
 
 ## Multi-master deployments
 
-It is possible to deploy multiple instances of Axelix Master. In this case, it is the responsibility of the end-users to
-arrange for the shared database (e.g. either the same mounted sqlite file or the common PostgreSQL database):
+Run **one active Master replica at a time**. Master currently assumes a single instance for its background jobs and
+in-memory caches; a shared database does not make multiple active replicas safe. With different automatic-discovery
+scopes, each replica can delete the other replica's auto-discovered registry entries during its scan.
 
-```
-              ┌──────────────┐                  ┌──────────────┐
-              │      UI      │                  │  AI Agents   │
-              └──────┬───────┘                  └──────┬───────┘
-                     │REST                             │MCP
-                     │                                 │
- ┌───────────────────┴─────────────────────────────────┴───────────────────┐
- │                         Load Balancer (K8S Service)                     │
- └──────────┬───────────────────────────────────────────────────┬──────────┘
-            │                                                   │
-            │                                                   │
- ┌──────────┴──────────┐                             ┌──────────┴──────────┐
- │    Axelix Master    │                             │    Axelix Master    │
- │       pod "A"       │                             │       pod "B"       │
- └──┬─────────────┬────┘                             └─┬─────────────┬─────┘
-    │             │                                    │             │
-    │             │                                    │             │
-    │     ┌───────┴────────────────────────────────────┴────────┐    │
-    │     │                      Shared DB                      │    │
-    │     │                                                     │    │
-    │     └─────────────────────────────────────────────────────┘    │
-    │                                                                │
-┌───┴──────────────────────┐                       ┌─────────────────┴─────┐
-│ Spring Boot Services     │                       │ Spring Boot Services  │
-│ (Spring Boot 2 - 4)      │                       │ (Spring Boot 2 - 4)   │
-└──────────────────────────┘                       └───────────────────────┘
-```
+Follow the single-instance deployment and upgrade restrictions in [Upgrading Axelix](../more/upgrading.mdx#invariants).
+A highly available, multi-replica Master is not currently supported.
 
 ## Security model
 
@@ -131,13 +107,12 @@ When logging-in, the user or the AI agent will be prompted to provide the creden
 checked against the database. In case of the login from the UI form, the backend will send a dedicated auth cookie that
 will contain the JWT access-token.
 
-In case of AI Agents usage, these credentials are simply going to be provided by the custom <code>"Basic ..."</code>
-header as it is defined in [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
+AI agents using Basic authentication send credentials in the standard HTTP `Authorization` header:
+<code>Authorization: Basic &lt;base64(username:password)&gt;</code>, as defined in
+[RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
 
 :::important
-Since there is no standard around the <code>"Basic"</code> authentication scheme for the AI Agent via MCP server, the AI
-Agent must present the credentials in the <code>"Basic"</code> header **in every request**, in case of Basic
-authentication for the Agent is used.
+When using Basic authentication with the MCP server, the AI agent must send this `Authorization` header **in every request**.
 :::
 
 ### OAuth2 and OIDC

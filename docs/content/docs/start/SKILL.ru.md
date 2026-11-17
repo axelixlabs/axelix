@@ -159,10 +159,21 @@ Gradle:
 Встрой исключение так, как в проекте уже настроена Security. Если подходящего места нет, добавь этот бин в
 servlet-приложение:
 
+Для Spring Boot 3/4 (Spring Security 6/7):
+
 ```java
 @Bean
 public WebSecurityCustomizer axelixWebSecurityCustomizer() {
     return (web) -> web.ignoring().requestMatchers("BASE/axelix-*/**");
+}
+```
+
+Для Spring Boot 2.7 (Spring Security 5.7) используйте `antMatchers`:
+
+```java
+@Bean
+public WebSecurityCustomizer axelixWebSecurityCustomizer() {
+    return (web) -> web.ignoring().antMatchers("BASE/axelix-*/**");
 }
 ```
 

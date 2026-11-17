@@ -37,7 +37,7 @@ You can change the level:
 - Of a logger group. The level applies to every logger in the group: setting the `web` group to <WARN /> sets <WARN /> for
   all of its loggers.
 
-The reset button <Image src="/img/feature/loggers/reset.svg" alt="reset icon" width={20} height={20}/> returns a logger to the level it had before you first changed it in Axelix. It works for loggers changed at
+The reset button <Image src="/img/feature/loggers/reset.svg" alt="reset icon" width={20} height={20}/> returns a logger to the configured level it had before the first Axelix change (since the last reset). It works for loggers changed at
 runtime: on this page, through MCP, or with a direct request to the `axelix-loggers` actuator endpoint. Logger groups
 cannot be reset.
 
@@ -74,7 +74,7 @@ When you need verbose logs only for a while, for example to catch a bug, set a t
 about switching it off. Click the timer icon next to the logger, pick the level and the time when it should end. If
 that time has already passed today, the level stays until that time tomorrow.
 
-When the time runs out, the logger returns to the level it had before. To end the temporary level early, reset the
+When the time runs out, the logger returns to the configured level it had before the first Axelix change (since the last reset). To end the temporary level early, reset the
 logger. Temporary levels are not available for logger groups.
 
 ## MCP Tools

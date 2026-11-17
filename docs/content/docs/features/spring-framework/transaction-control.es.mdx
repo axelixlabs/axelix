@@ -49,7 +49,11 @@ La monitorización de transacciones y, por tanto, esta página no están disponi
 
 ## Exponer el endpoint de metadatos [#expose-the-metadata-endpoint]
 
-La página no utiliza un endpoint de Actuator dedicado. Axelix Spring Boot Starter agrega la información de transacciones en la JVM y la envía a Master como parte de los metadatos de registro de la instancia: el mismo contenido que expone el endpoint `axelix-metadata` que Master ya consulta. Siempre que `axelix-metadata` esté expuesto (consulte [Exponer los endpoints en versiones de Axelix anteriores a 1.2.0](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposing-the-endpoints-on-axelix-below-120)), esta página funciona sin habilitar ningún endpoint adicional.
+No hay ningún endpoint de Actuator específico para transacciones. La información inicial sobre transacciones se incluye en los metadatos de registro de la instancia, expuestos mediante `axelix-metadata` cuando Master descubre la instancia.
+
+Con starters desde 1.3.0, Master consulta `axelix-ping` para obtener las actualizaciones posteriores de transacciones. Las instancias autorregistradas envían estas actualizaciones en sus señales de actividad. Con starters anteriores, Master sigue leyendo los metadatos de registro completos.
+
+Para el sondeo, exponga `axelix-metadata` y, con starters desde 1.3.0, `axelix-ping`. El starter expone sus propios endpoints automáticamente desde 1.2.0; consulte [Exponer los endpoints en versiones de Axelix anteriores a 1.2.0](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposing-the-endpoints-on-axelix-below-120) para versiones anteriores. No se necesita ningún endpoint adicional específico para transacciones.
 
 ## Véase también [#see-also]
 

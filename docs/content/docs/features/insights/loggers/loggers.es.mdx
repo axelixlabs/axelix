@@ -27,7 +27,7 @@ Se puede cambiar el nivel:
 - De un logger. Sus hijos sin nivel propio heredan el nuevo nivel: al cambiar `com.axelixlabs.axelix` de <INFO /> a <DEBUG />, `com.axelixlabs.axelix.sbs` también cambia a <DEBUG />.
 - De un grupo de loggers. El nivel se aplica a todos los loggers del grupo: establecer <WARN /> en el grupo `web` establece <WARN /> en todos sus loggers.
 
-El botón de restablecimiento <Image src="/img/feature/loggers/reset.svg" alt="Icono de restablecimiento" width={20} height={20}/> devuelve un logger al nivel que tenía antes del primer cambio realizado en Axelix. Funciona para los loggers modificados en tiempo de ejecución: en esta página, mediante MCP o con una petición directa al endpoint de Actuator `axelix-loggers`. Los grupos de loggers no se pueden restablecer.
+El botón de restablecimiento <Image src="/img/feature/loggers/reset.svg" alt="Icono de restablecimiento" width={20} height={20}/> devuelve un logger al nivel configurado que tenía antes del primer cambio realizado en Axelix (desde el último restablecimiento). Funciona para los loggers modificados en tiempo de ejecución: en esta página, mediante MCP o con una petición directa al endpoint de Actuator `axelix-loggers`. Los grupos de loggers no se pueden restablecer.
 
 ## Cambiar niveles en varias instancias [#change-levels-on-several-instances]
 
@@ -53,7 +53,7 @@ El selector solo aparece cuando la aplicación tiene más de una instancia. La s
 
 Cuando se necesitan registros detallados solo durante un tiempo, por ejemplo para detectar un error, se puede establecer un nivel temporal sin tener que acordarse de desactivarlo. Pulse el icono del temporizador junto al logger y elija el nivel y la hora a la que debe terminar. Si esa hora ya ha pasado hoy, el nivel se mantiene hasta esa hora de mañana.
 
-Cuando vence el plazo, el logger vuelve al nivel anterior. Para terminar antes el nivel temporal, restablezca el logger. Los niveles temporales no están disponibles para grupos de loggers.
+Cuando vence el plazo, el logger vuelve al nivel configurado antes del primer cambio mediante Axelix (desde el último restablecimiento). Para terminar antes el nivel temporal, restablezca el logger. Los niveles temporales no están disponibles para grupos de loggers.
 
 ## Herramientas MCP [#mcp-tools]
 

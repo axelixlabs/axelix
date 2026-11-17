@@ -40,13 +40,12 @@ La preparación consiste en los **cambios manuales** previos a la publicación. 
 
 ### 2. Iniciar el proceso de publicación [#2-launch-the-release-pipeline]
 
-**No creamos la etiqueta manualmente.** El proceso de publicación lee la versión de `gradle.properties`, ejecuta
-sus comprobaciones previas y, solo si todas pasan, crea la etiqueta `vX.Y.0` y publica todos
-los componentes: tanto los artefactos Maven (starters y plugins) como la imagen Docker de Master.
+**No creamos la etiqueta manualmente.** El proceso de publicación lee la versión de `gradle.properties` y ejecuta sus comprobaciones previas. Después publica los artefactos Maven (starters y plugins), compila y publica la imagen Docker de Master, y empaqueta y firma el chart de Helm. Solo entonces crea y envía la etiqueta `vX.Y.0`, y después actualiza el repositorio de charts de Helm. Por tanto, los artefactos pueden haberse publicado ya si el proceso falla antes de crear la etiqueta.
 
 :::info[Las notas de la versión se redactan manualmente]
-El proceso crea la **etiqueta**, pero **no** redacta las notas de la versión. El **desarrollador** que realiza la publicación
-redacta manualmente las notas correspondientes a la etiqueta `vX.Y.0` recién creada.
+El proceso crea la **etiqueta** y un **borrador de la versión en GitHub** con los artefactos JAR y Helm adjuntos.
+El desarrollador que realiza la publicación debe editar las notas del borrador de `vX.Y.0` y después **publicar el borrador** manualmente.
+Redactar las notas por sí solo no lo publica.
 :::
 
 ## Versiones de parche [#patch-releases]
@@ -73,10 +72,10 @@ cambian la documentación.
      menor: fijan explícitamente sus versiones de Axelix y no heredan `axelixVersion`.
 
 4. **Iniciar el proceso de publicación.** Es el **mismo proceso** que para una versión menor, iniciado desde la
-   rama de parches en lugar de `master`. Ejecuta las mismas comprobaciones previas, publica todos los componentes bajo
-   `X.Y.Z` y crea la etiqueta conjunta `vX.Y.Z`. Como todas las etiquetas de Axelix, lleva el prefijo `v`.
-   Al igual que en una versión menor, el proceso crea la etiqueta pero **no** las notas de la versión: el desarrollador las redacta
-   manualmente para la nueva etiqueta.
+   rama de parches en lugar de `master`. Sigue la misma secuencia de comprobaciones, publicación, empaquetado y etiquetado
+   descrita arriba, con la versión `X.Y.Z` y la etiqueta `vX.Y.Z`. Como todas las etiquetas de Axelix, lleva el prefijo `v`.
+   Al igual que en una versión menor, crea un borrador de la versión en GitHub con los artefactos JAR y Helm. El desarrollador debe
+   editar las notas del borrador para la nueva etiqueta y después **publicar el borrador** manualmente.
 
 ### Ejemplo completo [#worked-example]
 
@@ -87,8 +86,9 @@ Supongamos que la versión `3.1.0` necesita una corrección en el **Axelix Sprin
 2. Adaptamos la corrección de `master` a esa rama.
 3. En el `gradle.properties` de la raíz establecemos `axelixVersion` en `3.1.1`, la versión de parche que queremos
    publicar, y actualizamos los playgrounds a `3.1.1`.
-4. Iniciamos el proceso de publicación desde la rama `3.1.x`. Crea la etiqueta conjunta `v3.1.1` y publica
-   **todos** los componentes —starters, plugins y Master— bajo `3.1.1`, aunque solo haya cambiado realmente un starter.
+4. Iniciamos el proceso de publicación desde la rama `3.1.x`. Publica los artefactos Maven y la imagen de Master
+   con la versión `3.1.1`, empaqueta el chart de Helm y después crea y envía la etiqueta conjunta `v3.1.1`. A continuación
+   actualiza el repositorio de charts. **Todos** los componentes reciben la versión `3.1.1`, aunque solo haya cambiado un starter.
 
 El resultado cumple lo que promete
 [una versión para cada componente](../compatibility-and-versioning.mdx#one-version-for-every-component):

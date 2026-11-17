@@ -14,27 +14,55 @@ Master recibe un error 401 al comunicarse con el servicio gestionado, aunque el 
 En la práctica, los endpoints de Actuator expuestos por el servicio gestionado (el microservicio que incluye el starter y el plugin de Spring Boot de Axelix) casi nunca se dejan abiertos. Es muy habitual, y generalmente recomendable, protegerlos con algún mecanismo de autenticación: HTTP Basic, un servidor de recursos OIDC/OAuth2 o cualquier otro esquema integrado en la configuración de Spring Security de la aplicación.
 
 Al mismo tiempo, Axelix incluye su propia gestión de identidades y acceso (IAM). Cuando Master llama a un starter desde la versión 1.3, invoca los endpoints personalizados de Actuator de Axelix
-(normalmente `/actuator/axelix-**`, con un prefijo de Actuator configurable) con un token bearer técnico `AXELIX.MASTER` en
+(normalmente `/actuator/axelix-*/**`, con un prefijo de Actuator configurable) con un token bearer técnico `AXELIX.MASTER` en
 la cabecera `Authorization`. Para starters anteriores a 1.3, vuelve a emitir el token del usuario con nombres de permisos heredados.
 El descubrimiento inicial utiliza un token de compatibilidad que identifica a Master. En todos los casos, el token está destinado a los
 componentes de Axelix, no a la seguridad propia de la aplicación.
 
 :::note[Prefijo personalizado de Actuator]
-La parte `/actuator` es la ruta base de Actuator, configurable mediante `management.endpoints.web.base-path` (su valor predeterminado es `/actuator`). Si el servicio gestionado cambia esta propiedad, los endpoints de Axelix quedan bajo la ruta configurada: por ejemplo, con `/manage` se accede a ellos en `/manage/axelix-**`. Téngalo en cuenta al definir el patrón de solicitudes de la solución siguiente.
+La parte `/actuator` es la ruta base de Actuator, configurable mediante `management.endpoints.web.base-path` (su valor predeterminado es `/actuator`). Si el servicio gestionado cambia esta propiedad, los endpoints de Axelix quedan bajo la ruta configurada: por ejemplo, con `/manage` se accede a ellos en `/manage/axelix-*/**`. Téngalo en cuenta al definir el patrón de solicitudes de la solución siguiente.
 :::
 
 El 401 se debe al conflicto entre estos dos sistemas de autenticación independientes: el filtro de seguridad del servicio intercepta la solicitud antes de que llegue a los componentes de Axelix, detecta un token bearer e intenta validarlo con el IAM propio del servicio, donde el token de Axelix es desconocido y se rechaza.
 
 ### Solución: [#the-solution]
 
-La solución es excluir del IAM de la aplicación los endpoints personalizados de Actuator de Axelix (los que tienen el prefijo `/actuator/axelix-**`, teniendo en cuenta que el prefijo de Actuator es configurable) y confiar en el IAM de Axelix:
+La solución es excluir del IAM de la aplicación los endpoints personalizados de Actuator de Axelix (los que tienen el prefijo `/actuator/axelix-*/**`, teniendo en cuenta que el prefijo de Actuator es configurable) y confiar en el IAM de Axelix:
 
-```
+Este patrón abarca tanto las raíces de los endpoints como las rutas anidadas, por ejemplo, las operaciones de vaciado de caché.
+
+<Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
+  <Tab value="Spring Boot 4.x">
+
+```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
 }
 ```
+
+  </Tab>
+  <Tab value="Spring Boot 3.x">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
+}
+```
+
+  </Tab>
+  <Tab value="Spring Boot 2.7">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().antMatchers("/actuator/axelix-*/**");
+}
+```
+
+  </Tab>
+</Tabs>
 
 ## 2. Módulo de starter incorrecto para la versión de Spring Boot [#2-wrong-starter-module-for-your-spring-boot-version]
 

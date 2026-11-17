@@ -218,7 +218,9 @@ configuración.
 | `SUPER_ADMIN` | Todos los permisos definidos por Master, incluidos `users:read` y `users:manage`.                                                                 | La cuenta de superadministrador integrada.                                                                   |
 | `ADMIN`       | `environment.values:read`, `config-properties.values:read`, `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`, `heap-dump:read`. | Usuarios locales de la BD con rol `admin`. Usuarios OIDC cuyo `role-attribute-path` se resuelve en `admin`.       |
 | `EDITOR`      | `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`.                                                                        | Usuarios locales de la BD con rol `editor`. Usuarios OIDC cuyo `role-attribute-path` se resuelve en `editor`.     |
-| `VIEWER`      | Ninguno: vista de solo lectura de todo lo que no esté protegido por un permiso.                                                                                 | Usuarios locales de la BD con rol `viewer`. Usuarios OIDC sin `role-attribute-path` establecido o con valores no mapeados. |
+| `VIEWER`      | Ninguno: vista de solo lectura de todo lo que no esté protegido por un permiso.                                                                                 | Usuarios locales de la BD con rol `viewer`. Usuarios OIDC con `role-attribute-path` sin establecer o en blanco. |
+
+Si una expresión `role-attribute-path` configurada no devuelve ningún rol o devuelve un rol desconocido, la autenticación falla.
 
 </div>
 
@@ -229,7 +231,7 @@ Qué controla cada permiso:
 - **`scheduled-tasks:write`**: activar, desactivar, forzar la ejecución y reprogramar tareas programadas.
 - **`caches:clear`**: vaciar cachés individuales, gestores de caché o toda la caché de la aplicación.
 - **`caches:toggle`**: activar y desactivar cachés individuales y gestores de caché durante la ejecución.
-- **`gc:manage`**: activar el GC y activar o desactivar la supervisión de sus registros.
+- **`gc:manage`**: iniciar una recolección de basura y activar o desactivar la supervisión de sus registros.
 - **`heap-dump:read`**: descargar volcados del heap directamente o incluirlos en un estado de aplicación exportado.
 - **`users:read`**: leer la lista de usuarios.
 - **`users:manage`**: crear, actualizar y eliminar usuarios locales.
@@ -246,9 +248,10 @@ en el manejador que corresponde al esquema.
 - **`Basic`**: `BasicMcpAuthenticationHandler` decodifica `Authorization: Basic <base64(user:pass)>` y delega en el
   mismo `CompositeUserAuthenticator` que utiliza la interfaz. Funcionan tanto la cuenta de superadministrador como las locales. El mapeo de roles es idéntico
   al de un inicio de sesión desde el navegador.
-- **`Bearer`**: `BearerMcpAuthenticationHandler` interpreta la credencial como un token de acceso OIDC. Pasa el token
-  por `JmesPathOidcRoleExtractor` (la misma ruta que el flujo OIDC del navegador) para derivar un rol y después crea un
-  `PasswordlessUser` sintético llamado `AI_AGENT` con ese rol. Solo está disponible cuando
+- **`Bearer`**: `BearerMcpAuthenticationHandler` interpreta la credencial como un token de acceso OIDC. Valida el token con el proveedor OIDC
+  y utiliza `UserInfoJsonAccessor` para obtener un rol de la respuesta UserInfo, y después crea un
+  `PasswordlessUser` con ese rol y el ID y nombre de usuario de la cuenta persistida. El usuario debe iniciar sesión
+  primero en el navegador para crear la cuenta; el rol se evalúa a partir de la respuesta actual de userinfo. Solo está disponible cuando
   `axelix.master.auth.options.oauth2.enabled=true`.
 
 Una vez identificado el usuario, el filtro realiza la misma comprobación de permisos que el filtro web: los requisitos de permisos

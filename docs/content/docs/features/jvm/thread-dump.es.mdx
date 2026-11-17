@@ -37,9 +37,9 @@ Despliegue un hilo para ver su instantánea detallada del intervalo elegido en l
 - **Thread name**: nombre del hilo.
 - **Thread state**: estado del hilo en la JVM (`RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED`, …).
 - **Priority**: prioridad del hilo en la JVM.
-- **Blocked count**: número total de veces que el hilo estuvo bloqueado. Solo se rellena mientras **Thread Contention Monitoring** está activado; de lo contrario muestra *Not Available*.
+- **Blocked count**: número total de veces que el hilo estuvo bloqueado.
 - **Blocked time**: tiempo que el hilo estuvo bloqueado, en milisegundos. Solo se rellena mientras **Thread Contention Monitoring** está activado; de lo contrario muestra *Not Available*.
-- **Waited count**: número total de veces que el hilo esperó una notificación. Solo se rellena mientras **Thread Contention Monitoring** está activado; de lo contrario muestra *Not Available*.
+- **Waited count**: número total de veces que el hilo esperó una notificación.
 - **Waited time**: tiempo que el hilo estuvo esperando, en milisegundos. Solo se rellena mientras **Thread Contention Monitoring** está activado; de lo contrario muestra *Not Available*.
 - **Daemon**: si el hilo es un hilo daemon.
 - **Locked by**: información sobre el objeto de bloqueo por el que espera el hilo, cuando corresponde:
@@ -65,7 +65,7 @@ Despliegue un hilo para ver su instantánea detallada del intervalo elegido en l
 
 Al pulsar <Image src="/img/feature/icons/settings-icon.png" alt="Icono de ajustes" width={20} height={20}/> se abre un cuadro de diálogo con un interruptor:
 
-- **Thread Contention Monitoring**: activa la monitorización de contención de JMX en el `ThreadMXBean` de la instancia. Cuando está activado, la JVM registra cuánto tiempo pasó cada hilo en **BLOCKED** y **WAITING**, lo que habilita los campos `Blocked count` / `Blocked time` / `Waited count` / `Waited time` anteriores. Cuando está desactivado, esos cuatro campos permanecen en *Not Available*.
+- **Thread Contention Monitoring**: activa la monitorización de contención de JMX en el `ThreadMXBean` de la instancia. Cuando está activado, la JVM registra cuánto tiempo pasó cada hilo en **BLOCKED**, **WAITING** y **TIMED_WAITING**, y rellena los campos `Blocked time` y `Waited time` anteriores. Cuando está desactivado, solo esos dos campos de tiempo muestran *Not Available*. `Blocked count` y `Waited count` permanecen disponibles independientemente de este ajuste.
 
 La monitorización de contención tiene un coste medible en la JVM, por lo que normalmente se deja desactivada en las instancias de producción y solo se activa durante una investigación concreta.
 

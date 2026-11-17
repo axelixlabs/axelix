@@ -36,6 +36,10 @@ starter.
 | Dónde funciona | Solo en Kubernetes | En cualquier lugar desde el que el servicio pueda acceder a Master |
 | Cómo activarlo | `axelix.master.discovery.auto.enabled` en Master | `axelix.sbs.discovery.self-registration` en el servicio |
 
+El autorregistro también debe estar activado en Master. Su propiedad de aplicación `axelix.master.discovery.self-registration.enabled`
+tiene el valor predeterminado `true`, pero el chart oficial de Helm la desactiva de forma predeterminada. En despliegues con Helm,
+establezca `axelix.master.discovery.selfRegistration.enabled=true` en los valores del chart, también al combinar ambos modos de descubrimiento.
+
 Cuando Master se ejecuta en el mismo clúster de Kubernetes que los servicios, el descubrimiento automático no requiere configuración en estos.
 El autorregistro cubre el resto de casos, como máquinas virtuales, Docker Compose o redes que Master no puede explorar.
 
@@ -118,8 +122,11 @@ en cada exploración.
          │──────────────────────────────────────────────────▶│
          │                                                   │
          ╳  the service stops, heartbeats stop               │
-                                                             │  removed after 45 s
+                                                             │  removed on next eviction run
+                                                             │  after 45 s without a heartbeat
 ```
+
+El tiempo de espera predeterminado de las señales de actividad es de 45 segundos. Master elimina las instancias obsoletas en la siguiente ejecución de expulsión, que se realiza cada minuto de forma predeterminada, en lugar de hacerlo inmediatamente al vencer el tiempo de espera.
 
 Con un starter anterior a 1.3.0, cada mensaje de actividad es un registro completo.
 

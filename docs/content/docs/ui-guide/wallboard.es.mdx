@@ -40,7 +40,7 @@ El campo de búsqueda sobre la cuadrícula filtra tarjetas por nombre de servici
 El botón **+ Add filter**, junto a la búsqueda, abre un panel emergente con tres campos:
 
 - **Field**: uno de **Spring Boot**, **Java**, **Spring Framework** o **Kotlin**.
-- **Comparison**: **Equal**, **Less than or equal** o **Greater than or equal**. La comparación interpreta las versiones semánticas, por lo que `<= 3.2` coincide con `3.1.x` y `3.2.x`, pero no con `3.3.x`.
+- **Comparison**: **Equal**, **Less than or equal** o **Greater than or equal**. La comparación interpreta las versiones semánticas, por lo que `<= 3.2` interpreta el parche omitido como cero: coincide con `3.1.x` y `3.2.0`, pero no con `3.2.1` ni versiones posteriores.
 - **Value**: una versión obtenida de las instancias actuales del conjunto de aplicaciones. Solo se ofrecen versiones que existen en al menos una tarjeta, de modo que no se puede crear un filtro sin coincidencias.
 
 Guardar el filtro añade una etiqueta eliminable entre la búsqueda y la cuadrícula, reduce las tarjetas mostradas y escribe el filtro en la URL como parámetro de consulta `?f=Field:Operator:Value`. Las URL de Wallboard con filtros se pueden guardar como marcadores y compartir. Repita la acción para añadir más filtros: una tarjeta solo aparece si cumple todos los filtros activos.

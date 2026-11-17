@@ -119,45 +119,30 @@ deben actualizar al menos a **Java 11**.
 
 ## Compatibilidad entre componentes [#compatibility-between-components]
 
-Axelix se [publica de forma coordinada](#one-version-for-every-component), pero nada obliga a **actualizar** todos los componentes a la vez:
-en un despliegue real puede actualizar Master al último parche antes que los servicios o actualizar el starter de un servicio
-sin cambiar el resto. Para estos despliegues mixtos hay una única regla, aplicable a **todos** los componentes de Axelix:
+Axelix se [publica de forma coordinada](#one-version-for-every-component), pero puede **actualizar** los componentes en momentos distintos. Se aplican dos reglas de compatibilidad:
 
-> **Se garantiza la compatibilidad entre dos componentes de Axelix siempre que compartan las mismas versiones `major` y `minor`.
-> La versión de parche es irrelevante.**
+- **Master y starter:** dentro de una misma versión principal, Master admite starters de las últimas **4 versiones menores, incluida la suya**. El starter no debe tener una versión menor más reciente que Master. Esta ventana se aplica desde Axelix 1.1; consulte [Actualización de Axelix](./upgrading.mdx).
+- **Starter y plugin de compilación:** dentro de un servicio, ambos deben compartir la misma versión `major.minor`.
 
-Ese es todo el contrato. Cubre todas las combinaciones a la vez (Master con un starter, un starter con su plugin o todos
-juntos), por lo que no necesita una matriz de compatibilidad. Basta con alinear `major.minor`.
+**Las versiones de parche no afectan a ninguna de las dos reglas.**
 
-- ✅ Master `1.4.2`, starter `1.4.5`, plugin `1.4.0`: todos en `1.4`, compatibilidad garantizada.
+- ✅ Master `1.4.2`, starter `1.4.5`, plugin `1.4.0`: compatibilidad garantizada.
 - ✅ Starter `1.4.3` con plugin `1.4.0`: mismo `1.4`, compatibilidad garantizada.
-- ⚠️ Master `1.4.2` con starter `1.3.4`: **diferencia de versión menor**, sin garantía. Puede funcionar o fallar.
-- ⚠️ Starter `3.1.x` con plugin `3.3.x`: **diferencia de versión menor**, sin garantía ni soporte.
-- ⚠️ Cualquier diferencia de versión **principal**: sin garantía y con menos probabilidades de funcionar que una diferencia de versión menor.
+- ✅ Master `1.4.2` con starter `1.3.4`: dentro de la ventana `1.1`–`1.4` de Master, compatibilidad garantizada.
+- ⚠️ Master `1.4.x` con starter `1.0.x` o `1.5.x`: fuera de la ventana admitida.
+- ⚠️ Starter `3.1.x` con plugin `3.3.x`: distintas versiones menores, sin garantía ni soporte.
+- ⚠️ Master y starter con distintas versiones principales: fuera de la ventana de compatibilidad; siga la guía de migración de versión principal.
 
-Si los componentes difieren en la versión **menor** o **principal**, no garantizamos **nada**. La combinación podría funcionar,
-pero también podría fallar y no se prueba. La política más sencilla, facilitada por la publicación coordinada, es mantener
-todo en la misma versión exacta `X.Y.Z`, aunque el contrato real solo exige `major.minor`.
+Mantener todos los componentes en la misma versión exacta `X.Y.Z` es la política más sencilla. Si actualiza los componentes por separado, mantenga cada starter dentro de la ventana admitida por Master y alineado con su plugin.
 
 ### Por qué las diferencias de parche son seguras y las de versión menor o principal no [#why-patch-drift-is-safe-but-minormajor-drift-is-not]
 
-Esta política parte del supuesto de que **toda la funcionalidad expuesta por los componentes se utiliza mediante la
-interfaz web de Axelix Master**. No hay un caso en el que se aumente la versión **menor** de un componente aislado para
-habilitar una capacidad: esa capacidad se presenta mediante Master, no mediante el componente por separado. Por eso,
-nos permitimos **revisar los contratos entre componentes en las versiones menores**, lo que permite avanzar al proyecto
-con rapidez.
+Los contratos entre un starter y su plugin de compilación pueden cambiar entre versiones menores, por lo que solo se admiten versiones `major.minor` coincidentes. La comunicación entre Master y el starter tiene la ventana más amplia de cuatro versiones menores descrita arriba.
 
-Las versiones de parche son diferentes. Como indica [semver](https://semver.org/), un parche puede incluir una **corrección de una CVE
-crítica, una corrección de errores o una mejora de rendimiento**, y esos cambios tienen valor **por sí mismos**. Un parche
-vuelve a publicar **todos los componentes** con la nueva versión, pero la corrección real suele afectar solo a algunos.
-Por eso, actualizar únicamente el componente afectado y dejar los demás en un parche anterior es una combinación que se utiliza
-realmente y cuya compatibilidad garantizamos.
+Las versiones de parche pueden incluir una **corrección de una CVE crítica, una corrección de errores o una mejora de rendimiento**. Un parche vuelve a publicar **todos los componentes**, aunque la corrección real suele afectar solo a algunos. Actualizar únicamente un componente afectado y dejar los demás en un parche anterior sigue siendo compatible conforme a las dos reglas anteriores.
 
-:::warning[Las diferencias menores y principales pueden romper los protocolos de interacción]
-**Podemos** (esto **no** significa que **vayamos** a hacerlo, sino que **podemos**) revisar los protocolos entre componentes (Master ↔
-starter, plugin ↔ starter) entre versiones **menores**, y con mayor motivo entre **principales**. Esto significa que cualquier combinación
-que cruce una versión menor **puede** fallar. No significa que **vaya** a hacerlo, pero **puede**, y no garantizamos lo contrario.
-Mantenga todos los componentes en la misma versión principal **y** menor y permita únicamente diferencias de parche.
+:::warning[Mantenga cada combinación dentro de su intervalo admitido]
+No ejecute un starter con una versión menor más reciente que Master ni con más de tres versiones menores de retraso, y no mezcle versiones principales entre Master y starter. La ventana entre Master y starter no se aplica a la compatibilidad entre starter y plugin: mantenga esos dos componentes en la misma versión `major.minor`.
 :::
 
 ## Garantías de compatibilidad con versiones anteriores [#backward-compatibility-guarantees-between-releases]
@@ -189,7 +174,7 @@ Puede depender de las **propiedades** de Master (nombres, valores predeterminado
 ### Starters [#starters]
 
 Los starters **sí** se utilizan como bibliotecas. Son starters de Spring Boot, por lo que incorporan autoconfiguraciones con beans
-a la aplicación (conexiones de arranque, estrategia interna de proxies, etc.). Esta realidad determina dos reglas.
+a la aplicación (configuración de componentes durante el arranque, estrategia interna de proxies, etc.). Esta realidad determina dos reglas.
 
 **No sustituya los beans de Axelix.** Deliberadamente **no** permitimos que los usuarios sustituyan los beans internos declarados por Axelix
 para modificar el arranque, la estrategia de proxies u otros detalles internos. Es una decisión

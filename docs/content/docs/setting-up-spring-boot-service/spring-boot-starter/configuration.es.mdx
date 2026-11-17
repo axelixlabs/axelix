@@ -329,7 +329,7 @@ El starter expone los siguientes endpoints:
     </tr>
     <tr>
         <td><code>axelix-ping</code></td>
-        <td>Datos de estado, memoria y transacciones que Master consulta para las instancias que ya conoce</td>
+        <td>Actualizaciones de estado, memoria y transacciones que Master consulta para instancias ya conocidas y descubiertas automáticamente. Necesario para el sondeo; las instancias autorregistradas envían actualizaciones mediante señales de actividad.</td>
         <td><code>1.3.0</code></td>
     </tr>
     <tr>
@@ -532,10 +532,7 @@ ello. El starter registra estos medidores:
 | `axelix_cache_enabled` | `Gauge` | `cache` | Estado actual de cada caché ampliada durante la ejecución: `1` si está activada, `0` si está desactivada. |
 </div>
 
-Estos medidores complementan los endpoints Actuator utilizados por la interfaz, no los sustituyen. La interfaz sigue leyendo
-`axelix-metrics` y `axelix-caches`. Los datos de supervisión de transacciones no se sirven mediante un endpoint Actuator dedicado:
-viajan a Master como parte de los metadatos de registro de la instancia expuestos mediante `axelix-metadata` (véase
-[Supervisión de transacciones](#transaction-monitoring)).
+Estos medidores complementan los endpoints Actuator utilizados por la interfaz, no los sustituyen. La interfaz sigue leyendo `axelix-metrics` y `axelix-caches`. La información inicial sobre transacciones se incluye en los metadatos de registro; las actualizaciones posteriores utilizan `axelix-ping` cuando Master sondea starters desde 1.3.0, o señales de actividad enviadas por las instancias autorregistradas. No hay ningún endpoint de Actuator específico para transacciones; véase [Supervisión de transacciones](#transaction-monitoring).
 
 ## Compartir la clave de firma JWT con Master [#share-the-jwt-signing-key-with-master]
 
@@ -649,8 +646,7 @@ axelix.sbs.discovery.heartbeat-interval=15s
 
 Algunos detalles que suelen causar confusión:
 
-- `instance-actuator-url` es la URL **base** del servicio tal como Master accederá a él desde su propia red: solo host y
-  puerto.
+- `instance-actuator-url` es la URL del servicio tal como Master accederá a él desde su propia red, incluida la ruta base configurada de Actuator, normalmente `/actuator`.
 - `master-url` es la URL **completa**, incluido `/api/internal/service/register`. El starter la utiliza sin modificarla para sus envíos.
   Master escucha en `2935` por defecto desde Axelix `1.2.0`; antes de esa versión, el puerto predeterminado era `8080`. Consulte
   [General](../../setting-up-master-ui/configuring-master/configuring-master.mdx#general).
@@ -695,6 +691,7 @@ axelix:
           - database.password
           - spring.datasource.password
           - jwt.signing-key
+          - axelix.sbs.auth.jwt.signing-key
 ```
 
   </Tab>
@@ -704,6 +701,7 @@ axelix:
 axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
 axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
 axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+axelix.sbs.endpoints.config.sanitized-properties[3]=axelix.sbs.auth.jwt.signing-key
 ```
 
   </Tab>
@@ -799,9 +797,9 @@ las señales se rechazan con `401`.
 |----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | `axelix.sbs.discovery.self-registration`     | `false`                                              | Interruptor principal. Establézcalo en `true` para activar el autorregistro; mantenga `false` para depender del descubrimiento automático desde Master. |
 | `axelix.sbs.discovery.master-url`            | *(sin establecer)* <span className="Required">obligatoria</span> | URL completa del endpoint de autorregistro de Master, por ejemplo `http://master:2935/api/internal/service/register`. Obligatoria cuando `self-registration=true`. |
-| `axelix.sbs.discovery.instance-actuator-url` | *(sin establecer)* <span className="Required">obligatoria</span> | URL base de este servicio tal como es accesible desde Master (es necesario especificar el sufijo `/actuator`). Obligatoria cuando `self-registration=true`. |
+| `axelix.sbs.discovery.instance-actuator-url` | *(sin establecer)* <span className="Required">obligatoria</span> | URL de este servicio accesible desde Master, incluida la ruta base configurada de Actuator (normalmente `/actuator`). Obligatoria cuando `self-registration=true`. |
 | `axelix.sbs.discovery.instance-name`         | *(sin establecer)* <span className="Required">obligatoria</span> | Nombre visible en la interfaz de Axelix y en las respuestas MCP. Obligatorio cuando `self-registration=true`. |
-| `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                | Intervalo entre señales de actividad. Debe ser menor que el `heartbeat-timeout` de expulsión de Master. |
+| `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                | Intervalo entre señales de actividad. Debería ser menor que el `heartbeat-timeout` de expulsión de Master. |
 
 </div>
 
@@ -909,11 +907,7 @@ El starter comprueba el valor una vez iniciada la aplicación. Si es `0` o negat
 
 ### Supervisión de transacciones [#transaction-monitoring]
 
-La supervisión de transacciones proporciona los datos de la página Transaction Control y los medidores asociados: envuelve los
-métodos `@Transactional`, crea un proxy de la fuente de datos para contar consultas, limpia la pila de transacciones por solicitud y
-registra el integrador N+1 de Hibernate. Los análisis recopilados viajan a Master dentro de los metadatos de registro de
-la instancia (expuestos mediante `axelix-metadata`), por lo que no hay un endpoint Actuator independiente que exponer. Está **activada por
-defecto** cuando el starter está en el classpath.
+La supervisión de transacciones proporciona los datos de la página Transaction Control y los medidores asociados: envuelve los métodos `@Transactional`, crea un proxy de la fuente de datos para contar consultas, limpia la pila de transacciones por solicitud y registra el integrador N+1 de Hibernate. El registro inicial incluye la información recopilada. Las actualizaciones posteriores utilizan `axelix-ping` cuando Master sondea starters desde 1.3.0, o señales de actividad enviadas por las instancias autorregistradas; los starters anteriores siguen proporcionando los metadatos de registro completos. Exponga `axelix-ping` para sondear starters desde 1.3.0; no se necesita ningún endpoint adicional específico para transacciones. La supervisión de transacciones está **activada por defecto** cuando el starter está en el classpath.
 
 La supervisión de transacciones solo funciona en aplicaciones servlet (Spring MVC). En una aplicación reactiva (WebFlux), el starter
 no la activa, independientemente del valor de la propiedad. Consulte [Aplicaciones reactivas (WebFlux)](#reactive-webflux-applications).

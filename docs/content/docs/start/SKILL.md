@@ -158,10 +158,21 @@ authentication. What to know:
 Add the exclusion the way the project already configures Security. If there is no fitting place, add this bean to
 a servlet app:
 
+For Spring Boot 3/4 (Spring Security 6/7):
+
 ```java
 @Bean
 public WebSecurityCustomizer axelixWebSecurityCustomizer() {
     return (web) -> web.ignoring().requestMatchers("BASE/axelix-*/**");
+}
+```
+
+For Spring Boot 2.7 (Spring Security 5.7), use `antMatchers` instead:
+
+```java
+@Bean
+public WebSecurityCustomizer axelixWebSecurityCustomizer() {
+    return (web) -> web.ignoring().antMatchers("BASE/axelix-*/**");
 }
 ```
 

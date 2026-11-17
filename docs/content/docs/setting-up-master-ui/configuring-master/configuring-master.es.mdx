@@ -28,8 +28,8 @@ iniciarse.
 
 :::warning
 Las credenciales predeterminadas de superadministrador (`admin / admin`) otorgan control total sobre todos los servicios descubiertos por Master, y
-la clave de firma JWT integrada es públicamente conocida, por lo que cualquiera puede utilizarla para falsificar una sesión. Sustituya ambas, junto con `axelix.master.auth.cookie.secure` si sirve
-la aplicación mediante HTTPS, antes de exponer Master a otras personas.
+la clave de firma JWT integrada es públicamente conocida, por lo que cualquiera puede utilizarla para falsificar una sesión. Sustituya las credenciales y la clave de firma y, si sirve la aplicación mediante HTTPS, establezca
+`axelix.master.auth.cookie.secure` en `true` antes de exponer Master a otras personas.
 :::
 
 ### Cómo proporcionar propiedades [#supplying-properties]
@@ -567,6 +567,22 @@ que se incluyen *en* la señal (`master-url`, `instance-actuator-url`, `instance
 
 </div>
 
+### Paneles [#dashboards]
+
+<ReleasedInNotice version="1.3.1" />
+
+Los paneles muestran datos en caché en lugar de resultados en directo. Master actualiza la caché al iniciarse y, de forma predeterminada, cada cinco minutos; los cambios en las aplicaciones aparecen después de la siguiente actualización correcta. Recargar la página de un panel no actualiza la caché.
+
+Utilice `axelix.master.dashboard.refresh-schedule` para cambiar la programación de actualización.
+
+<div className={styles.ConfigTable}>
+
+| Propiedad | Valor predeterminado | Descripción |
+|----------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------|
+| `axelix.master.dashboard.refresh-schedule` | `0 */5 * * * *` | Expresión cron que recarga la caché de todos los paneles. |
+
+</div>
+
 ### Servidor MCP [#mcp-server]
 
 <div className={styles.ConfigTable}>
@@ -868,6 +884,8 @@ docker.io/axelixlabs/axelix@sha256:<digest>
 
 Una ejecución mínima, adecuada para una primera prueba:
 
+La publicación en loopback del host sirve para pruebas locales. Los contenedores de la misma red Docker deben acceder a Master por el nombre del contenedor/servicio y el puerto `2935`. Un contenedor que use host-gateway necesita una interfaz del host accesible desde él; una publicación solo en loopback no es accesible por esa dirección.
+
 <Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
   <Tab value="Docker GHCR">
 
@@ -875,7 +893,7 @@ Una ejecución mínima, adecuada para una primera prueba:
   <Tab value="Clave integrada (prueba local)">
 
 ```bash
-docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+docker run --rm -p 127.0.0.1:2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
 Sin propiedades JWT establecidas, Master utiliza la clave de firma integrada. Utilice esta opción solo para una prueba local; consulte [Ejecución sin
@@ -901,7 +919,7 @@ docker run --rm -p 2935:2935 \
   <Tab value="Clave integrada (prueba local)">
 
 ```bash
-docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+docker run --rm -p 127.0.0.1:2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
 Sin propiedades JWT establecidas, Master utiliza la clave de firma integrada. Utilice esta opción solo para una prueba local; consulte [Ejecución sin
@@ -938,8 +956,8 @@ que mantiene los secretos fuera del registro de inicio.
 
 #### Variables de entorno individuales [#individual-environment-variables]
 
-Proporcionar configuración mediante variables de entorno individuales sigue las reglas de vinculación flexible de [Cómo proporcionar
-propiedades](#supplying-properties), pasadas con `-e`. Es lo que utiliza el comando de ejecución anterior:
+Las variables de entorno individuales se pasan con `-e` y sus nombres siguen las reglas de vinculación flexible de
+[Cómo proporcionar propiedades](#supplying-properties). Es lo que utiliza el comando de ejecución anterior:
 
 <Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
   <Tab value="Docker GHCR">
@@ -1241,7 +1259,7 @@ helm install axelix axelix/axelix \
   --values values.yaml
 ```
 
-Guarde sus valores personalizados —como mínimo `axelix.master.auth.jwt.signing-key`, la contraseña del superadministrador y la conexión
+Guarde sus valores personalizados —como mínimo `axelix.master.auth.jwt.signingKey`, la contraseña del superadministrador y la conexión
 de base de datos— en `values.yaml`. El chart configura la ServiceAccount y el RBAC necesarios para el descubrimiento automático dentro del clúster.
 
 Exponga el Service mediante el mecanismo habitual de su clúster —un `Ingress` o un `Gateway`— para realizar una comprobación rápida.
