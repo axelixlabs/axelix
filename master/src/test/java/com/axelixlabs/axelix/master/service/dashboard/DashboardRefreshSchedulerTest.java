@@ -61,7 +61,8 @@ class DashboardRefreshSchedulerTest {
         void shouldPopulateDashboardCachesOnApplicationStartup() {
             // when / then.
             for (String dashboard : DASHBOARDS) {
-                assertThat(Objects.requireNonNull(cacheManager.getCache(dashboard)).get(SimpleKey.EMPTY))
+                assertThat(Objects.requireNonNull(cacheManager.getCache(dashboard))
+                                .get(SimpleKey.EMPTY))
                         .as(dashboard)
                         .isNotNull();
             }
@@ -83,16 +84,16 @@ class DashboardRefreshSchedulerTest {
             for (String dashboard : DASHBOARDS) {
                 previous.put(
                         dashboard,
-                        Objects.requireNonNull(
-                                        Objects.requireNonNull(cacheManager.getCache(dashboard)).get(SimpleKey.EMPTY))
+                        Objects.requireNonNull(Objects.requireNonNull(cacheManager.getCache(dashboard))
+                                        .get(SimpleKey.EMPTY))
                                 .get());
             }
 
             // when / then.
             await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
                 for (String dashboard : DASHBOARDS) {
-                    assertThat(Objects.requireNonNull(
-                                            Objects.requireNonNull(cacheManager.getCache(dashboard)).get(SimpleKey.EMPTY))
+                    assertThat(Objects.requireNonNull(Objects.requireNonNull(cacheManager.getCache(dashboard))
+                                            .get(SimpleKey.EMPTY))
                                     .get())
                             .as(dashboard)
                             .isNotSameAs(previous.get(dashboard));
