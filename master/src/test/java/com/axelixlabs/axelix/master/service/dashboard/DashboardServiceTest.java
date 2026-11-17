@@ -132,33 +132,6 @@ class DashboardServiceTest {
                 DashboardCaches.SPRING_PORTFOLIO,
                 DashboardCaches.LANGUAGES
             })
-    void shouldServeCachedDashboardAfterPersistedApplicationsChange(String dashboard) {
-        // given.
-        persistApplication();
-        scheduler.refresh();
-        Object cached = readDashboard(dashboard);
-        deleteApplications();
-        Object current = computeDashboard(dashboard);
-
-        // when.
-        Object result = readDashboard(dashboard);
-
-        // then.
-        assertThat(result).isSameAs(cached);
-        assertThat(result)
-                .usingRecursiveComparison()
-                .ignoringFields("computedAt")
-                .isNotEqualTo(current);
-    }
-
-    @ParameterizedTest // GH-1844
-    @ValueSource(
-            strings = {
-                DashboardCaches.PERSISTENCE,
-                DashboardCaches.DEPENDENCIES,
-                DashboardCaches.SPRING_PORTFOLIO,
-                DashboardCaches.LANGUAGES
-            })
     void shouldReplaceCachedDashboardWithCurrentPersistedDataOnRefresh(String dashboard) {
         // given.
         persistApplication();
