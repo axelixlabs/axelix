@@ -1,0 +1,135 @@
+---
+title: Motivation
+description: "Dieses Dokument erläutert die zentralen Probleme, die Axelix für Spring-Boot-Entwickler und Organisationen löst. Praxisbeispiele zeigen die Schwierigkeiten, die zur Entwicklung von Axelix führten."
+---
+
+Axelix vereint Laufzeitanalyse, Fehlerbehebung und die Weiterentwicklung von Ökosystemen in einer quelloffenen, KI-nativen Plattform.
+Teams müssen sowohl die Abläufe innerhalb eines Services als auch die Weiterentwicklung ihrer Systemlandschaft verstehen.
+Dazu gehören das Erkennen von Fehlkonfigurationen, die Bewertung des Zustands von Abhängigkeiten, die Verfolgung von Java- und Spring-Boot-Migrationen sowie die Steuerung geplanter Aufgaben. Axelix ermöglicht Entwicklern und KI-Agenten, über die Weboberfläche und den integrierten MCP-Server an diesen Abläufen mitzuwirken. Eine Übersicht bietet die [Einführung](./introduction.mdx).
+
+## Motivation: Prolog
+
+Ein typisches Großunternehmen hat viel intern entwickelte Software. Sie löst unterschiedliche Probleme und ist meist in mehreren Programmiersprachen wie JavaScript, Java oder Go geschrieben. Eine der beliebtesten Sprachen für serverseitige Backend-Anwendungen in Großunternehmen [ist Java](https://en.wikipedia.org/wiki/Programming_languages_used_in_most_popular_websites), insbesondere im Bankwesen.
+
+Das beliebteste Framework für Java-Backend-Anwendungen [ist zweifellos Spring Boot](https://en.wikipedia.org/wiki/Spring_Boot). Es bildet eine zusätzliche Schicht über dem [Spring Framework](https://spring.io/) und vereinfacht dessen Konfiguration. Aus verschiedenen Gründen ist es für Unternehmen die mit Abstand häufigste Wahl. Beispielsweise hat Netflix [sein Ökosystem mit mehr als 3000 Anwendungen auf Spring Boot 3 migriert](https://www.youtube.com/watch?v=IMGcD08rdVw). Spring Boot ist also eine sehr verbreitete Wahl für Java-Backend-Anwendungen.
+
+## Motivation: Die Schwierigkeiten
+
+Spring Boot begann als zusätzliche Abstraktionsschicht über dem Spring Framework, ist inzwischen aber wesentlich mehr. Alle Java-Anwendungen auf Spring Boot arbeiten mit denselben Spring-Boot-Abstraktionen.
+
+Zum Beispiel:
+- Jede Java-Anwendung mit Spring Boot besteht aus _Beans_, also Java-Objekten, deren Verwaltung in gewissem
+  Umfang
+  vom Spring Framework übernommen wird.
+- Jede Spring-Boot-Anwendung hat einen `ApplicationContext`, dessen Hauptaufgabe die Verwaltung der Beans der
+  Anwendung
+  und des Gesamtzustands der laufenden Spring-Boot-Anwendung ist.
+- Jede Spring-Boot-Anwendung hat zahlreiche Eigenschaften, die aus unterschiedlichen Quellen stammen können,
+  etwa einer Datei `application.properties`, der Betriebssystem-Prozessumgebung oder Java-Systemeigenschaften.
+
+Spring ist umfangreich und bringt viele zusammenwirkende Bestandteile mit: Eigenschaften beeinflussen beispielsweise die Bean-Erstellung, und erstellte Beans können weitere Eigenschaften bereitstellen.
+
+**Ein zentraler Grund für dieses Projekt: Selbst wenn eine Spring-Boot-Anwendung lokal erwartungsgemäß funktioniert und alle Tests bestehen, bedeutet das keineswegs, dass sie auch in einer Produktions- oder Testumgebung einwandfrei läuft. Wir wissen alle, dass man sich darauf nicht einfach verlassen kann.**
+
+Als Java-Entwickler mit Spring Boot begegnen wir nach der Bereitstellung unserer Anwendungen immer wieder denselben Problemen. Einige Beispiele verdeutlichen dies.
+
+### Beispiel 1: Fein abgestimmtes Logging
+
+Um zu verstehen, was Axelix lösen möchte, betrachten wir etwas Java-Code. Stellen Sie sich folgende Klasse in unserer Anwendung vor. Sie ist eine Spring Bean, mit der wir die Berechtigungen eines hypothetischen Kunden ermitteln:
+
+```java
+@Slf4j
+@Service
+public class PermissionsResolver {
+
+    @Value("${permission.caching.enabled:true}")
+    private boolean cacheLookupsEnabled;
+
+    @Autowired
+    private ExternalPermissionsResolver delegate;
+
+    @Autowired
+    private PermissionsCache cache;
+
+    @PostConstruct
+    void init() {
+        log.debug("Permissions cache lookup enabled: {}", cacheLookupsEnabled);
+    }
+
+    public Set<Permission> resolveClientPermissions(Client client) {
+        log.debug("Resolving permissions for the client {}", client.getId());
+
+        try {
+            return delegate.resolve(client);
+        } catch (SomeExpectedException e) {
+            // if we can, we do a cache lookup
+            if (featureFlag && client.getStatus() == ClientStatus.EXISTING) {
+                return cache.get(client.getId());
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+```
+
+Wir haben diesen Code und die zugehörigen Tests geschrieben und lokal getestet. Alles funktionierte. Nun stellen wir ihn in unserer Sandbox-Umgebung bereit.
+
+Doch nach Murphys Gesetz gilt:\ ***Alles, was schiefgehen kann, wird schiefgehen.***\ In der Sandbox-/Testumgebung funktioniert etwas nicht richtig. Lokal hat es funktioniert, in der Testumgebung plötzlich nicht mehr. Zwar enthält die Klasse Log-Anweisungen, die beim Verständnis der Abläufe helfen würden, aber diese nutzen `DEBUG`, während nur `INFO` aktiviert ist. **Es wäre hilfreich, das Log-Level vorübergehend (!) zur Laufzeit nur für diese Java-Klasse oder ein bestimmtes Java-Paket ändern zu können.** Natürlich könnten wir das Log-Level in der Anwendungskonfiguration ändern und die Anwendung erneut bereitstellen. Aber möchten wir für einen Blick in die Logs wirklich den gesamten Build- und Bereitstellungsprozess durchlaufen? Und wenn die Logs nicht helfen: erneut bauen und bereitstellen?
+
+**Bei Axelix kennen wir dieses Problem sehr gut.** Wir möchten einen Weg bieten, es zu lösen.
+
+### Beispiel 2: Konfigurationsquellen
+
+Angenommen, wir konnten das erste Problem lösen und über die Axelix-Oberfläche Logging für genau diese Java-Klasse aktivieren. Nun haben wir ein weiteres Problem. Wir haben erkannt, dass ein falscher Wert in `cacheLookupsEnabled` injiziert wurde. Für den Kunden _XYZ_ erwarteten wir Daten aus dem Cache, doch dazu kam es nicht, weil `cacheLookupsEnabled` auf `false` gesetzt war.
+
+Was tun wir nun? Wir wissen lediglich, dass die Eigenschaft auf `false` steht und wir sie nicht so gesetzt haben. Also muss sie _irgendwo_ in einer Konfigurationsquelle unserer Anwendung auf `false` gesetzt worden sein. Aber wo genau?
+
+**Seien wir ehrlich: Als Entwickler in einem Großunternehmen wissen wir nicht immer genau, wie unsere Anwendung in der Umgebung bereitgestellt wird.** Wir verstehen nicht immer vollständig, wie sie in einen Docker-Container verpackt und per Helm-Chart in unseren K8S-Clustern bereitgestellt wird oder welche zusätzlichen Konfigurationsquellen angewendet werden. **Wir haben _ein gewisses_ Verständnis der Bereitstellung, doch es ist unvollständig. Darin liegt das zentrale Problem.**
+
+Axelix zeigt nicht nur, aus welcher Konfigurationsquelle der Wert einer Eigenschaft stammt. Es bietet auch Möglichkeiten, den Wert in der laufenden Java-Anwendung zu ändern, indem der Anwendungskontext in der laufenden JVM neu geladen wird — ohne erneuten Build oder erneute Bereitstellung.
+
+### Beispiel 3: Anwendungszustand
+
+Wir haben `cacheLookupsEnabled` nun auf `true` gesetzt. Jetzt sollte alles funktionieren, oder? **Falsch.** Es funktioniert weiterhin nicht, denn `PermissionsCache` ist tatsächlich ein Interface:
+
+```java
+
+public interface PermissionsCache {
+
+    Set<Permission> get(UUID clientId);
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "in-memory", matchIfMissing = true)
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class InMemoryPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "redis")
+@ConditionalOnRedisPresent
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class RedisPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+```
+
+Es kommt häufig vor, dass ein `interface` einen Vertrag definiert und verschiedene Implementierungen als Spring Beans existieren. Wir erwarten, dass diese Beans nur bei bestimmten erfüllten Bedingungen initialisiert werden. `ConditionalOnProperty`, `ConditionalOnMissingBean` und ähnliche Annotationen kennt praktisch jeder Spring-Entwickler.
+
+Angenommen, wir erwarteten die Berechtigungen des Kunden aus dem Redis-Cache statt aus einer In-Memory-Datenstruktur. Tatsächlich wurde jedoch `InMemoryPermissionsCache` abgefragt. Sind wir überhaupt sicher, dass es `InMemoryPermissionsCache` war? Vielleicht liefert eine eingebundene Unternehmensbibliothek einen eigenen `ThreadSafeInMemoryPermissionsCache`? Wir möchten also folgende Fragen beantworten:
+
+- ***Welche*** Beans sind aktuell in der Spring-Anwendung aktiv?
+- ***Warum*** sind genau diese Beans aktiv und nicht andere?
+
+**Auch dabei hilft Axelix.**

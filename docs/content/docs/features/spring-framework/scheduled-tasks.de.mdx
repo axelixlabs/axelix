@@ -1,0 +1,175 @@
+---
+title: Geplante Aufgaben
+description: "Die Seite Scheduled Tasks listet alle @Scheduled-Aufgaben einer Spring Boot-Anwendung auf und zeigt die Ergebnisse ihrer letzten Ausführungen. Sie können Aufgaben außerdem aktivieren oder deaktivieren, ihren Zeitplan ändern und sie bei Bedarf ausführen."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Hauptseite der geplanten Aufgaben](/img/feature/scheduled-tasks/scheduled-tasks-main-page.png)
+
+</ScreenshotsNotice>
+
+***Scheduled Tasks in der Axelix-Benutzeroberfläche***
+
+Eine `@Scheduled`-Aufgabe läuft im Hintergrund. Dass sie fehlschlägt oder langsamer wird, fällt daher oft erst auf,
+wenn ihre Auswirkungen ausbleiben. Diese Seite zeigt alle geplanten Aufgaben der Anwendung und die Ergebnisse ihrer
+letzten Ausführungen. Außerdem können Sie ihren Zeitplan ohne erneute Bereitstellung ändern.
+
+Zum Aktivieren oder Deaktivieren einer Aufgabe, Bearbeiten ihres Triggers und Ausführen bei Bedarf ist die
+Berechtigung `scheduled-tasks:write` erforderlich. Sie gehört zu den integrierten Rollen **EDITOR**, **ADMIN** und
+**SUPER_ADMIN**. Benutzer ohne diese Berechtigung sehen dieselben Steuerelemente, Axelix deaktiviert sie jedoch und
+erklärt den Grund beim Bewegen des Mauszeigers darüber in einem Tooltip.
+
+## Was die Seite zeigt
+
+Die Aufgaben sind nach Trigger-Typ gruppiert:
+
+- **Cron**-Aufgaben laufen zu den durch einen Cron-Ausdruck beschriebenen Zeiten, etwa `0 0/15 9-17 * * MON-FRI`.
+- **Fixed delay**-Aufgaben warten nach dem Ende jeder Ausführung das angegebene Intervall ab. Ausführungen überschneiden sich daher nie.
+- **Fixed rate**-Aufgaben starten in festen Intervallen, jeweils ab dem Start der vorherigen Ausführung gerechnet.
+
+Sie können die Liste nach Klassen- oder Methodennamen durchsuchen. Neben jeder Aufgabe zeigt die Seite ihre
+Erfolgsquote über die gespeicherten Ausführungen. So fallen fehlschlagende Aufgaben auf, ohne sie zu öffnen. Eine
+Quote von mindestens 90 % gilt als gesund. Deaktivierte Aufgaben zeigen **OFF** statt einer Quote.
+
+Wenn Sie eine Aufgabe auswählen, zeigt die Seite ihren vollständigen Klassennamen und ihren Zeitplan in Worten,
+beispielsweise „Alle 3 Sekunden“. Bei Cron-Aufgaben steht neben der Beschreibung auch der Ausdruck selbst.
+
+## Ausführungsverlauf
+
+<ReleasedInNotice version="1.3.0" />
+
+Jede Ausführung wird erfasst, ob sie vom Zeitplan oder durch Klicken auf **Run now** gestartet wurde. Master sammelt
+die Ausführungen aller Instanzen der Anwendung; der Verlauf einer Aufgabe ist daher instanzübergreifend. Die
+Zusammenfassung umfasst alle gespeicherten Ausführungen:
+
+- **Last run**: wie lange der Start der letzten Ausführung zurückliegt.
+- **Success**: der Anteil der Ausführungen, die ohne Ausnahme beendet wurden.
+- **Failed**: die Anzahl der Ausführungen, die eine Ausnahme ausgelöst haben.
+- **Avg** und **p95**: die durchschnittliche Dauer und die Dauer, innerhalb derer 95 % der Ausführungen enden.
+  Ein deutlich über dem Durchschnitt liegender p95-Wert bedeutet, dass manche Ausführungen gelegentlich hängen bleiben.
+
+Das Diagramm **Duration** zeigt die letzten 30 Ausführungen von alt nach neu und markiert fehlgeschlagene Ausführungen.
+Die Balkenhöhe ist nicht linear, damit kurze Ausführungen neben einem langsamen Ausreißer sichtbar bleiben. Bewegen
+Sie den Mauszeiger über einen Balken, um Startzeit, Dauer und bei einem Fehler den Fehlertyp zu sehen.
+
+Wenn eine Aufgabe fehlgeschlagen ist, gruppiert **Failures by error type** die Fehler nach Ausnahmeklasse, beginnend
+mit der häufigsten. Für jede Gruppe sehen Sie die neueste Fehlermeldung und ihren Zeitpunkt. So erkennen Sie sofort,
+ob sich eine Ursache wiederholt oder die Fehler unabhängig voneinander auftreten.
+
+Die Tabelle **Executions** listet dieselben letzten 30 Ausführungen mit Startzeit, ausführender Instanz, Dauer und
+Ergebnis auf. Wechseln Sie zu **Failed**, um nur fehlgeschlagene Ausführungen zu sehen.
+
+Der Verlauf wird bei geöffneter Seite nicht automatisch aktualisiert. Wählen Sie die Aufgabe erneut aus, um neue
+Ausführungen zu sehen. Bis Master die erste Ausführung einer Aufgabe empfängt, erscheint statt des Verlaufs
+**No execution data for this task**.
+
+### Aufbewahrung des Ausführungsverlaufs
+
+Master speichert den Verlauf in seiner Datenbank und entfernt alte Ausführungen nach einem Zeitplan. Diese
+Master-Eigenschaften steuern die Aufbewahrung (siehe auch
+[Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx#verlauf-geplanter-aufgaben)):
+
+| Eigenschaft | Standardwert | Beschreibung |
+|-------------|--------------|--------------|
+| `axelix.master.scheduled-tasks.history.retention` | `30d` | Wie lange Master eine Ausführung aufbewahrt. Ältere Ausführungen werden bei der nächsten Bereinigung gelöscht. |
+| `axelix.master.scheduled-tasks.history.max-executions-per-task` | `50` | Wie viele der neuesten Ausführungen Master pro Aufgabe aufbewahrt. |
+| `axelix.master.scheduled-tasks.history.cleanup.schedule` | `0 */10 * * * *` | Cron-Ausdruck des Bereinigungsjobs. Standardmäßig läuft er alle 10 Minuten. |
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.master.scheduled-tasks.history.retention=7d
+axelix.master.scheduled-tasks.history.max-executions-per-task=100
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  master:
+    scheduled-tasks:
+      history:
+        retention: 7d
+        max-executions-per-task: 100
+```
+
+  </Tab>
+</Tabs>
+
+## Aufgaben verwalten
+
+Diese Aktionen gelten für die geöffnete Instanz. Andere Instanzen derselben Anwendung behalten ihren aktuellen
+Zustand und Zeitplan.
+
+### Aufgabe aktivieren oder deaktivieren
+
+Mit dem Schalter **ON** / **OFF** verhindern Sie die zeitplangesteuerte Ausführung einer Aufgabe, etwa während der
+Wartung eines nachgelagerten Systems. Axelix fragt zuvor nach einer Bestätigung. Wenn Sie eine Aufgabe während einer
+Ausführung deaktivieren, läuft diese Ausführung zu Ende; danach ignoriert die Aufgabe ihren Zeitplan.
+Schalten Sie sie wieder auf **ON**, um den Zeitplan fortzusetzen.
+
+### Trigger bearbeiten
+
+Klicken Sie auf **Edit trigger**, um den Ausführungszeitpunkt zu ändern. Der neue Zeitplan gilt sofort, ohne
+Anwendungsneustart.
+
+- Geben Sie bei einer Cron-Aufgabe einen neuen Ausdruck mit sechs Feldern ein: Sekunde, Minute, Stunde, Tag, Monat,
+  Wochentag. Axelix prüft den Ausdruck während der Eingabe. Die Vorschau zeigt die Ausführungszeiten (**Runs:**) oder
+  den Grund für einen ungültigen Ausdruck (**Invalid:**).
+- Geben Sie bei Fixed-delay- oder Fixed-rate-Aufgaben das neue Intervall als ganze Zahl von Millisekunden größer als 0 ein.
+
+**Apply trigger** bleibt deaktiviert, bis der Wert gültig ist und vom aktuellen Wert abweicht.
+
+### Aufgabe sofort ausführen
+
+Klicken Sie auf **Run now** und bestätigen Sie, um die Aufgabe einmal sofort auszuführen. Dies ändert ihren Zeitplan
+nicht. So können Sie einen fehlgeschlagenen Job erneut versuchen oder eine Korrektur prüfen, ohne auf den nächsten
+geplanten Lauf zu warten.
+
+## MCP-Tools
+
+Ein KI-Agent kann geplante Aufgaben auch über MCP untersuchen. Siehe den
+[MCP-Tool-Katalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#instanz-untersuchen).
+
+## Dedizierten Actuator-Endpunkt aktivieren
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Ab Axelix 1.2.0 ist dies nicht mehr erforderlich: Der Starter registriert seine eigenen Actuator-Endpunkte
+    selbst, und Axelix benötigt keine aktivierten <code>health</code>/<code>info</code>-Endpunkte mehr.
+    Es funktioniert auch ohne diese Endpunkte. Hier ist keine Konfiguration erforderlich.</>}
+/>
+
+Diese Seite verwendet den Actuator-Endpunkt `axelix-scheduled-tasks`, den der Axelix Spring Boot Starter bereitstellt.
+Geben Sie ihn über die üblichen Spring Boot Actuator-Eigenschaften frei. Die vollständige Liste der Axelix-Endpunkte
+und die zugehörige Einrichtung finden Sie unter [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-scheduled-tasks
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-scheduled-tasks
+```
+
+  </Tab>
+</Tabs>
+
+## Siehe auch
+
+- [Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

@@ -1,0 +1,70 @@
+---
+title: Dependency Health
+description: "Das Dashboard Dependency Health zeigt alle von den Anwendungen in der Systemlandschaft verwendeten Bibliotheken, ihre Versionsverteilung und welche nicht mehr aktiv weiterentwickelt werden."
+---
+
+<ReleasedInNotice version="1.3.0" />
+
+<ScreenshotsNotice text="Die Screenshots zeigen den neuesten Minor-Release von Axelix.">
+
+![Dashboard Dependency Health](/img/feature/dashboard/dashboard-dependency-health.png)
+
+</ScreenshotsNotice>
+
+***Dependency Health in der Axelix-Oberfläche***
+
+Dependency Health zeigt den Status der Bibliotheken Ihrer Anwendungen: welche nicht mehr aktiv weiterentwickelt werden, welche nur kritische Korrekturen erhalten und welche vermutlich überhaupt keine Korrekturen mehr bekommen. So wissen Sie frühzeitig, wo bei einer morgen veröffentlichten [CVE](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) wahrscheinlich kein Patch zu erwarten ist. Die Seite sucht nicht nach Schwachstellen und ändert nichts an Ihren Anwendungen. Sie macht Sie auf dieses Risiko aufmerksam, bevor es zum Problem wird.
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Eine Zusammenfassung zeigt, wie viele Anwendungen ihre Abhängigkeiten gemeldet haben und wie viele davon eine Bibliothek mit dem jeweiligen risikobehafteten Status verwenden:
+
+- **Discontinued**: Das Projekt hat das Entwicklungsende angekündigt oder sein Repository archiviert. Weitere Releases einschließlich Sicherheitskorrekturen sind nicht geplant.
+- **Maintenance mode**: Das Projekt hat erklärt, nur noch kritische Fehler und Sicherheitsprobleme zu beheben. Es ergänzt keine neuen Funktionen; in der Regel wird ein Nachfolger empfohlen.
+- **Dormant**: Seit längerer Zeit gab es keine Releases, und das Projekt hat weder einen Wartungsstatus noch ein Entwicklungsende erklärt. Es funktioniert möglicherweise noch, aber es ist niemand bekannt, der Fehler behebt.
+
+Darunter betrachtet die Seite dasselbe Risiko aus zwei Perspektiven. Zunächst die Anwendungen: wie viele eine riskante Abhängigkeit verwenden, welcher Anteil auf jeden Status entfällt und wie viele **None of these** verwenden. Eine Anwendung erscheint unter jedem zutreffenden Status. Verwendet sie sowohl eine eingestellte als auch eine ruhende Bibliothek, wird sie zweimal gezählt. Daher können sich die Prozentwerte auf mehr als 100 % summieren.
+
+Die zweite Perspektive sind die Bibliotheken: wie viele verwendete Bibliotheken riskant sind und welche Kategorien die meisten davon enthalten, etwa Persistence, Logging oder Security. Die Seite stellt die fünf Kategorien mit den meisten riskanten Bibliotheken grafisch dar.
+
+## Eine Bibliothek finden
+
+Die Liste beginnt mit den riskanten Bibliotheken. Innerhalb jeder Gruppe stehen die am weitesten verbreiteten zuerst, sodass Probleme mit den meisten betroffenen Anwendungen oben erscheinen. Für jede Bibliothek sehen Sie:
+
+- Ihren Status, wenn dieser risikobehaftet ist.
+- Ob das Projekt einen Nachfolger hat, wenn der Status risikobehaftet ist.
+- Ihre Kategorie.
+- Wie viele Anwendungen sie verwenden und welchen Anteil der Systemlandschaft dies ausmacht.
+
+Sie können die Liste nach Kategorie und Status eingrenzen. Wählen Sie beispielsweise **Discontinued** und die Kategorie Security, um Sicherheitsbibliotheken ohne weitere Korrekturen zu finden. Ein Klick auf eine Kategorie im Diagramm wendet denselben Kategoriefilter auf die Liste an.
+
+Eine Bibliothek ohne Status wird entweder aktiv entwickelt oder ist Axelix unbekannt; siehe [Funktionsweise](#funktionsweise). Unbekannte Bibliotheken haben weder Kategorie noch Status und werden daher von jedem Kategorie- oder Statusfilter ausgeblendet.
+
+## Bibliotheksdetails
+
+Klappen Sie eine Bibliothek auf, um über das weitere Vorgehen zu entscheiden. Bei einer riskanten Bibliothek sehen Sie:
+
+- Eine Zusammenfassung des Projektstatus.
+- Das Nachfolgeprojekt oder die empfohlene Alternative, sofern vorhanden.
+- Einen Link zur Upstream-Seite, die den Status belegt.
+
+Für jede Bibliothek sehen Sie außerdem die verwendeten Versionen von der neuesten bis zur ältesten, die Anzahl der Anwendungen pro Version und deren Anteil an allen Anwendungen dieser Bibliothek. So erkennen Sie auch bei einer aktiv gepflegten Bibliothek den Versionsrückstand und wie viele Anwendungen von einem Upgrade betroffen wären.
+
+## Funktionsweise
+
+Beim Build schreibt das [Axelix-Build-Plugin](../../setting-up-spring-boot-service/build-plugin/configuration.mdx) den Laufzeit-Abhängigkeitsgraphen als [CycloneDX-SBOM](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx#abhängigkeits-sbom-gradle) in das Anwendungsarchiv. Die Anwendung meldet diese SBOM einmal bei ihrer Registrierung an Master. Eine spätere Meldung derselben Anwendung ersetzt die vorherige. Die Seite spiegelt somit den zuletzt registrierten Build wider. Beim Öffnen berechnet Master die Zahlen aus den gespeicherten Meldungen.
+
+Eine Anwendung wird unabhängig von der Anzahl ihrer Instanzen einmal gezählt. Meldet sie keine Daten mehr, bleibt sie mit ihren zuletzt gemeldeten Abhängigkeiten auf der Seite.
+
+Nur Anwendungen mit Axelix-[Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) ab Version 1.3.0 melden ihre Abhängigkeiten bei der Registrierung; ältere Versionen werden nicht gezählt. Hat keine Anwendung Abhängigkeiten gemeldet, weist die Seite auf fehlende Daten hin. Zum Upgrade siehe [Axelix aktualisieren](../../more/upgrading.mdx).
+
+Master gleicht Bibliotheken mit seinem Projektkatalog ab. Der Status gehört zum Projekt hinter der Bibliothek, nicht zu einer bestimmten Version. Ein Upgrade einer eingestellten Bibliothek auf ihre neueste Version ändert daher ihren Status nicht. Eine Bibliothek, deren Projekt nicht im Katalog steht, etwa eine interne Bibliothek Ihrer Organisation, zählt weiterhin zur Gesamtzahl. Axelix macht damit keine Aussage über sie; dies bedeutet nicht, dass das Projekt gesund ist.
+
+## Siehe auch
+
+- [Dependencies Analyzer](../../features/insights/dependencies-analyzer.mdx)
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Build-Plugin konfigurieren](../../setting-up-spring-boot-service/build-plugin/configuration.mdx)
+- [Axelix aktualisieren](../../more/upgrading.mdx)

@@ -1,0 +1,56 @@
+---
+title: Branching-Modell
+description: "Axelix wird offen als Monorepo entwickelt. Wie sich der Quellcode entwickelt, erklärt daher auch, wie Veröffentlichungen entstehen."
+---
+
+Diese Seite beschreibt unsere Branches, wie Änderungen integriert werden und wie daraus die [Veröffentlichungen](../compatibility-and-versioning.mdx) entstehen, die Sie verwenden.
+
+## Der Hauptentwicklungszweig
+
+Axelix folgt **Trunk-based Development** mit einigen bewussten Ausnahmen. Es gibt einen Hauptentwicklungszweig: den Branch **`master`**.
+
+- Für jede neue Funktion oder Korrektur erstellen wir einen Branch _von_ `master`.
+- Über einen Pull Request führen wir ihn _zurück in_ `master` zusammen.
+
+`master` ist immer die maßgebliche Quelle dafür, was Axelix aktuell ist. **Minor- und Major-Versionen werden direkt daraus veröffentlicht,
+indem der Hauptzweig einen Tag** der Form `vX.Y.0` erhält, etwa `v3.1.0`. Die Patch-Nummer eines solchen Tags ist **immer `0`**.
+
+Patch-Versionen erhalten hingegen Tags auf eigenen Patch-Branches nach dem Muster `X.Y.x`, wie unten beschrieben.
+
+Diese Tags, ob vom Hauptzweig oder einem Patch-Branch, markieren die koordinierte Veröffentlichung aller Komponenten unter
+[einer gemeinsamen Version](../compatibility-and-versioning.mdx#eine-version-für-alle-komponenten).
+
+## Inkompatible Änderungen
+
+Nicht jede fertige Änderung wird sofort zusammengeführt. Enthält eine Änderung **inkompatible Änderungen**, führen wir sie nicht im normalen Ablauf
+in `master` zusammen. Stattdessen:
+
+1. Verschieben wir den Pull Request.
+2. Versehen wir ihn mit dem Label `breaking-changes`.
+3. Führen wir ihn später zusammen, wenn der Zeitpunkt passt, typischerweise zu Beginn der Arbeit an der nächsten **Major-Version**.
+
+So bleibt `master` **jederzeit als Minor- oder Patch-Version veröffentlichbar**, während inkompatible Arbeiten auf die nächste Major-Grenze warten.
+Das trägt wesentlich dazu bei, dass eine neue **Minor-Version** keine unerwartete inkompatible Änderung einschleust.
+
+## Wo Patch-Arbeiten stattfinden
+
+Korrekturen für eine bereits veröffentlichte Minor-Linie erscheinen **nicht** direkt aus `master`.
+Wenn eine Korrektur benötigt wird, enthält der Hauptzweig meist schon Arbeiten für die _nächste_ Minor-Version.
+Deshalb erhält jede veröffentlichte Minor-Linie einen **langlebigen Patch-Branch** neben `master`.
+
+Dieser wird vom Minor-Tag `vX.Y.0` abgezweigt und nach dem Muster `X.Y.x` benannt. Das wörtliche `x` kennzeichnet die gesamte Patch-Linie.
+Anders als der Tag enthält der Branch-Name **kein** Präfix `v`. Der Patch-Branch zu `1.0.0` heißt beispielsweise `1.0.x` und wurde vom Tag `v1.0.0`
+abgezweigt. Im Repository lässt sich dieses Modell nachvollziehen.
+
+Eine Korrektur gelangt gewöhnlich zuerst über den normalen Pull-Request-Ablauf nach `master` und wird anschließend auf den Patch-Branch der betroffenen
+Linie **zurückportiert**. Jede Patch-Veröffentlichung, also `vX.Y.1`, `vX.Y.2` usw., entsteht aus diesem Branch.
+Wie jede Axelix-Veröffentlichung liefert sie **alle Komponenten gemeinsam** unter derselben Version aus, siehe
+[eine Version für alle Komponenten](../compatibility-and-versioning.mdx#eine-version-für-alle-komponenten).
+
+:::note[Ein Patch-Branch pro Minor-Linie, nicht pro Komponente]
+Pro veröffentlichter Minor-Linie gibt es genau **einen** gemeinsamen Patch-Branch für alle Komponenten. Patches für `3.1` liegen alle im Branch `3.1.x`,
+abgezweigt vom Tag `v3.1.0`, unabhängig davon, ob sie einen Starter, ein Plugin oder Master betreffen.
+Komponentenspezifische Branches gibt es nicht, weil auch die Versionierung und Veröffentlichung gemeinsam erfolgt.
+:::
+
+Die genauen Veröffentlichungsschritte, einschließlich Vorbereitungen, Versionssetzung und Pipeline-Start, beschreibt [Veröffentlichungen](./releases.mdx).

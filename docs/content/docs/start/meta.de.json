@@ -1,0 +1,10 @@
+{
+    "title": "Start",
+    "pages": [
+        "getting-started",
+        "SKILL",
+        "configuring-master",
+        "configuring-spring-boot-starter",
+        "configuring-build-plugin"
+    ]
+}

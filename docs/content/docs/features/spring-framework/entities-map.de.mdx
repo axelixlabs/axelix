@@ -1,0 +1,70 @@
+---
+title: Entitätsübersicht
+description: "Die Seite Entities Map prüft das JPA-Mapping jeder Entität einer Spring-Boot-Instanz und zeigt Beziehungen, deren Mapping zusätzliche Abfragen verursacht: Eager Fetching, List-basiertes @ManyToMany, Kaskadierung mit REMOVE oder ALL und unidirektionales @OneToMany."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Übersicht der JPA-Entitätszuordnungen](/img/feature/entity/entity-main-page.png)
+
+</ScreenshotsNotice>
+
+**_Entities Map in der Axelix-Oberfläche_**
+
+Fehler beim Mapping von JPA-Beziehungen führen nicht zum Ausfall der Anwendung. Stattdessen verursachen sie bei jeder
+Verwendung der Entität zusätzliche Abfragen und Ladevorgänge und werden bei Code-Reviews leicht übersehen. Entities Map
+prüft das Mapping aller Entitäten und zeigt, wo solche Fehler auftreten.
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und
+**SUPER_ADMIN** können sie öffnen. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und
+Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Eine Zusammenfassung oben zeigt, wie viele Entitäten die Instanz abbildet, wie viele davon [Probleme](#erkannte-probleme)
+haben und wie viele unauffällig sind. Darunter listet die Seite die Entitäten mit Problemen auf.
+
+Klappen Sie eine Entität auf, um Folgendes zu sehen:
+
+- Den Tabellennamen aus `@Table` oder den Entitätsnamen, wenn `@Table` keinen Namen festlegt.
+- Jede problematische Beziehung, etwa `Owner.pets`, mit ihren Problemen.
+- Das Mapping dieser Beziehung mit den tatsächlich wirksamen Werten einschließlich Standardwerten, etwa
+  `@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL) @JoinColumn(name = "owner_id") List<Pet>`.
+
+Hat keine Entität Probleme, zeigt die Seite einen entsprechenden Hinweis statt der Liste.
+
+## Erkannte Probleme
+
+- **EAGER fetching**: Die Beziehung wird bei jedem Lesen der Entität geladen, unabhängig davon, ob die Daten verwendet
+  werden. Dies umfasst `@ManyToOne` und `@OneToOne` ohne explizites `fetch`, da JPA sie standardmäßig sofort lädt.
+- **List for @ManyToMany**: Bei einer durch `List` repräsentierten `@ManyToMany`-Beziehung leert Hibernate bei jeder
+  Änderung die gesamte Zuordnungstabelle und fügt die Einträge neu ein.
+- **Bad CascadeType**: Bei `@OneToMany` oder `@ManyToMany` führt `CascadeType.REMOVE` oder `CascadeType.ALL` dazu,
+  dass Hibernate zugehörige Datensätze einzeln entfernt, wodurch N+1-Abfragen entstehen.
+- **Unidirectional @OneToMany**: Ein `@OneToMany` ohne `mappedBy` benötigt eine zusätzliche Zuordnungstabelle oder ein
+  separates `UPDATE` für jeden Datensatz.
+
+## Funktionsweise
+
+Der Axelix Spring Boot Starter liest das JPA-Metamodell der Anwendung und prüft jede Beziehung. Anders als bei
+[Transaction Control](./transaction-control.mdx) hängt das Ergebnis nicht vom Datenverkehr ab: Axelix prüft das Mapping
+der Entitäten und nicht die ausgeführten Abfragen. Die Seite benötigt Hibernate in der Anwendung.
+
+## MCP-Werkzeuge
+
+KI-Agenten können die Entitäten und ihre Mapping-Probleme über MCP abrufen, für die gesamte Anwendung oder für eine
+bestimmte Entität. Siehe [MCP-Werkzeugkatalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#persistenzanalysen).
+
+## Eigenschaften
+
+Entities Map arbeitet mit der Transaktionsüberwachung zusammen und ist standardmäßig aktiviert. Zum Deaktivieren setzen
+Sie `axelix.sbs.transaction.monitoring.enabled=false`. Einzelheiten finden Sie unter
+[Transaktionsüberwachung](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#transaktionsüberwachung).
+
+Entities Map ist in reaktiven Anwendungen (WebFlux) nicht verfügbar, weil die Transaktionsüberwachung dort nicht läuft.
+Siehe [Reaktive Anwendungen (WebFlux)](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#reaktive-anwendungen-webflux).
+
+## Siehe auch
+
+- [Transaction Control](./transaction-control.mdx)
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

@@ -1,0 +1,41 @@
+---
+title: Languages Profile
+description: "Das Dashboard Languages Profile zeigt, welche Java-Releases, JDK-Builds und Kotlin-Versionen die Anwendungen in der Systemlandschaft verwenden."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Die Screenshots zeigen den neuesten Minor-Release von Axelix.">
+
+![Dashboard Languages Profile](/img/feature/dashboard/dashboard-languages-profile.png)
+
+</ScreenshotsNotice>
+
+***Languages Profile in der Axelix-Oberfläche***
+
+Bei Dutzenden Anwendungen kann jede ein anderes Java-Release und einen anderen JDK-Anbieter verwenden, mit oder ohne Kotlin. Languages Profile zeigt dies für die gesamte Systemlandschaft: wie viele Anwendungen noch Java-Releases ohne LTS verwenden, wie viele JDK-Anbieter im Einsatz sind und wie weit Kotlin verbreitet ist.
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Eine Zusammenfassung zeigt die Anzahl der Anwendungen und wie viele davon ein Java-LTS-Release verwenden beziehungsweise kein LTS-Release verwenden.
+
+Darunter zeigt die Seite:
+
+- Die Verteilung der Anwendungen auf Java-Releases wie Java `21` oder `25` und welche davon LTS-Releases sind.
+- Die JDK-Anbieter der Anwendungen, etwa Eclipse Temurin, Amazon Corretto oder Azul Zulu.
+- Wie viele Anwendungen Kotlin-Code enthalten und ihre Verteilung auf Kotlin-Versionen wie `2.1`.
+
+Enthält keine Anwendung Kotlin-Code, weist die Seite darauf hin, anstatt Kotlin-Diagramme anzuzeigen.
+
+## Funktionsweise
+
+Master erkennt Java-Release, JDK-Anbieter und Kotlin-Version jeder Anwendung zur Laufzeit. Es zeichnet sie einmal täglich auf und verwendet den neuesten Datensatz. Eine Anwendung wird unabhängig von der Anzahl ihrer Instanzen einmal gezählt. Meldet eine Anwendung keine Daten mehr, bleibt sie mit ihren zuletzt gemeldeten Daten auf der Seite.
+
+Java 11 und 17 sind LTS-Releases. Ab Java 21 gilt dies für jedes vierte Release: 21, 25, 29 und so weiter. Ein von Axelix nicht erkanntes JDK wird als Unknown angezeigt.
+
+## Siehe auch
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)

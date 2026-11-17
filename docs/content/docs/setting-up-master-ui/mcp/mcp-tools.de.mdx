@@ -1,0 +1,135 @@
+---
+title: MCP-Werkzeuge
+description: "Diese Seite enthält die Referenz aller Werkzeuge, die der integrierte MCP-Server von Axelix Master KI-Agenten bereitstellt."
+---
+
+import styles from './styles.module.css';
+
+Jeder Eintrag beschreibt den Werkzeugnamen, die deklarierten Annotation-Tags, den Aktivierungsstatus, die zum Aufruf berechtigten Rollen und kurz die Funktion. Derselbe Katalog ist im Browser auf der [MCP-Seite](../../ui-guide/mcp.mdx) sichtbar. Diese Seite ist die maßgebliche Referenz für Betreiber, die festlegen, wer was aufrufen darf.
+
+Die Liste setzt voraus, dass der MCP-Server aktiviert ist (`axelix.master.mcp-server.enabled=true`, der Standard). Bei `false` wird der Server überhaupt nicht registriert, keines der folgenden Werkzeuge ist erreichbar und der Link **MCP** wird in der UI ausgeblendet. Siehe [MCP-Server konfigurieren](../configuring-master/configuring-master.mdx#mcp-server).
+
+## Werkzeugstatus
+
+Alle folgenden Werkzeuge werden mit Master ausgeliefert und beim Start am MCP-Server registriert. Es gibt keinen Schalter zum Aktivieren oder Deaktivieren einzelner Werkzeuge; der Build legt den Katalog fest. Ein Werkzeug ist nur dann nicht erreichbar, wenn der MCP-Server deaktiviert ist oder der Master-Prozess nicht läuft. Im [UI-Katalog](../../ui-guide/mcp.mdx#der-werkzeugkatalog) zeigt der Statuspunkt jeder Karte diesen aktuellen Registrierungszustand: grün bei registriertem Werkzeug, rot bei derzeitiger Nichtverfügbarkeit.
+
+## Werkzeug-Tags
+
+Jedes Werkzeug deklariert vier boolesche Annotation-Tags, die MCP-Clients über zu erwartende Nebenwirkungen informieren. Die folgenden Tags geben die von Axelix-Werkzeugen deklarierten Werte wieder. Es sind Hinweise für den aufrufenden Agenten, keine von Master durchgesetzten Autorisierungsprüfungen.
+
+- **read-only** — das Werkzeug verändert keinen Zustand in der Ziel-Spring-Boot-Instanz.
+- **idempotent** — mehrfache Aufrufe mit denselben Argumenten haben dieselbe Wirkung wie ein einzelner Aufruf.
+- **destructive** — das Werkzeug kann Daten löschen oder Änderungen anwenden, die sich über die UI nicht rückgängig machen lassen.
+- **open-world** — das Werkzeug greift über Master und die registrierten Spring-Boot-Instanzen hinaus.
+
+## Zugriff nach Rollen
+
+Der MCP-Filter (`McpAuthorizationFilter`) authentifiziert den Agenten wie die UI eine Browsersitzung. Die unterstützten Zugangsdatenverfahren beschreibt [Authentifizierung am MCP-Server](../authentication/authentication.mdx#authentifizierung-am-mcp-server).
+
+## Katalog
+
+:::info
+Der folgende Katalog zeigt die derzeit mit Master ausgelieferten MCP-Werkzeuge. Weitere Werkzeuge werden aktiv entwickelt; die Liste wächst mit künftigen Releases.
+:::
+
+Die Spalte **Seit** nennt das erste Axelix-Master-Release eines Werkzeugs. `1.0.0` ist das erste Axelix-Release; so markierte Werkzeuge sind von Anfang an enthalten. Eine mit _upcoming_ markierte Version ist noch nicht veröffentlicht: Das Werkzeug wird im nächsten Axelix-Release verfügbar, unabhängig davon, ob dies ein Minor- oder Major-Release ist.
+
+### Instanzen
+
+Das einzige Werkzeug dieser Gruppe liefert Masters vollständiges Verzeichnis verwalteter Spring-Boot-Instanzen. Es ist der Einstiegspunkt für Aufgaben wie „Dienst anhand des Namens finden und seine `instanceId` ermitteln“. Alle anderen Werkzeuge benötigen diese `instanceId`.
+
+Siehe auch: [Wallboard-Anleitung](../../ui-guide/wallboard.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titel | Werkzeugname | Seit | Tags | Erlaubte Rollen | Beschreibung |
+|----------------|----------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Instanzübersicht | `getInstances` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Momentaufnahme aller verwalteten Instanzen: lesbare Dienstnamen mit Zuordnung zu `instanceId`, Echtzeitstatus (UP/DOWN), Spring-Boot-/Java-Versionen, Bereitstellungsdauer und Git-Commit-SHA. |
+
+</div>
+
+#### `getWallboard` wurde in `getInstances` umbenannt
+
+<ReleasedInNotice version="1.3.0" />
+
+Bis einschließlich Axelix 1.2.x hieß dieses Werkzeug `getWallboard`. Ab Axelix 1.3.0 heißt es `getInstances`; `getWallboard` existiert nicht mehr. Verhalten, Parameter und Antwort des Werkzeugs bleiben unverändert.
+
+KI-Agenten ermitteln beim Verbindungsaufbau die Werkzeuge des MCP-Servers und übernehmen den neuen Namen automatisch. Rufen Sie das Werkzeug direkt über seinen Namen auf, etwa aus eigenen Skripten oder Agentenanweisungen, ersetzen Sie `getWallboard` durch `getInstances`.
+
+### Instanz untersuchen
+
+Reine Leseansichten einer einzelnen Spring-Boot-Instanz: Spring Beans, Environment-Eigenschaften, `@ConfigurationProperties`-Beans, Autokonfigurationsbericht und registrierte geplante Tasks. Jedes Werkzeug dieser Gruppe erhält eine über `getInstances` ermittelte `instanceId`.
+
+Siehe auch: [Beans](../../features/spring-framework/beans.mdx), [Environment-Eigenschaften](../../features/spring-framework/properties.mdx), [Konfigurationseigenschaften](../../features/spring-framework/configuration-properties.mdx), [Bedingungen](../../features/spring-framework/conditions.mdx), [Geplante Tasks](../../features/spring-framework/scheduled-tasks.mdx), [Dienstprofil-Anleitung](../../ui-guide/service-profile.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titel | Werkzeugname | Seit | Tags | Erlaubte Rollen | Beschreibung |
+|----------------------|-----------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Bean-Übersicht | `getInstanceBeans`          | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Listet alle Spring Beans der Instanz mit Typ und Abhängigkeiten auf. |
+| Eigenschaften | `getInstanceEnvironment`    | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liefert das vollständige Environment: Anwendungseigenschaften, Systemeigenschaften und Umgebungsvariablen; hilfreich bei Fragen zu `@Value` und `@ConditionalOnProperty`. |
+| Konfigurationseigenschafts-Beans | `getInstanceConfigProps`    | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liefert alle `@ConfigurationProperties`-Beans der Instanz mit ihren gebundenen Werten. |
+| `@Conditional`-Übersicht | `getInstanceConditions`     | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Konfigurationsbericht: welche Spring-Boot- und eigenen Konfigurationen angewandt oder übersprungen wurden und warum. |
+| Geplante Tasks | `getInstanceScheduledTasks` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Listet in der Instanz registrierte `@Scheduled`-Tasks mit Cron, fester Rate, fester Verzögerung sowie eigene Tasks auf. |
+| Logs | `getInstanceLogs`           | `1.3.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liefert die neuesten Log-Einträge der Instanz (alle gepufferten oder nur die angeforderte Anzahl), einschließlich Stacktraces protokollierter Ausnahmen. |
+
+</div>
+
+### Caches
+
+Alle Cache-Manager und Caches einer Spring-Boot-Instanz untersuchen und Einträge entfernen: entweder aus allen Caches aller Cache-Manager zugleich oder aus einem bestimmten benannten Cache in einem ausgewählten Cache-Manager.
+
+Siehe auch: [Caches](../../features/spring-framework/caches.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titel | Werkzeugname | Seit | Tags | Erlaubte Rollen | Beschreibung |
+|----------------------|----------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Cache-Übersicht | `getAllCaches`             | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Listet alle Cache-Manager und ihre Caches mit dem jeweiligen Flag `enabled` auf. Ausgangspunkt für Cache-Aufgaben: Namenszuordnung zu Managern, Statusprüfungen und Auflösung von Mehrdeutigkeiten. |
+| Alle Caches leeren | `clearAllCaches`           | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`              | Entfernt alle Einträge aus allen Caches aller Cache-Manager der angegebenen Instanz. Umfassende destruktive Operation, nur für die ausdrückliche Aufforderung zum Leeren aller Caches gedacht. |
+| Bestimmten Cache leeren | `clearSpecificCacheEntity` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`              | Entfernt einen einzelnen durch den Cache-Namen identifizierten Cache-Eintrag in einem bestimmten Cache-Manager. Andere Einträge bleiben unverändert. |
+
+</div>
+
+### Loggers
+
+Den Logger-Baum einer Spring-Boot-Instanz lesen — einzelne Logger, Logger-Gruppen und verfügbare Log-Level — und Level zur Laufzeit ändern: für einen einzelnen Logger, eine gesamte Logger-Gruppe oder durch Zurücksetzen auf den in der Anwendung definierten Standard.
+
+Siehe auch: [Loggers](../../features/insights/loggers/loggers.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titel | Werkzeugname | Seit | Tags | Erlaubte Rollen | Beschreibung |
+|----------------------------|----------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Verfügbare Log-Level | `getAvailableLoggingLevels`      | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liefert die von der Instanz akzeptierten Log-Level (etwa `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `OFF`). Dient zur Prüfung von Eingaben vor einer Level-Änderung. |
+| Logger-Gruppenübersicht | `getLoggerGroupsFeed`            | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Listet jede konfigurierte Logger-Gruppe mit Mitgliedern und dem aktuell für die Gruppe gesetzten Level auf. |
+| Logger-Übersicht | `getLoggersFeed`                 | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Listet jeden in der Instanz konfigurierten einzelnen Logger mit seinem aktuell wirksamen Log-Level auf. |
+| Logger finden | `findLoggersByName`              | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Sucht einen oder mehrere einzelne Logger anhand des vollständigen Namens oder eines Namensteils. Liefert für jeden Treffer konfigurierte und wirksame Level. |
+| Logger-Gruppe finden | `findGroupsByName`               | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Sucht eine oder mehrere Logger-Gruppen anhand des vollständigen Namens oder eines Namensteils. Liefert Namen, Level und Mitglieder jeder Gruppe. |
+| Logger-Level ändern | `changeLoggingLevelByLoggerName` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Setzt das Log-Level eines bestimmten einzelnen Loggers. Verwenden Sie zuerst [Logger finden](#loggers), wenn der Name unklar ist. |
+| Gruppen-Logger-Level ändern | `changeLoggingLevelByGroupName`  | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Setzt das Log-Level aller Logger einer Gruppe. Verwenden Sie zuerst [Logger-Gruppe finden](#loggers), wenn der Gruppenname unklar ist. |
+| Logger-Level zurücksetzen | `resetLoggingLevelByLoggerName`  | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Setzt das Level eines einzelnen Loggers auf den in der Anwendungskonfiguration deklarierten Standard zurück. Zurücksetzen auf Gruppenebene ist nicht verfügbar. |
+
+</div>
+
+### Persistenzanalysen
+
+Von Axelix erkannte Persistenzprobleme in der Datenzugriffsschicht einer Anwendung. Anders als alle obigen Werkzeuge werden diese durch die Build-Koordinaten der Anwendung adressiert: `groupId` und `artifactId` (G und A der GAV-Koordinate), die beide erforderlich sind, statt einer `instanceId`. Sie lesen den erfassten Anwendungssnapshot, statt eine laufende Instanz abzufragen.
+
+Siehe auch: [Transaktionskontrolle](../../features/spring-framework/transaction-control.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titel | Werkzeugname | Seit | Tags | Erlaubte Rollen | Beschreibung |
+|----------------------|--------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Transaktionsprofil | `getApplicationTransactionsProfile`  | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Die in Transaktionsmethoden (`@Transactional`, `TransactionTemplate` usw.) der Anwendung erkannten N+1-Lazy-Loading- und In-Memory-Paginierungsprobleme. Optional auf eine Klasse (`className`) oder Methode (`className` + `methodName`) eingrenzbar. |
+| Entity-Profil | `getApplicationEntitiesProfile`      | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Die von Axelix erfassten JPA-Entities und ihre erkannten Beziehungs-Mapping-Probleme (Eager Fetching, listenbasiertes `@ManyToMany`, Cascade REMOVE/ALL, unidirektionales `@OneToMany`). Optional über `entityName` auf eine Entity eingrenzbar. |
+
+</div>
+
+## Weiterführende Informationen
+
+- [MCP-Katalogseite](../../ui-guide/mcp.mdx) — dieselbe Katalogansicht im Browser mit Werkzeugstatus und Annotation-Popover, ausschließlich lesend.
+- [Authentifizierung am MCP-Server](../authentication/authentication.mdx#authentifizierung-am-mcp-server) — unterstützte MCP-Zugangsdaten (`Basic`, `Bearer`) und Zuordnung der Identität zu einer Rolle.
+- [Rollen und Berechtigungen](../authentication/authentication.mdx#rollen-und-berechtigungen) — Schutzumfang und integrierte Rollen jeder Berechtigung.
+- [MCP-Server konfigurieren](../configuring-master/configuring-master.mdx#mcp-server) — die Eigenschaftsschlüssel `axelix.master.mcp-server.*`.

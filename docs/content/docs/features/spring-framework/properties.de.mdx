@@ -1,0 +1,174 @@
+---
+title: Eigenschaften
+description: "Die Seite Properties zeigt, woher jede Eigenschaft einer Spring-Boot-Instanz stammt, welchen Wert die Anwendung tatsächlich verwendet, welche Eigenschaften veraltet sind und welche Beans sie lesen."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Übersicht der Konfigurationseigenschaften](/img/feature/properties/properties-main-page.png)
+
+</ScreenshotsNotice>
+
+**_Properties in der Axelix-Oberfläche_**
+
+Dieselbe Eigenschaft kann aus vielen Quellen stammen: `application.yaml`, profilspezifische Dateien,
+Umgebungsvariablen, Systemeigenschaften oder Befehlszeilenargumente.
+
+## Was die Seite zeigt
+
+Die Seite listet alle Eigenschaften nach Eigenschaftsquelle gruppiert auf. Die Quellen sind nach absteigender Priorität
+angeordnet, in der Reihenfolge, in der Spring Boot sie auswertet (siehe [Externalized
+Configuration](https://docs.spring.io/spring-boot/reference/features/external-config.html)). Wenn mehrere Quellen
+dieselbe Eigenschaft definieren, verwendet die Anwendung den Wert aus der weiter oben aufgeführten Quelle.
+
+Für jede Eigenschaft sehen Sie:
+
+- Ob ihr Wert wirksam wird:
+    - **Active**, wenn die Anwendung diesen Wert verwendet.
+    - **Suppressed**, wenn eine Quelle mit höherer Priorität die Eigenschaft ebenfalls definiert und dieser Wert daher
+      nicht in der Anwendung ankommt.
+- Alle Quellen, die die Eigenschaft definieren, nach absteigender Priorität, mit markiertem wirksamem Wert.
+- Die `@ConfigurationProperties`-Bean, die die Eigenschaft bindet, sowie die Beans, die sie über `@Value` injizieren,
+  mit Links zu [Configuration Properties](./configuration-properties.mdx) und [Beans](./beans.mdx).
+- Ihre Beschreibung aus `spring-configuration-metadata.json`, sofern vorhanden.
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Details der Konfigurationseigenschaften](/img/feature/properties/properties-details-page.png)
+
+</ScreenshotsNotice>
+
+**_Aufgeklappte Properties in der Axelix-Oberfläche_**
+
+Veraltete Eigenschaften sind hervorgehoben und zeigen den Hinweis zur Veraltung. So finden Sie Einstellungen, die Sie
+vor einem Upgrade migrieren sollten.
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Als veraltet markierte Eigenschaft](/img/feature/properties/properties-deprecated-page.png)
+
+</ScreenshotsNotice>
+
+**_Eine veraltete Eigenschaft in der Axelix-Oberfläche_**
+
+Die Seite zeigt außerdem die aktiven und die Standardprofile der Instanz (`spring.profiles.active` und
+`spring.profiles.default`).
+
+## Gefährliche Eigenschaftswerte
+
+Manche Eigenschaftswerte sind auf einem Entwicklungsrechner unproblematisch, führen im Produktivbetrieb jedoch häufig
+zu Datenverlust, offengelegten Interna oder langsamen Abfragen. Axelix markiert Eigenschaften mit solchen Werten und
+zeigt jeweils, warum der Wert riskant ist und welcher Wert stattdessen verwendet werden sollte. Beispielsweise erlaubt
+`spring.jpa.hibernate.ddl-auto=update` Hibernate, das Datenbankschema selbstständig zu ändern.
+
+Axelix prüft nur den tatsächlich von der Anwendung verwendeten Wert. Ein gefährlicher Wert in einer verdrängten
+Eigenschaftsquelle wird daher nicht markiert. Der gesamte Wert muss übereinstimmen, unabhängig von Groß- und
+Kleinschreibung: `management.endpoints.web.exposure.include=*` wird markiert, `health,*` hingegen nicht. Maskierte Werte
+werden ebenfalls nicht geprüft. Ohne die Berechtigung `environment.values:read` sehen Sie daher keine Markierung für
+maskierte Schlüssel (siehe [Werte maskieren](#werte-maskieren)).
+
+:::info
+Standardmäßig wird jeder Wert für Aufrufer ohne die Berechtigung `environment.values:read` als `******` maskiert. Unter
+[Werte maskieren](#werte-maskieren) erfahren Sie, wie Sie die maskierten Schlüssel und den Zugriff auf Originalwerte festlegen.
+:::
+
+## Werte maskieren
+
+Axelix verwendet den Spring-Boot-Schalter `management.endpoint.env.show-values` nicht. Es fordert von Spring Boot immer
+die Originalwerte an (`Show.ALWAYS`) und wendet anschließend eine eigene Maskierung anhand einer Berechtigungsprüfung an.
+
+**Wer Originalwerte sieht.** Aufrufer mit der Berechtigung `environment.values:read`, die den integrierten Rollen
+**ADMIN** und **SUPER_ADMIN** erteilt ist, erhalten die Originalwerte. Für alle anderen werden die Werte durch `******`
+ersetzt. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und
+Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+**Welche Schlüssel maskiert werden.** Die Starter-Eigenschaft `axelix.sbs.endpoints.config.sanitized-properties` bestimmt
+die Auswahl. Sie gilt sowohl für `axelix-env` (diese Seite) als auch für `axelix-configprops` (die Seite
+[Configuration Properties](./configuration-properties.mdx)):
+
+- **Leere Liste (Standard)**: Jeder Wert wird für Aufrufer ohne die Berechtigung maskiert.
+- **Nicht leere Liste**: Nur die aufgeführten Schlüssel werden maskiert, alle anderen unverändert zurückgegeben.
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+```
+
+  </Tab>
+</Tabs>
+
+Unter [Vertrauliche Eigenschaftswerte maskieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#vertrauliche-eigenschaftswerte-maskieren)
+wird dieselbe Eigenschaft im Zusammenhang mit der übrigen Starter-Konfiguration beschrieben.
+
+:::note
+Die üblichen Spring-Boot-Actuator-Eigenschaften zur Maskierung (`management.endpoint.env.show-values`,
+`management.endpoint.env.keys-to-sanitize` und ihre `configprops`-Entsprechungen) werden nicht ausgewertet. Verwenden Sie
+stattdessen `axelix.sbs.endpoints.config.sanitized-properties`.
+:::
+
+## MCP-Werkzeuge
+
+Die vollständige Umgebung einer verwalteten Instanz (Anwendungseigenschaften, Systemeigenschaften und
+Betriebssystem-Umgebungsvariablen) steht auch KI-Agenten über MCP zur Verfügung. Siehe [MCP-Werkzeugkatalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#instanz-untersuchen).
+
+## Eigenen Actuator-Endpunkt freigeben
+
+<LegacyNotice
+    version="1.2.0"
+    reason={
+        <>
+            Ab Axelix 1.2.0 ist dies nicht mehr erforderlich: Der Starter registriert seine eigenen Actuator-Endpunkte
+            selbst. Axelix benötigt die Endpunkte <code>health</code>/<code>info</code> nicht mehr und funktioniert auch
+            ohne sie. Hier ist keine Konfiguration erforderlich.
+        </>
+    }
+/>
+
+Die Seite verwendet den Actuator-Endpunkt `axelix-env`, den der Axelix Spring Boot Starter bereitstellt. Geben Sie ihn
+über die üblichen Spring-Boot-Actuator-Eigenschaften frei. Unter [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) finden Sie
+die vollständige Liste der Axelix-Endpunkte und die zugehörige Einrichtung:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-env
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-env
+```
+
+  </Tab>
+</Tabs>
+
+## Siehe auch
+
+- [Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

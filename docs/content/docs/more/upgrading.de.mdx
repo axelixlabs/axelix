@@ -1,0 +1,153 @@
+---
+title: Axelix aktualisieren
+description: "Das Verfahren für sichere, planbare Aktualisierungen einer Dienstlandschaft, wenn Master und Starter unterschiedlich schnell aktualisiert werden."
+---
+
+Axelix wird [gemeinsam versioniert und veröffentlicht](./compatibility-and-versioning.mdx): Jede Veröffentlichung liefert alle Komponenten unter einer Version aus.
+Eine reale Dienstlandschaft wird jedoch nie vollständig gleichzeitig **aktualisiert**. Das Plattformteam aktualisiert **Axelix Master** auf einmal,
+während zahlreiche Dienste den **Starter** und das **Build-Plugin** als gewöhnliche Abhängigkeiten mitführen und nach dem Zeitplan ihrer Teams aktualisieren.
+Diese Seite beschreibt das Verfahren, das diesen Ablauf sicher und planbar macht.
+
+:::info[Seit Axelix 1.1]
+Diese Aktualisierungsrichtlinie wurde mit **Axelix 1.1** eingeführt und gilt ab dieser Version.
+Sie betrifft **Minor-Aktualisierungen innerhalb einer Axelix-Major-Version**. Für jede Major-Migration gibt es eine eigene Migrationsanleitung.
+:::
+
+## Das Kompatibilitätsfenster
+
+Das gesamte Verfahren beruht auf einer Garantie:
+
+> **Axelix Master unterstützt Starter aus den letzten 4 Minor-Versionen einschließlich seiner eigenen.**
+
+Master `1.4.x` unterstützt beispielsweise Dienste mit Startern von `1.1.x` bis `1.4.x`. Ein Dienst mit Starter `1.0.x` liegt **außerhalb des Fensters**
+von Master `1.4.x`. Seine Zusammenarbeit mit diesem Master ist nicht mehr garantiert:
+
+![Axelix-Kompatibilitätsfenster](/img/more/axelix-compatibility-window.png) **_Master `1.4` unterstützt Dienste mit Startern im Fenster `1.1`–`1.4`.
+Der Dienst mit Starter `1.0` liegt außerhalb des Fensters und wird nicht mehr unterstützt._**
+
+Dies ist ein **garantiertes Minimum**. In der Praxis können weitere Versionen funktionieren, aber mindestens diese 4 Minor-Versionen sind zugesichert.
+Innerhalb einer Major-Version wird das Fenster nicht verkleinert.
+
+Daraus folgen zwei Regeln:
+
+- **Master zuerst.** Das Fenster ist rückwärtsgerichtet: Ein neuerer Master unterstützt ältere Starter, niemals umgekehrt. Betreiben Sie keinen Starter mit einer neueren Version als Ihr Master.
+- **Starter und Plugin gemeinsam.** Innerhalb eines Dienstes müssen Starter und Build-Plugin dieselbe Version `major.minor` haben. Aktualisieren Sie beide in derselben Änderung. Das Fenster gilt zwischen **Master und Ihren Diensten**, nicht innerhalb eines Dienstes.
+
+## Veröffentlichungsrhythmus
+
+Axelix strebt ungefähr **7–9 Minor-Versionen pro Kalenderjahr** an, etwa alle 1,5 Monate, und jährlich eine gemeinsame **Major-Veröffentlichung**.
+
+Zusammen mit dem Kompatibilitätsfenster ergibt das einen konkreten Zeitrahmen: Weil Master die letzten 4 Minor-Versionen unterstützt,
+muss ein Dienst innerhalb des Fensters nur **etwa einmal pro Halbjahr** aktualisiert werden.
+Da die Client-Komponenten bewusst einfach gehalten werden, besteht diese Aktualisierung meist nur aus einer höheren Abhängigkeitsversion und einer erneuten Bereitstellung.
+
+## Das Aktualisierungsverfahren
+
+### 1. Mögliche Zielversion ermitteln
+
+Öffnen Sie **Administration → Upgrading** in der Master-Oberfläche. Dort sehen Sie die höchste Master-Version, auf die Sie aktualisieren können,
+ohne einen Dienst aus dem Kompatibilitätsfenster zu drängen. Die Berechnung basiert auf der ältesten Starter-Version, die Master in Ihrer Dienstlandschaft erfasst hat.
+
+Weil das Fenster rein rechnerisch bestimmt wird, berechnet Master diese Empfehlung **vollständig lokal**.
+Es werden weder Release-Seiten aufgerufen noch Internetzugriffe benötigt. In abgeschotteten Umgebungen funktioniert es genauso.
+
+Die Seite listet außerdem die Dienste mit den ältesten Startern auf, welche die Empfehlung begrenzen. So wissen Sie, welche Teams Sie für eine weitergehende Aktualisierung ansprechen müssen.
+
+### 2. Axelix Master aktualisieren
+
+Aktualisieren Sie Master in allen Umgebungen: zuerst Entwicklung, dann Staging, dann Produktion.
+Master wird eigenständig als JAR, Docker-Image oder Helm-Chart bereitgestellt. Dieser Schritt liegt daher vollständig beim Plattformteam und verändert keinen Dienst.
+Das Anhalten, Sichern, Aktualisieren und Zurücksetzen beschreibt der Abschnitt [Axelix Master selbst aktualisieren](#axelix-master-selbst-aktualisieren).
+
+Ihre Dienste funktionieren währenddessen weiter, denn sie liegen innerhalb des Fensters. Genau das stellt Schritt 1 sicher.
+
+### 3. Dienstteams ihre Dienste aktualisieren lassen
+
+Übergeben Sie nun an die Dienstteams: **Starter** und **Plugin** auf dieselbe neue Version in derselben Änderung aktualisieren und erneut bereitstellen.
+Für einen typischen Dienst ist nur die Abhängigkeitsversion zu ändern.
+
+Dahinter steht eine **bewusste Entwurfsregel**: Axelix Master übernimmt die **intelligente** Verarbeitung, während die Client-Komponenten,
+Starter und Plugin, **so einfach wie möglich** bleiben. Interpretation und komplexe Logik liegen in Master. Die Clients sammeln und übermitteln lediglich Rohdaten.
+Das hält Aktualisierungen schnell und einfach. Deshalb versuchen wir, in den Axelix-Clients möglichst wenige Konfigurationsoptionen anzubieten.
+
+Teams aktualisieren **unabhängig und in ihrem eigenen Tempo**. Das Fenster ist ihr Zeitbudget:
+Mit 4 garantierten Minor-Versionen kann ein Dienst einige Master-Aktualisierungen überspringen, bevor er aufholen muss.
+
+### 4. Fortschritt der Dienstlandschaft beobachten
+
+Die Seite **Upgrading** zeigt die Verteilung der Starter-Versionen in der Dienstlandschaft.
+Beobachten Sie nach einer Master-Aktualisierung die Verschiebung zur neuen Version. Sie erkennen zurückliegende Dienste auf einen Blick,
+auch solche, die aus veralteten Vorlagen mit alten Starter-Versionen erstellt wurden.
+
+## Axelix Master selbst aktualisieren
+
+Master-Aktualisierungen gehen **nur vorwärts**: Es wird stets auf eine neuere Version gewechselt, und ein Downgrade-Verfahren ist bewusst nicht vorgesehen.
+Dieses Modell ist für zustandsbehaftete Steuerungssysteme üblich. Der Grund ist die Datenbank.
+Master besitzt eine solche, und [Schema-Migrationen](../setting-up-master-ui/migrations/migrations.mdx) werden beim Start automatisch angewendet.
+Wir entwerfen diese Migrationen **einfach und nicht umkehrbar**. Eine umgeformte Tabelle lässt sich meist nur mit Datenverlust zurücksetzen.
+Deshalb setzen wir auf einen verlässlichen Rückweg: eine **während der Aktualisierung erstellte Datenbanksicherung**, die bei Problemen wiederhergestellt wird.
+
+Nur vorwärts bedeutet **nicht**, dass jede Minor-Version einzeln durchlaufen werden muss.
+Innerhalb **einer Major-Version** wird der direkte Wechsel von jeder älteren auf jede neuere Version unterstützt. Von `1.1` direkt auf `1.4` ist möglich.
+Beim Start findet Master alle noch nicht angewendeten Migrationen und führt die gesamte Kette in der richtigen Reihenfolge aus.
+Ob sie eine oder drei Minor-Versionen umfasst, spielt keine Rolle. Einzige Ausnahme ist eine **Major-Grenze**:
+Jede Major-Veröffentlichung enthält eine eigene Migrationsanleitung, der Sie stattdessen folgen müssen.
+
+Vor den Schritten noch ein Hinweis: Das Verfahren **hält Master vollständig an**.
+Es beginnt mit dem Stoppen des laufenden Masters. Dadurch entsteht eine kurze **Ausfallzeit**, meist wenige Minuten,
+in der Master-Oberfläche und API nicht verfügbar sind. Ihre Dienste bemerken davon nichts.
+
+### Was während der Ausfallzeit mit Ihren Diensten geschieht
+
+Absichtlich nichts. Der Starter jedes Dienstes meldet sich **regelmäßig** per Heartbeat, nicht nur beim Start.
+Während Master nicht läuft, bleiben Heartbeats unbeantwortet. Der Dienst bedient weiterhin seinen eigenen Verkehr,
+puffert nichts und versucht es nach dem normalen Zeitplan erneut.
+Sobald Master wieder läuft, registriert der nächste Heartbeat jeden Dienst vollständig neu.
+Die gesamte Dienstlandschaft stellt sich so innerhalb eines Heartbeat-Intervalls wieder her.
+Deshalb benötigen die folgenden Schritte weder Abstimmung mit Dienstteams noch das Leeren von Verbindungen oder Neustarts.
+Für einen Dienst entspricht die Master-Aktualisierung einer kurzen Netzwerkunterbrechung.
+[So funktioniert die Diensterkennung](../product/discovery.mdx) beschreibt Registrierung und Heartbeats.
+
+### Schritt für Schritt
+
+1. **Laufenden Master stoppen.** Fahren Sie ihn vollständig herunter, egal ob Kubernetes-Deployment, Container oder einfache JAR. Hier beginnt die Ausfallzeit.
+2. **Datenbank sichern.** Verwenden Sie die üblichen Werkzeuge Ihrer Datenbank: einen Dump für **PostgreSQL** oder **MySQL**, eine Kopie der Datenbankdatei für **SQLite**. Sichern Sie **nach** dem Stoppen von Master. Ohne Schreibzugriffe ist die Sicherung garantiert konsistent. Überspringen Sie diesen Schritt auch bei vermeintlich einfachen Aktualisierungen nicht: Diese Sicherung **ist** das Rollback-Verfahren.
+3. **Neue Master-Version starten.** Sie wendet beim Start automatisch alle ausstehenden [Datenbankmigrationen](../setting-up-master-ui/migrations/migrations.mdx) an und nimmt danach Anfragen an. Warten Sie, bis dies abgeschlossen ist. Starten Sie Master während der Migrationen weder neu noch beenden Sie ihn.
+4. **Prüfen.** Die Oberfläche ist erreichbar und zeigt die neue Version. Ihre Dienste erscheinen innerhalb eines Heartbeat-Intervalls selbstständig wieder. Wenn die Dienstlandschaft vollständig aussieht und die Dienste erfolgreich neu registriert sind, ist die Aktualisierung abgeschlossen.
+
+### Zurücksetzen
+
+Wenn die neue Version aus irgendeinem Grund Probleme bereitet, verwenden Sie die Sicherung aus Schritt 2:
+
+1. Den neuen Master stoppen.
+2. Die Datenbank aus der Sicherung wiederherstellen.
+3. Die vorherige Version starten.
+
+Alle seit der Sicherung bis zum Zurücksetzen in die Datenbank geschriebenen Daten gehen verloren. Master ist **bewusst so ausgelegt**, dass dieser Verlust vernachlässigbar ist.
+
+Das Dienstverzeichnis **heilt sich selbst**: Es baut sich innerhalb eines Intervalls aus Heartbeats wieder auf.
+Nicht automatisch wiederhergestellte Daten wie Benutzer, Rollen und Einstellungen ändern sich in einem so kurzen Zeitraum selten.
+Ein Rollback ist nur eine Zwischenlösung. Langfristig führt der Weg immer zu neueren Versionen.
+Wenn eine Aktualisierung fehlschlägt, [erstellen Sie ein Issue](https://github.com/axelixlabs/axelix/issues). Die eigentliche Korrektur erscheint in einer neueren Version.
+
+### Grundregeln
+
+- **Niemals zwei unterschiedliche Master-Versionen gleichzeitig mit derselben Datenbank betreiben.** Die neue Version verändert beim Start das Schema. Die alte Version ist nicht dafür ausgelegt, mit diesen Änderungen zu funktionieren. Die Kompatibilität alten Codes mit künftigen Schemas ist genau die Komplexität, die dieses Modell vermeidet. In Kubernetes muss das Master-Deployment deshalb die Strategie `Recreate` verwenden. Das standardmäßige `RollingUpdate` betreibt alten und neuen Pod selbst bei einer einzigen Replik kurz gleichzeitig, genau während der Migrationen.
+- **Eine kurze Ausfallzeit von Master ist vorgesehen.** Wir versprechen bewusst keine Aktualisierung ohne Ausfallzeit. Das würde umkehrbare, mehrstufige Migrationen und einen hochverfügbaren Master erfordern. Wir halten Produkt und Verfahren lieber einfach. Nur Master-Oberfläche und API sind betroffen, Ihre Dienste laufen unverändert weiter.
+- **Jeweils nur eine Master-Replik.** Master ist derzeit als Einzelinstanz-Anwendung ausgelegt. Hintergrundaufgaben wie Erkennungsabfragen und das Entfernen ausgefallener Instanzen sowie die In-Memory-Caches setzen genau einen laufenden Master voraus. Mehrere Repliken würden Arbeiten duplizieren und konkurrieren. Ein hochverfügbarer Master mit mehreren Repliken ist geplant.
+
+## Zurückliegende Dienste
+
+Zurückliegende Dienste **blockieren niemals** eine Master-Aktualisierung. Die Entscheidung liegt immer beim Plattformteam.
+Die Folgen sind vorab sichtbar: **Upgrading** listet genau die Dienste auf, die bei einem Wechsel über die sichere Zielversion hinaus
+aus dem Fenster fallen würden. So kennen Sie die Kosten der Aktualisierung und die zuständigen Teams.
+
+Ein Dienst mit einem Starter außerhalb des Fensters wird **überhaupt nicht mehr unterstützt**.
+Er verschwindet aus der Master-Oberfläche und bleibt unsichtbar, bis sein Starter wieder innerhalb des Fensters liegt.
+Die Warnung erfolgt **vor** der Aktualisierung. Danach erinnert die Oberfläche nicht mehr an diesen Dienst.
+
+## Major-Aktualisierungen
+
+Das Kompatibilitätsfenster ist **innerhalb einer Major-Version** definiert.
+Jede Major-Veröffentlichung enthält eine eigene Migrationsanleitung für den Wechsel von der vorherigen Major-Version.
+Sie beschreibt auch, mit welchen letzten Minor-Versionen der vorherigen Major-Linie der neue Master während des Übergangs noch kommunizieren kann.

@@ -1,0 +1,10 @@
+{
+    "title": "Master",
+    "pages": [
+        "what-is-master",
+        "...configuring-master",
+        "...migrations",
+        "...authentication",
+        "...mcp"
+    ]
+}

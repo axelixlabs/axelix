@@ -1,0 +1,33 @@
+---
+title: Übersicht
+description: "Das Dashboard Overview zeigt, welche Versionen von Spring Boot, Spring Framework, Java und Kotlin die Anwendungen in der Systemlandschaft verwenden."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Das Dashboard Overview wird in Axelix 1.2.0 entfernt. Die Spring-Boot- und Spring-Framework-Versionen der Systemlandschaft werden stattdessen im Dashboard Spring Portfolio angezeigt.</>}
+/>
+
+Bei Dutzenden Anwendungen ist schwer zu erkennen, welche Versionen der zentralen Komponenten verwendet werden und welche am häufigsten vorkommt. Das Dashboard Overview beantwortet dies für die gesamte Systemlandschaft und führt von einer Version zur Liste der Instanzen, die sie verwenden.
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Die Seite zeigt, welche Versionen von Spring Boot, Spring Framework, Java und Kotlin in der Systemlandschaft verwendet werden und welchen Anteil der Instanzen sie jeweils ausmachen:
+
+- **Spring Boot** und **Spring Framework**: nach Versionslinie, etwa `3.5`.
+- **Java**: nach Versionsnummer, etwa `21`.
+- **Kotlin**: nach Versionslinie, ausschließlich unter Instanzen mit Kotlin im Klassenpfad. Verwendet keine Instanz Kotlin, wird Kotlin nicht angezeigt.
+
+Die häufigste Version jeder Komponente wird gesondert hervorgehoben.
+
+## Anwendungen im Wallboard öffnen
+
+Klicken Sie auf eine Version, um das [Wallboard](../wallboard.mdx) mit einem Filter für die Instanzen dieser Version zu öffnen, etwa `Spring Boot = 3.5`. Halten Sie beim Klicken Strg, Cmd oder Umschalt gedrückt, um es in einem neuen Tab zu öffnen.
+
+## Siehe auch
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Axelix aktualisieren](../../more/upgrading.mdx)

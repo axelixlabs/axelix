@@ -1,0 +1,142 @@
+---
+title: So funktioniert die Diensterkennung
+description: "Wie Axelix Master vorhandene Spring-Boot-Instanzen ermittelt und ihren Zustand aktuell hält: durch automatische Erkennung in Kubernetes oder durch Selbstregistrierung der Instanzen."
+---
+
+Master kann nur Instanzen anzeigen und verwalten, die ihm bekannt sind. Er erfährt auf zwei Wegen von ihnen: Master findet
+sie selbst (automatische Erkennung), oder die Instanz meldet sich bei Master an (Selbstregistrierung).
+
+## Zwei Wege zur Erkennung
+
+```text
+┌─ Kubernetes cluster ─────────────────────────────┐
+│                                                  │
+│  ┌──────────────────┐    ┌──────────────────┐    │
+│  │  orders-service  │    │ billing-service  │    │
+│  └────────▲─────────┘    └─────────▲────────┘    │
+│           │                        │             │     ┌────────────────────┐
+│           └────────────┬───────────┘             │     │ inventory-service  │
+│                        │                         │     │ (VM, Docker, ...)  │
+│                        │  auto-discovery:        │     └─────────┬──────────┘
+│                        │  Master finds the pods  │               │
+│                        │  and polls them         │               │  self-registration:
+│                ┌───────┴───────┐                 │               │  the service registers
+│                │ Axelix Master │◀────────────────┼───────────────┘  once, then heartbeats
+│                └───────────────┘                 │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
+Jeder Dienst in diesen Diagrammen ist eine Spring-Boot-Anwendung, die mit dem Axelix-Build-Plugin erstellt wurde und den Axelix-Starter ausführt.
+
+|                        | Automatische Erkennung                            | Selbstregistrierung                                |
+| ---------------------- | ------------------------------------------------- | -------------------------------------------------- |
+| Wer den Aufruf startet | Master ruft den Dienst auf                        | Der Dienst ruft Master auf                         |
+| Wo es funktioniert     | Nur in Kubernetes                                 | Überall, wo der Dienst Master erreichen kann       |
+| Aktivierung            | `axelix.master.discovery.auto.enabled` auf Master | `axelix.sbs.discovery.self-registration` im Dienst |
+
+Wenn Master im selben Kubernetes-Cluster wie Ihre Dienste läuft, benötigt die automatische Erkennung keine Einrichtung auf Dienstseite.
+Die Selbstregistrierung deckt alle anderen Fälle ab, etwa einfache VMs, Docker Compose oder ein Netzwerk, das Master nicht durchsuchen kann.
+
+:::note[Beide Wege funktionieren gleichzeitig]
+Die Entscheidung erfolgt pro Dienst, nicht für die gesamte Dienstlandschaft. Ein Master kann die Dienste in seinem Kubernetes-Cluster
+automatisch erkennen und gleichzeitig Selbstregistrierungen von Diensten an anderen Standorten annehmen. Beispielsweise können sich drei
+Anwendungen auf VMs selbst registrieren, während alle Dienste im Cluster automatisch erkannt werden.
+:::
+
+## Einmal der vollständige Zustand, danach kleine Aktualisierungen
+
+<ReleasedInNotice version="1.3.0" />
+
+Ab Axelix 1.3.0 folgen beide Wege demselben Prinzip. Master erhält den vollständigen Zustand einer Instanz nur einmal:
+bei der Selbstregistrierung in der Registrierungsanfrage, bei der automatischen Erkennung im ersten `axelix-metadata`-Aufruf.
+Danach sendet die Instanz nur noch kleine, häufige Aktualisierungen: einen Heartbeat bei Selbstregistrierung oder eine Antwort auf
+`axelix-ping` bei automatischer Erkennung.
+
+Jede Aktualisierung erfüllt zwei Aufgaben. Erstens teilt sie Master mit, dass die Instanz noch aktiv ist. Zweitens übermittelt sie die wenigen
+veränderlichen Daten: den Gesundheitszustand der Instanz, ihre Heap-Nutzung und ihre Transaktionsstatistiken. So erscheint eine neue problematische
+Transaktion ohne erneute Registrierung in Master. Die folgenden Diagramme zeigen dieses Verhalten.
+
+Vor 1.3.0 erhielt Master jedes Mal den vollständigen Zustand: bei jedem Durchlauf der automatischen Erkennung und bei jedem Heartbeat der Selbstregistrierung.
+
+## Automatische Erkennung
+
+```text
+ Axelix Master                  Kubernetes API                orders-service
+       │                              │                              │
+       │  which pods are there?       │                              │
+       │─────────────────────────────▶│                              │
+       │◀─────────────────────────────│                              │
+       │                                                             │
+       │  first scan: axelix-metadata                                │
+       │────────────────────────────────────────────────────────────▶│
+       │◀──────────────────────────────────────── full registration ─│
+       │                                                             │
+       │  every next scan (each minute by default): axelix-ping      │
+       │────────────────────────────────────────────────────────────▶│
+       │◀─────────────────────────────── health, heap, transactions ─│
+```
+
+Der erste Aufruf liefert die vollständige Registrierung zurück: Build-Koordinaten, Versionen und die von Axelix gesammelten Erkenntnisse.
+Danach erscheint die Instanz in Master. Signaturschlüssel und Algorithmus müssen auf Master und im Dienst übereinstimmen.
+
+Bei dieser ersten Prüfung kennt Master die Starter-Version noch nicht. Er sendet ein Kompatibilitäts-JWT mit dem Subject
+`AXELIX.MASTER` und den von älteren Startern benötigten Legacy-Claims. Starter ab 1.3 akzeptieren die Master-Identität und ignorieren
+diese zusätzlichen Claims. Die Entfernung dieses Kompatibilitätsformats ist für 1.6 geplant.
+
+Bei nachfolgenden UI- und MCP-Aufrufen prüft Master zuerst die Berechtigungen des Benutzers. Bei Startern ab 1.3 sendet er anschließend ein
+kurzlebiges JWT für den technischen Benutzer `AXELIX.MASTER`, ohne Benutzerrollen oder Berechtigungen. Ältere Starter erhalten ein neu ausgestelltes
+Benutzertoken mit den alten Berechtigungsnamen und setzen die Berechtigungen weiterhin selbst durch.
+
+Jeder Erkennungsdurchlauf ersetzt die gesamte Liste automatisch erkannter Instanzen. Deshalb verschwindet ein Pod, den Kubernetes nicht mehr meldet,
+beim nächsten Durchlauf. Ein für Master nicht erreichbarer Pod fällt ebenfalls heraus und erscheint wieder, sobald ihn ein späterer Durchlauf erreicht.
+
+Instanzen mit einem Starter vor 1.3.0 haben kein `axelix-ping`. Daher liest Master bei jedem Durchlauf die vollständigen `axelix-metadata` aus.
+
+## Selbstregistrierung
+
+```text
+ inventory-service                                     Axelix Master
+         │                                                   │
+         │  on startup: register (full description,          │
+         │  actuator URL, instance name)                     │
+         │──────────────────────────────────────────────────▶│  the instance appears
+         │                                                   │
+         │  every 15 s: heartbeat (health, heap,             │
+         │  transactions)                                    │
+         │──────────────────────────────────────────────────▶│
+         │──────────────────────────────────────────────────▶│
+         │                                                   │
+         │  heartbeat after Master lost the instance         │
+         │──────────────────────────────────────────────────▶│
+         │◀─────────────────────────────── unknown instance ─│
+         │  register again                                   │
+         │──────────────────────────────────────────────────▶│
+         │                                                   │
+         ╳  the service stops, heartbeats stop               │
+                                                             │  removed after 45 s
+```
+
+Bei einem Starter vor 1.3.0 ist jeder Heartbeat eine vollständige Registrierung.
+
+Master kann eine Instanz verlieren, wenn er mit leerer Datenbank neu startet oder die Instanz nach ausgebliebenen Heartbeats entfernt hat.
+In beiden Fällen veranlasst der nächste Heartbeat den Dienst zur erneuten Registrierung. So erscheint die gesamte Dienstlandschaft innerhalb
+eines Heartbeat-Intervalls wieder. Registrierung und Heartbeats werden mit dem gemeinsamen JWT-Signaturschlüssel signiert. Master weist sie bei abweichenden Schlüsseln zurück.
+
+Ein Starter ab 1.3 signiert beide Anfragen mit einem JWT für einen technischen Benutzer mit dem Subject `AXELX.MANAGED_SERVICE`
+(diese Schreibweise ist die Protokollkennung). Es enthält keine Rollen oder Berechtigungen. Master akzeptiert an diesen Endpunkten nur die Identität
+eines verwalteten Dienstes. Er akzeptiert außerdem das ältere Subject `AXELIX.STARTER` von älteren Startern. Die Entfernung dieses Kompatibilitätsalias ist für 1.6 geplant.
+
+## Was Master in beiden Fällen benötigt
+
+Die Diensterkennung teilt Master nur mit, dass eine Instanz existiert. Jede UI-Seite, jedes MCP-Werkzeug und jede Aktion, etwa das Ändern eines
+Loglevels, bleibt ein Aufruf von Master an den Dienst. Master muss daher die Actuator-Endpunkte des Dienstes über HTTP erreichen können,
+unabhängig vom Erkennungsweg. Wenn die Anwendung ihre Actuator-Endpunkte selbst absichert, beschreibt die [Fehlerbehebung](../more/troubleshooting.mdx),
+wie Sie Masters Aufrufe zulassen.
+
+## Siehe auch
+
+- [Architektur](./architecture.mdx)
+- [Master konfigurieren: automatische Erkennung](../setting-up-master-ui/configuring-master/configuring-master.mdx#diensterkennung--automatische-erkennung)
+- [Master konfigurieren: Selbstregistrierung](../setting-up-master-ui/configuring-master/configuring-master.mdx#diensterkennung--selbstregistrierung)
+- [Spring Boot Starter konfigurieren: Instanz von Master finden lassen](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#instanz-von-master-finden-lassen)

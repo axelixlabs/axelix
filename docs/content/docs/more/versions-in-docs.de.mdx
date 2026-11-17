@@ -1,0 +1,45 @@
+---
+title: Versionen in der Dokumentation
+description: "Wie die Dokumentation Veröffentlichungen kennzeichnet und welche Version die Screenshots zeigen."
+---
+
+Diese Seite erklärt, wie die Dokumentation Axelix-Veröffentlichungen kennzeichnet und welche Version die Screenshots zeigen.
+Unter manchen Überschriften steht ein kurzer Hinweis. Er nennt die Axelix-Version, auf die sich der Abschnitt bezieht.
+Die Dokumentation wird nur pro Major-Version versioniert. Eine Seite beschreibt daher alle Minor-Versionen dieser Linie,
+und die Hinweise kennzeichnen die Unterschiede.
+
+## Veröffentlicht
+
+<ReleasedInNotice version="1.1.0" />
+
+Der Abschnitt beschreibt eine Funktion, die mit der angegebenen Version erscheint. In älteren Versionen existiert sie noch nicht:
+Aktualisieren Sie, um sie zu verwenden.
+
+## Demnächst
+
+<UpcomingReleaseNotice />
+
+Der Abschnitt beschreibt etwas bereits Fertiggestelltes, das noch nicht veröffentlicht wurde. Es erscheint in der nächsten Minor-Version.
+Sobald diese veröffentlicht ist, wechselt der Hinweis zu **Veröffentlicht** mit der Versionsnummer.
+
+## Veraltet
+
+<LegacyNotice version="1.2.0" />
+
+Der Abschnitt wird nur bei Versionen vor der angegebenen benötigt. Ab dieser Version überspringen Sie ihn.
+Manche Hinweise erklären außerdem, warum der Abschnitt nicht mehr benötigt wird.
+
+## Screenshots
+
+<ScreenshotsNotice text="Screenshots zeigen die neueste Minor-Version von Axelix." />
+
+Screenshots zeigen die Axelix-Oberfläche der neuesten Minor-Version. Wenn eine Minor-Version einen Bildschirm verändert,
+aktualisieren wir die Screenshots und versuchen, alle Seiten an die neueste Minor-Version anzupassen.
+Patch-Versionen verändern die auf den Screenshots gezeigte Oberfläche nicht.
+
+Wenn Sie eine ältere Version verwenden, kann ein Bildschirm anders aussehen: Manche Bedienelemente fehlen möglicherweise oder befinden sich an anderer Stelle.
+
+## Siehe auch
+
+- [Kompatibilität und Versionierung](./compatibility-and-versioning.mdx)
+- [Axelix aktualisieren](./upgrading.mdx)

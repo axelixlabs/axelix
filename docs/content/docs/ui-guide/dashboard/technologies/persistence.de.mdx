@@ -1,0 +1,42 @@
+---
+title: Persistence
+description: "Das Dashboard Persistence zeigt, welche Services in der Systemlandschaft die meisten N+1-Abfragen und Fälle von In-Memory-Paginierung aufweisen."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen den neuesten Minor-Release von Axelix.">
+
+![Dashboard Persistence](/img/feature/dashboard/dashboard-persistance.png)
+
+</ScreenshotsNotice>
+
+***Dashboard Persistence in der Axelix-Oberfläche***
+
+N+1-Abfragen und In-Memory-Paginierung verhindern den Betrieb einer Anwendung nicht, verursachen aber zusätzliche Abfragen und Speicherbedarf. [Transaction Control](../../../features/spring-framework/transaction-control.mdx) zeigt sie für einen einzelnen Service. Das Dashboard Persistence zeigt, wo sie in der Systemlandschaft am häufigsten auftreten, damit Sie wissen, welche Services Sie zuerst untersuchen sollten.
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und Berechtigungen](../../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Die Seite zeigt zwei Probleme nebeneinander:
+
+- **N+1**: Eine lazy geladene Beziehung wird für jeden Datensatz mit einer eigenen Abfrage geladen.
+- **In-Memory Pagination**: Hibernate lädt die gesamte Ergebnismenge und schneidet die Seite im Speicher zu.
+
+Für jedes Problem sehen Sie:
+
+- Wie viele Fälle in der gesamten Systemlandschaft auftreten.
+- Welcher Service die meisten Fälle aufweist.
+- Wie sich die Fälle auf die Services verteilen.
+
+Services ohne Fälle werden nicht angezeigt. Einzelheiten finden Sie unter [Erkannte Probleme](../../../features/spring-framework/transaction-control.mdx#erkannte-probleme) in Transaction Control.
+
+## Funktionsweise
+
+Das Dashboard zählt die von Transaction Control in jedem Service erkannten Fälle. Master zeichnet dies einmal täglich auf und verwendet den neuesten Datensatz. Ein Service wird unabhängig von der Anzahl seiner Instanzen einmal gezählt.
+
+Daten erscheinen nur für Services mit Hibernate und aktivierter Transaktionsüberwachung. Siehe [Eigenschaften](../../../features/spring-framework/transaction-control.mdx#eigenschaften) in Transaction Control.
+
+## Siehe auch
+
+- [Transaction Control](../../../features/spring-framework/transaction-control.mdx)
+- [Entities Map](../../../features/spring-framework/entities-map.mdx)

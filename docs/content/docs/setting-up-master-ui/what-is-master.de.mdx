@@ -1,0 +1,36 @@
+---
+title: Was ist Master?
+description: "Axelix Master (kurz Master) ist die zentrale Anwendung des Axelix-Ökosystems und bietet erweiterte Funktionen zum Verwalten und Überwachen von Spring-Boot-Anwendungen in unterschiedlichen Umgebungen."
+---
+
+## Hauptaufgabe
+
+Axelix Master ist die zentrale Anwendung von Axelix, der quelloffenen, auf KI ausgerichteten Plattform zur Entwicklung und Weiterentwicklung von Java-Spring-Boot-Microservice-Ökosystemen. Es erkennt, registriert und überwacht Dienste und stellt sowohl die Web-UI für Entwickler als auch den integrierten MCP-Server für KI-Agenten bereit. Beide Benutzergruppen erhalten damit Zugriff auf Anwendungsanalysen und Debugging. Die verfügbaren MCP-Funktionen sind im [Werkzeugkatalog](./mcp/mcp-tools.mdx) aufgeführt.
+
+## Zentrale Funktionen
+
+### 🔍 **Diensterkennung**
+Master erkennt Spring-Boot-Anwendungen über zwei sich ergänzende Mechanismen:
+
+**Selbstregistrierung (jede Umgebung):**
+Anwendungen mit dem Axelix Spring Boot Starter melden sich bei Master an und senden regelmäßig Heartbeats. Das funktioniert überall, wo die Anwendung Master erreichen kann, etwa in Docker Compose, auf physischer Hardware, in VMs oder Kubernetes. Sie muss **pro Anwendung ausdrücklich aktiviert** werden: mit `axelix.sbs.discovery.self-registration=true` (standardmäßig deaktiviert). Master akzeptiert solche Registrierungen ohne zusätzliche Einrichtung (`axelix.master.discovery.self-registration.enabled` ist in Master standardmäßig aktiviert).
+
+**Automatische Erkennung (nur Kubernetes):**
+Wenn `axelix.master.discovery.auto.enabled` aktiviert ist, durchsucht Master die Plattform aktiv nach geeigneten Diensten. Die Plattformsuche ist derzeit nur für **Kubernetes** implementiert. In Masters eigener Konfiguration ist sie standardmäßig deaktiviert; das offizielle [Helm-Chart](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) aktiviert sie jedoch standardmäßig.
+
+**So funktioniert die Erkennung:**
+1. **Selbstregistrierung**: Anwendungen mit Axelix Starter registrieren sich und senden Heartbeats.
+2. **Plattformsuche** (Kubernetes): Master prüft den Cluster auf Dienste, die Axelix-SBS-Endpunkte bereitstellen.
+3. **Liste aktuell halten**: Master aktualisiert automatisch erkannte Instanzen bei jeder Suche und entfernt selbstregistrierte Instanzen, die keine Heartbeats mehr senden.
+
+Details finden Sie unter [So funktioniert die Erkennung](../product/discovery.mdx).
+
+### 🖥️ **Einheitliche Weboberfläche**
+Eine zentrale Oberfläche für alle Ihre Spring-Boot-Anwendungen:
+
+**Zu den Funktionen gehören:**
+- Dashboard mit allen registrierten Anwendungen
+- Integrierter MCP-Server, der diese Informationen KI-Agenten bereitstellt
+- Untersuchung von Konfigurationseigenschaften und Environment
+- Detaillierte Bean-Analyse
+- Weitere Funktionen finden Sie im Abschnitt Funktionen.

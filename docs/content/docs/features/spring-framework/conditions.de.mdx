@@ -1,0 +1,114 @@
+---
+title: Bedingungen
+description: "Die Seite Conditions zeigt den Spring-Boot-Autokonfigurationsbericht der verwalteten Instanz: jede @Conditional-Auswertung, die Spring beim Start durchgeführt hat, nach Ergebnis auf zwei Tabs verteilt."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Übersicht der Autokonfigurationsbedingungen](/img/feature/conditions/conditions-main-page.png)
+
+</ScreenshotsNotice>
+
+**_Die Seite Conditions in der Axelix-Oberfläche_**
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und
+**SUPER_ADMIN** können sie öffnen. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und
+Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+Oben befinden sich zwei Tabs: **Negative Matches** (Standard) und **Positive Matches**. Darüber stehen ein gemeinsames
+Suchfeld und ein Zähler im Format `<matching> / <total>`, der sich auf den aktuell ausgewählten Tab bezieht.
+
+Beide Tabs sind gleich aufgebaut: Sie zeigen eine Liste von Konfigurationsklassen und gegebenenfalls der jeweiligen
+`@Bean`-Methode darin. Die Überschrift jedes Eintrags zeigt:
+
+- **Class:** die vollständig qualifizierte Klasse, zu der die bedingte Annotation gehört. Ein Kopierelement daneben
+  kopiert den vollständigen Namen.
+- **Method:** den Namen der `@Bean`-Methode. Er erscheint nur, wenn die Bedingung auf einer Methode statt auf der Klasse
+  selbst steht.
+
+Unter der Überschrift stehen die einzelnen Bedingungen. Jede Bedingung ist eine aufklappbare Zeile, deren Bezeichnung
+den Kurznamen der Bedingung zeigt, etwa `OnClassCondition` oder `OnPropertyCondition`. Nach dem Aufklappen sehen Sie die
+beschreibende **message**, die Spring bei der Auswertung erzeugt hat. Ein Statussymbol links zeigt das Ergebnis:
+
+- <span style={{ color: "#00ab55", fontWeight: "bold" }}>✓</span>: Bedingung erfüllt.
+- <span style={{ color: "#FF000A", fontWeight: "bold" }}>✗</span>: Bedingung nicht erfüllt.
+
+## Tab Negative Matches
+
+Eine scrollbare Liste zeigt die von Spring ausgewerteten Konfigurationen mit dem Gesamtergebnis _nicht erfüllt_, bei
+denen also mindestens eine erforderliche Bedingung fehlgeschlagen ist. Für jede solche Konfiguration listet die Seite
+**sowohl** die fehlgeschlagenen Bedingungen (<span style={{color: '#FF000A', fontWeight: 'bold'}}>✗</span>) **als auch**
+die erfüllten Bedingungen (<span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>) auf. So sehen Sie genau,
+welche Prüfung ausschlaggebend war.
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Nicht erfüllte Autokonfigurationsbedingungen im Detail](/img/feature/conditions/conditions-not-matches-details-page.png)
+
+</ScreenshotsNotice>
+
+**_Negative Matches auf der Seite Conditions in der Axelix-Oberfläche_**
+
+## Tab Positive Matches
+
+Eine scrollbare Liste zeigt Konfigurationen mit dem Gesamtergebnis _erfüllt_, bei denen jede erforderliche Bedingung
+zutraf. Jeder Eintrag zeigt die erfüllten Bedingungen (<span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>)
+und die Meldung, die erklärt, warum die jeweilige Bedingung erfüllt war.
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Erfüllte Autokonfigurationsbedingungen im Detail](/img/feature/conditions/conditions-matches-details-page.png)
+
+</ScreenshotsNotice>
+
+**_Positive Matches auf der Seite Conditions in der Axelix-Oberfläche_**
+
+## MCP-Werkzeuge
+
+Der Autokonfigurationsbericht steht auch KI-Agenten über MCP zur Verfügung. Siehe
+[MCP-Werkzeugkatalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#instanz-untersuchen).
+
+## Eigenen Actuator-Endpunkt freigeben
+
+<LegacyNotice
+    version="1.2.0"
+    reason={
+        <>
+            Ab Axelix 1.2.0 ist dies nicht mehr erforderlich: Der Starter registriert seine eigenen Actuator-Endpunkte
+            selbst. Axelix benötigt die Endpunkte <code>health</code>/<code>info</code> nicht mehr und funktioniert auch
+            ohne sie. Hier ist keine Konfiguration erforderlich.
+        </>
+    }
+/>
+
+Die Seite verwendet den Actuator-Endpunkt `axelix-conditions`, den der Axelix Spring Boot Starter bereitstellt. Geben Sie ihn
+über die üblichen Spring-Boot-Actuator-Eigenschaften frei. Unter [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) finden Sie
+die vollständige Liste der Axelix-Endpunkte und die zugehörige Einrichtung:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-conditions
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-conditions
+```
+
+  </Tab>
+</Tabs>
+
+## Siehe auch
+
+- [Beans](./beans.mdx): Bean-Zeilen verlinken über **`@AutoConfiguration class`** und **Who defines this bean?** hierher.
+- [Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

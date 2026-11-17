@@ -22,6 +22,7 @@ const EXPECTED_CADENCE_DAYS = 45;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const LABELS = {
+    de: { supported: "OSS-Support", expected: "Bis zum nächsten Minor-Release (erwartet)", ended: "Beendet" },
     en: { supported: "OSS support", expected: "Until the next minor (expected)", ended: "Ended" },
     ru: { supported: "Поддержка OSS", expected: "До следующего минора (ожидается)", ended: "Завершена" },
     fr: { supported: "Support OSS", expected: "Jusqu’à la prochaine version mineure (prévision)", ended: "Terminé" },
@@ -32,7 +33,7 @@ const toTime = (date: string) => new Date(`${date}T00:00:00Z`).getTime();
 /**
  * Spring-style Gantt chart of the OSS support window of each Axelix minor line.
  */
-export const SupportTimeline = ({ locale = "en" }: { locale?: "en" | "ru" | "fr" }) => {
+export const SupportTimeline = ({ locale = "en" }: { locale?: "en" | "ru" | "fr" | "de" }) => {
     const labels = LABELS[locale];
     const bars = LINES.map((line) => {
         const start = toTime(line.released);
@@ -79,7 +80,10 @@ export const SupportTimeline = ({ locale = "en" }: { locale?: "en" | "ru" | "fr"
                             ))}
                             <div
                                 className={`${styles.Bar} ${bar.open ? styles.Open : styles.Ended}`}
-                                style={{ left: `${percent(bar.start)}%`, width: `${percent(bar.end) - percent(bar.start)}%` }}
+                                style={{
+                                    left: `${percent(bar.start)}%`,
+                                    width: `${percent(bar.end) - percent(bar.start)}%`,
+                                }}
                                 title={bar.open ? labels.expected : `${labels.supported}: ${labels.ended}`}
                             />
                         </div>

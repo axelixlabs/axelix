@@ -54,9 +54,14 @@ type VersionProps = {
  */
 export const ReleasedInNotice = ({ version }: VersionProps) => {
     const { locale } = useI18n();
-    const label = translate({ en: "Released", ru: "Выпущено", fr: "Publié" }, locale);
+    const label = translate({ en: "Released", ru: "Выпущено", fr: "Publié", de: "Veröffentlicht" }, locale);
     const detail = translate(
-        { en: "Available since release", ru: "Доступно начиная с релиза", fr: "Disponible depuis la version" },
+        {
+            en: "Available since release",
+            ru: "Доступно начиная с релиза",
+            fr: "Disponible depuis la version",
+            de: "Verfügbar seit Version",
+        },
         locale,
     );
 
@@ -82,12 +87,13 @@ export const ReleasedInNotice = ({ version }: VersionProps) => {
 /** Marks a section as not yet released. */
 export const UpcomingReleaseNotice = () => {
     const { locale } = useI18n();
-    const label = translate({ en: "Upcoming", ru: "Ожидается", fr: "À venir" }, locale);
+    const label = translate({ en: "Upcoming", ru: "Ожидается", fr: "À venir", de: "Demnächst" }, locale);
     const detail = translate(
         {
             en: "Available in an upcoming minor release",
             ru: "Появится в ближайшем минорном релизе",
             fr: "Disponible dans une prochaine version mineure",
+            de: "Verfügbar in einer kommenden Minor-Version",
         },
         locale,
     );
@@ -116,7 +122,7 @@ type ScreenshotsNoticeProps = {
 /** Frames the screenshot passed as children, with the notice line as its header. */
 export const ScreenshotsNotice = ({ text, children }: ScreenshotsNoticeProps) => {
     const { locale } = useI18n();
-    const label = translate({ en: "Screenshots", ru: "Скриншоты", fr: "Captures d’écran" }, locale);
+    const label = translate({ en: "Screenshots", ru: "Скриншоты", fr: "Captures d’écran", de: "Screenshots" }, locale);
 
     // Slate blue reads as neutral context, apart from the green, purple and amber notices.
     const accent = "[--accent:#4a6a8a] dark:[--accent:#9db7d1]";
@@ -150,12 +156,13 @@ type LegacyNoticeProps = VersionProps & {
 /** Marks a section as no longer applicable from a given release onwards. */
 export const LegacyNotice = ({ version, reason }: LegacyNoticeProps) => {
     const { locale } = useI18n();
-    const label = translate({ en: "Legacy", ru: "Устарело", fr: "Obsolète" }, locale);
+    const label = translate({ en: "Legacy", ru: "Устарело", fr: "Obsolète", de: "Veraltet" }, locale);
     const detail = translate(
         {
             en: "Only needed before release",
             ru: "Актуально только до релиза",
             fr: "Nécessaire uniquement avant la version",
+            de: "Nur vor dieser Version erforderlich",
         },
         locale,
     );
@@ -164,6 +171,7 @@ export const LegacyNotice = ({ version, reason }: LegacyNoticeProps) => {
             en: "On later versions, skip this section.",
             ru: "На более поздних версиях пропустите этот раздел.",
             fr: "Dans les versions ultérieures, ignorez cette section.",
+            de: "Überspringen Sie diesen Abschnitt ab dieser Version.",
         },
         locale,
     );

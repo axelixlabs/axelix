@@ -1,0 +1,109 @@
+---
+title: Garbage Collector
+description: "Die Seite Garbage Collector ermöglicht es, die JVM-GC-Protokollierung einer verwalteten Spring Boot-Instanz zu aktivieren, eine Speicherbereinigung bei Bedarf auszulösen und die erzeugte Protokolldatei herunterzuladen. In der Produktion ist die GC-Protokollierung normalerweise deaktiviert. Die Seite dient dazu, sie für eine gezielte Untersuchung ein- und anschließend wieder auszuschalten."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Hauptseite des Garbage Collectors](/img/feature/garbage-collector/gc-main-page.png)
+
+</ScreenshotsNotice>
+
+***Garbage Collector in der Axelix-Benutzeroberfläche***
+
+## Zugriff
+
+Alle authentifizierten Benutzer, **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**, können die GC-Protokolldatei lesen
+und den Protokollierungsstatus einsehen. Sie können die Seite öffnen und ein vorhandenes Protokoll herunterladen.
+Die aktiven Steuerelemente setzen eine eigene Berechtigung voraus:
+
+- **Trigger GC**, **Enable GC Logging** und **Disable GC Logging** erfordern `gc:manage`.
+
+`gc:manage` gehört zu den integrierten Rollen **EDITOR**, **ADMIN** und **SUPER_ADMIN**. **VIEWER** sieht die
+Schaltflächen, die verändernden bleiben jedoch deaktiviert. Die vollständige Rollen- und Berechtigungsmatrix finden
+Sie unter [Rollen und Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+Ist eine Schaltfläche sichtbar, Ihrem Konto fehlt aber diese Berechtigung, bleibt sie deaktiviert. Beim Bewegen des
+Mauszeigers darüber zeigt Axelix einen Tooltip mit der entsprechenden Meldung.
+
+## GC-Protokollierung aktivieren
+
+Die GC-Protokollierung ist standardmäßig deaktiviert. Bis zur Aktivierung zeigt die Seite eine Leeransicht mit der
+Schaltfläche **Enable GC Logging**. Durch Klicken öffnen Sie einen Dialog, in dem Sie die JVM-Protokollstufe wählen:
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+<Image src="/img/feature/garbage-collector/enable-gc-logging.png" alt="GC-Protokollierung aktivieren" width={490} height={280}/>
+
+</ScreenshotsNotice>
+
+Die Liste der Stufen wird zur Laufzeit über `jcmd VM.log list` auf der Zielinstanz ermittelt. Üblich sind `error`,
+`warning`, `info`, `debug` und `trace`.
+
+## Mit Protokollen arbeiten
+
+Nach der Aktivierung bietet der Seitenkopf drei Aktionen:
+
+1. **Trigger GC** <Image src="/img/feature/icons/play-icon.png" width={20} height={20}/> — erzwingt über `System.gc()`
+   auf der Instanz eine Speicherbereinigung. Sie müssen dadurch nicht auf ein natürliches GC-Ereignis warten, um
+   Protokolleinträge zu erhalten. Erfordert `gc:manage`.
+2. **Download GC Log** <Image src="/img/feature/icons/download-icon.png" width={25} height={27}/> — überträgt die aktuelle
+   GC-Protokolldatei als `text/plain` an den Browser. Schreibgeschützt und für alle verfügbar.
+3. **Disable GC Logging** <Image src="/img/feature/icons/disable-icon.png" width={25} height={27}/> — schaltet die
+   GC-Protokollierung aus, ohne die bereits geschriebene Protokolldatei zu verändern. Erfordert `gc:manage`.
+
+Eine beispielhafte Zeile aus einem heruntergeladenen GC-Protokoll mit Erläuterungen:
+
+```
+[2026-03-02T17:38:55.009+0000][info][gc] GC(428) Pause Full (System.gc()) 29M->28M(97M) 82.955ms
+              │                  │    │    │               │               │    │   │       │
+              │                  │    │    │               │               │    │   │       └─ GC pause duration
+              │                  │    │    │               │               │    │   └─ Total heap
+              │                  │    │    │               │               │    └─ After heap
+              │                  │    │    │               │               └─ Before heap
+              │                  │    │    │               └─ GC event description
+              │                  │    │    └─ GC event ID
+              │                  │    └─ Log tag (subsystem)
+              │                  └─ Log level
+              └─ Timestamp (ISO-8601 with timezone)
+```
+
+## Dedizierten Actuator-Endpunkt aktivieren
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Ab Axelix 1.2.0 ist dies nicht mehr erforderlich: Der Starter registriert seine eigenen Actuator-Endpunkte
+    selbst, und Axelix benötigt keine aktivierten <code>health</code>/<code>info</code>-Endpunkte mehr.
+    Es funktioniert auch ohne diese Endpunkte. Hier ist keine Konfiguration erforderlich.</>}
+/>
+
+Diese Seite verwendet den Actuator-Endpunkt `axelix-gc`, den der Axelix Spring Boot Starter bereitstellt.
+Geben Sie ihn über die üblichen Spring Boot Actuator-Eigenschaften frei. Die vollständige Liste der Axelix-Endpunkte
+und die zugehörige Einrichtung finden Sie unter [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-gc
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-gc
+```
+
+  </Tab>
+</Tabs>
+
+## Siehe auch
+
+- [Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

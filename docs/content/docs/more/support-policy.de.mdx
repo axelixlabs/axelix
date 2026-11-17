@@ -1,0 +1,51 @@
+---
+title: Support-Richtlinie
+description: "Wie häufig Axelix neue Versionen veröffentlicht, welche Open-Source-Versionen noch Korrekturen erhalten und wie lange."
+---
+
+import { SupportTimeline } from './SupportTimeline';
+
+Jede Axelix-Release-Linie erhält für begrenzte Zeit Korrekturen. Diese Seite erläutert, wie häufig neue Versionen erscheinen, welche Open-Source-Versionen derzeit unterstützt werden und was der Support umfasst.
+
+## Veröffentlichungsrhythmus
+
+Axelix veröffentlicht etwa alle **1 bis 1,5 Monate** ein neues Minor- oder Major-Release. Eines dieser Releases pro Jahr ist ein **Major-Release**. Ein Kalenderjahr umfasst daher meist etwa acht oder neun Minor-Releases und ein Major-Release.
+
+Dazwischen kann eine unterstützte Linie auch **Patch-Releases** erhalten (`1.2.1`, `1.2.2` usw.). Dafür gibt es keinen festen Zeitplan: Sie erscheinen, sobald eine Korrektur fertig ist. Welche Änderungen die einzelnen Release-Arten enthalten dürfen, beschreibt [Kompatibilität und Versionierung](./compatibility-and-versioning.mdx#der-aufwandsindikator).
+
+## Wie lange eine Version unterstützt wird
+
+Die Open-Source-Edition unterstützt **nur die neueste Release-Linie**. Eine Minor-Linie `X.Y` wird ab Veröffentlichung von `X.Y.0` unterstützt, bis das nächste Release `X.Y+1.0` oder ein neues Major-Release erscheint. Beim üblichen Veröffentlichungsrhythmus sind das etwa **1,5 Monate**.
+
+Beispielsweise erschien `1.1.0` am 10. September 2026 und `1.2.0` am 10. Oktober 2026. Die Linie `1.1` wurde somit während dieses Monats unterstützt; seit dem 10. Oktober wird nur `1.2` unterstützt.
+
+Solange eine Linie unterstützt wird, erhält sie:
+
+- Korrekturen für Sicherheitslücken in Axelix selbst und in seinen Abhängigkeiten;
+- Korrekturen für kritische Fehler.
+
+Diese Korrekturen erscheinen als Patch-Releases der unterstützten Linie, etwa `1.2.1`. Neue Funktionen kommen nie in ein Patch-Release; sie warten auf das nächste Minor-Release. Nach Ende des Supports erhält eine Linie keine weiteren Patch-Releases. Bei einem dort auftretenden Problem besteht die Lösung daher im Upgrade auf das neueste Release.
+
+:::note[Support ist nicht gleich Kompatibilität]
+Das Support-Ende bedeutet nicht, dass eine ältere Version nicht mehr funktioniert. Master arbeitet weiterhin mit Diensten zusammen, deren Starter aus den letzten vier Minor-Releases stammen; siehe [Kompatibilitätsfenster](./upgrading.mdx#das-kompatibilitätsfenster). Der Support legt nur fest, welche Versionen noch Korrekturen erhalten.
+:::
+
+## Unterstützte Versionen
+
+| Version | Erstveröffentlichung | Ende des OSS-Supports |
+|---------|----------------------|-----------------------|
+| `1.2.x` | 10. Oktober 2026 | Wenn das nächste Release erscheint |
+| `1.1.x` | 10. September 2026 | 10. Oktober 2026 |
+| `1.0.x` | 29. Juli 2026 | 10. September 2026 |
+
+Das folgende Diagramm zeigt dieselben Zeiträume im Verlauf. Das Ende der aktuellen Linie ist anhand des üblichen Abstands zwischen Releases geschätzt und verschiebt sich mit dem tatsächlichen Veröffentlichungsdatum.
+
+<SupportTimeline locale="de" />
+
+Um bei einer unterstützten Version zu bleiben, aktualisieren Sie auf jedes neue Minor-Release. Die Schritte beschreibt [Axelix aktualisieren](./upgrading.mdx).
+
+## Siehe auch
+
+- [Kompatibilität und Versionierung](./compatibility-and-versioning.mdx)
+- [Axelix aktualisieren](./upgrading.mdx)
+- [Branching-Modell](./development/branching-model.mdx)

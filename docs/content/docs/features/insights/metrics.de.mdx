@@ -1,0 +1,145 @@
+---
+title: Metriken
+description: "Die Seite Metrics listet alle von einer verwalteten Spring Boot-Instanz bereitgestellten Micrometer-Messinstrumente auf, jeweils mit Live-Diagramm und Tag-Filterung."
+---
+
+Metriken werden anhand ihres Präfixes automatisch in aufklappbare Bereiche gruppiert. Jede Gruppe steht für eine
+logische Kategorie verwandter Metriken, etwa JVM, HTTP oder JDBC. So finden und analysieren Sie schnell Metriken
+desselben Funktionsbereichs.
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Hauptseite der Metriken](/img/feature/metrics/metrics-main-page.png)
+
+</ScreenshotsNotice>
+
+***Metrics in der Axelix-Benutzeroberfläche***
+
+Diese Seite ist schreibgeschützt und für alle authentifizierten Benutzer verfügbar: **VIEWER**, **EDITOR**, **ADMIN** und
+**SUPER_ADMIN** können sie öffnen. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter
+[Rollen und Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Von Axelix bereitgestellte Messinstrumente
+
+Neben den bereits von Ihrer Anwendung bereitgestellten Messinstrumenten kann Axelix eigene Micrometer-Messinstrumente
+hinzufügen. Dies geschieht, wenn Sie `axelix-spring-boot-X-starter` (den Axelix-Starter) verwenden und die Anwendung
+bereits eine `MeterRegistry`-Bean hat.
+
+Ist `MeterRegistry` registriert, fügt Axelix der Registry folgende Messinstrumente hinzu:
+
+- `axelix_transaction_duration` — `Timer` mit den Tags `class` und `method`.
+- `axelix_transaction_queries` — `Counter` mit den Tags `class` und `method`.
+- `axelix_transaction_external_calls` — `Counter` mit den Tags `class` und `method`.
+- `axelix_cache_requests` — `Counter` mit den Tags `cache` und `result=hit|miss`.
+- `axelix_cache_enabled` — `Gauge` mit dem Tag `cache`, das `1` für aktivierte und `0` für deaktivierte Caches meldet.
+
+Der Endpunkt `/actuator/prometheus` stellt diese Metriken ebenfalls bereit, sofern der Prometheus-Actuator-Endpunkt
+aktiviert ist. Sie können sie daher für eigene Dashboards in Systemen wie Grafana verwenden.
+
+Einzelheiten zu jeder Metrik finden Sie [auf der entsprechenden Seite](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#axelix-metriken-über-micrometer-exportieren).
+
+## Metrikdetails
+
+Die Detailseite bietet eine eingehende Analyse einzelner Metriken mit interaktiven Diagrammen, Echtzeitwerten und
+intelligenter Tag-Filterung.
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Detailseite einer Metrik](/img/feature/metrics/metrics-details-page.png)
+
+</ScreenshotsNotice>
+
+***Details einer JVM-Speichermetrik in der Axelix-Benutzeroberfläche***
+
+## Seitenaufbau
+
+### Aufklappbarer Kopfbereich
+
+- **Metric Name**: der vollständige Metrikbezeichner (z. B. `jvm.memory.max`).
+- **Description**: Bewegen Sie den Mauszeiger über das Symbol
+  ![Beschreibung der Metrik](/img/feature/icons/question-icon.png), um zu sehen, was die Metrik misst.
+
+### Linker Bereich: aktuelle Metrikinformationen
+
+Zeigt Echtzeitinformationen zur ausgewählten Metrik:
+
+- **Value**: die neueste Messung.
+- **Base Unit**: die Maßeinheit (Bytes, Millisekunden, Prozent, skalare Größe usw.).
+- **Tags**: Auswahllisten zum Filtern der Messungen nach Tag-Dimensionen. Angeboten werden nur tatsächlich auf der
+  Instanz vorhandene Kombinationen; ungültige Kombinationen bleiben sichtbar, sind aber deaktiviert.
+
+### Rechter Bereich: Zeitreihendiagramm
+
+Ein Liniendiagramm zeigt den Metrikwert über ein gleitendes Zeitfenster. Die Seite fragt die Instanz regelmäßig ab und
+setzt das Fenster nach dessen Ablauf zurück. Das Diagramm zeigt somit das jüngste Verhalten und nicht den gesamten
+Verlauf seit dem Start der Instanz.
+
+## Tag-Filterung (Drilling Down)
+
+Die Liste gültiger Tag-Kombinationen stammt aus der Micrometer-`MeterRegistry` der Instanz. Axelix erfindet oder
+beschränkt diese Kombinationen nicht. Wenn Sie in einer Auswahlliste einen Wert wählen, werden die anderen aktualisiert
+und bieten nur noch gültige Optionen an. Ungültige Optionen bleiben sichtbar, aber deaktiviert, mit dem Tooltip
+*"This tag value is not valid, considering the values selected for other tags"*. Die zugrunde liegende Funktionsweise
+beschreibt die Spring Boot-Referenz unter [Drilling Down](https://docs.spring.io/spring-boot/api/rest/actuator/metrics.html).
+
+### Funktionsweise
+
+Wenn Sie einen Tag-Wert auswählen, werden die Optionen für die übrigen Tags auf Kombinationen eingegrenzt, die auf der
+laufenden Instanz tatsächlich existieren.
+
+### Beispiel: JVM-Speichermetriken
+
+Für die Metrik `jvm.memory.used` mit den Tags `area` und `id`:
+
+| `area`  | `id`                          | Angeboten |
+|---------|-------------------------------|---------|
+| heap    | G1 Eden Space                 | ✅       |
+| heap    | G1 Survivor Space             | ✅       |
+| heap    | G1 Old Gen                    | ✅       |
+| nonheap | Metaspace                     | ✅       |
+| nonheap | Compressed Class Space        | ✅       |
+| nonheap | CodeHeap profiled nmethods    | ✅       |
+| nonheap | CodeHeap non-nmethods         | ✅       |
+| nonheap | CodeHeap nonprofiled-nmethods | ✅       |
+| heap    | Metaspace                     | ❌       |
+| nonheap | G1 Old Gen                    | ❌       |
+
+## Dedizierten Actuator-Endpunkt aktivieren
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Ab Axelix 1.2.0 ist dies nicht mehr erforderlich: Der Starter registriert seine eigenen Actuator-Endpunkte
+    selbst, und Axelix benötigt keine aktivierten <code>health</code>/<code>info</code>-Endpunkte mehr.
+    Es funktioniert auch ohne diese Endpunkte. Hier ist keine Konfiguration erforderlich.</>}
+/>
+
+Diese Seite verwendet den Actuator-Endpunkt `axelix-metrics`, den der Axelix Spring Boot Starter bereitstellt.
+Geben Sie ihn über die üblichen Spring Boot Actuator-Eigenschaften frei. Die vollständige Liste der Axelix-Endpunkte
+und die zugehörige Einrichtung finden Sie unter [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metrics
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metrics
+```
+
+  </Tab>
+</Tabs>
+
+## Siehe auch
+
+- [Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

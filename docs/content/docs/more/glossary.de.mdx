@@ -1,0 +1,33 @@
+---
+title: Glossar
+description: "Dieses Dokument definiert die wichtigsten Begriffe und Abkürzungen der Axelix-Dokumentation und des Quellcodes."
+---
+
+## Begriffe
+
+### Axelix
+
+Der Name des Projekts. Auch als Oberbegriff für das gesamte System verwendet.
+
+### Axelix Master
+
+Eine eigenständige, separat bereitgestellte Anwendung, die:
+
+- die Weboberfläche für Axelix bereitstellt,
+- mit verwalteten Diensten kommuniziert,
+- als zentrale Verwaltungsstelle dient,
+- Diensterkennung und Registrierung übernimmt,
+- einen integrierten MCP-Server enthält.
+
+### Axelix Spring Boot Starter
+
+Ein Spring-Boot-Starter, der Spring-Boot-Anwendungen hinzugefügt wird, um die Axelix-Integration zu ermöglichen.
+Er stellt die benötigten Funktionen bereit, die Axelix Master aufruft.
+
+### Verwalteter Dienst
+
+Eine Spring-Boot-Anwendung, die:
+
+- den Axelix Spring Boot Starter integriert hat,
+- bei Axelix Master registriert und ihm bekannt ist,
+- über Axelix überwacht und verwaltet werden kann.

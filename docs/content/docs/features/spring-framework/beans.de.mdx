@@ -1,0 +1,136 @@
+---
+title: Beans
+description: "Die Seite Beans listet alle Spring-Beans im ApplicationContext der verwalteten Instanz auf. Jede Zeile lässt sich aufklappen und zeigt Klasse, Gültigkeitsbereich, Abhängigkeiten, Qualifier, Proxy-Strategie und die Herkunft, die Spring zur Erstellung verwendet hat."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Übersicht der Spring-Beans](/img/feature/beans/beans-main-page.png)
+
+</ScreenshotsNotice>
+
+**_Die Seite Beans in der Axelix-Oberfläche_**
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und
+**SUPER_ADMIN** können sie öffnen. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und
+Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+Eine scrollbar angeordnete Liste zeigt alle Beans. Darüber befinden sich ein Suchfeld und ein Zähler im Format `<matching> / <total>`.
+
+Jede Zeilenüberschrift zeigt drei Angaben nebeneinander:
+
+- **Bean Name**: der Bezeichner der Bean im Spring-Kontext.
+- **Class Name**: die vollständig qualifizierte Klasse, etwa `org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor`.
+- **Scope**: ein farblich gekennzeichnetes `Tag` rechts in der Überschrift. Axelix ordnet den von Spring gemeldeten Gültigkeitsbereich einer dieser Farben zu:
+    - <span style={{ color: "#1677ff", fontWeight: "bold" }}>singleton</span>
+    - <span style={{ color: "#fa8c16", fontWeight: "bold" }}>prototype</span>
+    - <span style={{ color: "#13c2c2", fontWeight: "bold" }}>request</span>
+    - <span style={{ color: "#a0d911", fontWeight: "bold" }}>session</span>
+    - <span style={{ color: "#faad14", fontWeight: "bold" }}>application</span>
+    - <span style={{ color: "#722ed1", fontWeight: "bold" }}>websocket</span>
+    - <span style={{ color: "#fa541c", fontWeight: "bold" }}>refresh</span> (Spring Cloud)
+    - <span style={{ color: "#eb2f96", fontWeight: "bold" }}>сustom scopes</span> (benutzerdefinierte
+      Gültigkeitsbereiche)
+
+## Aufklappbare Bean-Details
+
+Wenn Sie eine Zeile aufklappen, erscheinen die Details der Bean. Abschnitte erscheinen nur, wenn Daten vorhanden sind.
+Eine Bean ohne Qualifier zeigt beispielsweise keine Qualifiers-Zeile.
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Aufgeklappte Details einer Spring-Bean](/img/feature/beans/beans-details-page.png)
+
+</ScreenshotsNotice>
+
+**_Aufgeklappte Bean-Details in der Axelix-Oberfläche_**
+
+- **Dependencies**: Namen anderer Beans, von denen diese Bean abhängt. Ist eine Abhängigkeit selbst eine registrierte
+  Bean, führt ein Klick auf ihren Namen zu dieser Bean in der Liste.
+- **Aliases**: weitere Namen, unter denen diese Bean registriert ist, sofern vorhanden.
+- **Qualifiers**: auf die Bean angewendete `@Qualifier`-Werte, sofern vorhanden.
+- **Proxying Strategy**: wie Spring die Bean-Instanz umschlossen hat. Mögliche Werte:
+    - **CGLIB**: ein auf einer CGLIB-Unterklasse basierender Proxy.
+    - **JDK Dynamic Proxy**: ein auf JDK-Interfaces basierender Proxy.
+    - **No Proxying**: die Bean wird unverändert verwendet.
+    - **Unknown**: Axelix konnte den Proxy-Typ nicht aus der Bean-Definition ermitteln.
+- **Lazily Initialized**: boolescher Wert. `true` für Beans, die erst bei der ersten Verwendung statt beim Start erstellt werden.
+- **Primary**: boolescher Wert. `true` für mit `@Primary` annotierte Beans.
+- **Origin**: wie Spring die Bean erstellt hat. Siehe [Herkunft einer Bean](#herkunft-einer-bean).
+
+### Herkunft einer Bean
+
+Der Abschnitt Origin zeigt je nach der von Spring gemeldeten Herkunft eine einzelne Bezeichnung oder einen kleinen
+aufklappbaren Baum:
+
+- **`@Component` or variants**: die Bean stammt aus `@Component`, `@Service`, `@Repository`, `@Controller` oder einem
+  benutzerdefinierten Stereotyp. Wird die deklarierende Klasse auf der Seite [Conditions](./conditions.mdx) erfasst,
+  wechselt die Bezeichnung zu **`@AutoConfiguration class`** und verlinkt auf diese Seite.
+- **`@Bean` method**: die Bean stammt aus einer `@Bean`-Factory-Methode. Der Baum zeigt:
+    - den Namen der **`@Bean` method**.
+    - **Declaring class**: die Klasse, die die `@Bean`-Methode definiert. Falls eine Bean mit passender Klasse registriert
+      ist, führt ein Klick zu ihr. Die Bezeichnung wechselt zu **Declaring AutoConfiguration class**, wenn die deklarierende
+      Klasse auf der Seite [Conditions](./conditions.mdx) erfasst wird.
+    - den Link **Who defines this bean?** zur Seite [Conditions](./conditions.mdx), ebenfalls nur dann, wenn die
+      deklarierende Klasse dort erfasst wird.
+    - den Link **`@ConfigurationProperties` bean** zur Seite [Configuration Properties](./configuration-properties.mdx),
+      sofern die Bean mit `@ConfigurationProperties` annotiert ist.
+- **Produced by the `FactoryBean`**: die Bean wurde von einer `FactoryBean` erstellt. Der Baum zeigt den Klassennamen
+  der **Factory Bean**.
+- **Synthetic bean**: eine interne Spring-Bean, etwa Infrastruktur-Objekte, die das Framework oder Bibliotheken wie
+  Spring Data registrieren.
+- **Unknown**: Spring hat nicht genügend Metadaten gemeldet, um die Herkunft einzuordnen. Bei programmatisch über
+  `BeanDefinitionRegistry` registrierten Beans ist dies der übliche Fall. Ist eine solche Bean zusätzlich mit
+  `@ConfigurationProperties` annotiert, wechselt die Origin-Bezeichnung zu **`@ConfigurationProperties` bean** und
+  verlinkt auf die Seite [Configuration Properties](./configuration-properties.mdx).
+
+## MCP-Werkzeuge
+
+Der Bean-Katalog einer verwalteten Instanz steht auch KI-Agenten über MCP zur Verfügung. Siehe [MCP-Werkzeugkatalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#instanz-untersuchen).
+
+## Eigenen Actuator-Endpunkt freigeben
+
+<LegacyNotice
+    version="1.2.0"
+    reason={
+        <>
+            Ab Axelix 1.2.0 ist dies nicht mehr erforderlich: Der Starter registriert seine eigenen Actuator-Endpunkte
+            selbst. Axelix benötigt die Endpunkte <code>health</code>/<code>info</code> nicht mehr und funktioniert auch
+            ohne sie. Hier ist keine Konfiguration erforderlich.
+        </>
+    }
+/>
+
+Die Seite verwendet den Actuator-Endpunkt `axelix-beans`, den der Axelix Spring Boot Starter bereitstellt. Geben Sie ihn
+über die üblichen Spring-Boot-Actuator-Eigenschaften frei. Unter [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) finden Sie
+die vollständige Liste der Axelix-Endpunkte und die zugehörige Einrichtung:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-beans
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-beans
+```
+
+  </Tab>
+</Tabs>
+
+## Siehe auch
+
+- [Properties](./properties.mdx): verlinkt über **Injected in** auf eine Bean auf dieser Seite.
+- [Configuration Properties](./configuration-properties.mdx): erreichbar über den Link **`@ConfigurationProperties` bean** in Origin.
+- [Conditions](./conditions.mdx): erreichbar über die Links **`@AutoConfiguration class`** und **Who defines this bean?** in Origin.
+- [Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)
