@@ -1,0 +1,197 @@
+---
+title: Sorun giderme
+description: "Bu sayfa, Axelix kurulumu ve yapılandırması sırasında en sık karşılaşılan sorunları açıklar."
+---
+
+## 1. Axelix uç noktalarına erişirken kimlik doğrulama hatası (401) [#1-authentication-error-401-when-accessing-axelix-endpoints]
+
+### Belirti [#symptom]
+
+Yönetilen servis tarafında `application.yaml` içinde Axelix uç noktalarına erişim etkinleştirilmiş ve Spring Security doğru
+yapılandırılmış olsa da Master tarafında yönetilen servisle iletişim kurulurken 401 hatası döner.
+
+### En olası neden [#most-likely-cause]
+
+Uygulamada, yönetilen servisin (Axelix Spring Boot Starter ve eklenti içeren mikroservisin) sunduğu actuator uç noktaları
+neredeyse hiçbir zaman herkese açık bırakılmaz. Bunları HTTP Basic, OIDC/OAuth2 kaynak sunucusu veya uygulamanın Spring
+Security yapılandırmasına bağlı başka bir kimlik doğrulama yöntemiyle korumak çok yaygındır ve genellikle önerilir.
+
+Axelix aynı zamanda kendi Kimlik ve Erişim Yönetimi (IAM) sistemiyle gelir. Master, 1.3 ve üzeri starter çağırırken özel Axelix
+actuator uç noktalarını (genellikle yapılandırılabilir actuator ön ekiyle `/actuator/axelix-*/**`), `Authorization` başlığında
+`AXELIX.MASTER` teknik bearer belirteciyle çağırır. 1.3'ten eski starter'lar için kullanıcının belirtecini eski yetki adlarıyla
+yeniden düzenler. İlk keşif, Master'ı tanımlayan bir uyumluluk belirteci kullanır. Her durumda belirteç, uygulamanın kendi
+güvenlik sistemine değil Axelix bileşenlerine yöneliktir.
+
+:::note[Özel actuator ön eki]
+`/actuator` bölümü actuator temel yoludur; `management.endpoints.web.base-path` ile yapılandırılabilir (varsayılanı
+`/actuator`). Yönetilen servisiniz bu özelliği değiştirirse Axelix uç noktaları yapılandırılan temel yol altında bulunur;
+örneğin `/manage` temel yolu, uç noktaların `/manage/axelix-*/**` adresinden erişilebileceği anlamına gelir.
+Aşağıdaki çözümün istek eşleştiricisinde bunu dikkate alın.
+:::
+
+401, bu iki bağımsız kimlik doğrulama sisteminin çakışmasından kaynaklanır: yönetilen servisin güvenlik filtresi, istek Axelix
+bileşenlerine ulaşmadan önce araya girer, bearer belirtecini görür ve yönetilen servisin kendi IAM sistemiyle doğrulamaya
+çalışır. Axelix belirteci bu sistemde bilinmediğinden reddedilir.
+
+### Çözüm: [#the-solution]
+
+Çözüm, özel Axelix actuator uç noktalarını (yine actuator uç noktalarının özel ön ekini yapılandırma olasılığı dikkate
+alınarak `/actuator/axelix-*/**` yoluyla eşleşenleri) uygulama IAM sisteminden hariç tutmak ve Axelix'in kendi IAM sistemine güvenmektir:
+
+Bu kalıp hem uç nokta köklerini hem de önbellek temizleme gibi iç içe yolları kapsar.
+
+<Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
+  <Tab value="Spring Boot 4.x">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
+}
+```
+
+  </Tab>
+  <Tab value="Spring Boot 3.x">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
+}
+```
+
+  </Tab>
+  <Tab value="Spring Boot 2.7">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().antMatchers("/actuator/axelix-*/**");
+}
+```
+
+  </Tab>
+</Tabs>
+
+## 2. Spring Boot sürümünüz için yanlış starter modülü [#2-wrong-starter-module-for-your-spring-boot-version]
+
+### Belirti [#symptom-1]
+
+Axelix Spring Boot Starter bağımlılığını ekledikten hemen sonra uygulama, bir `javax.servlet.*` veya `jakarta.servlet.*`
+sınıfını belirten `NoClassDefFoundError` ya da `ClassNotFoundException` ile başlayamaz. Örneğin Spring Boot 4.x projesinde
+`javax/servlet/FilterChain` veya Spring Boot 2.x projesinde `jakarta/servlet/FilterChain`.
+
+### En olası neden [#most-likely-cause-1]
+
+Axelix her Spring Boot ana sürümü için ayrı bir starter artifact'ı sunar:
+
+- Spring Boot 2.7+ için `axelix-spring-boot-2-starter`
+- Spring Boot 3 için `axelix-spring-boot-3-starter`
+- Spring Boot 4 için `axelix-spring-boot-4-starter`
+
+Bunlar ayrı yayımlanan farklı Maven artifact'larıdır (tümü aynı sürümlendirme düzenini izlese de).
+Bu nedenle Spring Boot starter eklerken Spring Boot'un uygun ana sürümüne ait starter'ı eklediğinizden emin olmalısınız.
+
+### Çözüm: [#the-solution-1]
+
+Starter'ı uygulamanızın Spring Boot **ana** sürümüyle eşleştirin.
+[Her Spring Boot ana sürümü için ayrı starter](./compatibility-and-versioning.mdx#a-dedicated-starter-per-spring-boot-major-version)
+bölümüne ve tam koordinatlar için
+[Spring Boot Starter yapılandırmasına](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency) bakın.
+
+## 3. Yerelde başlatılan servis yerelde başlatılan Master'a kaydolmuyor [#3-a-locally-started-service-doesnt-register-with-a-locally-started-master]
+
+### Belirti [#symptom-2]
+
+Axelix Master'ı yerelde çalıştırır, kendi servisinize starter ekler ve servisi IDE'den başlatırsınız.
+Hatasız başlar, ancak Master'da hiç görünmez; iki tarafta da hata yoktur ve kenar çubuğunda kayıt bulunmaz.
+
+### En olası neden [#most-likely-cause-2]
+
+İki ön koşul eksiktir. IDE'nin varsayılan “Run” düğmesi yalnızca ana sınıfı derleyip başlatıyorsa ikisini de atlamak kolaydır.
+
+**Derleme eklentisi hiç çalışmamıştır.** Axelix'in Maven ve Gradle için derleme eklentileri vardır.
+Bunlar derleme çıktısına, servisin `groupId`/`artifactId`/`version` bilgilerini içeren `META-INF/axelix-info.properties`
+dosyasını ekler. Starter'ın servisi Master'a tanıtmak için bu dosyaya ihtiyacı vardır.
+
+Maven'da bu işi yapan hedef (`axelix-generate-project-info`), `prepare-package` aşamasına bağlıdır; IDE'deki sıradan
+“derle ve çalıştır” işlemi bu aşamaya ulaşmaz. Gradle görevi, IDE çalıştırmalarına da dahil olması için özellikle
+`processResources`'a bağlanmıştır. Ancak bu yalnızca IDE gerçekten bu görevi çağırıyorsa gerçekleşir; bunun için IDE'nin
+kendi artımlı derleyicisi yerine derleme/çalıştırma eylemlerini Gradle'a devretmek gerekir.
+
+**Master örneği kendi başına bulamaz.** Master'ın Kubernetes tabanlı otomatik keşfinin yerel makinede tarayacağı bir şey yoktur;
+bu nedenle servis kendiliğinden kaydolmalıdır.
+
+### Çözüm: [#the-solution-2]
+
+IDE'nin Run düğmesine güvenmeden önce en az bir kez gerçek derleme çalıştırın: `mvn package` (veya `mvn install`) ya da
+`./gradlew build`. Eklentinin ürettikleri ve neden gerekli olduğu için
+[Axelix derleme eklentisi nedir?](../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) sayfasına bakın.
+
+Ardından starter'ı kendiliğinden kayıtla yerel Master'ınıza yönlendirin ve iki tarafta JWT imzalama anahtarını eşleştirin.
+Simetrik HMAC algoritması kullanıldığından Master'da ve her örnekte aynı değer olmalıdır:
+
+```properties
+server.port=9444
+axelix.sbs.auth.jwt.algorithm=HMAC256
+axelix.sbs.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
+axelix.sbs.discovery.self-registration=true
+axelix.sbs.discovery.instance-name=your-application-name
+axelix.sbs.discovery.instance-actuator-url=http://localhost:9444/actuator
+axelix.sbs.discovery.master-url=http://localhost:2935/api/internal/service/register
+```
+
+`2935`, Axelix `1.2.0` itibarıyla Master'ın varsayılan portudur. Önceki sürümlerde varsayılan `8080` olduğundan Master'ınız
+daha eskiyse `master-url` içinde `8080` kullanın; [Genel](../setting-up-master-ui/configuring-master/configuring-master.mdx#general) bölümüne bakın.
+
+1.2.0'dan eski Axelix sürümlerinde bir özellik daha gerekir: eski starter'lar uç noktalarını kendileri sunmaz ve
+`axelix-metadata` olmadan Master örneği yoklayamaz:
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata
+```
+
+Son olarak Master'ı **aynı** algoritma ve imzalama anahtarıyla JAR olarak başlatın:
+
+```bash
+java \
+  -Daxelix.master.auth.jwt.algorithm=HMAC256 \
+  -Daxelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Anahtar uyuşmazlığı, yaşam sinyalini kaydetmek yerine `401` ile reddeder.
+Tam kendiliğinden kayıt başvurusu için [Spring Boot Starter yapılandırmasına](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#let-master-find-the-instance),
+Master tarafı için [JAR olarak çalıştırma](../setting-up-master-ui/configuring-master/configuring-master.mdx#run-as-a-jar) bölümüne bakın.
+
+:::warning
+Yukarıdaki imzalama anahtarını veya bu sayfadaki herhangi bir örnek anahtarı gerçek dağıtımda asla kullanmayın.
+:::
+
+## 4. Kayıttan sonra bazı kenar çubuğu bölümleri boş kalıyor [#4-some-sidebar-sections-stay-empty-after-registration]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya üzerindeyseniz bunların hiçbiri gerekmez: starter özel actuator uç noktalarını kendisi kaydeder ve
+    Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkin olmasını gerektirmez; bunlar olmadan da sorunsuz çalışır.
+    Burada yapılandırma gerekmez.</>}
+/>
+
+### Belirti [#symptom-3]
+
+Örnek Master'da görünür ve sağlıklı durumdadır, ancak Beans, Caches, Loggers gibi bazı kenar çubuğu bölümleri boş kalır veya yüklenemez.
+
+![Beklenmeyen sunucu hatası gösteren kenar çubuğu bölümü](/img/feature/troubleshooting/troubleshooting-actuator-endpoint-error.png)
+***Seçili kenar çubuğu bölümü (Details), gerçek veriler yerine “No data” ve “Unexpected server error” bildirimi gösteriyor***
+
+### En olası neden [#most-likely-cause-3]
+
+Spring Boot varsayılan olarak özel actuator uç noktalarını web erişimine açmaz. Her Axelix arayüz bölümü kendi özel uç
+noktasını okur (`axelix-beans`, `axelix-caches`, `axelix-loggers` vb.). Örneğin Master'da görünmesi için yalnızca
+`axelix-metadata` gerekir; diğer tüm uç noktalar isteğe bağlıdır. Dolayısıyla `management.endpoints.web.exposure.include`
+içinde eşleşen uç noktası olmayan bir bölümün okuyabileceği kaynak yoktur.
+
+### Çözüm: [#the-solution-3]
+
+Yönetilen serviste eksik uç nokta kimliklerini `management.endpoints.web.exposure.include` içine ekleyin.
+Tam liste için [Starter'ın sundukları](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#what-the-starter-exposes) bölümüne bakın.

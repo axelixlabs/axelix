@@ -1,0 +1,397 @@
+---
+title: Başlarken
+description: "Bu sayfa Axelix'i bir kuruluşta kullanıma almanın önerilen yolunu açıklar: hangi ortamlardan başlanacağı, bileşenlerin hangi sırayla kurulacağı ve üretime nasıl güvenle geçileceği. Her adım somut komutlar, minimum yapılandırma ve tam başvuru için ayrıntılı yapılandırma sayfasına bağlantılar sunar."
+---
+
+:::note
+Bu sayfadaki örnekler gösterim amacıyla `AXELIX_VERSION_PLACEHOLDER` sürümünü sabitler.
+En son yayımlanan etiket için [Sürümler sayfasını](https://github.com/axelixlabs/axelix/releases) kontrol edin ve kendi
+komutlarınızda bu değeri kullanın.
+:::
+
+## Axelix ve ortamlarınız [#axelix-and-your-environments]
+
+Tipik yazılım geliştirme yaşam döngüsü birkaç ortamı kapsar. Bunlara tam olarak ne ad verirseniz verin (dev, sandbox,
+QA, UAT, staging), her ortam iki sınıftan birine girer: **üretim** ve **üretim dışı**.
+
+Ekiplerin ilk sorusu genellikle şudur: Axelix Master üretimde mi çalışmalıdır? **Evet.** Master performans, güvenlik ve
+hata toleransı açısından hem üretimde hem test ortamlarında çalışmak için tasarlanmıştır. Master'ı üretimde çalıştırmak, amacına uygun ve yerleşmiş bir kullanım biçimidir.
+
+Ancak Axelix'in üretim dağıtımını, test ortamlarınızı yöneten dağıtımdan ayrı tutmanızı kesinlikle öneririz.
+Başka bir deyişle tüm ortamları yöneten tek Master çalıştırmayın. Nedenleri:
+
+1. **Erişim denetimi farklıdır.** Test ortamındaki RBAC yapılandırması neredeyse kesinlikle üretimle aynı değildir.
+   Üretimde günlük düzeyini değiştirebilen, önbellekleri açıp kapatabilen veya heap dökümü alabilen kişilerin listesi
+   hazırlık ortamından çok daha kısadır.
+   [Roller ve yetkiler](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+2. **Ağ kuralları farklıdır.** Master arayüzüne ve Master MCP sunucusuna kimlerin erişebileceğini belirleyen kurallar
+   üretimde genellikle test ortamlarından çok daha sıkıdır.
+3. **Politikalar farklı olacaktır.** Şu anda geliştirilmekte olan Axelix Enterprise politikalarının da ortama özgü olması beklenmektedir.
+
+:::tip
+Her Master dağıtımı, `axelix.master.environment` özelliğiyle hangi ortama hizmet ettiğini belirtebilir
+(örneğin `production` veya `staging`). Bugün bu etiket yalnızca
+[yapılandırılmış günlük kaydını](../setting-up-master-ui/configuring-master/configuring-master.mdx#structured-logging)
+besler; ancak ilk günden ayarlamak dağıtımlarınızın kendini tanımlamasını sağlar.
+:::
+
+Bu ayrımla benimseme süreci önce testten geçer. Böylece Axelix üretime ulaştığında hem yapılandırma hem de ekibinizin
+alışkanlıkları doğrulanmış olur.
+
+## Adım 1 — Veritabanını hazırlayın [#step-1--prepare-the-database]
+
+Master ilişkisel veritabanına ihtiyaç duyar. Yerleşik [SQLite](https://www.sqlite.org/) ve varsayılan
+`jdbc:sqlite:axelix.db` URL'siyle sunulduğundan ilk çalıştırmada **hiç veritabanı yapılandırması gerekmez**.
+Bu varsayılan hızla çalışmaya başlamanızı sağlar.
+
+Deneme aşamasını geçtiyseniz ve kurulumdan gerçek değer istiyorsanız desteklenen listeden bir motor seçin:
+**PostgreSQL**, **MySQL** veya **SQLite**. Tek düğümlü denemenin ötesinde PostgreSQL veya MySQL seçin.
+SQLite veriyi yerel dosyada saklar; bağlı bir birim olmadan kapsayıcı yeniden başlatmalarında korunmaz ve birden fazla
+Master kopyasının arkasında kullanılamaz. Desteklenen motor listesini gelecekte genişletmeyi planlıyoruz.
+
+Master şemasını kendisi uyguladığından veritabanını ve şema geçiş yetkilerine sahip kullanıcıyı hazırlayın:
+[Liquibase](https://www.liquibase.com/) her başlangıçta çalışır, geçişleri asla elle çalıştırmazsınız;
+[Veritabanı geçişleri](../setting-up-master-ui/migrations/migrations.mdx) sayfasına bakın.
+Bağlantı, [Veritabanı](./configuring-master.mdx#database) bölümünde açıklanan üç özellikle yapılandırılır.
+
+Veritabanı hazır olduğunda devam edin.
+
+## Adım 2 — Master'ı test ortamına kurun [#step-2--install-master-on-a-test-environment]
+
+Önce Master'ı bir test ortamına kurun (her test ortamına ayrı Axelix dağıtımı yapıyorsanız birkaçına).
+Her paketleme biçimi uygundur; altyapınıza uyanı seçin: [düz JAR](./configuring-master.mdx#run-as-a-jar),
+[Docker](./configuring-master.mdx#run-with-docker), [Docker Compose](./configuring-master.mdx#run-with-docker-compose)
+veya [resmî Helm chart ile Kubernetes](./configuring-master.mdx#run-on-kubernetes). Her biri için minimum başlatma:
+
+<Tabs items={['Docker GHCR', 'Docker Hub', 'Kubernetes (Helm)', 'JAR']}>
+  <Tab value="Docker GHCR">
+
+İmaj GitHub Container Registry'de yayımlanır. Aşağıdaki komutlar en son sürüm `AXELIX_VERSION_PLACEHOLDER` kullanır;
+farklı sürüm çalıştırmak için etiketi değiştirin:
+
+<Tabs groupId="jwt-key" items={['Yerleşik anahtar (yerel deneme)', 'Kendi anahtarınız']}>
+  <Tab value="Yerleşik anahtar (yerel deneme)">
+
+```bash
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+JWT özellikleri ayarlanmadığında Master yerleşik imzalama anahtarını kullanır. Bunu yalnızca yerel denemede kullanın;
+[İmzalama anahtarı olmadan çalıştırma](./configuring-master.mdx#running-without-a-signing-key) bölümüne bakın.
+
+  </Tab>
+  <Tab value="Kendi anahtarınız">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+Veritabanı bağlantısını ve diğer yapılandırmayı sağlamak için [Docker ile çalıştırma](./configuring-master.mdx#run-with-docker),
+Compose seçeneği için [Docker Compose ile çalıştırma](./configuring-master.mdx#run-with-docker-compose) bölümüne bakın.
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+İmaj Docker Hub'da yayımlanır. Aşağıdaki komutlar en son sürüm `AXELIX_VERSION_PLACEHOLDER` kullanır;
+farklı sürüm çalıştırmak için etiketi değiştirin:
+
+<Tabs groupId="jwt-key" items={['Yerleşik anahtar (yerel deneme)', 'Kendi anahtarınız']}>
+  <Tab value="Yerleşik anahtar (yerel deneme)">
+
+```bash
+docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+JWT özellikleri ayarlanmadığında Master yerleşik imzalama anahtarını kullanır. Bunu yalnızca yerel denemede kullanın;
+[İmzalama anahtarı olmadan çalıştırma](./configuring-master.mdx#running-without-a-signing-key) bölümüne bakın.
+
+  </Tab>
+  <Tab value="Kendi anahtarınız">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+Veritabanı bağlantısını ve diğer yapılandırmayı sağlamak için [Docker ile çalıştırma](./configuring-master.mdx#run-with-docker),
+Compose seçeneği için [Docker Compose ile çalıştırma](./configuring-master.mdx#run-with-docker-compose) bölümüne bakın.
+
+  </Tab>
+  <Tab value="Kubernetes (Helm)">
+
+Axelix resmî bir [Helm chart](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) sunar:
+
+```bash
+helm repo add axelix https://axelixlabs.github.io/axelix
+helm repo update
+helm install axelix axelix/axelix \
+  --namespace axelix --create-namespace \
+  --values values.yaml
+```
+
+En azından JWT imzalama anahtarı, super-admin parolası ve veritabanı bağlantısı olmak üzere özel değerlerinizi
+`values.yaml` içine yazın. Chart'ın
+[`values.yaml`](https://github.com/axelixlabs/axelix/blob/master/charts/axelix/values.yaml) dosyası tüm değerleri belgeler.
+Chart, küme içi otomatik keşif için gerekli ServiceAccount ve RBAC'ı da kurar.
+[Kubernetes'te çalıştırma](./configuring-master.mdx#run-on-kubernetes) bölümüne bakın.
+
+  </Tab>
+  <Tab value="JAR">
+
+[Sürümler sayfasındaki](https://github.com/axelixlabs/axelix/releases) sürümün **Assets** bölümünden
+`axelix-AXELIX_VERSION_PLACEHOLDER.jar` indirin. JAR arayüzü zaten içerir ve adı, her sürümün
+[artifact adlandırmasını](../more/compatibility-and-versioning.mdx#artifact-names) izler. Başlatın:
+
+<Tabs groupId="jwt-key" items={['Yerleşik anahtar (yerel deneme)', 'Kendi anahtarınız']}>
+  <Tab value="Yerleşik anahtar (yerel deneme)">
+
+```bash
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+JWT özellikleri ayarlanmadığında Master yerleşik imzalama anahtarını kullanır. Bunu yalnızca yerel denemede kullanın;
+[İmzalama anahtarı olmadan çalıştırma](./configuring-master.mdx#running-without-a-signing-key) bölümüne bakın.
+
+  </Tab>
+  <Tab value="Kendi anahtarınız">
+
+```bash
+export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
+export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
+
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+  </Tab>
+</Tabs>
+
+Yapılandırmayı iletmenin diğer yolları için [JAR olarak çalıştırma](./configuring-master.mdx#run-as-a-jar) bölümüne bakın.
+
+  </Tab>
+</Tabs>
+
+Master'a artık `http://localhost:2935` adresinden (Kubernetes'te Ingress üzerinden) erişilebilir.
+[Super-admin](../setting-up-master-ui/authentication/authentication.mdx#super-admin) hesabıyla oturum açın.
+
+:::note
+`2935`, Axelix `1.2.0` itibarıyla varsayılan porttur. Önceki sürümde Master `8080` dinliyordu.
+Gerekçesi ve eski porta dönmek için [Genel](./configuring-master.mdx#general) bölümüne bakın.
+:::
+
+Ardından yapılandırın. Master birçok kaynaktan yapılandırma kabul eder: ortam değişkenleri, haricî yapılandırma dosyası,
+Spring Cloud Config Server veya HashiCorp Vault. Bu nedenle mevcut yapılandırma sürecinize uydurmak zor olmamalıdır.
+[Özellikleri sağlama](./configuring-master.mdx#supplying-properties) bölümüne bakın.
+
+Yukarıdaki başlatma örneklerindeki iki JWT değeri, `axelix.master.auth.jwt.algorithm` ve
+`axelix.master.auth.jwt.signing-key` değerleridir; [Kimlik doğrulama — JWT](./configuring-master.mdx#authentication--jwt)
+bölümüne bakın. İlk günden imzalama anahtarına özen gösterin: her yönetilen servisin daha sonra Master'a sunacağı paylaşılan
+sır budur. Uzun rastgele bir değer üretin ve sürüm kontrolüne alınmış dosyada değil sır yöneticinizde tutun.
+
+:::warning[Axelix 1.2.0 ve üzerinde]
+Her iki JWT değeri de isteğe bağlıdır. Bunlar olmadan Master ve servisleriniz yerleşik imzalama anahtarına döner;
+böylece anahtar üretmeden Axelix'i yerelde deneyebilirsiniz. Bu anahtar herkesçe bilinir; dolayısıyla herkes onu Master'da
+oturum açmak ve servislerinizin Axelix uç noktalarını çağırmak için kullanabilir. Yalnızca yerel denemede kullanın,
+diğer her yerde kendi anahtarınızı ayarlayın.
+[İmzalama anahtarı olmadan çalıştırma](./configuring-master.mdx#running-without-a-signing-key) bölümüne bakın.
+:::
+
+Veritabanı bağlantısı ve imzalama anahtarı dışında bu aşamada bilinçli verilmesi gereken iki karar vardır:
+
+- **Keşif yöntemi.** [Otomatik keşifte](./configuring-master.mdx#discovery--auto-discovery) Master Kubernetes ortamını tarar
+  ve bulduğu servisleri yoklar. [Kendiliğinden kayıtta](./configuring-master.mdx#discovery--self-registration) her servis
+  Master'a yaşam sinyalleri gönderir. İki yöntem birleştirilebilir; örneğin küme içi servislerde otomatik keşif,
+  Master'ın tarayamadığı servislerde kendiliğinden kayıt. Davranışları için [Keşif nasıl çalışır?](../product/discovery.mdx) sayfasına bakın.
+- **Oturum açma ve RBAC.** Master'ın hesapları kendi veritabanında sakladığı
+  [yerel kullanıcılar](../setting-up-master-ui/authentication/authentication.mdx#local-users) küçük ekipler için muhtemelen
+  yeterlidir. Büyük kuruluşlarda kimlik sağlayıcınızla
+  [OAuth2 / OIDC](../setting-up-master-ui/authentication/authentication.mdx#oauth2--oidc) genellikle daha iyi seçenektir.
+  Her iki durumda da başlangıç [super-admin](../setting-up-master-ui/authentication/authentication.mdx#super-admin)
+  hesabı ilk günden arayüze girmenizi sağlar.
+
+## Adım 3 — Servislerinize starter ve derleme eklentisini ekleyin [#step-3--add-the-starter-and-the-build-plugin-to-your-services]
+
+Ardından Master'ın yönetmesini istediğiniz servislere istemci bileşenlerini kademeli ekleyin.
+İki bileşen vardır ve ikisi de gereklidir: servisin Spring Boot ana sürümüne uygun
+[Axelix Spring Boot starter](./configuring-spring-boot-starter.mdx) ve Maven veya Gradle için
+[Axelix derleme eklentisi](./configuring-build-plugin.mdx). İkisi de [Maven Central'da](https://central.sonatype.com/)
+yayımlanır; eklemek sıradan bir bağımlılık değişikliğidir, özel depo gerekmez.
+Axelix birlikte sürümlendirilir; Master, starter'lar ve derleme eklentisi için aynı Axelix sürümünü kullanın.
+Starter-Boot eşlemesi ve tam sürüm farkı kuralları için [Uyumluluk ve sürümlendirme](../more/compatibility-and-versioning.mdx) sayfasına bakın.
+
+Spring Boot 4 servisi için derleme değişiklikleri şöyledir (servisin Boot ana sürümüne göre `4` yerine `2` veya `3` kullanın):
+
+<Tabs items={['Gradle (Kotlin DSL)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "AXELIX_VERSION_PLACEHOLDER"
+}
+
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:AXELIX_VERSION_PLACEHOLDER")
+}
+```
+
+Eklenti henüz Gradle Plugin Portal'da olmadığından `settings.gradle.kts` içindeki `pluginManagement`'a `mavenCentral()`
+ekleyin; [Derleme eklentisi yapılandırmasına](./configuring-build-plugin.mdx) bakın.
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-4-starter</artifactId>
+    <version>AXELIX_VERSION_PLACEHOLDER</version>
+  </dependency>
+</dependencies>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>AXELIX_VERSION_PLACEHOLDER</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+  </Tab>
+</Tabs>
+
+Yalnızca bağımlılıkları eklemek yetmez. Her servis ayrıca [starter yapılandırma sayfasında](./configuring-spring-boot-starter.mdx)
+ayrıntılı açıklanan iki yapılandırmaya ihtiyaç duyar. Axelix **1.2.0 ve üzerinde** actuator uç noktaları için burada bir şey
+gerekmez: starter bunları `management.endpoints.web.exposure.include` içine otomatik ekler;
+[Actuator uç noktaları](./configuring-spring-boot-starter.mdx#actuator-endpoints) bölümüne bakın.
+Eski sürümlerde bunları erişime açmak üçüncü zorunlu yapılandırmadır; örneklerin altındaki nota bakın.
+
+- **2. adımdaki paylaşılan JWT imzalama anahtarını** `axelix.sbs.auth.jwt.*` altında ayarlayın.
+  Master ve servis arasındaki anahtar uyuşmazlığı `401` yanıtlarının en yaygın nedenidir;
+  [JWT imzalama anahtarını Master ile paylaşın](./configuring-spring-boot-starter.mdx#share-the-jwt-signing-key-with-master)
+  ve [Sorun giderme](../more/troubleshooting.mdx) bölümlerine bakın.
+  Axelix 1.2.0 ve üzerinde yerel denemede bunu atlayabilirsiniz; servis yerleşik anahtarı kullanır.
+  [İmzalama anahtarı olmadan çalıştırma](./configuring-spring-boot-starter.mdx#running-without-a-signing-key) bölümüne bakın.
+- **Keşfi yapılandırın; yalnızca kendiliğinden kaydı seçtiyseniz.**
+  [Master'ın örneği bulmasını sağlayın](./configuring-spring-boot-starter.mdx#let-master-find-the-instance) bölümünde
+  gösterildiği gibi `axelix.sbs.discovery.*` özelliklerini Master'ınıza yönlendirin.
+  Master tarafında otomatik keşifte serviste ek yapılandırma yoktur.
+
+Bir araya getirildiğinde minimum servis yapılandırması:
+
+<Tabs items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+</Tabs>
+
+:::note[1.2.0'dan eski Axelix sürümlerinde]
+1.2.0'dan eski starter'lar uç noktalarını `management.endpoints.web.exposure.include` içine kendileri eklemez;
+bu sürümlerde uç nokta listesi de minimum yapılandırmanın parçasıdır. `axelix-metadata`, Master'ın örneği tespit etmek için
+yokladığı uç noktadır; bu nedenle keşif yönteminden bağımsız olarak onsuz servis hiç görünmez:
+
+<Tabs items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+```
+
+  </Tab>
+</Tabs>
+
+Bu starter sürümleri eski `axelix-feign` uç noktasını da ekler. Bilinçli olarak listede yoktur: Master onu asla okumaz ve
+uç nokta Axelix 1.3.0'da kaldırılmıştır;
+[`axelix-feign` uç noktası kaldırıldı](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#the-axelix-feign-endpoint-is-removed) bölümüne bakın.
+:::
+
+Servisleri tek tek kullanıma alın. Her servis test ortamına yeniden dağıtıldığında test Master'ında görünür ve ekip
+[arayüzü](../ui-guide/dashboard/spring-portfolio.mdx) ve MCP'yi hemen kullanmaya başlayabilir.
+
+Üretimle ilgili bir ayrıntıyı planlamak gerekir. Servisler genellikle aynı artifact'ı testten üretime taşır;
+bu nedenle starter üretime Master'dan önce ulaşır. Böyle bir serviste kendiliğinden kayıt etkinse starter henüz
+var olmayan Master'a kaydolmayı denemeye devam eder. Bu servislerde starter'ı pasif tutmak için üretim yapılandırmasında
+`axelix.sbs.enabled=false` ayarlayın;
+[Starter'ı devre dışı bırakma](./configuring-spring-boot-starter.mdx#disabling-the-starter) bölümüne bakın.
+
+## Adım 4 — Master'ı üretime kurun [#step-4--install-master-in-production]
+
+Son olarak test kullanımı kendini kanıtladığında Axelix'i üretime taşıyın.
+Bu, 1. ve 2. adımların **ayrı bir dağıtım** olarak tekrarıdır: kendi veritabanı, üretim düzeyinde RBAC ve üretimin
+gerektirdiği daha sıkı arayüz ve MCP sunucusu ağ erişim kuralları.
+
+Üretim Master'ı açıldığında 3. adımdaki geçici `axelix.sbs.enabled=false` ayarlarını kaldırın;
+böylece üretim örnekleri kaydolur ve görünür olur.
+
+## İlgili sayfalar [#related]
+
+- [Master nedir?](../setting-up-master-ui/what-is-master.mdx): Master'ın yönettiği servislerle yaptıkları hakkında arka plan.
+- [Master yapılandırması](./configuring-master.mdx): tüm Master özellikleri, paketleme seçenekleri ve yapılandırma kaynakları.
+- [Spring Boot Starter yapılandırması](./configuring-spring-boot-starter.mdx): servisi bağlamanın ayrıntıları.
+- [Derleme eklentisi yapılandırması](./configuring-build-plugin.mdx): ikinci zorunlu istemci bileşeni.
+- [Kimlik doğrulama](../setting-up-master-ui/authentication/authentication.mdx): oturum açma seçenekleri, roller ve yetkiler.
+- [Uyumluluk ve sürümlendirme](../more/compatibility-and-versioning.mdx): hangi starter'ın hangi Spring Boot ve Java
+  sürümüne uyduğu ve bileşen sürümlerinin birbirleriyle uyumlu kaldığı.
+- [Sorun giderme](../more/troubleshooting.mdx): en yaygın kurulum sorunları (`401` yanıtları, yanlış starter modülü,
+  hiç kaydolmayan servis) ve çözümleri.

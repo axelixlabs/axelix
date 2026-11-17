@@ -1,0 +1,144 @@
+---
+title: Zamanlanmış görevler
+description: "Zamanlanmış görevler sayfası, bir Spring Boot uygulamasının tüm @Scheduled görevlerini listeler ve son çalıştırmaların nasıl sonuçlandığını gösterir. Bir görevi açıp kapatabilir, zamanlamasını değiştirebilir ve isteğe bağlı çalıştırabilirsiniz."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Zamanlanmış görevlerin ana sayfası](/img/feature/scheduled-tasks/scheduled-tasks-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Scheduled Tasks***
+
+Bir `@Scheduled` görevi arka planda çalıştığından, hata vermeye veya yavaşlamaya başladığı ancak beklenen etkileri görülmediğinde fark edilir. Bu sayfa uygulamanın tüm zamanlanmış görevlerini ve son çalıştırmalarının sonuçlarını gösterir; yeniden dağıtım yapmadan zamanlamayı değiştirmenizi sağlar.
+
+Bir görevi açıp kapatmak, tetikleyicisini düzenlemek ve isteğe bağlı çalıştırmak, yerleşik **EDITOR**, **ADMIN** ve **SUPER_ADMIN** rollerinin sağladığı `scheduled-tasks:write` yetkisini gerektirir. Bu yetkisi olmayan kullanıcılar aynı kontrolleri görür, ancak Axelix bunları devre dışı tutar ve üzerine gelindiğinde araç ipucunda nedenini açıklar.
+
+## Sayfada gösterilenler [#what-the-page-shows]
+
+Sayfa görevleri tetikleyici türüne göre gruplar:
+
+- **Cron** görevleri, örneğin `0 0/15 9-17 * * MON-FRI` gibi bir cron ifadesinin belirttiği zamanlarda çalışır.
+- **Fixed delay** görevleri her çalıştırma bittikten sonra belirtilen süreyi bekler; bu nedenle çalıştırmalar çakışmaz.
+- **Fixed rate** görevleri, önceki çalıştırmanın başlangıcından sayılan belirli aralıklarla başlar.
+
+Listede sınıf veya metot adına göre arama yapabilirsiniz. Sayfa her görevin yanında kayıtlı çalıştırmaların başarı oranını gösterir; böylece hata veren bir görev açılmadan fark edilir. %90 veya üzeri oran sağlıklı kabul edilir. Devre dışı görevlerde oran yerine **OFF** gösterilir.
+
+Bir görevi seçtiğinizde sayfa tam sınıf adını ve zamanlamasını, örneğin “Every 3 seconds” gibi anlaşılır sözlerle gösterir. Cron görevlerinde açıklamanın yanında ifadenin kendisi yer alır.
+
+## Çalıştırma geçmişi [#execution-history]
+
+<ReleasedInNotice version="1.3.0" />
+
+İster zamanlamayla başlasın ister **Run now** düğmesine tıklansın, bir görevin her çalıştırılması kaydedilir. Master, uygulamanın tüm örneklerinden çalıştırmaları toplar; dolayısıyla görevin geçmişi örnekler arasında ortaktır. Özet tüm kayıtlı çalıştırmaları kapsar:
+
+- **Last run**: en son çalıştırmanın ne kadar önce başladığı.
+- **Success**: istisna atmadan tamamlanan çalıştırmaların oranı.
+- **Failed**: istisna atan çalıştırmaların sayısı.
+- **Avg** ve **p95**: ortalama çalışma süresi ve çalıştırmaların %95'inin tamamlandığı süre. Ortalamadan çok yüksek bir p95, bazı çalıştırmaların ara sıra takıldığını gösterir.
+
+**Duration** grafiği en eskiden en yeniye son 30 çalıştırmayı gösterir; başarısız olanlar işaretlenir. Çubuk yüksekliği doğrusal değildir; böylece yavaş bir aykırı değerin yanında kısa çalıştırmalar da görünür kalır. Başlangıç zamanını, süresini ve başarısızsa hata türünü görmek için çubuğun üzerine gelin.
+
+Bir görev başarısız olduğunda **Failures by error type**, hataları en sık görülen önce gelecek şekilde istisna sınıfına göre gruplar. Her grupta en son hata mesajını ve ne zaman gerçekleştiğini görürsünüz. Böylece aynı nedenin tekrarlanıp tekrarlanmadığını veya hataların ilişkisiz olup olmadığını bir bakışta anlayabilirsiniz.
+
+**Executions** tablosu aynı son 30 çalıştırmayı başlangıç zamanı, görevi çalıştıran örnek, süre ve sonuçla birlikte listeler. Yalnızca başarısız çalıştırmaları görmek için **Failed** seçeneğine geçin.
+
+Sayfa açıkken geçmiş kendiliğinden yenilenmez. Yeni çalıştırmaları görmek için görevi yeniden seçin. Master bir görevin ilk çalıştırmasını alana kadar sayfa geçmiş yerine **No execution data for this task** ifadesini gösterir.
+
+### Çalıştırma geçmişinin saklanması [#execution-history-retention]
+
+Master geçmişi veritabanında tutar ve eski çalıştırmaları belirli aralıklarla siler. Saklanan geçmişin miktarını şu Master özellikleri denetler (ayrıca bkz. [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx#scheduled-tasks-history)):
+
+| Özellik | Varsayılan | Açıklama |
+|---------|------------|----------|
+| `axelix.master.scheduled-tasks.history.retention` | `30d` | Master'ın bir çalıştırmayı ne kadar süre sakladığı. Daha eski çalıştırmalar bir sonraki temizlikte silinir. |
+| `axelix.master.scheduled-tasks.history.max-executions-per-task` | `50` | Master'ın her görev için sakladığı en son çalıştırma sayısı. |
+| `axelix.master.scheduled-tasks.history.cleanup.schedule` | `0 */10 * * * *` | Temizlik görevinin cron ifadesi. Varsayılan olarak her 10 dakikada bir çalışır. |
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.master.scheduled-tasks.history.retention=7d
+axelix.master.scheduled-tasks.history.max-executions-per-task=100
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  master:
+    scheduled-tasks:
+      history:
+        retention: 7d
+        max-executions-per-task: 100
+```
+
+  </Tab>
+</Tabs>
+
+## Görevleri yönetme [#managing-tasks]
+
+Bu eylemler açtığınız örneğe uygulanır. Aynı uygulamanın diğer örnekleri geçerli durumlarını ve zamanlamalarını korur.
+
+### Bir görevi etkinleştirme veya devre dışı bırakma [#enable-or-disable-a-task]
+
+Örneğin aşağı akıştaki bir sistem bakımdayken görevin zamanlamaya göre çalışmasını durdurmak için **ON** / **OFF** anahtarını kullanın. Axelix önce onay ister. Çalışan bir görevi devre dışı bırakırsanız o çalıştırma tamamlanır; ardından görev zamanlamasını yok sayar. Zamanlamayı sürdürmek için yeniden **ON** konumuna getirin.
+
+### Tetikleyiciyi düzenleme [#edit-the-trigger]
+
+Görevin ne zaman çalışacağını değiştirmek için **Edit trigger** düğmesine tıklayın. Yeni zamanlama, uygulamayı yeniden başlatmadan hemen etkili olur.
+
+- Cron görevleri için altı alanlı yeni bir ifade girin: saniye, dakika, saat, gün, ay, haftanın günü. Axelix siz yazarken ifadeyi denetler. Önizleme, görevin ne zaman çalışacağını (**Runs:**) veya ifadenin neden yanlış olduğunu (**Invalid:**) gösterir.
+- Fixed delay veya fixed rate görevleri için yeni aralığı 0'dan büyük bir tam sayı olarak milisaniye cinsinden girin.
+
+**Apply trigger**, değer geçerli olana ve mevcut değerden farklılaşana kadar devre dışı kalır.
+
+### Bir görevi hemen çalıştırma [#run-a-task-now]
+
+Görevi hemen bir kez çalıştırmak için **Run now** düğmesine tıklayıp onaylayın. Bu, zamanlamasını değiştirmez; dolayısıyla bir sonraki zamanlanmış çalıştırmayı beklemeden başarısız bir işi yeniden denemek veya bir düzeltmeyi denetlemek için kullanışlıdır.
+
+## MCP araçları [#mcp-tools]
+
+Zamanlanmış görevler MCP aracılığıyla bir yapay zekâ ajanı tarafından da incelenebilir. [MCP araçları kataloğuna](../../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection) bakın.
+
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-scheduled-tasks` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-scheduled-tasks
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-scheduled-tasks
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

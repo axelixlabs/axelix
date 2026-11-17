@@ -1,0 +1,55 @@
+---
+title: Varlık haritası
+description: "Varlık haritası sayfası, bir Spring Boot örneğindeki tüm varlıkların JPA eşlemelerini denetler ve ek sorgulara yol açan ilişkileri gösterir: eager yükleme, List tabanlı @ManyToMany, REMOVE veya ALL cascade ve tek yönlü @OneToMany."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Varlık haritasının ana sayfası](/img/feature/entity/entity-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Entities Map***
+
+JPA ilişki eşlemelerindeki hatalar uygulamayı bozmaz. Bunun yerine varlık her kullanıldığında ek sorgulara ve yüklemelere yol açar; kod incelemesinde de kolayca gözden kaçabilir. Varlık haritası tüm varlıkların eşlemelerini denetler ve bu tür hataların nerede olduğunu gösterir.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açabilir. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfada gösterilenler [#what-the-page-shows]
+
+Üstteki özet, örneğin kaç varlık eşlediğini, kaçında [sorun](#detected-problems) bulunduğunu ve kaçının sorunsuz olduğunu gösterir. Sayfanın altında sorunlu varlıklar listelenir.
+
+Bir varlığı genişleterek şunları görebilirsiniz:
+
+- `@Table` içindeki tablo adı veya `@Table` bir ad belirtmiyorsa varlığın adı.
+- `Owner.pets` gibi her sorunlu ilişki ve sorunları.
+- Varsayılanlar dâhil geçerli değerlerle ilişkinin eşlemesi; örneğin `@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL) @JoinColumn(name = "owner_id") List<Pet>`.
+
+Hiçbir varlıkta sorun yoksa sayfa liste göstermek yerine bunu belirtir.
+
+## Tespit edilen sorunlar [#detected-problems]
+
+- **EAGER fetching**: İlişki, veriler kullanılsa da kullanılmasa da varlık her okunduğunda yüklenir. JPA varsayılan olarak eager yüklediğinden, açık bir `fetch` belirtmeyen `@ManyToOne` ve `@OneToOne` ilişkileri de buna dâhildir.
+- **List for @ManyToMany**: `List` kullanan bir `@ManyToMany`, herhangi bir değişiklikte Hibernate'in birleştirme tablosundaki tüm kayıtları silip yeniden eklemesine yol açar.
+- **Bad CascadeType**: Bir `@OneToMany` veya `@ManyToMany` üzerindeki `CascadeType.REMOVE` ya da `CascadeType.ALL`, Hibernate'in ilişkili kayıtları tek tek silmesine yol açarak N+1 sorgu oluşturur.
+- **Unidirectional @OneToMany**: `mappedBy` içermeyen bir `@OneToMany`, ek bir birleştirme tablosu veya her kayıt için ayrı bir `UPDATE` gerektirir.
+
+## Nasıl çalışır? [#how-it-works]
+
+Axelix Spring Boot Starter, uygulamanın JPA meta modelini okur ve her ilişkiyi denetler. [İşlem denetiminden](./transaction-control.mdx) farklı olarak sonuç trafiğe bağlı değildir: Axelix hangi sorguların çalıştırıldığını değil, varlıkların nasıl eşlendiğini denetler. Bu sayfa için uygulamada Hibernate bulunmalıdır.
+
+## MCP araçları [#mcp-tools]
+
+Yapay zekâ ajanları MCP aracılığıyla tüm uygulama veya tek bir varlık için varlıkları ve eşleme sorunlarını alabilir. [MCP araçları kataloğuna](../../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights) bakın.
+
+## Özellikler [#properties]
+
+Varlık haritası işlem izlemeyle birlikte çalışır ve varsayılan olarak etkindir. Kapatmak için `axelix.sbs.transaction.monitoring.enabled=false` ayarını kullanın. Ayrıntılar için [İşlem izleme](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#transaction-monitoring) bölümüne bakın.
+
+İşlem izleme reaktif (WebFlux) uygulamalarda çalışmadığı için varlık haritası bu uygulamalarda kullanılamaz. [Reaktif (WebFlux) uygulamalar](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#reactive-webflux-applications) bölümüne bakın.
+
+
+## Ayrıca bkz. [#see-also]
+
+- [İşlem denetimi](./transaction-control.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

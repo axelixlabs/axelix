@@ -1,0 +1,1011 @@
+---
+title: Spring Boot Starter yapılandırması
+description: "Axelix Master'ın uygulamayı keşfedebilmesi, durumunu okuyabilmesi ve üzerinde işlem yapabilmesi için Axelix Spring Boot Starter'ı bir Spring Boot uygulamasına bağlama."
+---
+
+import styles from './styles.module.css';
+
+Bu sayfa, [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) uygulamanızı keşfedebilsin,
+durumunu okuyabilsin ve üzerinde işlem yapabilsin diye Axelix Spring Boot Starter'ı bir [Spring Boot](https://spring.io/)
+uygulamasına nasıl bağlayacağınızı gösterir. Bu erişim hem kullanıcı arayüzünden hem de aynı verileri yapay zekâ ajanlarına
+sunan, Master'ın yerleşik MCP (Model Context Protocol) sunucusu üzerinden sağlanır. Boot ana sürümünüze uygun starter
+modülünü seçin, Axelix actuator uç noktalarını erişime açın (Axelix 1.2.0'dan itibaren otomatiktir), JWT imzalama anahtarını
+Master ile paylaşın ve Master'a örneği nerede bulacağını bildirin.
+
+## Başlamadan önce [#before-you-start]
+
+Aşağıdaki örnekleri kopyalamadan önce netleştirmeniz gereken birkaç nokta vardır.
+
+- **Üç starter modülü**, her Spring Boot ana sürümü için bir tane. Uygulamanızın zaten kullandığı Boot sürümüne uygun olanı seçin:
+    - `com.axelixlabs:axelix-spring-boot-2-starter` — Spring Boot **2.7+** (yalnızca test edilen sürüm değil, kesin alt sınır;
+      `2.7.18`, Spring Cloud `2021.0.9` ile derlenip test edilmiştir; en az JDK 11 gerekir).
+    - `com.axelixlabs:axelix-spring-boot-3-starter` — Spring Boot 3.x (`3.0.13`, Spring Cloud `2022.0.4` ile derlenip
+      test edilmiştir; en az JDK 17 gerekir).
+    - `com.axelixlabs:axelix-spring-boot-4-starter` — Spring Boot 4.x (`4.0.6`, Spring Cloud `2025.1.0` ile derlenip
+      test edilmiştir; en az JDK 17 gerekir).
+- **Starter'ın sağladıkları**: Axelix'e özgü actuator uç noktaları (`axelix-metadata`, `axelix-beans`, `axelix-loggers`, …),
+  bunlara erişimi denetleyen JWT tabanlı bir yetkilendirme filtresi ve bu örneği Master'a bildiren isteğe bağlı bir kendi kendine kayıt bileşeni.
+- **Axelix derleme eklentisi de gereklidir**: starter bağımlılığının yanı sıra Axelix Gradle veya Maven derleme eklentisini
+  uygulayın. Eklenti, derleme koordinatlarınızı (`groupId`/`artifactId`/`version`) çıktıya işler ve Master her uygulamayı
+  bu koordinatlarla tanımlar; eklenti olmadan derlenen bir örnek **kaydolamaz**. Bkz.
+  [Axelix derleme eklentisi nedir?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) ve
+  [Derleme eklentisini yapılandırma](../../setting-up-spring-boot-service/build-plugin/configuration.mdx).
+- **Aynı verinin iki tüketicisi**: Master, `/` adresinde Axelix kullanıcı arayüzünü ve `/api/mcp` adresinde bir MCP
+  sunucusunu sunar (`axelix.master.mcp-server.enabled` ile denetlenir, varsayılan olarak açıktır). İkisi de starter'ın
+  açtığı actuator uç noktalarından okur; dolayısıyla starter'ı bağlamak, starter tarafında ek yapılandırma gerektirmeden
+  örneği hem arayüz kullanıcılarına *hem de* MCP istemcilerine görünür kılar.
+- **Master'ın örnekle iletişim kurmak için gerekenleri**: uygulamanın actuator temel yoluna HTTP erişimi (varsayılan
+  `/actuator`), `management.endpoints.web.exposure.include` üzerinden açılan Axelix uç noktaları ve Master'da
+  yapılandırılanla aynı JWT imzalama anahtarı. Master tarafı için bkz.
+  [Kimlik doğrulama — JWT](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentication--jwt).
+- **Master'ın örneği bulmasının iki yolu**:
+    - **Master tarafında otomatik keşif** — Master ortamını (şu anda Kubernetes Services) tarar ve actuator uç noktasını
+      kendisi yoklar. Starter'ın yalnızca uç noktaları açması gerekir; ek yapılandırma gerekmez.
+    - **Kendi kendine kayıt** — starter, sabit aralıklarla Master'a bir yaşam sinyali gönderir. Master örneğin ortamını
+      tarayamadığında (farklı ağ, platform entegrasyonunun olmaması, sıradan sanal makineler) bunu kullanın.
+
+### Reaktif (WebFlux) uygulamalar [#reactive-webflux-applications]
+
+<ReleasedInNotice version="1.3.0" />
+
+Axelix 1.3.0'dan itibaren üç starter da yalnızca servlet (Spring MVC) uygulamalarında değil, Spring WebFlux tabanlı
+reaktif uygulamalarda da çalışır. Starter, uygulamanızın hangi web yığını üzerinde çalıştığını algılar; dolayısıyla
+eklemeniz veya yapılandırmanız gereken başka bir şey yoktur: bağımlılık, derleme eklentisi ve bu sayfadaki özellikler
+her ikisi için de aynıdır. Actuator ayrı bir `management.server.port` üzerinde çalıştığında da Axelix uç noktaları
+ve bunların önündeki JWT yetkilendirmesi aynı şekilde çalışır.
+
+Bir özellik yalnızca servlet uygulamalarında kullanılabilir. [İşlem izleme](#transaction-monitoring) ve dolayısıyla
+Transaction Control ve Entities Map sayfaları WebFlux uygulamalarında kullanılamaz.
+
+## Bağımlılığı ekleme [#add-the-dependency]
+
+Boot ana sürümünüze uygun starter koordinatını bildirin.
+
+:::note
+Aşağıdaki örnekler en son yayımlanan `AXELIX_VERSION_PLACEHOLDER` sürümünü kullanır.
+:::
+
+<Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
+  <Tab value="Spring Boot 4.x">
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:AXELIX_VERSION_PLACEHOLDER")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.axelixlabs:axelix-spring-boot-4-starter:AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-4-starter</artifactId>
+    <version>AXELIX_VERSION_PLACEHOLDER</version>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+  <Tab value="Spring Boot 3.x">
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-3-starter:AXELIX_VERSION_PLACEHOLDER")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-3-starter</artifactId>
+    <version>AXELIX_VERSION_PLACEHOLDER</version>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+  <Tab value="Spring Boot 2.7">
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:AXELIX_VERSION_PLACEHOLDER")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-2-starter</artifactId>
+    <version>AXELIX_VERSION_PLACEHOLDER</version>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+</Tabs>
+
+Starter ayrıca [Spring Boot Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator)
+bağımlılığına da ihtiyaç duyar; uygulamanız zaten `spring-boot-starter-actuator` içermiyorsa onu da ekleyin.
+
+:::tip[Derleme eklentisi ayrı bir adımdır]
+Axelix derleme eklentisini uygulamak, yönetilen her servis için gereklidir; ancak bu konu ayrı bir bölümde ele alınır.
+Bkz. [Axelix derleme eklentisi nedir?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) ve
+[Derleme eklentisini yapılandırma](../../setting-up-spring-boot-service/build-plugin/configuration.mdx).
+:::
+
+### Geçişli bağımlılıklar [#transitive-dependencies]
+
+Starter, classpath'inize mümkün olduğunca az ekleme yapacak şekilde tasarlanmıştır. Entegre olduğu her şeye — Spring
+Boot, Actuator, Spring Kafka, Micrometer, Caffeine, Jackson — karşı derlenir, ancak bunları **beraberinde getirmez**:
+uygulamanızda zaten bulunanları kullanır. Geçişli olarak getirdiği tek kütüphaneler şunlardır:
+
+| Bağımlılık | Neden gereklidir |
+|---|---|
+| `org.slf4j:slf4j-api` | Günlük kaydı. Tüm Spring Boot uygulamalarında zaten bulunur. |
+| `io.jsonwebtoken:jjwt-api`, `jjwt-impl`, `jjwt-jackson` | Master'ın her istekle gönderdiği JWT'yi doğrulama. |
+
+Bu listenin küçülmesi amaçlanmaktadır. Starter, servislerinizin içinde çalışan tek Axelix bileşenidir; beraberinde
+getirdiği her kütüphane, classpath'inizde taranması, yamalanması ve uygulamanızın geri kalanıyla uyumlu tutulması gereken
+bir öğe daha demektir. Axelix çekirdek ekibinin görüşü, starter'ın **hiçbir harici bağımlılığının olmaması** gerektiğidir.
+Kalanları adım adım kaldırıyoruz; ilerlemeyi [axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748)
+üzerinden takip edebilirsiniz.
+
+#### JsonPath artık dahil değildir [#jsonpath-is-no-longer-included]
+
+<ReleasedInNotice version="1.2.0" />
+
+Axelix 1.1.x dahil önceki sürümlerde starter, hiç kullanmamasına rağmen `com.jayway.jsonpath:json-path` bağımlılığını da
+getiriyordu. Axelix 1.2.0'dan itibaren bu bağımlılık kaldırılmıştır; bu,
+[axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748) içinde açıklanan bağımlılıksız starter'a doğru ilk adımdır.
+
+Uygulamanız kendi kodunda JsonPath kullanıyorsa ve bunu yalnızca Axelix starter üzerinden alıyorsa, yükseltme sırasında
+bağımlılığı açıkça bildirin. Sürümü Spring Boot yönettiğinden sürüm belirtmeniz gerekmez:
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.jayway.jsonpath:json-path")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.jayway.jsonpath:json-path'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.jayway.jsonpath</groupId>
+    <artifactId>json-path</artifactId>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+Testler etkilenmez: `spring-boot-starter-test`, JsonPath'i kendisi getirir.
+
+#### JSpecify artık dahil değildir [#jspecify-is-no-longer-included]
+
+<ReleasedInNotice version="1.3.0" />
+
+Axelix 1.2.x dahil önceki sürümlerde starter, `org.jspecify:jspecify` bağımlılığını da getiriyordu. Starter, JSpecify'ı
+yalnızca null olabilme durumunu belirten anotasyonlar için kullanır ve bunlara yalnızca derleme zamanında ihtiyaç duyar.
+Axelix 1.3.0'dan itibaren bu bağımlılık, [axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748) içinde
+açıklanan bağımlılıksız starter'a doğru bir sonraki adım olarak kaldırılmıştır.
+
+JVM, çalışma zamanında sınıfları eksik olan anotasyonları yok saydığından starter, classpath'te JSpecify olmadan çalışmaya
+devam eder. Spring Framework 7 zaten JSpecify'a bağımlı olduğundan Spring Boot 4'te hiçbir şey değişmez.
+
+Kendi kodunuz JSpecify anotasyonlarını kullanıyorsa ve bunları yalnızca Axelix starter üzerinden alıyorsanız, yükseltme
+sırasında bağımlılığı açıkça bildirin. Spring Boot 2 ve 3 bu bağımlılığın sürümünü yönetmediğinden sürümü belirtin:
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("org.jspecify:jspecify:1.0.0")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'org.jspecify:jspecify:1.0.0'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>org.jspecify</groupId>
+    <artifactId>jspecify</artifactId>
+    <version>1.0.0</version>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+## Actuator uç noktaları [#actuator-endpoints]
+
+Axelix **1.2.0** sürümünden itibaren elle yapılandırmanız gereken bir şey yoktur: uygulama başlatılırken starter kendi
+actuator uç noktalarını `management.endpoints.web.exposure.include` listesine ekler; böylece Master bunlara doğrudan
+ulaşabilir. Eski sürümlerde starter bunu yapmaz ve uç noktaların elle listelenmesi gerekir. Bkz.
+[Axelix 1.2.0'dan eski sürümlerde uç noktaları açma](#exposing-the-endpoints-on-axelix-below-120).
+
+### Starter'ın açtığı uç noktalar [#what-the-starter-exposes]
+
+Starter aşağıdaki uç noktaları açar:
+
+<table>
+    <thead>
+    <tr>
+        <th>Uç nokta</th>
+        <th>Amaç</th>
+        <th>İlk sürüm</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>axelix-metadata</code> <span className={styles.required}>zorunlu</span></td>
+        <td>Servis meta verileri; Master'ın ilk yokladığı uç nokta</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-ping</code></td>
+        <td>Master'ın önceden bilinen, otomatik keşfedilmiş örnekler için yokladığı sağlık, bellek ve işlem güncellemeleri. Yoklama için gereklidir; kendi kendine kaydolan örnekler bunun yerine yaşam sinyali güncellemeleri gönderir.</td>
+        <td><code>1.3.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-details</code></td>
+        <td>Örnek hakkında özet bilgi</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-beans</code></td>
+        <td>Bağlam bean'leri</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-caches</code></td>
+        <td>Önbellekler (bir <code>CacheManager</code> varsa)</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-conditions</code></td>
+        <td>Otomatik yapılandırma koşulları raporu</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-configprops</code></td>
+        <td><code>@ConfigurationProperties</code></td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-env</code></td>
+        <td>Ortam ve özellik kaynakları</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-feign</code> <em>eski</em></td>
+        <td>Feign istemcileri (classpath'te Feign varsa). <code>1.3.0</code> sürümünde kaldırılmıştır; aşağıya bakın</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-gc</code></td>
+        <td>Çöp toplama</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-heap-dump</code></td>
+        <td>Heap dökümü</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-loggers</code></td>
+        <td>Günlük düzeyleri</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-logs</code></td>
+        <td>Son günlük kayıtları</td>
+        <td><code>1.3.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-metrics</code></td>
+        <td>Metrikler</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-scheduled-tasks</code></td>
+        <td>Zamanlanmış görevler</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-thread-dump</code></td>
+        <td>İş parçacığı dökümü</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-dependencies</code></td>
+        <td>Bağımlılık SBOM'u</td>
+        <td><code>1.2.0</code></td>
+    </tr>
+    </tbody>
+</table>
+
+**İlk sürüm** sütunu, bir uç noktanın ilk kez sunulduğu Axelix starter sürümünü belirtir. `1.0.0` ilk Axelix sürümüdür;
+bu nedenle `1.0.0` işaretli bir uç nokta en başından beri vardır. _Yakında_ olarak işaretlenen bir sürüm henüz
+yayımlanmamıştır: uç nokta, minör veya majör olmasına bakılmaksızın bir sonraki Axelix sürümünde kullanıma sunulacaktır.
+
+Uygulamanıza uygun olmayan uç noktalar etkinleşmez; starter her birini yalnızca ön koşulları karşılandığında etkinleştirir
+(örneğin `CacheManager` yoksa `axelix-caches` hiçbir zaman açılmaz).
+
+Axelix **1.2.0** sürümünden itibaren Spring Boot'un yerleşik `health` ve `info` uç noktaları artık gerekli değildir; bu nedenle starter
+bunları kendiliğinden açmaz (1.2.0 öncesinde Axelix bunlara bağımlıydı ve starter ikisini de zorunlu olarak açıyordu).
+Yalnızca `management.endpoints.web.exposure.include` içinde listelediğiniz uç noktalar ve Axelix uç noktaları açılır.
+Spring Boot'un aksi durumda varsayılan olarak açacağı `health` uç noktası da dahil olmak üzere, ihtiyaç duyduğunuzda
+`health` ve `info` uç noktalarını listeye kendiniz ekleyin.
+
+#### `axelix-feign` uç noktası kaldırılmıştır [#the-axelix-feign-endpoint-is-removed]
+
+<ReleasedInNotice version="1.3.0" />
+
+Axelix 1.2.x dahil önceki sürümlerde Spring Boot 3 ve Spring Boot 4 starter'ları, uygulamanın Spring Cloud OpenFeign
+istemcilerini listeleyen bir `axelix-feign` uç noktası da sağlıyordu. Axelix Master bunu hiçbir zaman bir şey göstermek
+için kullanmadı; yalnızca projenin ilk dönemlerinden kalan bir öğe olarak varlığını sürdürdü. Axelix 1.3.0'dan itibaren
+bu uç nokta starter'lardan ve Master'da onu çağırabilen tüm bileşenlerle birlikte kaldırılmıştır.
+
+Yükseltme sırasında yapmanız gereken bir şey yoktur. Görünür tek fark, starter 1.3.0 veya daha yenisini çalıştıran bir
+serviste `/actuator/axelix-feign` adresinin artık bulunmamasıdır; kendi araçlarınız bu URL'yi doğrudan çağırıyorsa `404`
+alır. Axelix uç noktalarını `management.endpoints.web.exposure.include` içinde elle listeliyorsanız ve aralarında
+`axelix-feign` varsa listeden kaldırabilirsiniz; listede kalması da zararsızdır.
+
+### Kendi uç noktalarınızı ekleme [#adding-your-own-endpoints]
+
+Kendi actuator uç noktalarınıza ihtiyaç duyuyorsanız **yalnızca onları** listeleyin; starter listenizi değiştirmek yerine
+kendi listesiyle **birleştirir**.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - prometheus
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=prometheus
+```
+
+  </Tab>
+</Tabs>
+
+Sonuç olarak `prometheus` ve tüm Axelix uç noktaları erişime açılır.
+
+`*` değeri de desteklenir; her şey açılır ve starter listeyi olduğu gibi bırakır.
+
+### Axelix 1.2.0'dan eski sürümlerde uç noktaları açma [#exposing-the-endpoints-on-axelix-below-120]
+
+<LegacyNotice version="1.2.0" />
+
+1.2.0'dan eski starter'lar uç noktalarını erişim listesine kendileri eklemez. Bu nedenle Master'ın okumasını istediğiniz
+her Axelix uç noktası `management.endpoints.web.exposure.include` içinde elle listelenmelidir. En azından
+`axelix-metadata` uç noktasını açın; bu olmadan örnek Master'da hiç görünmez. Pratikte her arayüz bölümünün gösterecek
+verisi olması için tüm kümeyi açın. Bu starter sürümleri `health` ve `info` uç noktalarını kendileri zorunlu olarak
+açar; bunları listelemeniz gerekmez:
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+```
+
+  </Tab>
+</Tabs>
+
+Bu starter sürümleri eski `axelix-feign` uç noktasını da sağlar. Bu uç nokta bilerek listeye alınmamıştır: Master onu
+hiçbir zaman okumaz ve uç nokta Axelix 1.3.0'da kaldırılmıştır. Bkz. [yukarıdaki bölüm](#what-the-starter-exposes).
+
+## Axelix metriklerini Micrometer üzerinden dışa aktarma [#export-axelix-metrics-through-micrometer]
+
+`axelix-metrics` actuator uç noktası Axelix kullanıcı arayüzüne veri sağlar. Buna ek olarak Spring Boot starter'ları,
+uygulamanızın kendi Micrometer `MeterRegistry` bileşenine Axelix'e özgü küçük bir ölçüm kümesi yayımlayabilir.
+
+Bir `MeterRegistry` bean'i varsa bu dışa aktarma yolu otomatik olarak etkinleşir. Bunun için ek bir Axelix özelliği yoktur.
+Starter şu ölçümleri kaydeder:
+
+<div className={styles.MetricsTable}>
+| Ölçüm | Tür | Etiketler | Anlamı |
+|-------|------|------|---------|
+| `axelix_transaction_duration` | `Timer` | `class`, `method` | İzlenen her `@Transactional` çalıştırmasının süresi. Zamanlayıcı ayrıca `0.5`, `0.95` ve `0.99` yüzdeliklerini yayımlar. |
+| `axelix_transaction_queries` | `Counter` | `class`, `method` | İzlenen işlemler içinde yürütülen SQL sorgularının toplam sayısı. |
+| `axelix_transaction_external_calls` | `Counter` | `class`, `method` | İzlenen işlemler içinde yapılan harici çağrıların (örneğin `RestTemplate`) toplam sayısı. |
+| `axelix_cache_requests` | `Counter` | `cache`, `result` | Axelix ile geliştirilmiş önbelleklerin kaydettiği toplam önbellek araması sayısı. |
+| `axelix_cache_enabled` | `Gauge` | `cache` | Geliştirilmiş her önbelleğin güncel çalışma zamanı durumu: etkinken `1`, devre dışıyken `0`. |
+</div>
+
+Bu ölçümler, arayüze veri sağlayan actuator uç noktalarını tamamlar; onların yerini almaz. Arayüz `axelix-metrics` ve
+`axelix-caches` uç noktalarını okumaya devam eder. İlk işlem analizleri kayıt meta verilerine dahil edilir; sonraki
+güncellemeler, Master 1.3.0'dan itibaren starter'ları yokladığında `axelix-ping`, kendi kendine kayıtta ise gönderilen yaşam
+sinyalleri üzerinden iletilir. İşlemlere özgü bir Actuator uç noktası yoktur; bkz. [İşlem izleme](#transaction-monitoring).
+
+## JWT imzalama anahtarını Master ile paylaşma [#share-the-jwt-signing-key-with-master]
+
+Her Axelix actuator uç noktasına erişim `JwtAuthorizationFilter` ile denetlenir. Filtre, Master'ın kullandığı anahtarla
+imzalanmış bir HS256, HS384 veya HS512 belirteci bekler; dolayısıyla iki tarafın algoritma ve sır üzerinde anlaşması gerekir.
+Master'da `axelix.master.auth.jwt.signing-key` için ayarladığınız değerin aynısını kullanın.
+
+Starter 1.3'ten itibaren Master, servisi çağırmadan önce oturum açan kullanıcıyı yetkilendirir. Starter, öznesi
+`AXELIX.MASTER` olan, kullanıcının rollerini veya yetkilerini içermeyen kısa ömürlü bir teknik kullanıcı JWT'si alır.
+Master'ın kimliğini, imzayı ve belirtecin süresini doğrular. Eski starter'lar kullanıcının izinlerini denetlemeye devam
+ettiğinden Master onlar için kullanıcının belirtecini eski yetki adlarıyla yeniden üretir. İlk keşif, her iki sürümün de
+kabul ettiği bir uyumluluk belirteci kullanır; bkz. [Keşif nasıl çalışır](../../product/discovery.mdx).
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+</Tabs>
+
+Axelix 1.3'ten itibaren `axelix.sbs.auth.jwt.duration` artık kullanılmaz. Bunu yapılandırmanızdan kaldırabilirsiniz.
+Starter, her kayıt ve yaşam sinyali isteği için yeni bir teknik kullanıcı JWT'si üretir. Çalınan bir belirtecin
+kullanılabileceği süreyi sınırlamak için her belirtecin ömrü sabit olarak bir dakikadır.
+Yerine başka bir özellik gerekmez ve bu süre yapılandırılamaz.
+
+:::warning
+Master ile izlenen tüm servisler arasında paylaşılan imzalama anahtarı hassas bir sırdır. Bunu sürüm kontrolüne eklenen
+bir YAML dosyasıyla değil, ortam değişkeni, bağlanan dosya veya gizli bilgi yöneticisi üzerinden sağlayın.
+:::
+
+### İmzalama anahtarı olmadan çalıştırma [#running-without-a-signing-key]
+
+<ReleasedInNotice version="1.2.0" />
+
+Axelix 1.2.0'dan itibaren `algorithm` ve `signing-key` isteğe bağlıdır. Ayarlanmadıklarında starter `HMAC512` ve Master'ın
+varsayılan olarak kullandığı yerleşik anahtarın aynısını kullanır; böylece servis, herhangi bir anahtar ayarlamadan
+varsayılan ayarlarla çalışan bir Master'a bağlanır. Yerleşik anahtar kullanımdayken starter başlatmada bir uyarı kaydeder.
+
+:::warning
+Yerleşik anahtar herkesçe bilinir. Servisin actuator uç noktalarına ulaşabilen herkes bu anahtarla belirteç imzalayabilir
+ve örneğin ortamı okumak veya heap dökümü almak için Axelix uç noktalarını çağırabilir. Axelix'i yerel bir denemenin
+ötesinde kullanmadan önce Master'dakiyle aynı olan kendi `axelix.sbs.auth.jwt.signing-key` değerinizi ayarlayın.
+:::
+
+## Master'ın örneği bulmasını sağlama [#let-master-find-the-instance]
+
+Aşağıdaki iki yoldan birini seçin. Pratikte birbirlerini dışlarlar; Master ortamı zaten tarayabiliyorsa kendi kendine
+kayıt yalnızca gecikme ekler.
+
+### A seçeneği — Master tarafında otomatik keşif [#option-a--master-side-autodiscovery]
+
+Master, servislerinizle aynı Kubernetes kümesinde çalışıyorsa en basit kurulum, Master'ın, ad alanındaki Services
+nesnelerini taramasını ve her birinin `/actuator/axelix-metadata` uç noktasını yoklamasını sağlamaktır. Actuator uç
+noktalarını açmak ve JWT imzalama anahtarını paylaşmak dışında starter tarafında başka yapılandırma gerekmez.
+Master tarafındaki taramayı `axelix.master.discovery.auto.*` ile yapılandırın. Master sayfasındaki
+[Keşif — otomatik keşif](../../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery)
+bölümüne bakın. Master'ın her taramada ne yaptığını öğrenmek için bkz. [Keşif nasıl çalışır](../../product/discovery.mdx).
+
+### B seçeneği — Kendi kendine kayıt [#option-b--self-registration]
+
+Master örneğin ortamını tarayamadığında — farklı bir küme, sıradan bir sanal makine, yalıtılmış bir ağ — starter'da kendi
+kendine kaydı etkinleştirin. Örnek, actuator URL'sini taşıyan bir yaşam sinyalini sabit aralıklarla Master'a gönderir.
+Master gönderimi `POST /api/internal/service/register` adresinde kabul eder; `axelix.sbs.discovery.master-url` değerini de
+buraya yönlendirirsiniz. Axelix 1.3.0'dan itibaren starter bu tam kaydı yalnızca bir kez gönderir, ardından `master-url`
+yanındaki bir uç noktaya giden hafif yaşam sinyallerine geçer. Döngünün tamamı için bkz.
+[Keşif nasıl çalışır](../../product/discovery.mdx).
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    discovery:
+      self-registration: true
+      master-url: http://master.internal:2935/api/internal/service/register
+      instance-actuator-url: http://my-app.internal:8080/actuator
+      instance-name: orders-service
+      heartbeat-interval: 15s
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.discovery.self-registration=true
+axelix.sbs.discovery.master-url=http://master.internal:2935/api/internal/service/register
+axelix.sbs.discovery.instance-actuator-url=http://my-app.internal:8080/actuator
+axelix.sbs.discovery.instance-name=orders-service
+axelix.sbs.discovery.heartbeat-interval=15s
+```
+
+  </Tab>
+</Tabs>
+
+Sıkça gözden kaçan birkaç ayrıntı:
+
+- `instance-actuator-url`, Master'ın kendi ağından ulaşacağı servis URL'sidir ve yapılandırılmış Actuator temel yolunu
+  (normalde `/actuator`) içerir.
+- `master-url`, `/api/internal/service/register` dahil **tam** URL'dir. Starter bu adresi aynen kullanarak gönderim yapar.
+  Axelix `1.2.0` sürümünden itibaren Master varsayılan olarak `2935` portunu dinler; bu sürümden önce varsayılan port `8080`
+  idi. Bkz. [Genel](../../setting-up-master-ui/configuring-master/configuring-master.mdx#general).
+- `instance-name`, Master'ın bu örnek için arayüzde ve MCP yanıtlarında gösterdiği etikettir. Yeniden başlatmalarda ve
+  replikalarda aynı kalan bir ad seçin; bu genellikle pod adı değil, servis adıdır.
+- Master kendi kendine kaydı doğrudan kabul eder (`axelix.master.discovery.self-registration.enabled` varsayılan olarak
+  `true` değerindedir); yaşam sinyallerini reddetmek istiyorsanız `false` yapın. Master,
+  `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` süresince sinyal almadığında (varsayılan `45s`)
+  örneği çıkarır; bu nedenle `heartbeat-interval` değerini bunun yeterince altında tutun.
+
+## Hassas özellik değerlerini maskeleme [#sanitize-sensitive-property-values]
+
+Axelix'in `axelix-env` ve `axelix-configprops` uç noktaları özellik değerlerini Master'a döndürür. Master, gizli bilgilerin
+yetkisizce okunmasını önlemek için ilgili yetkiye sahip olmayan kullanıcılara değerleri maskeler. Aynı kurallar iki uç
+nokta için de geçerlidir. Hassas özellik anahtarlarını starter'da yapılandırın:
+
+`axelix.sbs.endpoints.config.sanitized-properties`
+
+- **Boş liste (varsayılan)** — ilgili yetkiye sahip olmayan çağıranlar için `axelix-env` ve `axelix-configprops` tarafından
+  döndürülen her değer `******` ile değiştirilir. Varsayılan kasıtlı olarak temkinlidir; güvenli olmak için ayrıca etkinleştirme gerekmez.
+- **Boş olmayan liste** — yalnızca listelenen anahtarlar maskelenir; diğer her şey her çağırana ham olarak döndürülür.
+  Temkinli varsayılan fazla kapsamlı olduğunda ve yalnızca belirli anahtarları (parolalar, belirteçler, imzalama anahtarları)
+  maskelemek istediğinizde bunu kullanın.
+
+Yetki, her uç nokta için ayrı denetlenir:
+
+- **`axelix-env`**: `environment.values:read` yetkisi, çağıranın ham değerleri görmesini sağlar.
+- **`axelix-configprops`**: `config-properties.values:read` yetkisi, çağıranın ham değerleri görmesini sağlar.
+
+Her iki yetki de Master'ın yerleşik **ADMIN** ve **SUPER_ADMIN** rolleri tarafından verilir. **VIEWER** ve **EDITOR** her
+zaman maskeleme işlevinden geçer. Tam matris için bkz.
+[Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities).
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+          - axelix.sbs.auth.jwt.signing-key
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+axelix.sbs.endpoints.config.sanitized-properties[3]=axelix.sbs.auth.jwt.signing-key
+```
+
+  </Tab>
+</Tabs>
+
+:::note
+Standart Spring Boot Actuator maskeleme ayarları — `management.endpoint.env.show-values`,
+`management.endpoint.env.keys-to-sanitize` ve bunların `configprops` karşılıkları — **dikkate alınmaz**.
+:::
+
+## Yapılandırma başvurusu [#configuration-reference]
+
+Her starter özelliği `axelix.sbs.*` ad alanında yer alır.
+
+### Starter'ı devre dışı bırakma [#disabling-the-starter]
+
+<ReleasedInNotice version="1.2.0" />
+
+`axelix.sbs.enabled`, tüm starter için genel açma kapama ayarıdır. Varsayılan olarak `true` olduğundan, bu sayfada
+anlatılan her şeyi etkinleştirmek için bağımlılığı eklemek yeterlidir. `false` yapıldığında tüm Axelix otomatik
+yapılandırmaları geri çekilir: Axelix actuator uç noktaları, JWT yetkilendirme filtresi, kendi kendine kayıt yaşam
+sinyalleri, Micrometer ölçümleri ve işlem izleme devre dışı kalır. Bağımlılığın kendisi derlemede kalırken uygulama,
+starter classpath'te yokmuş gibi başlar.
+
+Ayrı bir bağımlılık kümesi tutmadan belirli bir ortamda — örneğin yerel ortamda veya bir test profilinde — Axelix'i
+kapatmak istediğinizde bu ayarı kullanın. Başlatma sorunlarını giderirken starter'ın neden olup olmadığını elemenin de hızlı bir yoludur.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+Özellik başlatma sırasında bir kez okunur. Bu nedenle değiştirilmesi uygulamanın yeniden başlatılmasını gerektirir.
+
+:::note
+Starter devre dışıyken Master örneği göremez: `/actuator/axelix-metadata` adresine yapılan otomatik keşif yoklamaları
+başarısız olur ve kendi kendine kayıt yaşam sinyalleri durur; dolayısıyla örnek arayüzden ve MCP yanıtlarından kaybolur.
+:::
+
+<div className={styles.SharedTable}>
+
+| Özellik | Varsayılan | Açıklama |
+|----------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.enabled` | `true` | Tüm starter için genel açma kapama ayarı. Tüm Axelix otomatik yapılandırmalarının geri çekilmesi için `false` yapın. Spring Boot 2, 3 ve 4 starter'larında aynı şekilde davranır. |
+
+</div>
+
+### Kimlik doğrulama — JWT [#authentication--jwt]
+
+<div className={styles.SharedTable}>
+| Özellik | Varsayılan | Açıklama |
+|-----------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.auth.jwt.algorithm` | `HMAC512` (1.2.0+; öncesinde zorunlu) | İmzalama algoritması. `HMAC256`, `HMAC384` veya `HMAC512` değerlerinden biri. Master'ın `axelix.master.auth.jwt.algorithm` değeriyle eşleşmelidir. |
+| `axelix.sbs.auth.jwt.signing-key` | yerleşik anahtar (1.2.0+; öncesinde zorunlu) | Master'ın ürettiği belirteçleri doğrulamak ve kendi kendine kayıt yaşam sinyallerini imzalamak için kullanılan ortak sır. Master'ın imzalama anahtarıyla eşleşmelidir. |
+| `axelix.sbs.auth.jwt.duration` | `5m` | Yalnızca 1.3 öncesinde kendi kendine kayıt belirtecinin ömrü için kullanılır. 1.3'ten itibaren bu ayarın etkisi yoktur ve kaldırılabilir. Her istek için sabit bir dakikalık ömre sahip yeni bir teknik kullanıcı belirteci üretilir. |
+</div>
+
+### Kendi kendine kayıt [#self-registration]
+
+Kendi kendine kayıt **varsayılan olarak kapalıdır** (`axelix.sbs.discovery.self-registration=false`); Master örneği
+Master tarafında otomatik keşif yoluyla bulabiliyorsa bu şekilde bırakın.
+
+`axelix.sbs.discovery.self-registration=true` olduğunda aşağıdaki özellikler **zorunlu** hale gelir:
+
+- `axelix.sbs.discovery.master-url`
+- `axelix.sbs.discovery.instance-actuator-url`
+- `axelix.sbs.discovery.instance-name`
+
+Bu yaşam sinyallerinin Master tarafındaki alıcısı — uç nokta, çıkarma zaman aşımı, çıkarma taraması zamanlaması —
+Master sayfasındaki [Keşif — kendi kendine kayıt](../../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--self-registration)
+bölümünde belgelenmiştir. `axelix.sbs.auth.jwt.signing-key` altında yapılandırılan JWT imzalama anahtarı, Master'daki
+`axelix.master.auth.jwt.signing-key` ile eşleşmelidir; aksi halde yaşam sinyalleri `401` ile reddedilir.
+
+<div className={styles.SharedTable}>
+
+| Özellik | Varsayılan | Açıklama |
+|----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.discovery.self-registration` | `false` | Genel açma kapama ayarı. Kendi kendine kaydı etkinleştirmek için `true` yapın; Master tarafında otomatik keşfe dayanmak için `false` bırakın. |
+| `axelix.sbs.discovery.master-url` | *(ayarlanmamış)* <span className="Required">zorunlu</span> | Master'ın kendi kendine kayıt uç noktasının tam URL'si; örneğin `http://master:2935/api/internal/service/register`. `self-registration=true` olduğunda zorunludur. |
+| `axelix.sbs.discovery.instance-actuator-url` | *(ayarlanmamış)* <span className="Required">zorunlu</span> | Yapılandırılan Actuator temel yolunu (normalde `/actuator`) içeren, bu servisin Master'dan erişilebilir URL'si. `self-registration=true` olduğunda zorunludur. |
+| `axelix.sbs.discovery.instance-name` | *(ayarlanmamış)* <span className="Required">zorunlu</span> | Axelix arayüzünde ve MCP yanıtlarında gösterilen ad. `self-registration=true` olduğunda zorunludur. |
+| `axelix.sbs.discovery.heartbeat-interval` | `15s` | Yaşam sinyalleri arasındaki süre. Master'ın çıkarma `heartbeat-timeout` değerinden küçük olmalıdır. |
+
+</div>
+
+### Uç nokta değerlerini maskeleme [#endpoint-value-sanitization]
+
+<div className={styles.SharedTable}>
+
+| Özellik | Varsayılan | Açıklama |
+|----------------------------------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.endpoints.config.sanitized-properties` | *(boş liste)* | `environment.values:read` (`axelix-env` için) veya `config-properties.values:read` (`axelix-configprops` için) yetkisi olmayan çağıranlara değerleri `******` olarak maskelenen özellik anahtarları. Boş liste, **tüm** değerlerin maskelenmesi demektir. Eşleştirme kuralları için bkz. [Hassas özellik değerlerini maskeleme](#sanitize-sensitive-property-values). |
+
+</div>
+
+### Önbellek yönetimi [#cache-management]
+
+<ReleasedInNotice version="1.2.0" />
+
+Önbellek yönetimi, Caches sayfasına ve `axelix_cache_*` ölçümlerine veri sağlar: starter, uygulamanızdaki her
+`CacheManager` bean'ini, önbellek aramalarını kaydeden ve çalışma zamanında önbellekleri etkinleştirmenize, devre dışı
+bırakmanıza ve temizlemenize olanak veren bir proxy ile sarar; bu verileri `axelix-caches` actuator uç noktası üzerinden
+sunar. Starter classpath'e eklendiğinde **varsayılan olarak açıktır**.
+
+Tamamen kapatmak için `axelix.sbs.cache.management.enabled` değerini `false` yapın; `CacheManager` proxy'leri,
+`axelix-caches` uç noktası ve önbellek ölçümleri devre dışı kalır. `CacheManager` bean'leriniz uygulamanızın tanımladığı
+şekliyle bırakılır.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    cache:
+      management:
+        enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.cache.management.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.SharedTable}>
+
+| Özellik | Varsayılan | Açıklama |
+|---------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.cache.management.enabled` | `true` | Önbellek yönetimi için genel açma kapama ayarı. Tüm önbellek yönetimi otomatik yapılandırmasının geri çekilmesi için `false` yapın. Spring Boot 2, 3 ve 4 starter'larında aynı şekilde davranır. |
+
+</div>
+
+:::note
+Önbellek yönetimi devre dışıyken Master'daki Caches sayfasının bu örnek için gösterecek verisi yoktur ve önbellek MCP
+araçları bu örnek için başarısız olur.
+:::
+
+### Günlük kayıtları [#log-entries]
+
+<ReleasedInNotice version="1.3.0" />
+
+`axelix-logs` uç noktası, uygulamanızın en son günlük kayıtlarını sunar; böylece makineye erişmeden bunları okuyabilirsiniz.
+Starter, uygulama başlatıldığı andan itibaren bu kayıtları bellekte tutar. Tampon dolduğunda her yeni kayıt en eski kaydı
+çıkarır. Tampon bellekte bulunduğundan yeniden başlatma sonrasında tekrar boştur.
+
+Varsayılan olarak starter son 1000 kaydı tutar. Yoğun bir servis, 1000 kaydın yalnızca birkaç saniyeyi kapsayacağı kadar
+çok günlük üretiyorsa `axelix.sbs.logs.max-entries` değerini artırın. Tutulan her kayıt heap'te kaldığından bellek sınırlıysa azaltın.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    logs:
+      max-entries: 5000
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.logs.max-entries=5000
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.SharedTable}>
+
+| Özellik | Varsayılan | Açıklama |
+|-------------------------------|---------|-------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.logs.max-entries` | `1000` | Starter'ın bellekte tuttuğu en son günlük kayıtlarının azami sayısı. `0` değerinden büyük olmalıdır. |
+
+</div>
+
+:::note
+Starter, uygulama başlatıldıktan sonra değeri denetler. `0` veya negatifse başlatma,
+`axelix.sbs.logs.max-entries must be positive` iletisini içeren bir `IllegalArgumentException` ile başarısız olur.
+:::
+
+### İşlem izleme [#transaction-monitoring]
+
+İşlem izleme, Transaction Control sayfasına ve ilgili ölçümlere veri sağlar: `@Transactional` metotlarınızı sarar,
+sorguları saymak için veri kaynağını proxy ile sarar, istek başına işlem yığınını temizler ve Hibernate N+1 entegratörünü
+kaydeder. İlk kayıt, toplanan analizleri içerir. Sonraki güncellemeler, Master 1.3.0'dan itibaren starter'ları yokladığında
+`axelix-ping`, kendi kendine kayıtta ise gönderilen yaşam sinyalleri üzerinden iletilir; eski starter'lar tam kayıt meta
+verilerini sağlamaya devam eder. 1.3.0'dan itibaren starter'ları yoklamak için `axelix-ping` uç noktasını açın; işlemlere
+özgü ek bir uç nokta gerekmez. Starter classpath'e eklendiğinde işlem izleme **varsayılan olarak açıktır**.
+
+İşlem izleme yalnızca servlet (Spring MVC) uygulamalarında çalışır. Reaktif (WebFlux) uygulamada starter, özellik değeri
+ne olursa olsun bunu etkinleştirmez. Bkz. [Reaktif (WebFlux) uygulamalar](#reactive-webflux-applications).
+
+Tamamen kapatmak için `axelix.sbs.transaction.monitoring.enabled` değerini `false` yapın; bean son işlemcileri, veri
+kaynağı proxy'leri, temizleme filtresi ve Hibernate entegratörü devre dışı kalır. İlgili ek yükü azaltmak, veri kaynağı /
+Hibernate kurulumunuzdaki sorunları giderirken olası etkileşimi elemek veya özelliği kullanmadığınızda kapatmak için bunu kullanın.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    transaction:
+      monitoring:
+        enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.transaction.monitoring.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.configTable}>
+
+| Özellik | Varsayılan | Açıklama |
+|----------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.transaction.monitoring.enabled` | `true` | İşlem izleme için genel açma kapama ayarı. Tüm işlem izleme otomatik yapılandırmasının geri çekilmesi için `false` yapın. Spring Boot 2, 3 ve 4 starter'larında aynı şekilde davranır. |
+
+</div>
+
+:::note
+İşlem izlemeyi devre dışı bırakmak, aynı otomatik yapılandırmanın parçası olduğundan aşağıda açıklanan bellek içi
+sayfalama algılamasını da devre dışı bırakır.
+:::
+
+### Bellek içi sayfalama algılama [#in-memory-pagination-detection]
+
+Bir koleksiyonu fetch ile yüklerken
+[setFirstResult/setMaxResults](https://docs.hibernate.org/orm/current/javadocs/org/hibernate/query/Query.html?#setMaxResults(int))
+kullanımının neden olduğu Hibernate bellek içi sayfalamasını algılar.
+
+Varsayılan olarak işlem izleme, Hibernate uyarılarını yakalayan bir appender kaydeder (Hibernate 5.x'te HHH000104,
+Hibernate 6.x–7.3.x'te HHH90003004). Starter, uygulamanızın etkin günlük sistemine uygun appender'ı seçer; bu nedenle
+Logback veya Log4j2 kullanmanızdan bağımsız olarak algılama çalışır:
+
+- **Logback** — starter,
+  `com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppender` bileşenini
+  kaydeder. Günlük sisteminin Logback olduğu varsayılan Spring Boot kurulumu için bu geçerlidir.
+- **Log4j2** — uygulamanız Log4j2 kullandığında (genellikle `spring-boot-starter-log4j2` ekleyip varsayılan Logback
+  starter'ını dışladıktan sonra) starter,
+  `com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.Log4j2InMemoryPaginationAppender` bileşenini kaydeder.
+
+Bunlar arasında seçim yapmazsınız; starter etkin günlük sistemini algılar ve uygun appender'ı sizin için kaydeder.
+
+İki appender'ın da kaydedilmesini önlemek istiyorsanız
+`axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled` değerini `false` yapın.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    transaction:
+      monitoring:
+        in-memory-pagination-detection:
+          enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+## İlgili sayfalar [#related]
+
+- [Derleme eklentisini yapılandırma](../../setting-up-spring-boot-service/build-plugin/configuration.mdx) — servisi bağlamanın
+  ikinci yarısı; örneğin kaydolması için gereklidir.
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx) — imzalama anahtarı, çıkarma
+  zaman aşımı ve Kubernetes taramasının ayarlandığı yer.
+- [Master nedir?](../../setting-up-master-ui/what-is-master.mdx) — Master'ın starter'ın sunduğu verileri nasıl kullandığına dair arka plan.
+- [Kimlik doğrulama](../../setting-up-master-ui/authentication/authentication.mdx) — her iki tarafta JWT ve yetki
+  çözümlemesinin daha ayrıntılı açıklaması.

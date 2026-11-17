@@ -1,0 +1,270 @@
+---
+title: Kimlik doğrulama
+description: "Bu sayfa, Axelix Master'da oturum açmanın nasıl çalıştığını açıklar: mevcut kimlik doğrulama seçenekleri, tarayıcı oturumunun oluşturulması ve her istekte doğrulanması, kullanıcı arayüzüne erişimi denetleyen rol ve yetki modeli ve MCP sunucusunun yapay zekâ ajanlarının kimliğini nasıl doğruladığı."
+---
+
+import signInOptionsStyles from './_signInOptionsTable.module.css';
+import rolesStyles from './_rolesTable.module.css';
+import oauth2Styles from './_oauth2PropertiesTable.module.css';
+
+Özellik anahtarları [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx#configuration-reference) sayfasında yer alır; burada amaç işleyişi açıklamaktır.
+
+## Üç oturum açma seçeneği [#the-three-sign-in-options]
+
+Master, birbirinden bağımsız üç kimlik doğrulama sağlayıcısıyla gelir. Bunların herhangi bir birleşimi aynı anda etkinleştirilebilir;
+`/login` adresindeki oturum açma ekranı, etkin seçeneklere ait denetimleri gösterir.
+
+<div className={signInOptionsStyles.SignInOptionsTable}>
+
+| Seçenek       | Varsayılan    | Etkinleştirme özelliği                                                                   | Ne zaman kullanılır                                                                    |
+|---------------|---------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| Süper yönetici | Her zaman etkin | (`axelix.master.auth.options.super-admin.credentials.{username,password}` ile denetlenir) | İlk kurulum, kurtarma hesabı, tek operatörlü dağıtımlar. |
+| Yerel kullanıcılar | Kapalı | `axelix.master.auth.options.local.enabled=true` | Parolaların saklanmasını Master yönettiğinde. |
+| OAuth2 / OIDC | Kapalı | `axelix.master.auth.options.oauth2.enabled=true` | Üretim ortamı. Keycloak, Auth0, Okta, Google veya OIDC uyumlu herhangi bir sağlayıcı üzerinden SSO. |
+
+</div>
+
+Birden fazla seçenek etkinleştirildiğinde ekran bunları alt alta gösterir: süper yönetici ve yerel kullanıcılar için
+kullanıcı adı/parola formu, OIDC etkinse bunun ardından tek bir **Sign in with OAuth2/OIDC Provider** düğmesi görünür.
+
+### Süper yönetici [#super-admin]
+
+Yerleşik süper yönetici, her zaman etkin olan tek hesaptır. Süper yöneticiyi Axelix'in _"God Mode"_ kullanıcısı olarak düşünebilirsiniz:
+
+1. Mümkün olan tüm yetkilere sahiptir.
+2. Yerleşiktir ve _her zaman_ etkindir. Devre dışı bırakılamaz veya silinemez (nedeni aşağıda açıklanmıştır).
+3. Düzenlenemez veya değiştirilemez; ancak kullanıcı adını/parolasını
+`axelix.master.auth.options.super-admin.credentials.username` / `.password` ayarlarıyla değiştirebilirsiniz (ve değiştirmelisiniz!).
+**Bu ayarların yalnızca ilk kurulumda değil, Axelix Master'ın her başlatılışında yeniden uygulandığını** unutmayın!
+
+#### Ne zaman kullanılır [#when-to-use-it]
+
+Süper yönetici günlük kullanım için değil, iki durum için vardır:
+
+1. **İlk kurulum.** Yeni bir Master'da henüz başka hesap yoktur. Lisansı ayarlamak, ilk yerel kullanıcıları oluşturmak ve
+   ekibinizin bundan sonra kullanacağı ayrıcalıklı rolleri düzenlemek gibi ilk kurulum işlerini yapmak için süper yönetici
+   olarak oturum açın.
+2. **Acil durum kurtarması.** Ekibinizin normalde kullandığı hesaplar çalışmayı durdurduğunda süper yönetici bir kurtarma
+   yoludur. Örneğin bir OIDC rol eşlemesi herkesi `VIEWER` olarak çözümleyebilir veya bir yönetici yanlışlıkla silinebilir.
+   Süper yönetici veritabanına veya harici bir kimlik sağlayıcısına hiçbir zaman bağlı olmadığından, sorunu düzeltirken
+   oturum açmanıza olanak vermeye devam eder.
+
+Günlük işler için yerel bir hesapla veya OIDC hesabıyla oturum açın. Süper yöneticiyi kurulum ve kurtarma için ayırın.
+
+#### Diğer hesaplardan farkı [#how-it-differs-from-other-accounts]
+
+Diğer iki oturum açma seçeneği Master'ın veritabanında bir kayıt bırakır; süper yönetici bırakmaz.
+
+- **Yerel kullanıcılar** tamamen Master'ın veritabanında bulunur ve **Users** ekranından yönetilir.
+- **OIDC kullanıcıları** kimlik sağlayıcınıza aittir; ancak Master, **Users** ekranında gösterebilmek ve eşlemeyi yeniden
+  kullanabilmek için `role-attribute-path` üzerinden çözümlenen rol dahil her kullanıcı için bir kayıt saklar.
+- **Süper yöneticinin** hiçbir veritabanı kaydı yoktur. Kimlik bilgileri yalnızca yapılandırmada bulunur. **Users** ekranında
+  asla görünmez ve kullanıcı adı ayrılmıştır: hiçbir yerel kullanıcı veya OIDC kullanıcısı bu kullanıcı adıyla
+  oluşturulamaz; bu ada dönüştürülecek şekilde yeniden adlandırılamaz, düzenlenemez veya silme işlemiyle bu kullanıcı adı
+  hedeflenemez. Dolayısıyla süper yönetici hesabı kullanıcı arayüzünden düzenlenemez veya silinemez.
+
+:::tip
+Süper yönetici kullanıcı adını veya parolasını değiştirmek için `axelix.master.auth.options.super-admin.credentials`
+ayarını düzenleyin ve Master'ı yeniden başlatın. Tasarım gereği bunu uygulama içinden yapmanın bir yolu yoktur.
+:::
+
+Master'ı başkalarının erişimine açmadan önce varsayılanları değiştirin: `admin / admin`, izlenen tüm servisler üzerinde
+tam denetim sağlar.
+
+Parola aşağıdaki biçimlerden biriyle sağlanabilir:
+
+* **Düz metin**: parolanın ham değeri.
+* **Kodlanmış**: nasıl doğrulanacağını belirtmek için değerin başına süslü parantez içinde bir tanımlayıcı ekleyin:
+düz metin için `{noop}`, BCrypt özeti için `{bcrypt}`.
+
+Ön ek sağlanmazsa değer düz metin olarak değerlendirilir.
+Güvenlik nedeniyle düz metin yerine özetlenmiş bir parola biçimi (`{bcrypt}` gibi) kullanmanız önemle önerilir.
+
+Kodlanmış parola örnekleri:
+
+* `{bcrypt}$2a$10$KjkxE0Tt8L4B2kDYlSWcme0o/AjKE7LqyDaTqPr0sESbF85e3bDTC` - bcrypt ile kodlanmış parola
+* `{noop}password` - düz metin olarak kodlanmış (yalnızca `password` yazılmasıyla aynı).
+
+### Yerel kullanıcılar [#local-users]
+
+Yerel kullanıcılar Master'ın kendi veritabanında (`UserEntity`) bulunur. Parolalar BCrypt ile özetlenir.
+`axelix.master.auth.options.local.enabled=true` olduğunda `DatabaseUserAuthenticator`, gönderilen kullanıcı adını arar,
+parolayı BCrypt ile doğrular ve saklanan rol metnini (`admin`, `editor`, `viewer`) yerleşik rollerden biriyle eşler.
+Bilinmeyen rol metinleri, oturum açma sırasında `UserRoleNotFoundException` hatasına yol açar.
+
+Yerel kullanıcılar, kullanıcı arayüzündeki **Users** ekranından yönetilir: oluşturma, güncelleme ve silme işlemleri,
+varsayılan olarak yalnızca `SUPER_ADMIN` rolünün sahip olduğu `users:manage` yetkisini gerektirir.
+
+### OAuth2 / OIDC [#oauth2--oidc]
+
+Master, standart Authorization Code Flow akışını uygular. `axelix.master.auth.options.oauth2.enabled=true` ile etkinleştirin
+ve `issuer-uri`, `client-id`, `client-secret` ile bu Master dağıtımının herkese açık `base-url` değerini sağlayın.
+
+Uçtan uca akış:
+
+1. Kullanıcı `/login` sayfasında **Sign in with OAuth2/OIDC Provider** düğmesine tıklar. Tarayıcı, `client-id` ve
+   `<base-url>/api/external/oauth2/callback` olarak ayarlanmış `redirect_uri` ile IdP'nin yetkilendirme uç noktasına yönlendirilir.
+2. IdP kullanıcının kimliğini doğrular ve bir `code` ile geri çağrı adresine yönlendirir.
+3. `OAuth2CallbackController`, IdP'nin belirteç uç noktasında kodu bir kimlik belirteci ve erişim belirteciyle değiştirir,
+   kimlik belirtecini doğrular ve kullanıcı adını çıkarır.
+4. Rol, `axelix.master.auth.options.oauth2.role-attribute-path` içindeki JMESPath ifadesinin userinfo yanıtı üzerinde
+   değerlendirilmesiyle çözümlenir. Sonuç `admin`, `editor` veya `viewer` ile eşlenir. `role-attribute-path` ayarlanmazsa
+   her OIDC kullanıcısı `VIEWER` rolünü alır.
+5. Master, oturum çerezini oluşturmadan önce kullanıcıyı kendi veritabanında `OIDC` kaynağıyla ekler veya günceller;
+   userinfo içinde e-posta varsa saklanan e-postayı yeniler ve `Last login` değerini günceller.
+6. Master kendi oturum JWT'sini oluşturur (parola akışlarıyla aynı kodlayıcıyı kullanır) ve oturum çerezleri ayarlanmış
+   olarak tarayıcıyı `/wallboard` adresine yönlendirir.
+
+Authorization Code Flow yalnızca tarayıcı üzerinden başlatılır. OIDC belirteçleri hiçbir zaman saklanmaz: Master bunları
+kullanıcıyı tanımlamak için bir kez kullanır, ardından kendi oturum JWT'sini üretir.
+
+Bu nedenle tarayıcı üzerinden her başarılı oturum açma, **Users** ekranında kalıcı bir `OIDC` hesabı bırakır. Aynı kullanıcı
+adı zaten OIDC dışı bir hesaba aitse Master, kimlikleri birleştirmek yerine oturum açmayı reddeder.
+
+**`axelix.master.auth.options.oauth2.enabled=true` olduğunda şu özellikler sağlanmalıdır:** `issuer-uri`, `client-id`,
+`client-secret`, `base-url`. `scopes` varsayılan olarak `openid` değerindedir ve yalnızca IdP'niz ek kapsamlar gerektiriyorsa
+değiştirilmesi gerekir. `role-attribute-path` isteğe bağlıdır: oturum açan tüm kullanıcıları `VIEWER` rolüyle eşlemek için ayarlamayın.
+
+<div className={oauth2Styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+|---------------------------------------------------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled` | `false` | OIDC ile oturum açmayı etkinleştirir. |
+| `axelix.master.auth.options.oauth2.issuer-uri` | *(ayarlanmamış)* <span className="Required">zorunlu</span> | OIDC sağlayıcısının temel URL'si. Master, uç noktaları keşfetmek için buradan `/.well-known/openid-configuration` dosyasını okur. `oauth2.enabled=true` olduğunda zorunludur. |
+| `axelix.master.auth.options.oauth2.client-id` | *(ayarlanmamış)* <span className="Required">zorunlu</span> | OIDC sağlayıcısında kayıtlı istemci tanımlayıcısı. `oauth2.enabled=true` olduğunda zorunludur. |
+| `axelix.master.auth.options.oauth2.client-secret` | *(ayarlanmamış)* <span className="Required">zorunlu</span> | OIDC sağlayıcısında kayıtlı istemci sırrı. `oauth2.enabled=true` olduğunda zorunludur. |
+| `axelix.master.auth.options.oauth2.base-url` | *(ayarlanmamış)* <span className="Required">zorunlu</span> | Bu Master örneğinin herkese açık temel URL'si. OAuth2 geri çağrı yönlendirme URI'sini oluşturmak için kullanılır. `oauth2.enabled=true` olduğunda zorunludur. |
+| `axelix.master.auth.options.oauth2.scopes` | `openid` | Yetkilendirme kodu akışı sırasında istenen, boşlukla ayrılmış kapsamlar. Eksikse `openid` otomatik olarak eklenir. |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | *(ayarlanmamış)* | Axelix rolünü çözümlemek için userinfo yanıtı üzerinde değerlendirilen JMESPath ifadesi. Ayarlanmazsa her OIDC kullanıcısı `VIEWER` olur. |
+
+</div>
+
+:::warning
+Oturum açan her kullanıcıyı `VIEWER` rolüyle eşlemek ilk inceleme için kullanışlıdır; ancak üretim ortamında bu,
+**IdP'nizle kimlik doğrulayabilen herkesin keşfedilen tüm servislerin tüm izleme verilerine okuma erişimi elde etmesi**
+anlamına gelir. IdP kullanıcıları tam olarak Master'ı görmesi gereken kişilerden oluşmuyorsa, açıkça bir Axelix rolü
+atanmamış kullanıcılara sessizce `VIEWER` verilmesini önlemek için `role-attribute-path` ayarını yapılandırın.
+:::
+
+## Oturum: çerezler ve JWT [#the-session-cookies-and-jwt]
+
+Tüm oturum açma yolları aynı şekilde sonuçlanır: Master bir JWT oluşturur ve bunu çerez olarak döndürür. Sonraki tüm
+kullanıcı arayüzü isteklerine erişim aynı çerezle denetlenir.
+
+### Oturum açmanın ürettikleri [#what-login-produces]
+
+`POST /api/external/users/login` (ve OIDC geri çağrısı), `Set-Cookie` ile iki çerez üretir:
+
+- **`auth_token`**: JWT'nin kendisi. `HttpOnly`, `SameSite=Strict`, `Path=/`, `MaxAge=axelix.master.auth.jwt.lifespan`
+  (varsayılan `12h`). `Secure`, `axelix.master.auth.cookie.secure` ile denetlenir: bunu yalnızca düz HTTP üzerinden
+  localhost erişiminde `false` bırakın.
+- **`authorities`**: oturum açan kullanıcının sahip olduğu yetki adlarının Base64 ile kodlanmış JSON dizisi; örneğin
+  `["environment.values:read","scheduled-tasks:write"]`. Ön yüz hangi düğmeleri göstereceğini belirlemek için okuduğundan
+  `HttpOnly` **değildir**. Yalnızca kullanıcı arayüzü için bir ipucudur. Arka uç, her istekte yetkileri JWT'den yeniden
+  türetir; dolayısıyla bu çerezle oynanması yalnızca arayüzün sunduklarını değiştirir, sunucunun izin verdiklerini değiştirmez.
+
+JWT'nin kendisi, `axelix.master.auth.jwt.signing-key` içindeki sırla HMAC kullanılarak imzalanır (`HMAC256`, `HMAC384`
+veya `HMAC512`; `axelix.master.auth.jwt.algorithm` ile ayarlanır). İçerdiği talepler kullanıcı adı (`sub`), oluşturulma ve
+sona erme zaman damgaları ve verilen her rolü yetkileri ve iç içe bileşenleriyle birlikte kodlayan bir `roles` talebidir.
+
+### Her isteğin geçtiği adımlar [#what-every-request-goes-through]
+
+`CookieBasedJwtAuthorizationFilter`, küçük bir izin listesi dışındaki tüm `/api/...` isteklerinde çalışır (oturum açma
+uç noktası, OAuth2 geri çağrısı, herkese açık ayarlar uç noktası, kendi kendine kayıt uç noktası ve `/api/mcp/**`;
+bunların kendi filtreleri vardır veya kasıtlı olarak anonimdirler). Diğer tüm isteklerde:
+
+1. Filtre `auth_token` çerezini okur. Eksik veya boşsa `JwtProcessingException` oluşur ve `401 Unauthorized` olarak döner.
+2. `DefaultJwtDecoderService`, imzayı ve süre sonunu `axelix.master.auth.jwt.signing-key` ile doğrular. Değiştirilmiş,
+   imzasız veya süresi dolmuş belirteç `401` sonucunu verir.
+3. `MasterAuthorityResolver`, istek yolunu ve HTTP yöntemini, "bu uç nokta şu yetkiyi gerektirir" kurallarını içeren
+   yerleşik bir tabloda arar. Tabloda bulunmayan uç noktalar yalnızca geçerli bir belirteç gerektirir.
+4. `DefaultAuthorizer`, kullanıcının rollerini tam yetki kümesine dönüştürür ve gereken yetkileri kapsayıp kapsamadığını
+   denetler. Bir yetki eksikse `AuthorizationException` oluşur ve `403 Forbidden` olarak döner.
+5. Başarılı olursa istek, kimliği doğrulanmış `User` ve ham belirteci taşıyan bir `DefaultSecurityContext` içinde çalışır;
+   böylece sonraki kodlar yeniden ayrıştırma yapmadan çağrıyı yapan kullanıcıyı okuyabilir.
+
+### Oturumu kapatma ve anahtar yenileme [#logout-and-rotation]
+
+`POST /api/external/users/logout`, iki çerezin de üzerine boş değerler ve `MaxAge=0` yazar; böylece tarayıcı bunları
+hemen siler. JWT'nin kendisi, `exp` talebindeki zaman geçene kadar teknik olarak geçerli kalır: Master sunucu tarafında
+bir engelleme listesi tutmaz.
+
+Tüm etkin oturumları sonlandırmak için (bir anahtarın ele geçirilmesinden sonra, eski bir ortak sırrı değiştirmek için
+veya üç aylık yenilemede) `axelix.master.auth.jwt.signing-key` değerini değiştirin. İmza artık yeni sırla eşleşmediğinden,
+üretilmiş tüm belirteçler bir sonraki istekte hemen doğrulamadan geçemez. Kullanıcılar `/login` sayfasına geri döner.
+
+## Roller ve yetkiler [#roles-and-authorities]
+
+Axelix 1.3, [Grafana RBAC modelinden](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/access-control/)
+esinlenen yeni RBAC yetki adlarını getirir. `resource:action` ve `resource.sub-resource:action` adlandırma kalıpları
+yalnızca Axelix 1.3 ve sonraki sürümler için geçerlidir. Önceki sürümler `CACHES_CLEAR` gibi eski adları kullanır.
+Örneğin `caches:clear` önbellekleri temizlemeye izin verir; `environment.values:read` ise özellik değerlerine erişimi belirtir.
+Kullanıcıların hangi işlemleri yapabileceğini roller belirlemeye devam eder. 1.3'ten eski starter'lar için Master,
+kod adlarını otomatik olarak `CACHES_CLEAR` gibi eski adlara dönüştürür; servis yapılandırmasında değişiklik gerekmez.
+
+Master, sabit bir rol ve yetki kümesi kullanır. Roller yetki gruplarıdır; yetkilendirme denetimi her zaman yetkilere
+karşı yapılır, rol adlarına karşı yapılmaz. Bu nedenle OIDC eşlemesi veya veritabanı katmanıyla sağlanan özel bir rol,
+yerleşik adlardan birine çözümlenmelidir: şu anda yapılandırmadan yeni bir yetki tanımlamanın yolu yoktur.
+
+<div className={rolesStyles.RolesTable}>
+
+| Rol | Verilen yetkiler | Kimlere verilir |
+|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `SUPER_ADMIN` | `users:read` ve `users:manage` dahil Master'ın tanımladığı tüm yetkiler. | Yerleşik süper yönetici hesabı. |
+| `ADMIN` | `environment.values:read`, `config-properties.values:read`, `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`, `heap-dump:read`. | Rolü `admin` olan yerel veritabanı kullanıcıları. `role-attribute-path` sonucu `admin` olan OIDC kullanıcıları. |
+| `EDITOR` | `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`. | Rolü `editor` olan yerel veritabanı kullanıcıları. `role-attribute-path` sonucu `editor` olan OIDC kullanıcıları. |
+| `VIEWER` | Yok: bir yetkiyle kısıtlanmamış her şeyin salt okunur görünümü. | Rolü `viewer` olan yerel veritabanı kullanıcıları. `role-attribute-path` ayarlanmamış veya boş olan OIDC kullanıcıları. |
+
+Yapılandırılmış bir `role-attribute-path` hiçbir rol döndürmezse veya bilinmeyen bir rol döndürürse kimlik doğrulama başarısız olur.
+
+</div>
+
+Her yetkinin denetlediği işlemler:
+
+- **`environment.values:read`**: **Environment** ekranında özellik değerlerini gösterme.
+- **`config-properties.values:read`**: **Configuration Properties** ekranında özellik değerlerini gösterme.
+- **`scheduled-tasks:write`**: zamanlanmış görevleri etkinleştirme, devre dışı bırakma, zorla çalıştırma ve yeniden zamanlama.
+- **`caches:clear`**: tek tek önbellekleri, önbellek yöneticilerini veya uygulamanın tüm önbelleğini temizleme.
+- **`caches:toggle`**: çalışma zamanında tek tek önbellekleri ve önbellek yöneticilerini etkinleştirme ve devre dışı bırakma.
+- **`gc:manage`**: GC'yi tetikleme, GC günlüklerinin izlenmesini etkinleştirme ve devre dışı bırakma.
+- **`heap-dump:read`**: heap dökümlerini doğrudan indirme veya dışa aktarılan uygulama durumuna dahil etme.
+- **`users:read`**: Users kullanıcı listesini okuma.
+- **`users:manage`**: yerel kullanıcı oluşturma, güncelleme ve silme.
+
+`users:read` ve `users:manage` şu anda `SUPER_ADMIN` rolüne ayrılmıştır; `ADMIN`, daha yüksek yetki verilmeden kullanıcıları yönetemez.
+
+## MCP sunucusu kimlik doğrulaması [#mcp-server-authentication]
+
+MCP istemcilerinin taşıdığı kimlik bilgileri tarayıcı oturum çerezi olmadığından, `/api/mcp` adresindeki yerleşik MCP
+sunucusuna erişim kendi filtresi olan `McpAuthorizationFilter` ile denetlenir. Filtre, `Authorization` başlığını ayrıştırır
+ve kullanılan şemaya karşılık gelen işleyiciye iletir.
+
+- **`Basic`**: `BasicMcpAuthenticationHandler`, `Authorization: Basic <base64(user:pass)>` değerini çözer ve kullanıcı
+  arayüzünün kullandığı aynı `CompositeUserAuthenticator` bileşenine devreder. Süper yönetici ve yerel hesaplar çalışır.
+  Rol eşlemesi, tarayıcı üzerinden oturum açmayla aynıdır.
+- **`Bearer`**: `BearerMcpAuthenticationHandler`, kimlik bilgisini bir OIDC erişim belirteci olarak değerlendirir.
+  Belirteci OIDC sağlayıcısıyla doğrular ve UserInfo yanıtından bir rol türetmek için `UserInfoJsonAccessor` kullanır;
+  ardından bu rol ve kalıcı hesabın kimliği ve kullanıcı adıyla bir `PasswordlessUser` oluşturur. Kullanıcı, hesabı
+  oluşturmak için önce tarayıcı üzerinden oturum açmalıdır; rol, güncel userinfo yanıtından değerlendirilir.
+  Yalnızca `axelix.master.auth.options.oauth2.enabled=true` olduğunda kullanılabilir.
+
+Kullanıcı tanımlandıktan sonra filtre, web filtresiyle aynı yetki denetimini yapar: araç başına yetki gereksinimleri
+`McpEndpointResolver` ve `McpEndpointAuthorityResolver` üzerinden çözümlenir. Çağıranın çalıştırmaya yetkili olmadığı
+bir araç `403 Forbidden` döndürür. Bilinmeyen veya geçersiz kimlik bilgisi `401 Unauthorized` döndürür.
+
+OIDC etkin olduğunda ve `Authorization` başlığı olmadan bir istek geldiğinde, `401` yanıtı ayrıca şunu içerir:
+
+```
+WWW-Authenticate: Bearer resource_metadata="<base-url>/api/external/mcp-oauth2/.well-known/oauth-protected-resource"
+```
+
+RFC 9728'i uygulayan MCP istemcileri, Master'ın OAuth2 yapılandırmasını keşfetmek ve kullanıcıyı yetkilendirme akışından
+kendileri geçirmek için bu başlığı kullanır.
+
+## İlgili sayfalar [#related]
+
+- [Master yapılandırması: Kimlik doğrulama özellikleri](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentication--jwt):
+  bu sayfada geçen tüm özellik anahtarları ve varsayılanlar.
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx): aynı JWT
+  imzalama anahtarının starter tarafı.
+- [Master nedir?](../what-is-master.mdx): oturum açıldıktan sonra Master'ın yaptıkları hakkında daha geniş bilgi.

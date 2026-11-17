@@ -55,7 +55,7 @@ type VersionProps = {
 export const ReleasedInNotice = ({ version }: VersionProps) => {
     const { locale } = useI18n();
     const label = translate(
-        { en: "Released", ru: "Выпущено", fr: "Publié", de: "Veröffentlicht", es: "Publicado" },
+        { en: "Released", ru: "Выпущено", fr: "Publié", de: "Veröffentlicht", es: "Publicado", tr: "Yayımlandı" },
         locale,
     );
     const detail = translate(
@@ -65,6 +65,7 @@ export const ReleasedInNotice = ({ version }: VersionProps) => {
             fr: "Disponible depuis la version",
             de: "Verfügbar seit Version",
             es: "Disponible desde la versión",
+            tr: "Şu sürümden itibaren kullanılabilir",
         },
         locale,
     );
@@ -92,7 +93,7 @@ export const ReleasedInNotice = ({ version }: VersionProps) => {
 export const UpcomingReleaseNotice = () => {
     const { locale } = useI18n();
     const label = translate(
-        { en: "Upcoming", ru: "Ожидается", fr: "À venir", de: "Demnächst", es: "Próximamente" },
+        { en: "Upcoming", ru: "Ожидается", fr: "À venir", de: "Demnächst", es: "Próximamente", tr: "Yakında" },
         locale,
     );
     const detail = translate(
@@ -102,6 +103,7 @@ export const UpcomingReleaseNotice = () => {
             fr: "Disponible dans une prochaine version mineure",
             de: "Verfügbar in einer kommenden Minor-Version",
             es: "Disponible en una próxima versión menor",
+            tr: "Gelecek bir minör sürümde kullanıma sunulacak",
         },
         locale,
     );
@@ -131,7 +133,14 @@ type ScreenshotsNoticeProps = {
 export const ScreenshotsNotice = ({ text, children }: ScreenshotsNoticeProps) => {
     const { locale } = useI18n();
     const label = translate(
-        { en: "Screenshots", ru: "Скриншоты", fr: "Captures d’écran", de: "Screenshots", es: "Capturas de pantalla" },
+        {
+            en: "Screenshots",
+            ru: "Скриншоты",
+            fr: "Captures d’écran",
+            de: "Screenshots",
+            es: "Capturas de pantalla",
+            tr: "Ekran görüntüleri",
+        },
         locale,
     );
 
@@ -168,7 +177,14 @@ type LegacyNoticeProps = VersionProps & {
 export const LegacyNotice = ({ version, reason }: LegacyNoticeProps) => {
     const { locale } = useI18n();
     const label = translate(
-        { en: "Legacy", ru: "Устарело", fr: "Obsolète", de: "Veraltet", es: "Versiones anteriores" },
+        {
+            en: "Legacy",
+            ru: "Устарело",
+            fr: "Obsolète",
+            de: "Veraltet",
+            es: "Versiones anteriores",
+            tr: "Eski sürümler",
+        },
         locale,
     );
     const detail = translate(
@@ -178,6 +194,7 @@ export const LegacyNotice = ({ version, reason }: LegacyNoticeProps) => {
             fr: "Nécessaire uniquement avant la version",
             de: "Nur vor dieser Version erforderlich",
             es: "Solo necesario antes de la versión",
+            tr: "Yalnızca şu sürümden önce gereklidir",
         },
         locale,
     );
@@ -188,6 +205,7 @@ export const LegacyNotice = ({ version, reason }: LegacyNoticeProps) => {
             fr: "Dans les versions ultérieures, ignorez cette section.",
             de: "Überspringen Sie diesen Abschnitt ab dieser Version.",
             es: "En versiones posteriores, omita esta sección.",
+            tr: "Daha yeni sürümlerde bu bölümü atlayın.",
         },
         locale,
     );

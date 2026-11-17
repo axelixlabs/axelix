@@ -1,0 +1,47 @@
+---
+title: Dil profili
+description: "Languages Profile panosu, uygulamaların hangi Java sürümleri, JDK dağıtımları ve Kotlin sürümleri üzerinde çalıştığını gösterir."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix'in en son minör sürümünü gösterir.">
+
+![Languages Profile panosu](/img/feature/dashboard/dashboard-languages-profile.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzündeki Languages Profile***
+
+Düzinelerce uygulamanın her biri farklı bir Java sürümü ve farklı bir sağlayıcının JDK'sı üzerinde, Kotlin ile veya Kotlin
+olmadan çalışabilir. Languages Profile bunu tüm uygulamalar için tek seferde gösterir: kaç uygulamanın hâlâ LTS dışı Java
+sürümlerinde olduğu, kaç JDK sağlayıcısının kullanıldığı ve Kotlin'in ne kadar yaygınlaştığı.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış her kullanıcıya açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN**
+sayfayı açabilir. Tam rol/yetki matrisi için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfa neleri gösterir? [#what-the-page-shows]
+
+Üstteki özet, toplam uygulama sayısını ve bunlardan kaçının Java'nın LTS sürümünde çalıştığını, kaçının çalışmadığını gösterir.
+
+Alt bölümde şunlar gösterilir:
+
+- Uygulamaların Java `21` veya `25` gibi Java sürümlerine dağılımı ve hangi sürümlerin LTS olduğu.
+- Uygulamaların kullandığı JDK sağlayıcıları; örneğin Eclipse Temurin, Amazon Corretto veya Azul Zulu.
+- Kaç uygulamanın Kotlin kodu içerdiği ve `2.1` gibi Kotlin sürümlerine dağılımları.
+
+Hiçbir uygulama Kotlin kodu içermiyorsa sayfa Kotlin grafiklerini göstermek yerine bunu belirtir.
+
+## Nasıl çalışır? [#how-it-works]
+
+Master her uygulamanın Java sürümünü, JDK sağlayıcısını ve Kotlin sürümünü çalışma zamanında tespit eder. Bunları günde bir
+kez kaydeder ve en son kaydı kullanır. Kaç örneği olursa olsun her uygulama bir kez sayılır. Raporlamayı durduran uygulama,
+son bildirdiği verilerle sayfada kalır.
+
+Java 11 ve 17 LTS sürümleridir; Java 21'den itibaren her dördüncü sürüm LTS'dir: 21, 25, 29 vb.
+Axelix'in tanımadığı JDK, Unknown olarak gösterilir.
+
+## Ayrıca bakın [#see-also]
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)

@@ -1,0 +1,182 @@
+---
+title: Axelix'i yükseltme
+description: "Master ve starter'lar farklı hızlarda ilerlerken gerçek bir servis topluluğunu yükseltmeyi güvenli ve öngörülebilir kılan süreç."
+---
+
+Axelix [birlikte sürümlendirilerek yayımlanır](./compatibility-and-versioning.mdx); her sürüm tüm bileşenleri tek sürüm numarası
+altında sunar. Ancak gerçek servisler birlikte **yükseltilmez**: platform ekibi **Axelix Master'ı** tek seferde yükseltirken,
+düzinelerce servis **starter'ı** ve **derleme eklentisini** sıradan bağımlılıklar olarak taşır ve ekipleri sıra bulduğunda
+yükseltir. Bu sayfa, bu durumu güvenli ve öngörülebilir kılan süreci açıklar.
+
+:::info[Axelix 1.1'den itibaren]
+Aşağıdaki yükseltme politikası **Axelix 1.1** ile getirilmiştir; bu sürüm ve sonrasında geçerlidir.
+Politika, **tek Axelix ana sürümü içindeki minör sürüm yükseltmelerini** kapsar.
+Her ana sürüm geçişinin ayrı bir geçiş kılavuzu vardır.
+:::
+
+## Uyumluluk aralığı [#the-compatibility-window]
+
+Tüm süreç tek bir garantiye dayanır:
+
+> **Axelix Master, kendi sürümü dahil son 4 minör sürümün starter'larını destekler.**
+
+Örneğin Master `1.4.x`, `1.1.x` ile `1.4.x` arasındaki starter'ları çalıştıran servisleri destekler.
+Starter `1.0.x` kullanan servis, Master `1.4.x` için **aralığın dışındadır** ve onunla çalışması artık garanti edilmez:
+
+![Axelix uyumluluk aralığı](/img/more/axelix-compatibility-window.png) ***Master `1.4`, starter'ı `1.1`–`1.4` aralığında
+olan servisleri destekler. Hâlâ starter `1.0` kullanan servis aralığın dışındadır ve artık desteklenmez.***
+
+Bu **garanti edilen minimumdur**: uygulamada daha geniş aralığı destekleyebiliriz, ancak en az bu 4 minör sürümü taahhüt
+ederiz ve bir ana sürüm içinde aralığı daraltmayız.
+
+Aralıktan iki kural çıkar:
+
+- **Önce Master.** Aralık geriye bakar: yeni Master eski starter'ları destekler, tersi olmaz.
+  Sürümü Master'ınızdan yeni bir starter çalıştırmayın.
+- **Starter ve eklenti birlikte ilerler.** Tek servis içinde starter ve derleme eklentisi aynı `major.minor` sürümünü
+  paylaşmalıdır; aynı değişiklikte yükseltin. Aralık servis içinde değil, **Master ile servisleriniz arasında** geçerlidir.
+
+## Sürüm sıklığı [#release-cadence]
+
+Axelix, **takvim yılı başına yaklaşık 7–9 minör sürüm**, yani yaklaşık her 1,5 ayda bir minör sürüm ve yılda bir
+**ana** sürümün tüm bileşenlerle birlikte yayımlanmasını hedefler.
+
+Uyumluluk aralığıyla birlikte bu, soyut aralığı somut zaman bütçesine dönüştürür: Master son 4 minör sürümün starter'larını
+desteklediğinden aralıkta kalan bir servisin yalnızca **yaklaşık altı ayda bir** güncellenmesi gerekir.
+İstemci bileşenleri bilinçli olarak basit tutulduğu için bu güncelleme çoğu durumda kolaydır: bağımlılık sürümünü artırıp yeniden dağıtmak.
+
+## Yükseltme süreci [#the-upgrade-procedure]
+
+### 1. Ne kadar ileri yükseltebileceğinizi öğrenin [#1-find-out-how-far-you-can-upgrade]
+
+Master arayüzünde **Administration → Upgrading** açın. Bu sayfa, hiçbir servisi uyumluluk aralığının dışına çıkarmadan
+yükseltebileceğiniz en yüksek Master sürümünü gösterir; değer, Master'ın tüm servislerde gözlemlediği en eski starter
+sürümünden hesaplanır.
+
+Aralık tamamen aritmetik olduğundan Master bu sonucu **tamamen yerelde** hesaplar: herhangi bir sürüm sayfasına çağrı
+yapılmaz, internet erişimi gerekmez. Ağdan yalıtılmış ortamlarda da aynı şekilde çalışır.
+
+Sayfa ayrıca sonucu sınırlayan, en eski starter'ları çalıştıran servisleri listeler. Böylece daha ileri yükseltmek
+isterseniz hangi ekiplerle görüşmeniz gerektiğini tam olarak bilirsiniz.
+
+### 2. Axelix Master'ı yükseltin [#2-upgrade-axelix-master]
+
+Master'ı tüm ortamlarda yükseltin: önce geliştirme, ardından hazırlık ve üretim. Master bağımsız bir dağıtımdır
+(JAR, Docker imajı veya Helm chart); bu adım tamamen platform ekibinin elindedir ve hiçbir servise dokunmaz.
+Durdurma, yedekleme, ileri yükseltme ve geri dönüş işlemleri aşağıdaki
+[Axelix Master'ın kendisini yükseltme](#upgrading-axelix-master-itself) bölümünde açıklanır.
+
+Servisleriniz bu süreç boyunca çalışmaya devam eder: aralığın içindedirler; 1. adımın amacı budur.
+
+### 3. Ekiplerin servislerini yükseltmesini sağlayın [#3-let-the-teams-bump-their-services]
+
+Şimdi işi servis ekiplerine devredin: **starter** ve **eklentiyi**, aynı değişiklikte ve ikisini de aynı sürüme olacak şekilde
+yeni sürüme yükseltip yeniden dağıtsınlar. Tipik bir serviste bu yalnızca bağımlılık sürümünü artırmaktır.
+
+Bu tesadüf değil, izlediğimiz **bilinçli bir tasarım kuralıdır**: Axelix Master **akıllı** taraftır; istemci bileşenleri
+(starter ve eklenti) **olabildiğince basit** tutulur. Tüm yorumlama ve ağır mantık Master'dadır; istemci bileşenleri yalnızca
+ham verileri toplar ve gönderir. Servis yükseltmesini hızlı ve basit tutan budur; ideal olarak Axelix istemci bileşenlerinde
+çok az yapılandırma seçeneği bulundurmaya çalışırız.
+
+Ekipler bunu **bağımsız ve kendi hızlarında** yapar. Aralık onların zaman bütçesidir: 4 minör sürüm garantisiyle bir servis,
+yetişmesi gerekmeden önce birkaç Master yükseltmesini atlayabilir.
+
+### 4. Servislerin yetişmesini izleyin [#4-watch-the-fleet-catch-up]
+
+**Upgrading** sayfası, servislerdeki starter sürümlerinin dağılımını gösterir. Master yükseltmesinden sonra bunun yeni sürüme
+kaymasını izleyin; eski starter sürümü içeren güncelliğini yitirmiş şablonlardan oluşturulanlar dahil hangi servislerin
+geride kaldığını bir bakışta görün.
+
+## Axelix Master'ın kendisini yükseltme [#upgrading-axelix-master-itself]
+
+Master yükseltmeleri **yalnızca ileri yöndedir**: her zaman daha yeni sürüme geçilir ve bilinçli olarak sürüm düşürme
+prosedürü yoktur. Bu, durum tutan kontrol katmanları için standart modeldir; nedeni veritabanıdır.
+Master'ın kendi veritabanı vardır ve [şema geçişleri](../setting-up-master-ui/migrations/migrations.mdx) başlangıçta otomatik
+uygulanır. Bu geçişleri **basit ve geri alınamaz** tasarlarız; tabloyu yeniden şekillendiren bir geçiş genellikle ancak
+verileri atarak geri alınabilir. Dolayısıyla sürüm düşürmenin çalıştığını varsaymak yerine güvenilir bir geri dönüşe
+odaklanırız: **yükseltme sırasında alınan ve sorun olursa geri yüklenen veritabanı yedeği**.
+
+Yalnızca ileri yön, bir seferde bir minör sürüm demek değildir. **Aynı ana sürüm içinde** herhangi bir eski sürümden
+herhangi bir yeni sürüme tek adımda yükseltme desteklenir; `1.1`'den doğrudan `1.4`'e geçebilirsiniz.
+Başlangıçta yeni Master, veritabanınızda henüz uygulanmamış tüm geçişleri bulur ve tüm zinciri sırayla uygular;
+zincirin bir veya üç minör sürümü kapsaması fark etmez. Tek istisna **ana** sürüm sınırını aşmaktır:
+her ana sürüm kendi özel geçiş kılavuzuyla gelir; bu süreç yerine onu izleyin.
+
+Adımlardan önce bilinmesi gereken bir şey daha var: bu, **tam durdurma** prosedürüdür. Çalışan Master'ı durdurmakla
+başladığından Master arayüzü ve API'sinin kullanılamadığı kısa bir **kesinti süresi** vardır; genellikle birkaç dakika.
+Ancak servisleriniz bunu fark etmez.
+
+### Kesinti sırasında servislerinize ne olur? [#what-happens-to-your-services-during-the-downtime]
+
+Tasarım gereği hiçbir şey olmaz. Her servisin içindeki starter yalnızca başlangıçta değil, yaşam sinyali olarak
+**düzenli aralıklarla** Master'a rapor verir. Master kapalıyken yaşam sinyalleri yalnızca yanıtsız kalır: servis kendi
+trafiğine hizmet vermeye devam eder, hiçbir şeyi tamponlamaz ve normal zamanlamasında tekrar dener.
+Yeni Master açıldığında her servisin bir sonraki yaşam sinyali onu sıfırdan yeniden kaydeder; böylece tüm servisler bir
+yaşam sinyali aralığında yeniden toplanır. Bu nedenle aşağıdaki adımlar servislerinizden bahsetmez: servis ekipleriyle
+koordinasyon, trafiği boşaltma veya yeniden başlatma gerekmez. Servis açısından Master yükseltmesi kısa bir ağ
+aksamasından ayırt edilemez. Servislerin kaydı ve yaşam sinyalleri için [Keşif nasıl çalışır?](../product/discovery.mdx) sayfasına bakın.
+
+### Adım adım [#step-by-step]
+
+1. **Çalışan Master'ı durdurun.** Kurulumunuz nasıl çalıştırırsa çalıştırsın (Kubernetes Deployment, kapsayıcı veya düz JAR),
+   tamamen kapatın. Kesinti süresi burada başlar.
+
+2. **Veritabanını yedekleyin.** Motorunuzun standart araçlarını kullanın: **PostgreSQL** veya **MySQL** için döküm,
+   **SQLite** için veritabanı dosyasının kopyası. Yedeği Master'ı durdurduktan **sonra** alın; veritabanına yazan
+   olmadığından anlık görüntünün tutarlılığı garanti edilir. Sıradan görünen yükseltmelerde bile bu adımı atlamayın:
+   bu yedek, geri dönüş prosedürünün **kendisidir**.
+
+3. **Yeni Master sürümünü başlatın.** Başlangıçta bekleyen tüm
+   [veritabanı geçişlerini](../setting-up-master-ui/migrations/migrations.mdx) otomatik uygular ve ardından trafiğe hizmet
+   vermeye başlar. Tamamlanması için zaman tanıyın; geçişler uygulanırken Master'ı yeniden başlatmayın veya sonlandırmayın.
+
+4. **Doğrulayın.** Arayüz erişilebilir olmalı ve yeni sürümü bildirmelidir; servisleriniz bir yaşam sinyali aralığında
+   kendiliğinden yeniden görünmelidir. Tüm servisler görünüyorsa ve kendilerini başarıyla yeniden kaydetmişlerse
+   Axelix Master yükseltmesinin tamamlandığını kabul edebilirsiniz.
+
+### Geri dönüş [#rolling-back]
+
+Yeni sürüm herhangi bir nedenle hatalı davranırsa geri dönüş yolu 2. adımdaki yedektir:
+
+1. Yeni Master'ı durdurun.
+2. Veritabanını yedekten geri yükleyin.
+3. Yükseltmeden önceki sürümü başlatın.
+
+Yedekleme ile geri dönüş arasında veritabanına yazılan her şey kaybolur; Master için bu kayıp **tasarım gereği** önemsizdir.
+
+Servis kayıtları **kendini onarır**: yaşam sinyallerinden bir aralık içinde yeniden oluşur.
+Kendini onarmayan kullanıcılar, roller ve ayarlar ise bu kadar kısa sürede nadiren değişir. Geri dönüşün kalıcı çözüm değil,
+geçici önlem olduğunu unutmayın: yalnızca ileri yön, uzun vadeli yolun daima daha yeni sürümlere çıktığı anlamına gelir.
+Yükseltmeniz başarısız olduysa lütfen [issue açın](https://github.com/axelixlabs/axelix/issues); asıl düzeltme yeni bir sürüm olarak gelecektir.
+
+### Değişmez kurallar [#invariants]
+
+- **Aynı veritabanında aynı anda iki farklı Master sürümü asla çalıştırmayın.** Yeni sürüm başladığı anda şemayı yeniden
+  şekillendirir ve eski sürüm buna dayanacak şekilde tasarlanmamıştır. Eski kodu gelecekteki şemalarla uyumlu tutma
+  karmaşıklığı, yalnızca ileri yön modelinin kaçınmamızı sağladığı şeydir. Kubernetes'te Master Deployment `Recreate`
+  stratejisini kullanmalıdır: varsayılan `RollingUpdate`, tek kopyada bile eski ve yeni pod'u kısa süre yan yana
+  çalıştırır; bu örtüşme tam da geçişlerin uygulandığı ana denk gelir.
+
+- **Kısa Master kesintisi beklenir.** Bilinçli olarak kesintisiz Master yükseltmeleri vaat etmiyoruz; bu, geri alınabilir
+  çok aşamalı geçişler ve yüksek erişilebilirlikli Master gerektirir. Ürünü ve süreci basit tutmayı tercih ediyoruz.
+  Kesinti sırasında yalnızca Master arayüzü ve API'si kapalıdır; servisleriniz etkilenmeden çalışır.
+
+- **Aynı anda tek Master kopyası.** Master şu anda tek örnekli uygulama olarak tasarlanmıştır: arka plan işleri
+  (keşif sorguları, ölü örnekleri kaldırma) ve bellek içi önbellekleri tam olarak bir Master'ın çalıştığını varsayar.
+  Birden fazla kopya bu işleri çoğaltır ve birbiriyle yarışır. Yüksek erişilebilirlikli, çok kopyalı Master yol haritasındadır.
+
+## Geride kalan servisler [#services-that-fall-behind]
+
+Geride kalan servisler Master yükseltmesini **asla engellemez**; karar her zaman platform ekibindedir.
+Bedeli baştan açıktır: yükseltmeden önce **Upgrading** sayfası, güvenli sonucun ötesine geçerseniz hangi servislerin
+uyumluluk aralığından çıkacağını tam olarak listeler. Böylece yükseltmenin bedelini ve kiminle görüşeceğinizi bilirsiniz.
+
+Bu bedeli anlayın: starter'ı aralığın dışında kalan servis **artık hiç desteklenmez**.
+Master arayüzünden kaybolur ve starter'ı tekrar aralığa yükseltilene kadar görünmez kalır. Uyarı yükseltmeden **önce**
+yapılır, sonra değil; bir servisin ötesine yükselttikten sonra arayüzde onun varlığını hatırlatan hiçbir şey kalmaz.
+
+## Ana sürüm yükseltmeleri [#major-version-upgrades]
+
+Uyumluluk aralığı **bir ana sürüm içinde** tanımlanır. Her ana sürüm, önceki ana sürümden yükseltme yolunu açıklayan özel
+geçiş kılavuzuyla gelir. Bu kılavuz, geçiş sırasında yeni Master'ın önceki ana sürümün hangi son minör sürümleriyle
+iletişim kurabileceğini de belirtir.

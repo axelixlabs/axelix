@@ -1,0 +1,55 @@
+---
+title: Pano
+description: "Dashboard, Axelix'in açılış sayfalarından biridir. Axelix Master'ın izlediği tüm Spring Boot servislerini özetler: çalışma zamanı sürümleri, o anda sağlıklı olan örnek sayısı ve toplam bellek kullanımı."
+---
+
+<LegacyNotice version="1.0.0" />
+
+Veriler Axelix starter içeren her Spring Boot uygulamasından Axelix Master tarafından toplanır.
+İlk örnek kaydolana kadar sayfa boş görünür.
+
+## Sistem haritası [#systems-map]
+
+**System's Map**, sayfanın üstündeki pasta grafikleridir. Her grafik servisleri bir yazılım bileşenine göre ayırır:
+
+- **Spring Boot**: keşfedilen tüm örneklerdeki Spring Boot sürümlerinin dağılımı.
+- **Spring Framework**: Spring Framework sürümlerinin dağılımı.
+- **Java**: ana Java sürümlerinin dağılımı (örneğin `17`, `21`).
+- **Kotlin**: Kotlin sürümlerinin dağılımı. Yalnızca Java kullanan örnekler buraya katkıda bulunmadığından Kotlin servisi
+  olmayan ortamlarda grafik boştur.
+
+Dilim etiketleri örnek sayısını ve payını `value (percent%)` biçiminde gösterir. Örneğin `12 (60%)`, 12 örneğin bu sürümü
+çalıştırdığı ve grafikteki bileşenin %60'ını oluşturduğu anlamına gelir.
+
+### Ayrıntılara geçmek için bir dilime tıklayın [#click-a-slice-to-drill-into-the-wallboard]
+
+Bir dilime tıklamak, seçtiğiniz bileşen ve sürüm için önceden uygulanmış filtreyle [Wallboard'a](../wallboard.mdx) götürür.
+Yukarıda listelenen dört grafiğin tümü tıklanabilir.
+
+## Sağlık durumu [#health-status]
+
+**Health Status**, keşfedilen her örneğin canlı durumunu gösteren bir halka grafiktir. Üç durum izlenir:
+
+- **UP** (yeşil): örnek sağlıklıdır.
+- **DOWN** (kırmızı): örnek sağlıklı değildir.
+- **UNKNOWN** (gri): Axelix Master örneğin durumunu belirleyememiştir.
+
+Halkanın ortasındaki sayı **Total Count** olarak etiketlenir ve üç durumun toplamına, yani Axelix'in şu anda izlediği
+toplam örnek sayısına eşittir.
+
+## İstatistikler [#statistics]
+
+**Statistics**, Health Status grafiğinin yanındaki üç karttan oluşur:
+
+- **Total count of services**: Health Status halkasının ortasında gösterilen aynı toplam.
+- **Average Heap Size**: keşfedilen tüm örneklerdeki ortalama JVM heap boyutu.
+- **Total Heap Size**: keşfedilen tüm örneklerdeki JVM heap boyutlarının toplamı.
+
+Her iki heap değeri de gösterilmeden önce okunabilir bir birime dönüştürülür; kart, servislerin büyüklüğüne bağlı olarak
+`512 MB`, `2 GB` vb. gösterebilir.
+
+## İlgili sayfalar [#related]
+
+- [Wallboard](../wallboard.mdx)
+- [Servis profili](../service-profile.mdx)
+- [Details](../../features/insights/details.mdx)

@@ -1,0 +1,9 @@
+{
+    "title": "Teknolojiler",
+    "defaultOpen": false,
+    "pages": [
+        "java",
+        "persistence",
+        "spring-framework"
+    ]
+}

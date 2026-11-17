@@ -1,0 +1,1167 @@
+---
+title: Master'ı yapılandırma
+description: "Bu sayfa, Axelix Master'ı kendi ortamınızda nasıl çalıştıracağınızı gösterir. Diğer servislerinizi dağıtma biçiminize uygun seçeneği kullanın: bağımsız JAR, Docker konteyneri, Docker Compose yığını veya Kubernetes dağıtımı."
+---
+
+import styles from './styles.module.css';
+
+## Başlamadan önce [#before-you-start]
+
+Aşağıdaki örnekleri kopyalamadan önce birkaç noktayı aklınızda tutun; bunlar daha sonra hata ayıklamada zaman kazandırır.
+
+- **HTTP portu**: Master varsayılan olarak `2935` portunu dinler (`axelix.master.port`). Axelix `1.2.0` öncesinde varsayılan `8080` idi; ayrıntılar ve eski porta dönmek için [HTTP portu](#http-port) bölümüne bakın.
+- **Veritabanı**: Master, JDBC URL önekinden otomatik seçilen üç motoru destekler: **SQLite** (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`) ve **MySQL** (`jdbc:mysql:`). Varsayılan SQLite'tır; çalışma dizininin yanında `axelix.db` adlı bir dosya kullanır. Liquibase her başlangıçta şema geçişlerini çalıştırır.
+- **Ön yüz varlıkları**: Hem `axelix-AXELIX_VERSION_PLACEHOLDER.jar` hem de yayımlanan Docker imajı arayüzü içerir; web arayüzü için ek bir bağlantı kurmanız gerekmez.
+- **Kimlik doğrulama**: Master, yerleşik `admin / admin` süper yönetici hesabı ve (Axelix 1.2 itibarıyla) herkesçe bilinen yerleşik bir JWT imzalama anahtarıyla gelir. Geçici olmayan tüm ortamlarda ikisini de değiştirmelisiniz; bkz. [Yapılandırma başvurusu](#configuration-reference).
+
+## Yapılandırma başvurusu [#configuration-reference]
+
+Tüm Axelix Master özellikleri `axelix.master.*` ad alanındadır. Aşağıdaki tablolar her özelliği, varsa varsayılan değeriyle listeler. *(Ayarlanmamış)* olarak işaretlenen değerleri ilgili özellik başlamadan önce kendiniz sağlamalısınız.
+
+:::warning
+Varsayılan süper yönetici kimlik bilgileri (`admin / admin`), Master'ın keşfettiği tüm servisler üzerinde tam denetim sağlar. Yerleşik JWT imzalama anahtarı herkesçe bilindiği için herkes bu anahtarla sahte bir oturum oluşturabilir. Master'ı kendiniz dışındaki kişilere açmadan önce ikisini de değiştirin; HTTPS üzerinden sunuyorsanız `axelix.master.auth.cookie.secure` ayarını da değiştirin.
+:::
+
+### Özellikleri sağlama [#supplying-properties]
+
+Master bir Spring Boot uygulamasıdır; bu sayfadaki her özellik, yalnızca yapılandırma dosyasından değil, Spring Boot'un okuduğu herhangi bir kaynaktan sağlanabilir:
+
+- **YAML** veya **properties** yapılandırma dosyası (`application.yaml` / `application.properties`);
+- `java` komut satırında `-D` ile geçirilen bir **JVM sistem özelliği**;
+- bir **ortam değişkeni**.
+
+Master bir özelliği hiçbir zaman tek bir kaynakla sınırlamaz. Bu sayfada `axelix.master.auth.jwt.signing-key` gibi bir özellik belgelendiğinde, dağıtımınıza uygun olan üç kaynaktan herhangi biriyle ayarlayabilirsiniz; aynı ad, tüm kaynaklardan Master'a aynı şekilde ulaşır.
+
+Bu davranış Spring Boot'un [esnek bağlama](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding) desteği sayesinde mümkündür: mantıksal bir özelliğin eşdeğer birkaç yazımı vardır ve Master bunları aynı değer olarak okur. Bu sayfada kullanılan standart biçim küçük harfli, noktalarla ayrılmış ve tireli yazımdır (`axelix.master.auth.jwt.signing-key`). Aşağıdaki tablo bu özelliğin her kaynakta nasıl yazıldığını gösterir:
+
+| Kaynak | `axelix.master.auth.jwt.signing-key` nasıl yazılır? |
+| --- | --- |
+| `application.yaml` | iç içe anahtarlar `axelix:` → `master:` → `auth:` → `jwt:` → `signing-key:` |
+| `application.properties` | `axelix.master.auth.jwt.signing-key=...` |
+| JVM sistem özelliği (`-D`) | `-Daxelix.master.auth.jwt.signing-key=...` |
+| Ortam değişkeni | `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...` |
+
+Ortam değişkeni biçimi kesin bir kurala uyar: **adı büyük harfe çevirin, her noktayı alt çizgiyle değiştirin ve tüm tireleri kaldırın**. Bu nedenle `signing-key`, `SIGNINGKEY` olur; tire alt çizgiye dönüşmez, kaldırılır. Tire içermeyen bir özellik daha doğrudan eşlenir: `axelix.master.metrics.prometheus.enabled`, `AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED` olur.
+
+:::note
+`-Daxelix.master.auth.jwt.signing-key=...` bayrağı ile `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...` ortam değişkeni birbirinin yerine kullanılabilir. Değer Master'a her iki yolla da aynı şekilde ulaşır; platformunuzda hangisi daha kolaysa onu kullanın.
+:::
+
+:::warning[Gizli değerleri güvenle sağlama]
+Üç kaynak, JWT imzalama anahtarı, süper yönetici parolası, veritabanı parolası veya Vault token'ı gibi **gizli** değerler için **aynı derecede güvenli değildir**. Bu sayfadaki `-D` ve yapılandırma dosyası örnekleri hızlı bir ilk çalıştırma içindir. Gerçek bir gizli değer söz konusu olduğunda her kaynağın nasıl sızıntıya yol açabileceğini bilin ve buna göre seçim yapın:
+
+- **`java` komut satırında `-D`** — bir sürecin tam komut satırı, makinedeki diğer tüm kullanıcılar tarafından okunabilir (`ps -ef`, `/proc/<pid>/cmdline`) ve sıklıkla süreç izleyicilerine ve çökme raporlarına kaydedilir. `-D` ile geçirilen gizli değer bunların tümüne açılır. Kendi makinenizde geçici bir deneme için uygundur; **üretimde gizli değerler için asla kullanmayın**.
+- **`JAVA_TOOL_OPTIONS`** (konteynerlerde `-D` bayraklarını iletmenin yaygın yolu) — JVM başlangıçta tam değerini stderr'e yazar (`Picked up JAVA_TOOL_OPTIONS: ...`); dolayısıyla içindeki her şey `docker logs` ve tüm günlük toplayıcılarına gider. Gizli değerleri buraya koymayın.
+- **Yapılandırma dosyası** — gizli olmayan ayarlar için uygundur. Gizli bir değer için dosyayı sürüm kontrolünden ve imajdan uzak tutun, izinlerini sınırlayın ve değeri tercihen bir gizli değer deposundan alın (bkz. [Vault](#loading-configuration-from-hashicorp-vault)).
+- **Ortam değişkenleri** — gizli değerler için pratik varsayılandır; aşağıdaki Docker ve Docker Compose örnekleri bu yöntemi kullanır, çünkü gizli değerleri komut satırından ve başlangıç günlüklerinden uzak tutar. Üretimde en güçlü koruma için gizli değeri statik bir değişken yerine özel bir gizli değer yöneticisinden Master'a aktarın.
+:::
+
+### Master'a yapılandırma dosyasının konumunu bildirme [#pointing-master-at-a-config-file]
+
+<ReleasedInNotice version="1.1.0" />
+
+Yukarıdaki üç kaynak çoğu kurulumu kapsar; ancak çoğu zaman Axelix Master'a haricî bir YAML veya properties dosyasından yapılandırma sağlamak isteyebilirsiniz. Örneğin dosya, konteynere özel bir yolda bağlanmış olabilir.
+
+Bunun için Axelix Master yapılandırmasına `axelix.master.config.location` adlı özelliği sağlayabilirsiniz.
+
+Axelix Master bir Spring Boot uygulaması olduğundan, Spring Boot'un anladığı tüm konum biçimlerini destekler: tek dosya, dizin veya bunlardan oluşan virgülle ayrılmış liste. Her biri isteğe bağlı olarak `file:` veya `optional:` öneki alabilir (ikinci ön ek, dosya eksikse başlangıcı başarısız kılmak yerine eksikliği tolere eder). Burada belirtilen dosya, Master'ın yerleşik varsayılanlarını değiştirmek yerine bunlara **eklenir**: tanımladığı değerler öncelik kazanır; belirtmediği her şey varsayılanını korur.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.config.location` | boş | Master'ın varsayılanlarının üzerine yüklenecek haricî yapılandırma dosyasının (veya dizinin) konumu. Her biri isteğe bağlı `file:` / `optional:` öneki taşıyabilen tek yol, dizin veya virgülle ayrılmış liste kabul eder. |
+
+</div>
+
+Bu özellik yapılandırmanın *nereden* okunacağını belirlediğinden, okuma başlamadan önce bilinmelidir. Onu işaret ettiği dosyanın içinden değil, **JVM sistem özelliği** veya **ortam değişkeni** olarak sağlayın:
+
+```bash
+java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Ya da bir konteyner için ortam değişkeni olarak geçirin ve dosyayı bağlayın:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+### Spring Cloud Config Server'dan yapılandırma yükleme [#loading-configuration-from-a-spring-cloud-config-server]
+
+<ReleasedInNotice version="1.1.0" />
+
+Servislerinizin yapılandırmasını merkezîleştirmek için zaten bir [Spring Cloud Config Server](https://docs.spring.io/spring-cloud-config/reference/server.html) çalıştırıyorsanız Master da kendi ayarlarını buradan alabilir. Master bir Spring Cloud Config **istemcisi** olarak davranır: başlangıçta uygulama adına ait yapılandırmayı alır ve birleştirir. Dolayısıyla bu sayfadaki herhangi bir `axelix.master.*` özelliği yerel dosya yerine Config Server'ın arka uç deposunda bulunabilir.
+
+Bu özellik varsayılan olarak kapalıdır. `axelix.master.external-config.spring-cloud-config.enabled=true` ile açın ve `uri` özelliğiyle sunucuyu belirtin.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.external-config.spring-cloud-config.enabled` | `false` | Başlangıçta Spring Cloud Config Server'dan yapılandırma yükler. |
+| `axelix.master.external-config.spring-cloud-config.uri` | boş | Config Server temel URL'si, örneğin `http://config-server:8888`. `enabled=true` olduğunda gereklidir. |
+| `axelix.master.external-config.spring-cloud-config.name` | boş | Sunucunun yapılandırmasını çözümlediği uygulama adı; istek yolundaki `{application}` bölümüdür. Boş bırakıldığında Master kendi adı olan `axelix` değerini kullanır. |
+| `axelix.master.external-config.spring-cloud-config.label` | `master` | Sunucudan istenen `{label}`; genellikle arka uç deposundaki bir Git dalı veya etiketi. |
+| `axelix.master.external-config.spring-cloud-config.username` | boş | Config Server HTTP Basic kimlik doğrulaması gerektiriyorsa Basic-auth kullanıcı adı. |
+| `axelix.master.external-config.spring-cloud-config.password` | boş | `username` ile eşleşen Basic-auth parolası. |
+
+</div>
+
+:::warning
+Kısalık için `uri` örneklerinde düz `http://` kullanılır. Config Server `username`/`password` gerektirdiğinde bu kimlik bilgileri ve gizli değerler dâhil sunucunun döndürdüğü tüm değerler, düz HTTP üzerinden açık metin olarak taşınır. Master ile sunucu arasındaki ağa tam güvenilmeyen tüm ortamlarda `uri` için bir `https://` uç noktası belirtin.
+:::
+
+Yukarıdaki yapılandırma dosyası konumu gibi bu özellikler de yapılandırmanın *nereden* okunacağını belirler; bu nedenle okuma başlamadan önce bilinmelidir. Bunları Config Server'ın kendisinin sunacağı bir dosyadan değil, **JVM sistem özellikleri** veya **ortam değişkenleri** olarak sağlayın. En basit çalıştırma örneği şöyledir:
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-config.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-config.uri=http://config-server:8888 \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+:::warning
+Özellik etkin olduğunda Master, hatada hemen durma (fail-fast) modunda başlar. Başlangıçta Config Server'a erişilemezse eksik yapılandırmayla çalışmak yerine başlamayı reddeder. Özellik kapalı kaldığında (varsayılan), Master sunucuyla hiç iletişim kurmaz ve normal biçimde başlar.
+:::
+
+### HashiCorp Vault'tan yapılandırma yükleme [#loading-configuration-from-hashicorp-vault]
+
+<ReleasedInNotice version="1.1.0" />
+
+Kuruluşunuz gizli değerleri [HashiCorp Vault](https://developer.hashicorp.com/vault) içinde tutuyorsa Master kendi yapılandırmasını da buradan okuyabilir. Master başlangıçta Vault'un [KV gizli değer motorundan](https://developer.hashicorp.com/vault/docs/secrets/kv) bir gizli değer alır ve bu kaydın her anahtarını, tıpkı yapılandırma dosyasında yazılıymış gibi yapılandırmasına birleştirir. Dolayısıyla bu sayfadaki herhangi bir `axelix.master.*` özelliği Vault'ta bulunabilir. Yaygın yaklaşım, hassas alt kümeyi — örneğin `axelix.master.database.password` ve `axelix.master.auth.jwt.signing-key` — burada, geri kalanını normal bir yapılandırma dosyasında tutmaktır.
+
+Özellik varsayılan olarak kapalıdır. `axelix.master.external-config.spring-cloud-vault.enabled=true` ile açın ve `uri` özelliğiyle Vault sunucunuzu belirtin. Varsayılan ayarlarla Master, `secret/axelix` konumundaki kaydı okur: `secret` KV bağlama yolu ve Master'ın kendi uygulama adı. KV motorunun 2. sürümü beklenir; güncel Vault ile oluşturulan bağlama noktalarında bu varsayılandır. Bu nedenle bir yapılandırma değerini başlangıçta eklemek şöyle görünür:
+
+```bash
+vault kv put secret/axelix \
+  axelix.master.database.password=a-strong-password \
+  axelix.master.auth.jwt.signing-key=cSuGCTNSJUW7yobufJTZ4C7BScamq2Yz
+```
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.external-config.spring-cloud-vault.enabled` | `false` | Başlangıçta HashiCorp Vault'tan yapılandırma yükler. |
+| `axelix.master.external-config.spring-cloud-vault.uri` | boş | Vault sunucusunun temel URL'si, örneğin `http://vault:8200`. `enabled=true` olduğunda gereklidir. |
+| `axelix.master.external-config.spring-cloud-vault.authentication` | `TOKEN` | Kimlik doğrulama yöntemi. `TOKEN`, `APPROLE` ve `KUBERNETES` aşağıda açıklanır. |
+| `axelix.master.external-config.spring-cloud-vault.fail-fast` | `true` | Vault'a erişilemediğinde eksik yapılandırmayla başlamak yerine başlamayı reddeder. |
+| `axelix.master.external-config.spring-cloud-vault.kv.enabled` | `true` | KV gizli değer motorundan gizli değerleri okur. |
+| `axelix.master.external-config.spring-cloud-vault.kv.backend` | `secret` | KV gizli değer motorunun bağlama yolu. |
+| `axelix.master.external-config.spring-cloud-vault.kv.application-name` | `axelix` | Master'ın bağlama yolu altında okuduğu kaydın adı; varsayılanlarla `secret/axelix`. |
+| `axelix.master.external-config.spring-cloud-vault.kv.default-context` | `application` | Birkaç uygulamanın ortak ayarları için uygulamaya özgü kayda ek olarak okunan paylaşılan kayıt (varsayılanlarla `secret/application`). |
+| `axelix.master.external-config.spring-cloud-vault.kv.profile-separator` | `/` | Profile özgü gizli değer yollarında uygulama adı ile Spring profili arasındaki ayırıcı. |
+
+</div>
+
+:::warning
+Kısalık için `uri` örneklerinde düz `http://` kullanılır. Master'ın sunduğu Vault token'ı ve Vault'un döndürdüğü tüm gizli değerler, düz HTTP üzerinden açık metin olarak taşınır. Master ile Vault arasındaki ağa tam güvenilmeyen tüm ortamlarda `uri` için bir `https://` uç noktası belirtin ve Vault'un CA bilgilerini `axelix.master.external-config.spring-cloud-vault.ssl.*` altında sağlayın.
+:::
+
+Master arka planda bir [Spring Cloud Vault](https://docs.spring.io/spring-cloud-vault/reference/) istemcisi olarak davranır. Bu nedenle Spring Cloud Vault bağlantı seçeneklerinin tamamı aynı `axelix.master.external-config.spring-cloud-vault.*` öneki altında kullanılabilir: `ssl.*` altında TLS güven materyalleri, Vault Enterprise için `namespace`, bağlantı ve okuma zaman aşımları ve aşağıdaki üç yöntemin ötesinde başka kimlik doğrulama yöntemleri. Yukarıdaki tablo yalnızca çoğu kurulumda kullanılan özellikleri listeler.
+
+Vault **başlangıçta bir kez** okunur. Değişen bir gizli değer, Master'ın bir sonraki yeniden başlatılmasında geçerli olur. Yalnızca statik KV motoruna başvurulur; kısa ömürlü veritabanı kimlik bilgileri gibi dinamik gizli değer motorları bu özelliğe dâhil değildir.
+
+#### Statik token ile kimlik doğrulama [#authenticating-with-a-static-token]
+
+Varsayılan yöntem `TOKEN` olduğundan yalnızca bir Vault token'ı sağlamak yeterlidir. Bu, geliştirici makinesinde özelliği denemenin en hızlı yoludur. Ancak uzun ömürlü statik token, Vault'un ortadan kaldırmayı amaçladığı kimlik bilgisi türünün kendisidir; bu yüzden üretimde aşağıdaki [AppRole](#authenticating-with-approle) veya [Kubernetes](#authenticating-with-kubernetes) yöntemini tercih edin.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.external-config.spring-cloud-vault.token` | boş | Master'ın kimliğini doğrulamak için kullandığı statik Vault token'ı. `TOKEN` için gereklidir. |
+
+</div>
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-vault.uri=http://localhost:8200 \
+  -Daxelix.master.external-config.spring-cloud-vault.token=hvs.6j4cuewowBGit65rheNoceI7 \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Token'ın kendisi gizlidir ve yukarıdaki `-D` biçimi onu komut satırına koyar. Bu, hızlı bir yerel deneme için kabul edilebilir; ancak süreç listesinin okunabildiği her yerde bunun yerine ortam değişkeni (`AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_TOKEN`) olarak geçirin. Bkz. [Gizli değerleri güvenle sağlama](#supplying-properties).
+
+#### AppRole ile kimlik doğrulama [#authenticating-with-approle]
+
+[AppRole](https://developer.hashicorp.com/vault/docs/auth/approle), platform kimliği olmayan ortamlar için makineler arası yöntemdir: sanal makineler, fiziksel sunucular, Docker Compose. Master bir `role-id`/`secret-id` çifti sunar; Vault bunu rolün politikasıyla sınırlı, kısa ömürlü bir token ile değiştirir.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.external-config.spring-cloud-vault.app-role.role-id` | boş | Master'ın oturum açtığı AppRole'un RoleID değeri. |
+| `axelix.master.external-config.spring-cloud-vault.app-role.secret-id` | boş | `role-id` ile eşleşen SecretID. |
+| `axelix.master.external-config.spring-cloud-vault.app-role.role` | boş | Çekme modu için kullanılan, isteğe bağlı rol adı. |
+| `axelix.master.external-config.spring-cloud-vault.app-role.app-role-path` | `approle` | AppRole kimlik doğrulama arka ucunun bağlama yolu. |
+
+</div>
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-vault.uri=http://vault:8200 \
+  -Daxelix.master.external-config.spring-cloud-vault.authentication=APPROLE \
+  -Daxelix.master.external-config.spring-cloud-vault.app-role.role-id=5f3420cd-2c65-4a0e-87f4-b525b8e26a54 \
+  -Daxelix.master.external-config.spring-cloud-vault.app-role.secret-id=f8e77c67-40b6-49aa-a548-e50c62a765b3 \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+`secret-id` değeri de gizlidir; bu yüzden konteyner platformlarında `-D` bayrağı yerine ortam değişkeni (`AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_APPROLE_SECRETID`) olarak geçirin.
+
+#### Kubernetes ile kimlik doğrulama [#authenticating-with-kubernetes]
+
+Kubernetes'te önerdiğimiz kurulum [Kubernetes kimlik doğrulama yöntemidir](https://developer.hashicorp.com/vault/docs/auth/kubernetes): Master, pod'unun zaten taşıdığı servis hesabı token'ıyla kimliğini doğrular; böylece baştan statik kimlik bilgisi bulunmaz. Vault tarafında Kubernetes kimlik doğrulama arka ucunda bir rol oluşturun ve bunu Master'ın servis hesabına bağlayın. Master tarafında bu rolün adını belirtin:
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.role` | boş | Oturum açma işleminin denendiği Vault rolü. Gereklidir. |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.kubernetes-path` | `kubernetes` | Kubernetes kimlik doğrulama arka ucunun bağlama yolu. |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.service-account-token-file` | `/var/run/secrets/kubernetes.io/serviceaccount/token` | Pod'un servis hesabı token dosyasının yolu. |
+
+</div>
+
+```yaml
+env:
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_ENABLED
+    value: "true"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_URI
+    value: "http://vault.vault.svc:8200"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_AUTHENTICATION
+    value: "KUBERNETES"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_KUBERNETES_ROLE
+    value: "axelix-master"
+```
+
+Yukarıdaki ilgili bölümlerde olduğu gibi bu özelliklerin tümü yapılandırmanın *nereden* okunacağını belirler; dolayısıyla okuma başlamadan önce bilinmelidir. Bunları JVM sistem özellikleri veya ortam değişkenleri olarak sağlayın; asla bir Vault gizli değer kaydının içindeki anahtarlar olarak vermeyin.
+
+:::warning
+Özellik etkin olduğunda Master fail-fast modunda başlar. Başlangıçta Vault'a erişilemezse eksik yapılandırmayla çalışmak yerine başlamayı reddeder. Özellik kapalı kaldığında (varsayılan), Master Vault ile hiç iletişim kurmaz ve normal biçimde başlar.
+:::
+
+### HTTP portu [#http-port]
+
+<ReleasedInNotice version="1.2.0" />
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.port` | `2935` | Master'ın dinlediği HTTP portu; arayüz, REST API ve MCP sunucusu bu portu paylaşır. Axelix `1.2.0` öncesinde varsayılan `8080` idi; aşağıdaki nota bakın. |
+
+</div>
+
+:::note[Varsayılan port: neden 2935 ve 8080'e ne oldu?]
+Axelix `1.2.x` öncesinde Master `8080` portunu dinliyordu; bu, tüm Spring Boot uygulamalarının varsayılan olarak bağlandığı porttur. Bu varsayılanın çeşitli sorunları vardır:
+- Master'ın yönettiği servisler de Spring Boot uygulamalarıdır; dolayısıyla Master'ı yerelde bunlardan biriyle yan yana denediğiniz anda ikisi `8080` portunda çakışıyordu.
+
+- 8080, [Tomcat web sunucusunun](https://tomcat.apache.org/tomcat-11.0-doc/RUNNING.txt) varsayılan portudur. Bu nedenle `domain:8080` adresini ziyaret eden kullanıcı, arayüz üzerinden hangi uygulamaya eriştiği konusunda tereddüt yaşayabilir: Tomcat mi, Axelix mi?
+
+Bu nedenle Axelix `1.2.0` itibarıyla Master varsayılan olarak `2935` portunu dinler.
+
+Axelix'i `1.2.0` öncesinde kullanmaya başladıysanız ve ortamınız eski porta bağımlıysa — yer imleri, güvenlik duvarı kuralları, servislerinizdeki `axelix.sbs.discovery.master-url` değerleri — portu açıkça `axelix.master.port=8080` olarak ayarlayarak önceki davranışı istediğiniz zaman geri yükleyebilirsiniz.
+:::
+
+### Genel [#general]
+
+<ReleasedInNotice version="1.1.0" />
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.environment` | boş | Bu Master örneğinin çalıştığı ortamın adı, örneğin `production` veya `staging`. Şu anda yalnızca [yapılandırılmış günlük kaydı](#structured-logging) etkin olduğunda ECS `service.environment` alanını doldurmak için kullanılır. |
+
+</div>
+
+### Veritabanı [#database]
+
+Veritabanı motoru JDBC URL önekinden seçilir. Hangi özellikleri sağlamanız gerektiği motora bağlıdır:
+
+- **SQLite** (`jdbc:sqlite:...`) — yerleşik varsayılan `jdbc:sqlite:axelix.db`, ilk çalıştırmada **ek yapılandırma gerektirmez**: SQLite verileri yerel bir dosyada sakladığından `username` ve `password` kullanılmaz. Dosya çalışma dizinindedir; bağlanmış bir volume'u olmayan konteyner yeniden başlatıldığında verilerini kaybeder. SQLite birden fazla Master replikasını da destekleyemez; tek düğümlü denemenin ötesindeki kullanımlar için PostgreSQL veya MySQL'e geçin.
+- **PostgreSQL** (`jdbc:postgresql://...`) — `url`, `username` ve `password` özelliklerinin tümü **gereklidir**. Kullanıcının tablo oluşturma ve şema geçişlerini uygulama izni olmalıdır (Liquibase her başlangıçta çalışır).
+- **MySQL** (`jdbc:mysql://...`) — PostgreSQL ile aynıdır: `url`, `username` ve `password` özelliklerinin tümü **gereklidir** ve kullanıcının şema geçişi yetkileri olmalıdır.
+
+:::warning
+SQLite, ilk çalıştırmada kurulum gerektirmeyen varsayılandır; ancak **Master için bir üretim veritabanı değildir**. Dosya çalışma dizinindedir; volume bağlanmamışsa konteyner yeniden başlatıldığında kaybolur. Tek dosya birden fazla Master replikası tarafından paylaşılamadığından yüksek erişilebilirlik sağlayan bir dağıtımı da engeller. Tek düğümlü denemenin ötesindeki kullanımlar için `axelix.master.database.url` değerini PostgreSQL veya MySQL'e yönlendirin.
+:::
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.database.url` | `jdbc:sqlite:axelix.db` | JDBC URL'si. Önek motoru seçer: `jdbc:sqlite:`, `jdbc:postgresql:` veya `jdbc:mysql:`. SQLite, volume bağlanmadığında konteyner yeniden başlatmalarında verileri korumaz ve birden fazla Master replikasını desteklemez. |
+| `axelix.master.database.username` | boş | Veritabanı kullanıcısı. `url`, PostgreSQL veya MySQL'i gösterdiğinde gereklidir. SQLite için yok sayılır. |
+| `axelix.master.database.password` | boş | Veritabanı parolası. `url`, PostgreSQL veya MySQL'i gösterdiğinde gereklidir. SQLite için yok sayılır. |
+
+</div>
+
+### Kimlik doğrulama — JWT [#authentication--jwt]
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.auth.jwt.algorithm` | `HMAC512` (1.2.0+; öncesinde gerekli) | İmzalama algoritması. `HMAC256`, `HMAC384` veya `HMAC512` değerlerinden biri. Yerleşik yerel profilde `HMAC512` kullanılır. |
+| `axelix.master.auth.jwt.signing-key` | yerleşik anahtar (1.2.0+; öncesinde gerekli) | Oturum token'larını imzalamak ve doğrulamak için kullanılan gizli anahtar. Uzun ve rastgele bir değer kullanın. Tüm oturumları geçersiz kılmak için anahtarı değiştirin. |
+| `axelix.master.auth.jwt.lifespan` | `12h` | Spring `Duration` biçiminde token ömrü (ör. `30m`, `12h`, `7d`). |
+
+</div>
+
+#### İmzalama anahtarı olmadan çalıştırma [#running-without-a-signing-key]
+
+<ReleasedInNotice version="1.2.0" />
+
+Axelix 1.2.0 itibarıyla `algorithm` ve `signing-key` isteğe bağlıdır. Ayarlanmadıklarında Master `HMAC512` ve yerleşik bir imzalama anahtarı kullanır. Starter'da da aynı anahtar yerleşiktir; böylece Master ve servisleriniz anahtar ayarı gerektirmeden birlikte çalışır. Bu, ilk yerel deneme için kullanışlıdır. Yerleşik anahtar kullanıldığı sürece Master başlangıçta bir uyarı kaydeder.
+
+:::warning
+Yerleşik anahtar herkesçe bilinir. Bu anahtara sahip olan herkes süper yönetici dâhil herhangi bir kullanıcı için oturum token'ı imzalayabilir ve parola olmadan Master'a giriş yapabilir. Master kendiniz dışındaki kişilerin erişimine açılmadan önce kendi `axelix.master.auth.jwt.signing-key` değerinizi ve tüm servislerde aynı anahtarı ayarlayın.
+:::
+
+### Kimlik doğrulama — süper yönetici [#authentication--super-admin]
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.auth.options.super-admin.credentials.username` | `admin` | Yerleşik süper yönetici giriş adı. Süper yönetici sistemdeki tüm yetkilere sahiptir. |
+| `axelix.master.auth.options.super-admin.credentials.password` | `admin` | Yerleşik süper yönetici parolası. Uzun ve rastgele bir değer seçin. |
+
+</div>
+
+#### Varsayılan kimlik bilgileriyle giriş yapma [#signing-in-with-the-default-credentials]
+
+<ReleasedInNotice version="1.2.0" />
+
+Axelix 1.2.0 itibarıyla süper yönetici varsayılan `admin / admin` kimlik bilgileriyle her giriş yaptığında Master'ın uyarı kaydettiğini unutmayın; böylece unutulan varsayılan parola günlüklerde görünür.
+
+### Kimlik doğrulama — yerel kullanıcılar [#authentication--local-users]
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.auth.options.local.enabled` | `false` | Master'ın kendi veritabanında saklanan kullanıcı hesaplarının giriş yapmasına izin verir. |
+
+</div>
+
+### Kimlik doğrulama — OAuth2 / OIDC [#authentication--oauth2--oidc]
+
+OAuth2 / OIDC giriş akışının uçtan uca işleyişi [Kimlik doğrulama](../../setting-up-master-ui/authentication/authentication.mdx#oauth2--oidc) sayfasında açıklanır.
+
+`axelix.master.auth.options.oauth2.enabled=true` olduğunda aşağıdaki özellikler **gerekli** hâle gelir:
+
+- `axelix.master.auth.options.oauth2.issuer-uri`
+- `axelix.master.auth.options.oauth2.client-id`
+- `axelix.master.auth.options.oauth2.client-secret`
+- `axelix.master.auth.options.oauth2.base-url`
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.auth.options.oauth2.enabled` | `false` | OIDC girişini etkinleştirir. |
+| `axelix.master.auth.options.oauth2.issuer-uri` | *(ayarlanmamış)* <span className="Required">gerekli</span> | OIDC issuer temel URL'si. Master uç noktaları keşfetmek için buradan `/.well-known/openid-configuration` okur. `oauth2.enabled=true` olduğunda her zaman gereklidir. |
+| `axelix.master.auth.options.oauth2.client-id` | *(ayarlanmamış)* <span className="Required">gerekli</span> | OIDC sağlayıcısında kayıtlı istemci tanımlayıcısı. `oauth2.enabled=true` olduğunda her zaman gereklidir. |
+| `axelix.master.auth.options.oauth2.client-secret` | *(ayarlanmamış)* <span className="Required">gerekli</span> | OIDC sağlayıcısında kayıtlı istemci gizli anahtarı. `oauth2.enabled=true` olduğunda her zaman gereklidir. |
+| `axelix.master.auth.options.oauth2.base-url` | *(ayarlanmamış)* <span className="Required">gerekli</span> | OAuth2 geri çağırma yönlendirme URI'sini oluşturmak için kullanılan, bu Master örneğinin herkese açık temel URL'si. `oauth2.enabled=true` olduğunda her zaman gereklidir. |
+| `axelix.master.auth.options.oauth2.scopes` | `openid` | Yetkilendirme kodu akışında istenen, boşlukla ayrılmış kapsamlar. `openid` eksikse otomatik eklenir. |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | *(ayarlanmamış)* | Bir Axelix rolünü çözümlemek için userinfo yanıtı üzerinde değerlendirilen JMESPath ifadesi. Ayarlanmazsa tüm OIDC kullanıcıları `VIEWER` olur. |
+
+</div>
+
+:::warning
+`role-attribute-path` değerini ayarlamamak ilk inceleme için kullanışlıdır; ancak **IdP'nizde kimliğini doğrulayabilen her kullanıcıyı** `VIEWER` rolüne eşler. Bu rol, keşfedilen her servisin tüm izleme verilerine okuma erişimi verir. IdP kullanıcıları tam olarak Master'ı görmesi gereken kişilerden oluşmuyorsa, açık bir Axelix rolü olmayan kullanıcılara sessizce erişim verilmemesi için üretime geçmeden önce `role-attribute-path` değerini ayarlayın.
+:::
+
+### Kimlik doğrulama — oturum çerezi [#authentication--session-cookie]
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.auth.cookie.secure` | `false` | Oturum çerezinin düz HTTP üzerinden gönderilmemesi için Master HTTPS üzerinden sunulduğunda `true` olarak ayarlayın. |
+
+</div>
+
+### Keşif — otomatik keşif [#discovery--auto-discovery]
+
+Otomatik keşif, Spring Boot Starter içeren uygulamaların tek tek bildirim yapmasına gerek kalmadan Master'ın bunları bulmasını sağlar. `broadcast.schedule` ile belirlenen zamanlamada Master, yapılandırılmış ad alanlarındaki Service nesneleri için Kubernetes API'sini sorgular, bunları etiketlere göre süzer ve her eşleşmede `axelix.master.auth.jwt.signing-key` ile kendisinin ürettiği JWT'yi kullanarak `/actuator/axelix-metadata` uç noktasını yoklar. Başarılı yoklama örneği kaydeder; başarısız yoklama listeden çıkarır. 1.3.0 itibarıyla Master, zaten bildiği örnekleri bunun yerine daha hafif `axelix-ping` uç noktasıyla yeniler. Tüm döngü için [Keşif nasıl çalışır?](../../product/discovery.mdx) sayfasına bakın.
+
+Özelliği açmak için `axelix.master.discovery.auto.enabled=true` ayarlayın (varsayılan `false`, yani kapalı). Şu anda desteklenen tek keşif platformu Kubernetes'tir.
+
+Master kümenin **içinde** pod olarak çalıştığında Kubernetes bağlantı ayarları (`kube-apiserver-url`, `sa-token-path`, `ca-cert-path`) varsayılan olarak pod içindeki değerleri kullanır ve değişiklik gerektirmez. Starter tarafının yalnızca JWT imzalama anahtarını paylaşması gerekir; starter `axelix-metadata` uç noktasını kendisi sunar. Master kümenin **dışında** çalıştığında bu üç ayarı haricî API URL'sine, gerekli RBAC yetkilerini taşıyan bir token dosyasına ve küme CA yoluna yönlendirin. Taramanın kapsamını `filters.namespaces` ve `filters.labels` ile sınırlayın.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.discovery.auto.enabled` | `false` | Yönetilen servislerin platform tabanlı otomatik keşfini etkinleştirir. |
+| `axelix.master.discovery.auto.broadcast.schedule` | `0 * * * * *` | Keşif taramasını tetikleyen cron ifadesi. |
+| `axelix.master.discovery.auto.kubernetes.kube-apiserver-url` | `https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}` | Kubernetes API sunucusunun URL'si. |
+| `axelix.master.discovery.auto.kubernetes.sa-token-path` | `/var/run/secrets/kubernetes.io/serviceaccount/token` | Master pod'u içinde ServiceAccount token'ının bağlandığı yol. |
+| `axelix.master.discovery.auto.kubernetes.ca-cert-path` | `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt` | Master pod'u içinde kube-apiserver CA sertifikasının bağlandığı yol. |
+| `axelix.master.discovery.auto.kubernetes.filters.namespaces` | `default` | Taranacak ad alanlarının virgülle ayrılmış listesi. |
+| `axelix.master.discovery.auto.kubernetes.filters.labels` | boş | Bir Kubernetes Service nesnesinin keşfe dâhil edilmesi için eşleşmesi gereken etiket anahtar/değer çiftleri haritası. |
+
+</div>
+
+### Keşif — kendi kendine kayıt [#discovery--self-registration]
+
+Kendi kendine kayıt, otomatik keşfin ters yönüdür: Master, uygulamayı taramak yerine Spring Boot Starter içeren bir uygulamanın gönderdiği yaşam sinyallerini *kabul eder*. Her yaşam sinyali örneğin actuator URL'sini, örnek adını ve paylaşılan `axelix.master.auth.jwt.signing-key` ile imzalanmış JWT'yi taşır. Master kaydı saklar ve yaşam sinyalleri durana kadar örneği bilinen bir örnek olarak değerlendirir. `eviction.heartbeat-timeout` içinde yaşam sinyali gelmezse `eviction.schedule` ile zamanlanan çıkarma taraması örneği kaldırır. 1.3.0 itibarıyla yalnızca ilk istek tam kayıttır; sonraki yaşam sinyalleri hafiftir. Tüm döngü için [Keşif nasıl çalışır?](../../product/discovery.mdx) sayfasına bakın.
+
+Uç nokta `POST /api/internal/service/register` şeklindedir. 1.3.0 itibarıyla buraya yalnızca ilk kayıt gider; yaşam sinyalleri komşu bir uç noktaya gider. Erişim, `axelix.master.auth.jwt.*` altında ayarlanan aynı JWT imzalama anahtarıyla denetlenir; anahtar eşleşmezse yaşam sinyalleri reddedilir.
+
+Master tarafında **değiştirilmesi zorunlu ayar yoktur**; buradaki her özelliğin çalışan bir varsayılanı vardır. Özellik **varsayılan olarak açıktır** (`enabled=true`); yalnızca Master'ın tüm yaşam sinyallerini reddetmesini istiyorsanız `false` yapın. Yaşam sinyaline *eklenen* starter tarafı özellikleri (`master-url`, `instance-actuator-url`, `instance-name`), [Spring Boot Starter'ı yapılandırma](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasında açıklanır.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.discovery.self-registration.enabled` | `true` | Spring Boot Starter içeren uygulamalardan kendi kendine kayıt yaşam sinyallerini kabul eder. Reddetmek için `false` ayarlayın. |
+| `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` | `45s` | Bu süre boyunca yaşam sinyali gelmeyen, kendi kendine kaydolmuş örneği çıkarır. |
+| `axelix.master.discovery.self-registration.eviction.schedule` | `0 * * * * *` | Çıkarma taramasını tetikleyen cron ifadesi. |
+
+</div>
+
+### Gösterge panelleri [#dashboards]
+
+<ReleasedInNotice version="1.3.1" />
+
+Gösterge panelleri canlı sonuçlar yerine önbelleğe alınmış verileri gösterir. Master önbelleği başlangıçta ve varsayılan olarak her beş dakikada bir günceller; dolayısıyla uygulamalarınızdaki değişiklikler bir sonraki başarılı yenilemeden sonra görünür. Gösterge paneli sayfasını yeniden yüklemek önbelleği yenilemez.
+
+Yenileme zamanlamasını değiştirmek için `axelix.master.dashboard.refresh-schedule` kullanın.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.dashboard.refresh-schedule` | `0 */5 * * * *` | Tüm gösterge paneli önbelleklerini yeniden yükleyen cron ifadesi. |
+
+</div>
+
+### MCP sunucusu [#mcp-server]
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.mcp-server.enabled` | `true` | Yerleşik Model Context Protocol sunucusunu `/api/mcp` yolunda sunar. |
+
+</div>
+
+:::note
+MCP sunucusu **varsayılan olarak etkindir**. Arayüzle aynı kimlik doğrulama ve rol denetimlerine tabidir (bkz. [MCP sunucusunda kimlik doğrulama](../../setting-up-master-ui/authentication/authentication.mdx#mcp-server-authentication)); dolayısıyla herkese açık bir giriş değildir, ancak uzaktan erişilebilen ek bir yüzeydir. Hiçbir yapay zekâ ajanı kullanmıyorsa üretimde `axelix.master.mcp-server.enabled=false` ayarlayın. Açık tutuyorsanız `/api/mcp` erişimini arayüzde olduğu gibi güvenilir istemcilerle sınırlayın.
+:::
+
+### Zamanlanmış görev geçmişi [#scheduled-tasks-history]
+
+<ReleasedInNotice version="1.3.0" />
+
+Master, bir `@Scheduled` görevinin bildirilen her çalışmasını veritabanında saklar; böylece [Scheduled Tasks](../../features/spring-framework/scheduled-tasks.mdx#execution-history) sayfası her görevin başarı oranını, sürelerini ve hatalarını gösterebilir. Temizleme işi, `retention` süresinden eski çalışmaları kaldırır ve her görevin yalnızca son `max-executions-per-task` çalışmasını tutar. Varsayılanlar olduğu gibi çalışır; yalnızca daha fazla geçmiş tutmak veya veritabanında yer kazanmak için değiştirin.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.scheduled-tasks.history.retention` | `30d` | Master'ın bir çalışmayı ne kadar süre sakladığı; Spring `Duration` biçiminde (ör. `7d`, `12h`). |
+| `axelix.master.scheduled-tasks.history.max-executions-per-task` | `50` | Master'ın her görev için tuttuğu en son çalışma sayısı. |
+| `axelix.master.scheduled-tasks.history.cleanup.schedule` | `0 */10 * * * *` | Temizleme işini tetikleyen cron ifadesi. Varsayılan olarak her 10 dakikada bir çalışır. |
+
+</div>
+
+### Yapılandırılmış günlük kaydı [#structured-logging]
+
+<ReleasedInNotice version="1.1.0" />
+
+Master varsayılan olarak konsola (sürecin stdout çıktısına) düz metin yazar. Bunun yerine [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS) biçiminde yapılandırılmış JSON günlük kaydına geçmek için `axelix.master.logging.json.enabled=true` ayarlayın. Bu, Master'ın bugün desteklediği tek yapılandırılmış biçimdir. ECS, JSON tabanlı bir günlük biçimidir; günlükler Elasticsearch veya ECS'yi anlayan benzer bir işleme hattına gönderildiğinde kullanın.
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.logging.json.enabled` | `false` | Konsol günlük kaydını düz metinden ECS biçiminde yapılandırılmış JSON'a geçirir. |
+
+</div>
+
+### Metrikler [#metrics]
+
+#### Prometheus [#prometheus]
+
+<ReleasedInNotice version="1.1.0" />
+
+`axelix.master.metrics.prometheus.enabled=true` ile açtığınızda Master bir Prometheus veri toplama uç noktası sunar. `/api/actuator/prometheus` yolundan yanıt verir ve kimlik doğrulama gerektirmez.
+
+Varsayılan olarak Master'ın geri kalanıyla aynı portu (`server.port`) kullanır. Farklı bir port kullanmak için `axelix.master.metrics.prometheus.port` ayarlayın; bu, veri toplama erişimini ana arayüz ve API'den ayrı sınırlamak istediğinizde kullanışlıdır.
+
+Dışa aktarılan her metriğe, örneğin dağıtım bölgesi veya ortamı gibi ortak etiketler eklemek için `axelix.master.metrics.prometheus.tags.<name>=<value>` kullanın.
+
+:::warning
+Uç nokta kimlik doğrulaması gerektirmediğinden, Master'a ağ üzerinden erişebilen herkes metrik değerlerini ve yapılandırılmış ortak etiketleri okuyabilir. `/api/actuator/prometheus` erişimini ağ politikası, ingress kuralı veya eşdeğer bir çevre denetimiyle güvenilir Prometheus altyapısıyla sınırlayın.
+:::
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.metrics.prometheus.enabled` | `false` | Prometheus veri toplama uç noktasını `/api/actuator/prometheus` yolunda sunar. |
+| `axelix.master.metrics.prometheus.port` | *(ayarlanmamış)* | Prometheus uç noktasının portu. Varsayılan olarak `server.port` kullanılır. |
+| `axelix.master.metrics.prometheus.tags` | boş | Dışa aktarılan her metriğe uygulanan ortak etiketler. |
+
+</div>
+
+```yaml
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+        tags:
+          region: eu-west-1
+```
+
+Bunun yerine ayrı bir port kullanma:
+
+```yaml
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+        port: 9404
+```
+
+#### OTLP [#otlp]
+
+<ReleasedInNotice version="1.1.0" />
+
+Master kendi JVM, HTTP, veritabanı havuzu ve diğer Micrometer metriklerini HTTP/protobuf üzerinden OTLP uyumlu bir toplayıcıya gönderebilir. Bu, Axelix starter üzerinden bağlı servislerden okunan metrikleri değil, Master'ın kendisinin ürettiği metrikleri dışa aktarır. OTLP ile metrik dışa aktarımı varsayılan olarak devre dışıdır (aşağıdaki özelliklere bakın).
+
+<div className={styles.ConfigTable}>
+
+| Özellik | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `axelix.master.metrics.otlp.enabled` | `false` | Düzenli OTLP metrik dışa aktarımını etkinleştirir. |
+| `axelix.master.metrics.otlp.url` | `http://localhost:4318/v1/metrics` | Tam HTTP/protobuf metrik uç noktası. `/v1/metrics` yolunu dâhil edin. |
+| `axelix.master.metrics.otlp.step` | `1m` | Dışa aktarımlar arasındaki süre; Spring `Duration` biçiminde. |
+| `axelix.master.metrics.otlp.headers.*` | boş | Örneğin yetkilendirme başlığı gibi özel istek başlıkları. Gizli değerleri çalışma zamanında sağlayın. |
+| `axelix.master.metrics.otlp.compression-mode` | `none` | İstek sıkıştırma modu: `none` veya `gzip`. |
+
+</div>
+
+```yaml
+axelix:
+  master:
+    metrics:
+      otlp:
+        enabled: true
+        url: http://otel-collector:4318/v1/metrics
+        step: 30s
+        headers:
+          Authorization: ${OTLP_AUTHORIZATION_HEADER}
+```
+
+Bu ayarlar aynı şekilde ortam değişkenleri veya JVM sistem özellikleri olarak da sağlanabilir. Örneğin `axelix.master.metrics.otlp.enabled` değerini `AXELIX_MASTER_METRICS_OTLP_ENABLED` ile eşleyen esnek bağlama kuralları için [Özellikleri sağlama](#supplying-properties) bölümüne bakın.
+
+Kimlik doğrulama başlıklarını bir yapılandırma dosyasına commit etmek yerine dağıtım platformunuzun gizli değer deposundan sağlamayı tercih edin.
+
+## JAR olarak çalıştırma [#run-as-a-jar]
+
+Axelix Master özünde bir JVM sürecidir ve JAR olarak dağıtılır; bu nedenle basit `java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar` komutuyla başlatılabilir (elbette gerçek kurulum biraz daha ayrıntılı olacaktır). Herhangi bir nedenle konteyner kullanmıyorsanız bu seçenek size uygundur.
+
+### 1. JAR dosyasını indirin [#1-download-the-jar]
+
+[Releases sayfasından](https://github.com/axelixlabs/axelix/releases) istediğiniz sürüme eklenmiş Axelix Master JAR dosyasını indirin. JAR, sürüm numarasına göre adlandırılır; örneğin Axelix `1.3.0` için `axelix-1.3.0.jar`. Bkz. [Çıktı adları](../../more/compatibility-and-versioning.mdx#artifact-names). Yayımlanan çıktı arayüzü zaten içerir; derlemeniz gereken başka bir şey yoktur.
+
+### 2. Master'ı yapılandırıp başlatın [#2-configure-and-start-master]
+
+Axelix 1.2.0 ve sonraki sürümlerde yerel deneme için `java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar` yeterlidir; Master yerleşik JWT imzalama anahtarını kullanır. Axelix'i gerçek bir ortamda (üretim dışında bile olsa) kuruyorsanız kendi imzalama anahtarınızı ve algoritmanızı sağlayın. İlk çalıştırmada diğer ayarlar varsayılan kalabilir. Bu yapılandırmayı birbirinin yerine kullanılabilen üç yoldan biriyle Master'a verebilirsiniz; Master hepsini aynı şekilde okur (bkz. [Özellikleri sağlama](#supplying-properties)): **ortam değişkenleri**, komut satırındaki **`-D` JVM sistem özellikleri** (ikisi de aşağıda gösterilir) veya `application.yaml` / `application.properties` gibi bir **haricî yapılandırma dosyası**.
+
+#### Ortam değişkenleri [#environment-variables]
+
+Kabuğunuz veya süreç yöneticiniz değerleri zaten dışa aktarıyorsa kullanışlıdır:
+
+<Tabs groupId="jwt-key" items={['Yerleşik anahtar (yerel deneme)', 'Kendi anahtarınız']}>
+  <Tab value="Yerleşik anahtar (yerel deneme)">
+
+```bash
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+JWT özellikleri ayarlanmadığında Master yerleşik imzalama anahtarını kullanır. Bunu yalnızca yerel deneme için kullanın; bkz. [İmzalama anahtarı olmadan çalıştırma](#running-without-a-signing-key).
+
+  </Tab>
+  <Tab value="Kendi anahtarınız">
+
+```bash
+export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
+export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
+
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+  </Tab>
+</Tabs>
+
+#### JVM sistem özellikleri (-D) [#jvm-system-properties--d]
+
+Hızlı, tek seferlik çalıştırma için kullanışlıdır:
+
+```bash
+java \
+  -Daxelix.master.auth.jwt.algorithm=HMAC512 \
+  -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+:::warning
+İmzalama anahtarı gizlidir ve `-D` bayrağı, makinenin süreç listesini okuyabilen tüm kullanıcılar tarafından görülebilir. Bu biçim yerel deneme için uygundur; gerçek dağıtımda gizli değerleri ortam değişkenleriyle veya bir gizli değer deposundan sağlayın. Bkz. [Gizli değerleri güvenle sağlama](#supplying-properties).
+:::
+
+#### Haricî yapılandırma dosyası [#external-config-file]
+<ReleasedInNotice version="1.1.0" />
+
+Aynı ayarları bir YAML veya properties dosyasında tutun ve `axelix.master.config.location` ile Master'a konumunu bildirin. Kabul edilen konum biçimleri için [Master'a yapılandırma dosyasının konumunu bildirme](#pointing-master-at-a-config-file) bölümüne bakın.
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: replace-with-a-long-random-secret
+```
+
+```bash
+java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Master'a artık `http://localhost:2935` adresinden erişilebilir. Yapılandırdığınız süper yönetici kimlik bilgileriyle giriş yapın.
+
+## Docker ile çalıştırma [#run-with-docker]
+
+Konteyner desteğiniz varsa Axelix Master'ı kurmak için önerilen yöntem Docker imajıdır. Sürüm işleme hattı imajı GitHub Container Registry ve Docker Hub'da yayımlar. Bu sayfadaki örnekler en son sürümü, `AXELIX_VERSION_PLACEHOLDER`, kullanır:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker pull ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker pull docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+:::note
+Farklı bir sürüm çalıştırmak için imaj adındaki etiketi değiştirin, örneğin:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```
+ghcr.io/axelixlabs/axelix:1.2.2
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```
+docker.io/axelixlabs/axelix:1.2.2
+```
+
+  </Tab>
+</Tabs>
+
+Yayımlanan etiketler için [Releases sayfasına](https://github.com/axelixlabs/axelix/releases) bakın.
+
+Üretimde imajı etiket yerine özet değeriyle (digest) çekin:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```
+ghcr.io/axelixlabs/axelix@sha256:<digest>
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```
+docker.io/axelixlabs/axelix@sha256:<digest>
+```
+
+  </Tab>
+</Tabs>
+:::
+
+### Çalıştırma komutu [#run-command]
+
+İlk inceleme için uygun, en basit çalıştırma:
+
+Ana makinenin loopback arayüzünde port yayımlamak yerel denemeler içindir. Aynı Docker ağındaki konteynerler Master'a konteyner/servis adı ve `2935` portuyla erişmelidir. Ana makine ağ geçidi adresini kullanan bir konteynerin, erişebildiği bir ana makine arayüzüne ihtiyacı vardır; yalnızca loopback'te yayımlanan porta bu adres üzerinden erişilemez.
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+<Tabs groupId="jwt-key" items={['Yerleşik anahtar (yerel deneme)', 'Kendi anahtarınız']}>
+  <Tab value="Yerleşik anahtar (yerel deneme)">
+
+```bash
+docker run --rm -p 127.0.0.1:2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+JWT özellikleri ayarlanmadığında Master yerleşik imzalama anahtarını kullanır. Bunu yalnızca yerel deneme için kullanın; bkz. [İmzalama anahtarı olmadan çalıştırma](#running-without-a-signing-key).
+
+  </Tab>
+  <Tab value="Kendi anahtarınız">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+<Tabs groupId="jwt-key" items={['Yerleşik anahtar (yerel deneme)', 'Kendi anahtarınız']}>
+  <Tab value="Yerleşik anahtar (yerel deneme)">
+
+```bash
+docker run --rm -p 127.0.0.1:2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+JWT özellikleri ayarlanmadığında Master yerleşik imzalama anahtarını kullanır. Bunu yalnızca yerel deneme için kullanın; bkz. [İmzalama anahtarı olmadan çalıştırma](#running-without-a-signing-key).
+
+  </Tab>
+  <Tab value="Kendi anahtarınız">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+</Tabs>
+
+Bu komutla ilgili birkaç not:
+
+- İmaj, root olmayan `axelix` kullanıcısıyla çalışır ve imaj derleme aşamasında oluşturulan Ahead-of-Time sınıf yükleme önbelleğini kullanır; böylece başlangıç, düz JAR çalıştırmaya göre daha hızlıdır.
+- Varsayılan veritabanı hâlâ çalışma dizinindeki SQLite'tır (`/application/axelix.db`). Dosya, konteynerin yazılabilir katmanındadır ve konteyner kaldırıldığında kaybolur. PostgreSQL/MySQL'e geçin (sonraki bölüme bakın) veya SQLite yoluna bir volume bağlayın.
+
+### Yapılandırma sağlama yolları [#ways-to-supply-configuration]
+
+**Ortam değişkenlerini** tercih edin; konteyner içinde yapılandırma için en güvenli yerdir ve gizli değerleri başlangıç günlüğünden uzak tutan tek seçenektir.
+
+#### Ayrı ortam değişkenleri [#individual-environment-variables]
+
+Ayrı ortam değişkenleriyle yapılandırma sağlamak, [Özellikleri sağlama](#supplying-properties) bölümündeki esnek bağlama kurallarını izler; değerler `-e` ile geçirilir. Yukarıdaki çalıştırma komutu bu yöntemi kullanır:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
+  -e AXELIX_MASTER_DATABASE_USERNAME=axelix \
+  -e AXELIX_MASTER_DATABASE_PASSWORD=... \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
+  -e AXELIX_MASTER_DATABASE_USERNAME=axelix \
+  -e AXELIX_MASTER_DATABASE_PASSWORD=... \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+#### `JAVA_TOOL_OPTIONS` üzerinden sistem özellikleri (-D) [#system-properties--d-via-java_tool_options]
+
+`-D` sistem özelliklerini `JAVA_TOOL_OPTIONS` üzerinden sağlarsanız JVM bu değişkeni `java` komutuna otomatik uygular. Bu, heap boyutu gibi JVM ayarları için kullanışlı bir yoldur.
+
+:::warning
+JVM, başlangıçta `JAVA_TOOL_OPTIONS` değerinin tamamını stderr'e yazar (`Picked up JAVA_TOOL_OPTIONS: ...`); dolayısıyla buraya koyduğunuz her şey `docker logs` ve tüm günlük toplayıcılarına gider. JWT imzalama anahtarını, süper yönetici parolasını veya veritabanı kimlik bilgilerini asla buraya koymayın; bunları ayrı `-e` ortam değişkenleriyle geçirin.
+:::
+
+Kullanım örneği aşağıdadır:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+#### Haricî yapılandırma dosyası [#external-config-file-1]
+<ReleasedInNotice version="1.1.0" />
+
+Yapılandırmayı haricî bir dosya üzerinden de sağlayabilirsiniz. YAML veya properties dosyasını konteynere bağlayın ve `axelix.master.config.location` ile Master'a konumunu bildirin (bkz. [Master'a yapılandırma dosyasının konumunu bildirme](#pointing-master-at-a-config-file)). Gizli değerleri imaja gömülen veya imajın yanında commit edilen dosyadan uzak tutun; bunları yukarıdaki gibi ayrı `-e` ortam değişkenleriyle geçirin.
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+```
+
+Ardından dosyayı Docker komutuna volume olarak geçirin:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+## Docker Compose ile çalıştırma [#run-with-docker-compose]
+
+Axelix Master'ı Docker Compose dağıtımında çalıştırmak da elbette mümkündür.
+
+Aşağıdaki örnek, yeni bir `docker-compose.yaml` dosyasına koyup düzenleyerek `docker compose up -d` ile başlatabileceğiniz tam bir yığındır. Buradaki `master` servisi en son sürümü kullanır; dağıtıma çıkmadan önce imajı digest ile sabitleyin (bkz. [Docker ile çalıştırma](#run-with-docker)).
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```yaml title="docker-compose.yaml"
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: axelix
+      POSTGRES_USER: ${AXELIX_DB_USERNAME:?set AXELIX_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AXELIX_DB_PASSWORD:?set AXELIX_DB_PASSWORD}
+    volumes:
+      - axelix-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  master:
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "2935:2935"
+    environment:
+      AXELIX_MASTER_DATABASE_URL: jdbc:postgresql://postgres:5432/axelix
+      AXELIX_MASTER_DATABASE_USERNAME: ${AXELIX_DB_USERNAME}
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_USERNAME: ${AXELIX_ADMIN_USERNAME}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_PASSWORD: ${AXELIX_ADMIN_PASSWORD}
+      AXELIX_MASTER_AUTH_COOKIE_SECURE: "false"
+
+volumes:
+  axelix-pgdata:
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: axelix
+      POSTGRES_USER: ${AXELIX_DB_USERNAME:?set AXELIX_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AXELIX_DB_PASSWORD:?set AXELIX_DB_PASSWORD}
+    volumes:
+      - axelix-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  master:
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "2935:2935"
+    environment:
+      AXELIX_MASTER_DATABASE_URL: jdbc:postgresql://postgres:5432/axelix
+      AXELIX_MASTER_DATABASE_USERNAME: ${AXELIX_DB_USERNAME}
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_USERNAME: ${AXELIX_ADMIN_USERNAME}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_PASSWORD: ${AXELIX_ADMIN_PASSWORD}
+      AXELIX_MASTER_AUTH_COOKIE_SECURE: "false"
+
+volumes:
+  axelix-pgdata:
+```
+
+  </Tab>
+</Tabs>
+
+Her `AXELIX_MASTER_*` anahtarı, esnek bağlama üzerinden ilgili özellikle eşleşir (bkz. [Özellikleri sağlama](#supplying-properties)). Bunları `JAVA_TOOL_OPTIONS` içinde birleştirmek yerine ayrı ortam değişkenleri olarak geçirmek, imzalama anahtarı ve parolaları konteynerin başlangıç günlüğünden uzak tutar.
+
+Bir diğer seçenek, değerleri Compose dosyasının yanındaki bir `.env` dosyasıyla sağlamaktır:
+
+```bash title=".env"
+AXELIX_DB_USERNAME=axelix
+AXELIX_DB_PASSWORD=...
+AXELIX_JWT_SIGNING_KEY=...
+AXELIX_ADMIN_USERNAME=admin
+AXELIX_ADMIN_PASSWORD=...
+```
+
+Bu dosya imzalama anahtarı ve parolaları açık metin olarak tutar; bu yüzden sürüm kontrolüne eklemeyin (`.gitignore` dosyasına ekleyin) ve dosya izinlerini sınırlayın. Üretimde, diskte uzun süre tutulan `.env` dosyası yerine değerleri platformunuzun gizli değer deposundan sağlamayı tercih edin.
+
+Bu örnekte `AXELIX_MASTER_AUTH_COOKIE_SECURE`, yerel test için Master düz HTTP üzerinden sunulduğundan `false` değerindedir. Gerçek dağıtımlarda Master'ı TLS sonlandıran bir proxy arkasına koyun ve değeri `true` yapın.
+
+### Bağlanmış dosya üzerinden yapılandırma sağlama [#supplying-configuration-via-a-mounted-file]
+
+<ReleasedInNotice version="1.1.0" />
+
+Gizli olmayan her ayarı `environment` altında listelemek yerine bir YAML veya properties dosyasını `master` servisine bağlayabilir ve `axelix.master.config.location` ile Master'a konumunu bildirebilirsiniz (bkz. [Master'a yapılandırma dosyasının konumunu bildirme](#pointing-master-at-a-config-file)):
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    database:
+      url: jdbc:postgresql://postgres:5432/axelix
+    auth:
+      cookie:
+        secure: false
+```
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```yaml title="docker-compose.yaml"
+  master:
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    volumes:
+      - ./master.yaml:/etc/axelix/master.yaml:ro
+    environment:
+      AXELIX_MASTER_CONFIG_LOCATION: file:/etc/axelix/master.yaml
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+  master:
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    volumes:
+      - ./master.yaml:/etc/axelix/master.yaml:ro
+    environment:
+      AXELIX_MASTER_CONFIG_LOCATION: file:/etc/axelix/master.yaml
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+</Tabs>
+
+JWT imzalama anahtarı, süper yönetici parolası ve veritabanı kimlik bilgileri gibi gizli değerleri commit edilen dosyalardan uzak tutun; bunları yukarıda gösterildiği gibi ayrı ortam değişkenleriyle geçirin.
+
+## Kubernetes üzerinde çalıştırma [#run-on-kubernetes]
+
+Master'ın izlediği servislerle aynı kümede bulunmasını ve bunları otomatik keşfetmesini istediğinizde bu yöntemi kullanın.
+
+Axelix kendi Helm chart'ını sağlar; bu yüzden manifestleri elle oluşturmanız gerekmez:
+
+- **Chart kaynağı**: Axelix deposundaki [`charts/axelix`](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) dizini. `values.yaml`, veritabanı bağlantısı, JWT, süper yönetici kimlik bilgileri, otomatik keşif, RBAC ve Ingress dâhil chart'ın sunduğu tüm değerleri belgeler.
+- **Yayımlanan paket**: [artifacthub.io/packages/helm/axelix/axelix](https://artifacthub.io/packages/helm/axelix/axelix) — chart'ı Axelix Helm deposundan çeker ve kullanılabilir sürümleri listeler.
+
+Tipik bir kurulum şu adımlara iner:
+
+```bash
+helm repo add axelix https://axelixlabs.github.io/axelix
+helm repo update
+helm install axelix axelix/axelix \
+  --namespace axelix --create-namespace \
+  --values values.yaml
+```
+
+Özelleştirmelerinizi — en azından `axelix.master.auth.jwt.signingKey`, süper yönetici parolası ve veritabanı bağlantısını — `values.yaml` içine koyun. Chart, küme içi otomatik keşif için gereken ServiceAccount ve RBAC bağlantılarını sizin için kurar.
+
+Hızlı kontrol için Service'i kümenizin alışılmış mekanizmasıyla — `Ingress` veya `Gateway` — dışarı açın.
+
+### Kendi chart'ınızı kullanma [#bringing-your-own-chart]
+
+Bazı ekipler resmî chart yerine kendi Helm chart'larını veya doğrudan manifestlerini kullanır. Bu da uygundur. Yalnızca vurgulanması gereken birkaç nokta vardır.
+
+#### Otomatik keşif [#automatic-discovery]
+
+Otomatik keşif sırasında Axelix Master, K8S denetim düzleminin REST API'sini sorgular. Bunun için pod'a verilen [K8S ServiceAccount](https://kubernetes.io/docs/concepts/security/service-accounts/) uygun izinlere sahip olmalıdır. [Resmî chart](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) bu izinleri sizin için ayarlar.
+
+:::note
+
+Bu yalnızca `axelix.master.discovery.auto.enabled=true` olduğunda önemlidir; otomatik keşif olmadan Master aşağıdaki izinlerin hiçbirine ihtiyaç duymaz.
+
+:::
+
+Özel Helm chart yazarken şu noktaları aklınızda tutun:
+
+**1. Master, Kubernetes API'sine erişebilmelidir.** Belirtildiği gibi otomatik keşif modunda Master, `broadcast.schedule` ile belirlenen zamanlamada kümenin denetim düzlemi API'sini çağırır; yapılandırılmış her ad alanındaki Service nesnelerini ve arkalarındaki Pod nesnelerini listeler. Varsayılan olarak Axelix Master bağlantı ayrıntılarını standart pod içi konumlardan okur:
+
+- API sunucusunun URL'si, Kubernetes'in her pod'a eklediği `KUBERNETES_SERVICE_HOST` / `KUBERNETES_SERVICE_PORT_HTTPS` değişkenlerinden alınır;
+- [ServiceAccount token'ı](https://kubernetes.io/docs/concepts/security/service-accounts/#authenticating-credentials), `/var/run/secrets/kubernetes.io/serviceaccount/token` konumundan alınır;
+- CA sertifikası, `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt` konumundan alınır.
+
+Bunlar [otomatik keşif](#discovery--auto-discovery) altında listelenen `kube-apiserver-url`, `sa-token-path` ve `ca-cert-path` özelliklerinin varsayılanlarıdır. Varsayılanları koruyun; yalnızca token ve CA'nın bu yollarda bulunmasını sağlamanız gerekir. Sonraki iki madde bunu ele alır.
+
+**2. Pod, token'ı bağlanmış bir ServiceAccount gerektirir.** Bir ServiceAccount oluşturun, Deployment üzerinde `serviceAccountName` ayarlayın ve token ile CA'nın yukarıdaki yollarda görünmesi için `automountServiceAccountToken: true` bırakın. Bağlanmış token olmadan Master'ın sunabileceği kimlik bilgisi olmaz ve her tarama yetkilendirme hatasıyla başarısız olur.
+
+**3. Bu ServiceAccount, iş yüklerini okumak için RBAC gerektirir.** Yalın bir ServiceAccount kimliğini doğrulayabilir ancak hiçbir şeye izinli değildir. Keşfedilmesini istediğiniz her ad alanında `pods`, `services` ve `endpoints` üzerinde `get`, `list` ve `watch` yetkilerini verin; ardından oluşturulan Role'u ServiceAccount'a bağlayın. İzin verdiğiniz ad alanları `filters.namespaces` ile eşleşmelidir: Master tam olarak bunları tarar ve okuyamadığı bir ad alanı hiçbir örnek döndürmez.
+
+Bir araya getirildiğinde, tek bir keşfedilen ad alanı için gereken en küçük yapı şöyledir:
+
+```yaml title="rbac.yaml"
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: axelix-master
+  namespace: axelix
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: axelix-master-role
+  namespace: default          # a namespace listed in filters.namespaces
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: axelix-master-role-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: axelix-master
+    namespace: axelix         # the namespace the ServiceAccount lives in
+roleRef:
+  kind: Role
+  name: axelix-master-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+Ardından Deployment'ı bu ServiceAccount'a yönlendirin:
+
+```yaml title="deployment.yaml"
+spec:
+  template:
+    spec:
+      serviceAccountName: axelix-master
+      containers:
+        - name: axelix-master
+          image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+K8S'te Role, ad alanı kapsamındaki bir nesnedir; bu yüzden `filters.namespaces` içindeki her ad alanı için aynı ServiceAccount'a başvuran bir Role ve RoleBinding oluşturun. ServiceAccount iş yüklerinden farklı bir ad alanında bulunuyorsa RoleBinding öznesi yine yukarıda gösterildiği gibi ServiceAccount'ın kendi ad alanını belirtmelidir.
+
+:::tip
+Resmî chart'ın [`templates/rbac.yaml`](https://github.com/axelixlabs/axelix/blob/master/charts/axelix/templates/rbac.yaml) ve [`templates/serviceaccount.yaml`](https://github.com/axelixlabs/axelix/blob/master/charts/axelix/templates/serviceaccount.yaml) dosyaları tam olarak bu konuda başvurudur. Başlangıç noktası isterseniz chart üzerinde `helm template` çalıştırabilir ve oluşturulan ServiceAccount, Role ve RoleBinding nesnelerini kendi manifestlerinize kopyalayabilirsiniz.
+:::
+
+## İlgili konular [#related]
+
+- [Spring Boot Starter'ı yapılandırma](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) — Master'ın izlenen uygulamalarınızı görebilmesi için bağlantılarını kurun.
+- [Master nedir?](../../setting-up-master-ui/what-is-master.mdx) — çalışmaya başladıktan sonra Master'ın neler yaptığına ilişkin arka plan.
+- [Kimlik doğrulama](../../setting-up-master-ui/authentication/authentication.mdx) — JWT, süper yönetici ve OAuth2/OIDC hakkında ayrıntılı bilgi.

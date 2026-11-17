@@ -1,0 +1,96 @@
+---
+title: Çöp toplayıcı
+description: "Çöp toplayıcı sayfası, yönetilen bir Spring Boot örneğinde JVM GC günlük kaydını etkinleştirmenizi, isteğe bağlı toplama tetiklemenizi ve oluşan günlük dosyasını indirmenizi sağlar. Üretimde GC günlük kaydı genellikle kapalıdır. Bu sayfa, belirli bir inceleme için kaydı açıp sonra yeniden kapatmak içindir."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Çöp toplayıcının ana sayfası](/img/feature/garbage-collector/gc-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Garbage Collector***
+
+## Erişim [#access]
+
+GC günlük dosyasını okumak ve kayıt durumunu incelemek kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açıp mevcut bir günlüğü indirebilir. İşlem yapan kontroller ayrı bir yetkiye bağlıdır:
+
+- **Trigger GC**, **Enable GC Logging** ve **Disable GC Logging**, `gc:manage` yetkisini gerektirir.
+
+`gc:manage`, yerleşik **EDITOR**, **ADMIN** ve **SUPER_ADMIN** rollerine verilir. **VIEWER** düğmeleri görür, ancak değişiklik yapanlar devre dışı kalır. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+Bir kontrol düğmesi görünürken hesabınızda bu yetki yoksa Axelix düğmeyi devre dışı tutar ve üzerine gelindiğinde ilgili mesajı araç ipucunda gösterir.
+
+## GC günlük kaydını etkinleştirme [#enabling-gc-logging]
+
+GC günlük kaydı varsayılan olarak kapalıdır. Kayıt açılana kadar sayfa **Enable GC Logging** düğmesiyle boş durum gösterir. Tıkladığınızda JVM günlük düzeyini seçebileceğiniz bir pencere açılır:
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+<Image src="/img/feature/garbage-collector/enable-gc-logging.png" alt="GC günlük kaydını etkinleştirme" width={490} height={280}/>
+
+</ScreenshotsNotice>
+
+Düzey listesi çalışma zamanında hedef örnekteki `jcmd VM.log list` komutundan alınır; genellikle `error`, `warning`, `info`, `debug`, `trace` değerlerini içerir.
+
+## Günlüklerle çalışma [#working-with-logs]
+
+Günlük kaydı etkinleştirildiğinde sayfa başlığı üç eylem sunar:
+
+1. **Trigger GC** <Image src="/img/feature/icons/play-icon.png" width={20} height={20}/> — örnekte `System.gc()` çağırarak toplamayı zorlar; böylece kayıt üretmek için doğal bir GC olayını beklemeniz gerekmez. `gc:manage` gerektirir.
+2. **Download GC Log** <Image src="/img/feature/icons/download-icon.png" width={25} height={27}/> — geçerli GC günlük dosyasını tarayıcıya `text/plain` olarak aktarır. Salt okunurdur; kimliği doğrulanmış tüm kullanıcılar tarafından kullanılabilir.
+3. **Disable GC Logging** <Image src="/img/feature/icons/disable-icon.png" width={25} height={27}/> — yazılmış günlük dosyasına dokunmadan GC günlük kaydını yeniden kapatır. `gc:manage` gerektirir.
+
+İndirilen bir GC günlüğünden açıklamalar içeren örnek bir satır:
+
+```
+[2026-03-02T17:38:55.009+0000][info][gc] GC(428) Pause Full (System.gc()) 29M->28M(97M) 82.955ms
+              │                  │    │    │               │               │    │   │       │
+              │                  │    │    │               │               │    │   │       └─ GC pause duration
+              │                  │    │    │               │               │    │   └─ Total heap
+              │                  │    │    │               │               │    └─ After heap
+              │                  │    │    │               │               └─ Before heap
+              │                  │    │    │               └─ GC event description
+              │                  │    │    └─ GC event ID
+              │                  │    └─ Log tag (subsystem)
+              │                  └─ Log level
+              └─ Timestamp (ISO-8601 with timezone)
+```
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-gc` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-gc
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-gc
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

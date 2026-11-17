@@ -1,0 +1,66 @@
+---
+title: Lisanslama
+description: "Her Axelix bileşeninin hangi lisans kapsamında olduğu ve Axelix'i kendi projelerinizde kullanırken bu lisansların ne anlama geldiği."
+---
+
+Axelix açık kaynaklıdır, ancak tüm parçaları aynı lisansla sunulmaz. Bu sayfa her bileşenin lisansını listeler ve Axelix ile
+birlikte çalıştırdığınız uygulamalar için bunun ne anlama geldiğini açıklar.
+
+## Bileşenlere göre lisanslar [#licenses-by-component]
+
+Axelix'in neredeyse tamamı **GNU Lesser General Public License, sürüm 3** (LGPLv3) kapsamındadır.
+Tek istisna **MIT License** kullanan resmî Helm chart'tır.
+
+| Bileşen | Lisans |
+|---|---|
+| Web arayüzü ve MCP sunucusu dahil Axelix Master | LGPLv3 |
+| Axelix Spring Boot Starter'ları (Spring Boot 2, 3 ve 4) | LGPLv3 |
+| Gradle ve Maven için Axelix derleme eklentileri | LGPLv3 |
+| Resmî Axelix Helm chart | MIT |
+
+Lisans, bileşenin sunulduğu her biçim için geçerlidir. Örneğin Master JAR ve Master Docker imajı LGPLv3 kapsamındadır;
+Maven Central'daki starter ve eklenti artifact'ları da POM meta verilerinde LGPLv3 belirtir. Tam LGPLv3 metni
+[Axelix deposundaki](https://github.com/axelixlabs/axelix)
+[`LICENSE`](https://github.com/axelixlabs/axelix/blob/master/LICENSE) dosyasındadır; Helm chart kendi MIT lisans metnini içerir.
+Tüm bileşenlerin telif hakkı sahibi Axelix Labs'tir.
+
+## LGPLv3 uygulamanız için ne anlama gelir? [#what-lgplv3-means-for-your-application]
+
+**Evet, Axelix starter'larını ve derleme eklentilerini kapalı kaynaklı, özel mülkiyete tabi bir uygulamada ücretsiz kullanabilirsiniz.**
+Herhangi bir ücret ödemez veya Axelix Labs ile sözleşme imzalamazsınız.
+
+LGPLv3, zayıf copyleft lisansıdır. Spring Boot servisinize starter veya derlemenize derleme eklentisi eklemek tek başına
+uygulamanızın kaynak kodunu yayımlamanızı veya lisansını değiştirmenizi gerektirmez. Dağıtım, aşağıda açıklanan lisans
+koşullarına tabidir.
+
+Kurum içi kullanım dağıtımdan farklıdır. LGPLv3'te ağ maddesi yoktur; dolayısıyla Master'ı değiştirip yalnızca kendi
+sunucularınızda çalıştırmak tek başına dağıtım sayılmaz.
+
+**Bir Axelix bileşenini dağıtmak, onu değiştirmemiş olsanız bile yükümlülükler doğurabilir.** Örneğin deponun `LICENSE`
+dosyasının 4. bölümü, Birleşik Eser dağıtımı için bildirimler, GNU GPL ve LGPL kopyaları ile o bölümdeki diğer koşulları
+belirler. Starter'ı değiştirip değiştirilmiş JAR'ı müşterilere dağıtırsanız değişikliklerinizin kaynağını da LGPLv3 kapsamında
+onlara sunmalısınız.
+
+:::note[Hukuki danışmanlık değildir]
+Bu bölüm yön bulmanıza yardımcı olan kısa bir özettir. Bağlayıcı olan tek kaynak lisans metnidir. Durumunuz ayrıntılara
+bağlıysa, örneğin Axelix'i sattığınız bir ürüne gömüyorsanız, hukuk ekibinizle görüşün.
+:::
+
+## MIT kapsamındaki Helm chart [#the-helm-chart-under-mit]
+
+Helm chart yalnızca Master'ın Kubernetes'e nasıl dağıtılacağını açıkladığından daha esnek MIT License kullanır.
+Değişiklikleri paylaşmadan kurum içi chart deponuza kopyalayabilir, değiştirebilir veya kendi üst chart'ınıza birleştirebilirsiniz.
+Tek koşul, kopyalarda telif hakkı ve lisans bildirimini korumaktır. Chart'ın dağıttığı Master'ın kendisi LGPLv3 kapsamında kalır.
+
+## Axelix Enterprise [#axelix-enterprise]
+
+Yakında sunulacak ücretli **Axelix Enterprise** sürümü açık kaynaklı değildir. Axelix Labs ile ayrı bir ticari lisans
+sözleşmesi kapsamında dağıtılır ve ek özellikleri LGPLv3 kapsamına girmez. Yukarıdaki tabloda açıklanan Axelix OSS,
+LGPLv3 kapsamında kalır. İki sürüm hakkında daha fazla bilgi için
+[Axelix OSS ve Enterprise](../product/introduction.mdx#axelix-oss-and-enterprise) bölümüne bakın.
+
+## Ayrıca bakın [#see-also]
+
+- [Giriş](../product/introduction.mdx)
+- [Destek politikası](./support-policy.mdx)
+- [Uyumluluk ve sürümlendirme](./compatibility-and-versioning.mdx)

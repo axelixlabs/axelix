@@ -1,0 +1,19 @@
+{
+    "pagesIndex": "index",
+    "pages": [
+        "---Ürün---",
+        "...product",
+        "---Başlangıç---",
+        "...start",
+        "---Arayüz kılavuzu---",
+        "...ui-guide",
+        "---Özellikler---",
+        "...features",
+        "---Master---",
+        "...setting-up-master-ui",
+        "---Servisleriniz---",
+        "...setting-up-spring-boot-service",
+        "---Diğer---",
+        "...more"
+    ]
+}

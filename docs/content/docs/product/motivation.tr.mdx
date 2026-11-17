@@ -1,0 +1,168 @@
+---
+title: Gerekçe
+description: "Bu belge, Axelix'in Spring Boot geliştiricileri ve kuruluşları için çözdüğü temel sorunları açıklar. Gerçek dünyadan örneklerle Axelix'in ortaya çıkmasına yol açan güçlükleri ele alır."
+---
+
+Axelix, çalışma zamanı analizini, hata ayıklamayı ve ekosistemin dönüşümünü tek bir açık kaynaklı, yapay zekâ odaklı platformda bir araya getirir.
+Ekiplerin hem bir servisin içinde neler olduğunu hem de servislerinin birlikte nasıl geliştiğini anlaması gerekir.
+Buna yapılandırma hatalarını bulmak, bağımlılık sağlığını değerlendirmek, Java ve Spring Boot geçişlerini takip etmek
+ve zamanlanmış işleri denetlemek dahildir. Axelix, mühendislerin ve yapay zekâ ajanlarının web arayüzü ve yerleşik MCP
+sunucusu üzerinden bu iş akışlarına katılması için geliştirilmiştir. Genel bakış için [Giriş](./introduction.mdx) sayfasına bakın.
+
+## Gerekçe: önsöz [#motivation-prologue]
+
+Tipik bir kurumda çok sayıda kurum içinde geliştirilmiş yazılım bulunur. Bu yazılımlar çeşitli sorunları çözer ve genellikle
+JavaScript, Java, Go gibi farklı programlama dilleriyle yazılır. Büyük kurumlarda sunucu tarafı/backend uygulamaları için
+en yaygın seçeneklerden biri [Java'dır](https://en.wikipedia.org/wiki/Programming_languages_used_in_most_popular_websites).
+Bu durum özellikle bankacılık alanında geçerlidir.
+
+Bunun yanında, Java ile backend uygulamaları geliştirmek için en popüler çatı [kuşkusuz
+Spring Boot'tur](https://en.wikipedia.org/wiki/Spring_Boot). [Spring Framework](https://spring.io/) üzerine eklenen ve onun
+yapılandırmasını kolaylaştıran bir katmandır. Çeşitli nedenlerle kurumların açık ara en çok tercih ettiği seçeneklerden biridir.
+Örneğin Netflix, [ekosistemini (3000'den fazla uygulamayı) Spring Boot 3'e taşımıştır](https://www.youtube.com/watch?v=IMGcD08rdVw).
+Buradaki temel nokta, Java backend uygulamaları geliştirirken Spring Boot'un çok popüler bir tercih olmasıdır.
+
+## Gerekçe: karşılaşılan güçlük [#motivation-pain-point]
+
+Daha önce belirtildiği gibi Spring Boot, başlangıçta Spring Framework üzerinde ek bir soyutlama katmanıydı; ancak artık
+bundan çok daha fazlasıdır. Spring Boot üzerinde çalışan tüm Java uygulamaları aynı Spring Boot soyutlamalarını kullanır.
+
+Örneğin:
+- Her Spring Boot Java uygulaması, yönetimi bir ölçüde Spring Framework tarafından gerçekleştirilen Java nesneleri olan
+  bir dizi _bean'den_ oluşur.
+- Her Spring Boot uygulamasının, temel amacı uygulamanın bean'lerini ve çalışan Spring Boot uygulamasının genel durumunu
+  yönetmek olan bir `ApplicationContext`'i vardır.
+- Her Spring Boot uygulamasının çeşitli kaynaklardan gelebilen pek çok özelliği bulunur
+  (`application.properties` dosyası, işletim sistemi süreç ortamı veya Java sistem özellikleri gibi).
+
+Kısacası Spring oldukça kapsamlıdır ve birbirini etkileyen çok sayıda hareketli parça oluşturur (örneğin özellikler bean
+oluşturmayı etkiler, oluşturulan bean'ler daha fazla özellik sağlayabilir).
+
+**Bu projenin var olmasının temel nedenlerinden biri şudur: Spring Boot uygulaması yerelde beklendiği gibi çalışsa ve
+tüm testler geçse bile aynı uygulamanın üretim veya test ortamına dağıtıldığında sorunsuz çalışacağı anlamına gelmez.
+Her şeyin yolunda gideceğini varsaymanın doğru olmadığını hepimiz biliyoruz.**
+
+Bu nedenle, Spring Boot kullanan Java geliştiricileri olarak uygulamalarımızı bir ortama dağıttığımızda aynı sorunlarla
+tekrar tekrar karşılaşırız. Sorunu gösteren birkaç örneği inceleyelim.
+
+### Örnek 1: ayrıntılı günlük kaydı [#example-1-fine-grained-logging]
+
+Axelix'in tam olarak neyi çözmeye çalıştığını anlamak için birkaç Java kodu örneğine bakalım. Uygulamamızda aşağıdaki
+Java sınıfının bulunduğunu varsayalım. Bu, varsayımsal bir istemcinin sahip olduğu izin kümesini belirlemek için kullandığımız
+bir Spring bean'idir:
+
+```java
+@Slf4j
+@Service
+public class PermissionsResolver {
+
+    @Value("${permission.caching.enabled:true}")
+    private boolean cacheLookupsEnabled;
+
+    @Autowired
+    private ExternalPermissionsResolver delegate;
+
+    @Autowired
+    private PermissionsCache cache;
+
+    @PostConstruct
+    void init() {
+        log.debug("Permissions cache lookup enabled: {}", cacheLookupsEnabled);
+    }
+
+    public Set<Permission> resolveClientPermissions(Client client) {
+        log.debug("Resolving permissions for the client {}", client.getId());
+
+        try {
+            return delegate.resolve(client);
+        } catch (SomeExpectedException e) {
+            // if we can, we do a cache lookup
+            if (featureFlag && client.getStatus() == ClientStatus.EXISTING) {
+                return cache.get(client.getId());
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+```
+
+Bu kodu yazdık. Testlerini de yazdık. Yerelde test ettik ve çalıştı. Şimdi bu kodu deneme ortamımıza dağıtıyoruz.
+
+Ancak Murphy Kanunu gereği:\ ***Ters gidebilecek her şey ters gider.***\ Deneme/test ortamımızda bir şey doğru çalışmıyor.
+Yerelde test etmiştik ve çalışıyordu; test ortamında ise birden çalışmıyor. Sınıftaki günlük ifadeleri dağıtılmış uygulamanın
+içinde neler olduğunu anlamamıza yardımcı olabilse de bunlar `DEBUG` düzeyinde; bizde yalnızca `INFO` düzeyi etkin.
+**Günlük düzeyini yalnızca belirli bir Java sınıfı veya Java paketi için geçici olarak(!), anında değiştirebilmek harika olurdu.**
+Uygulama yapılandırmasında günlük düzeyini değiştirip uygulamayı yeniden dağıtabilir miyiz? Elbette. Ancak sırf günlükleri
+incelemek için tüm derleme ve dağıtım sürecinden geçmek ister miyiz? Peki günlükler yardımcı olmazsa? Yeniden derleyip
+tekrar mı dağıtacağız?
+
+**Axelix olarak bu güçlüğü çok iyi anlıyoruz.** Ve çözmek için bir yol sunmak istiyoruz.
+
+### Örnek 2: yapılandırma kaynakları [#example-2-sources-of-configuration]
+
+İlk sorunu çözdüğümüzü ve Axelix arayüzünden ilgili Java sınıfının günlük kaydını etkinleştirdiğimizi varsayalım.
+Şimdi başka bir sorun var. Sorunun, `cacheLookupsEnabled` özelliğine yanlış değer enjekte edilmesinden kaynaklandığını
+anladığımızı düşünelim. _XYZ_ istemcisi için verinin önbellekten alınmasını bekliyorduk, ancak alınmadı.
+Bunun nedeni `cacheLookupsEnabled` değerinin `false` olmasıydı.
+
+Peki şimdi ne yapacağız? Bildiğimiz tek şey bu özelliğin `false` olduğu ve bunu bizim yapmadığımız.
+Demek ki uygulamamızın bir yapılandırma kaynağında, _bir yerde_ `false` olarak ayarlanmış. Ama tam olarak nerede?
+
+**Dürüst olalım: büyük kurumlardaki geliştiriciler olarak uygulamamızın ortama tam olarak nasıl dağıtıldığını her zaman
+bilemeyiz.** Uygulamanın Docker kapsayıcısına nasıl paketlendiğini, Helm chart ile K8S kümelerine nasıl dağıtıldığını,
+uygulamaya hangi ek yapılandırma kaynaklarının uygulandığını her zaman tam olarak anlamayız.
+**Uygulamamızın nasıl dağıtıldığına dair _bir miktar_ bilgimiz vardır, ancak bu bilgi eksiktir; temel sorun budur.**
+
+Axelix, özellik değerlerini incelemenizi ve her değerin tam olarak hangi yapılandırma kaynağından geldiğini görmenizi sağlar.
+
+### Örnek 3: uygulamanın durumu [#example-3-applications-state]
+
+Şimdi `cacheLookupsEnabled` değerini `true` yaptık; her şeyin yolunda olması gerekir, değil mi? **Hayır.** Hâlâ çalışmıyor.
+Çünkü `PermissionsCache` aslında bir arayüzdür:
+
+```java
+
+public interface PermissionsCache {
+
+    Set<Permission> get(UUID clientId);
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "in-memory", matchIfMissing = true)
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class InMemoryPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "redis")
+@ConditionalOnRedisPresent
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class RedisPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+```
+
+Bir sözleşme tanımlayan `interface`'e ve her biri bir Spring bean'i olan bu Java arayüzünün çeşitli gerçekleştirimlerine sahip olmak çok yaygındır.
+Bu Spring bean'lerinin yalnızca belirli koşullar sağlandığında başlatılmasını bekleriz. `ConditionalOnProperty`,
+`ConditionalOnMissingBean` ve benzerleri hemen hemen her Spring geliştiricisine tanıdıktır.
+
+Bizim durumumuzda, ilgili istemcinin izinlerinin bellek içi veri yapısından değil Redis önbelleğinden alınmasını beklediğimizi
+varsayalım. Ancak gerçekte `InMemoryPermissionsCache` sorgulanmış. Bunun bir `InMemoryPermissionsCache` olduğundan bile emin miyiz?
+Belki bağımlılık olarak içe aktardığımız bir kurumsal kütüphane kendi `ThreadSafeInMemoryPermissionsCache` uygulamasını getiriyordur.
+Başka bir deyişle şu sorulara yanıt arıyoruz:
+
+- Spring uygulamasında şu anda ***hangi*** bean'ler etkin?
+- ***Neden*** diğerleri değil de tam olarak bu bean'ler etkin?
+
+**Axelix bunu yapmanıza da yardımcı olur.**

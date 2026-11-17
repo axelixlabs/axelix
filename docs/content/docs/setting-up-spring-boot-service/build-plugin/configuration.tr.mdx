@@ -1,0 +1,106 @@
+---
+title: Axelix derleme eklentisini yapılandırma
+description: "Axelix derleme eklentisi, Master'ın örneği tanımlayabilmesi için derleme koordinatlarınızı uygulama çıktısına işler."
+---
+
+Axelix derleme eklentisini uygulamak, bir servisi [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) için görünür kılmanın ikinci yarısıdır; ilk yarısı [starter bağlantısını kurmaktır](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx). Eklentide yapılandırılacak bir şey yoktur: uyguladığınızda Master'ın örneği tanımlayabilmesi için derleme koordinatlarını çıktıya işler. Neler ürettiği ve neden gerekli olduğu için [Axelix derleme eklentisi nedir?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) sayfasına bakın.
+
+:::warning[Kayıt için gereklidir]
+Master her uygulamayı `groupId` + `artifactId` ile tanımlar. Eklenti olmadan `META-INF/axelix-info.properties` dosyası bulunmaz, koordinatlar boş kalır ve **Master kaydı reddeder**; örnek arayüzde hiçbir zaman görünmez. Aynı koordinatlar [kalıcılık analizlerini](../../setting-up-master-ui/mcp/mcp-tools.mdx) (N+1 ve varlık eşleme analizi) de ilişkilendirir. Axelix'in yönetmesini istediğiniz her servise eklentiyi uygulayın.
+:::
+
+:::note
+Eklentiler şu anda **yalnızca Maven Central'da** yayımlanır. Gradle Plugin Portal'da yayımlama yol haritasındadır; o zamana kadar Gradle derlemeleri eklentiyi Maven Central'dan çözümlemelidir (aşağıdaki `pluginManagement` bloğuna bakın). Eklenti sürümünü starter sürümüyle eş tutun.
+:::
+
+## Eklentiyi uygulama [#apply-the-plugin]
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+Eklenti henüz Gradle Plugin Portal'da olmadığından `settings.gradle.kts` dosyasındaki `pluginManagement` bölümüne `mavenCentral()` ekleyin:
+
+```kotlin title="settings.gradle.kts"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+Ardından `build.gradle.kts` dosyasında eklentiyi uygulayın:
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "AXELIX_VERSION_PLACEHOLDER"
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+Eklenti henüz Gradle Plugin Portal'da olmadığından `settings.gradle` dosyasındaki `pluginManagement` bölümüne `mavenCentral()` ekleyin:
+
+```groovy title="settings.gradle"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+Ardından `build.gradle` dosyasında eklentiyi uygulayın:
+
+```groovy title="build.gradle"
+plugins {
+    id 'com.axelixlabs.axelix' version 'AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>AXELIX_VERSION_PLACEHOLDER</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+`axelix-generate-project-info` hedefi varsayılan olarak `prepare-package` aşamasına bağlanır; bu yüzden normal bir `package`/`install` derlemesinde otomatik olarak çalışır. Ek aşama yapılandırması gerekmez.
+
+  </Tab>
+</Tabs>
+
+İki eklenti de herhangi bir yapılandırma seçeneği sunmaz. Gradle eklentisi yalnızca standart proje `version` değerinin ayarlanmasını gerektirir (Axelix `1.2.0` öncesinde `group` boşsa derleme de başarısız olurdu; sonraki bölüme bakın). Maven her zaman GAV koordinatlarına sahiptir, dolayısıyla başka bir şey gerekmez.
+
+## İsteğe bağlı `group` koordinatı [#optional-group-coordinate]
+
+<ReleasedInNotice version="1.2.0" />
+
+İlk sürümlerde Axelix, yönettiği tüm Java uygulamalarının `groupId` değerine (GAV'ın G bölümü) sahip olmasını gerektiriyordu. Ancak `1.2.0` sürümünden itibaren bu zorunluluk kaldırılmıştır.
+
+Teknik olarak paketlenip dağıtılan her Java uygulamasının bir Maven çıktısı olması beklenir. Ancak uygulamanın Maven uyumlu bir ikili dosya deposuna dağıtılmasının amaçlanmadığı durumlar vardır. Örneğin uygulama doğrudan bir Docker imajı olarak oluşturulup K8S kümesine dağıtılabilir.
+
+Bu durumda Java uygulamasının tam bir Maven çıktısı olması gerekmez (teknik olarak Nexus/Artifactory'ye dağıtılmadığından); özellikle `groupId` zorunlu değildir. Tam da bu nedenle Gradle, Maven çıktısı olarak dağıtılması amaçlanmayan Java uygulamalarının `groupId` değerini atlamasına izin verir.
+
+Dolayısıyla Axelix artık groupId içermeyen projeleri işleyebilir. Bu durumda Axelix, uygulamaların boş bir `groupId` değerine (yani `""`) sahip olduğunu varsayar. Sonuç olarak kuruluşunuzdaki Java mikroservislerinde `groupId` kullanmıyorsanız mikroservis adlarının (`build.gradle.kts` dosyalarınızdaki, `artifactId` olarak çözümlenen `name` özelliğinin) benzersiz olduğundan emin olmalısınız. Adlar benzersiz değilse Axelix Master'ın Spring Boot uygulamalarınızla davranışı tanımsızdır.
+
+## İlgili konular [#related]
+
+- [Axelix derleme eklentisi nedir?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) — eklenti neler üretir ve kayıt neden buna bağlıdır?
+- [Spring Boot Starter'ı yapılandırma](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) — üretilen koordinatları okuyup Master'a bildiren çalışma zamanı bileşeni.

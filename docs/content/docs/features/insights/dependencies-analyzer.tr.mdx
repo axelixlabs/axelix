@@ -1,0 +1,58 @@
+---
+title: Bağımlılık analizörü
+description: "Bağımlılık analizörü, bir Spring Boot örneğinin kullandığı tüm kütüphaneleri gösterir, artık etkin olarak geliştirilmeyen projeleri işaretler ve örneğin Spring Boot sürüm dalının hâlâ OSS güncellemeleri alıp almadığını belirtir."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Bağımlılık analizörünün ana sayfası](/img/feature/dependencies-analyzer/dependencies-analyzer-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Dependencies Analyzer***
+
+Bir uygulama, çoğu geçişli olmak üzere onlarca kütüphane kullanır. Derleme dosyası hangilerinin terk edildiğini veya bakım modunda olduğunu ve artık güvenlik düzeltmesi almayacağını söylemez. Uygulamanın kullandığı Spring Boot sürüm dalının (`3.5.x` gibi bir minör sürüm dalı) hâlâ OSS güncellemeleri alıp almadığını da söylemez. Bağımlılık analizörü belirli bir örnek için her ikisini de gösterir.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açabilir. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfada gösterilenler [#what-the-page-shows]
+
+Önce [Spring Boot destek süresi](https://spring.io/projects/spring-boot#support) gösterilir. Örneğin hangi Spring Boot sürüm dalında çalıştığını, bu dalın [OSS desteğinin](https://spring.io/support-policy) ne zaman sona ereceğini veya erdiğini, ticari desteğin bulunup bulunmadığını, dalın ne kadar süredir OSS desteği dışında olduğunu ve hâlâ desteklenen en yakın dalı gösterir. OSS desteği sona erdiğinde güvenlik yamaları dâhil yeni OSS sürümleri yayımlanmaz: [CVE'ler](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) yalnızca ticari abonelik kapsamında düzeltilir.
+
+Altında çalışma zamanı sınıf yolundaki tüm kütüphaneler, sürümleriyle ve derleme dosyasında doğrudan tanımlanmış mı yoksa geçişli olarak mı gelmiş olduklarıyla listelenir. Artık etkin olarak geliştirilmeyen projeler işaretlenir:
+
+- **Maintenance mode**: özellik geliştirme durmuştur; sürümler yalnızca kritik düzeltmeler için yayımlanır.
+- **Dormant**: uzun zamandır sürüm yayımlanmamıştır, ancak geliştiriciler bir açıklama yapmamıştır. Diğer durumlardan farklı olarak bu, geliştiricilerin açıklaması değil Axelix'in gözlemidir.
+- **Discontinued**: proje sona ermiştir. Güvenlik düzeltmeleri dâhil hiçbir yeni sürüm beklenmez.
+
+Bir kütüphaneyi genişleterek şunları görebilirsiniz:
+
+- Uygulamadan bu kütüphaneye giden yol; yani hangi doğrudan bağımlılığın onu getirdiği.
+- Projesinin durumu.
+- Durumu doğrulayan proje sayfasına bağlantı.
+
+## Nasıl çalışır? [#how-it-works]
+
+[Axelix derleme eklentisi](../../setting-up-spring-boot-service/build-plugin/configuration.mdx), derleme sırasında uygulamanın çalışma zamanı bağımlılık grafiğini CycloneDX SBOM olarak uygulama arşivine yazar. Axelix Spring Boot Starter bu dosyayı Master'a sunar. Sayfayı açtığınızda Master, kütüphaneleri proje kataloğu ve Spring Boot sürüm dallarına ilişkin verileriyle eşleştirir.
+
+Projesi katalogda olmayan bir kütüphane durumsuz gösterilir. Bu, Axelix'in proje hakkında bir iddiada bulunmadığı anlamına gelir; projenin sağlıklı olduğu anlamına gelmez.
+
+Sayfa, Axelix [starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) 1.2.0 veya sonraki sürümleri kullanan örneklerde gösterilir. Eski starter sürümlerinde [Servis profili](../../ui-guide/service-profile.mdx) kenar çubuğunda yer almaz. SBOM, [derleme eklentisinin](../../setting-up-spring-boot-service/build-plugin/configuration.mdx) 1.2.0 veya sonraki sürümünden gelir. Yükseltme için [Axelix'i yükseltme](../../more/upgrading.mdx) sayfasına bakın.
+
+## SBOM'u indirme [#download-the-sbom]
+
+<ReleasedInNotice version="1.3.0" />
+
+Master 1.3.0'dan itibaren örneğin CycloneDX SBOM'unu `dependencies.cdx.json` olarak indirebilirsiniz. Örnekte Axelix starter 1.2.0 veya sonraki sürümü kullanılmalı ve uygulama Axelix derleme eklentisi 1.2.0 veya sonraki sürümüyle derlenmiş olmalıdır. Starter'ı 1.3.0'a yükseltmek gerekmez. Kendi derleme sistemi modülleriniz (Maven / Gradle) grafiğe dâhil edilmez.
+
+Normal bir Gradle veya Maven derlemesi SBOM'u otomatik olarak paketler; ek yapılandırma gerekmez.
+
+Belge henüz lisans verisi içermediğinden lisans/uyumluluk denetimleri için uygun değildir. [Bağımlılık SBOM'u](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx#dependency-sbom-gradle), dosyanın içeriğini açıklar.
+
+
+## Ayrıca bkz. [#see-also]
+
+- [Axelix derleme eklentisinin yapılandırması](../../setting-up-spring-boot-service/build-plugin/configuration.mdx)
+- [Servis profili](../../ui-guide/service-profile.mdx)

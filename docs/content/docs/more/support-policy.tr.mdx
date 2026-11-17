@@ -1,0 +1,63 @@
+---
+title: Destek politikası
+description: "Axelix'in ne sıklıkta yeni sürüm yayımladığı, hangi açık kaynak sürümlerin hâlâ düzeltme aldığı ve bunun ne kadar sürdüğü."
+---
+
+import { SupportTimeline } from './SupportTimeline';
+
+Her Axelix sürüm serisi sınırlı bir süre düzeltme alır. Bu sayfa, yeni sürümlerin ne sıklıkta yayımlandığını,
+şu anda hangi açık kaynak sürümlerin desteklendiğini ve desteğin neleri kapsadığını açıklar.
+
+## Sürüm sıklığı [#release-cadence]
+
+Axelix yaklaşık her **1 ila 1,5 ayda** bir yeni minör veya ana sürüm yayımlar. Her yıl bunlardan biri **ana** sürümdür;
+bu nedenle bir takvim yılında genellikle 8 veya 9 minör sürüm ve bir ana sürüm çıkar.
+
+Bunların arasında desteklenen bir seri **yama sürümleri** de alabilir (`1.2.1`, `1.2.2` vb.). Yama sürümlerinin sabit takvimi
+yoktur; düzeltme hazır olduğunda yayımlanırlar. Her sürüm türünün neleri değiştirebileceği
+[Uyumluluk ve sürümlendirme](./compatibility-and-versioning.mdx#the-pain-index) sayfasında açıklanır.
+
+## Bir sürüm ne kadar süre desteklenir? [#how-long-a-version-is-supported]
+
+Açık kaynak sürümü **yalnızca en son sürüm serisini** destekler. `X.Y` minör serisi, `X.Y.0` yayımlandığı günden bir sonraki
+sürüm (`X.Y+1.0` veya yeni bir ana sürüm) yayımlanana kadar desteklenir. Sürüm sıklığına göre bu genellikle yaklaşık **1,5 aydır**.
+
+Örneğin `1.1.0`, 10 Eylül 2026'da; `1.2.0`, 10 Ekim 2026'da yayımlanmıştır. Dolayısıyla `1.1` serisi o ay boyunca
+desteklenmiştir ve 10 Ekim'den itibaren yalnızca `1.2` desteklenmektedir.
+
+Desteklendiği süre boyunca bir seri şunları alır:
+
+- Hem Axelix'in kendisindeki hem bağımlılıklarındaki güvenlik açıkları için düzeltmeler;
+- Kritik hatalar için düzeltmeler.
+
+Bu düzeltmeler, örneğin `1.2.1` gibi desteklenen serinin yama sürümleri olarak yayımlanır. Yama sürümlerine yeni özellik
+asla eklenmez; bunlar bir sonraki minör sürümü bekler. Destek sona erdikten sonra seri başka yama sürümü almaz;
+bu nedenle orada bulduğunuz bir sorunun çözümü en son sürüme yükseltmektir.
+
+:::note[Destek, uyumluluk değildir]
+Desteğin sona ermesi eski sürümün çalışmayı durduracağı anlamına gelmez. Master,
+[uyumluluk aralığında](./upgrading.mdx#the-compatibility-window) açıklandığı gibi son 4 minör sürümdeki starter'ları
+çalıştıran servislerle çalışmaya devam eder. Destek yalnızca hangi sürümlerin hâlâ düzeltme aldığını belirler.
+:::
+
+## Desteklenen sürümler [#supported-versions]
+
+| Sürüm | İlk yayımlanma | OSS desteğinin sonu |
+|---|---|---|
+| `1.2.x` | 10 Ekim 2026 | Bir sonraki sürüm yayımlandığında |
+| `1.1.x` | 10 Eylül 2026 | 10 Ekim 2026 |
+| `1.0.x` | 29 Temmuz 2026 | 10 Eylül 2026 |
+
+Aşağıdaki grafik aynı aralıkları zaman içinde gösterir. Mevcut serinin bitişi, sürümler arasındaki olağan süreye dayalı
+bir tahmindir ve gerçek yayımlanma tarihiyle birlikte değişir.
+
+<SupportTimeline locale="tr" />
+
+Desteklenen bir sürümde kalmak için her yeni minör sürüme yükseltin. Adımlar [Axelix'i yükseltme](./upgrading.mdx)
+sayfasında açıklanır.
+
+## Ayrıca bakın [#see-also]
+
+- [Uyumluluk ve sürümlendirme](./compatibility-and-versioning.mdx)
+- [Axelix'i yükseltme](./upgrading.mdx)
+- [Dal modeli](./development/branching-model.mdx)

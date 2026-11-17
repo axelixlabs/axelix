@@ -1,0 +1,52 @@
+---
+title: Spring Portfolio
+description: "Spring Portfolio panosu, servislerdeki uygulamaların hangi Spring Boot ve Spring Framework sürümlerini kullandığını ve kaçının OSS desteğinin sona erdiğini gösterir."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix'in en son minör sürümünü gösterir.">
+
+![Spring Portfolio panosu](/img/feature/dashboard/dashboard-spring-portfolio.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzündeki Spring Portfolio***
+
+Her Spring Boot ve Spring Framework serisinin (`3.5.x` gibi bir minör sürüm dalı) sınırlı bir
+[OSS destek](https://spring.io/support-policy) süresi vardır. Bu süre dolduğunda güvenlik düzeltmeleri dahil topluluk sürümleri
+yayımlanmaz; yeni [CVE'ler](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) yalnızca ticari abonelik kapsamında
+düzeltilir. Düzinelerce uygulamada hangilerinin bu tarihi geçtiğini ve sırada hangilerinin olduğunu anlamak zordur.
+Spring Portfolio tüm uygulamalar için bu soruyu tek seferde yanıtlar.
+
+Sayfa salt okunurdur ve kimliği doğrulanmış her kullanıcıya açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN**
+sayfayı açabilir. Tam rol/yetki matrisi için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfa neleri gösterir? [#what-the-page-shows]
+
+Üstteki özet, toplam uygulama sayısını ve kaçının OSS destek süresinin sona erdiğini gösterir. Bir uygulama ancak hem
+Spring Boot hem de Spring Framework OSS güncellemeleri almaya devam ediyorsa destekleniyor sayılır.
+
+Alt bölümde Spring Boot ve Spring Framework ayrı ayrı gösterilir. Her biri için şunları görebilirsiniz:
+
+- OSS destekli bir seride kaç uygulamanın çalıştığı.
+- Uygulamaların ana sürümlere ve `3.5.x` gibi serilere dağılımı.
+- Her serinin hâlâ OSS güncellemesi alıp almadığı.
+
+Son bölüm, kullanılan her serinin OSS destek süresini zaman çizelgesinde gösterir: yayımlanma tarihi, OSS desteğinin
+biteceği veya bittiği tarih ve bu seride çalışan uygulama sayısı. Böylece sıradaki serilerin destek dışı kalmasına ne kadar
+süre kaldığını görebilirsiniz.
+
+## Nasıl çalışır? [#how-it-works]
+
+Master her uygulamanın Spring Boot ve Spring Framework sürümlerini günde bir kez kaydeder ve en son kaydı kullanır.
+Kaç örneği olursa olsun her uygulama bir kez sayılır. Raporlamayı durduran uygulama, son bildirdiği sürümlerle sayfada kalır.
+
+Destek tarihleri, örneğin [Spring Boot destek süresi](https://spring.io/projects/spring-boot#support) gibi Spring ekibinin
+yayımladığı takvimlerden alınır.
+
+## Ayrıca bakın [#see-also]
+
+- [Dependencies Analyzer](../../features/insights/dependencies-analyzer.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Axelix'i yükseltme](../../more/upgrading.mdx)

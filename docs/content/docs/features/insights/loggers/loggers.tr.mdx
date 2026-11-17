@@ -1,0 +1,99 @@
+---
+title: Günlük kaydediciler
+description: "Günlük kaydediciler sayfası, bir Spring Boot örneğindeki her günlük kaydedicinin ve günlük kaydedici grubunun günlük düzeyini gösterir; düzeyi çalışma zamanında kalıcı olarak veya sınırlı bir süre için değiştirmenizi sağlar."
+---
+
+import {TargetThemeIcon} from './TargetThemeIcon';
+import { INFO, DEBUG, WARN } from './StatePaletteForLoggingLevel';
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![Günlük kaydedicilerin ana sayfası](/img/feature/loggers/loggers-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Loggers sayfası***
+
+Çalışan bir servisteki sorunu incelemek için sıklıkla belirli bir bölümden daha ayrıntılı günlükler gerekir. Günlük kaydediciler sayfası, yapılandırmayı değiştirmeden veya servisi yeniden başlatmadan bir günlük kaydedicinin günlük ayrıntı düzeyini hemen artırmanızı ve sonra geri almanızı sağlar.
+
+Sayfa kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açabilir, düzeyleri değiştirebilir ve sıfırlayabilir. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+## Sayfada gösterilenler [#what-the-page-shows]
+
+Sayfa, örneğin tüm günlük kaydedicilerini ve günlük kaydedici gruplarını geçerli düzeyleriyle listeler. Bir düzeyin yanındaki hedef işareti <TargetThemeIcon />, düzeyin uygulama yapılandırmasında veya Axelix'te bu günlük kaydedici ya da grup için açıkça ayarlandığını belirtir. İşaretsiz düzey üst günlük kaydediciden devralınır.
+
+Şunların düzeyini değiştirebilirsiniz:
+
+- Bir günlük kaydedicinin. Kendi düzeyi olmayan alt günlük kaydediciler yeni düzeyi devralır: `com.axelixlabs.axelix` düzeyini <INFO /> yerine <DEBUG /> yaptığınızda `com.axelixlabs.axelix.sbs` de <DEBUG /> düzeyine geçer.
+- Bir günlük kaydedici grubunun. Düzey gruptaki tüm günlük kaydedicilere uygulanır: `web` grubunu <WARN /> olarak ayarlamak tüm günlük kaydedicilerini <WARN /> düzeyine getirir.
+
+Sıfırlama düğmesi <Image src="/img/feature/loggers/reset.svg" alt="sıfırlama simgesi" width={20} height={20}/>, günlük kaydediciyi ilk Axelix değişikliğinden önceki (son sıfırlamadan itibaren) yapılandırılmış düzeyine döndürür. Çalışma zamanında bu sayfadan, MCP üzerinden veya `axelix-loggers` Actuator uç noktasına doğrudan istekle değiştirilen günlük kaydedicilerde çalışır. Günlük kaydedici grupları sıfırlanamaz.
+
+## Birden fazla örnekte düzey değiştirme [#change-levels-on-several-instances]
+
+<ReleasedInNotice version="1.3.0" />
+
+Uygulama birden fazla replika olarak çalıştığında aynı sorun genellikle hepsinde görülür ve günlük ayrıntı düzeyini her replikada tek tek artırmak yavaştır. Değişikliğin uygulamanın hangi örneklerine uygulanacağını seçmek için arama alanının yanındaki **Instances** düğmesini açın. Liste her örneği commit bilgisi ve durumuyla gösterir; örneğin yalnızca aynı derlemeyi çalıştıran replikaları seçebilirsiniz.
+
+Açtığınız örnek her zaman seçilidir ve seçimi kaldırılamaz. Diğer örnekleri tek tek işaretleyin veya **Select all other instances** seçeneğini kullanın. Düğme seçili örnek sayısını, tüm örnekler seçiliyse **All** ifadesini gösterir.
+
+Seçim sayfadaki tüm değişiklikler için geçerlidir: günlük kaydedici düzeyi, geçici düzey, günlük kaydedici grubu düzeyi ve sıfırlama. Seçili örneklerden bazılarına ulaşılamazsa değişiklik yine diğerlerine uygulanır. Sayfa her zaman açtığınız örneğin düzeylerini gösterir.
+
+Seçici yalnızca uygulamanın birden fazla örneği varsa görünür. Başka bir örneğe geçtiğinizde seçim geçerli örneğe sıfırlanır.
+
+## Geçici günlük düzeyi [#temporary-logging-level]
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+<Image src="/img/feature/loggers/loggers-edit-time-level-page.png" alt="geçici günlük düzeyi penceresi" width={304} height={380}/>
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde geçici günlük düzeyi ayarlama***
+
+Yalnızca bir süre için, örneğin bir hatayı yakalamak amacıyla ayrıntılı günlükler gerektiğinde geçici bir düzey ayarlayın; kapatmayı düşünmeniz gerekmez. Günlük kaydedicinin yanındaki zamanlayıcı simgesine tıklayın, düzeyi ve biteceği saati seçin. Seçtiğiniz saat bugün için geçmişse düzey yarın aynı saate kadar korunur.
+
+Süre dolduğunda günlük kaydedici, ilk Axelix değişikliğinden önceki (son sıfırlamadan itibaren) yapılandırılmış düzeyine döner. Geçici düzeyi erken sonlandırmak için günlük kaydediciyi sıfırlayın. Günlük kaydedici grupları için geçici düzeyler kullanılamaz.
+
+## MCP araçları [#mcp-tools]
+
+Günlük kaydedici ağacını okuma ve çalışma zamanında düzey değiştirme (tek bir günlük kaydedici, bir günlük kaydedici grubu veya tek bir günlük kaydediciyi sıfırlama) işlemleri MCP aracılığıyla yapay zekâ ajanlarına da sunulur. [MCP araçları kataloğuna](../../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers) bakın.
+
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-loggers` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-loggers
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-loggers
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Master yapılandırması](../../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

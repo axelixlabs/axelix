@@ -1,0 +1,108 @@
+---
+title: İş parçacığı dökümü
+description: "İş parçacığı dökümü sayfası, yönetilen Spring Boot örneğindeki tüm iş parçacıklarının canlı bir anlık görüntüsünü gösterir. Sayfa örneği düzenli olarak sorguladığından liste, iş parçacığı durumları ve zaman çizelgesi sabit bir kayıt yerine JVM’nin yakın zamandaki durumunu yansıtır."
+---
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![İş parçacığı dökümünün ana sayfası](/img/feature/thread-dump/thread-dump-main-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Thread Dump sayfası***
+
+Sayfa kimliği doğrulanmış tüm kullanıcılara açıktır: **VIEWER**, **EDITOR**, **ADMIN** ve **SUPER_ADMIN** sayfayı açabilir ve **Thread Contention Monitoring** özelliğini açıp kapatabilir. Rol/yetki matrisinin tamamı için [Roller ve yetkiler](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+Sayfanın üst kısmında üç kontrol bulunur:
+
+- İş parçacığı listesini ada göre filtreleyen bir **arama** alanı; yanındaki sayaç `<matching> / <total>` gösterir.
+- **Thread Contention Monitoring** anahtarını içeren bir pencere açan **Settings** <Image src="/img/feature/icons/settings-icon.png" alt="ayarlar simgesi" width={20} height={20}/> düğmesi (aşağıdaki [Ayarlar](#settings) bölümüne bakın).
+- İncelemek istediğiniz anı seçmenizi sağlayan kayan bir **zaman çizelgesi**; burada aralık seçmek aşağıdaki iş parçacığı ayrıntılarını belirler.
+
+İş parçacıkları JVM önceliğine göre sıralanır ve akordeonlar şeklinde gösterilir. Her akordeon başlığı iş parçacığının adını, geçerli durumunu ve renkle kodlanmış durum göstergesini içerir (aşağıdaki [İş parçacığı durum renkleri](#thread-state-colors) bölümüne bakın).
+
+## İş parçacığı dökümü ayrıntıları [#thread-dump-details]
+
+<ScreenshotsNotice text="Ekran görüntüleri Axelix’in en son minör sürümünü gösterir.">
+
+![İş parçacığı dökümünün ayrıntı sayfası](/img/feature/thread-dump/thread-dump-details-page.png)
+
+</ScreenshotsNotice>
+
+***Axelix arayüzünde Thread Dump ayrıntıları***
+
+Zaman çizelgesinde seçilen aralığa ait ayrıntılı anlık görüntüyü görmek için bir iş parçacığını genişletin:
+
+- **Thread id**: JVM tarafından atanan iş parçacığı tanımlayıcısı.
+- **Thread name**: iş parçacığının adı.
+- **Thread state**: JVM iş parçacığı durumu (`RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED`, …).
+- **Priority**: JVM iş parçacığı önceliği.
+- **Blocked count**: iş parçacığının toplam kaç kez bloklandığı.
+- **Blocked time**: iş parçacığının bloklanmış durumda geçirdiği süre, milisaniye cinsinden. Yalnızca **Thread Contention Monitoring** açıkken doldurulur; aksi durumda *Not Available* gösterilir.
+- **Waited count**: iş parçacığının bildirim beklemek için beklemeye geçtiği toplam sayı.
+- **Waited time**: iş parçacığının bekleyerek geçirdiği süre, milisaniye cinsinden. Yalnızca **Thread Contention Monitoring** açıkken doldurulur; aksi durumda *Not Available* gösterilir.
+- **Daemon**: iş parçacığının daemon olup olmadığı.
+- **Locked by**: varsa iş parçacığının beklediği kilit nesnesi hakkındaki bilgiler:
+    - **Class**: kilit nesnesinin tam nitelikli sınıf adı.
+    - **Identity hash code**: kilit nesnesinin kimlik hash kodu.
+- **Stacktrace**: seçili anda kaydedilen yığın izi.
+
+### İş parçacığı durum renkleri [#thread-state-colors]
+
+| Gösterge | Durum |
+|:---------:|-------|
+| <Image src="/img/feature/thread-dump/running-green-state.png" width={25} height={25}/> | RUNNABLE |
+| <Image src="/img/feature/thread-dump/running-blue-state.png" width={25} height={25}/> | RUNNABLE (native) |
+| <Image src="/img/feature/thread-dump/waiting-yellow-state.png" width={25} height={25}/> | WAITING |
+| <Image src="/img/feature/thread-dump/waiting-orange-state.png" width={25} height={25}/> | WAITING (suspended) |
+| <Image src="/img/feature/thread-dump/timed-waiting-orange-state.png" width={25} height={25}/> | TIMED_WAITING |
+| <Image src="/img/feature/thread-dump/blocked-red-state.png" width={25} height={25}/> | BLOCKED |
+| <Image src="/img/feature/thread-dump/terminated-grey-state.png" width={25} height={25}/> | TERMINATED |
+| <Image src="/img/feature/thread-dump/other-purple-state.png" width={25} height={25}/> | diğer |
+
+## Ayarlar [#settings]
+
+<Image src="/img/feature/icons/settings-icon.png" alt="ayarlar simgesi" width={20} height={20}/> düğmesine tıklamak, tek bir anahtar içeren bir pencere açar:
+
+- **Thread Contention Monitoring** — örneğin `ThreadMXBean` bileşeninde JMX kilit çekişmesi izlemeyi etkinleştirir. Açıkken JVM her iş parçacığının **BLOCKED**, **WAITING** ve **TIMED_WAITING** durumlarında geçirdiği süreyi izleyerek yukarıdaki `Blocked time` ve `Waited time` alanlarını doldurur. Kapalıyken yalnızca bu iki süre alanı *Not Available* gösterir. `Blocked count` ve `Waited count` bu ayardan bağımsız olarak kullanılabilir.
+
+Kilit çekişmesi izleme JVM'de ölçülebilir bir ek yük oluşturduğundan, üretim örneklerinde genellikle kapalı tutulur ve yalnızca belirli bir inceleme sırasında açılır.
+
+
+## Özel Actuator uç noktasını etkinleştirme [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Axelix 1.2.0 veya sonraki bir sürümü kullanıyorsanız bunların hiçbiri gerekmez: starter kendi özel Actuator
+    uç noktalarını kendisi kaydeder ve Axelix artık <code>health</code>/<code>info</code> uç noktalarının etkinleştirilmesini
+    gerektirmez; onlar olmadan da sorunsuz çalışır. Burada yapılandırma gerekmez.</>}
+/>
+
+Bu sayfa, Axelix Spring Boot Starter tarafından sağlanan `axelix-thread-dump` Actuator uç noktasını kullanır. Standart Spring Boot Actuator özellikleriyle bu uç noktasını erişime açın. Axelix uç noktalarının tam listesi ve ilgili kurulum için [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) sayfasına bakın:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-thread-dump
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-thread-dump
+```
+
+  </Tab>
+</Tabs>
+
+## Ayrıca bkz. [#see-also]
+
+- [Master yapılandırması](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter yapılandırması](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)
