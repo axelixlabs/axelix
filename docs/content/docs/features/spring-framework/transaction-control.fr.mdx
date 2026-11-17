@@ -78,12 +78,11 @@ Consultez [Applications réactives
 
 ## Exposer l’endpoint de métadonnées
 
-La page ne s’appuie pas sur un endpoint Actuator dédié. L’Axelix Spring Boot Starter agrège les informations sur les
-transactions dans la JVM et les envoie à Master dans les métadonnées d’enregistrement de l’instance : la même charge
-utile que celle exposée par l’endpoint `axelix-metadata` que Master interroge déjà. Tant que `axelix-metadata` est
-exposé (voir [Exposition des endpoints sur Axelix avant
-1.2.0](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposition-des-endpoints-avant-axelix-120)),
-cette page fonctionne sans endpoint supplémentaire à activer.
+Il n’existe pas d’endpoint Actuator propre aux transactions. Les premières informations sur les transactions sont incluses dans les métadonnées d’enregistrement de l’instance, exposées via `axelix-metadata` lorsque Master découvre l’instance.
+
+Pour les starters à partir de 1.3.0, Master interroge `axelix-ping` pour obtenir les mises à jour suivantes des transactions. Les instances auto-enregistrées transmettent ces mises à jour dans leurs heartbeats à la place. Pour les starters plus anciens, Master continue de lire les métadonnées d’enregistrement complètes.
+
+Pour l’interrogation par Master, exposez `axelix-metadata` et, pour les starters à partir de 1.3.0, `axelix-ping`. Le starter expose automatiquement ses propres endpoints depuis 1.2.0 ; consultez [Exposition des endpoints sur Axelix avant 1.2.0](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposition-des-endpoints-avant-axelix-120) pour les versions antérieures. Aucun endpoint supplémentaire propre aux transactions n’est nécessaire.
 
 ## Voir aussi
 

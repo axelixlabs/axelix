@@ -1,0 +1,151 @@
+---
+title: Details
+description: "Die Seite Details liefert Informationen über eine verwaltete Spring Boot-Anwendungsinstanz. Sie zeigt technische Metadaten, Laufzeitinformationen und Build-Details in übersichtlicher, leicht lesbarer Form."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Hauptseite der Instanzdetails](/img/feature/details/details-main-page.png)
+
+</ScreenshotsNotice>
+
+***Details in der Axelix-Benutzeroberfläche***
+
+Alle authentifizierten Benutzer, **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**, können die Seite öffnen und den
+Export **Download state** auslösen. Für die Dateien mit Umgebungs- und Konfigurationseigenschaften im exportierten
+Archiv gilt weiterhin die berechtigungsabhängige Maskierung der jeweiligen Seite: Aufrufer ohne
+`environment.values:read` / `config-properties.values:read` erhalten für diese Werte `******`. Die vollständige
+Rollen- und Berechtigungsmatrix finden Sie unter
+[Rollen und Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Innerer Kopfbereich mit Dienstinformationen
+
+- **Instance Name**: der Name der Anwendungsinstanz. Der Suffix kann je nach Laufzeit- und Erkennungsumgebung von
+  Axelix Master variieren.
+- **Download state**: exportiert den Zustand der Instanz als einzelne `.zip`-Datei, damit Sie ein Problem später
+  analysieren oder die Datei einem Fehlerbericht beifügen können.
+
+### Bestandteile von Download state
+
+Im Dialog wählen Sie die einzuschließenden Bestandteile aus. Sie sind in **JVM** und **Spring** gruppiert:
+
+- **Heap Dump**: jedes Objekt im Arbeitsspeicher als `.hprof`-Datei. Für Speicherlecks.
+- **Thread Dump**: Stacktraces aller Threads. Für Hänger und Ressourcenkonflikte.
+- **Beans**: alle Beans mit Scope, Typ und Abhängigkeiten.
+- **Caches**: Cache-Manager und Caches.
+- **Conditions**: warum die jeweilige automatische Konfiguration angewendet wurde oder nicht.
+- **Configuration Properties**: `@ConfigurationProperties`-Beans und ihre gebundenen Werte, mit maskierten vertraulichen Werten.
+- **Environment**: Eigenschaftsquellen nach Priorität, mit maskierten vertraulichen Werten.
+- **Scheduled Tasks**: Cron-, Fixed-rate- und Fixed-delay-Aufgaben.
+
+Vor dem Herunterladen zeigt der Dialog die geschätzte Archivgröße. Jeder Bestandteil außer dem Heap-Dump ist kleiner
+als 1 MB. Der Heap-Dump ist ungefähr so groß wie der belegte Heap, häufig mehrere Hundert MB. Während er geschrieben
+wird, reagiert die Anwendung nicht. Er enthält außerdem den gesamten Speicherinhalt einschließlich Passwörtern und
+Tokens. Bewahren Sie ihn deshalb wie Zugangsdaten auf.
+
+#### Zugriff auf Heap-Dumps
+
+<ReleasedInNotice version="1.3.0" />
+
+Ab Axelix 1.3.0 erfordert der Export eines Heap-Dumps als Teil des Anwendungszustands die Berechtigung `heap-dump:read`.
+Ohne diese ist die Option deaktiviert, die anderen Bestandteile können Sie jedoch weiterhin exportieren. `ADMIN` und
+`SUPER_ADMIN` besitzen diese Berechtigung standardmäßig.
+
+## Git-Informationen
+
+Zeigt Metadaten der Versionsverwaltung, sofern verfügbar:
+
+| Feld | Beschreibung | Beispiel |
+|------|--------------|----------|
+| **Commit SHA** | Kurzer Commit-Hash | `a1b2c3d` |
+| **Branch** | Name des Git-Branches | `main` |
+| **Commit's Author** | Name des Commit-Autors | `John Doe` |
+| **Author's Email** | E-Mail-Adresse des Commit-Autors | `john@example.com` |
+| **Commit's Timestamp** | Zeitpunkt des Commits | `2024-01-15T10:15:30Z` |
+
+## Build-Informationen
+
+Zeigt Details zum Anwendungs-Build, sofern verfügbar:
+
+| Feld | Beschreibung | Beispiel |
+|------|--------------|----------|
+| **Artifact ID** | Maven-/Gradle-Artefakt-ID | `spring-petclinic` |
+| **Version** | Anwendungsversion | `3.2.0` |
+| **Group ID** | Projekt-Gruppen-ID | `org.springframework.samples` |
+| **Build Timestamp** | Zeitpunkt des Anwendungs-Builds | `2024-01-15T14:30:22Z` |
+
+## Informationen zur Laufzeitumgebung
+
+Detaillierte Java- und Laufzeitinformationen:
+
+| Feld | Beschreibung | Beispiel |
+|------|--------------|----------|
+| **Java** | JVM-Version | `17.0.17` |
+| **Kotlin** | Kotlin-Version <br/> (wenn die Instanz Kotlin verwendet) | `1.9.22` |
+| **JDK Vendor** | Anbieter der Java-Distribution | `Liberica`, `OpenJDK`, `Amazon Corretto` |
+| **Garbage Collector** | Aktiver GC der Anwendung | `G1`, `ZGC`, `GEN_SHENADOAH`, `EPSILONGC` |
+
+## Spring Framework-Details
+
+Versionen des Spring-Ökosystems:
+
+| Feld | Beschreibung | Beispiel |
+|------|--------------|----------|
+| **Spring Boot** | Version von Spring Boot | `3.3.0` |
+| **Spring Framework** | Version des Spring Framework-Kerns | `6.2.0` |
+| **Spring Cloud** | Spring Cloud-Version, falls verwendet | `2023.0.0` |
+
+## Betriebssysteminformationen
+
+Systeminformationen:
+
+| Feld | Beschreibung | Beispiel |
+|------|--------------|----------|
+| **OS Family** | Name des Betriebssystems | `Linux`, `Windows Server` |
+| **Kernel Version** | Betriebssystemversion | `6.12.96`, `2022` |
+| **CPU Architecture** | CPU-Architektur | `amd64`, `arm64` |
+| **PID** | Kennung des Anwendungsprozesses | `1` |
+| **Process User** | Betriebssystembenutzer, unter dem der Anwendungsprozess läuft | `root`, `app` |
+
+**PID** und **Process User** erscheinen ab Axelix 1.3.0. Ein als `root` laufender Prozess in einem Container verdient
+einen genaueren Blick, da er mehr Rechte hat, als die Anwendung benötigt.
+
+## Dedizierten Actuator-Endpunkt aktivieren
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Ab Axelix 1.2.0 ist dies nicht mehr erforderlich: Der Starter registriert seine eigenen Actuator-Endpunkte
+    selbst, und Axelix benötigt keine aktivierten <code>health</code>/<code>info</code>-Endpunkte mehr.
+    Es funktioniert auch ohne diese Endpunkte. Hier ist keine Konfiguration erforderlich.</>}
+/>
+
+Diese Seite verwendet den Actuator-Endpunkt `axelix-details`, den der Axelix Spring Boot Starter bereitstellt.
+Geben Sie ihn über die üblichen Spring Boot Actuator-Eigenschaften frei. Die vollständige Liste der Axelix-Endpunkte
+und die zugehörige Einrichtung finden Sie unter [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-details
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-details
+```
+
+  </Tab>
+</Tabs>
+
+## Siehe auch
+
+- [Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

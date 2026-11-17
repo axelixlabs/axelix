@@ -1,0 +1,125 @@
+---
+title: Logger
+description: "Die Seite Loggers zeigt die Protokollstufe aller Logger und Logger-Gruppen einer Spring Boot-Instanz und ermöglicht es, sie zur Laufzeit dauerhaft oder befristet zu ändern."
+---
+
+import {TargetThemeIcon} from './TargetThemeIcon';
+import { INFO, DEBUG, WARN } from './StatePaletteForLoggingLevel';
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+![Hauptseite der Logger](/img/feature/loggers/loggers-main-page.png)
+
+</ScreenshotsNotice>
+
+***Loggers in der Axelix-Benutzeroberfläche***
+
+Zur Untersuchung eines Problems in einem laufenden Dienst benötigen Sie oft detailliertere Protokolle aus einem
+bestimmten Teil des Dienstes. Auf der Seite Loggers können Sie die Protokollstufe eines Loggers sofort erhöhen, ohne
+Konfigurationsänderung oder Neustart, und sie anschließend wieder zurücksetzen.
+
+Alle authentifizierten Benutzer, **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**, können die Seite öffnen,
+Protokollstufen ändern und zurücksetzen. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter
+[Rollen und Berechtigungen](../../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Die Seite listet alle Logger und Logger-Gruppen der Instanz mit ihrer aktuellen Stufe auf. Eine Zielmarkierung
+<TargetThemeIcon /> neben einer Stufe bedeutet, dass diese ausdrücklich für den Logger oder die Gruppe festgelegt
+wurde, in der Anwendungskonfiguration oder in Axelix. Eine Stufe ohne Markierung wird von einem übergeordneten Logger geerbt.
+
+Sie können die Stufe ändern:
+
+- Für einen Logger. Seine untergeordneten Logger ohne eigene Stufe erben den neuen Wert: Wenn Sie
+  `com.axelixlabs.axelix` von <INFO /> auf <DEBUG /> ändern, wechselt auch `com.axelixlabs.axelix.sbs` auf <DEBUG />.
+- Für eine Logger-Gruppe. Die Stufe gilt für jeden Logger der Gruppe: Wenn Sie die Gruppe `web` auf <WARN /> setzen,
+  gilt <WARN /> für alle ihre Logger.
+
+Die Schaltfläche zum Zurücksetzen <Image src="/img/feature/loggers/reset.svg" alt="Zurücksetzen" width={20} height={20}/>
+stellt die Stufe wieder her, die der Logger vor Ihrer ersten Änderung in Axelix hatte. Dies funktioniert bei zur
+Laufzeit geänderten Loggern: auf dieser Seite, über MCP oder durch eine direkte Anfrage an den Actuator-Endpunkt
+`axelix-loggers`. Logger-Gruppen können nicht zurückgesetzt werden.
+
+## Stufen auf mehreren Instanzen ändern
+
+<ReleasedInNotice version="1.3.0" />
+
+Wenn eine Anwendung mit mehreren Repliken läuft, tritt dasselbe Problem meist auf allen auf. Die Stufe auf jeder
+Replik einzeln zu erhöhen, ist langsam. Öffnen Sie **Instances** neben dem Suchfeld, um die Instanzen auszuwählen,
+auf die eine Änderung angewendet wird. Die Liste zeigt jede Instanz mit Commit und Status. So können Sie beispielsweise
+nur Repliken desselben Builds auswählen.
+
+Die geöffnete Instanz ist immer ausgewählt und kann nicht abgewählt werden. Wählen Sie weitere Instanzen einzeln oder
+über **Select all other instances** aus. Die Schaltfläche zeigt die Anzahl ausgewählter Instanzen oder **All**, wenn
+alle ausgewählt sind.
+
+Die Auswahl gilt für jede Änderung auf der Seite: eine Logger-Stufe, eine befristete Stufe, eine Logger-Gruppenstufe
+und das Zurücksetzen. Sind einige ausgewählte Instanzen nicht erreichbar, wird die Änderung trotzdem auf die übrigen
+angewendet. Die Seite selbst zeigt immer die Stufen der geöffneten Instanz.
+
+Die Auswahl erscheint nur, wenn die Anwendung mehrere Instanzen hat. Beim Wechsel zu einer anderen Instanz wird sie
+auf die aktuelle Instanz zurückgesetzt.
+
+## Befristete Protokollstufe
+
+<ScreenshotsNotice text="Die Screenshots zeigen die neueste Minor-Version von Axelix.">
+
+<Image src="/img/feature/loggers/loggers-edit-time-level-page.png" alt="Dialog für befristete Protokollstufe" width={304} height={380}/>
+
+</ScreenshotsNotice>
+
+***Befristete Protokollstufe in der Axelix-Benutzeroberfläche festlegen***
+
+Wenn Sie ausführliche Protokolle nur vorübergehend benötigen, etwa um einen Fehler zu erfassen, legen Sie eine
+befristete Stufe fest. Sie müssen dann nicht an das Abschalten denken. Klicken Sie auf das Timer-Symbol neben dem
+Logger und wählen Sie Stufe und Endzeit aus. Ist diese Uhrzeit heute bereits vergangen, bleibt die Stufe bis zu
+dieser Uhrzeit am nächsten Tag aktiv.
+
+Nach Ablauf kehrt der Logger zu seiner vorherigen Stufe zurück. Um die befristete Stufe früher zu beenden, setzen Sie
+den Logger zurück. Für Logger-Gruppen sind befristete Stufen nicht verfügbar.
+
+## MCP-Tools
+
+KI-Agenten können den Logger-Baum lesen und Stufen zur Laufzeit ändern, für einen einzelnen Logger oder eine
+Logger-Gruppe, sowie einzelne Logger zurücksetzen. Siehe den
+[MCP-Tool-Katalog](../../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers).
+
+## Dedizierten Actuator-Endpunkt aktivieren
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Ab Axelix 1.2.0 ist dies nicht mehr erforderlich: Der Starter registriert seine eigenen Actuator-Endpunkte
+    selbst, und Axelix benötigt keine aktivierten <code>health</code>/<code>info</code>-Endpunkte mehr.
+    Es funktioniert auch ohne diese Endpunkte. Hier ist keine Konfiguration erforderlich.</>}
+/>
+
+Diese Seite verwendet den Actuator-Endpunkt `axelix-loggers`, den der Axelix Spring Boot Starter bereitstellt.
+Geben Sie ihn über die üblichen Spring Boot Actuator-Eigenschaften frei. Die vollständige Liste der Axelix-Endpunkte
+und die zugehörige Einrichtung finden Sie unter [Spring Boot Starter konfigurieren](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-loggers
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-loggers
+```
+
+  </Tab>
+</Tabs>
+
+## Siehe auch
+
+- [Master konfigurieren](../../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Spring Boot Starter konfigurieren](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

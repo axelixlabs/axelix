@@ -1,0 +1,52 @@
+---
+title: MCP
+description: "Die MCP-Seite listet alle Werkzeuge auf, die Axelix Master über seinen integrierten Model-Context-Protocol-Server bereitstellt. Jede Karte entspricht einem Werkzeug, das ein über MCP verbundener KI-Agent für eine registrierte Spring-Boot-Instanz aufrufen kann."
+---
+
+## Wann der MCP-Tab erscheint
+
+Der Navigationslink **MCP** erscheint nur, wenn der MCP-Server in Master aktiviert ist. Dies steuert die Eigenschaft `axelix.master.mcp-server.enabled`, deren Standardwert `true` ist. Bei deaktiviertem Server ist der Link verborgen und `/mcp-server` nicht erreichbar. Siehe [MCP-Server-Konfiguration](../setting-up-master-ui/configuring-master/configuring-master.mdx#mcp-server).
+
+Der MCP-Server authentifiziert KI-Agenten getrennt von der Browsersitzung. Zugangsdaten, die unterstützten Verfahren `Basic` und `Bearer` sowie Berechtigungen pro Werkzeug behandelt die [MCP-Server-Authentifizierung](../setting-up-master-ui/authentication/authentication.mdx#authentifizierung-am-mcp-server). Diese Seite beschreibt ausschließlich den schreibgeschützten Katalog in der Oberfläche; sie ändert nicht, welche Werkzeuge ein Agent aufrufen darf.
+
+## Der Werkzeugkatalog
+
+Der Katalog besteht aus einem Kartenraster. Das Suchfeld oben filtert die Karten nach Titel; der Zähler rechts zeigt `<matches> / <total>`. Die Suche findet Teilzeichenfolgen an beliebiger Stelle des Werkzeugtitels und ignoriert Groß-/Kleinschreibung.
+
+Jede Karte hat dieselben drei Bereiche:
+
+- **Kopfbereich** mit Werkzeugtitel und farbigem Statuspunkt: grün, wenn das Werkzeug beim MCP-Server registriert ist, rot, wenn es aktuell nicht verfügbar ist.
+- **Beschreibung**: der kurze Beschreibungstext für MCP-Clients. Lange Texte werden auf eine feste Höhe begrenzt; beim Darüberfahren erscheint der vollständige Text als Tooltip.
+- **Fußbereich** mit Annotations-Tags; siehe [Werkzeugannotationen](#werkzeugannotationen).
+
+## Werkzeugannotationen
+
+Jedes Werkzeug deklariert vier boolesche Hinweise auf die bei einem Aufruf erwartbaren Nebenwirkungen. Der Kartenfuß zeigt zwei davon direkt und alle vier in einem Popover.
+
+**Direkt sichtbare Tags**:
+
+- **Read-only**: Das Werkzeug verändert keinen Zustand in der Zielinstanz von Spring Boot.
+- **Idempotent**: Mehrere Aufrufe mit denselben Argumenten haben dieselbe Wirkung wie ein einzelner Aufruf.
+
+Ein Tag ist grün bei <code style={{color: 'green'}}>true</code> und orange bei <code style={{color: 'orange'}}>false</code>. Der sichtbare Wert ist eine Selbstauskunft des Werkzeugs, keine Garantie für das tatsächliche Verhalten des zugrunde liegenden Endpunkts.
+
+**Popover mit allen Annotationen**: Klicken Sie auf die Menüschaltfläche rechts im Fußbereich, um alle vier Hinweise mit ihren booleschen Werten zu sehen:
+
+- **Read-only**: Das Werkzeug verändert keinen Zustand in der Zielinstanz von Spring Boot.
+- **Idempotent**: Mehrere Aufrufe mit denselben Argumenten haben dieselbe Wirkung wie ein einzelner Aufruf.
+- **Destructive**: Das Werkzeug kann Daten löschen oder andere Änderungen ausführen, die über die Oberfläche nicht rückgängig gemacht werden können.
+- **Open-world**: Das Werkzeug greift auf Ressourcen außerhalb von Master und den registrierten Spring-Boot-Instanzen zu, beispielsweise über einen externen HTTP-Aufruf.
+
+## Was diese Seite nicht bietet
+
+Die MCP-Seite dient zum Erkunden, nicht zum Ausführen von Werkzeugen. Hier können Sie nicht:
+
+- Ein Werkzeug für eine Spring-Boot-Instanz aufrufen; dies erfolgt über Ihren MCP-Client (Claude Desktop, Cursor, einen eigenen Agenten usw.).
+- Einzelne Werkzeuge aktivieren oder deaktivieren; der Katalog zeigt die beim Start von Master registrierten Werkzeuge.
+- Frühere Aufrufe oder werkzeugspezifische Metriken einsehen.
+
+Richten Sie Ihren MCP-Client auf `<master-base-url>/api/mcp` und authentifizieren Sie sich wie unter [MCP-Server-Authentifizierung](../setting-up-master-ui/authentication/authentication.mdx#authentifizierung-am-mcp-server) beschrieben.
+
+:::info
+Ein **Access Log** für MCP-Werkzeugaufrufe ist geplant und wird mit Axelix Enterprise verfügbar sein. Sowohl das Access Log als auch Axelix Enterprise selbst befinden sich noch in Entwicklung. Die MCP-Seite bleibt vorerst ein schreibgeschützter Katalog ohne Verlauf oder werkzeugspezifische Metriken.
+:::

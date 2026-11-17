@@ -329,7 +329,7 @@ The starter exposes the following endpoints:
     </tr>
     <tr>
         <td><code>axelix-ping</code></td>
-        <td>Health, memory, and transaction data Master polls for instances it already knows</td>
+        <td>Health, memory, and transaction updates Master polls for already known, automatically discovered instances. Required for polling; self-registered instances push heartbeat updates instead.</td>
         <td><code>1.3.0</code></td>
     </tr>
     <tr>
@@ -532,10 +532,7 @@ it. The starter registers these meters:
 | `axelix_cache_enabled` | `Gauge` | `cache` | Current runtime state of each enhanced cache: `1` when enabled, `0` when disabled. |
 </div>
 
-These meters complement the UI-facing actuator endpoints rather than replace them. The UI still reads
-`axelix-metrics` and `axelix-caches`. Transaction monitoring data is not served by a dedicated actuator endpoint —
-it travels to Master as part of the instance's registration metadata exposed through `axelix-metadata` (see
-[Transaction monitoring](#transaction-monitoring)).
+These meters complement the UI-facing actuator endpoints rather than replace them. The UI still reads `axelix-metrics` and `axelix-caches`. Initial transaction insights are included in registration metadata; subsequent updates use `axelix-ping` when Master polls starters from 1.3.0, or pushed heartbeats for self-registration. There is no transaction-specific Actuator endpoint; see [Transaction monitoring](#transaction-monitoring).
 
 ## Share the JWT signing key with Master
 
@@ -649,8 +646,7 @@ axelix.sbs.discovery.heartbeat-interval=15s
 
 A few details that catch people out:
 
-- `instance-actuator-url` is the **base** URL of the service as Master will reach it from its own network — host and
-  port only.
+- `instance-actuator-url` is the URL of the service as Master will reach it from its own network, including the configured Actuator base path, normally `/actuator`.
 - `master-url` is the **full** URL including `/api/internal/service/register`. The starter posts to it verbatim.
   Master listens on `2935` by default since Axelix `1.2.0`; before that release the default port was `8080` — see
   [General](../../setting-up-master-ui/configuring-master/configuring-master.mdx#general).
@@ -799,7 +795,7 @@ heartbeats are rejected with `401`.
 |----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | `axelix.sbs.discovery.self-registration`     | `false`                                              | Master switch. Set to `true` to enable self-registration; leave `false` to rely on Master-side autodiscovery.                                  |
 | `axelix.sbs.discovery.master-url`            | *(unset)* <span className="Required">required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:2935/api/internal/service/register`. Required when `self-registration=true`. |
-| `axelix.sbs.discovery.instance-actuator-url` | *(unset)* <span className="Required">required</span> | Base URL of this service as reachable from Master (It is necessary to specify the postfix `/actuator`). Required when `self-registration=true`.   |
+| `axelix.sbs.discovery.instance-actuator-url` | *(unset)* <span className="Required">required</span> | URL of this service as reachable from Master, including the configured Actuator base path (normally `/actuator`). Required when `self-registration=true`.   |
 | `axelix.sbs.discovery.instance-name`         | *(unset)* <span className="Required">required</span> | Display name shown in Axelix UI and MCP responses. Required when `self-registration=true`.                                                        |
 | `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                | Interval between heartbeats. Should be smaller than Master's eviction `heartbeat-timeout`.                                           |
 
@@ -909,11 +905,7 @@ The starter checks the value once the application has started. If it is `0` or n
 
 ### Transaction monitoring
 
-Transaction monitoring is what powers the Transaction Control page and the related meters: it wraps your
-`@Transactional` methods, proxies the data source to count queries, cleans up the per-request transaction stack, and
-registers the Hibernate N+1 integrator. The collected insights travel to Master inside the instance's registration
-metadata (exposed through `axelix-metadata`), so there is no separate actuator endpoint to expose. It is **on by
-default** once the starter is on the classpath.
+Transaction monitoring is what powers the Transaction Control page and the related meters: it wraps your `@Transactional` methods, proxies the data source to count queries, cleans up the per-request transaction stack, and registers the Hibernate N+1 integrator. Initial registration includes the collected insights. Subsequent updates use `axelix-ping` when Master polls starters from 1.3.0, or pushed heartbeats for self-registration; older starters continue to supply full registration metadata. Expose `axelix-ping` for polling starters from 1.3.0; no additional transaction-specific endpoint is needed. Transaction monitoring is **on by default** once the starter is on the classpath.
 
 Transaction monitoring works only in servlet (Spring MVC) applications. In a reactive (WebFlux) application the starter
 doesn't turn it on, whatever the property says. See [Reactive (WebFlux) applications](#reactive-webflux-applications).

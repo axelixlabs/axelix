@@ -48,7 +48,7 @@ The **+ Add filter** button next to the search opens a popover with three fields
 
 - **Field** — one of **Spring Boot**, **Java**, **Spring Framework**, **Kotlin**.
 - **Comparison** — **Equal**, **Less than or equal**, or **Greater than or equal**. The comparison is semver-aware, so
-  `<= 3.2` matches `3.1.x` and `3.2.x` but not `3.3.x`.
+  `<= 3.2` treats the missing patch as zero: it matches `3.1.x` and `3.2.0`, but not `3.2.1` or later versions.
 - **Value** — a version pulled from the instances currently in the fleet. Only versions that exist on at least one card
   are offered, so you cannot build a filter that matches nothing.
 

@@ -1,0 +1,37 @@
+---
+title: Was ist der Axelix Spring Boot Starter?
+description: "Axelix Starter (auch ASBS, Axelix Spring Boot Starter) ist eine Spring-Boot-Starter-Abhängigkeit, die Ihre Spring-Boot-Anwendungen in die Axelix-Plattform integriert. Sie verbindet Ihre Anwendungen mit der Verwaltungskonsole Axelix Master."
+---
+
+## Überblick
+
+Axelix Starter macht aus einer normalen Spring-Boot-Anwendung einen „verwalteten Dienst“, der über die Axelix-Master-Oberfläche überwacht, untersucht und gesteuert werden kann. Dazu erweitert er die vorhandenen Spring-Boot-Funktionen um zusätzliche Endpunkte und Funktionen.
+
+## Zentrale Funktionen
+
+### **Automatische Diensterkennung und Registrierung**
+- **Automatische Erkennung**: Axelix Master registriert Instanzen automatisch.
+- **Unterstützung mehrerer Umgebungen**: Funktioniert in Kubernetes und Docker Compose.
+- **Selbstheilende Registrierung**: Automatische erneute Registrierung bei Verbindungsunterbrechungen.
+
+### **Erweiterte Überwachung und Debugging**
+- **Bean-Analyse in Echtzeit**: Alle Spring Beans anzeigen.
+- **Untersuchung von Konfigurationseigenschaften**: Eigenschaftswerte und deren Quellen anzeigen.
+- **Laufzeitmetriken**: Metriken zu Leistung und Zustand der Anwendung.
+- **Zustandsexport**: Den Zustand einer Anwendungsinstanz exportieren (einschließlich Heap-Dump, Thread-Dump, Environment usw.).
+
+## Wann Axelix Starter sinnvoll ist
+
+### **Entwicklung und Tests**
+- **Konfigurationsprobleme untersuchen** in verschiedenen Umgebungen (lokal, Staging, Produktion).
+- **Bean-Verknüpfungen und Abhängigkeiten verstehen**, ohne den Code im Detail zu untersuchen.
+- **Konfigurationsänderungen testen**, ohne erneute Bereitstellung oder Neustart.
+- **Auflösung von Eigenschaften prüfen** über mehrere Konfigurationsquellen hinweg.
+- **Geplante Tasks umschalten**: Unterschiedliche Planungsszenarien durch Aktivieren und Deaktivieren von `@Scheduled`-Methoden testen.
+- **Cache-Verwaltung**: Cache-Verhalten durch Leeren oder Deaktivieren von Caches während Tests prüfen.
+
+### **Produktionsbetrieb**
+- **Anwendungszustand überwachen** über mehrere Umgebungen und Instanzen hinweg.
+- **Notfall-Debugging durchführen** bei Produktionsvorfällen.
+- **Konfiguration verwalten** über mehrere Anwendungsinstanzen hinweg.
+- **Anwendungszustand und Konfiguration prüfen**, um Fehler zu beheben.

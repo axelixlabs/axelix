@@ -45,12 +45,10 @@ Expand a thread to see its detailed snapshot for the time range picked on the ti
 - **Thread name**:            Thread name.
 - **Thread state**:           JVM thread state (`RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED`, …).
 - **Priority**:               JVM thread priority.
-- **Blocked count**:          Total times the thread was blocked. Populated only while **Thread Contention Monitoring**
-  is enabled — otherwise shown as *Not Available*.
+- **Blocked count**:          Total times the thread was blocked.
 - **Blocked time**:           Time the thread spent blocked, in milliseconds. Populated only while **Thread Contention
   Monitoring** is enabled — otherwise shown as *Not Available*.
-- **Waited count**:           Total times the thread waited for notification. Populated only while **Thread Contention
-  Monitoring** is enabled — otherwise shown as *Not Available*.
+- **Waited count**:           Total times the thread waited for notification.
 - **Waited time**:            Time the thread spent waiting, in milliseconds. Populated only while **Thread Contention
   Monitoring** is enabled — otherwise shown as *Not Available*.
 - **Daemon**:                 Whether the thread is a daemon thread.
@@ -79,8 +77,9 @@ Clicking <Image src="/img/feature/icons/settings-icon.png" alt="settings-icon" w
 one switch:
 
 - **Thread Contention Monitoring** — enables JMX contention monitoring on the instance's `ThreadMXBean`. When on, the
-  JVM tracks how long each thread spent **BLOCKED** and **WAITING**, which lights up the `Blocked count` / `Blocked
-  time` / `Waited count` / `Waited time` fields above. When off, those four fields stay *Not Available*.
+  JVM tracks how long each thread spent **BLOCKED**, **WAITING**, and **TIMED_WAITING**, populating the `Blocked time` and `Waited time`
+  fields above. When off, only those two time fields show *Not Available*. `Blocked count` and `Waited count` remain
+  available regardless of this setting.
 
 Note that contention monitoring has measurable JVM overhead, so production instances typically leave it disabled and
 turn it on only during a focused investigation.

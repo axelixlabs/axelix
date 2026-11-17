@@ -1,0 +1,73 @@
+---
+title: Veröffentlichungen
+description: "Diese Seite beschreibt das genaue Verfahren zur Veröffentlichung von Axelix."
+---
+
+Es gibt zwei Veröffentlichungsarten mit demselben Grundprinzip: Beide liefern **alle Komponenten** gleichzeitig unter einer Version aus:
+
+- Eine **Minor-Version** entsteht aus `master` und eröffnet eine neue Linie `X.Y`.
+- Eine **Patch-Version** entsteht aus dem **Patch-Branch** dieser Linie (`X.Y.x`) und bringt alle Komponenten auf `X.Y.Z`.
+
+Auch Major-Versionen sind vorgesehen. Sobald diese anstehen, dokumentieren wir auch deren Veröffentlichung.
+
+Die zugrunde liegende Branch-Struktur beschreibt das [Branching-Modell](./branching-model.mdx).
+
+## Minor-Versionen
+
+Eine Minor-Veröffentlichung liefert alle Komponenten gemeinsam unter `X.Y.0` aus und kennzeichnet dies durch einen Tag `vX.Y.0` auf `master`, siehe
+[eine Version für alle Komponenten](../compatibility-and-versioning.mdx#eine-version-für-alle-komponenten).
+Die Schritte in ihrer Reihenfolge:
+
+### 1. Vorbereitungen
+
+Die Vorbereitungen umfassen **manuelle Änderungen** vor der Veröffentlichung. Alle gelangen in **einen einzigen Commit auf `master`**, damit sich
+die Veröffentlichung bei einer Verschiebung sauber zurücksetzen oder per Cherry-pick übernehmen lässt.
+
+- **Gemeinsame Version setzen.** Zwischen Veröffentlichungen trägt `axelixVersion` in der `gradle.properties` **im Repository-Stammverzeichnis** die kommende Version mit `-SNAPSHOT`, etwa `3.1.0-SNAPSHOT` während der Entwicklung von `3.1.0`. Entfernen Sie zur Veröffentlichung das Suffix und setzen Sie exakt die zu veröffentlichende Version, für `3.1.0` also `3.1.0`. Die Release-Pipeline liest diesen Wert und benennt danach den Tag. Sie **verweigert** die Veröffentlichung einer `-SNAPSHOT`-Version. Die `gradle.properties` im Repository-Stammverzeichnis ist der **einzige** Ablageort der Version, von dem alle Komponenten sie erben.
+- **Playgrounds aktualisieren.** Die Beispielanwendungen unter `playgrounds/` sind bewusst **separate Projekte**. Sie erben `axelixVersion` **nicht**, sondern geben ihre Starter- und Plugin-Versionen explizit an. Aktualisieren Sie diese auf die zu veröffentlichende Version.
+- **Dokumentation aktualisieren.** Wir versionieren die Dokumentation nur pro **Major-Linie**. Während der Entwicklung einer Minor-Version erhalten neue Funktionen Hinweise auf eine kommende Veröffentlichung. Sobald die Minor-Version diese Funktionen ausliefert, werden die Hinweise durch entsprechende Veröffentlichungshinweise ersetzt.
+
+### 2. Release-Pipeline starten
+
+**Wir erstellen den Tag nicht von Hand.** Die Release-Pipeline liest die Version aus `gradle.properties` und führt
+die Vorabprüfungen aus. Anschließend veröffentlicht sie die Maven-Artefakte (Starter und Plugins), baut und überträgt
+das Master-Docker-Image und paketiert und signiert das Helm-Chart. Erst danach erstellt und überträgt sie den Tag
+`vX.Y.0` und aktualisiert anschließend das Helm-Chart-Repository. Artefakte können daher bereits veröffentlicht sein,
+wenn die Pipeline vor der Tag-Erstellung fehlschlägt.
+
+:::info[Versionshinweise werden von Hand geschrieben]
+Die Pipeline erstellt den **Tag**, aber **keine Versionshinweise**. Diese schreibt der **Entwickler**, der die Veröffentlichung durchführt,
+manuell für den neu erstellten Tag `vX.Y.0`.
+:::
+
+## Patch-Versionen
+
+Wie jede Axelix-Veröffentlichung liefert eine Patch-Version **alle Komponenten** unter einer Version aus. Komponentenspezifische Patches gibt es nicht.
+Das Verfahren entspricht einer Minor-Veröffentlichung mit einem strukturellen Unterschied: Es verwendet den **Patch-Branch** der Minor-Linie statt `master`.
+Der Dokumentationsschritt entfällt, da Patches die Dokumentation nicht ändern.
+
+1. **Patch-Branch auschecken.** Patch-Arbeiten liegen auf dem einzigen Branch der Linie namens `X.Y.x`. Das wörtliche `x` kennzeichnet die gesamte Patch-Linie. Anders als ein Tag hat der Branch **kein** Präfix `v`. Er wird vom Minor-Tag `vX.Y.0` abgezweigt, siehe [Branching-Modell → Wo Patch-Arbeiten stattfinden](./branching-model.mdx#wo-patch-arbeiten-stattfinden). Erstellen Sie ihn vom Tag, wenn dies der erste Patch der Linie ist. Andernfalls existiert er bereits.
+2. **Korrekturen in diesen Branch übernehmen.** Üblicherweise gelangt eine Korrektur zuerst nach `master` und wird dann zurückportiert. Nur die vom Patch tatsächlich korrigierten Teile ändern sich.
+3. **Vorbereitungen auf dem Branch in einem Commit.**
+    - **Gemeinsame Version setzen.** Setzen Sie `axelixVersion` in der `gradle.properties` **im Repository-Stammverzeichnis** auf die neue Patch-Version `X.Y.Z`. Anders als `master` trägt der Patch-Branch zwischen Veröffentlichungen kein Suffix `-SNAPSHOT`. Er bleibt bei der zuletzt veröffentlichten Version seiner Linie, bis der nächste Patch sie erhöht.
+    - **Playgrounds aktualisieren.** Aktualisieren Sie die Beispielanwendungen auf die neue Patch-Version. Wie bei Minor-Veröffentlichungen geben sie ihre Axelix-Versionen explizit an und erben `axelixVersion` nicht.
+4. **Release-Pipeline starten.** Es ist **dieselbe Pipeline** wie bei einer Minor-Version, gestartet vom Patch-Branch
+   statt von `master`. Sie folgt derselben oben beschriebenen Reihenfolge für Prüfungen, Veröffentlichung, Paketierung
+   und Tag-Erstellung mit Version `X.Y.Z` und Tag `vX.Y.Z`. Wie jeder Axelix-Tag trägt er das Präfix `v`.
+   Die Pipeline erstellt auch hier den Tag, aber **keine Versionshinweise**. Diese schreibt der Entwickler manuell zum neuen Tag.
+
+### Beispiel
+
+Angenommen, die Version `3.1.0` benötigt eine Korrektur im **Axelix Spring Boot 3 Starter**:
+
+1. Der Patch liegt im Branch `3.1.x`, abgezweigt vom Tag `v3.1.0`. Wenn es für `3.1` schon einen Patch gab, existiert dieser Branch bereits. Andernfalls erstellen wir ihn von `v3.1.0`.
+2. Wir portieren die Korrektur von `master` auf diesen Branch zurück.
+3. In der `gradle.properties` im Repository-Stammverzeichnis setzen wir `axelixVersion` auf `3.1.1`, die gewünschte Patch-Version, und aktualisieren die Playgrounds auf `3.1.1`.
+4. Wir starten die Release-Pipeline vom Branch `3.1.x`. Sie veröffentlicht die Maven-Artefakte und das Master-Image
+   unter `3.1.1`, paketiert das Helm-Chart und erstellt und überträgt danach den gemeinsamen Tag `v3.1.1`. Anschließend
+   aktualisiert sie das Chart-Repository. **Jede** Komponente erhält die Version `3.1.1`, obwohl sich nur ein Starter geändert hat.
+
+Das Ergebnis entspricht der Zusage [einer Version für alle Komponenten](../compatibility-and-versioning.mdx#eine-version-für-alle-komponenten):
+Nach der Veröffentlichung existiert `3.1.1` für sämtliche Komponenten. Ob Sie alle bereitgestellten Komponenten zugleich aktualisieren oder nur die tatsächlich
+korrigierte, entscheiden Sie selbst. [Kompatibilität ist durch `major.minor` garantiert](../compatibility-and-versioning.mdx#kompatibilität-zwischen-komponenten),
+sodass unterschiedliche Patch-Stände bereitgestellter Komponenten immer sicher sind.

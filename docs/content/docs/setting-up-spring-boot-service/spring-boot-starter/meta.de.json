@@ -1,0 +1,8 @@
+{
+    "title": "Spring Boot Starter",
+    "defaultOpen": false,
+    "pages": [
+        "what-is-spring-boot-starter",
+        "configuration"
+    ]
+}

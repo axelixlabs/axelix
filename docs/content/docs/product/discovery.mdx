@@ -119,8 +119,11 @@ on every scan.
          │──────────────────────────────────────────────────▶│
          │                                                   │
          ╳  the service stops, heartbeats stop               │
-                                                             │  removed after 45 s
+                                                             │  removed on next eviction run
+                                                             │  after 45 s without a heartbeat
 ```
+
+The default heartbeat timeout is 45 seconds. Master removes stale instances on the next eviction run, which runs once per minute by default, rather than immediately when the timeout expires.
 
 With a starter older than 1.3.0, every heartbeat is a full registration.
 

@@ -197,7 +197,7 @@ If `APP_IN_COMPOSE` is yes:
   axelix-master:
     image: ghcr.io/axelixlabs/axelix:VERSION
     ports:
-      - "2935:2935"
+      - "127.0.0.1:2935:2935"
     environment:
       AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED: "true"
 ```
@@ -213,7 +213,7 @@ taken by something else, start Master on another port and use it in `MASTER`. If
 taken by another container, use a different name.
 
 ```bash
-docker run -d --name axelix-master -p 2935:2935 \
+docker run -d --name axelix-master -p 127.0.0.1:2935:2935 \
   --add-host=host.docker.internal:host-gateway \
   -e AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED=true \
   ghcr.io/axelixlabs/axelix:VERSION

@@ -1,0 +1,66 @@
+---
+title: Lizenzierung
+description: "Welche Lizenz für die einzelnen Axelix-Komponenten gilt und was diese Lizenzen für die Nutzung in Ihren Projekten bedeuten."
+---
+
+Axelix ist Open Source, aber nicht jeder Teil wird unter derselben Lizenz veröffentlicht. Diese Seite nennt die Lizenz jeder Komponente
+und erläutert ihre Bedeutung für die Anwendungen, mit denen Sie Axelix verwenden.
+
+## Lizenzen nach Komponente
+
+Fast ganz Axelix steht unter der **GNU Lesser General Public License, Version 3** (LGPLv3).
+Die einzige Ausnahme ist das offizielle Helm-Chart mit der **MIT-Lizenz**.
+
+| Komponente                                                | Lizenz |
+| --------------------------------------------------------- | ------ |
+| Axelix Master einschließlich Weboberfläche und MCP-Server | LGPLv3 |
+| Axelix Spring Boot Starter (Spring Boot 2, 3 und 4)       | LGPLv3 |
+| Axelix-Build-Plugins für Gradle und Maven                 | LGPLv3 |
+| Offizielles Axelix-Helm-Chart                             | MIT    |
+
+Die Lizenz gilt für jede veröffentlichte Form der Komponente. Beispielsweise stehen sowohl die Master-JAR als auch das Master-Docker-Image
+unter LGPLv3. Die Starter- und Plugin-Artefakte auf Maven Central geben LGPLv3 in ihren POM-Metadaten an.
+Der vollständige LGPLv3-Text steht in der Datei [`LICENSE`](https://github.com/axelixlabs/axelix/blob/master/LICENSE)
+des [Axelix-Repositorys](https://github.com/axelixlabs/axelix). Das Helm-Chart enthält einen eigenen MIT-Lizenztext.
+Urheberrechtsinhaber aller Komponenten ist Axelix Labs.
+
+## Was LGPLv3 für Ihre Anwendung bedeutet
+
+**Sie können die Axelix-Starter und Build-Plugins kostenlos in einer proprietären Anwendung mit geschlossenem Quellcode verwenden.**
+Sie zahlen keine Gebühren und schließen keine Vereinbarung mit Axelix Labs ab.
+
+LGPLv3 ist eine Lizenz mit schwachem Copyleft. Ein Starter in Ihrem Spring-Boot-Dienst oder ein Build-Plugin in Ihrem
+Build verpflichtet Sie für sich genommen weder zur Veröffentlichung Ihres Anwendungsquellcodes noch zur Änderung
+seiner Lizenz. Bei einer Weitergabe gelten die unten beschriebenen Lizenzbedingungen.
+
+Interne Nutzung unterscheidet sich von Weitergabe. LGPLv3 enthält keine Netzwerkklausel. Master zu ändern und
+anschließend nur auf Ihren eigenen Servern zu betreiben, gilt daher für sich genommen nicht als Weitergabe.
+
+**Die Weitergabe einer Axelix-Komponente kann auch dann Pflichten auslösen, wenn Sie sie nicht geändert haben.**
+Abschnitt 4 der `LICENSE` im Repository enthält beispielsweise Bedingungen für die Weitergabe eines kombinierten
+Werks (Combined Work). Dazu gehören Hinweise und Kopien der GNU GPL und LGPL sowie die weiteren dort genannten
+Bedingungen. Wenn Sie den Starter ändern und die geänderte JAR an Kunden ausliefern, müssen Sie ihnen außerdem den
+Quellcode Ihrer Änderungen unter LGPLv3 zugänglich machen.
+
+:::note[Keine Rechtsberatung]
+Dieser Abschnitt ist eine kurze Orientierung. Verbindlich ist allein der Lizenztext. Wenn Ihr Fall von Einzelheiten abhängt,
+etwa beim Einbetten von Axelix in ein verkauftes Produkt, klären Sie ihn mit Ihrer Rechtsabteilung.
+:::
+
+## Das Helm-Chart unter MIT
+
+Das Helm-Chart beschreibt lediglich die Bereitstellung von Master in Kubernetes und verwendet deshalb die freizügigere MIT-Lizenz.
+Sie können es in Ihr internes Chart-Repository kopieren, ändern oder in ein eigenes Umbrella-Chart integrieren, ohne Ihre Änderungen zu veröffentlichen.
+Die einzige Bedingung ist, den Urheberrechts- und Lizenzhinweis in den Kopien beizubehalten. Master selbst, den das Chart bereitstellt, bleibt unter LGPLv3.
+
+## Axelix Enterprise
+
+Die kommende kostenpflichtige Edition **Axelix Enterprise** ist nicht Open Source. Sie wird unter einem separaten kommerziellen Lizenzvertrag
+mit Axelix Labs vertrieben. Ihre zusätzlichen Funktionen fallen nicht unter LGPLv3. Axelix OSS aus der obigen Tabelle bleibt unter LGPLv3.
+Weitere Informationen bietet [Axelix OSS und Enterprise](../product/introduction.mdx#axelix-oss-und-enterprise).
+
+## Siehe auch
+
+- [Einführung](../product/introduction.mdx)
+- [Support-Richtlinie](./support-policy.mdx)
+- [Kompatibilität und Versionierung](./compatibility-and-versioning.mdx)

@@ -1,0 +1,56 @@
+---
+title: Wallboard
+description: "Das Wallboard ist die standardmäßige Startseite in Axelix."
+---
+
+<ScreenshotsNotice text="Die Screenshots zeigen den neuesten Minor-Release von Axelix.">
+
+![Hauptseite des Wallboards](/img/feature/wallboard/wallboard-main-page.png)
+
+</ScreenshotsNotice>
+
+***Wallboard in der Axelix-Oberfläche***
+
+Es zeigt jede von Axelix Master erkannte Spring-Boot-Instanz als kompakte Karte mit aktuellem Gesundheitszustand und einer kurzen Laufzeitübersicht. Ein Klick auf eine Karte öffnet das [Service Profile](./service-profile.mdx) dieser Instanz.
+
+## Servicekarten
+
+Jede Karte repräsentiert eine erkannte Instanz. Ihr Kopf zeigt den Servicenamen und rechts einen Statusindikator:
+
+- Ein durchgehend **grüner** Punkt: Die Instanz ist **UP**.
+- Ein pulsierender **roter** Punkt: Die Instanz ist **DOWN**.
+- Ein **Fragezeichen-Symbol**: Axelix Master konnte den Zustand nicht ermitteln (**UNKNOWN**).
+
+Karten mit einem anderen Zustand als **UP** erhalten einen statusabhängigen Hintergrund, damit sie im Raster auffallen.
+
+Der Karteninhalt zeigt die bei der Registrierung erfassten Laufzeitinformationen:
+
+- **Version**: die eigene Version des Services (Maven-/Gradle-Artefaktversion).
+- **Spring Boot**: die Spring-Boot-Version, gegen die die Instanz gebaut wurde.
+- **Java**: die Java-Version der laufenden JVM, etwa `21.0.10`.
+
+Die unterste Zeile zeigt links den kurzen Git-SHA des Builds als **Commit: 315897f** (aus Metadaten im Stil von `git-commit-id`, sofern die Anwendung sie bereitstellt). Rechts steht die Dauer seit der Registrierung bei Master, beispielsweise `27d 4h`.
+
+Ein Klick auf eine beliebige Stelle der Karte öffnet die Seite **Details** im [Service Profile](./service-profile.mdx) der Instanz.
+
+## Suche und Filter
+
+Das Suchfeld über dem Raster filtert Karten nach Servicenamen (Teilzeichenfolge ohne Beachtung der Groß-/Kleinschreibung). Der Zähler rechts zeigt `<matches> / <total>`.
+
+Die Schaltfläche **+ Add filter** neben der Suche öffnet ein Popover mit drei Feldern:
+
+- **Field**: eines von **Spring Boot**, **Java**, **Spring Framework**, **Kotlin**.
+- **Comparison**: **Equal**, **Less than or equal** oder **Greater than or equal**. Der Vergleich berücksichtigt Semver; `<= 3.2` behandelt die fehlende Patch-Version als null und trifft auf `3.1.x` und `3.2.0` zu, aber nicht auf `3.2.1` oder spätere Versionen.
+- **Value**: eine Version der aktuell vorhandenen Instanzen. Angeboten werden nur Versionen auf mindestens einer Karte, sodass kein Filter ohne Treffer entsteht.
+
+Beim Speichern erscheint zwischen Suche und Raster ein entfernbares Filter-Tag. Die angezeigten Karten werden eingegrenzt und der Filter als `?f=Field:Operator:Value` in die URL geschrieben. Gefilterte Wallboard-URLs können als Lesezeichen gespeichert und geteilt werden. Wiederholen Sie die Aktion für weitere Filter; eine Karte erscheint nur, wenn alle aktiven Filter zutreffen.
+
+## MCP-Zugriff
+
+Die Wallboard-Daten sind als MCP-Werkzeug verfügbar. Ein mit dem integrierten MCP-Server von Axelix Master verbundener KI-Agent kann alle verwalteten Instanzen mit denselben Feldern wie auf den Karten auflisten. [Siehe MCP-Katalog.](../setting-up-master-ui/mcp/mcp-tools.mdx#instanzen)
+
+## Verwandte Themen
+
+- [Service Profile](./service-profile.mdx)
+- [Spring Portfolio](./dashboard/spring-portfolio.mdx)
+- [MCP](./mcp.mdx)

@@ -46,12 +46,10 @@ Dépliez un thread pour afficher son instantané détaillé correspondant à la 
 - **Thread name** : nom du thread.
 - **Thread state** : état du thread dans la JVM (`RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED`, …).
 - **Priority** : priorité du thread dans la JVM.
-- **Blocked count** : nombre total de blocages du thread. Renseigné uniquement lorsque **Thread Contention Monitoring**
-  est activé ; sinon, la valeur affichée est *Not Available*.
+- **Blocked count** : nombre total de blocages du thread.
 - **Blocked time** : temps passé par le thread en état de blocage, en millisecondes. Renseigné uniquement lorsque **Thread Contention
   Monitoring** est activé ; sinon, la valeur affichée est *Not Available*.
-- **Waited count** : nombre total d’attentes de notification par le thread. Renseigné uniquement lorsque **Thread Contention
-  Monitoring** est activé ; sinon, la valeur affichée est *Not Available*.
+- **Waited count** : nombre total d’attentes de notification par le thread.
 - **Waited time** : temps passé par le thread en attente, en millisecondes. Renseigné uniquement lorsque **Thread Contention
   Monitoring** est activé ; sinon, la valeur affichée est *Not Available*.
 - **Daemon** : indique si le thread est un thread daemon.
@@ -80,9 +78,9 @@ Cliquer sur <Image src="/img/feature/icons/settings-icon.png" alt="icône des pa
 modale contenant un seul commutateur :
 
 - **Thread Contention Monitoring** — active la surveillance JMX de la contention sur le `ThreadMXBean` de l’instance. Lorsqu’elle est
-  activée, la JVM mesure le temps passé par chaque thread dans les états **BLOCKED** et **WAITING**, ce qui renseigne les champs
-  `Blocked count` / `Blocked time` / `Waited count` / `Waited time` ci-dessus. Lorsqu’elle est désactivée, ces quatre champs
-  conservent la valeur *Not Available*.
+  activée, la JVM mesure le temps passé par chaque thread dans les états **BLOCKED**, **WAITING** et **TIMED_WAITING**, ce qui renseigne les champs
+  `Blocked time` et `Waited time` ci-dessus. Lorsqu’elle est désactivée, seuls ces deux champs de durée affichent
+  *Not Available*. `Blocked count` et `Waited count` restent disponibles quel que soit ce réglage.
 
 Notez que la surveillance de la contention entraîne une surcharge mesurable pour la JVM. Les instances de production la laissent donc
 généralement désactivée et ne l’activent que pendant une investigation ciblée.

@@ -1,0 +1,32 @@
+---
+title: Java
+description: "Das Java-Dashboard zeigt, welche JVM-Funktionen die Services in der Systemlandschaft verwenden: Project Leyden, Garbage Collectors, GC-Logging und Project Lilliput."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Das Java-Dashboard wird in Axelix 1.2.0 entfernt.</>}
+/>
+
+Bei Dutzenden Services ist schwer zu erkennen, welche bereits schneller mit AppCDS oder dem AOT-Cache starten, welchen Garbage Collector sie verwenden und wo GC-Logging aktiviert ist. Das Java-Dashboard beantwortet dies für die gesamte Systemlandschaft.
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und Berechtigungen](../../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Für jede JVM-Funktion zeigt die Seite den Anteil der Services, die sie verwenden:
+
+- **Project Leyden**: Services, die mit AppCDS (`-XX:SharedArchiveFile`) oder dem AOT-Cache (`-XX:AOTCache`) starten, jeweils getrennt und beide zusammen.
+- **Garbage collectors**: Welchen Garbage Collector welcher Anteil der Services verwendet, etwa G1, Parallel oder ZGC. Der häufigste wird gesondert hervorgehoben.
+- **GC logging**: Services, bei denen GC-Logging aktuell aktiviert ist, einschließlich der Services, bei denen es über Axelix aktiviert wurde. Siehe [GC-Logging aktivieren](../../../features/jvm/garbage-collector.mdx#gc-protokollierung-aktivieren).
+- **Project Lilliput**: Services mit kompakten Objekt-Headern (`-XX:+UseCompactObjectHeaders`).
+
+## Funktionsweise
+
+Das Dashboard zählt, was die einzelnen Services über ihre JVM melden. Master zeichnet dies einmal täglich auf und verwendet den neuesten Datensatz. Ein Service wird unabhängig von der Anzahl seiner Instanzen einmal gezählt.
+
+## Siehe auch
+
+- [Garbage Collector](../../../features/jvm/garbage-collector.mdx)
+- [Languages Profile](../languages-profile.mdx)
+- [Persistence](./persistence.mdx)

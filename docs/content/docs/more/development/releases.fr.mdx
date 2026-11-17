@@ -44,9 +44,11 @@ récupéré proprement par cherry-pick si nous devons la reporter.
 
 ### 2. Lancer le pipeline de publication
 
-**Nous ne créons pas le tag manuellement.** Le pipeline de publication lit la version dans `gradle.properties`, exécute
-ses contrôles préalables et, uniquement si tout est au vert, crée le tag `vX.Y.0` et publie tous les composants : les
-artefacts Maven (starters et plugins) comme l’image Docker de Master.
+**Nous ne créons pas le tag à la main.** Le pipeline lit la version dans `gradle.properties` et exécute les
+vérifications préalables. Il publie ensuite les artefacts Maven (starters et plugins), construit et pousse l’image
+Docker de Master, puis crée et signe le paquet du chart Helm. Ce n’est qu’ensuite qu’il crée et pousse le tag `vX.Y.0`,
+avant de mettre à jour le dépôt de charts Helm. Des artefacts peuvent donc déjà être publiés si le pipeline échoue
+avant la création du tag.
 
 :::info[Les notes de version sont rédigées manuellement]
 Le pipeline crée le **tag**, mais ne rédige **pas** les notes de version. La rédaction des notes pour le tag `vX.Y.0`
@@ -78,11 +80,11 @@ relative à la documentation est ignorée, car les versions correctives ne modif
      corrective, pour la même raison que pour une version mineure : elles épinglent explicitement leurs versions Axelix
      et n’héritent pas d’`axelixVersion`.
 
-4. **Lancer le pipeline de publication.** Il s’agit du **même pipeline** que pour une version mineure, mais lancé à
-   partir de la branche de correctifs plutôt que de `master`. Il exécute les mêmes contrôles préalables, publie tous les
-   composants sous `X.Y.Z` et crée le tag `vX.Y.Z` pour l’ensemble. Comme tout tag Axelix, celui-ci comporte le préfixe
-   `v`. Comme pour une version mineure, le pipeline crée le tag, mais **pas** les notes de version : le développeur les
-   rédige manuellement pour le nouveau tag.
+4. **Lancer le pipeline de publication.** C’est le **même pipeline** que pour une version mineure, lancé depuis la
+   branche corrective plutôt que depuis `master`. Il suit le même ordre de vérifications, de publication, de création
+   du paquet et de création du tag décrit ci-dessus, avec la version `X.Y.Z` et le tag `vX.Y.Z`. Comme tous les tags
+   Axelix, celui-ci porte le préfixe `v`. Le pipeline crée le tag, mais **pas** les notes de version ; le développeur
+   les rédige manuellement pour le nouveau tag.
 
 ### Exemple concret
 
@@ -93,8 +95,9 @@ Supposons que la version `3.1.0` nécessite un correctif dans **Axelix Spring Bo
 2. Nous rétroportons le correctif de `master` vers cette branche.
 3. Dans le `gradle.properties` racine, nous définissons `axelixVersion` sur `3.1.1`, la version corrective à publier,
    et mettons à jour les playgrounds vers `3.1.1`.
-4. Nous lançons le pipeline de publication à partir de la branche `3.1.x`. Il crée le tag `v3.1.1` pour l’ensemble et
-   publie **tous** les composants (starters, plugins et Master) sous `3.1.1`, même si un seul starter a réellement changé.
+4. Nous lançons le pipeline depuis la branche `3.1.x`. Il publie les artefacts Maven et l’image de Master sous
+   `3.1.1`, crée le paquet du chart Helm, puis crée et pousse le tag commun `v3.1.1`. Il met ensuite à jour le dépôt de
+   charts. **Chaque** composant reçoit la version `3.1.1`, même si un seul starter a réellement changé.
 
 Le résultat correspond à ce que promet
 [une version pour chaque composant](../compatibility-and-versioning.mdx#une-version-pour-tous-les-composants) : après la

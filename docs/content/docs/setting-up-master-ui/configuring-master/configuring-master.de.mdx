@@ -1,0 +1,1152 @@
+---
+title: Master konfigurieren
+description: "Diese Seite zeigt, wie Sie Axelix Master in Ihrer Umgebung betreiben. Wählen Sie passend zu Ihren übrigen Diensten eine eigenständige JAR-Datei, einen Docker-Container, einen Docker-Compose-Stack oder eine Kubernetes-Bereitstellung."
+---
+
+import styles from './styles.module.css';
+
+## Bevor Sie beginnen
+
+Beachten Sie vor dem Kopieren der Beispiele die folgenden Grundlagen. So sparen Sie später Zeit bei der Fehlersuche.
+
+- **HTTP-Port**: Master lauscht standardmäßig auf `2935` (`axelix.master.port`). Vor Axelix `1.2.0` war der Standard `8080`. Einzelheiten und die Rückkehr zum alten Port beschreibt [HTTP-Port](#http-port).
+- **Datenbank**: Master unterstützt drei Datenbanksysteme, die automatisch anhand des JDBC-URL-Präfixes gewählt werden: **SQLite** (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`) und **MySQL** (`jdbc:mysql:`). Standard ist SQLite mit einer Datei `axelix.db` im Arbeitsverzeichnis. Liquibase führt bei jedem Start Schemamigrationen aus.
+- **Frontend-Dateien**: Sowohl `axelix-AXELIX_VERSION_PLACEHOLDER.jar` als auch das veröffentlichte Docker-Image enthalten die Benutzeroberfläche. Für die Weboberfläche ist keine zusätzliche Einrichtung erforderlich.
+- **Authentifizierung**: Master enthält das Super-Admin-Konto `admin / admin` und seit Axelix 1.2 einen eingebauten, öffentlich bekannten JWT-Signaturschlüssel. Ändern Sie beides in jeder dauerhaft genutzten Umgebung. Siehe [Konfigurationsreferenz](#konfigurationsreferenz).
+
+## Konfigurationsreferenz
+
+Alle Eigenschaften von Axelix Master liegen im Namensraum `axelix.master.*`. Die folgenden Tabellen nennen die jeweilige Eigenschaft mit ihrem Standardwert, sofern vorhanden. Mit _(nicht gesetzt)_ gekennzeichnete Werte müssen Sie selbst angeben, bevor die zugehörige Funktion starten kann.
+
+:::warning
+Die Standardzugangsdaten des Super-Admins (`admin / admin`) gewähren vollständige Kontrolle über jeden von Master erkannten Dienst. Der eingebaute JWT-Signaturschlüssel ist öffentlich bekannt, sodass jeder damit eine Sitzung fälschen kann. Ändern Sie beides und setzen Sie bei HTTPS `axelix.master.auth.cookie.secure`, bevor andere Personen Master erreichen können.
+:::
+
+### Eigenschaften bereitstellen
+
+Master ist eine Spring-Boot-Anwendung. Deshalb können Sie jede Eigenschaft dieser Seite über jede von Spring Boot gelesene Quelle bereitstellen, nicht nur über eine Konfigurationsdatei:
+
+- eine **YAML**- oder **properties**-Konfigurationsdatei (`application.yaml` / `application.properties`);
+- eine **JVM-Systemeigenschaft**, die mit `-D` an den `java`-Aufruf übergeben wird;
+- eine **Umgebungsvariable**.
+
+Master beschränkt keine Eigenschaft auf eine einzelne Quelle. Eine Eigenschaft wie `axelix.master.auth.jwt.signing-key` können Sie auf die für Ihre Bereitstellung passende Weise setzen. Alle drei Varianten liefern denselben Wert an Master.
+
+Grundlage ist Spring Boots [Relaxed Binding](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding): Eine logische Eigenschaft besitzt mehrere gleichwertige Schreibweisen, die Master als denselben Wert liest. Diese Seite verwendet die kanonische Form mit Kleinbuchstaben, Punkten und Bindestrichen (`axelix.master.auth.jwt.signing-key`). Die Tabelle zeigt die Schreibweise für jede Quelle:
+
+| Quelle                       | Schreibweise von `axelix.master.auth.jwt.signing-key`                              |
+| ---------------------------- | ---------------------------------------------------------------------------------- |
+| `application.yaml`           | verschachtelte Schlüssel `axelix:` → `master:` → `auth:` → `jwt:` → `signing-key:` |
+| `application.properties`     | `axelix.master.auth.jwt.signing-key=...`                                           |
+| JVM-Systemeigenschaft (`-D`) | `-Daxelix.master.auth.jwt.signing-key=...`                                         |
+| Umgebungsvariable            | `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`                                            |
+
+Für Umgebungsvariablen gilt: **Schreiben Sie den Namen groß, ersetzen Sie jeden Punkt durch einen Unterstrich und entfernen Sie Bindestriche**. Daher wird aus `signing-key` der Teil `SIGNINGKEY`. Der Bindestrich wird entfernt, nicht durch einen Unterstrich ersetzt. Ohne Bindestriche ist die Zuordnung direkter: Aus `axelix.master.metrics.prometheus.enabled` wird `AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED`.
+
+:::note
+Das Argument `-Daxelix.master.auth.jwt.signing-key=...` und die Umgebungsvariable `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...` sind austauschbar. Master erhält denselben Wert. Verwenden Sie die für Ihre Plattform einfachere Variante.
+:::
+
+:::warning[Geheimnisse sicher bereitstellen]
+Die drei Quellen sind für **geheime Werte** wie JWT-Signaturschlüssel, Super-Admin-Passwort, Datenbankpasswort oder Vault-Token **nicht gleich sicher**. Die `-D`- und Dateibeispiele dieser Seite dienen dem schnellen Einstieg. Sobald echte Geheimnisse beteiligt sind, berücksichtigen Sie die möglichen Offenlegungen:
+
+- **`-D` im `java`-Aufruf**: Andere Benutzer auf dem Host können die vollständige Prozesskommandozeile lesen (`ps -ef`, `/proc/<pid>/cmdline`). Auch Prozessüberwachung und Absturzberichte erfassen sie häufig. Ein mit `-D` übergebenes Geheimnis ist dort sichtbar. Für einen kurzlebigen lokalen Versuch ist das vertretbar, **für Geheimnisse in Produktion niemals**.
+- **`JAVA_TOOL_OPTIONS`**, häufig für `-D`-Argumente in Containern verwendet: Die JVM schreibt beim Start den vollständigen Wert nach stderr (`Picked up JAVA_TOOL_OPTIONS: ...`). Alles darin landet in `docker logs` und jeder Logsammlung. Legen Sie dort keine Geheimnisse ab.
+- **Konfigurationsdatei**: Für nicht geheime Einstellungen geeignet. Bei Geheimnissen darf die Datei weder in die Versionsverwaltung noch ins Image gelangen. Beschränken Sie die Dateiberechtigungen und beziehen Sie den Wert vorzugsweise aus einem Secret Store, siehe [Vault](#konfiguration-aus-hashicorp-vault-laden).
+- **Umgebungsvariablen**: Der pragmatische Standard für Geheimnisse und die hier in Docker- und Docker-Compose-Beispielen verwendete Variante. Sie hält Geheimnisse aus Kommandozeile und Startprotokoll fern. Für den stärksten Schutz in Produktion verwenden Sie einen dedizierten Secret Manager statt einer statischen Variablen.
+  :::
+
+### Master auf eine Konfigurationsdatei verweisen
+
+<ReleasedInNotice version="1.1.0" />
+
+Die drei genannten Quellen decken die meisten Installationen ab. Häufig soll Axelix Master jedoch eine externe YAML- oder properties-Datei lesen, etwa eine unter einem eigenen Pfad in den Container eingebundene Datei.
+
+Dazu dient die Eigenschaft `axelix.master.config.location` in der Master-Konfiguration.
+
+Da Master eine Spring-Boot-Anwendung ist, unterstützt es alle entsprechenden Ortsangaben von Spring Boot: eine Datei, ein Verzeichnis oder eine durch Kommas getrennte Liste davon. Jeder Eintrag kann mit `file:` oder `optional:` beginnen. Letzteres toleriert fehlende Dateien, statt den Start abzubrechen. Eine hier angegebene Datei **ergänzt** die eingebauten Standardwerte. Ihre Werte haben Vorrang; nicht angegebene Werte behalten ihren Standard.
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                     | Standard | Beschreibung                                                                                                                                                                                                                                      |
+| ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `axelix.master.config.location` | leer     | Ort einer externen Konfigurationsdatei oder eines Verzeichnisses, die zusätzlich zu den Master-Standardwerten geladen werden. Akzeptiert einen Pfad, ein Verzeichnis oder eine kommaseparierte Liste, jeweils optional mit `file:` / `optional:`. |
+
+</div>
+
+Da diese Eigenschaft bestimmt, _wo_ die Konfiguration gelesen wird, muss sie vorher bekannt sein. Geben Sie sie als **JVM-Systemeigenschaft** oder **Umgebungsvariable** an, nicht innerhalb der Datei, auf die sie verweist:
+
+```bash
+java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Für einen Container übergeben Sie sie als Umgebungsvariable und binden die Datei ein:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+### Konfiguration aus einem Spring Cloud Config Server laden
+
+<ReleasedInNotice version="1.1.0" />
+
+Wenn Sie bereits einen [Spring Cloud Config Server](https://docs.spring.io/spring-cloud-config/reference/server.html) zur zentralen Konfiguration Ihrer Anwendungen betreiben, kann Master seine Einstellungen ebenfalls daraus beziehen. Master arbeitet als Spring-Cloud-Config-**Client**: Beim Start ruft es die Konfiguration für seinen Anwendungsnamen ab und führt sie zusammen. Jede Eigenschaft `axelix.master.*` dieser Seite kann daher im Speicher des Config Servers statt in einer lokalen Datei liegen.
+
+Die Funktion ist standardmäßig deaktiviert. Aktivieren Sie sie mit `axelix.master.external-config.spring-cloud-config.enabled=true` und geben Sie den Server über `uri` an.
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                                  | Standard | Beschreibung                                                                                                                                                                |
+| ------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `axelix.master.external-config.spring-cloud-config.enabled`  | `false`  | Konfiguration beim Start aus einem Spring Cloud Config Server laden.                                                                                                        |
+| `axelix.master.external-config.spring-cloud-config.uri`      | leer     | Basis-URL des Config Servers, etwa `http://config-server:8888`. Erforderlich bei `enabled=true`.                                                                            |
+| `axelix.master.external-config.spring-cloud-config.name`     | leer     | Anwendungsname, für den der Server die Konfiguration ermittelt: das Segment `{application}` im Anfragepfad. Bei leerem Wert verwendet Master seinen eigenen Namen `axelix`. |
+| `axelix.master.external-config.spring-cloud-config.label`    | `master` | Vom Server angefordertes `{label}`, üblicherweise ein Git-Branch oder -Tag im hinterlegten Repository.                                                                      |
+| `axelix.master.external-config.spring-cloud-config.username` | leer     | Benutzername für HTTP Basic Authentication, falls der Config Server diese verlangt.                                                                                         |
+| `axelix.master.external-config.spring-cloud-config.password` | leer     | Zu `username` gehörendes Basic-Auth-Passwort.                                                                                                                               |
+
+</div>
+
+:::warning
+Die `uri`-Beispiele verwenden der Kürze halber `http://`. Falls der Config Server `username`/`password` verlangt, werden diese Zugangsdaten und alle zurückgegebenen Werte einschließlich Geheimnissen über HTTP unverschlüsselt übertragen. Verwenden Sie für `uri` einen `https://`-Endpunkt, wenn das Netzwerk zwischen Master und Server nicht vollständig vertrauenswürdig ist.
+:::
+
+Wie die Dateiangabe oben bestimmen diese Eigenschaften, _wo_ die Konfiguration gelesen wird. Sie müssen daher vorher bekannt sein. Geben Sie sie als **JVM-Systemeigenschaften** oder **Umgebungsvariablen** an, nicht in einer Datei, die erst der Config Server ausliefern würde. Ein minimaler Start sieht so aus:
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-config.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-config.uri=http://config-server:8888 \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+:::warning
+Bei aktivierter Funktion verwendet Master den Fail-Fast-Modus. Ist der Config Server beim Start nicht erreichbar, startet Master nicht mit unvollständiger Konfiguration, sondern bricht ab. Solange die Funktion deaktiviert bleibt, kontaktiert Master keinen Server und startet normal.
+:::
+
+### Konfiguration aus HashiCorp Vault laden
+
+<ReleasedInNotice version="1.1.0" />
+
+Wenn Ihre Organisation Geheimnisse in [HashiCorp Vault](https://developer.hashicorp.com/vault) speichert, kann Master auch seine Konfiguration daraus lesen. Beim Start ruft Master ein Secret aus der [KV Secrets Engine](https://developer.hashicorp.com/vault/docs/secrets/kv) ab und übernimmt jeden Schlüssel in die Konfiguration, als stünde er in einer Konfigurationsdatei. Jede Eigenschaft `axelix.master.*` dieser Seite kann somit in Vault liegen. Üblicherweise speichern Sie dort sensible Werte wie `axelix.master.database.password` und `axelix.master.auth.jwt.signing-key` und behalten den Rest in einer gewöhnlichen Konfigurationsdatei.
+
+Die Funktion ist standardmäßig deaktiviert. Aktivieren Sie sie mit `axelix.master.external-config.spring-cloud-vault.enabled=true` und verweisen Sie über `uri` auf Ihren Vault-Server. Mit den Standardwerten liest Master das Secret unter `secret/axelix`: den KV-Mount `secret` und den eigenen Anwendungsnamen. Erwartet wird Version 2 der KV Engine, der Standard für Mounts aktueller Vault-Versionen. Ein Konfigurationswert wird daher so hinterlegt:
+
+```bash
+vault kv put secret/axelix \
+  axelix.master.database.password=a-strong-password \
+  axelix.master.auth.jwt.signing-key=cSuGCTNSJUW7yobufJTZ4C7BScamq2Yz
+```
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                                             | Standard      | Beschreibung                                                                                                                                                      |
+| ----------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `axelix.master.external-config.spring-cloud-vault.enabled`              | `false`       | Konfiguration beim Start aus HashiCorp Vault laden.                                                                                                               |
+| `axelix.master.external-config.spring-cloud-vault.uri`                  | leer          | Basis-URL des Vault-Servers, etwa `http://vault:8200`. Erforderlich bei `enabled=true`.                                                                           |
+| `axelix.master.external-config.spring-cloud-vault.authentication`       | `TOKEN`       | Authentifizierungsmethode. `TOKEN`, `APPROLE` und `KUBERNETES` werden unten beschrieben.                                                                          |
+| `axelix.master.external-config.spring-cloud-vault.fail-fast`            | `true`        | Start abbrechen, wenn Vault nicht erreichbar ist, statt mit unvollständiger Konfiguration zu starten.                                                             |
+| `axelix.master.external-config.spring-cloud-vault.kv.enabled`           | `true`        | Secrets aus der KV Secrets Engine lesen.                                                                                                                          |
+| `axelix.master.external-config.spring-cloud-vault.kv.backend`           | `secret`      | Mount-Pfad der KV Secrets Engine.                                                                                                                                 |
+| `axelix.master.external-config.spring-cloud-vault.kv.application-name`  | `axelix`      | Name des von Master unter dem Mount gelesenen Secrets, standardmäßig `secret/axelix`.                                                                             |
+| `axelix.master.external-config.spring-cloud-vault.kv.default-context`   | `application` | Zusätzlich zum anwendungsspezifischen Secret gelesenes gemeinsames Secret, standardmäßig `secret/application`, für gemeinsame Einstellungen mehrerer Anwendungen. |
+| `axelix.master.external-config.spring-cloud-vault.kv.profile-separator` | `/`           | Trennzeichen zwischen Anwendungsname und Spring-Profil in profilspezifischen Secret-Pfaden.                                                                       |
+
+</div>
+
+:::warning
+Die `uri`-Beispiele verwenden der Kürze halber `http://`. Dabei werden das von Master gesendete Vault-Token und alle von Vault zurückgegebenen Geheimnisse unverschlüsselt übertragen. Verwenden Sie für `uri` einen `https://`-Endpunkt und hinterlegen Sie die Vault-CA unter `axelix.master.external-config.spring-cloud-vault.ssl.*`, wenn das Netzwerk zwischen Master und Vault nicht vollständig vertrauenswürdig ist.
+:::
+
+Master arbeitet dabei als [Spring-Cloud-Vault](https://docs.spring.io/spring-cloud-vault/reference/)-Client. Daher stehen unter `axelix.master.external-config.spring-cloud-vault.*` sämtliche Verbindungseinstellungen von Spring Cloud Vault zur Verfügung: TLS-Vertrauensmaterial unter `ssl.*`, `namespace` für Vault Enterprise, Verbindungs- und Lesezeitlimits sowie weitere Authentifizierungsmethoden neben den drei folgenden. Die obige Tabelle nennt nur die in den meisten Installationen verwendeten Eigenschaften.
+
+Vault wird **einmal beim Start** gelesen. Ein geändertes Secret wirkt erst nach dem nächsten Master-Neustart. Es wird ausschließlich die statische KV Engine verwendet. Dynamische Secrets Engines, etwa für kurzlebige Datenbankzugangsdaten, sind nicht Teil dieser Funktion.
+
+#### Authentifizierung mit einem statischen Token
+
+`TOKEN` ist die Standardmethode, sodass ein Vault-Token genügt. Damit lässt sich die Funktion auf einem Entwicklungsrechner am schnellsten ausprobieren. Ein langlebiges statisches Token ist allerdings genau die Art von Zugangsdaten, die Vault vermeiden soll. Bevorzugen Sie in Produktion daher [AppRole](#authentifizierung-mit-approle) oder [Kubernetes](#authentifizierung-mit-kubernetes).
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                              | Standard | Beschreibung                                                                   |
+| -------------------------------------------------------- | -------- | ------------------------------------------------------------------------------ |
+| `axelix.master.external-config.spring-cloud-vault.token` | leer     | Statisches Vault-Token für die Anmeldung von Master. Für `TOKEN` erforderlich. |
+
+</div>
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-vault.uri=http://localhost:8200 \
+  -Daxelix.master.external-config.spring-cloud-vault.token=hvs.6j4cuewowBGit65rheNoceI7 \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Das Token selbst ist geheim. Die oben gezeigte `-D`-Variante stellt es in die Kommandozeile. Für einen kurzen lokalen Versuch ist das vertretbar. Wo andere die Prozessliste lesen können, übergeben Sie es stattdessen als Umgebungsvariable (`AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_TOKEN`). Siehe [Geheimnisse sicher bereitstellen](#eigenschaften-bereitstellen).
+
+#### Authentifizierung mit AppRole
+
+[AppRole](https://developer.hashicorp.com/vault/docs/auth/approle) dient der Maschinenkommunikation in Umgebungen ohne Plattformidentität: virtuelle Maschinen, Bare Metal oder Docker Compose. Master sendet ein Paar aus `role-id` und `secret-id`. Vault tauscht es gegen ein kurzlebiges Token mit der Policy der Rolle.
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                                               | Standard  | Beschreibung                                       |
+| ------------------------------------------------------------------------- | --------- | -------------------------------------------------- |
+| `axelix.master.external-config.spring-cloud-vault.app-role.role-id`       | leer      | RoleID der AppRole, mit der Master sich anmeldet.  |
+| `axelix.master.external-config.spring-cloud-vault.app-role.secret-id`     | leer      | Zu `role-id` gehörende SecretID.                   |
+| `axelix.master.external-config.spring-cloud-vault.app-role.role`          | leer      | Optionaler Rollenname für den Pull-Modus.          |
+| `axelix.master.external-config.spring-cloud-vault.app-role.app-role-path` | `approle` | Mount-Pfad des AppRole-Authentifizierungsbackends. |
+
+</div>
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-vault.uri=http://vault:8200 \
+  -Daxelix.master.external-config.spring-cloud-vault.authentication=APPROLE \
+  -Daxelix.master.external-config.spring-cloud-vault.app-role.role-id=5f3420cd-2c65-4a0e-87f4-b525b8e26a54 \
+  -Daxelix.master.external-config.spring-cloud-vault.app-role.secret-id=f8e77c67-40b6-49aa-a548-e50c62a765b3 \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+`secret-id` ist selbst geheim. Übergeben Sie den Wert auf Containerplattformen als Umgebungsvariable (`AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_APPROLE_SECRETID`) statt mit `-D`.
+
+#### Authentifizierung mit Kubernetes
+
+Auf Kubernetes empfehlen wir die [Kubernetes-Authentifizierung](https://developer.hashicorp.com/vault/docs/auth/kubernetes): Master verwendet das ServiceAccount-Token seines Pods, sodass keine statischen Zugangsdaten nötig sind. Erstellen Sie auf Vault-Seite eine Rolle im Kubernetes-Authentifizierungsbackend und binden Sie diese an den ServiceAccount von Master. Geben Sie auf Master-Seite diese Rolle an:
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                                                              | Standard                                              | Beschreibung                                                |
+| ---------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------- |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.role`                       | leer                                                  | Vault-Rolle, gegen die die Anmeldung erfolgt. Erforderlich. |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.kubernetes-path`            | `kubernetes`                                          | Mount-Pfad des Kubernetes-Authentifizierungsbackends.       |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.service-account-token-file` | `/var/run/secrets/kubernetes.io/serviceaccount/token` | Pfad zur ServiceAccount-Token-Datei des Pods.               |
+
+</div>
+
+```yaml
+env:
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_ENABLED
+    value: "true"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_URI
+    value: "http://vault.vault.svc:8200"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_AUTHENTICATION
+    value: "KUBERNETES"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_KUBERNETES_ROLE
+    value: "axelix-master"
+```
+
+Wie in den vorigen Abschnitten bestimmen diese Eigenschaften, _wo_ die Konfiguration gelesen wird. Sie müssen vorher bekannt sein: Geben Sie sie als JVM-Systemeigenschaften oder Umgebungsvariablen an, niemals als Schlüssel innerhalb eines Vault-Secrets.
+
+:::warning
+Bei aktivierter Funktion startet Master im Fail-Fast-Modus. Ist Vault beim Start nicht erreichbar, bricht Master ab, statt mit unvollständiger Konfiguration zu starten. Solange die Funktion standardmäßig deaktiviert bleibt, kontaktiert Master Vault nicht und startet normal.
+:::
+
+### HTTP-Port
+
+<ReleasedInNotice version="1.2.0" />
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft          | Standard | Beschreibung                                                                                                                      |
+| -------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `axelix.master.port` | `2935`   | HTTP-Port von Master, gemeinsam für UI, REST-API und MCP-Server. Vor Axelix `1.2.0` war der Standard `8080`; siehe Hinweis unten. |
+
+</div>
+
+:::note[Der Standardport: Warum 2935 und was wurde aus 8080?]
+Vor Axelix `1.2.x` lauschte Master auf `8080`, demselben Standardport wie jede Spring-Boot-Anwendung. Das war aus mehreren Gründen problematisch:
+
+- Die von Master verwalteten Dienste sind selbst Spring-Boot-Anwendungen. Lief Master lokal neben einer solchen Anwendung, kollidierten beide auf `8080`.
+
+- Port 8080 ist der Standardport des [Tomcat-Webservers](https://tomcat.apache.org/tomcat-11.0-doc/RUNNING.txt). Beim Aufruf von `domain:8080` konnte daher unklar sein, ob die Benutzeroberfläche von Tomcat oder Axelix angezeigt werden sollte.
+
+Seit Axelix `1.2.0` lauscht Master deshalb standardmäßig auf `2935`.
+
+Wenn Sie Axelix bereits vor `1.2.0` eingesetzt haben und Ihre Umgebung mit Lesezeichen, Firewallregeln oder `axelix.sbs.discovery.master-url` in Ihren Diensten auf dem alten Port basiert, können Sie das frühere Verhalten jederzeit mit `axelix.master.port=8080` wiederherstellen.
+:::
+
+### Allgemein
+
+<ReleasedInNotice version="1.1.0" />
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                 | Standard | Beschreibung                                                                                                                                                                                                                             |
+| --------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `axelix.master.environment` | leer     | Name der Umgebung dieser Master-Instanz, etwa `production` oder `staging`. Wird derzeit nur verwendet, um bei aktivierter [strukturierter Protokollierung](#strukturierte-protokollierung) das ECS-Feld `service.environment` zu füllen. |
+
+</div>
+
+### Datenbank
+
+Das JDBC-URL-Präfix bestimmt das Datenbanksystem. Davon hängt ab, welche Eigenschaften Sie angeben müssen:
+
+- **SQLite** (`jdbc:sqlite:...`): Der eingebaute Standard `jdbc:sqlite:axelix.db` funktioniert für den ersten Start **ohne zusätzliche Konfiguration**. `username` und `password` werden nicht verwendet, weil SQLite Daten in einer lokalen Datei speichert. Diese liegt im Arbeitsverzeichnis. Ohne eingebundenes Volume gehen Containerdaten bei einem Neustart verloren. SQLite unterstützt keine mehreren Master-Replikate. Verwenden Sie für alles über einen Versuch mit einem einzelnen Knoten hinaus PostgreSQL oder MySQL.
+- **PostgreSQL** (`jdbc:postgresql://...`): `url`, `username` und `password` sind **erforderlich**. Der Benutzer muss Tabellen erstellen und Schemamigrationen ausführen dürfen. Liquibase läuft bei jedem Start.
+- **MySQL** (`jdbc:mysql://...`): Wie bei PostgreSQL sind `url`, `username` und `password` **erforderlich**, ebenso die Berechtigung für Schemamigrationen.
+
+:::warning
+SQLite ist der Standard ohne Einrichtungsaufwand, aber **keine Produktionsdatenbank für Master**. Die Datei im Arbeitsverzeichnis geht bei Containerneustarts ohne eingebundenes Volume verloren. Mehrere Master-Replikate können keine einzelne Datei gemeinsam verwenden, sodass Hochverfügbarkeit ausgeschlossen ist. Verwenden Sie für `axelix.master.database.url` PostgreSQL oder MySQL, sobald der Einsatz über einen Versuch mit einem einzelnen Knoten hinausgeht.
+:::
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                       | Standard                | Beschreibung                                                                                                                                                                                                       |
+| --------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `axelix.master.database.url`      | `jdbc:sqlite:axelix.db` | JDBC-URL. Das Präfix wählt das System: `jdbc:sqlite:`, `jdbc:postgresql:` oder `jdbc:mysql:`. SQLite übersteht Containerneustarts ohne eingebundenes Volume nicht und unterstützt keine mehreren Master-Replikate. |
+| `axelix.master.database.username` | leer                    | Datenbankbenutzer. Für PostgreSQL oder MySQL erforderlich, bei SQLite ignoriert.                                                                                                                                   |
+| `axelix.master.database.password` | leer                    | Datenbankpasswort. Für PostgreSQL oder MySQL erforderlich, bei SQLite ignoriert.                                                                                                                                   |
+
+</div>
+
+### Authentifizierung — JWT
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                          | Standard                                             | Beschreibung                                                                                                                             |
+| ------------------------------------ | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `axelix.master.auth.jwt.algorithm`   | `HMAC512` (ab 1.2.0; davor erforderlich)             | Signaturalgorithmus: `HMAC256`, `HMAC384` oder `HMAC512`. Das eingebaute lokale Profil verwendet `HMAC512`.                              |
+| `axelix.master.auth.jwt.signing-key` | eingebauter Schlüssel (ab 1.2.0; davor erforderlich) | Geheimnis zum Signieren und Prüfen von Sitzungstoken. Verwenden Sie einen langen Zufallswert. Ein Wechsel macht alle Sitzungen ungültig. |
+| `axelix.master.auth.jwt.lifespan`    | `12h`                                                | Token-Lebensdauer als Spring-`Duration`, etwa `30m`, `12h` oder `7d`.                                                                    |
+
+</div>
+
+#### Betrieb ohne eigenen Signaturschlüssel
+
+<ReleasedInNotice version="1.2.0" />
+
+Seit Axelix 1.2.0 sind `algorithm` und `signing-key` optional. Ohne diese Angaben verwendet Master `HMAC512` und einen eingebauten Signaturschlüssel. Der Starter enthält denselben Schlüssel. Daher arbeiten Master und Dienste ohne Schlüsseleinrichtung zusammen, was für einen ersten lokalen Versuch praktisch ist. Solange der eingebaute Schlüssel verwendet wird, protokolliert Master beim Start eine Warnung.
+
+:::warning
+Der eingebaute Schlüssel ist öffentlich bekannt. Jeder mit diesem Schlüssel kann Sitzungstoken für beliebige Benutzer einschließlich des Super-Admins signieren und sich ohne Passwort an Master anmelden. Setzen Sie einen eigenen `axelix.master.auth.jwt.signing-key` und denselben Schlüssel in jedem Dienst, bevor andere Personen Master erreichen können.
+:::
+
+### Authentifizierung — Super-Admin
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                                   | Standard | Beschreibung                                                                            |
+| ------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `axelix.master.auth.options.super-admin.credentials.username` | `admin`  | Anmeldung des eingebauten Super-Admins, der sämtliche Berechtigungen im System besitzt. |
+| `axelix.master.auth.options.super-admin.credentials.password` | `admin`  | Passwort des eingebauten Super-Admins. Wählen Sie einen langen Zufallswert.             |
+
+</div>
+
+#### Anmeldung mit den Standardzugangsdaten
+
+<ReleasedInNotice version="1.2.0" />
+
+Seit Axelix 1.2.0 protokolliert Master bei jeder Super-Admin-Anmeldung mit `admin / admin` eine Warnung. Ein vergessenes Standardpasswort wird damit in den Logs sichtbar.
+
+### Authentifizierung — lokale Benutzer
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                | Standard | Beschreibung                                                            |
+| ------------------------------------------ | -------- | ----------------------------------------------------------------------- |
+| `axelix.master.auth.options.local.enabled` | `false`  | Anmeldung von Benutzerkonten aus der eigenen Master-Datenbank zulassen. |
+
+</div>
+
+### Authentifizierung — OAuth2 / OIDC
+
+Den vollständigen OAuth2-/OIDC-Anmeldeablauf beschreibt die Seite [Authentifizierung](../../setting-up-master-ui/authentication/authentication.mdx#oauth2--oidc).
+
+Bei `axelix.master.auth.options.oauth2.enabled=true` sind folgende Eigenschaften **erforderlich**:
+
+- `axelix.master.auth.options.oauth2.issuer-uri`
+- `axelix.master.auth.options.oauth2.client-id`
+- `axelix.master.auth.options.oauth2.client-secret`
+- `axelix.master.auth.options.oauth2.base-url`
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                             | Standard                                                         | Beschreibung                                                                                                                                              |
+| ------------------------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `axelix.master.auth.options.oauth2.enabled`             | `false`                                                          | OIDC-Anmeldung aktivieren.                                                                                                                                |
+| `axelix.master.auth.options.oauth2.issuer-uri`          | _(nicht gesetzt)_ <span className="Required">erforderlich</span> | Basis-URL des OIDC-Ausstellers. Master liest hier `/.well-known/openid-configuration`, um Endpunkte zu ermitteln. Erforderlich bei `oauth2.enabled=true`. |
+| `axelix.master.auth.options.oauth2.client-id`           | _(nicht gesetzt)_ <span className="Required">erforderlich</span> | Beim OIDC-Anbieter registrierte Client-ID. Erforderlich bei `oauth2.enabled=true`.                                                                        |
+| `axelix.master.auth.options.oauth2.client-secret`       | _(nicht gesetzt)_ <span className="Required">erforderlich</span> | Beim OIDC-Anbieter registriertes Client-Secret. Erforderlich bei `oauth2.enabled=true`.                                                                   |
+| `axelix.master.auth.options.oauth2.base-url`            | _(nicht gesetzt)_ <span className="Required">erforderlich</span> | Öffentliche Basis-URL dieser Master-Instanz für den OAuth2-Callback. Erforderlich bei `oauth2.enabled=true`.                                              |
+| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                                         | Durch Leerzeichen getrennte Scopes für den Authorization Code Flow. Fehlendes `openid` wird automatisch ergänzt.                                          |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | _(nicht gesetzt)_                                                | JMESPath-Ausdruck zur Auswertung der Userinfo-Antwort und Ermittlung der Axelix-Rolle. Ohne Angabe wird jeder OIDC-Benutzer zu `VIEWER`.                  |
+
+</div>
+
+:::warning
+Ein nicht gesetzter `role-attribute-path` ist für einen ersten Blick praktisch. Damit erhält jedoch **jeder Benutzer, der sich bei Ihrem IdP authentifizieren kann**, die Rolle `VIEWER` und Lesezugriff auf sämtliche Überwachungsdaten aller erkannten Dienste. Sofern nicht genau alle IdP-Benutzer Master sehen sollen, setzen Sie `role-attribute-path` vor dem Produktionseinsatz, damit Benutzer ohne ausdrückliche Axelix-Rolle nicht stillschweigend Zugriff erhalten.
+:::
+
+### Authentifizierung — Sitzungscookie
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                        | Standard | Beschreibung                                                                                           |
+| ---------------------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
+| `axelix.master.auth.cookie.secure` | `false`  | Bei HTTPS auf `true` setzen, damit das Sitzungscookie nicht über unverschlüsseltes HTTP gesendet wird. |
+
+</div>
+
+### Diensterkennung — automatische Erkennung
+
+Die automatische Erkennung findet Anwendungen mit Spring Boot Starter, ohne dass diese sich selbst melden müssen. Nach dem Zeitplan `broadcast.schedule` fragt Master die Kubernetes-API nach Services in den konfigurierten Namespaces ab, filtert nach Labels und prüft bei Treffern `/actuator/axelix-metadata`. Dazu stellt Master selbst ein JWT mit `axelix.master.auth.jwt.signing-key` aus. Eine erfolgreiche Prüfung registriert die Instanz; bei einem Fehler wird sie aus der Liste entfernt. Seit 1.3.0 aktualisiert Master bereits bekannte Instanzen stattdessen über den leichtgewichtigeren Endpunkt `axelix-ping`. Den gesamten Ablauf beschreibt [So funktioniert die Diensterkennung](../../product/discovery.mdx).
+
+Aktivieren Sie die Funktion mit `axelix.master.discovery.auto.enabled=true`, standardmäßig `false`. Kubernetes ist derzeit die einzige unterstützte Plattform für die Diensterkennung.
+
+Wenn Master als Pod **im Cluster** läuft, verwenden die Kubernetes-Verbindungseinstellungen (`kube-apiserver-url`, `sa-token-path`, `ca-cert-path`) passende Pod-Standardwerte. Sie müssen sie nicht ändern. Der Starter muss lediglich denselben JWT-Signaturschlüssel verwenden; `axelix-metadata` stellt er selbst bereit. Läuft Master **außerhalb** des Clusters, geben Sie die externe API-URL, eine Token-Datei mit erforderlichen RBAC-Rechten und den Cluster-CA-Pfad an. Begrenzen Sie den Scan mit `filters.namespaces` und `filters.labels`.
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                                  | Standard                                                              | Beschreibung                                                                                                 |
+| ------------------------------------------------------------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `axelix.master.discovery.auto.enabled`                       | `false`                                                               | Plattformgestützte automatische Erkennung verwalteter Dienste aktivieren.                                    |
+| `axelix.master.discovery.auto.broadcast.schedule`            | `0 * * * * *`                                                         | Cron-Ausdruck für den Erkennungsscan.                                                                        |
+| `axelix.master.discovery.auto.kubernetes.kube-apiserver-url` | `https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}` | URL des Kubernetes-API-Servers.                                                                              |
+| `axelix.master.discovery.auto.kubernetes.sa-token-path`      | `/var/run/secrets/kubernetes.io/serviceaccount/token`                 | Pfad des eingebundenen ServiceAccount-Tokens im Master-Pod.                                                  |
+| `axelix.master.discovery.auto.kubernetes.ca-cert-path`       | `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`                | Pfad des eingebundenen CA-Zertifikats für kube-apiserver im Master-Pod.                                      |
+| `axelix.master.discovery.auto.kubernetes.filters.namespaces` | `default`                                                             | Kommaseparierte Liste der zu scannenden Namespaces.                                                          |
+| `axelix.master.discovery.auto.kubernetes.filters.labels`     | leer                                                                  | Zuordnung von Label-Schlüsseln und -Werten, denen ein Kubernetes-Service für die Erkennung entsprechen muss. |
+
+</div>
+
+### Diensterkennung — Selbstregistrierung
+
+Die Selbstregistrierung arbeitet in umgekehrter Richtung: Master _empfängt_ Heartbeats von einer Anwendung mit Spring Boot Starter, statt danach zu suchen. Jeder Heartbeat enthält Actuator-URL, Instanzname und ein mit dem gemeinsamen `axelix.master.auth.jwt.signing-key` signiertes JWT. Master speichert die Registrierung und führt die Instanz, bis Heartbeats ausbleiben. Trifft innerhalb von `eviction.heartbeat-timeout` kein Heartbeat ein, entfernt der durch `eviction.schedule` geplante Bereinigungslauf die Instanz. Seit 1.3.0 ist nur die erste Anfrage eine vollständige Registrierung; spätere Heartbeats sind leichtgewichtig. Siehe [So funktioniert die Diensterkennung](../../product/discovery.mdx).
+
+Der Endpunkt lautet `POST /api/internal/service/register`. Seit 1.3.0 wird nur die erste Registrierung dorthin gesendet, die Heartbeats gehen an einen benachbarten Endpunkt. Es gilt derselbe JWT-Signaturschlüssel unter `axelix.master.auth.jwt.*`. Ohne übereinstimmenden Schlüssel werden Heartbeats abgelehnt.
+
+Auf Master-Seite sind **keine Anpassungen erforderlich**. Jede Eigenschaft besitzt einen funktionierenden Standardwert. Die Funktion ist **standardmäßig aktiviert** (`enabled=true`). Setzen Sie sie nur dann auf `false`, wenn Master alle Heartbeats ablehnen soll. Die Starter-Eigenschaften für den Heartbeat (`master-url`, `instance-actuator-url`, `instance-name`) beschreibt [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                                            | Standard      | Beschreibung                                                                                               |
+| ---------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| `axelix.master.discovery.self-registration.enabled`                    | `true`        | Heartbeats zur Selbstregistrierung von Anwendungen mit Spring Boot Starter annehmen. Mit `false` ablehnen. |
+| `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` | `45s`         | Selbstregistrierte Instanz nach diesem Zeitraum ohne Heartbeat entfernen.                                  |
+| `axelix.master.discovery.self-registration.eviction.schedule`          | `0 * * * * *` | Cron-Ausdruck für den Bereinigungslauf.                                                                    |
+
+</div>
+
+### MCP-Server
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                        | Standard | Beschreibung                                                              |
+| ---------------------------------- | -------- | ------------------------------------------------------------------------- |
+| `axelix.master.mcp-server.enabled` | `true`   | Eingebauten Model-Context-Protocol-Server unter `/api/mcp` bereitstellen. |
+
+</div>
+
+:::note
+Der MCP-Server ist **standardmäßig aktiviert**. Er verwendet dieselben Authentifizierungs- und Rollenprüfungen wie die UI, siehe [MCP-Server-Authentifizierung](../authentication/authentication.mdx#authentifizierung-am-mcp-server). Er ist daher kein offener Zugang, stellt aber eine zusätzliche aus der Ferne erreichbare Schnittstelle dar. Wenn kein KI-Agent ihn nutzt, setzen Sie in Produktion `axelix.master.mcp-server.enabled=false`. Andernfalls beschränken Sie `/api/mcp` wie die UI auf vertrauenswürdige Clients.
+:::
+
+### Verlauf geplanter Aufgaben
+
+<ReleasedInNotice version="1.3.0" />
+
+Master speichert jeden gemeldeten Lauf einer `@Scheduled`-Aufgabe in seiner Datenbank. So kann die Seite [Scheduled Tasks](../../features/spring-framework/scheduled-tasks.mdx#ausführungsverlauf) Erfolgsrate, Dauer und Fehler jeder Aufgabe anzeigen. Eine Bereinigungsaufgabe entfernt Läufe, die älter als `retention` sind, und behält je Aufgabe nur die neuesten `max-executions-per-task` Läufe. Die Standardwerte funktionieren unverändert. Passen Sie sie nur an, wenn Sie mehr Verlauf oder weniger Datenbankverbrauch benötigen.
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                                     | Standard         | Beschreibung                                                                |
+| --------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------- |
+| `axelix.master.scheduled-tasks.history.retention`               | `30d`            | Aufbewahrungsdauer eines Laufs als Spring-`Duration`, etwa `7d` oder `12h`. |
+| `axelix.master.scheduled-tasks.history.max-executions-per-task` | `50`             | Anzahl der neuesten Läufe, die Master je Aufgabe behält.                    |
+| `axelix.master.scheduled-tasks.history.cleanup.schedule`        | `0 */10 * * * *` | Cron-Ausdruck für die Bereinigungsaufgabe, standardmäßig alle 10 Minuten.   |
+
+</div>
+
+### Strukturierte Protokollierung
+
+<ReleasedInNotice version="1.1.0" />
+
+Standardmäßig schreibt Master Klartext in die Konsole, also stdout des Prozesses. Mit `axelix.master.logging.json.enabled=true` wechseln Sie zur strukturierten JSON-Protokollierung nach [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS), derzeit das einzige unterstützte strukturierte Format. ECS ist ein JSON-basiertes Logformat. Verwenden Sie es, wenn Logs an Elasticsearch oder eine andere ECS-kompatible Verarbeitungskette gesendet werden.
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                          | Standard | Beschreibung                                                                          |
+| ------------------------------------ | -------- | ------------------------------------------------------------------------------------- |
+| `axelix.master.logging.json.enabled` | `false`  | Konsolenprotokollierung von Klartext auf strukturiertes JSON im ECS-Format umstellen. |
+
+</div>
+
+### Metriken
+
+#### Prometheus
+
+<ReleasedInNotice version="1.1.0" />
+
+Mit `axelix.master.metrics.prometheus.enabled=true` stellt Master einen Prometheus-Scrape-Endpunkt bereit. Er antwortet unter `/api/actuator/prometheus` und verlangt keine Authentifizierung.
+
+Standardmäßig verwendet er denselben Port wie Master (`server.port`). Mit `axelix.master.metrics.prometheus.port` verwenden Sie einen separaten Port, etwa um den Scrape-Zugriff getrennt von Haupt-UI und API zu beschränken.
+
+Gemeinsame Tags für alle exportierten Metriken setzen Sie mit `axelix.master.metrics.prometheus.tags.<name>=<value>`, beispielsweise für Bereitstellungsregion oder Umgebung.
+
+:::warning
+Da der Endpunkt keine Authentifizierung verlangt, kann jeder mit Netzwerkzugriff auf Master Metrikwerte und konfigurierte gemeinsame Tags lesen. Beschränken Sie `/api/actuator/prometheus` über Netzwerkrichtlinien, Ingress-Regeln oder gleichwertige Maßnahmen auf vertrauenswürdige Prometheus-Infrastruktur.
+:::
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                | Standard          | Beschreibung                                                               |
+| ------------------------------------------ | ----------------- | -------------------------------------------------------------------------- |
+| `axelix.master.metrics.prometheus.enabled` | `false`           | Prometheus-Scrape-Endpunkt unter `/api/actuator/prometheus` bereitstellen. |
+| `axelix.master.metrics.prometheus.port`    | _(nicht gesetzt)_ | Port des Prometheus-Endpunkts. Standardmäßig `server.port`.                |
+| `axelix.master.metrics.prometheus.tags`    | leer              | Gemeinsame Tags für jede exportierte Metrik.                               |
+
+</div>
+
+```yaml
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+        tags:
+          region: eu-west-1
+```
+
+Alternativ mit separatem Port:
+
+```yaml
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+        port: 9404
+```
+
+#### OTLP
+
+<ReleasedInNotice version="1.1.0" />
+
+Master kann seine eigenen JVM-, HTTP-, Datenbankpool- und sonstigen Micrometer-Metriken über HTTP/protobuf an einen OTLP-kompatiblen Collector senden. Exportiert werden Metriken von Master selbst, keine Metriken aus Diensten mit Axelix Starter. Der OTLP-Metrikexport ist standardmäßig deaktiviert; siehe folgende Eigenschaften.
+
+<div className={styles.ConfigTable}>
+
+| Eigenschaft                                   | Standard                           | Beschreibung                                                                       |
+| --------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------- |
+| `axelix.master.metrics.otlp.enabled`          | `false`                            | Regelmäßigen OTLP-Metrikexport aktivieren.                                         |
+| `axelix.master.metrics.otlp.url`              | `http://localhost:4318/v1/metrics` | Vollständiger HTTP/protobuf-Metrikendpunkt einschließlich `/v1/metrics`.           |
+| `axelix.master.metrics.otlp.step`             | `1m`                               | Exportintervall als Spring-`Duration`.                                             |
+| `axelix.master.metrics.otlp.headers.*`        | leer                               | Eigene Anfrageheader, etwa für Autorisierung. Geheime Werte zur Laufzeit einfügen. |
+| `axelix.master.metrics.otlp.compression-mode` | `none`                             | Anfragekomprimierung: `none` oder `gzip`.                                          |
+
+</div>
+
+```yaml
+axelix:
+  master:
+    metrics:
+      otlp:
+        enabled: true
+        url: http://otel-collector:4318/v1/metrics
+        step: 30s
+        headers:
+          Authorization: ${OTLP_AUTHORIZATION_HEADER}
+```
+
+Diese Einstellungen lassen sich auch als Umgebungsvariablen oder JVM-Systemeigenschaften übergeben. [Eigenschaften bereitstellen](#eigenschaften-bereitstellen) beschreibt die Relaxed-Binding-Regeln, die etwa `axelix.master.metrics.otlp.enabled` auf `AXELIX_MASTER_METRICS_OTLP_ENABLED` abbilden.
+
+Beziehen Sie Authentifizierungsheader vorzugsweise aus dem Secret Store Ihrer Bereitstellungsplattform, statt sie in einer versionierten Konfigurationsdatei zu speichern.
+
+## Als JAR ausführen
+
+Axelix Master ist im Kern ein JVM-Prozess und wird deshalb als JAR ausgeliefert. Es lässt sich mit `java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar` starten, auch wenn die tatsächliche Einrichtung etwas mehr erfordert. Diese Variante eignet sich, wenn Sie keine Container verwenden.
+
+### 1. JAR herunterladen
+
+Laden Sie die Axelix-Master-JAR der gewünschten Version von der [Releases-Seite](https://github.com/axelixlabs/axelix/releases) herunter. Der Dateiname enthält die Releaseversion, etwa `axelix-1.3.0.jar` für Axelix `1.3.0`. Siehe [Artefaktnamen](../../more/compatibility-and-versioning.mdx#artefaktnamen). Das veröffentlichte Artefakt enthält die UI bereits. Sie müssen nichts zusätzlich bauen.
+
+### 2. Master konfigurieren und starten
+
+Für einen lokalen Versuch ab Axelix 1.2.0 genügt `java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar`, da Master auf den eingebauten JWT-Signaturschlüssel zurückgreift. In einer echten Umgebung, auch außerhalb der Produktion, geben Sie einen eigenen Signaturschlüssel und Algorithmus an. Für den ersten Start können alle anderen Standardwerte bleiben. Sie können diese Konfiguration auf drei gleichwertige Arten bereitstellen, die Master identisch liest: als **Umgebungsvariablen**, als **`-D`-JVM-Systemeigenschaften** im Aufruf oder als **externe Konfigurationsdatei** wie `application.yaml` / `application.properties`. Siehe [Eigenschaften bereitstellen](#eigenschaften-bereitstellen).
+
+#### Umgebungsvariablen
+
+Praktisch, wenn Shell oder Prozessverwaltung die Werte bereits exportieren:
+
+<Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
+  <Tab value="Built-in key (local trial)">
+
+```bash
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Ohne JWT-Eigenschaften verwendet Master den eingebauten Signaturschlüssel. Verwenden Sie dies nur für lokale Versuche. Siehe [Betrieb ohne eigenen Signaturschlüssel](#betrieb-ohne-eigenen-signaturschlüssel).
+
+  </Tab>
+  <Tab value="Your own key">
+
+```bash
+export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
+export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
+
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+  </Tab>
+</Tabs>
+
+#### JVM-Systemeigenschaften (-D)
+
+Praktisch für einen einmaligen schnellen Start:
+
+```bash
+java \
+  -Daxelix.master.auth.jwt.algorithm=HMAC512 \
+  -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+:::warning
+Der Signaturschlüssel ist geheim, und `-D` ist für jeden sichtbar, der die Prozessliste des Hosts lesen kann. Für einen lokalen Versuch ist diese Form geeignet. Bei echten Bereitstellungen übergeben Sie Geheimnisse als Umgebungsvariablen oder aus einem Secret Store. Siehe [Geheimnisse sicher bereitstellen](#eigenschaften-bereitstellen).
+:::
+
+#### Externe Konfigurationsdatei
+
+<ReleasedInNotice version="1.1.0" />
+
+Speichern Sie dieselben Einstellungen in einer YAML- oder properties-Datei und verweisen Sie mit `axelix.master.config.location` darauf. Die zulässigen Ortsangaben beschreibt [Master auf eine Konfigurationsdatei verweisen](#master-auf-eine-konfigurationsdatei-verweisen).
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: replace-with-a-long-random-secret
+```
+
+```bash
+java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Master ist anschließend unter `http://localhost:2935` erreichbar. Melden Sie sich mit den von Ihnen konfigurierten Super-Admin-Zugangsdaten an.
+
+## Mit Docker ausführen
+
+Wenn Sie Container verwenden können, empfehlen wir die Installation von Axelix Master als Docker-Image. Die Releasepipeline veröffentlicht das Image in GitHub Container Registry und Docker Hub. Die Beispiele verwenden die neueste Version `AXELIX_VERSION_PLACEHOLDER`:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker pull ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker pull docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+:::note
+Ersetzen Sie für eine andere Version das Tag im Imagenamen, etwa:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```
+ghcr.io/axelixlabs/axelix:1.2.2
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```
+docker.io/axelixlabs/axelix:1.2.2
+```
+
+  </Tab>
+</Tabs>
+
+Veröffentlichte Tags finden Sie auf der [Releases-Seite](https://github.com/axelixlabs/axelix/releases).
+
+Beziehen Sie das Image in Produktion über seinen Digest statt über ein Tag:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```
+ghcr.io/axelixlabs/axelix@sha256:<digest>
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```
+docker.io/axelixlabs/axelix@sha256:<digest>
+```
+
+  </Tab>
+</Tabs>
+:::
+
+### Startbefehl
+
+Ein minimaler Start für einen ersten Blick:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+<Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
+  <Tab value="Built-in key (local trial)">
+
+```bash
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+Ohne JWT-Eigenschaften verwendet Master den eingebauten Signaturschlüssel. Verwenden Sie dies nur für lokale Versuche. Siehe [Betrieb ohne eigenen Signaturschlüssel](#betrieb-ohne-eigenen-signaturschlüssel).
+
+  </Tab>
+  <Tab value="Your own key">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+<Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
+  <Tab value="Built-in key (local trial)">
+
+```bash
+docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+Ohne JWT-Eigenschaften verwendet Master den eingebauten Signaturschlüssel. Verwenden Sie dies nur für lokale Versuche. Siehe [Betrieb ohne eigenen Signaturschlüssel](#betrieb-ohne-eigenen-signaturschlüssel).
+
+  </Tab>
+  <Tab value="Your own key">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+</Tabs>
+
+Hinweise zum Befehl:
+
+- Das Image läuft als Nicht-Root-Benutzer `axelix` und verwendet einen beim Imagebau erzeugten Ahead-of-Time-Klassenladecache. Der Start ist daher schneller als bei einem einfachen JAR-Aufruf.
+- Standarddatenbank bleibt SQLite im Arbeitsverzeichnis (`/application/axelix.db`). Die Datei liegt in der beschreibbaren Containerschicht und verschwindet beim Entfernen des Containers. Wechseln Sie zu PostgreSQL/MySQL, siehe nächster Abschnitt, oder binden Sie ein Volume am SQLite-Pfad ein.
+
+### Möglichkeiten zur Konfiguration
+
+Bevorzugen Sie **Umgebungsvariablen**. Innerhalb eines Containers sind sie der sicherste Konfigurationsort und die einzige Variante, die Geheimnisse aus dem Startprotokoll fernhält.
+
+#### Einzelne Umgebungsvariablen
+
+Übergeben Sie einzelne Umgebungsvariablen mit `-e` nach den Relaxed-Binding-Regeln aus [Eigenschaften bereitstellen](#eigenschaften-bereitstellen). Der obige Startbefehl verwendet diese Variante:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
+  -e AXELIX_MASTER_DATABASE_USERNAME=axelix \
+  -e AXELIX_MASTER_DATABASE_PASSWORD=... \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
+  -e AXELIX_MASTER_DATABASE_USERNAME=axelix \
+  -e AXELIX_MASTER_DATABASE_PASSWORD=... \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+#### Systemeigenschaften (-D) über `JAVA_TOOL_OPTIONS`
+
+Die JVM übernimmt `-D`-Systemeigenschaften aus `JAVA_TOOL_OPTIONS` automatisch in den `java`-Aufruf. Das eignet sich für JVM-Einstellungen wie die Heapgröße.
+
+:::warning
+Die JVM schreibt beim Start den vollständigen Wert von `JAVA_TOOL_OPTIONS` nach stderr (`Picked up JAVA_TOOL_OPTIONS: ...`). Alles darin landet in `docker logs` und jeder Logsammlung. Hinterlegen Sie darin niemals JWT-Signaturschlüssel, Super-Admin-Passwort oder Datenbankzugangsdaten. Übergeben Sie diese stattdessen als einzelne `-e`-Umgebungsvariablen.
+:::
+
+Ein Beispiel:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+#### Externe Konfigurationsdatei
+
+<ReleasedInNotice version="1.1.0" />
+
+Sie können die Konfiguration auch aus einer externen Datei bereitstellen. Binden Sie eine YAML- oder properties-Datei in den Container ein und verweisen Sie mit `axelix.master.config.location` darauf. Siehe [Master auf eine Konfigurationsdatei verweisen](#master-auf-eine-konfigurationsdatei-verweisen). Speichern Sie Geheimnisse nicht in einer Datei, die ins Image eingebaut oder zusammen mit ihm versioniert wird. Übergeben Sie sie wie oben als einzelne `-e`-Umgebungsvariablen.
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+```
+
+Übergeben Sie die Datei anschließend als Volume an den Docker-Aufruf:
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+## Mit Docker Compose ausführen
+
+Axelix Master lässt sich auch in einer Docker-Compose-Bereitstellung betreiben.
+
+Das folgende Beispiel ist ein vollständiger Stack. Speichern Sie ihn in einer neuen `docker-compose.yaml`, passen Sie ihn an und starten Sie ihn mit `docker compose up -d`. Der Dienst `master` verwendet hier das neueste Release. Binden Sie vor dem Einsatz das Image an seinen Digest, siehe [Mit Docker ausführen](#mit-docker-ausführen).
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```yaml title="docker-compose.yaml"
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: axelix
+      POSTGRES_USER: ${AXELIX_DB_USERNAME:?set AXELIX_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AXELIX_DB_PASSWORD:?set AXELIX_DB_PASSWORD}
+    volumes:
+      - axelix-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  master:
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "2935:2935"
+    environment:
+      AXELIX_MASTER_DATABASE_URL: jdbc:postgresql://postgres:5432/axelix
+      AXELIX_MASTER_DATABASE_USERNAME: ${AXELIX_DB_USERNAME}
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_USERNAME: ${AXELIX_ADMIN_USERNAME}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_PASSWORD: ${AXELIX_ADMIN_PASSWORD}
+      AXELIX_MASTER_AUTH_COOKIE_SECURE: "false"
+
+volumes:
+  axelix-pgdata:
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: axelix
+      POSTGRES_USER: ${AXELIX_DB_USERNAME:?set AXELIX_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AXELIX_DB_PASSWORD:?set AXELIX_DB_PASSWORD}
+    volumes:
+      - axelix-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  master:
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "2935:2935"
+    environment:
+      AXELIX_MASTER_DATABASE_URL: jdbc:postgresql://postgres:5432/axelix
+      AXELIX_MASTER_DATABASE_USERNAME: ${AXELIX_DB_USERNAME}
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_USERNAME: ${AXELIX_ADMIN_USERNAME}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_PASSWORD: ${AXELIX_ADMIN_PASSWORD}
+      AXELIX_MASTER_AUTH_COOKIE_SECURE: "false"
+
+volumes:
+  axelix-pgdata:
+```
+
+  </Tab>
+</Tabs>
+
+Jeder Schlüssel `AXELIX_MASTER_*` wird durch Relaxed Binding der entsprechenden Eigenschaft zugeordnet, siehe [Eigenschaften bereitstellen](#eigenschaften-bereitstellen). Einzelne Umgebungsvariablen statt einer Zusammenfassung in `JAVA_TOOL_OPTIONS` halten Signaturschlüssel und Passwörter aus dem Startprotokoll des Containers fern.
+
+Alternativ können Sie die Werte in einer `.env`-Datei neben der Compose-Datei hinterlegen:
+
+```bash title=".env"
+AXELIX_DB_USERNAME=axelix
+AXELIX_DB_PASSWORD=...
+AXELIX_JWT_SIGNING_KEY=...
+AXELIX_ADMIN_USERNAME=admin
+AXELIX_ADMIN_PASSWORD=...
+```
+
+Die Datei enthält Signaturschlüssel und Passwörter im Klartext. Nehmen Sie sie deshalb mit `.gitignore` von der Versionsverwaltung aus und beschränken Sie ihre Dateiberechtigungen. Bevorzugen Sie in Produktion den Secret Store Ihrer Plattform statt einer langlebigen `.env`-Datei auf der Festplatte.
+
+`AXELIX_MASTER_AUTH_COOKIE_SECURE` ist im Beispiel `false`, da Master für lokale Tests über unverschlüsseltes HTTP erreichbar ist. Platzieren Sie Master bei echten Bereitstellungen hinter einem Proxy mit TLS-Terminierung und setzen Sie den Wert auf `true`.
+
+### Konfiguration über eine eingebundene Datei bereitstellen
+
+<ReleasedInNotice version="1.1.0" />
+
+Statt jede nicht geheime Einstellung unter `environment` aufzuführen, können Sie eine YAML- oder properties-Datei in den Dienst `master` einbinden und mit `axelix.master.config.location` darauf verweisen. Siehe [Master auf eine Konfigurationsdatei verweisen](#master-auf-eine-konfigurationsdatei-verweisen):
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    database:
+      url: jdbc:postgresql://postgres:5432/axelix
+    auth:
+      cookie:
+        secure: false
+```
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```yaml title="docker-compose.yaml"
+  master:
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    volumes:
+      - ./master.yaml:/etc/axelix/master.yaml:ro
+    environment:
+      AXELIX_MASTER_CONFIG_LOCATION: file:/etc/axelix/master.yaml
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+  master:
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    volumes:
+      - ./master.yaml:/etc/axelix/master.yaml:ro
+    environment:
+      AXELIX_MASTER_CONFIG_LOCATION: file:/etc/axelix/master.yaml
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+</Tabs>
+
+Halten Sie JWT-Signaturschlüssel, Super-Admin-Passwort und Datenbankzugangsdaten aus versionierten Dateien heraus. Übergeben Sie diese wie oben als einzelne Umgebungsvariablen.
+
+## Auf Kubernetes ausführen
+
+Verwenden Sie diese Variante, wenn Master im selben Cluster wie die überwachten Dienste laufen und diese automatisch erkennen soll.
+
+Axelix liefert ein eigenes Helm-Chart, sodass Sie Manifeste nicht von Hand zusammenstellen müssen:
+
+- **Chart-Quellcode**: Verzeichnis [`charts/axelix`](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) im Axelix-Repository. Die Datei `values.yaml` dokumentiert alle Chart-Werte einschließlich Datenbankverbindung, JWT, Super-Admin-Zugangsdaten, automatischer Erkennung, RBAC und Ingress.
+- **Veröffentlichtes Paket**: [artifacthub.io/packages/helm/axelix/axelix](https://artifacthub.io/packages/helm/axelix/axelix). Es bezieht das Chart aus dem Axelix-Helm-Repository und listet verfügbare Versionen auf.
+
+Eine typische Installation sieht so aus:
+
+```bash
+helm repo add axelix https://axelixlabs.github.io/axelix
+helm repo update
+helm install axelix axelix/axelix \
+  --namespace axelix --create-namespace \
+  --values values.yaml
+```
+
+Hinterlegen Sie Ihre Anpassungen in `values.yaml`, mindestens `axelix.master.auth.jwt.signing-key`, das Super-Admin-Passwort und die Datenbankverbindung. Das Chart richtet ServiceAccount und RBAC für die automatische Erkennung im Cluster ein.
+
+Machen Sie den Service für einen kurzen Test über den in Ihrem Cluster üblichen Weg erreichbar, etwa `Ingress` oder `Gateway`.
+
+### Ein eigenes Chart verwenden
+
+Manche Teams verwenden eigene Helm-Charts oder direkte Manifeste statt des offiziellen Charts. Das ist möglich. Beachten Sie dabei die folgenden Punkte.
+
+#### Automatische Erkennung
+
+Während der automatischen Erkennung fragt Axelix Master die REST-API der Kubernetes-Steuerungsebene ab. Der dem Pod zugeordnete [Kubernetes-ServiceAccount](https://kubernetes.io/docs/concepts/security/service-accounts/) benötigt daher passende Berechtigungen. Das [offizielle Chart](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) richtet diese ein.
+
+:::note
+
+Dies gilt nur bei `axelix.master.discovery.auto.enabled=true`. Ohne automatische Erkennung benötigt Master keine der folgenden Berechtigungen.
+
+:::
+
+Beachten Sie beim Schreiben eines eigenen Helm-Charts Folgendes:
+
+**1. Master muss die Kubernetes-API erreichen.** Im Modus der automatischen Erkennung fragt Master die Cluster-Control-Plane-API nach `broadcast.schedule` ab und listet Services und die dahinterliegenden Pods in jedem konfigurierten Namespace. Standardmäßig liest Master die Verbindungsdaten aus den üblichen Pod-Pfaden:
+
+- API-Server-URL aus `KUBERNETES_SERVICE_HOST` / `KUBERNETES_SERVICE_PORT_HTTPS`, die Kubernetes in jeden Pod einfügt;
+- [ServiceAccount-Token](https://kubernetes.io/docs/concepts/security/service-accounts/#authenticating-credentials) aus `/var/run/secrets/kubernetes.io/serviceaccount/token`;
+- CA-Zertifikat aus `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`.
+
+Dies sind die Standardwerte von `kube-apiserver-url`, `sa-token-path` und `ca-cert-path` unter [automatische Erkennung](#diensterkennung--automatische-erkennung). Wenn Sie diese beibehalten, müssen Sie nur Token und CA an den genannten Pfaden bereitstellen. Darum geht es in den nächsten beiden Punkten.
+
+**2. Der Pod benötigt einen ServiceAccount mit eingebundenem Token.** Erstellen Sie einen ServiceAccount, setzen Sie `serviceAccountName` im Deployment und behalten Sie `automountServiceAccountToken: true` bei, damit Token und CA an den genannten Pfaden erscheinen. Ohne eingebundenes Token fehlen Master Zugangsdaten, und jeder Scan scheitert an der Autorisierung.
+
+**3. Der ServiceAccount benötigt RBAC-Leserechte für Workloads.** Ein ServiceAccount allein kann sich authentifizieren, hat aber keine Berechtigungen. Gewähren Sie ihm `get`, `list` und `watch` auf `pods`, `services` und `endpoints` in jedem zu erkennenden Namespace. Binden Sie die erstellte Role anschließend an den ServiceAccount. Die berechtigten Namespaces müssen `filters.namespaces` entsprechen: Master scannt genau diese, und ein nicht lesbarer Namespace liefert keine Instanzen.
+
+Die minimale Konfiguration für einen einzelnen zu erkennenden Namespace sieht so aus:
+
+```yaml title="rbac.yaml"
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: axelix-master
+  namespace: axelix
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: axelix-master-role
+  namespace: default          # a namespace listed in filters.namespaces
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: axelix-master-role-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: axelix-master
+    namespace: axelix         # the namespace the ServiceAccount lives in
+roleRef:
+  kind: Role
+  name: axelix-master-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+Verweisen Sie anschließend im Deployment auf diesen ServiceAccount:
+
+```yaml title="deployment.yaml"
+spec:
+  template:
+    spec:
+      serviceAccountName: axelix-master
+      containers:
+        - name: axelix-master
+          image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+Eine Kubernetes-Role gehört zu einem Namespace. Wiederholen Sie Role und RoleBinding deshalb für jeden Namespace in `filters.namespaces`, jeweils mit demselben ServiceAccount. Liegt der ServiceAccount in einem anderen Namespace als die Workloads, muss das RoleBinding-Subject trotzdem dessen eigenen Namespace angeben, wie oben gezeigt.
+
+:::tip
+Die Dateien [`templates/rbac.yaml`](https://github.com/axelixlabs/axelix/blob/master/charts/axelix/templates/rbac.yaml) und [`templates/serviceaccount.yaml`](https://github.com/axelixlabs/axelix/blob/master/charts/axelix/templates/serviceaccount.yaml) des offiziellen Charts dienen dafür als Referenz. Führen Sie bei Bedarf `helm template` aus und übernehmen Sie den gerenderten ServiceAccount sowie Role und RoleBinding als Ausgangspunkt für eigene Manifeste.
+:::
+
+## Weitere Informationen
+
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx): Überwachte Anwendungen so anbinden, dass Master sie erkennt.
+- [Was ist Master?](../../setting-up-master-ui/what-is-master.mdx): Hintergrund zur Arbeit von Master nach dem Start.
+- [Authentifizierung](../../setting-up-master-ui/authentication/authentication.mdx): Details zu JWT, Super-Admin und OAuth2/OIDC.

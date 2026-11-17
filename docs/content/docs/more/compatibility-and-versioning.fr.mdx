@@ -85,28 +85,41 @@ La seule exception à l’alignement sur la prise en charge de Java par Spring B
 
 ## Compatibilité entre les composants
 
-Axelix est [publié avec des versions synchronisées](#une-version-pour-tous-les-composants), mais rien ne vous oblige à **mettre à niveau** tous les composants ensemble : dans un parc réel, vous pouvez passer Master au dernier correctif avant les services, ou mettre à niveau le starter d’un seul service sans toucher au reste. Pour ces déploiements mixtes, une seule règle s’applique à **tous** les composants Axelix :
+Axelix est [publié de manière synchronisée](#une-version-pour-tous-les-composants), mais vous pouvez **mettre à
+niveau** les composants à des moments différents. Deux règles de compatibilité s’appliquent :
 
-> **Deux composants Axelix quelconques sont garantis compatibles dès lors qu’ils partagent les mêmes versions `major` et `minor`. La version corrective n’a aucune importance.**
+- **Master et starter :** au sein d’une même version majeure, Master prend en charge les starters des **4 dernières
+  versions mineures, en comptant la sienne**. La version mineure du starter ne doit pas être plus récente que celle
+  de Master. Cette fenêtre s’applique depuis Axelix 1.1 ; voir [Mettre à niveau Axelix](./upgrading.mdx).
+- **Starter et plugin de build :** au sein d’un service, les deux doivent partager la même version `major.minor`.
 
-C’est l’intégralité du contrat. Il couvre toutes les associations à la fois (Master avec un starter, un starter avec son plugin, tous ensemble) ; vous n’avez donc jamais besoin d’une matrice de compatibilité. Il suffit d’aligner `major.minor`.
+**Les versions correctives n’interviennent dans aucune de ces deux règles.**
 
-- ✅ Master `1.4.2`, starter `1.4.5`, plugin `1.4.0` : tous en `1.4`, compatibilité garantie.
-- ✅ Starter `1.4.3` avec plugin `1.4.0` : même version `1.4`, compatibilité garantie.
-- ⚠️ Master `1.4.2` avec starter `1.3.4` : **écart de version mineure**, aucune garantie. Cela peut fonctionner ou casser.
-- ⚠️ Starter `3.1.x` avec plugin `3.3.x` : **écart de version mineure**, aucune garantie et aucune prise en charge.
-- ⚠️ Tout écart de version **majeure** : aucune garantie, et une probabilité de fonctionnement encore plus faible qu’avec un écart de version mineure.
+- ✅ Master `1.4.2`, starter `1.4.5`, plugin `1.4.0` : compatibilité garantie.
+- ✅ Starter `1.4.3` avec plugin `1.4.0` : même `1.4`, compatibilité garantie.
+- ✅ Master `1.4.2` avec starter `1.3.4` : dans la fenêtre `1.1`–`1.4` de Master, compatibilité garantie.
+- ⚠️ Master `1.4.x` avec starter `1.0.x` ou `1.5.x` : hors de la fenêtre prise en charge.
+- ⚠️ Starter `3.1.x` avec plugin `3.3.x` : versions mineures différentes, compatibilité non garantie et combinaison non prise en charge.
+- ⚠️ Master et starter sur des versions majeures différentes : hors de la fenêtre de compatibilité ; suivez le guide de migration majeure.
 
-Si les composants diffèrent par leur version **mineure** ou **majeure**, nous ne garantissons **rien**. La combinaison peut fonctionner, mais elle peut aussi casser et n’est pas testée. La politique la plus simple, rendue facile par les publications synchronisées, consiste à conserver exactement la même version `X.Y.Z` partout ; toutefois, seul `major.minor` constitue le contrat effectif.
+Conserver exactement le même `X.Y.Z` partout est la politique la plus simple. Si vous mettez les composants à niveau
+séparément, maintenez chaque starter dans la fenêtre prise en charge par Master et alignez-le sur son plugin.
 
 ### Pourquoi les écarts de correctif sont sûrs, contrairement aux écarts mineurs ou majeurs
 
-Cette politique repose sur l’hypothèse que **toutes les fonctionnalités exposées par les composants sont destinées à être utilisées via l’interface web d’Axelix Master**. Il n’existe aucun scénario où vous augmenteriez isolément la version **mineure** d’un composant pour obtenir une fonctionnalité : celle-ci est accessible via Master, et non via le composant seul. Nous nous autorisons donc à **revoir les contrats entre composants dans les versions mineures**, ce qui permet au projet d’avancer rapidement.
+Les contrats entre un starter et son plugin de build peuvent changer entre les versions mineures ; seules des
+versions `major.minor` identiques sont donc prises en charge. La communication entre Master et starter bénéficie de
+la fenêtre de compatibilité plus large de quatre versions mineures décrite ci-dessus.
 
-Les versions correctives sont différentes. Comme l’indique [semver](https://semver.org/), une version corrective peut apporter un **correctif CVE critique, une correction de bogue ou une amélioration des performances**, et ces changements sont utiles **en eux-mêmes**. Une version corrective republie **tous les composants** sous le nouveau numéro, mais le correctif ne touche généralement que certains d’entre eux. Vous serez donc réellement amené à mettre à niveau uniquement le composant concerné en laissant les autres sur un correctif antérieur, et nous garantissons la compatibilité de cette combinaison.
+Les versions correctives peuvent apporter un **correctif CVE critique, une correction de bogue ou une amélioration des
+performances**. Un correctif republie **l’ensemble des composants**, même si la correction ne touche généralement que
+certains d’entre eux. Mettre à niveau uniquement un composant concerné et laisser les autres sur un correctif plus
+ancien reste compatible selon les deux règles ci-dessus.
 
-:::warning[Les écarts mineurs et majeurs peuvent rompre les protocoles d’interaction]
-Nous **pouvons** (cela ne signifie **pas** que nous le **ferons**, mais nous le **pouvons**) revoir les protocoles entre composants (Master ↔ starter, plugin ↔ starter) entre deux versions **mineures**, et à plus forte raison entre deux versions **majeures**. Toute combinaison franchissant une limite de version mineure **peut** donc casser. Cela ne signifie pas qu’elle cassera, mais elle le **peut**, et nous ne garantissons pas le contraire. Conservez la même version majeure **et** mineure pour tous les composants et n’autorisez des écarts que sur les versions correctives.
+:::warning[Maintenez chaque paire dans sa plage prise en charge]
+N’utilisez pas de starter dont la version mineure est plus récente que celle de Master ou ayant plus de trois versions mineures de retard, et ne mélangez
+pas les versions majeures entre Master et starter. La fenêtre Master-starter ne s’applique pas à la compatibilité
+starter-plugin : ces deux composants doivent conserver la même version `major.minor`.
 :::
 
 ## Garanties de rétrocompatibilité entre les versions

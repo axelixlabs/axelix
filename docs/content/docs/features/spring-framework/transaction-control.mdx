@@ -72,12 +72,11 @@ Transaction monitoring, and therefore this page, is not available in reactive (W
 
 ## Expose the metadata endpoint
 
-The page is not backed by a dedicated actuator endpoint. The Axelix Spring Boot Starter aggregates the transaction
-insights on the JVM and ships them to Master as part of the instance's registration metadata: the same payload
-exposed through the `axelix-metadata` endpoint that Master already probes. As long as `axelix-metadata` is exposed (see
-[Exposing the endpoints on Axelix below
-1.2.0](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposing-the-endpoints-on-axelix-below-120)),
-this page works with no extra endpoint to enable.
+There is no transaction-specific Actuator endpoint. Initial transaction insights are included in the instance's registration metadata, exposed through `axelix-metadata` when Master discovers the instance.
+
+For starters from 1.3.0, Master polls `axelix-ping` for subsequent transaction updates. Self-registered instances push these updates in their heartbeats instead. For older starters, Master continues to read the full registration metadata.
+
+For polling, expose `axelix-metadata` and, for starters from 1.3.0, `axelix-ping`. The starter exposes its own endpoints automatically since 1.2.0; see [Exposing the endpoints on Axelix below 1.2.0](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposing-the-endpoints-on-axelix-below-120) for older versions. No additional transaction-specific endpoint is needed.
 
 ## See also
 

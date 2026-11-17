@@ -1,0 +1,49 @@
+---
+title: Dashboard
+description: "Das Dashboard ist eine Startseite in Axelix. Es fasst alle von Axelix Master erfassten Spring-Boot-Services zusammen: Laufzeitversionen, aktuell gesunde Instanzen und gesamten Speicherbedarf."
+---
+
+<LegacyNotice version="1.0.0" />
+
+Axelix Master erfasst die Daten von jeder Spring-Boot-Anwendung mit einem Axelix-Starter. Solange sich keine Instanz registriert hat, bleibt die Seite leer.
+
+## System's Map
+
+**System's Map** ist die Reihe von Kreisdiagrammen oben auf der Seite. Jedes Diagramm unterteilt die Systemlandschaft nach einer Softwarekomponente:
+
+- **Spring Boot**: Verteilung der Spring-Boot-Versionen über alle erkannten Instanzen.
+- **Spring Framework**: Verteilung der Spring-Framework-Versionen.
+- **Java**: Verteilung der Java-Hauptversionen, etwa `17` oder `21`.
+- **Kotlin**: Verteilung der Kotlin-Versionen. Reine Java-Instanzen tragen hierzu nichts bei; ohne Kotlin-Services bleibt dieses Diagramm leer.
+
+Die Segmentbeschriftungen zeigen Anzahl und Anteil der Instanzen im Format `value (percent%)`. Beispielsweise bedeutet `12 (60%)`, dass 12 Instanzen diese Version verwenden und 60 % der im Diagramm erfassten Komponente ausmachen.
+
+### Ein Segment anklicken, um das Wallboard zu öffnen
+
+Ein Klick auf ein Segment öffnet das [Wallboard](../wallboard.mdx) mit einem Filter für die ausgewählte Komponente und Version. Alle vier genannten Diagramme sind anklickbar.
+
+## Health Status
+
+**Health Status** ist ein Ringdiagramm mit dem aktuellen Zustand aller erkannten Instanzen. Drei Zustände werden erfasst:
+
+- **UP** (grün): Die Instanz ist gesund.
+- **DOWN** (rot): Die Instanz ist nicht gesund.
+- **UNKNOWN** (grau): Axelix Master konnte den Zustand der Instanz nicht ermitteln.
+
+Die Zahl in der Mitte des Rings ist mit **Total Count** beschriftet und entspricht der Summe aller drei Zustände, also der Gesamtzahl der aktuell von Axelix erfassten Instanzen.
+
+## Statistics
+
+**Statistics** ist eine Reihe aus drei Karten neben dem Diagramm Health Status:
+
+- **Total count of services**: dieselbe Gesamtzahl wie in der Mitte des Ringdiagramms Health Status.
+- **Average Heap Size**: durchschnittliche JVM-Heap-Größe aller erkannten Instanzen.
+- **Total Heap Size**: Summe der JVM-Heap-Größen aller erkannten Instanzen.
+
+Beide Heap-Werte werden vor der Anzeige in eine lesbare Einheit umgerechnet. Je nach Größe der Systemlandschaft zeigt die Karte daher beispielsweise `512 MB` oder `2 GB` an.
+
+## Verwandte Themen
+
+- [Wallboard](../wallboard.mdx)
+- [Service Profile](../service-profile.mdx)
+- [Details](../../features/insights/details.mdx)

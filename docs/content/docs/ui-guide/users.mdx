@@ -1,6 +1,6 @@
 ---
 title: Users
-description: "The **Users** screen is where you see who can sign in to Axelix Master, what role each account carries, and — when local
+description: "The **Users** screen is where you see who can sign in to Axelix Master, what roles each account carries, and — when local
               authentication is enabled — where you create, edit, and delete those accounts. The page is reachable from the **Users**
               link in the top navigation bar."
 ---
@@ -49,27 +49,25 @@ Clicking the button opens a modal with the following fields:
 - **Username** — the login name. Must be unique.
 - **Email** — optional. If you leave it blank, the account is stored without an email.
 - **Password** — the initial password. The user can change it later from their profile.
-- **Role** — exactly one role: `ADMIN`, `EDITOR`, or `VIEWER`. Multiple roles can be assigned later from the profile
-  screen.
+- **Roles** — select one or more roles: `ADMIN`, `EDITOR`, and `VIEWER`. You can change the selection later from the profile.
 
 A successful creation closes the modal, shows a **User created successfully** toast, and refreshes the list.
 
 ## User Profile
 
-Selecting a row in the users list opens that account's profile page. It presents the **User Profile** card with four
-inline-editable fields, followed by an action area for managing the account itself.
+Selecting a row in the users list opens that account's profile with its account details and roles.
 
-Each row in the card carries an edit pencil on the right. Clicking it swaps the value for an input plus a confirm and a
-cancel action. The save action sends the new value to Master immediately; the cancel action reverts the field without
-persisting.
+For a local account, choose **Edit user** to open the editing dialog. You can change the first name, last name,
+username, email, and password. **Confirm** saves the fields together; **Cancel** discards the changes.
 
 - **Username** — the login name. Editing it changes how the user signs in.
 - **Email** — the email address. Saving an empty value clears the email on the account.
-- **Roles** — the multi-select drop-down lets you assign any combination of `ADMIN`, `EDITOR`, and `VIEWER`. The user's
-  effective permissions are the union of the authorities those roles grant.
-- **Password** — the value is always masked as `••••••••••`. Editing it sets a brand-new password; there is no "show
-  current value" because Master never stores the password in clear text. Leaving the field empty and confirming saves an
-  empty string and is rejected by the backend.
+- **Password** — enter and confirm a new password to replace the current one. Leave it blank to keep the current
+  password. The current password cannot be displayed because Master never stores it in clear text.
+
+To update the assigned roles, choose **Change roles** in the **Roles** section. Select one or more of `ADMIN`,
+`EDITOR`, and `VIEWER`, then choose **Confirm**. The user's effective permissions are the union of the authorities
+those roles grant.
 
 Below the card sit two action buttons:
 

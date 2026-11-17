@@ -1,0 +1,195 @@
+---
+title: Authentifizierung
+description: "Diese Seite erläutert die Anmeldung an Axelix Master: die verfügbaren Verfahren, Aufbau und Prüfung der Browsersitzung bei jeder Anfrage, Rollen und Berechtigungen der UI sowie die Authentifizierung von KI-Agenten am MCP-Server."
+---
+
+import signInOptionsStyles from './_signInOptionsTable.module.css';
+import rolesStyles from './_rolesTable.module.css';
+import oauth2Styles from './_oauth2PropertiesTable.module.css';
+
+Die Eigenschaftsschlüssel stehen unter [Master konfigurieren](../../setting-up-master-ui/configuring-master/configuring-master.mdx#konfigurationsreferenz). Hier geht es um das zugrunde liegende Modell.
+
+## Die drei Anmeldeverfahren
+
+Master enthält drei unabhängige Authentifizierungsanbieter. Beliebige Kombinationen können gleichzeitig aktiv sein. Die Anmeldeseite `/login` zeigt die Bedienelemente der jeweils aktiven Verfahren.
+
+<div className={signInOptionsStyles.SignInOptionsTable}>
+
+| Verfahren | Standard | Aktivierung | Geeignet für |
+|---|---|---|---|
+| Super-admin | Immer aktiv | (gesteuert durch `axelix.master.auth.options.super-admin.credentials.{username,password}`) | Ersteinrichtung, Wiederherstellungskonto, Betrieb durch eine einzelne Person. |
+| Lokale Benutzer | Aus | `axelix.master.auth.options.local.enabled=true` | Master verwaltet die Passwortspeicherung. |
+| OAuth2 / OIDC | Aus | `axelix.master.auth.options.oauth2.enabled=true` | Produktion. SSO über Keycloak, Auth0, Okta, Google oder andere OIDC-konforme Anbieter. |
+
+</div>
+
+Sind mehrere Verfahren aktiv, zeigt die Seite sie untereinander: das Formular für Benutzername und Passwort für Super-admin und lokale Benutzer, gefolgt von der Schaltfläche **Sign in with OAuth2/OIDC Provider**, wenn OIDC aktiviert ist.
+
+### Super-admin
+
+Der integrierte Super-admin ist das einzige stets aktive Konto. Er entspricht gewissermaßen dem Benutzer im _„God Mode“_ in Axelix:
+
+1. Er besitzt sämtliche verfügbaren Berechtigungen.
+2. Er ist integriert und _immer_ aktiv. Er kann nicht deaktiviert oder gelöscht werden (die Gründe folgen unten).
+3. Er lässt sich nicht bearbeiten oder verändern. Benutzername und Passwort können und sollten jedoch über `axelix.master.auth.options.super-admin.credentials.username` / `.password` geändert werden. **Diese Einstellungen werden bei jedem Start von Axelix Master erneut angewandt**, nicht nur bei der Ersteinrichtung!
+
+#### Wann Sie ihn verwenden sollten
+
+Super-admin ist für zwei Situationen vorgesehen, nicht für den täglichen Betrieb:
+
+1. **Ersteinrichtung.** In einem frisch eingerichteten Master gibt es noch keine weiteren Konten. Melden Sie sich als Super-admin an, um die Lizenz einzurichten, erste lokale Benutzer anzulegen und die privilegierten Rollen für die spätere Arbeit Ihres Teams vorzubereiten.
+2. **Wiederherstellung im Notfall.** Wenn die üblichen Konten Ihres Teams nicht mehr funktionieren, bleibt Super-admin als Notzugang. Beispielsweise könnte ein OIDC-Rollenmapping alle Benutzer zu `VIEWER` machen oder ein Administrator versehentlich gelöscht werden. Da Super-admin weder von der Datenbank noch von einem externen Identitätsanbieter abhängt, können Sie sich weiterhin anmelden und das Problem beheben.
+
+Verwenden Sie für die tägliche Arbeit ein lokales oder OIDC-Konto. Reservieren Sie Super-admin für Einrichtung und Wiederherstellung.
+
+#### Unterschiede zu anderen Konten
+
+Die beiden anderen Anmeldeverfahren hinterlassen einen Datensatz in Masters Datenbank; Super-admin nicht.
+
+- **Lokale Benutzer** liegen vollständig in Masters Datenbank und werden auf der Seite **Users** verwaltet.
+- **OIDC-Benutzer** werden von Ihrem Identitätsanbieter verwaltet. Master speichert dennoch einen Datensatz pro Benutzer einschließlich der aus `role-attribute-path` ermittelten Rolle, um ihn auf **Users** anzuzeigen und das Mapping wiederzuverwenden.
+- **Super-admin** hat keinen Datenbankeintrag. Seine Zugangsdaten stehen ausschließlich in der Konfiguration. Er erscheint nie auf **Users**, und sein Benutzername ist reserviert: Kein lokaler oder OIDC-Benutzer kann mit diesem Namen angelegt, in ihn umbenannt oder unter diesem Namen bearbeitet oder gelöscht werden. Das Super-admin-Konto selbst lässt sich deshalb nicht über die UI bearbeiten oder löschen.
+
+:::tip
+Ändern Sie Benutzername oder Passwort von Super-admin in `axelix.master.auth.options.super-admin.credentials` und starten Sie Master neu. Eine Änderung innerhalb der Anwendung ist bewusst nicht vorgesehen.
+:::
+
+Ändern Sie die Standardwerte, bevor Sie Master anderen zugänglich machen: `admin / admin` gewährt vollständige Kontrolle über jeden überwachten Dienst.
+
+Das Passwort kann in einem der folgenden Formate angegeben werden:
+
+* **Klartext**: der unveränderte Passwortwert.
+* **Kodiert**: Stellen Sie dem Wert eine Kennung in geschweiften Klammern voran, die das Prüfverfahren angibt: `{noop}` für Klartext, `{bcrypt}` für einen BCrypt-Hash.
+
+Ohne Präfix wird der Wert als Klartext behandelt. Aus Sicherheitsgründen wird dringend empfohlen, ein Hash-Format wie `{bcrypt}` statt Klartext zu verwenden.
+
+Beispiele für kodierte Passwörter:
+
+* `{bcrypt}$2a$10$KjkxE0Tt8L4B2kDYlSWcme0o/AjKE7LqyDaTqPr0sESbF85e3bDTC` — BCrypt-kodiertes Passwort
+* `{noop}password` — als Klartext kodiert (entspricht einfach `password`).
+
+### Lokale Benutzer
+
+Lokale Benutzer liegen in Masters eigener Datenbank (`UserEntity`). Passwörter werden mit BCrypt gehasht. Bei `axelix.master.auth.options.local.enabled=true` sucht `DatabaseUserAuthenticator` den übermittelten Benutzernamen, prüft das Passwort mit BCrypt und ordnet den gespeicherten Rollenwert (`admin`, `editor`, `viewer`) einer integrierten Rolle zu. Unbekannte Rollenwerte lösen bei der Anmeldung eine `UserRoleNotFoundException` aus.
+
+Lokale Benutzer werden auf der UI-Seite **Users** verwaltet. Anlegen, Aktualisieren und Löschen erfordern die Berechtigung `users:manage`, die standardmäßig nur `SUPER_ADMIN` besitzt.
+
+### OAuth2 / OIDC
+
+Master implementiert den standardisierten Authorization Code Flow. Aktivieren Sie ihn mit `axelix.master.auth.options.oauth2.enabled=true` und geben Sie `issuer-uri`, `client-id`, `client-secret` und die öffentliche `base-url` dieser Master-Bereitstellung an.
+
+Der vollständige Ablauf:
+
+1. Der Benutzer klickt auf `/login` auf **Sign in with OAuth2/OIDC Provider**. Der Browser wird zum Autorisierungsendpunkt des IdP weitergeleitet, mit `client-id` und `redirect_uri=<base-url>/api/external/oauth2/callback`.
+2. Der IdP authentifiziert den Benutzer und leitet mit einem `code` zum Callback zurück.
+3. `OAuth2CallbackController` tauscht den Code am Token-Endpunkt des IdP gegen ID-Token und Access-Token, validiert das ID-Token und liest den Benutzernamen aus.
+4. Die Rolle wird durch Auswertung des JMESPath-Ausdrucks aus `axelix.master.auth.options.oauth2.role-attribute-path` gegen die userinfo-Antwort ermittelt. Das Ergebnis wird `admin`, `editor` oder `viewer` zugeordnet. Ohne `role-attribute-path` erhält jeder OIDC-Benutzer die Rolle `VIEWER`.
+5. Vor Erzeugung des Sitzungscookies legt Master den Benutzer mit Herkunft `OIDC` in seiner Datenbank an oder aktualisiert ihn, übernimmt eine in userinfo vorhandene E-Mail-Adresse und aktualisiert `Last login`.
+6. Master erzeugt sein eigenes Sitzungs-JWT mit demselben Encoder wie bei Passwortanmeldungen und leitet den Browser mit gesetzten Sitzungscookies zu `/wallboard` weiter.
+
+Der Authorization Code Flow wird ausschließlich im Browser ausgelöst. Die OIDC-Token werden nie gespeichert: Master verwendet sie einmal zur Benutzeridentifizierung und stellt anschließend sein eigenes Sitzungs-JWT aus.
+
+Jede erfolgreiche Browseranmeldung hinterlässt daher ein dauerhaftes `OIDC`-Konto auf **Users**. Gehört derselbe Benutzername bereits einem Nicht-OIDC-Konto, lehnt Master die Anmeldung ab, statt die Identitäten zusammenzuführen.
+
+**Bei `axelix.master.auth.options.oauth2.enabled=true` sind folgende Eigenschaften erforderlich:** `issuer-uri`, `client-id`, `client-secret`, `base-url`. `scopes` ist standardmäßig `openid` und muss nur überschrieben werden, wenn Ihr IdP weitere Scopes verlangt. `role-attribute-path` ist optional: Ohne diesen Wert erhält jeder angemeldete Benutzer `VIEWER`.
+
+<div className={oauth2Styles.ConfigTable}>
+
+| Eigenschaft | Standardwert | Beschreibung |
+|---|---|---|
+| `axelix.master.auth.options.oauth2.enabled` | `false` | OIDC-Anmeldung aktivieren. |
+| `axelix.master.auth.options.oauth2.issuer-uri` | *(nicht gesetzt)* <span className="Required">erforderlich</span> | Basis-URL des OIDC-Ausstellers. Master liest hier `/.well-known/openid-configuration`, um Endpunkte zu ermitteln. Bei `oauth2.enabled=true` erforderlich. |
+| `axelix.master.auth.options.oauth2.client-id` | *(nicht gesetzt)* <span className="Required">erforderlich</span> | Beim OIDC-Anbieter registrierte Client-Kennung. Bei `oauth2.enabled=true` erforderlich. |
+| `axelix.master.auth.options.oauth2.client-secret` | *(nicht gesetzt)* <span className="Required">erforderlich</span> | Beim OIDC-Anbieter registriertes Client-Secret. Bei `oauth2.enabled=true` erforderlich. |
+| `axelix.master.auth.options.oauth2.base-url` | *(nicht gesetzt)* <span className="Required">erforderlich</span> | Öffentliche Basis-URL dieser Master-Instanz. Dient zur Bildung der OAuth2-Callback-Redirect-URI. Bei `oauth2.enabled=true` erforderlich. |
+| `axelix.master.auth.options.oauth2.scopes` | `openid` | Durch Leerzeichen getrennte Scopes für den Authorization Code Flow. `openid` wird bei Bedarf automatisch ergänzt. |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | *(nicht gesetzt)* | JMESPath-Ausdruck zur Ermittlung einer Axelix-Rolle aus der userinfo-Antwort. Ohne Wert wird jeder OIDC-Benutzer zu `VIEWER`. |
+
+</div>
+
+:::warning
+Allen angemeldeten Benutzern `VIEWER` zuzuweisen ist zum Ausprobieren bequem. In Produktion bedeutet es jedoch: **Jeder, der sich bei Ihrem IdP authentifizieren kann, erhält Lesezugriff auf sämtliche Überwachungsdaten** aller erkannten Dienste. Falls nicht genau diese Personen Master sehen sollen, setzen Sie `role-attribute-path` so, dass Benutzer ohne ausdrückliche Axelix-Rolle nicht stillschweigend `VIEWER` erhalten.
+:::
+
+## Die Sitzung: Cookies und JWT
+
+Jedes Anmeldeverfahren endet gleich: Master erzeugt ein JWT und gibt es als Cookie zurück. Dasselbe Cookie kontrolliert jede nachfolgende UI-Anfrage.
+
+### Was die Anmeldung erzeugt
+
+`POST /api/external/users/login` und der OIDC-Callback setzen über `Set-Cookie` zwei Cookies:
+
+- **`auth_token`**: das JWT selbst. `HttpOnly`, `SameSite=Strict`, `Path=/`, `MaxAge=axelix.master.auth.jwt.lifespan` (Standard `12h`). `Secure` wird durch `axelix.master.auth.cookie.secure` gesteuert. Lassen Sie es nur bei reinem HTTP auf localhost auf `false`.
+- **`authorities`**: ein Base64-kodiertes JSON-Array der Berechtigungsnamen des angemeldeten Benutzers, etwa `["environment.values:read","scheduled-tasks:write"]`. Es ist *nicht* `HttpOnly`, weil das Frontend daraus ableitet, welche Schaltflächen erscheinen. Es ist ausschließlich ein UI-Hinweis. Das Backend ermittelt bei jeder Anfrage die Berechtigungen erneut aus dem JWT. Manipulationen dieses Cookies ändern daher nur das UI-Angebot, nicht die vom Server erlaubten Aktionen.
+
+Das JWT wird mit dem Geheimnis aus `axelix.master.auth.jwt.signing-key` per HMAC signiert (`HMAC256`, `HMAC384` oder `HMAC512`, gesetzt über `axelix.master.auth.jwt.algorithm`). Seine Claims enthalten den Benutzernamen (`sub`), Ausgabe- und Ablaufzeitstempel sowie einen Claim `roles`, der jede gewährte Rolle samt Berechtigungen und verschachtelten Komponenten kodiert.
+
+### Prüfung jeder Anfrage
+
+`CookieBasedJwtAuthorizationFilter` läuft bei jeder Anfrage auf `/api/...`, abgesehen von einer kleinen Ausnahmeliste: Anmeldeendpunkt, OAuth2-Callback, öffentlicher Einstellungsendpunkt, Selbstregistrierungsendpunkt und `/api/mcp/**`. Diese haben eigene Filter oder sind bewusst anonym. Für alle anderen gilt:
+
+1. Der Filter liest das Cookie `auth_token`. Fehlend oder leer → `JwtProcessingException`, die als `401 Unauthorized` zurückgegeben wird.
+2. `DefaultJwtDecoderService` prüft Signatur und Ablauf anhand von `axelix.master.auth.jwt.signing-key`. Manipuliertes, unsigniertes oder abgelaufenes Token → `401`.
+3. `MasterAuthorityResolver` schlägt Anfragepfad und HTTP-Methode in einer integrierten Tabelle der Regeln „Dieser Endpunkt benötigt diese Berechtigung“ nach. Nicht aufgeführte Endpunkte benötigen nur ein gültiges Token.
+4. `DefaultAuthorizer` löst die Benutzerrollen zur vollständigen Berechtigungsmenge auf und prüft, ob sie die erforderlichen Berechtigungen umfasst. Fehlt eine → `AuthorizationException`, zurückgegeben als `403 Forbidden`.
+5. Bei Erfolg läuft die Anfrage in einem `DefaultSecurityContext` mit authentifiziertem `User` und unverarbeitetem Token. Nachfolgender Code kann den Aufrufer ohne erneutes Parsen auslesen.
+
+### Abmeldung und Rotation
+
+`POST /api/external/users/logout` überschreibt beide Cookies mit leeren Werten und `MaxAge=0`; der Browser entfernt sie sofort. Das JWT bleibt technisch gültig, bis sein Claim `exp` abgelaufen ist: Master führt keine serverseitige Sperrliste.
+
+Um alle aktiven Sitzungen zu beenden (etwa nach einem kompromittierten Schlüssel, einem veralteten gemeinsamen Geheimnis oder zur vierteljährlichen Rotation), ändern Sie `axelix.master.auth.jwt.signing-key`. Jedes ausgestellte Token scheitert bei der nächsten Anfrage sofort an der Prüfung, weil seine Signatur nicht zum neuen Geheimnis passt. Benutzer gelangen zurück zu `/login`.
+
+## Rollen und Berechtigungen
+
+Axelix 1.3 führt neue RBAC-Berechtigungsnamen ein, angelehnt an das [Grafana-RBAC-Modell](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/access-control/). Die Muster `resource:action` und `resource.sub-resource:action` gelten erst ab Axelix 1.3. Ältere Versionen verwenden Namen wie `CACHES_CLEAR`. Beispielsweise erlaubt `caches:clear` das Leeren von Caches; `environment.values:read` bezeichnet den Zugriff auf Eigenschaftswerte. Rollen bestimmen weiterhin die zulässigen Aktionen. Für Starter vor 1.3 übersetzt Master die Codenamen automatisch in alte Namen wie `CACHES_CLEAR`; die Dienstkonfiguration muss nicht geändert werden.
+
+Master verwendet feste Mengen von Rollen und Berechtigungen. Rollen bündeln Berechtigungen; die Autorisierungsprüfung prüft immer Berechtigungen, nie Rollennamen. Eine über OIDC-Mapping oder Datenbank eingebundene eigene Rolle muss daher zu einem integrierten Namen aufgelöst werden. Neue Berechtigungen lassen sich derzeit nicht über die Konfiguration definieren.
+
+<div className={rolesStyles.RolesTable}>
+
+| Rolle | Gewährte Berechtigungen | Zuordnung |
+|---|---|---|
+| `SUPER_ADMIN` | Alle von Master definierten Berechtigungen einschließlich `users:read` und `users:manage`. | Integriertes Super-admin-Konto. |
+| `ADMIN` | `environment.values:read`, `config-properties.values:read`, `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`, `heap-dump:read`. | Lokale Datenbankbenutzer mit Rolle `admin`; OIDC-Benutzer, deren `role-attribute-path` zu `admin` aufgelöst wird. |
+| `EDITOR` | `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`. | Lokale Datenbankbenutzer mit Rolle `editor`; OIDC-Benutzer, deren `role-attribute-path` zu `editor` aufgelöst wird. |
+| `VIEWER` | Keine: Leseansicht aller Daten ohne Berechtigungsschranke. | Lokale Datenbankbenutzer mit Rolle `viewer`; OIDC-Benutzer ohne gesetzten `role-attribute-path` oder mit nicht zugeordneten Werten. |
+
+</div>
+
+Was die einzelnen Berechtigungen erlauben:
+
+- **`environment.values:read`**: Eigenschaftswerte auf **Environment** einblenden.
+- **`config-properties.values:read`**: Eigenschaftswerte auf **Configuration Properties** einblenden.
+- **`scheduled-tasks:write`**: Geplante Tasks aktivieren, deaktivieren, sofort ausführen und neu planen.
+- **`caches:clear`**: Einzelne Caches, Cache-Manager oder den gesamten Anwendungscache leeren.
+- **`caches:toggle`**: Einzelne Caches und Cache-Manager zur Laufzeit aktivieren und deaktivieren.
+- **`gc:manage`**: GC auslösen sowie GC-Log-Überwachung aktivieren und deaktivieren.
+- **`heap-dump:read`**: Heap-Dumps direkt herunterladen oder in einen exportierten Anwendungszustand aufnehmen.
+- **`users:read`**: Den Users-Feed lesen.
+- **`users:manage`**: Lokale Benutzer anlegen, aktualisieren und löschen.
+
+`users:read` und `users:manage` sind derzeit `SUPER_ADMIN` vorbehalten. `ADMIN` kann ohne eine Rechteerhöhung keine Benutzer verwalten.
+
+## Authentifizierung am MCP-Server
+
+Der integrierte MCP-Server unter `/api/mcp` wird durch den eigenen Filter `McpAuthorizationFilter` geschützt, da MCP-Clients andere Zugangsdaten als das Browsersitzungscookie übertragen. Der Filter analysiert den Header `Authorization` und ruft den zum Verfahren passenden Handler auf.
+
+- **`Basic`**: `BasicMcpAuthenticationHandler` dekodiert `Authorization: Basic <base64(user:pass)>` und delegiert an denselben `CompositeUserAuthenticator` wie die UI. Sowohl Super-admin als auch lokale Konten funktionieren. Das Rollenmapping entspricht der Browseranmeldung.
+- **`Bearer`**: `BearerMcpAuthenticationHandler` behandelt die Zugangsdaten als OIDC-Access-Token. Er ermittelt über `JmesPathOidcRoleExtractor` (wie beim Browser-OIDC-Ablauf) eine Rolle und erzeugt einen synthetischen `PasswordlessUser` namens `AI_AGENT` mit dieser Rolle. Nur bei `axelix.master.auth.options.oauth2.enabled=true` verfügbar.
+
+Nach Identifizierung des Benutzers führt der Filter dieselbe Berechtigungsprüfung wie der Webfilter aus. Die Anforderungen pro Werkzeug werden über `McpEndpointResolver` + `McpEndpointAuthorityResolver` ermittelt. Ein Werkzeug, zu dessen Ausführung der Aufrufer nicht berechtigt ist, gibt `403 Forbidden` zurück. Unbekannte oder ungültige Zugangsdaten ergeben `401 Unauthorized`.
+
+Ist OIDC aktiviert und trifft eine Anfrage ohne `Authorization`-Header ein, enthält die `401`-Antwort zusätzlich:
+
+```
+WWW-Authenticate: Bearer resource_metadata="<base-url>/api/external/mcp-oauth2/.well-known/oauth-protected-resource"
+```
+
+MCP-Clients mit RFC-9728-Unterstützung nutzen diesen Header, um Masters OAuth2-Konfiguration zu ermitteln und den Benutzer selbst durch den Autorisierungsablauf zu führen.
+
+## Weiterführende Informationen
+
+- [Master konfigurieren: Authentifizierungseigenschaften](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentifizierung--jwt): alle auf dieser Seite genannten Eigenschaftsschlüssel und Standardwerte.
+- [Spring Boot Starter konfigurieren](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx): die Starter-Seite desselben JWT-Signaturschlüssels.
+- [Was ist Master?](../what-is-master.mdx): Hintergrund zu Masters Aufgaben nach Aufbau der Sitzung.

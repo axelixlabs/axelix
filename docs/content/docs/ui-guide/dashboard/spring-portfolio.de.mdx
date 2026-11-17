@@ -1,0 +1,42 @@
+---
+title: Spring Portfolio
+description: "Das Dashboard Spring Portfolio zeigt, welche Spring-Boot- und Spring-Framework-Versionen die Anwendungen in der Systemlandschaft verwenden und wie viele davon bereits außerhalb des OSS-Supports liegen."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Die Screenshots zeigen den neuesten Minor-Release von Axelix.">
+
+![Dashboard Spring Portfolio](/img/feature/dashboard/dashboard-spring-portfolio.png)
+
+</ScreenshotsNotice>
+
+***Spring Portfolio in der Axelix-Oberfläche***
+
+Jede Versionslinie von Spring Boot und Spring Framework (ein Minor-Versionszweig wie `3.5.x`) hat einen begrenzten [OSS-Support](https://spring.io/support-policy). Nach dessen Ende erhält die Linie keine Community-Releases mehr, auch keine Sicherheitskorrekturen: Neue [CVEs](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) werden nur im Rahmen eines kommerziellen Abonnements behoben. Bei Dutzenden Anwendungen ist schwer zu überblicken, welche diesen Zeitpunkt bereits überschritten haben und welche als Nächstes folgen. Spring Portfolio beantwortet dies für die gesamte Systemlandschaft.
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und Berechtigungen](../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Eine Zusammenfassung zeigt die Anzahl der Anwendungen und wie viele davon bereits außerhalb des OSS-Supportzeitraums liegen. Eine Anwendung gilt nur dann als unterstützt, wenn sowohl ihre Spring-Boot- als auch ihre Spring-Framework-Version noch OSS-Updates erhalten.
+
+Darunter werden Spring Boot und Spring Framework getrennt dargestellt. Für beide sehen Sie:
+
+- Wie viele Anwendungen eine Versionslinie mit OSS-Support verwenden.
+- Wie sich die Anwendungen auf Hauptversionen und Versionslinien wie `3.5.x` verteilen.
+- Ob jede Versionslinie noch OSS-Updates erhält.
+
+Der letzte Abschnitt zeigt den OSS-Supportzeitraum jeder verwendeten Versionslinie auf einer Zeitachse: Veröffentlichung, Ende des OSS-Supports und Anzahl der Anwendungen. So erkennen Sie, wie viel Zeit bis zum Supportende der nächsten Versionslinien bleibt.
+
+## Funktionsweise
+
+Master zeichnet die Spring-Boot- und Spring-Framework-Versionen jeder Anwendung einmal täglich auf und verwendet den neuesten Datensatz. Eine Anwendung wird unabhängig von der Anzahl ihrer Instanzen einmal gezählt. Meldet eine Anwendung keine Daten mehr, bleibt sie mit ihren zuletzt gemeldeten Versionen auf der Seite.
+
+Die Supportdaten stammen aus den vom Spring-Team veröffentlichten Zeitplänen, etwa dem [Spring-Boot-Supportzeitraum](https://spring.io/projects/spring-boot#support).
+
+## Siehe auch
+
+- [Dependencies Analyzer](../../features/insights/dependencies-analyzer.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Axelix aktualisieren](../../more/upgrading.mdx)

@@ -1,0 +1,80 @@
+---
+title: Benutzer
+description: "Die Seite Users zeigt, wer sich bei Axelix Master anmelden kann und welche Rollen die Konten haben. Bei aktivierter lokaler Authentifizierung können Sie dort Konten erstellen, bearbeiten und löschen. Sie erreichen die Seite über Users in der oberen Navigation."
+---
+
+## Wer diese Seite öffnen darf
+
+Der Link **Users** erscheint nur für Konten mit der Berechtigung `users:read`. Standardmäßig gehört diese ausschließlich zur integrierten Rolle `SUPER_ADMIN`. **ADMIN**, **EDITOR** und **VIEWER** können weder den Link sehen noch die Seite laden. Die vollständige Zuweisungstabelle finden Sie unter [Rollen und Berechtigungen](../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+Die Schaltfläche **Create User** sowie die Steuerelemente zum Bearbeiten und Löschen im Profil erfordern zusätzlich `users:manage`, ebenfalls ausschließlich für `SUPER_ADMIN` vorgesehen.
+
+## Die Benutzerliste
+
+Der obere Bereich bietet drei Möglichkeiten, die Tabelle einzugrenzen:
+
+- **Search** filtert nach Benutzername oder E-Mail. Der Zähler rechts im Suchfeld zeigt `<matches> / <total>`, also die sichtbaren Benutzer im Verhältnis zur vollständigen Liste.
+- **Roles** ist eine Mehrfachauswahl. Nach Auswahl einer oder mehrerer Rollen bleiben nur Benutzer mit mindestens einer dieser Rollen sichtbar.
+- **Origin** ist eine Mehrfachauswahl mit `LOCAL` und `OIDC`. In Master erstellte Konten sind `LOCAL`. OIDC-Konten erscheinen nach ihrer ersten erfolgreichen Browseranmeldung als `OIDC`; der Filter liefert daher nur OIDC-Benutzer, die sich mindestens einmal angemeldet haben.
+
+Unter den Filtern zeigt die Tabelle jeden sichtbaren Benutzer mit folgenden Spalten:
+
+- **Username**: der Anmeldename.
+- **Email**: die E-Mail-Adresse des Kontos; kann leer sein.
+- **Last login**: Zeitpunkt der letzten erfolgreichen Anmeldung im Format `DD.MM.YYYY HH:mm`. Noch nie angemeldete Konten zeigen **Not logged in**.
+- **Origin**: `LOCAL` für in Master erstellte Konten, `OIDC` für durch die OIDC-Anmeldung angelegte Konten.
+- **Roles**: farbige Tags für jede dem Benutzer zugewiesene Rolle (`ADMIN`, `EDITOR`, `VIEWER`).
+
+Klicken Sie auf eine Zeile, um das [Benutzerprofil](#benutzerprofil) des Kontos zu öffnen.
+
+## Einen Benutzer erstellen
+
+Die Schaltfläche **Create User** erscheint nur bei aktivierter lokaler Authentifizierung in Master (`axelix.master.auth.options.local.enabled=true`). In reinen OIDC-Bereitstellungen ist sie verborgen, da neue Konten dort vom Identitätsanbieter stammen.
+
+Die Schaltfläche öffnet einen Dialog mit folgenden Feldern:
+
+- **Username**: der Anmeldename; muss eindeutig sein.
+- **Email**: optional. Bleibt das Feld leer, wird das Konto ohne E-Mail-Adresse gespeichert.
+- **Password**: das anfängliche Passwort. Der Benutzer kann es später im Profil ändern.
+- **Roles**: Wählen Sie eine oder mehrere Rollen: `ADMIN`, `EDITOR` und `VIEWER`. Sie können die Auswahl später im Profil ändern.
+
+Nach erfolgreicher Erstellung schließt sich der Dialog, die Meldung **User created successfully** erscheint und die Liste wird aktualisiert.
+
+## Benutzerprofil
+
+Die Auswahl einer Zeile in der Benutzerliste öffnet das Profil des Kontos mit seinen Kontodaten und Rollen.
+
+Wählen Sie bei einem lokalen Konto **Edit user**, um den Bearbeitungsdialog zu öffnen. Dort können Sie Vorname,
+Nachname, Benutzername, E-Mail-Adresse und Passwort ändern. **Confirm** speichert die Felder gemeinsam;
+**Cancel** verwirft die Änderungen.
+
+- **Username**: der Anmeldename. Eine Änderung beeinflusst, wie sich der Benutzer anmeldet.
+- **Email**: die E-Mail-Adresse. Das Speichern eines leeren Werts entfernt die E-Mail-Adresse vom Konto.
+- **Password**: Geben Sie ein neues Passwort ein und bestätigen Sie es, um das aktuelle zu ersetzen. Lassen Sie das
+  Feld leer, um das aktuelle Passwort beizubehalten. Das aktuelle Passwort kann nicht angezeigt werden, da Master
+  Passwörter niemals im Klartext speichert.
+
+Wählen Sie zum Ändern der zugewiesenen Rollen **Change roles** im Abschnitt **Roles**. Wählen Sie eine oder mehrere
+Rollen aus `ADMIN`, `EDITOR` und `VIEWER` und anschließend **Confirm**. Die effektiven Berechtigungen des Benutzers
+sind die Vereinigungsmenge der Berechtigungen dieser Rollen.
+
+Unter der Karte stehen zwei Aktionsschaltflächen:
+
+- **Delete user** öffnet einen Bestätigungsdialog (**Are you sure you want to delete this user?**). Die Bestätigung entfernt das Konto sofort. Die Seite kehrt zur Benutzerliste zurück und zeigt **User deleted successfully**. Es gibt keine Rückgängig-Funktion.
+- **Access Log** ist aktuell deaktiviert. Das Steuerelement ist für eine kommende Funktion von Axelix Enterprise vorgesehen. Sowohl Access Log als auch Axelix Enterprise selbst befinden sich noch in Entwicklung; die Schaltfläche kann derzeit nicht angeklickt werden.
+
+:::warning
+**Delete user** ist unwiderruflich. Das Konto wird aus der Datenbank entfernt; es gibt weder Soft-Delete noch Wiederherstellung.
+:::
+
+## OIDC-Sitzungen
+
+Bei aktiviertem OIDC erstellt oder aktualisiert eine erfolgreiche Browseranmeldung einen `OIDC`-Benutzerdatensatz in der Master-Datenbank. Master aktualisiert **Last login**, speichert die E-Mail-Adresse aus der OIDC-`userinfo`-Antwort, sofern vorhanden, und zeigt das Konto mit Herkunft `OIDC` an.
+
+Bei jeder OIDC-Anmeldung wertet Master `axelix.master.auth.options.oauth2.role-attribute-path` erneut aus und aktualisiert anhand des Ergebnisses die gespeicherte Rollenzuweisung. OIDC-Konten erscheinen also auf dieser Seite; ihre effektive Rolle stammt weiterhin aus der Zuordnung des Identitätsanbieters.
+
+:::warning
+Entspricht ein OIDC-Benutzername einem bestehenden Nicht-OIDC-Konto, lehnt Master die Anmeldung ab, statt die Identitäten zusammenzuführen. Beheben Sie zuerst die Kollision beim Identitätsanbieter oder benennen Sie das lokale Konto um.
+:::
+
+Die vollständige Beschreibung der Authentifizierung finden Sie unter [Authentifizierung](../setting-up-master-ui/authentication/authentication.mdx).

@@ -1,0 +1,26 @@
+---
+title: Spring Framework
+description: "Das Dashboard Spring Framework zeigt, wie viele Services in der Systemlandschaft mit aktiviertem Open Session in View laufen."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Das Dashboard Spring Framework wird in Axelix 1.2.0 entfernt.</>}
+/>
+
+Open Session in View (OSIV) hält die Hibernate-Session und die Datenbankverbindung offen, bis die gesamte HTTP-Antwort gerendert ist. Lazy-Beziehungen werden dadurch unbemerkt außerhalb der Transaktion geladen, und jede Anfrage belegt eine Verbindung länger als nötig. Spring Boot aktiviert OSIV standardmäßig in Webanwendungen mit JPA, weshalb es oft unbeabsichtigt aktiv bleibt. Das Dashboard Spring Framework zeigt, wie verbreitet dies in der Systemlandschaft ist.
+
+Die Seite ist schreibgeschützt und für alle authentifizierten Benutzer zugänglich: **VIEWER**, **EDITOR**, **ADMIN** und **SUPER_ADMIN**. Die vollständige Rollen- und Berechtigungsmatrix finden Sie unter [Rollen und Berechtigungen](../../../setting-up-master-ui/authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Was die Seite zeigt
+
+Die Seite zeigt den Anteil der Services mit aktiviertem beziehungsweise deaktiviertem OSIV.
+
+## Funktionsweise
+
+OSIV gilt als aktiviert, wenn die Anwendung den Open-Session-in-View-Interceptor oder -Filter registriert. Master zeichnet dies einmal täglich auf und verwendet den neuesten Datensatz. Ein Service wird unabhängig von der Anzahl seiner Instanzen einmal gezählt.
+
+## Siehe auch
+
+- [Persistence](./persistence.mdx)
+- [Transaction Control](../../../features/spring-framework/transaction-control.mdx)
