@@ -36,20 +36,27 @@ Die Schaltfläche öffnet einen Dialog mit folgenden Feldern:
 - **Username**: der Anmeldename; muss eindeutig sein.
 - **Email**: optional. Bleibt das Feld leer, wird das Konto ohne E-Mail-Adresse gespeichert.
 - **Password**: das anfängliche Passwort. Der Benutzer kann es später im Profil ändern.
-- **Role**: genau eine Rolle: `ADMIN`, `EDITOR` oder `VIEWER`. Mehrere Rollen können später über das Profil zugewiesen werden.
+- **Roles**: Wählen Sie eine oder mehrere Rollen: `ADMIN`, `EDITOR` und `VIEWER`. Sie können die Auswahl später im Profil ändern.
 
 Nach erfolgreicher Erstellung schließt sich der Dialog, die Meldung **User created successfully** erscheint und die Liste wird aktualisiert.
 
 ## Benutzerprofil
 
-Die Auswahl einer Zeile öffnet die Profilseite des Kontos. Sie zeigt die Karte **User Profile** mit vier direkt bearbeitbaren Feldern und anschließend einen Aktionsbereich zur Verwaltung des Kontos.
+Die Auswahl einer Zeile in der Benutzerliste öffnet das Profil des Kontos mit seinen Kontodaten und Rollen.
 
-Jede Zeile der Karte hat rechts einen Bearbeitungsstift. Ein Klick ersetzt den Wert durch ein Eingabefeld mit Bestätigungs- und Abbruchaktion. Speichern sendet den neuen Wert sofort an Master; Abbrechen verwirft die Eingabe ohne Speicherung.
+Wählen Sie bei einem lokalen Konto **Edit user**, um den Bearbeitungsdialog zu öffnen. Dort können Sie Vorname,
+Nachname, Benutzername, E-Mail-Adresse und Passwort ändern. **Confirm** speichert die Felder gemeinsam;
+**Cancel** verwirft die Änderungen.
 
 - **Username**: der Anmeldename. Eine Änderung beeinflusst, wie sich der Benutzer anmeldet.
 - **Email**: die E-Mail-Adresse. Das Speichern eines leeren Werts entfernt die E-Mail-Adresse vom Konto.
-- **Roles**: Die Mehrfachauswahl erlaubt jede Kombination aus `ADMIN`, `EDITOR` und `VIEWER`. Die effektiven Berechtigungen sind die Vereinigungsmenge der Berechtigungen dieser Rollen.
-- **Password**: Der Wert ist stets als `••••••••••` maskiert. Eine Bearbeitung setzt ein neues Passwort. Der aktuelle Wert kann nicht angezeigt werden, da Master Passwörter niemals im Klartext speichert. Ein leeres Feld zu bestätigen übermittelt eine leere Zeichenfolge, die das Backend ablehnt.
+- **Password**: Geben Sie ein neues Passwort ein und bestätigen Sie es, um das aktuelle zu ersetzen. Lassen Sie das
+  Feld leer, um das aktuelle Passwort beizubehalten. Das aktuelle Passwort kann nicht angezeigt werden, da Master
+  Passwörter niemals im Klartext speichert.
+
+Wählen Sie zum Ändern der zugewiesenen Rollen **Change roles** im Abschnitt **Roles**. Wählen Sie eine oder mehrere
+Rollen aus `ADMIN`, `EDITOR` und `VIEWER` und anschließend **Confirm**. Die effektiven Berechtigungen des Benutzers
+sind die Vereinigungsmenge der Berechtigungen dieser Rollen.
 
 Unter der Karte stehen zwei Aktionsschaltflächen:
 

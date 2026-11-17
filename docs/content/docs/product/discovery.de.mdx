@@ -114,8 +114,11 @@ Instanzen mit einem Starter vor 1.3.0 haben kein `axelix-ping`. Daher liest Mast
          │──────────────────────────────────────────────────▶│
          │                                                   │
          ╳  the service stops, heartbeats stop               │
-                                                             │  removed after 45 s
+                                                             │  removed on next eviction run
+                                                             │  after 45 s without a heartbeat
 ```
+
+Das standardmäßige Heartbeat-Zeitlimit beträgt 45 Sekunden. Master entfernt veraltete Instanzen beim nächsten Bereinigungslauf, standardmäßig einmal pro Minute, und nicht unmittelbar nach Ablauf des Zeitlimits.
 
 Bei einem Starter vor 1.3.0 ist jeder Heartbeat eine vollständige Registrierung.
 

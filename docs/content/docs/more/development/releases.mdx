@@ -40,9 +40,10 @@ Housekeeping is the set of **manual changes** made before the release. They all 
 
 ### 2. Launch the release pipeline
 
-**We do not create the tag by hand.** The release pipeline reads the version from `gradle.properties`, runs
-its pre-release checks, and only if everything is green does it create the `vX.Y.0` tag and publish every
-component of the fleet — the Maven artifacts (starters and plugins) and the Master Docker image alike.
+**We do not create the tag by hand.** The release pipeline reads the version from `gradle.properties` and runs
+its pre-release checks. It then publishes the Maven artifacts (starters and plugins), builds and pushes the Master
+Docker image, and packages and signs the Helm chart. Only then does it create and push the `vX.Y.0` tag, followed by
+updating the Helm chart repository. Artifacts can therefore already be published if the pipeline fails before tag creation.
 
 :::info[Release notes are written by hand]
 The pipeline creates the **tag** — it does **not** write the release notes. Composing the release notes for the
@@ -74,9 +75,9 @@ change the docs.
      minor release: playgrounds pin their Axelix versions explicitly and do not inherit `axelixVersion`.
 
 4. **Launch the release pipeline.** It is the **same pipeline** as for a minor release, launched from the
-   patch branch instead of `master`. It runs the same pre-release checks, publishes every component of the
-   fleet under `X.Y.Z`, and creates the fleet tag `vX.Y.Z`. Like every Axelix tag it carries the `v` prefix.
-   As with a minor release, the pipeline creates the tag but **not** the release notes — the developer writes
+   patch branch instead of `master`. It follows the same checks and publication, packaging, and tagging sequence
+   described above, using version `X.Y.Z` and tag `vX.Y.Z`. Like every Axelix tag it carries the `v` prefix.
+   As with a minor release, the pipeline creates the tag but **not** the release notes; the developer writes
    those manually against the new tag.
 
 ### Worked example
@@ -88,9 +89,9 @@ Say the `3.1.0` release needs a fix in the **Axelix Spring Boot 3 Starter**:
 2. We backport the fix from `master` to that branch.
 3. In the root `gradle.properties` we set `axelixVersion` to `3.1.1` — the patch version we want to
    release — and bump the playgrounds to `3.1.1`.
-4. We launch the release pipeline from the `3.1.x` branch. It creates the fleet tag `v3.1.1` and publishes
-   **every** component — the starters, the plugins, and Master — under `3.1.1`, even though only one starter
-   actually changed.
+4. We launch the release pipeline from the `3.1.x` branch. It publishes the Maven artifacts and Master image
+   under `3.1.1`, packages the Helm chart, and then creates and pushes the fleet tag `v3.1.1`. It updates the chart
+   repository afterwards. **Every** component receives version `3.1.1`, even though only one starter actually changed.
 
 The result is what
 [one version for every component](../compatibility-and-versioning.mdx#one-version-for-every-component)

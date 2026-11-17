@@ -40,7 +40,7 @@ Das Suchfeld über dem Raster filtert Karten nach Servicenamen (Teilzeichenfolge
 Die Schaltfläche **+ Add filter** neben der Suche öffnet ein Popover mit drei Feldern:
 
 - **Field**: eines von **Spring Boot**, **Java**, **Spring Framework**, **Kotlin**.
-- **Comparison**: **Equal**, **Less than or equal** oder **Greater than or equal**. Der Vergleich berücksichtigt Semver; `<= 3.2` trifft somit auf `3.1.x` und `3.2.x` zu, aber nicht auf `3.3.x`.
+- **Comparison**: **Equal**, **Less than or equal** oder **Greater than or equal**. Der Vergleich berücksichtigt Semver; `<= 3.2` behandelt die fehlende Patch-Version als null und trifft auf `3.1.x` und `3.2.0` zu, aber nicht auf `3.2.1` oder spätere Versionen.
 - **Value**: eine Version der aktuell vorhandenen Instanzen. Angeboten werden nur Versionen auf mindestens einer Karte, sodass kein Filter ohne Treffer entsteht.
 
 Beim Speichern erscheint zwischen Suche und Raster ein entfernbares Filter-Tag. Die angezeigten Karten werden eingegrenzt und der Filter als `?f=Field:Operator:Value` in die URL geschrieben. Gefilterte Wallboard-URLs können als Lesezeichen gespeichert und geteilt werden. Wiederholen Sie die Aktion für weitere Filter; eine Karte erscheint nur, wenn alle aktiven Filter zutreffen.

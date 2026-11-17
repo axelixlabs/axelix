@@ -29,15 +29,17 @@ copyright holder for all components is Axelix Labs.
 **Yes, you can use the Axelix starters and build plugins in a closed-source, proprietary application, free of charge.**
 You don't pay any fees, and you don't sign any agreement with Axelix Labs.
 
-This works because LGPLv3 is a weak copyleft license. Its obligations cover Axelix's own code, not the code of
-applications that use it. So adding a starter to your Spring Boot service, or a build plugin to your build, doesn't
-require you to publish your application's source code or change its license. The same holds for running Master inside
-your company to monitor your services.
+LGPLv3 is a weak copyleft license. Adding a starter to your Spring Boot service, or a build plugin to your build,
+does not by itself require you to publish your application's source code or change its license. Distribution is
+subject to the license conditions described below.
 
-The obligations start when you **distribute a modified version** of an Axelix component. For example, if you patch the
-starter and ship the patched JAR to your customers, you must make the source of your changes available to them under
-LGPLv3. LGPLv3 has no network clause, so modifying Master and only running it on your own servers doesn't count as
-distribution.
+Internal use is different from distribution. LGPLv3 has no network clause, so modifying Master and only running it
+on your own servers does not by itself count as distribution.
+
+**Distributing an Axelix component can trigger obligations even if you have not modified it.** For example, Section 4
+of the repository's `LICENSE` sets conditions for distributing a Combined Work, including notices and copies of the
+GNU GPL and LGPL, as well as the other conditions in that section. If you modify the starter and distribute the
+modified JAR to customers, you must also make the source of your changes available to them under LGPLv3.
 
 :::note[Not legal advice]
 This section is a short summary to help you orient yourself. The license text is the only binding source. If your

@@ -29,12 +29,38 @@ The 401 arises from the collision between these two independent authentication s
 
 The solution is to exclude Axelix custom actuator endpoints (i.e. those that are prefixed with `/actuator/axelix-**`, again, considering the ability to configure the custom prefix for actuator endpoints) from the application IAM and trust Axelix's own IAM:
 
-```
+<Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
+  <Tab value="Spring Boot 4.x">
+
+```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
   return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
 }
 ```
+
+  </Tab>
+  <Tab value="Spring Boot 3.x">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+}
+```
+
+  </Tab>
+  <Tab value="Spring Boot 2.7">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().antMatchers("/actuator/axelix-**");
+}
+```
+
+  </Tab>
+</Tabs>
 
 ## 2. Wrong Starter Module for Your Spring Boot Version
 

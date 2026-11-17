@@ -101,12 +101,12 @@ Das Image wendet `JAVA_TOOL_OPTIONS` automatisch auf die JVM an. Darüber lassen
 
 ```bash
 docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_PASSWORD="${AXELIX_DB_PASSWORD}" \
+  -e AXELIX_MASTER_MIGRATIONS_PASSWORD="${AXELIX_MIGRATIONS_PASSWORD}" \
   -e JAVA_TOOL_OPTIONS="\
     -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
     -Daxelix.master.database.username=axelix_app \
-    -Daxelix.master.database.password=... \
-    -Daxelix.master.migrations.username=axelix_migrator \
-    -Daxelix.master.migrations.password=..." \
+    -Daxelix.master.migrations.username=axelix_migrator" \
   ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
@@ -115,12 +115,12 @@ docker run --rm -p 2935:2935 \
 
 ```bash
 docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_DATABASE_PASSWORD="${AXELIX_DB_PASSWORD}" \
+  -e AXELIX_MASTER_MIGRATIONS_PASSWORD="${AXELIX_MIGRATIONS_PASSWORD}" \
   -e JAVA_TOOL_OPTIONS="\
     -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
     -Daxelix.master.database.username=axelix_app \
-    -Daxelix.master.database.password=... \
-    -Daxelix.master.migrations.username=axelix_migrator \
-    -Daxelix.master.migrations.password=..." \
+    -Daxelix.master.migrations.username=axelix_migrator" \
   docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
@@ -133,7 +133,7 @@ Seit Axelix `1.2.0` lauscht Master standardmäßig auf `2935`. Zuvor war der Sta
 
 ### Mit Docker Compose ausführen
 
-Ergänzen Sie die Migrationseigenschaften neben den Datenbankeinstellungen in `JAVA_TOOL_OPTIONS` des Dienstes `master`.
+Ergänzen Sie die Datenbank- und Migrationseinstellungen ohne Geheimnisse in `JAVA_TOOL_OPTIONS` des Dienstes `master`. Übergeben Sie die Datenbank- und Migrationspasswörter wie unten gezeigt als separate Umgebungsvariablen.
 
 <Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
   <Tab value="Docker GHCR">
@@ -145,12 +145,12 @@ services:
     ports:
       - "2935:2935"
     environment:
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_MIGRATIONS_PASSWORD: ${AXELIX_MIGRATIONS_PASSWORD}
       JAVA_TOOL_OPTIONS: >-
         -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
         -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
-        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
         -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
-        -Daxelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
 ```
 
   </Tab>
@@ -163,12 +163,12 @@ services:
     ports:
       - "2935:2935"
     environment:
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_MIGRATIONS_PASSWORD: ${AXELIX_MIGRATIONS_PASSWORD}
       JAVA_TOOL_OPTIONS: >-
         -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
         -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
-        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
         -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
-        -Daxelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
 ```
 
   </Tab>

@@ -172,7 +172,7 @@ Si `APP_IN_COMPOSE` vaut yes :
   axelix-master:
     image: ghcr.io/axelixlabs/axelix:VERSION
     ports:
-      - "2935:2935"
+      - "127.0.0.1:2935:2935"
     environment:
       AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED: "true"
 ```
@@ -184,7 +184,7 @@ Sinon, exécutez-le avec `docker run`. Si Docker n’est pas installé, demandez
 Si Axelix Master s’exécute déjà sur cette machine (un service répond sur le port `2935`, ou un conteneur utilise l’image `ghcr.io/axelixlabs/axelix`), ne le supprimez pas et ne le redémarrez pas : demandez à l’utilisateur s’il souhaite le réutiliser. Si le port `2935` est occupé par autre chose, démarrez Master sur un autre port et utilisez celui-ci dans `MASTER`. Si le nom `axelix-master` est pris par un autre conteneur, utilisez un autre nom.
 
 ```bash
-docker run -d --name axelix-master -p 2935:2935 \
+docker run -d --name axelix-master -p 127.0.0.1:2935:2935 \
   --add-host=host.docker.internal:host-gateway \
   -e AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED=true \
   ghcr.io/axelixlabs/axelix:VERSION

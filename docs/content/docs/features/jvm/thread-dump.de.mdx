@@ -42,12 +42,10 @@ Klappen Sie einen Thread auf, um seine detaillierte Momentaufnahme für den auf 
 - **Thread name**: der Thread-Name.
 - **Thread state**: der JVM-Thread-Zustand (`RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED`, …).
 - **Priority**: die JVM-Thread-Priorität.
-- **Blocked count**: die Gesamtzahl der Blockierungen des Threads. Nur bei aktiviertem **Thread Contention Monitoring**
-  verfügbar, sonst als *Not Available* angezeigt.
+- **Blocked count**: die Gesamtzahl der Blockierungen des Threads.
 - **Blocked time**: die vom Thread im blockierten Zustand verbrachte Zeit in Millisekunden. Nur bei aktiviertem
   **Thread Contention Monitoring** verfügbar, sonst als *Not Available* angezeigt.
-- **Waited count**: die Gesamtzahl der Wartevorgänge des Threads auf eine Benachrichtigung. Nur bei aktiviertem
-  **Thread Contention Monitoring** verfügbar, sonst als *Not Available* angezeigt.
+- **Waited count**: die Gesamtzahl der Wartevorgänge des Threads auf eine Benachrichtigung.
 - **Waited time**: die vom Thread wartend verbrachte Zeit in Millisekunden. Nur bei aktiviertem
   **Thread Contention Monitoring** verfügbar, sonst als *Not Available* angezeigt.
 - **Daemon**: ob es sich um einen Daemon-Thread handelt.
@@ -77,9 +75,9 @@ Durch Klicken auf <Image src="/img/feature/icons/settings-icon.png" alt="Einstel
 öffnen Sie einen Dialog mit einem Schalter:
 
 - **Thread Contention Monitoring** — aktiviert die JMX-Überwachung von Ressourcenkonflikten auf der `ThreadMXBean` der
-  Instanz. Die JVM erfasst dann, wie lange jeder Thread in **BLOCKED** und **WAITING** verbracht hat. Dadurch werden
-  die Felder `Blocked count` / `Blocked time` / `Waited count` / `Waited time` oben mit Werten gefüllt. Bei deaktivierter
-  Überwachung bleiben diese vier Felder auf *Not Available*.
+  Instanz. Die JVM erfasst dann, wie lange jeder Thread in **BLOCKED** und **WAITING** verbracht hat, und füllt die
+  Felder `Blocked time` und `Waited time`. Bei deaktivierter Überwachung zeigen nur diese beiden Zeitfelder
+  *Not Available*. `Blocked count` und `Waited count` bleiben unabhängig von dieser Einstellung verfügbar.
 
 Die Überwachung verursacht messbaren zusätzlichen JVM-Aufwand. Deshalb bleibt sie auf Produktionsinstanzen
 üblicherweise deaktiviert und wird nur für eine gezielte Untersuchung eingeschaltet.

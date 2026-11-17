@@ -553,7 +553,7 @@ axelix.sbs.discovery.heartbeat-interval=15s
 
 Einige leicht übersehene Details:
 
-- `instance-actuator-url` ist die **Basis**-URL des Dienstes, wie Master ihn aus seinem eigenen Netzwerk erreicht: nur Host und Port.
+- `instance-actuator-url` ist die URL des Dienstes, wie Master ihn aus seinem eigenen Netzwerk erreicht, einschließlich des konfigurierten Actuator-Basispfads, normalerweise `/actuator`.
 - `master-url` ist die **vollständige** URL einschließlich `/api/internal/service/register`. Der Starter sendet sie unverändert an. Master lauscht seit Axelix `1.2.0` standardmäßig auf `2935`; zuvor war es `8080`. Siehe [Allgemeines](../../setting-up-master-ui/configuring-master/configuring-master.mdx#allgemein).
 - `instance-name` ist die Kennzeichnung dieser Instanz in UI und MCP-Antworten. Wählen Sie einen über Neustarts und Replikate hinweg beständigen Namen, meist den Dienstnamen statt des Pod-Namens.
 - Master akzeptiert Selbstregistrierung standardmäßig (`axelix.master.discovery.self-registration.enabled=true`). Setzen Sie dies auf `false`, um Heartbeats abzulehnen. Master entfernt eine Instanz nach `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` ohne Heartbeat (Standard `45s`). Halten Sie `heartbeat-interval` deutlich darunter.
@@ -677,7 +677,7 @@ Die Master-Seite dieser Heartbeats — Endpunkt, Zeitlimit und Prüfintervall f�
 |---|---|---|
 | `axelix.sbs.discovery.self-registration` | `false` | Hauptschalter. `true` aktiviert Selbstregistrierung; bei `false` wird die automatische Erkennung durch Master verwendet. |
 | `axelix.sbs.discovery.master-url` | *(nicht gesetzt)* <span className="Required">erforderlich</span> | Vollständige URL des Selbstregistrierungsendpunkts, etwa `http://master:2935/api/internal/service/register`. Bei `self-registration=true` erforderlich. |
-| `axelix.sbs.discovery.instance-actuator-url` | *(nicht gesetzt)* <span className="Required">erforderlich</span> | Von Master erreichbare Basis-URL dieses Dienstes (Suffix `/actuator` erforderlich). Bei `self-registration=true` erforderlich. |
+| `axelix.sbs.discovery.instance-actuator-url` | *(nicht gesetzt)* <span className="Required">erforderlich</span> | Von Master erreichbare URL dieses Dienstes einschließlich des konfigurierten Actuator-Basispfads (normalerweise `/actuator`). Bei `self-registration=true` erforderlich. |
 | `axelix.sbs.discovery.instance-name` | *(nicht gesetzt)* <span className="Required">erforderlich</span> | Anzeigename in Axelix-UI und MCP-Antworten. Bei `self-registration=true` erforderlich. |
 | `axelix.sbs.discovery.heartbeat-interval` | `15s` | Abstand zwischen Heartbeats. Sollte kleiner als Masters `heartbeat-timeout` für das Entfernen sein. |
 

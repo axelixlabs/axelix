@@ -110,44 +110,41 @@ Spring-Boot-2-Benutzer, die theoretisch noch **Java 8** verwenden können, müss
 
 ## Kompatibilität zwischen Komponenten
 
-Axelix wird [gemeinsam veröffentlicht](#eine-version-für-alle-komponenten), muss aber nicht gemeinsam **aktualisiert** werden.
-In einer realen Dienstlandschaft kann Master bereits den neuesten Patch haben, während Dienste noch nachziehen.
-Oder Sie aktualisieren den Starter eines einzelnen Dienstes, während alles andere unverändert bleibt.
-Für solche gemischten Bereitstellungen gilt eine Regel für **jede** Axelix-Komponente:
+Axelix wird [gemeinsam veröffentlicht](#eine-version-für-alle-komponenten), Sie können die Komponenten aber zu
+unterschiedlichen Zeitpunkten **aktualisieren**. Es gelten zwei Kompatibilitätsregeln:
 
-> **Zwei beliebige Axelix-Komponenten sind garantiert kompatibel, solange sie dieselbe `major`- und `minor`-Version haben. Die Patch-Version spielt keine Rolle.**
+- **Master und Starter:** Innerhalb einer Major-Version unterstützt Master Starter der letzten **4 Minor-Versionen,
+  einschließlich seiner eigenen**. Die Minor-Version des Starters darf nicht neuer sein als die von Master. Dieses
+  Fenster gilt seit Axelix 1.1; siehe [Axelix aktualisieren](./upgrading.mdx).
+- **Starter und Build-Plugin:** Innerhalb eines Dienstes müssen beide dieselbe `major.minor`-Version haben.
 
-Dies ist der vollständige Vertrag. Er gilt für alle Kombinationen: Master mit Starter, Starter mit Plugin und alle gemeinsam.
-Eine Kompatibilitätsmatrix ist nicht nötig. Stimmen Sie einfach `major.minor` ab.
+**Patch-Versionen spielen für beide Regeln keine Rolle.**
 
-- ✅ Master `1.4.2`, Starter `1.4.5`, Plugin `1.4.0`: alle auf `1.4`, garantiert kompatibel.
+- ✅ Master `1.4.2`, Starter `1.4.5`, Plugin `1.4.0`: garantiert kompatibel.
 - ✅ Starter `1.4.3` mit Plugin `1.4.0`: dieselbe `1.4`, garantiert kompatibel.
-- ⚠️ Master `1.4.2` mit Starter `1.3.4`: **abweichende Minor-Versionen**, nicht garantiert. Kann funktionieren oder fehlschlagen.
-- ⚠️ Starter `3.1.x` mit Plugin `3.3.x`: **abweichende Minor-Versionen**, nicht garantiert und nicht unterstützt.
-- ⚠️ Jede **Major-Abweichung**: nicht garantiert und noch weniger wahrscheinlich funktionsfähig als eine Minor-Abweichung.
+- ✅ Master `1.4.2` mit Starter `1.3.4`: innerhalb des Master-Fensters `1.1`–`1.4`, garantiert kompatibel.
+- ⚠️ Master `1.4.x` mit Starter `1.0.x` oder `1.5.x`: außerhalb des unterstützten Fensters.
+- ⚠️ Starter `3.1.x` mit Plugin `3.3.x`: unterschiedliche Minor-Versionen, nicht garantiert und nicht unterstützt.
+- ⚠️ Master und Starter mit unterschiedlichen Major-Versionen: außerhalb des Kompatibilitätsfensters; folgen Sie dem Major-Migrationsleitfaden.
 
-Bei unterschiedlichen **Minor- oder Major-Versionen** garantieren wir **nichts**.
-Die Kombination kann funktionieren, aber auch fehlschlagen, und sie wird nicht getestet.
-Die einfachste Richtlinie ist, alles auf exakt demselben `X.Y.Z` zu halten, was gemeinsame Veröffentlichungen leicht machen.
-Der eigentliche Vertrag gilt jedoch nur für `major.minor`.
+Die einfachste Richtlinie ist, alles auf exakt demselben `X.Y.Z` zu halten. Wenn Sie Komponenten getrennt aktualisieren,
+halten Sie jeden Starter innerhalb des von Master unterstützten Fensters und stimmen Sie ihn auf sein Plugin ab.
 
 ### Warum unterschiedliche Patch-Stände sicher sind, Minor- und Major-Abweichungen jedoch nicht
 
-Diese Richtlinie setzt voraus, dass **sämtliche Komponentenfunktionen über die Axelix-Master-Weboberfläche genutzt werden sollen**.
-Es gibt keinen vorgesehenen Fall, in dem nur die **Minor-Version** einer einzelnen Komponente erhöht wird, um eine Funktion freizuschalten:
-Die Funktion ist über Master verfügbar, nicht über die isolierte Komponente.
-Deshalb erlauben wir uns, **Verträge zwischen Komponenten in Minor-Versionen zu überarbeiten**, um die Entwicklung schnell voranzubringen.
+Zwischen einem Starter und seinem Build-Plugin können sich die Verträge bei Minor-Versionen ändern. Daher werden nur
+übereinstimmende `major.minor`-Versionen unterstützt. Für die Kommunikation zwischen Master und Starter gilt das oben
+beschriebene, größere Kompatibilitätsfenster von vier Minor-Versionen.
 
-Patch-Veröffentlichungen unterscheiden sich davon. Wie [Semver](https://semver.org/) beschreibt, können sie eine **kritische CVE-Korrektur,
-eine Fehlerbehebung oder eine Leistungsverbesserung** enthalten, die **für sich genommen** wertvoll sind.
-Ein Patch veröffentlicht **alle Komponenten** unter der neuen Version erneut, aber die tatsächliche Korrektur betrifft meist nur einige davon.
-Daher ist es realistisch, nur die betroffene Komponente zu aktualisieren und andere auf einem älteren Patch zu lassen. Wir garantieren die Kompatibilität dieser Kombination.
+Patch-Veröffentlichungen können eine **kritische CVE-Korrektur, eine Fehlerbehebung oder eine Leistungsverbesserung**
+enthalten. Ein Patch veröffentlicht **alle Komponenten** erneut, obwohl die tatsächliche Korrektur meist nur einige
+betrifft. Nur eine betroffene Komponente zu aktualisieren und die übrigen auf einem älteren Patch zu belassen, bleibt
+nach den beiden obigen Regeln kompatibel.
 
-:::warning[Minor- und Major-Abweichungen können Kommunikationsprotokolle brechen]
-Wir **können** die Protokolle zwischen Komponenten (Master ↔ Starter, Plugin ↔ Starter) zwischen **Minor-Versionen** überarbeiten,
-erst recht zwischen **Major-Versionen**. Das bedeutet ausdrücklich nicht, dass wir es tun werden, aber wir können es.
-Jede Kombination über eine Minor-Grenze hinweg **kann** daher fehlschlagen. Ein Fehler ist nicht zwangsläufig, aber wir garantieren nichts anderes.
-Halten Sie alle Komponenten auf derselben Major- **und** Minor-Version. Nur die Patch-Stände dürfen abweichen.
+:::warning[Jede Kombination im unterstützten Bereich halten]
+Verwenden Sie keinen Starter mit einer neueren Minor-Version als Master oder einem Rückstand von mehr als drei Minor-Versionen und kombinieren Sie
+Master und Starter nicht über Major-Versionen hinweg. Das Master-Starter-Fenster gilt nicht für die Kompatibilität
+zwischen Starter und Plugin: Diese beiden müssen dieselbe `major.minor`-Version haben.
 :::
 
 ## Garantien zur Rückwärtskompatibilität zwischen Veröffentlichungen

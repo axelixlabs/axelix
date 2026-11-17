@@ -119,8 +119,11 @@ Les instances dotées d’un starter antérieur à la version 1.3.0 ne possèden
          │──────────────────────────────────────────────────▶│
          │                                                   │
          ╳  the service stops, heartbeats stop               │
-                                                             │  removed after 45 s
+                                                             │  removed on next eviction run
+                                                             │  after 45 s without a heartbeat
 ```
+
+Le délai d’expiration des heartbeats est de 45 secondes par défaut. Master supprime les instances obsolètes lors du prochain passage de nettoyage, exécuté une fois par minute par défaut, et non immédiatement à l’expiration du délai.
 
 Avec un starter antérieur à la version 1.3.0, chaque signal de présence constitue un enregistrement complet.
 

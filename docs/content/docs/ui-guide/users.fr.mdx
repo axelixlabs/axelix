@@ -1,6 +1,6 @@
 ---
 title: Users
-description: "L’écran **Users** permet de voir qui peut se connecter à Axelix Master et quel rôle est attribué à chaque compte ; lorsque
+description: "L’écran **Users** permet de voir qui peut se connecter à Axelix Master et quels rôles sont attribués à chaque compte ; lorsque
               l’authentification locale est activée, il permet également de créer, modifier et supprimer ces comptes. Cette page est accessible via le lien **Users**
               de la barre de navigation supérieure."
 ---
@@ -49,27 +49,26 @@ Cliquer sur le bouton ouvre une boîte de dialogue modale avec les champs suivan
 - **Username** — le nom de connexion. Il doit être unique.
 - **Email** — facultatif. Si vous le laissez vide, le compte est enregistré sans adresse e-mail.
 - **Password** — le mot de passe initial. L’utilisateur peut le modifier ultérieurement depuis son profil.
-- **Role** — exactement un rôle : `ADMIN`, `EDITOR` ou `VIEWER`. Plusieurs rôles peuvent être attribués ultérieurement depuis l’écran de
-  profil.
+- **Roles** — sélectionnez un ou plusieurs rôles : `ADMIN`, `EDITOR` et `VIEWER`. Vous pouvez modifier cette sélection ultérieurement depuis le profil.
 
 Une création réussie ferme la boîte de dialogue, affiche une notification **User created successfully** et actualise la liste.
 
 ## User Profile
 
-La sélection d’une ligne dans la liste des utilisateurs ouvre la page de profil de ce compte. Elle présente la carte **User Profile** avec quatre
-champs modifiables directement, suivis d’une zone d’actions pour gérer le compte lui-même.
+La sélection d’une ligne dans la liste des utilisateurs ouvre le profil du compte avec ses informations et ses rôles.
 
-Chaque ligne de la carte comporte un crayon de modification à droite. Cliquer dessus remplace la valeur par un champ de saisie accompagné d’une action de confirmation et
-d’une action d’annulation. L’enregistrement envoie immédiatement la nouvelle valeur à Master ; l’annulation rétablit le champ sans
-rien conserver.
+Pour un compte local, choisissez **Edit user** afin d’ouvrir la boîte de dialogue de modification. Vous pouvez y
+modifier le prénom, le nom, le nom d’utilisateur, l’adresse e-mail et le mot de passe. **Confirm** enregistre tous les
+champs ensemble ; **Cancel** annule les modifications.
 
 - **Username** — le nom de connexion. Le modifier change l’identifiant utilisé par l’utilisateur pour se connecter.
 - **Email** — l’adresse e-mail. Enregistrer une valeur vide efface l’adresse e-mail du compte.
-- **Roles** — la liste déroulante à sélection multiple permet d’attribuer n’importe quelle combinaison de `ADMIN`, `EDITOR` et `VIEWER`. Les
-  permissions effectives de l’utilisateur correspondent à l’union des autorités accordées par ces rôles.
-- **Password** — la valeur est toujours masquée sous la forme `••••••••••`. Le modifier définit un tout nouveau mot de passe ; il n’existe aucune option pour
-  afficher la valeur actuelle, car Master ne stocke jamais le mot de passe en clair. Laisser le champ vide et confirmer enregistre une
-  chaîne vide, que le backend rejette.
+- **Password** — saisissez et confirmez un nouveau mot de passe pour remplacer le mot de passe actuel. Laissez le champ
+  vide pour conserver le mot de passe actuel. Celui-ci ne peut pas être affiché, car Master ne le stocke jamais en clair.
+
+Pour modifier les rôles attribués, choisissez **Change roles** dans la section **Roles**. Sélectionnez un ou plusieurs
+rôles parmi `ADMIN`, `EDITOR` et `VIEWER`, puis choisissez **Confirm**. Les permissions effectives de l’utilisateur
+correspondent à l’union des autorités accordées par ces rôles.
 
 Deux boutons d’action se trouvent sous la carte :
 

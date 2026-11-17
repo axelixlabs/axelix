@@ -121,46 +121,39 @@ least **Java 11**.
 
 ## Compatibility between components
 
-Axelix is [released in lockstep](#one-version-for-every-component), but nothing forces you to **upgrade** in lockstep:
-in a real fleet you may bump Master to the latest patch before the services catch up, or upgrade a single service's
-starter while everything else stays put. For those mixed deployments there is a single rule, and it applies to
-**every** Axelix component:
+Axelix is [released in lockstep](#one-version-for-every-component), but you can **upgrade** components at different
+times. Two compatibility rules apply:
 
-> **Any two Axelix components are guaranteed compatible as long as they share the same `major` and `minor` version. The
-> patch version is irrelevant.**
+- **Master and starter:** within one major version, Master supports starters from the last **4 minor releases, counting
+  its own**. The starter must not have a newer minor version than Master. This window applies since Axelix 1.1; see
+  [Upgrading Axelix](./upgrading.mdx).
+- **Starter and build plugin:** within a service, both must share the same `major.minor` version.
 
-That is the whole contract. It covers every pairing at once (Master with a starter, a starter with its plugin, all of
-them together), so you never need a compatibility matrix. Just line up `major.minor`.
+**Patch versions are irrelevant to both rules.**
 
-- ✅ Master `1.4.2`, starter `1.4.5`, plugin `1.4.0`: all on `1.4`, guaranteed compatible.
+- ✅ Master `1.4.2`, starter `1.4.5`, plugin `1.4.0`: guaranteed compatible.
 - ✅ Starter `1.4.3` with plugin `1.4.0`: same `1.4`, guaranteed compatible.
-- ⚠️ Master `1.4.2` with starter `1.3.4`: **minor drift**, not guaranteed. It may work; it may break.
-- ⚠️ Starter `3.1.x` with plugin `3.3.x`: **minor drift**, not guaranteed and unsupported.
-- ⚠️ Any **major** drift: not guaranteed, and even less likely to work than a minor drift.
+- ✅ Master `1.4.2` with starter `1.3.4`: inside Master's `1.1`–`1.4` window, guaranteed compatible.
+- ⚠️ Master `1.4.x` with starter `1.0.x` or `1.5.x`: outside the supported window.
+- ⚠️ Starter `3.1.x` with plugin `3.3.x`: different minor versions, not guaranteed and unsupported.
+- ⚠️ Master and starter on different major versions: outside the compatibility window; follow the major migration guide.
 
-If components diverge on the **minor** or **major** version we guarantee **nothing**. The combination may still work,
-but it may break, and it is not tested. The simplest policy, and the one lockstep releasing makes trivial, is to keep
-everything on the exact same `X.Y.Z`, but only `major.minor` is the actual contract.
+Keeping everything on exactly the same `X.Y.Z` is the simplest policy. If you upgrade components separately, keep
+each starter inside Master's supported window and aligned with its plugin.
 
 ### Why patch drift is safe but minor/major drift is not
 
-The assumption behind this policy is that **all functionality the components expose is meant to be reached through the
-Axelix Master web UI**. There is no scenario in which you would bump a single component's **minor** version on its own to
-unlock some capability: that capability surfaces through Master, not through the component in isolation. Because of
-that, we let ourselves **revisit the contracts between components in minor releases**, which keeps the project moving
-fast.
+For a starter and its build plugin, contracts may change between minor releases, so only matching `major.minor`
+versions are supported. Master-to-starter communication has the wider four-minor compatibility window described above.
 
-Patch releases are different. As stated by [semver](https://semver.org/), a patch release may carry a **critical CVE
-fix, a bug fix, or a performance improvement**, and those changes are valuable **on their own**. A patch release
-re-publishes the **whole fleet** under the new version, but the actual fix usually touches only some of the components.
-So upgrading just the affected component and leaving the rest on an older patch is a combination you will genuinely
-run, and we guarantee it stays compatible.
+Patch releases may carry a **critical CVE fix, a bug fix, or a performance improvement**. A patch re-publishes the
+**whole fleet**, although the actual fix usually touches only some components. Upgrading just an affected component
+and leaving the others on an older patch stays compatible under the two rules above.
 
-:::warning[Minor and major drift may break the interaction protocols]
-We **may** (this does **not** mean we **will**, but we **may**) revisit the protocols between components (Master ↔
-starter, plugin ↔ starter) between **minor** releases, let alone **major** ones. That means any combination that crosses
-a minor boundary **may** break. It does not mean it **would**, but it **may**, and we do not guarantee otherwise. Keep
-every component on the same major **and** minor version, and only let the patch versions drift.
+:::warning[Keep each pairing within its supported range]
+Do not run a starter with a newer minor version than Master or more than three minor releases behind it, and do not mix major versions
+between Master and starter. The Master-to-starter window does not apply to starter-to-plugin compatibility: keep
+those two on the same `major.minor` version.
 :::
 
 ## Backward compatibility guarantees between releases

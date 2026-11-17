@@ -25,12 +25,38 @@ Der Fehler 401 entsteht durch die Kollision dieser beiden unabhängigen Authenti
 
 Nehmen Sie die benutzerdefinierten Axelix-Actuator-Endpunkte (also `/actuator/axelix-**`, unter Berücksichtigung eines gegebenenfalls angepassten Actuator-Präfixes) vom Anwendungs-IAM aus und vertrauen Sie dem eigenen IAM von Axelix:
 
-```
+<Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
+  <Tab value="Spring Boot 4.x">
+
+```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
   return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
 }
 ```
+
+  </Tab>
+  <Tab value="Spring Boot 3.x">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+}
+```
+
+  </Tab>
+  <Tab value="Spring Boot 2.7">
+
+```java
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().antMatchers("/actuator/axelix-**");
+}
+```
+
+  </Tab>
+</Tabs>
 
 ## 2. Falsches Starter-Modul für Ihre Spring-Boot-Version
 

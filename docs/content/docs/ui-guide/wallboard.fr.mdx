@@ -48,7 +48,7 @@ Le bouton **+ Add filter** situé à côté de la recherche ouvre une fenêtre c
 
 - **Field** — l’une des valeurs **Spring Boot**, **Java**, **Spring Framework**, **Kotlin**.
 - **Comparison** — **Equal**, **Less than or equal** ou **Greater than or equal**. La comparaison tient compte du versionnement sémantique ; ainsi,
-  `<= 3.2` correspond à `3.1.x` et `3.2.x`, mais pas à `3.3.x`.
+  `<= 3.2` traite le numéro de correctif absent comme zéro : il correspond à `3.1.x` et `3.2.0`, mais pas à `3.2.1` ni aux versions ultérieures.
 - **Value** — une version extraite des instances actuellement présentes dans le parc. Seules les versions présentes sur au moins une carte
   sont proposées ; vous ne pouvez donc pas créer un filtre qui ne correspond à rien.
 

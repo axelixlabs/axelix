@@ -655,8 +655,7 @@ axelix.sbs.discovery.heartbeat-interval=15s
 
 Несколько деталей, на которых люди спотыкаются:
 
-- `instance-actuator-url` — это **базовый** URL-адрес сервиса, поскольку Master будет обращаться к нему из своей
-  собственной сети — только по имени хоста и порту.
+- `instance-actuator-url` — это URL-адрес сервиса, доступный из сети Master, включая настроенный базовый путь Actuator, обычно `/actuator`.
 - `master-url` — это **полный** URL-адрес, включая `/api/internal/service/register`. Стартер отправляет его без
   изменений. Начиная с Axelix `1.2.0` Master по умолчанию слушает порт `2935`; до этого релиза портом по умолчанию
   был `8080` — см. [Общие настройки](../../setting-up-master-ui/configuring-master/configuring-master.mdx#общие-настройки).
@@ -810,7 +809,7 @@ heartbeat-сигналы будут отклоняться с `401`.
 |----------------------------------------------|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `axelix.sbs.discovery.self-registration`     | `false`                                                      | Главный переключатель. Установите `true`, чтобы включить саморегистрацию; оставьте `false`, чтобы полагаться на автообнаружение на стороне Master. |
 | `axelix.sbs.discovery.master-url`            | *(не задано)* <span className="Required">обязательное</span> | Полный URL-адрес эндпоинта саморегистрации на Master, например `http://master:2935/api/internal/service/register`. Обязательно при `self-registration=true`.    |
-| `axelix.sbs.discovery.instance-actuator-url` | *(не задано)* <span className="Required">обязательное</span> | Базовый URL-адрес этого сервиса, доступный из Master (необходимо указать постфикс `/actuator`). Обязательно при `self-registration=true`.                       |
+| `axelix.sbs.discovery.instance-actuator-url` | *(не задано)* <span className="Required">обязательное</span> | URL-адрес этого сервиса, доступный из Master, включая настроенный базовый путь Actuator (обычно `/actuator`). Обязательно при `self-registration=true`.                       |
 | `axelix.sbs.discovery.instance-name`         | *(не задано)* <span className="Required">обязательное</span> | Отображаемое имя, показываемое в Axelix UI и в MCP-ответах. Обязательно при `self-registration=true`.                                                           |
 | `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                        | Интервал между heartbeat-сигналами. Должен быть меньше `heartbeat-timeout` выселения на Master.                                                    |
 
