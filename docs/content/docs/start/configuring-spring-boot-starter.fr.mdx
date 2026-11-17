@@ -329,7 +329,7 @@ Le starter expose les endpoints suivants :
     </tr>
     <tr>
         <td><code>axelix-ping</code></td>
-        <td>Données de santé, de mémoire et de transactions que Master interroge pour les instances qu’il connaît déjà</td>
+        <td>Mises à jour de l’état, de la mémoire et des transactions que Master demande aux instances déjà connues et découvertes automatiquement. Nécessaire pour cette interrogation ; les instances auto-enregistrées envoient les mises à jour dans leurs heartbeats à la place.</td>
         <td><code>1.3.0</code></td>
     </tr>
     <tr>
@@ -532,10 +532,7 @@ pour cela. Le starter enregistre les meters suivants :
 | `axelix_cache_enabled` | `Gauge` | `cache` | État d’exécution actuel de chaque cache enrichi : `1` lorsqu’il est activé, `0` lorsqu’il est désactivé. |
 </div>
 
-Ces meters complètent les endpoints Actuator destinés à l’UI au lieu de les remplacer. L’UI continue de lire
-`axelix-metrics` et `axelix-caches`. Les données de supervision des transactions ne sont pas fournies par un endpoint Actuator dédié :
-elles parviennent à Master dans les métadonnées d’enregistrement de l’instance exposées via `axelix-metadata` (voir
-[Surveillance des transactions](#surveillance-des-transactions)).
+Ces meters complètent les endpoints Actuator destinés à l’UI au lieu de les remplacer. L’UI continue de lire `axelix-metrics` et `axelix-caches`. Les premières informations sur les transactions sont incluses dans les métadonnées d’enregistrement ; les mises à jour suivantes passent par `axelix-ping` lorsque Master interroge les starters à partir de 1.3.0, ou par les heartbeats envoyés par le starter en cas d’auto-enregistrement. Il n’existe pas d’endpoint Actuator propre aux transactions ; consultez [Surveillance des transactions](#surveillance-des-transactions).
 
 ## Partager la clé de signature JWT avec Master
 
@@ -861,7 +858,7 @@ Le starter vérifie la valeur une fois l’application démarrée. Si elle est n
 
 ### Surveillance des transactions
 
-La surveillance des transactions alimente la page Transaction Control et les instruments associés : elle encapsule vos méthodes `@Transactional`, crée un proxy de la source de données pour compter les requêtes, nettoie la pile de transactions propre à chaque requête et enregistre l’intégrateur Hibernate N+1. Les informations collectées sont transmises à Master dans les métadonnées d’enregistrement de l’instance (exposées via `axelix-metadata`) : aucun endpoint Actuator distinct n’est donc à exposer. Cette fonctionnalité est **activée par défaut** lorsque le starter est présent dans le classpath.
+La surveillance des transactions alimente la page Transaction Control et les instruments associés : elle encapsule vos méthodes `@Transactional`, crée un proxy de la source de données pour compter les requêtes, nettoie la pile de transactions propre à chaque requête et enregistre l’intégrateur Hibernate N+1. L’enregistrement initial inclut les informations collectées. Les mises à jour suivantes passent par `axelix-ping` lorsque Master interroge les starters à partir de 1.3.0, ou par les heartbeats envoyés par le starter en cas d’auto-enregistrement ; les starters plus anciens continuent de fournir les métadonnées d’enregistrement complètes. Exposez `axelix-ping` pour l’interrogation des starters à partir de 1.3.0 ; aucun endpoint supplémentaire propre aux transactions n’est nécessaire. La surveillance des transactions est **activée par défaut** lorsque le starter est présent dans le classpath.
 
 La surveillance des transactions fonctionne uniquement dans les applications servlet (Spring MVC). Dans une application réactive (WebFlux), le starter ne l’active pas, quelle que soit la valeur de la propriété. Consultez [Applications réactives (WebFlux)](#applications-réactives-webflux).
 

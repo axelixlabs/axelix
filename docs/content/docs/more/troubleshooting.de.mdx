@@ -13,17 +13,19 @@ Auf Master-Seite tritt bei der Kommunikation mit dem verwalteten Dienst ein Fehl
 
 In der Praxis bleiben die Actuator-Endpunkte eines verwalteten Dienstes (des Microservice mit Axelix Spring Boot Starter und Plugin) fast nie ungeschützt. Es ist üblich und grundsätzlich empfehlenswert, sie durch Authentifizierung zu schützen: HTTP Basic, einen OIDC-/OAuth2-Resource-Server oder ein anderes Verfahren in der Spring-Security-Konfiguration der Anwendung.
 
-Gleichzeitig bringt Axelix ein eigenes Identity & Access Management (IAM) mit. Beim Aufruf eines Starters ab 1.3 verwendet Master die benutzerdefinierten Axelix-Actuator-Endpunkte (üblicherweise `/actuator/axelix-**`, mit konfigurierbarem Actuator-Präfix) mit einem technischen Bearer-Token `AXELIX.MASTER` im Header `Authorization`. Bei Startern vor 1.3 stellt es das Benutzertoken mit alten Berechtigungsnamen neu aus. Die anfängliche Erkennung verwendet ein Kompatibilitätstoken, das Master identifiziert. In allen Fällen ist das Token für die Axelix-Komponenten bestimmt, nicht für den Sicherheitsmechanismus der Anwendung selbst.
+Gleichzeitig bringt Axelix ein eigenes Identity & Access Management (IAM) mit. Beim Aufruf eines Starters ab 1.3 verwendet Master die benutzerdefinierten Axelix-Actuator-Endpunkte (üblicherweise `/actuator/axelix-*/**`, mit konfigurierbarem Actuator-Präfix) mit einem technischen Bearer-Token `AXELIX.MASTER` im Header `Authorization`. Bei Startern vor 1.3 stellt es das Benutzertoken mit alten Berechtigungsnamen neu aus. Die anfängliche Erkennung verwendet ein Kompatibilitätstoken, das Master identifiziert. In allen Fällen ist das Token für die Axelix-Komponenten bestimmt, nicht für den Sicherheitsmechanismus der Anwendung selbst.
 
 :::note[Eigenes Actuator-Präfix]
-Der Teil `/actuator` ist der über `management.endpoints.web.base-path` konfigurierbare Actuator-Basispfad (Standard: `/actuator`). Überschreibt Ihr verwalteter Dienst diese Eigenschaft, liegen die Axelix-Endpunkte unter diesem Basispfad. Bei `/manage` sind sie beispielsweise unter `/manage/axelix-**` erreichbar. Berücksichtigen Sie dies beim Request-Matcher in der folgenden Lösung.
+Der Teil `/actuator` ist der über `management.endpoints.web.base-path` konfigurierbare Actuator-Basispfad (Standard: `/actuator`). Überschreibt Ihr verwalteter Dienst diese Eigenschaft, liegen die Axelix-Endpunkte unter diesem Basispfad. Bei `/manage` sind sie beispielsweise unter `/manage/axelix-*/**` erreichbar. Berücksichtigen Sie dies beim Request-Matcher in der folgenden Lösung.
 :::
 
 Der Fehler 401 entsteht durch die Kollision dieser beiden unabhängigen Authentifizierungssysteme: Der Sicherheitsfilter des verwalteten Dienstes fängt die Anfrage ab, bevor sie die Axelix-Komponenten erreicht. Er erkennt ein Bearer-Token und versucht, es mit dem eigenen IAM des Dienstes zu validieren. Dort ist das Axelix-Token unbekannt und wird deshalb abgelehnt.
 
 ### Lösung:
 
-Nehmen Sie die benutzerdefinierten Axelix-Actuator-Endpunkte (also `/actuator/axelix-**`, unter Berücksichtigung eines gegebenenfalls angepassten Actuator-Präfixes) vom Anwendungs-IAM aus und vertrauen Sie dem eigenen IAM von Axelix:
+Nehmen Sie die benutzerdefinierten Axelix-Actuator-Endpunkte (also `/actuator/axelix-*/**`, unter Berücksichtigung eines gegebenenfalls angepassten Actuator-Präfixes) vom Anwendungs-IAM aus und vertrauen Sie dem eigenen IAM von Axelix:
+
+Dieses Muster erfasst sowohl die Endpunkte selbst als auch untergeordnete Pfade, etwa zum Leeren von Caches.
 
 <Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
   <Tab value="Spring Boot 4.x">
@@ -31,7 +33,7 @@ Nehmen Sie die benutzerdefinierten Axelix-Actuator-Endpunkte (also `/actuator/ax
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
 }
 ```
 
@@ -41,7 +43,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
 }
 ```
 
@@ -51,7 +53,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().antMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().antMatchers("/actuator/axelix-*/**");
 }
 ```
 

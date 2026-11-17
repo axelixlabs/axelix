@@ -281,7 +281,7 @@ Der Starter stellt folgende Endpunkte bereit:
     </tr>
     <tr>
         <td><code>axelix-ping</code></td>
-        <td>Zustands-, Speicher- und Transaktionsdaten, die Master für bereits bekannte Instanzen abfragt</td>
+        <td>Zustands-, Speicher- und Transaktionsaktualisierungen, die Master für bereits bekannte, automatisch erkannte Instanzen abfragt. Für diese Abfrage erforderlich; selbstregistrierte Instanzen senden Aktualisierungen stattdessen in Heartbeats.</td>
         <td><code>1.3.0</code></td>
     </tr>
     <tr>
@@ -464,7 +464,7 @@ Dieser Export wird automatisch aktiv, wenn eine `MeterRegistry`-Bean vorhanden i
 | `axelix_cache_enabled` | `Gauge` | `cache` | Aktueller Laufzeitzustand jedes erweiterten Caches: `1` bei aktiviertem, `0` bei deaktiviertem Cache. |
 </div>
 
-Diese Meter ergänzen die UI-bezogenen Actuator-Endpunkte, statt sie zu ersetzen. Die UI liest weiterhin `axelix-metrics` und `axelix-caches`. Transaktionsüberwachungsdaten haben keinen eigenen Actuator-Endpunkt: Sie gelangen als Teil der über `axelix-metadata` bereitgestellten Registrierungsmetadaten zu Master. Siehe [Transaktionsüberwachung](#transaktionsüberwachung).
+Diese Meter ergänzen die UI-bezogenen Actuator-Endpunkte, statt sie zu ersetzen. Die UI liest weiterhin `axelix-metrics` und `axelix-caches`. Die ersten Transaktionseinblicke sind in den Registrierungsmetadaten enthalten. Nachfolgende Aktualisierungen erfolgen über `axelix-ping`, wenn Master Starter ab 1.3.0 abfragt, oder über vom Starter gesendete Heartbeats bei der Selbstregistrierung. Es gibt keinen transaktionsspezifischen Actuator-Endpunkt; siehe [Transaktionsüberwachung](#transaktionsüberwachung).
 
 ## JWT-Signaturschlüssel mit Master teilen
 
@@ -776,7 +776,7 @@ Der Starter prüft den Wert nach dem Anwendungsstart. Bei `0` oder negativen Wer
 
 ### Transaktionsüberwachung
 
-Die Transaktionsüberwachung versorgt Transaction Control und zugehörige Meter: Sie umhüllt `@Transactional`-Methoden, zählt Abfragen über einen DataSource-Proxy, bereinigt den Transaktionsstack je Anfrage und registriert den Hibernate-N+1-Integrator. Die Ergebnisse gelangen in den Registrierungsmetadaten der Instanz (über `axelix-metadata`) zu Master. Es gibt daher keinen separaten freizugebenden Actuator-Endpunkt. Mit dem Starter auf dem Klassenpfad ist sie **standardmäßig aktiv**.
+Die Transaktionsüberwachung versorgt Transaction Control und zugehörige Meter: Sie umhüllt `@Transactional`-Methoden, zählt Abfragen über einen DataSource-Proxy, bereinigt den Transaktionsstack je Anfrage und registriert den Hibernate-N+1-Integrator. Die anfängliche Registrierung enthält die gesammelten Einblicke. Nachfolgende Aktualisierungen erfolgen über `axelix-ping`, wenn Master Starter ab 1.3.0 abfragt, oder über vom Starter gesendete Heartbeats bei der Selbstregistrierung. Ältere Starter liefern weiterhin vollständige Registrierungsmetadaten. Geben Sie `axelix-ping` für die Abfrage von Startern ab 1.3.0 frei; ein zusätzlicher transaktionsspezifischer Endpunkt ist nicht erforderlich. Mit dem Starter auf dem Klassenpfad ist die Transaktionsüberwachung **standardmäßig aktiv**.
 
 Die Transaktionsüberwachung funktioniert nur in Servlet-Anwendungen (Spring MVC). In reaktiven Anwendungen (WebFlux) aktiviert der Starter sie unabhängig vom Eigenschaftswert nicht. Siehe [Reaktive Anwendungen (WebFlux)](#reaktive-anwendungen-webflux).
 

@@ -15,20 +15,22 @@ description: "На этой странице описаны наиболее ч�
 На практике actuator-эндпоинты управляемого сервиса (микросервиса, который включает в себя Axelix Spring Boot Starter и плагин) почти никогда не остаются открытыми. Очень часто — и, как правило, это рекомендуемая практика — их защищают тем или иным механизмом аутентификации: HTTP Basic, OIDC/OAuth2 resource server или любой другой схемой, настроенной в конфигурации Spring Security приложения.
 
 В то же время Axelix поставляется с собственной системой управления доступом (IAM). При обращении к стартеру начиная с 1.3 Master вызывает кастомные actuator-эндпоинты Axelix
-(обычно `/actuator/axelix-**`, префикс actuator настраивается) с техническим bearer-токеном `AXELIX.MASTER` в заголовке
+(обычно `/actuator/axelix-*/**`, префикс actuator настраивается) с техническим bearer-токеном `AXELIX.MASTER` в заголовке
 `Authorization`. Для стартеров до 1.3 он перевыпускает пользовательский токен со старыми именами полномочий.
 При первом обнаружении используется совместимый токен с идентификатором Master. Во всех случаях токен предназначен
 для компонентов Axelix, а не для собственного стека безопасности приложения.
 
 :::note[Кастомный префикс actuator]
-Часть `/actuator` — это базовый путь actuator, который настраивается через `management.endpoints.web.base-path` (по умолчанию `/actuator`). Если ваш управляемый сервис переопределяет это свойство, эндпоинты Axelix будут доступны по настроенному базовому пути — например, при базовом пути `/manage` они доступны по `/manage/axelix-**`. Учитывайте это для request matcher в решении ниже.
+Часть `/actuator` — это базовый путь actuator, который настраивается через `management.endpoints.web.base-path` (по умолчанию `/actuator`). Если ваш управляемый сервис переопределяет это свойство, эндпоинты Axelix будут доступны по настроенному базовому пути — например, при базовом пути `/manage` они доступны по `/manage/axelix-*/**`. Учитывайте это для request matcher в решении ниже.
 :::
 
 Ошибка 401 возникает именно из-за столкновения этих двух независимых систем аутентификации: фильтр безопасности управляемого сервиса перехватывает запрос ещё до того, как он достигнет компонентов Axelix, видит bearer-токен и пытается провалидировать его на собственном IAM управляемого сервиса, где токен Axelix неизвестен и потому отклоняется.
 
 ### Решение
 
-Решение состоит в том, чтобы исключить кастомные actuator-эндпоинты Axelix (т. е. те, что имеют префикс `/actuator/axelix-**`, снова с учётом возможности настроить кастомный префикс для actuator-эндпоинтов) из IAM приложения и довериться IAM в Axelix:
+Решение состоит в том, чтобы исключить кастомные actuator-эндпоинты Axelix (т. е. те, пути которых соответствуют шаблону `/actuator/axelix-*/**`, снова с учётом возможности настроить кастомный префикс для actuator-эндпоинтов) из IAM приложения и довериться IAM в Axelix:
+
+Этот шаблон охватывает как сами эндпоинты, так и вложенные пути, например операции очистки кэшей.
 
 <Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
   <Tab value="Spring Boot 4.x">
@@ -36,7 +38,7 @@ description: "На этой странице описаны наиболее ч�
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
 }
 ```
 
@@ -46,7 +48,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
 }
 ```
 
@@ -56,7 +58,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().antMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().antMatchers("/actuator/axelix-*/**");
 }
 ```
 

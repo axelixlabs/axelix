@@ -13,17 +13,19 @@ Côté Master, une erreur 401 est renvoyée lors des échanges avec le service g
 
 En pratique, les endpoints Actuator exposés par le service géré (le microservice qui inclut le starter Spring Boot et le plugin Axelix) sont rarement accessibles sans protection. Il est très courant — et généralement recommandé — de les protéger par un mécanisme d’authentification : HTTP Basic, un serveur de ressources OIDC/OAuth2 ou tout autre mécanisme intégré à la configuration Spring Security de l’application.
 
-Axelix possède également son propre système de gestion des identités et des accès (IAM). Lorsque Master appelle un starter à partir de la version 1.3, il invoque les endpoints Actuator personnalisés d’Axelix (généralement `/actuator/axelix-**`, avec un préfixe Actuator configurable) avec un jeton bearer technique `AXELIX.MASTER` dans l’en-tête `Authorization`. Pour les starters antérieurs à 1.3, il réémet le jeton de l’utilisateur avec les anciens noms d’autorisations. La découverte initiale utilise un jeton de compatibilité identifiant Master. Dans tous les cas, le jeton est destiné aux composants Axelix, et non au système de sécurité propre à l’application.
+Axelix possède également son propre système de gestion des identités et des accès (IAM). Lorsque Master appelle un starter à partir de la version 1.3, il invoque les endpoints Actuator personnalisés d’Axelix (généralement `/actuator/axelix-*/**`, avec un préfixe Actuator configurable) avec un jeton bearer technique `AXELIX.MASTER` dans l’en-tête `Authorization`. Pour les starters antérieurs à 1.3, il réémet le jeton de l’utilisateur avec les anciens noms d’autorisations. La découverte initiale utilise un jeton de compatibilité identifiant Master. Dans tous les cas, le jeton est destiné aux composants Axelix, et non au système de sécurité propre à l’application.
 
 :::note[Préfixe Actuator personnalisé]
-La partie `/actuator` est le chemin de base d’Actuator, configurable via `management.endpoints.web.base-path` (sa valeur par défaut est `/actuator`). Si votre service géré redéfinit cette propriété, les endpoints Axelix se trouvent sous le chemin configuré : par exemple, avec `/manage`, ils sont accessibles à l’adresse `/manage/axelix-**`. Tenez-en compte dans le sélecteur de requêtes de la solution ci-dessous.
+La partie `/actuator` est le chemin de base d’Actuator, configurable via `management.endpoints.web.base-path` (sa valeur par défaut est `/actuator`). Si votre service géré redéfinit cette propriété, les endpoints Axelix se trouvent sous le chemin configuré : par exemple, avec `/manage`, ils sont accessibles à l’adresse `/manage/axelix-*/**`. Tenez-en compte dans le sélecteur de requêtes de la solution ci-dessous.
 :::
 
 L’erreur 401 résulte de la collision entre ces deux systèmes d’authentification indépendants : le filtre de sécurité du service géré intercepte la requête avant qu’elle n’atteigne les composants Axelix, détecte un jeton bearer et tente de le valider auprès de l’IAM du service géré, où le jeton Axelix est inconnu et donc rejeté.
 
 ### Solution
 
-La solution consiste à exclure les endpoints Actuator personnalisés d’Axelix (ceux dont le chemin correspond à `/actuator/axelix-**`, en tenant compte d’un éventuel préfixe Actuator personnalisé) de l’IAM de l’application et à faire confiance à l’IAM propre à Axelix :
+La solution consiste à exclure les endpoints Actuator personnalisés d’Axelix (ceux dont le chemin correspond à `/actuator/axelix-*/**`, en tenant compte d’un éventuel préfixe Actuator personnalisé) de l’IAM de l’application et à faire confiance à l’IAM propre à Axelix :
+
+Ce motif couvre les endpoints eux-mêmes ainsi que leurs chemins imbriqués, par exemple les opérations de vidage des caches.
 
 <Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
   <Tab value="Spring Boot 4.x">
@@ -31,7 +33,7 @@ La solution consiste à exclure les endpoints Actuator personnalisés d’Axelix
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
 }
 ```
 
@@ -41,7 +43,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-*/**");
 }
 ```
 
@@ -51,7 +53,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
 ```java
 @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
-  return (web) -> web.ignoring().antMatchers("/actuator/axelix-**");
+  return (web) -> web.ignoring().antMatchers("/actuator/axelix-*/**");
 }
 ```
 

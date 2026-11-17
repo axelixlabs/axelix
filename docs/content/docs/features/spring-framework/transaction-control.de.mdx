@@ -67,11 +67,11 @@ Die Transaktionsüberwachung und damit diese Seite sind in reaktiven Anwendungen
 
 ## Metadaten-Endpunkt freigeben
 
-Die Seite verwendet keinen eigenen Actuator-Endpunkt. Der Axelix Spring Boot Starter fasst die Transaktionseinblicke
-in der JVM zusammen und überträgt sie als Teil der Registrierungsmetadaten der Instanz an Master. Dies sind dieselben
-Daten, die der bereits von Master abgefragte Endpunkt `axelix-metadata` bereitstellt. Solange `axelix-metadata`
-freigegeben ist (siehe [Endpunkte bei Axelix vor 1.2.0 freigeben](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#endpunkte-vor-axelix-120-freigeben)),
-funktioniert diese Seite ohne die Aktivierung eines zusätzlichen Endpunkts.
+Es gibt keinen transaktionsspezifischen Actuator-Endpunkt. Die ersten Transaktionseinblicke sind in den Registrierungsmetadaten der Instanz enthalten, die bei der Erkennung durch Master über `axelix-metadata` bereitgestellt werden.
+
+Bei Startern ab 1.3.0 fragt Master nachfolgende Transaktionsaktualisierungen über `axelix-ping` ab. Selbstregistrierte Instanzen übertragen diese Aktualisierungen stattdessen in ihren Heartbeats. Bei älteren Startern liest Master weiterhin die vollständigen Registrierungsmetadaten.
+
+Geben Sie für die Abfrage durch Master `axelix-metadata` und bei Startern ab 1.3.0 auch `axelix-ping` frei. Seit 1.2.0 gibt der Starter seine eigenen Endpunkte automatisch frei; für ältere Versionen siehe [Endpunkte bei Axelix vor 1.2.0 freigeben](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#endpunkte-vor-axelix-120-freigeben). Ein zusätzlicher transaktionsspezifischer Endpunkt ist nicht erforderlich.
 
 ## Siehe auch
 
