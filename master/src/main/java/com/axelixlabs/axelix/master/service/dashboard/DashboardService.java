@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.dashboard;
 
+import org.springframework.cache.annotation.Cacheable;
+
 import com.axelixlabs.axelix.master.api.external.response.dashboard.DependenciesDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.LanguagesProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
@@ -27,66 +29,46 @@ import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
 /**
- * Serves the dashboards from a shared cache, computing each of them on the first request and on every refresh.
+ * Serves cached dashboard snapshots, computing missing snapshots on demand.
+ * {@link DashboardRefreshScheduler} refreshes the caches on a schedule.
  *
  * @author Vyacheslav Yanin
  */
 public class DashboardService {
 
-    private final DashboardCache cache;
     private final SpringPortfolioService springPortfolioService;
     private final LanguagesProfileService languagesProfileService;
     private final DatabaseHistoricalApplicationSnapshotService snapshotService;
     private final DependencyAnalysisService dependencyAnalysisService;
 
     public DashboardService(
-            DashboardCache cache,
             SpringPortfolioService springPortfolioService,
             LanguagesProfileService languagesProfileService,
             DatabaseHistoricalApplicationSnapshotService snapshotService,
             DependencyAnalysisService dependencyAnalysisService) {
-        this.cache = cache;
         this.springPortfolioService = springPortfolioService;
         this.languagesProfileService = languagesProfileService;
         this.snapshotService = snapshotService;
         this.dependencyAnalysisService = dependencyAnalysisService;
     }
 
+    @Cacheable(cacheNames = DashboardCaches.PERSISTENCE, sync = true)
     public PersistenceDashboardResponse getPersistenceDashboard() {
-        return cache.get(
-                DashboardKey.PERSISTENCE,
-                PersistenceDashboardResponse.class,
-                snapshotService::getPersistenceDashboard);
+        return snapshotService.getPersistenceDashboard();
     }
 
+    @Cacheable(cacheNames = DashboardCaches.DEPENDENCIES, sync = true)
     public DependenciesDashboardResponse getDependenciesDashboard() {
-        return cache.get(
-                DashboardKey.DEPENDENCIES,
-                DependenciesDashboardResponse.class,
-                dependencyAnalysisService::getDashboard);
+        return dependencyAnalysisService.getDashboard();
     }
 
+    @Cacheable(cacheNames = DashboardCaches.SPRING_PORTFOLIO, sync = true)
     public SpringPortfolioResponse getSpringPortfolio() {
-        return cache.get(
-                DashboardKey.SPRING_PORTFOLIO,
-                SpringPortfolioResponse.class,
-                springPortfolioService::getSpringPortfolio);
+        return springPortfolioService.getSpringPortfolio();
     }
 
+    @Cacheable(cacheNames = DashboardCaches.LANGUAGES, sync = true)
     public LanguagesProfileResponse getLanguagesProfile() {
-        return cache.get(
-                DashboardKey.LANGUAGES,
-                LanguagesProfileResponse.class,
-                languagesProfileService::getLanguagesProfile);
-    }
-
-    /**
-     * Recomputes every dashboard and replaces the cached values.
-     */
-    public void refreshAll() {
-        cache.put(DashboardKey.PERSISTENCE, snapshotService.getPersistenceDashboard());
-        cache.put(DashboardKey.DEPENDENCIES, dependencyAnalysisService.getDashboard());
-        cache.put(DashboardKey.SPRING_PORTFOLIO, springPortfolioService.getSpringPortfolio());
-        cache.put(DashboardKey.LANGUAGES, languagesProfileService.getLanguagesProfile());
+        return languagesProfileService.getLanguagesProfile();
     }
 }

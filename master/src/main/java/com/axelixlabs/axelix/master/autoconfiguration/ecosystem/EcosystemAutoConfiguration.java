@@ -18,6 +18,8 @@
 package com.axelixlabs.axelix.master.autoconfiguration.ecosystem;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
@@ -25,9 +27,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.axelixlabs.axelix.master.repository.ApplicationDependenciesRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
-import com.axelixlabs.axelix.master.service.dashboard.DashboardCache;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardCaches;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardRefreshScheduler;
 import com.axelixlabs.axelix.master.service.dashboard.DashboardService;
-import com.axelixlabs.axelix.master.service.dashboard.InMemoryMapDashboardCache;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultDependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultLanguagesProfileService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultSpringPortfolioService;
@@ -54,6 +56,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Vyacheslav Yanin
  */
 @AutoConfiguration
+@EnableCaching
 public class EcosystemAutoConfiguration {
 
     @Bean
@@ -116,22 +119,32 @@ public class EcosystemAutoConfiguration {
     }
 
     @Bean
-    public DashboardCache dashboardCache() {
-        return new InMemoryMapDashboardCache();
+    public CacheManager cacheManager() {
+        return DashboardCaches.cacheManager();
     }
 
     @Bean
     public DashboardService dashboardService(
-            DashboardCache dashboardCache,
             SpringPortfolioService springPortfolioService,
             LanguagesProfileService languagesProfileService,
             DatabaseHistoricalApplicationSnapshotService snapshotService,
             DependencyAnalysisService dependencyAnalysisService) {
         return new DashboardService(
-                dashboardCache,
+                springPortfolioService, languagesProfileService, snapshotService, dependencyAnalysisService);
+    }
+
+    @Bean
+    public DashboardRefreshScheduler dashboardRefreshScheduler(
+            SpringPortfolioService springPortfolioService,
+            LanguagesProfileService languagesProfileService,
+            DatabaseHistoricalApplicationSnapshotService snapshotService,
+            DependencyAnalysisService dependencyAnalysisService,
+            CacheManager cacheManager) {
+        return new DashboardRefreshScheduler(
                 springPortfolioService,
                 languagesProfileService,
                 snapshotService,
-                dependencyAnalysisService);
+                dependencyAnalysisService,
+                cacheManager);
     }
 }

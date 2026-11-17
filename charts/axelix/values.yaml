@@ -278,6 +278,11 @@ axelix:
             # that signals that any value of the label is acceptable.
             labels: {}
 
+    # -- Dashboard settings.
+    dashboard:
+      # -- Cron schedule of the job that reloads the cached dashboards. Defaults to every five minutes.
+      refreshSchedule: "0 */5 * * * *"
+
     # -- MCP Server related settings.
     mcpServer:
         # -- Whether the MCP Server is enabled. When enabled, Axelix Master exposes an MCP-compatible
