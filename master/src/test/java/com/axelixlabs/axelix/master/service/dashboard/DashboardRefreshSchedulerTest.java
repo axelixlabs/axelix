@@ -17,82 +17,121 @@
  */
 package com.axelixlabs.axelix.master.service.dashboard;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.cache.Cache;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.interceptor.SimpleKey;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import com.axelixlabs.axelix.master.api.external.response.dashboard.DependenciesDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
-import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
-import com.axelixlabs.axelix.master.service.ecosystem.LanguagesProfileService;
-import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
+import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 
 /**
- * Tests for {@link DashboardRefreshScheduler}.
+ * Integration tests for {@link DashboardRefreshScheduler} with real persistence, dashboard aggregators, and caching.
  *
  * @author Vyacheslav Yanin
  */
+@SpringBootTest
 class DashboardRefreshSchedulerTest {
 
-    private final CacheManager cacheManager = DashboardCaches.cacheManager();
-    private final DatabaseHistoricalApplicationSnapshotService snapshotService =
-            mock(DatabaseHistoricalApplicationSnapshotService.class);
-    private final DependencyAnalysisService dependencyAnalysisService = mock(DependencyAnalysisService.class);
-    private final DashboardRefreshScheduler subject = new DashboardRefreshScheduler(
-            mock(SpringPortfolioService.class),
-            mock(LanguagesProfileService.class),
-            snapshotService,
-            dependencyAnalysisService,
-            cacheManager);
+    @Autowired
+    private DashboardRefreshScheduler subject;
+
+    @Autowired
+    private DashboardService dashboardService;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
+
+    @MockitoSpyBean
+    private DatabaseHistoricalApplicationSnapshotService snapshotService;
+
+    @BeforeEach
+    @AfterEach
+    void cleanUp() {
+        jdbcAggregateTemplate.deleteAll(Instance.class);
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
+        jdbcAggregateTemplate.deleteAll(ApplicationDependencies.class);
+        for (String name : cacheManager.getCacheNames()) {
+            Objects.requireNonNull(cacheManager.getCache(name)).clear();
+        }
+    }
 
     @Test // GH-1844
     void shouldKeepServingPreviousResultDuringRefresh() {
         // given.
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(DashboardCaches.PERSISTENCE));
-        PersistenceDashboardResponse previous = mock(PersistenceDashboardResponse.class);
-        PersistenceDashboardResponse replacement = mock(PersistenceDashboardResponse.class);
-        cache.put(SimpleKey.EMPTY, previous);
-        when(snapshotService.getPersistenceDashboard()).thenAnswer(invocation -> {
-            assertThat(cache.get(SimpleKey.EMPTY, PersistenceDashboardResponse.class))
-                    .isSameAs(previous);
-            return replacement;
-        });
+        subject.refresh();
+        PersistenceDashboardResponse previous = dashboardService.getPersistenceDashboard();
+        persistApplication();
+        AtomicReference<PersistenceDashboardResponse> servedDuringRefresh = new AtomicReference<>();
+        doAnswer(invocation -> {
+                    servedDuringRefresh.set(dashboardService.getPersistenceDashboard());
+                    return invocation.callRealMethod();
+                })
+                .when(snapshotService)
+                .getPersistenceDashboard();
 
         // when.
         subject.refresh();
 
         // then.
-        assertThat(cache.get(SimpleKey.EMPTY, PersistenceDashboardResponse.class))
-                .isSameAs(replacement);
+        assertThat(servedDuringRefresh.get()).isSameAs(previous);
+        PersistenceDashboardResponse refreshed = dashboardService.getPersistenceDashboard();
+        assertThat(refreshed).isNotSameAs(previous);
+        assertThat(refreshed.inMemoryPagination()).containsExactly(new TreemapEntry("service-a", 1));
+        assertThat(dashboardService.getPersistenceDashboard()).isSameAs(refreshed);
     }
 
     @Test // GH-1844
     void shouldRetainPreviousResultAndRefreshOtherDashboardsWhenComputationFails() {
         // given.
-        Cache persistenceCache = Objects.requireNonNull(cacheManager.getCache(DashboardCaches.PERSISTENCE));
-        PersistenceDashboardResponse previous = mock(PersistenceDashboardResponse.class);
-        DependenciesDashboardResponse dependencies = mock(DependenciesDashboardResponse.class);
-        persistenceCache.put(SimpleKey.EMPTY, previous);
-        when(snapshotService.getPersistenceDashboard()).thenThrow(IllegalStateException.class);
-        when(dependencyAnalysisService.getDashboard()).thenReturn(dependencies);
+        subject.refresh();
+        PersistenceDashboardResponse previous = dashboardService.getPersistenceDashboard();
+        DependenciesDashboardResponse previousDependencies = dashboardService.getDependenciesDashboard();
+        persistApplication();
+        doThrow(IllegalStateException.class).when(snapshotService).getPersistenceDashboard();
 
         // when.
         subject.refresh();
 
         // then.
-        assertThat(persistenceCache.get(SimpleKey.EMPTY, PersistenceDashboardResponse.class))
-                .isSameAs(previous);
-        Cache dependenciesCache = Objects.requireNonNull(cacheManager.getCache(DashboardCaches.DEPENDENCIES));
-        assertThat(dependenciesCache.get(SimpleKey.EMPTY, DependenciesDashboardResponse.class))
-                .isSameAs(dependencies);
+        assertThat(dashboardService.getPersistenceDashboard()).isSameAs(previous);
+        assertThat(dashboardService.getDependenciesDashboard()).isNotSameAs(previousDependencies);
+        assertThat(dashboardService.getSpringPortfolio().applicationsTotal()).isEqualTo(1);
+        assertThat(dashboardService.getLanguagesProfile().applicationsOnLts()
+                        + dashboardService.getLanguagesProfile().applicationsOnNonLts())
+                .isEqualTo(1);
+    }
+
+    private void persistApplication() {
+        TransactionAggregatedProfile transaction = new TransactionAggregatedProfile()
+                .lazyLoadingTargets(List.of())
+                .inMemoryPagination(Map.of("owners", 3));
+        snapshotService.reloadCurrentStateBulk(List.of(TestMetadataFactory.withPersistenceInsights(
+                "com.example", "service-a", new PersistenceInsights().transactions(List.of(transaction)))));
     }
 }
