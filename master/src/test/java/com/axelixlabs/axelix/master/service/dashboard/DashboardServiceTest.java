@@ -37,8 +37,8 @@ import org.springframework.cache.interceptor.SimpleKey;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
-import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
-import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.master.domain.ApplicationDependencies;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
