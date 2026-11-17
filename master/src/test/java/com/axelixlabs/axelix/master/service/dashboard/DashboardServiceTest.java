@@ -101,7 +101,13 @@ class DashboardServiceTest {
     }
 
     @ParameterizedTest // GH-1844
-    @ValueSource(strings = {"persistence", "dependencies", "springPortfolio", "languages"})
+    @ValueSource(
+            strings = {
+                DashboardCaches.PERSISTENCE,
+                DashboardCaches.DEPENDENCIES,
+                DashboardCaches.SPRING_PORTFOLIO,
+                DashboardCaches.LANGUAGES
+            })
     void shouldLoadAndCacheMissingDashboardFromPersistedApplications(String dashboard) {
         // given.
         persistApplication();
@@ -119,7 +125,13 @@ class DashboardServiceTest {
     }
 
     @ParameterizedTest // GH-1844
-    @ValueSource(strings = {"persistence", "dependencies", "springPortfolio", "languages"})
+    @ValueSource(
+            strings = {
+                DashboardCaches.PERSISTENCE,
+                DashboardCaches.DEPENDENCIES,
+                DashboardCaches.SPRING_PORTFOLIO,
+                DashboardCaches.LANGUAGES
+            })
     void shouldServeCachedDashboardAfterPersistedApplicationsChange(String dashboard) {
         // given.
         persistApplication();
@@ -140,7 +152,13 @@ class DashboardServiceTest {
     }
 
     @ParameterizedTest // GH-1844
-    @ValueSource(strings = {"persistence", "dependencies", "springPortfolio", "languages"})
+    @ValueSource(
+            strings = {
+                DashboardCaches.PERSISTENCE,
+                DashboardCaches.DEPENDENCIES,
+                DashboardCaches.SPRING_PORTFOLIO,
+                DashboardCaches.LANGUAGES
+            })
     void shouldReplaceCachedDashboardWithCurrentPersistedDataOnRefresh(String dashboard) {
         // given.
         persistApplication();
@@ -166,7 +184,13 @@ class DashboardServiceTest {
     }
 
     @ParameterizedTest // GH-1844
-    @ValueSource(strings = {"persistence", "dependencies", "springPortfolio", "languages"})
+    @ValueSource(
+            strings = {
+                DashboardCaches.PERSISTENCE,
+                DashboardCaches.DEPENDENCIES,
+                DashboardCaches.SPRING_PORTFOLIO,
+                DashboardCaches.LANGUAGES
+            })
     void shouldPopulateDashboardCachesOnApplicationReady(String dashboard) {
         // given.
         persistApplication();
@@ -187,7 +211,13 @@ class DashboardServiceTest {
     }
 
     @ParameterizedTest // GH-1844
-    @ValueSource(strings = {"persistence", "dependencies", "springPortfolio", "languages"})
+    @ValueSource(
+            strings = {
+                DashboardCaches.PERSISTENCE,
+                DashboardCaches.DEPENDENCIES,
+                DashboardCaches.SPRING_PORTFOLIO,
+                DashboardCaches.LANGUAGES
+            })
     void shouldLimitEachDashboardCacheToASingleEntry(String dashboard) {
         // given.
         org.springframework.cache.Cache cache = Objects.requireNonNull(cacheManager.getCache(dashboard));
