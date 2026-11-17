@@ -245,7 +245,7 @@
             "loginButtonText": "Se connecter"
         },
         "oidcForm": {
-            "loginButtonText": "Se connecter avec un fournisseur OAuth2/OIDC"
+            "loginButtonText": "Connexion OAuth2/OIDC"
         }
     },
     "Conditions": {
@@ -369,7 +369,7 @@
         "Languages": {
             "title": "Profil des langages",
             "subtitle": "Langages JVM, versions Java et builds JDK utilisés dans le parc",
-            "applications": "Applications",
+            "applications": "Applis",
             "lts": "LTS",
             "nonLts": "Non-LTS",
             "onLtsRelease": "sur une version LTS",
@@ -407,7 +407,7 @@
         "Dependencies": {
             "title": "État des dépendances",
             "subtitle": "Toutes les bibliothèques utilisées par vos applications, la répartition de leurs versions et celles dont le développement actif a cessé",
-            "applications": "Applications",
+            "applications": "Applis",
             "libraries": "Bibliothèques",
             "badges": {
                 "SUNSET": "Abandonnée",
@@ -459,7 +459,7 @@
                 "status": "Statut",
                 "succession": "Remplacement",
                 "category": "Catégorie",
-                "applications": "Applications"
+                "applications": "Applis"
             },
             "successor": "Successeur",
             "none": "Aucun",
@@ -493,7 +493,7 @@
         "SpringPortfolio": {
             "title": "Parc Spring",
             "subtitle": "Versions utilisées dans le parc, comparées au calendrier de maintenance OSS publié",
-            "applications": "Applications",
+            "applications": "Applis",
             "ossOk": "OSS ✓",
             "ossNo": "OSS ✕",
             "supportedHint": "les versions communautaires continuent",
@@ -504,8 +504,8 @@
             "ladderTitle": "Période de maintenance OSS · Branches utilisées",
             "ladderHint": "D’après les calendriers publiés par l’équipe Spring",
             "line": "Branche",
-            "ossEnds": "Fin du support OSS",
-            "apps": "Applications",
+            "ossEnds": "Fin OSS",
+            "apps": "Applis",
             "legendSupported": "Prise en charge OSS — la communauté publie des correctifs pour cette branche",
             "legendUnsupported": "Sans prise en charge OSS — aucune version communautaire après cette date"
         }
@@ -716,8 +716,8 @@
             "runningLine": "Branche {{line}} utilisée · dernière branche connue d’Axelix : {{latest}}",
             "today": "Aujourd’hui",
             "released": "Publié le {{date}}",
-            "ossEnded": "Fin du support OSS le {{date}}",
-            "ossEnds": "Fin du support OSS le {{date}}",
+            "ossEnded": "Fin support OSS le {{date}}",
+            "ossEnds": "Fin support OSS le {{date}}",
             "commercial": "Support commercial jusqu’au {{date}}",
             "consequence": "Conséquence",
             "outOfOssFor": "Sans support OSS depuis",
