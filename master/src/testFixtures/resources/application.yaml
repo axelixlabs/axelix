@@ -75,6 +75,8 @@ axelix:
         max-executions-per-task: 50
         cleanup:
           schedule: "-"
+    dashboard:
+      refresh-schedule: "-"
     discovery:
       auto:
         broadcast:

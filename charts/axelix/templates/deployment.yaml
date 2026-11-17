@@ -148,6 +148,9 @@ spec:
             - name: AXELIX_MASTER_DISCOVERY_AUTO_KUBERNETES_FILTERS_NAMESPACES
               value: {{ $.Values.rbac.targetNamespaces | join "," | quote }}
                         
+            - name: AXELIX_MASTER_DASHBOARD_REFRESH_SCHEDULE
+              value: {{ $.Values.axelix.master.dashboard.refreshSchedule | quote }}
+
             - name: AXELIX_MASTER_MCP_SERVER_ENABLED
               value: {{ $.Values.axelix.master.mcpServer.enabled | quote }}
 

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,6 +55,7 @@ import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.domain.instance.Instance;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardRefreshScheduler;
 import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -72,6 +74,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link DashboardApi}.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public class DashboardApiTest extends AbstractProtectedEndpointTest {
 
@@ -94,8 +97,21 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     @Autowired
     private DependencyAnalysisService dependencyAnalysisService;
 
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
+    private DashboardRefreshScheduler scheduler;
+
     @BeforeEach
     void prepare() {
+        for (String name : cacheManager.getCacheNames()) {
+            var cache = cacheManager.getCache(name);
+            if (cache != null) {
+                cache.clear();
+            }
+        }
+
         // clear instanceRegistry before test
         deRegisterAll();
 
@@ -149,6 +165,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 persistenceMetadata("com.example", "service-b", List.of(), Map.of("owner", 3))));
 
         // when.
+        scheduler.refresh();
         IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/persistence", String.class);
 
@@ -176,6 +193,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 metadata("com.example", "service-b", GarbageCollector.ZGC)));
 
         // when.
+        scheduler.refresh();
         IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/spring-portfolio", String.class);
 
@@ -201,6 +219,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 languagesSnapshot("com.example", "b", 21, JdkVendor.ADOPTIUM, "2.1.0")));
 
         // when.
+        scheduler.refresh();
         IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/languages", String.class);
 
@@ -242,6 +261,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                         "org.springframework:spring-core:6.1.5"));
 
         // when.
+        scheduler.refresh();
         IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/dependencies", String.class);
 
@@ -271,6 +291,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnEmptyDependenciesDashboardWhenNothingRecorded() {
         // when.
+        scheduler.refresh();
         ResponseEntity<String> response =
                 restTemplate.asViewer().getForEntity("/api/external/dashboard/dependencies", String.class);
 
@@ -301,6 +322,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 Instant.now()));
 
         // when.
+        scheduler.refresh();
         ResponseEntity<String> response =
                 restTemplate.asViewer().getForEntity("/api/external/dashboard/dependencies", String.class);
 
