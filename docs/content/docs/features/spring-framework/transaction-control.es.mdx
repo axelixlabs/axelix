@@ -1,0 +1,61 @@
+---
+title: Control de transacciones
+description: "La página Transaction Control detecta métodos @Transactional que mantienen ocupada una conexión de base de datos más tiempo del necesario: llamadas de red bloqueantes, consultas N+1 y paginación en memoria dentro de la transacción. Para cada problema muestra dónde ocurre, para localizar el punto en el código."
+---
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal de control de transacciones](/img/feature/transaction/transaction-control-main-page.png)
+
+</ScreenshotsNotice>
+
+***Transaction Control tal como aparece en la interfaz de Axelix***
+
+Mientras está abierta, una transacción retiene una conexión de base de datos del pool. Cuando realiza trabajo adicional, como llamar a otro servicio, ejecutar una consulta por registro o cargar una tabla entera para mostrar una página, las conexiones se agotan y la aplicación se ralentiza bajo carga. Esto rara vez resulta evidente en el código. Transaction Control muestra qué métodos `@Transactional` lo hacen y dónde exactamente.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+La página enumera todos los métodos `@Transactional` que ha ejecutado la instancia, con sus tiempos de ejecución medio, mínimo y máximo y los [problemas](#detected-problems) detectados. Un resumen en la parte superior muestra cuántas transacciones tienen problemas y cuántas no, y se puede filtrar la lista por tipo de problema.
+
+Despliegue una transacción para ver:
+
+- Dónde se produjo cada problema: la URL llamada, la entidad y asociación o la entidad paginada en memoria.
+- La propagación y el nivel de aislamiento de la transacción.
+- El acceso: solo lectura o lectura y escritura.
+
+Si ninguna transacción tiene problemas, la página lo indica en lugar de mostrar la lista.
+
+## Problemas detectados [#detected-problems]
+
+- **Blocking network call**: la transacción realiza una llamada HTTP y mantiene su conexión mientras espera la respuesta. Axelix muestra el método y la URL de la petición. Actualmente detecta llamadas realizadas mediante `RestTemplate`.
+- **N+1 queries**: una asociación de carga diferida se carga mediante una consulta independiente por cada registro. Axelix muestra la entidad y la asociación, y solo la contabiliza cuando la asociación se ha cargado más de una vez.
+- **In-memory pagination**: se combina `Pageable` con `JOIN FETCH`, de modo que Hibernate carga todo el conjunto de resultados y selecciona la página en memoria. Axelix muestra la entidad o tabla.
+
+## Cómo funciona [#how-it-works]
+
+Axelix Spring Boot Starter observa todas las llamadas a métodos `@Transactional` dentro de la aplicación y mide su duración. Mientras la transacción está abierta, registra las llamadas HTTP realizadas mediante `RestTemplate` y las cargas diferidas de asociaciones de Hibernate, y detecta el aviso de Hibernate sobre paginación en memoria en los registros de la aplicación (Logback o Log4j2). No se requiere ningún agente ni herramienta APM.
+
+## Herramientas MCP [#mcp-tools]
+
+Los agentes de IA pueden obtener mediante MCP las consultas N+1 y la paginación en memoria detectadas en las transacciones, para toda la aplicación o para una clase o método. No se incluyen las llamadas de red bloqueantes. Consulte el [catálogo de herramientas MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights).
+
+## Propiedades [#properties]
+
+La monitorización de transacciones está activada de forma predeterminada. Para desactivarla por completo, establezca `axelix.sbs.transaction.monitoring.enabled=false`. Consulte [Monitorización de transacciones](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#transaction-monitoring) para más información.
+
+La monitorización de transacciones y, por tanto, esta página no están disponibles en aplicaciones reactivas (WebFlux). Consulte [Aplicaciones reactivas (WebFlux)](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#reactive-webflux-applications).
+
+## Exponer el endpoint de metadatos [#expose-the-metadata-endpoint]
+
+No hay ningún endpoint de Actuator específico para transacciones. La información inicial sobre transacciones se incluye en los metadatos de registro de la instancia, expuestos mediante `axelix-metadata` cuando Master descubre la instancia.
+
+Con starters desde 1.3.0, Master consulta `axelix-ping` para obtener las actualizaciones posteriores de transacciones. Las instancias autorregistradas envían estas actualizaciones en sus señales de actividad. Con starters anteriores, Master sigue leyendo los metadatos de registro completos.
+
+Para el sondeo, exponga `axelix-metadata` y, con starters desde 1.3.0, `axelix-ping`. El starter expone sus propios endpoints automáticamente desde 1.2.0; consulte [Exponer los endpoints en versiones de Axelix anteriores a 1.2.0](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposing-the-endpoints-on-axelix-below-120) para versiones anteriores. No se necesita ningún endpoint adicional específico para transacciones.
+
+## Véase también [#see-also]
+
+- [Configuración de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

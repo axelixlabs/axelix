@@ -1,0 +1,65 @@
+---
+title: Política de soporte
+description: "Con qué frecuencia se publican nuevas versiones de Axelix, qué versiones de código abierto siguen recibiendo correcciones y durante cuánto tiempo."
+---
+
+import { SupportTimeline } from './SupportTimeline';
+
+Cada línea de versiones de Axelix recibe correcciones durante un tiempo limitado. Esta página explica con qué frecuencia se publican nuevas versiones,
+qué versiones de código abierto tienen soporte actualmente y qué incluye el soporte.
+
+## Frecuencia de publicación [#release-cadence]
+
+Axelix publica una nueva versión menor o principal aproximadamente cada **1 a 1,5 meses**. Una de esas versiones al año es
+**principal**, por lo que un año natural suele incluir unas 8 o 9 versiones menores y una principal.
+
+Entre ellas, una línea con soporte también puede recibir **versiones de parche** (`1.2.1`, `1.2.2`, etc.). Estas no tienen
+un calendario fijo: se publican cuando una corrección está lista. Los cambios que puede incluir cada tipo de versión se describen en
+[compatibilidad y versiones](./compatibility-and-versioning.mdx#the-pain-index).
+
+## Durante cuánto tiempo tiene soporte una versión [#how-long-a-version-is-supported]
+
+La edición de código abierto solo ofrece soporte para **la línea de versiones más reciente**. Una línea de versiones menores `X.Y` recibe soporte desde el día
+en que se publica `X.Y.0` hasta que aparece la siguiente versión, `X.Y+1.0` o una nueva principal. Dada la frecuencia de publicación, esto
+suele ser aproximadamente **1,5 meses**.
+
+Por ejemplo, `1.1.0` se publicó el 10 de septiembre de 2026 y `1.2.0` el 10 de octubre de 2026. Por tanto, la línea `1.1` tuvo
+soporte durante ese mes y, desde el 10 de octubre, solo `1.2` tiene soporte.
+
+Mientras una línea tiene soporte, recibe:
+
+- correcciones de vulnerabilidades de seguridad, tanto en Axelix como en sus dependencias;
+- correcciones de errores críticos.
+
+Estas correcciones se publican como versiones de parche de la línea con soporte, por ejemplo `1.2.1`. Las funciones nuevas nunca se incluyen en una versión de
+parche: esperan a la siguiente versión menor. Cuando una línea deja de tener soporte, ya no recibe versiones de parche, por lo que la solución
+a un problema encontrado en ella es actualizar a la última versión.
+
+:::note[Soporte no significa compatibilidad]
+El fin del soporte no implica que una versión anterior deje de funcionar. Master sigue funcionando con servicios que ejecutan starters
+de las últimas 4 versiones menores, tal como se describe en
+[la ventana de compatibilidad](./upgrading.mdx#the-compatibility-window). El soporte solo define qué versiones siguen recibiendo
+correcciones.
+:::
+
+## Versiones con soporte [#supported-versions]
+
+| Versión | Publicación inicial | Fin del soporte OSS |
+|---|---|---|
+| `1.2.x` | 10 de octubre de 2026 | Cuando se publique la siguiente versión |
+| `1.1.x` | 10 de septiembre de 2026 | 10 de octubre de 2026 |
+| `1.0.x` | 29 de julio de 2026 | 10 de septiembre de 2026 |
+
+El gráfico siguiente muestra los mismos intervalos a lo largo del tiempo. El final de la línea actual es una estimación basada en el intervalo habitual
+entre versiones y se ajusta a la fecha real de publicación.
+
+<SupportTimeline locale="es" />
+
+Para mantenerse en una versión con soporte, actualice a cada nueva versión menor. Los pasos se describen en
+[actualización de Axelix](./upgrading.mdx).
+
+## Véase también [#see-also]
+
+- [Compatibilidad y versiones](./compatibility-and-versioning.mdx)
+- [Actualización de Axelix](./upgrading.mdx)
+- [Modelo de ramas](./development/branching-model.mdx)

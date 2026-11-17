@@ -1,0 +1,41 @@
+---
+title: Perfil de lenguajes
+description: "El panel Languages Profile muestra qué versiones de Java, distribuciones del JDK y versiones de Kotlin utilizan las aplicaciones del conjunto gestionado."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Panel de perfil de lenguajes](/img/feature/dashboard/dashboard-languages-profile.png)
+
+</ScreenshotsNotice>
+
+***Languages Profile tal como aparece en la interfaz de Axelix***
+
+En un conjunto de decenas de aplicaciones, cada una puede ejecutarse con su propia versión de Java, con un JDK de un proveedor distinto y con o sin Kotlin. Languages Profile lo muestra para todo el conjunto a la vez: cuántas aplicaciones siguen utilizando versiones de Java que no son LTS, cuántos proveedores de JDK se utilizan y cuánto se ha extendido Kotlin.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+Un resumen en la parte superior indica cuántas aplicaciones tiene el conjunto, cuántas utilizan una versión LTS de Java y cuántas no.
+
+Debajo se muestra:
+
+- Cómo se distribuyen las aplicaciones entre las versiones de Java, por ejemplo Java `21` o `25`, y cuáles son LTS.
+- Qué proveedores de JDK utilizan las aplicaciones, por ejemplo Eclipse Temurin, Amazon Corretto o Azul Zulu.
+- Cuántas aplicaciones contienen código Kotlin y cómo se distribuyen entre las versiones de Kotlin, por ejemplo `2.1`.
+
+Si ninguna aplicación contiene código Kotlin, la página lo indica en lugar de mostrar los gráficos de Kotlin.
+
+## Cómo funciona [#how-it-works]
+
+Master detecta la versión de Java, el proveedor del JDK y la versión de Kotlin de cada aplicación en tiempo de ejecución. Los registra una vez al día y utiliza el último registro. Cada aplicación cuenta una vez, independientemente del número de instancias que ejecute. Una aplicación que deja de enviar información permanece en la página con los últimos datos que comunicó.
+
+Java 11 y 17 son versiones LTS y, a partir de Java 21, lo es una de cada cuatro versiones: 21, 25, 29 y así sucesivamente. Un JDK que Axelix no reconoce se muestra como Unknown.
+
+## Véase también [#see-also]
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)

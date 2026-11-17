@@ -1,0 +1,49 @@
+---
+title: Panel
+description: "Dashboard es una página de inicio de Axelix. Resume todos los servicios de Spring Boot que Axelix Master sigue actualmente: las versiones de ejecución del conjunto, cuántas instancias están sanas en ese momento y el consumo de memoria agregado."
+---
+
+<LegacyNotice version="1.0.0" />
+
+Axelix Master recopila los datos de todas las aplicaciones Spring Boot que incluyen un starter de Axelix. Hasta que se registra la primera instancia, la página aparece vacía.
+
+## Mapa del sistema [#systems-map]
+
+**System's Map** es la fila de gráficos circulares en la parte superior. Cada gráfico desglosa el conjunto de instancias por un componente de software:
+
+- **Spring Boot**: distribución de versiones de Spring Boot entre todas las instancias descubiertas.
+- **Spring Framework**: distribución de versiones de Spring Framework.
+- **Java**: distribución de versiones principales de Java (por ejemplo, `17`, `21`).
+- **Kotlin**: distribución de versiones de Kotlin. Las instancias de Java puro no aportan datos aquí, por lo que el gráfico está vacío en conjuntos sin servicios Kotlin.
+
+Las etiquetas de los sectores muestran el número de instancias y su proporción, con el formato `value (percent%)`. Por ejemplo, `12 (60%)` significa que 12 instancias utilizan esa versión y representan el 60% del componente mostrado.
+
+### Pulsar un sector para profundizar en Wallboard [#click-a-slice-to-drill-into-the-wallboard]
+
+Al pulsar un sector se abre [Wallboard](../wallboard.mdx) con un filtro ya aplicado para el componente y la versión seleccionados. Los cuatro gráficos anteriores son interactivos.
+
+## Estado de salud [#health-status]
+
+**Health Status** es un gráfico de anillo con el estado actual de todas las instancias descubiertas. Se siguen tres estados:
+
+- **UP** (verde): la instancia está sana.
+- **DOWN** (rojo): la instancia no está sana.
+- **UNKNOWN** (gris): Axelix Master no pudo determinar el estado de la instancia.
+
+El número central del anillo lleva la etiqueta **Total Count** y es la suma de los tres estados, es decir, el total de instancias que Axelix sigue actualmente.
+
+## Estadísticas [#statistics]
+
+**Statistics** es una fila de tres tarjetas junto al gráfico Health Status:
+
+- **Total count of services**: el mismo total que aparece en el centro del anillo Health Status.
+- **Average Heap Size**: tamaño medio del heap de la JVM entre todas las instancias descubiertas.
+- **Total Heap Size**: suma del tamaño del heap de la JVM de todas las instancias descubiertas.
+
+Ambos valores del heap se convierten a una unidad legible antes de mostrarse, por lo que la tarjeta puede indicar `512 MB`, `2 GB`, etc., según el tamaño del conjunto.
+
+## Relacionado [#related]
+
+- [Wallboard](../wallboard.mdx)
+- [Service Profile](../service-profile.mdx)
+- [Details](../../features/insights/details.mdx)

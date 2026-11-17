@@ -1,0 +1,1006 @@
+---
+title: Configuración de Spring Boot Starter
+description: "Cómo integrar Axelix Spring Boot Starter en una aplicación Spring Boot para que Axelix Master pueda descubrirla, leer su estado y actuar sobre ella."
+---
+
+import styles from './styles.module.css';
+
+Esta página muestra cómo integrar Axelix Spring Boot Starter en una aplicación [Spring Boot](https://spring.io/) para que
+[Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) pueda descubrirla, leer su estado y actuar sobre ella, tanto desde
+la interfaz como mediante el servidor MCP (Model Context Protocol) integrado en Master, que expone los mismos datos a los agentes de IA. Elija
+el módulo de starter que corresponda a la versión principal de Boot, exponga los endpoints Actuator de Axelix (automático desde Axelix
+1.2.0), comparta la clave de firma JWT con Master e indique a Master dónde encontrar la instancia.
+
+## Antes de empezar [#before-you-start]
+
+Algunos datos que conviene tener claros antes de copiar los fragmentos siguientes.
+
+- **Tres módulos de starter**, uno por versión principal de Spring Boot. Elija el que coincida con la versión de Boot que
+  ya utiliza la aplicación:
+    - `com.axelixlabs:axelix-spring-boot-2-starter`: Spring Boot **2.7+** (un mínimo obligatorio, no solo la versión probada;
+      compilado y probado con `2.7.18`, Spring Cloud `2021.0.9`, JDK 11 como mínimo).
+    - `com.axelixlabs:axelix-spring-boot-3-starter`: Spring Boot 3.x (compilado y probado con `3.0.13`, Spring Cloud
+      `2022.0.4`, JDK 17 como mínimo).
+    - `com.axelixlabs:axelix-spring-boot-4-starter`: Spring Boot 4.x (compilado y probado con `4.0.6`, Spring Cloud
+      `2025.1.0`, JDK 17 como mínimo).
+- **Qué aporta el starter**: un conjunto de endpoints Actuator específicos de Axelix (`axelix-metadata`, `axelix-beans`,
+  `axelix-loggers`, …), un filtro de autorización basado en JWT que los protege y un componente opcional de autorregistro
+  que anuncia esta instancia a Master.
+- **El plugin de compilación de Axelix también es obligatorio**: además de la dependencia del starter, aplique el plugin de compilación de Axelix para Gradle o Maven.
+  Incorpora las coordenadas de compilación (`groupId`/`artifactId`/`version`) al artefacto, y Master identifica
+  cada aplicación por esas coordenadas: una instancia compilada sin el plugin **no puede registrarse**. Consulte [¿Qué es el
+  plugin de compilación de Axelix?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) y [Configuración del plugin de
+  compilación](../../setting-up-spring-boot-service/build-plugin/configuration.mdx).
+- **Dos consumidores de los mismos datos**: Master sirve la interfaz de Axelix en `/` y un servidor MCP en `/api/mcp` (controlado por
+  `axelix.master.mcp-server.enabled`, activado por defecto). Ambos leen los endpoints Actuator expuestos por el starter, por lo que
+  integrarlo hace visible la instancia para los usuarios de la interfaz *y* para los clientes MCP sin configuración adicional en el
+  starter.
+- **Qué necesita Master para comunicarse con la instancia**: acceso HTTP a la ruta base de Actuator de la aplicación (por defecto
+  `/actuator`), los endpoints de Axelix expuestos mediante `management.endpoints.web.exposure.include` y una clave de firma JWT
+  idéntica a la configurada en Master. Consulte [Autenticación:
+  JWT](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentication--jwt) para el lado de Master.
+- **Dos formas de que Master encuentre la instancia**:
+    - **Descubrimiento automático desde Master**: Master explora su entorno (actualmente, Services de Kubernetes) y sondea por sí mismo
+      el endpoint Actuator. El starter solo debe exponer los endpoints; no hay nada más que configurar.
+    - **Autorregistro**: el starter envía una señal de actividad a Master a intervalos fijos. Utilícelo cuando Master no pueda
+      explorar el entorno de la instancia (otra red, ausencia de integración de plataforma o máquinas virtuales convencionales).
+
+### Aplicaciones reactivas (WebFlux) [#reactive-webflux-applications]
+
+<ReleasedInNotice version="1.3.0" />
+
+Desde Axelix 1.3.0, los tres starters funcionan en aplicaciones reactivas basadas en Spring WebFlux, además de en
+aplicaciones servlet (Spring MVC). El starter detecta qué pila web utiliza la aplicación, por lo que no hay nada
+adicional que añadir ni configurar: la dependencia, el plugin de compilación y las propiedades de esta página son iguales para ambas.
+Los endpoints de Axelix y la autorización JWT que los protege funcionan igual, incluso cuando Actuator utiliza un
+`management.server.port` independiente.
+
+Una función sigue siendo exclusiva de servlet. La [supervisión de transacciones](#transaction-monitoring), y con ella las páginas Transaction Control
+y Entities Map, no está disponible en aplicaciones WebFlux.
+
+## Añadir la dependencia [#add-the-dependency]
+
+Declare la coordenada del starter correspondiente a la versión principal de Boot.
+
+:::note
+Los fragmentos siguientes utilizan la versión más reciente, `AXELIX_VERSION_PLACEHOLDER`.
+:::
+
+<Tabs groupId="spring-boot-major" items={['Spring Boot 4.x', 'Spring Boot 3.x', 'Spring Boot 2.7']}>
+  <Tab value="Spring Boot 4.x">
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:AXELIX_VERSION_PLACEHOLDER")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.axelixlabs:axelix-spring-boot-4-starter:AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-4-starter</artifactId>
+    <version>AXELIX_VERSION_PLACEHOLDER</version>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+  <Tab value="Spring Boot 3.x">
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-3-starter:AXELIX_VERSION_PLACEHOLDER")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-3-starter</artifactId>
+    <version>AXELIX_VERSION_PLACEHOLDER</version>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+  <Tab value="Spring Boot 2.7">
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:AXELIX_VERSION_PLACEHOLDER")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-2-starter</artifactId>
+    <version>AXELIX_VERSION_PLACEHOLDER</version>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+  </Tab>
+</Tabs>
+
+El starter también depende de [Spring Boot
+Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator). Si la aplicación no
+incluye ya `spring-boot-starter-actuator`, añádalo junto al starter.
+
+:::tip[El plugin de compilación es un paso independiente]
+Aplicar el plugin de compilación de Axelix es obligatorio para todos los servicios gestionados, pero se explica en su propia sección. Consulte [¿Qué es
+el plugin de compilación de Axelix?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) y [Configuración del plugin de
+compilación](../../setting-up-spring-boot-service/build-plugin/configuration.mdx).
+:::
+
+### Dependencias transitivas [#transitive-dependencies]
+
+El starter está diseñado para añadir lo mínimo posible al classpath. Se compila contra todas las tecnologías con las que se integra —Spring Boot,
+Actuator, Spring Kafka, Micrometer, Caffeine, Jackson—, pero **no** las incorpora:
+el starter utiliza lo que ya tiene la aplicación. Las únicas bibliotecas que incorpora de forma transitiva son:
+
+| Dependencia | Motivo |
+|---|---|
+| `org.slf4j:slf4j-api` | Registro de eventos. Ya está presente en todas las aplicaciones Spring Boot. |
+| `io.jsonwebtoken:jjwt-api`, `jjwt-impl`, `jjwt-jackson` | Verificación del JWT que Master envía en cada solicitud. |
+
+El objetivo es reducir esta lista. El starter es el componente de Axelix que se ejecuta dentro de sus servicios, y cada
+biblioteca que incorpora es un elemento adicional del classpath que debe analizarse, parchearse y mantenerse compatible con el resto de la
+aplicación. La postura del equipo central de Axelix es que el starter no debería tener **ninguna dependencia externa**, y
+estamos eliminando las restantes paso a paso. Puede seguir el progreso en
+[axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748).
+
+#### JsonPath ya no se incluye [#jsonpath-is-no-longer-included]
+
+<ReleasedInNotice version="1.2.0" />
+
+Hasta Axelix 1.1.x inclusive, el starter también incorporaba `com.jayway.jsonpath:json-path`, aunque nunca lo
+utilizaba. Desde Axelix 1.2.0, esa dependencia se ha eliminado: el primer paso hacia el starter sin dependencias
+descrito en [axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748).
+
+Si la aplicación utiliza JsonPath en su propio código y solo lo obtenía mediante el starter de Axelix, declárelo
+explícitamente al actualizar. Spring Boot gestiona su versión, por lo que no es necesario especificarla:
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.jayway.jsonpath:json-path")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.jayway.jsonpath:json-path'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.jayway.jsonpath</groupId>
+    <artifactId>json-path</artifactId>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+Las pruebas no se ven afectadas: `spring-boot-starter-test` incorpora JsonPath por sí mismo.
+
+#### JSpecify ya no se incluye [#jspecify-is-no-longer-included]
+
+<ReleasedInNotice version="1.3.0" />
+
+Hasta Axelix 1.2.x inclusive, el starter también incorporaba `org.jspecify:jspecify`. El starter utiliza JSpecify solo
+para sus anotaciones de nulabilidad y únicamente lo necesita durante la compilación. Desde Axelix 1.3.0, la dependencia se
+ha eliminado, como siguiente paso hacia el starter sin dependencias descrito en
+[axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748).
+
+El starter sigue funcionando sin JSpecify en el classpath, porque la JVM ignora las anotaciones cuyas clases
+no están disponibles durante la ejecución. En Spring Boot 4 no cambia nada, ya que el propio Spring Framework 7 depende de JSpecify.
+
+Si su código utiliza las anotaciones de JSpecify y solo las obtenía mediante el starter de Axelix, declare la
+dependencia explícitamente al actualizar. Spring Boot 2 y 3 no gestionan su versión, por lo que debe especificarla:
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("org.jspecify:jspecify:1.0.0")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'org.jspecify:jspecify:1.0.0'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>org.jspecify</groupId>
+    <artifactId>jspecify</artifactId>
+    <version>1.0.0</version>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+## Endpoints Actuator [#actuator-endpoints]
+
+Desde Axelix **1.2.0** no hay nada que configurar manualmente: al iniciar la aplicación, el starter añade sus propios
+endpoints Actuator a `management.endpoints.web.exposure.include`, por lo que Master puede acceder a ellos sin configuración adicional. En versiones
+anteriores, el starter no lo hace y los endpoints deben enumerarse manualmente. Consulte [Exponer los endpoints en
+Axelix anterior a 1.2.0](#exposing-the-endpoints-on-axelix-below-120).
+
+### Qué expone el starter [#what-the-starter-exposes]
+
+El starter expone los siguientes endpoints:
+
+<table>
+    <thead>
+    <tr>
+        <th>Endpoint</th>
+        <th>Finalidad</th>
+        <th>Desde</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>axelix-metadata</code> <span className={styles.required}>obligatorio</span></td>
+        <td>Metadatos del servicio; el primero que Master sondea</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-ping</code></td>
+        <td>Actualizaciones de estado, memoria y transacciones que Master consulta para instancias ya conocidas y descubiertas automáticamente. Necesario para el sondeo; las instancias autorregistradas envían actualizaciones mediante señales de actividad.</td>
+        <td><code>1.3.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-details</code></td>
+        <td>Información resumida de la instancia</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-beans</code></td>
+        <td>Beans del contexto</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-caches</code></td>
+        <td>Cachés (cuando hay un <code>CacheManager</code>)</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-conditions</code></td>
+        <td>Informe de condiciones de autoconfiguración</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-configprops</code></td>
+        <td><code>@ConfigurationProperties</code></td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-env</code></td>
+        <td>Entorno y fuentes de propiedades</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-feign</code> <em>heredado</em></td>
+        <td>Clientes Feign (cuando Feign está en el classpath). Eliminado en <code>1.3.0</code>, véase más abajo</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-gc</code></td>
+        <td>Recolección de basura</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-heap-dump</code></td>
+        <td>Volcado del heap</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-loggers</code></td>
+        <td>Niveles de registro</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-logs</code></td>
+        <td>Entradas de registro recientes</td>
+        <td><code>1.3.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-metrics</code></td>
+        <td>Métricas</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-scheduled-tasks</code></td>
+        <td>Tareas programadas</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-thread-dump</code></td>
+        <td>Volcado de hilos</td>
+        <td><code>1.0.0</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-dependencies</code></td>
+        <td>SBOM de dependencias</td>
+        <td><code>1.2.0</code></td>
+    </tr>
+    </tbody>
+</table>
+
+La columna **Desde** indica la primera versión del starter de Axelix que incluyó el endpoint. `1.0.0` es la primera versión de Axelix,
+por lo que un endpoint marcado con `1.0.0` existe desde el principio. Una versión marcada como _próxima_ aún no se ha publicado:
+el endpoint estará disponible en la siguiente versión de Axelix, tanto si es menor como si es principal.
+
+Los endpoints que no se aplican a la aplicación permanecen inactivos: el starter solo activa cada uno cuando se cumplen
+sus requisitos (por ejemplo, `axelix-caches` nunca se activa sin un `CacheManager`).
+
+Desde Axelix **1.2.0**, los endpoints nativos `health` e `info` ya no son necesarios, por lo que el starter nunca los expone
+por sí mismo (antes de 1.2.0 Axelix dependía de ellos y el starter forzaba la exposición de ambos). Solo se exponen los endpoints que
+se enumeren en `management.endpoints.web.exposure.include` y los de Axelix; añada `health` e `info` a la
+lista cuando los necesite, incluido el endpoint `health` que Spring Boot expondría por defecto en otras circunstancias.
+
+#### Se ha eliminado el endpoint `axelix-feign` [#the-axelix-feign-endpoint-is-removed]
+
+<ReleasedInNotice version="1.3.0" />
+
+Hasta Axelix 1.2.x inclusive, los starters de Spring Boot 3 y Spring Boot 4 también aportaban un endpoint `axelix-feign`
+que enumeraba los clientes Spring Cloud OpenFeign de la aplicación. Axelix Master nunca lo utilizó para
+mostrar información y solo se conservaba como un resto de las primeras etapas del proyecto. Desde Axelix 1.3.0, el endpoint se ha eliminado de los starters junto con todo el código de Master
+que podía invocarlo.
+
+No hay nada que hacer al actualizar. La única diferencia visible es que `/actuator/axelix-feign` ya no
+existe en un servicio con el starter 1.3.0 o posterior; si alguna herramienta propia llama directamente a esa URL, recibirá un
+`404`. Si enumera manualmente los endpoints de Axelix en `management.endpoints.web.exposure.include` y `axelix-feign` está
+entre ellos, puede quitarlo de la lista; dejarlo no causa problemas.
+
+### Añadir endpoints propios [#adding-your-own-endpoints]
+
+Si necesita endpoints Actuator propios, enumere **solo esos**: el starter **combina** su lista con la suya propia en lugar
+de sustituirla.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - prometheus
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=prometheus
+```
+
+  </Tab>
+</Tabs>
+
+Como resultado, se exponen `prometheus` y todos los endpoints de Axelix.
+
+También se admite el valor `*`: se expone todo y el starter no modifica la lista.
+
+### Exponer los endpoints en Axelix anterior a 1.2.0 [#exposing-the-endpoints-on-axelix-below-120]
+
+<LegacyNotice version="1.2.0" />
+
+Los starters anteriores a 1.2.0 no añaden por sí mismos sus endpoints a la lista de exposición, por lo que cada endpoint de Axelix que
+desee que lea Master debe incluirse manualmente en `management.endpoints.web.exposure.include`. Como mínimo, exponga
+`axelix-metadata` —sin él, la instancia nunca aparece en Master— y, en la práctica, el conjunto completo para que cada sección de la interfaz
+tenga datos que mostrar. Esas versiones del starter exponen forzosamente `health` e `info` por sí mismas,
+por lo que no es necesario enumerarlos:
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+```
+
+  </Tab>
+</Tabs>
+
+Estas versiones del starter también aportan el endpoint heredado `axelix-feign`. Se omite de la lista de forma intencionada:
+Master nunca lo lee y el endpoint se elimina en Axelix 1.3.0. Véase [más arriba](#what-the-starter-exposes).
+
+## Exportar métricas de Axelix mediante Micrometer [#export-axelix-metrics-through-micrometer]
+
+El endpoint Actuator `axelix-metrics` proporciona los datos de la interfaz de Axelix. Además, los starters de Spring Boot pueden publicar un pequeño
+conjunto de medidores específicos de Axelix en el `MeterRegistry` de Micrometer de la propia aplicación.
+
+Esta vía de exportación se activa automáticamente si hay un bean `MeterRegistry`. No existe ninguna propiedad adicional de Axelix para
+ello. El starter registra estos medidores:
+
+<div className={styles.MetricsTable}>
+| Medidor | Tipo | Etiquetas | Significado |
+|-------|------|------|---------|
+| `axelix_transaction_duration` | `Timer` | `class`, `method` | Duración de cada ejecución `@Transactional` supervisada. El temporizador también publica los percentiles `0.5`, `0.95` y `0.99`. |
+| `axelix_transaction_queries` | `Counter` | `class`, `method` | Número total de consultas SQL ejecutadas dentro de transacciones supervisadas. |
+| `axelix_transaction_external_calls` | `Counter` | `class`, `method` | Número total de llamadas externas (por ejemplo `RestTemplate`) realizadas dentro de transacciones supervisadas. |
+| `axelix_cache_requests` | `Counter` | `cache`, `result` | Número total de consultas a la caché registradas por las cachés ampliadas por Axelix. |
+| `axelix_cache_enabled` | `Gauge` | `cache` | Estado actual de cada caché ampliada durante la ejecución: `1` si está activada, `0` si está desactivada. |
+</div>
+
+Estos medidores complementan los endpoints Actuator utilizados por la interfaz, no los sustituyen. La interfaz sigue leyendo `axelix-metrics` y `axelix-caches`. La información inicial sobre transacciones se incluye en los metadatos de registro; las actualizaciones posteriores utilizan `axelix-ping` cuando Master sondea starters desde 1.3.0, o señales de actividad enviadas por las instancias autorregistradas. No hay ningún endpoint de Actuator específico para transacciones; véase [Supervisión de transacciones](#transaction-monitoring).
+
+## Compartir la clave de firma JWT con Master [#share-the-jwt-signing-key-with-master]
+
+Todos los endpoints Actuator de Axelix están protegidos por `JwtAuthorizationFilter`. El filtro espera un token HS256, HS384 o HS512
+firmado con la misma clave que utiliza Master, por lo que ambos deben coincidir en el algoritmo y el secreto. Utilice el mismo valor
+establecido en `axelix.master.auth.jwt.signing-key` de Master.
+
+Desde el starter 1.3, Master autoriza al usuario autenticado antes de llamar al servicio. El starter recibe un
+JWT de usuario técnico de corta duración con sujeto `AXELIX.MASTER`, sin los roles ni permisos del usuario. Verifica
+la identidad de Master, la firma y la caducidad del token. Los starters anteriores siguen comprobando los permisos del usuario, por lo que Master vuelve a emitir
+el token del usuario con nombres de permisos heredados para ellos. El descubrimiento inicial utiliza un token de compatibilidad aceptado por ambas
+versiones; consulte [Cómo funciona el descubrimiento](../../product/discovery.mdx).
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+</Tabs>
+
+Desde Axelix 1.3, `axelix.sbs.auth.jwt.duration` ya no se utiliza. Puede eliminarlo de la configuración.
+El starter emite un nuevo JWT de usuario técnico para cada solicitud de registro y señal de actividad.
+Cada token tiene una duración fija de un minuto para limitar el tiempo durante el que puede utilizarse un token robado.
+No se necesita una propiedad de sustitución y la duración no es configurable.
+
+:::warning
+La clave de firma compartida entre Master y todos los servicios supervisados es un secreto sensible. Inyéctela mediante una variable de
+entorno, un archivo montado o un gestor de secretos, no mediante un YAML bajo control de versiones.
+:::
+
+### Ejecución sin clave de firma [#running-without-a-signing-key]
+
+<ReleasedInNotice version="1.2.0" />
+
+Desde Axelix 1.2.0, `algorithm` y `signing-key` son opcionales. Si no se establecen, el starter utiliza
+`HMAC512` y la misma clave integrada que Master utiliza por defecto, por lo que el servicio se conecta a un Master con configuración
+predeterminada sin configurar claves. Mientras se utiliza la clave integrada, el starter registra una advertencia al iniciar.
+
+:::warning
+La clave integrada es públicamente conocida. Cualquiera que pueda acceder a los endpoints Actuator del servicio puede firmar un token con ella e
+invocar los endpoints de Axelix, por ejemplo para leer el entorno o realizar un volcado del heap. Establezca su propia
+`axelix.sbs.auth.jwt.signing-key`, igual que en Master, antes de utilizar Axelix más allá de una prueba local.
+:::
+
+## Permitir que Master encuentre la instancia [#let-master-find-the-instance]
+
+Elija una de las dos vías siguientes. En la práctica son mutuamente excluyentes: el autorregistro solo añade latencia si Master
+ya puede explorar el entorno.
+
+### Opción A: descubrimiento automático desde Master [#option-a--master-side-autodiscovery]
+
+Si Master se ejecuta dentro de un clúster de Kubernetes junto a los servicios, la configuración más sencilla es dejar que Master explore el
+espacio de nombres en busca de Services y sondee `/actuator/axelix-metadata` en cada uno. No se necesita configuración adicional en el
+starter aparte de exponer los endpoints Actuator y compartir la clave de firma JWT. Configure la exploración desde Master mediante
+`axelix.master.discovery.auto.*`; consulte [Descubrimiento:
+descubrimiento automático](../../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery) en la página de Master.
+Para conocer qué hace Master en cada exploración, consulte [Cómo funciona el descubrimiento](../../product/discovery.mdx).
+
+### Opción B: autorregistro [#option-b--self-registration]
+
+Si Master no puede explorar el entorno de la instancia —otro clúster, una máquina virtual convencional o una red aislada—, active el
+autorregistro en el starter. La instancia envía entonces señales de actividad con su URL de Actuator a Master a intervalos
+fijos. Master acepta el envío en `POST /api/internal/service/register`, que es también la dirección que debe indicarse en
+`axelix.sbs.discovery.master-url`. Desde Axelix 1.3.0, el starter solo envía este registro completo una vez y
+luego pasa a señales ligeras, que se dirigen a un endpoint junto a `master-url`. Para conocer el ciclo completo, consulte [Cómo
+funciona el descubrimiento](../../product/discovery.mdx).
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    discovery:
+      self-registration: true
+      master-url: http://master.internal:2935/api/internal/service/register
+      instance-actuator-url: http://my-app.internal:8080/actuator
+      instance-name: orders-service
+      heartbeat-interval: 15s
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.discovery.self-registration=true
+axelix.sbs.discovery.master-url=http://master.internal:2935/api/internal/service/register
+axelix.sbs.discovery.instance-actuator-url=http://my-app.internal:8080/actuator
+axelix.sbs.discovery.instance-name=orders-service
+axelix.sbs.discovery.heartbeat-interval=15s
+```
+
+  </Tab>
+</Tabs>
+
+Algunos detalles que suelen causar confusión:
+
+- `instance-actuator-url` es la URL del servicio tal como Master accederá a él desde su propia red, incluida la ruta base configurada de Actuator, normalmente `/actuator`.
+- `master-url` es la URL **completa**, incluido `/api/internal/service/register`. El starter la utiliza sin modificarla para sus envíos.
+  Master escucha en `2935` por defecto desde Axelix `1.2.0`; antes de esa versión, el puerto predeterminado era `8080`. Consulte
+  [General](../../setting-up-master-ui/configuring-master/configuring-master.mdx#general).
+- `instance-name` es la etiqueta que Master muestra para esta instancia en la interfaz y en las respuestas MCP. Elija un nombre que se mantenga entre
+  reinicios y réplicas, normalmente el del servicio, no el del pod.
+- Master acepta el autorregistro sin configuración adicional (`axelix.master.discovery.self-registration.enabled` es `true`
+  por defecto); establézcalo en `false` si desea rechazar las señales de actividad. Master elimina una instancia tras
+  `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` de silencio (`45s` por defecto), por lo que debe mantener
+  `heartbeat-interval` bastante por debajo de ese tiempo.
+
+## Enmascarar valores sensibles de propiedades [#sanitize-sensitive-property-values]
+
+Los endpoints de Axelix `axelix-env` y `axelix-configprops` devuelven valores de propiedades a Master. Para evitar que se lean secretos
+sin los permisos adecuados, Master enmascara los valores para los usuarios que no tienen el permiso correspondiente. Las mismas reglas se aplican a ambos endpoints.
+Configure las claves de propiedades sensibles en el starter:
+
+`axelix.sbs.endpoints.config.sanitized-properties`
+
+- **Lista vacía (valor predeterminado)**: todos los valores devueltos por `axelix-env` y `axelix-configprops` se sustituyen por `******` para
+  llamantes sin el permiso correspondiente. El valor predeterminado es conservador de forma intencionada: la protección no requiere activación explícita.
+- **Lista no vacía**: solo se enmascaran las claves enumeradas; todo lo demás se devuelve sin enmascarar a cualquier llamante. Utilícela si el
+  valor predeterminado conservador resulta demasiado restrictivo y desea enmascarar solo claves concretas (contraseñas, tokens o claves de firma).
+
+El permiso se comprueba por endpoint:
+
+- **`axelix-env`**: el permiso `environment.values:read` permite al llamante ver los valores sin enmascarar.
+- **`axelix-configprops`**: el permiso `config-properties.values:read` permite al llamante ver los valores sin enmascarar.
+
+Los roles integrados **ADMIN** y **SUPER_ADMIN** de Master conceden ambos permisos. **VIEWER** y **EDITOR** siempre
+pasan por la función de enmascaramiento. Consulte [Roles y
+permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+          - axelix.sbs.auth.jwt.signing-key
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+axelix.sbs.endpoints.config.sanitized-properties[3]=axelix.sbs.auth.jwt.signing-key
+```
+
+  </Tab>
+</Tabs>
+
+:::note
+Las opciones estándar de enmascaramiento de Spring Boot Actuator —`management.endpoint.env.show-values`,
+`management.endpoint.env.keys-to-sanitize` y sus equivalentes `configprops`— **no** se consultan.
+:::
+
+## Referencia de configuración [#configuration-reference]
+
+Todas las propiedades del starter pertenecen al espacio de nombres `axelix.sbs.*`.
+
+### Desactivar el starter [#disabling-the-starter]
+
+<ReleasedInNotice version="1.2.0" />
+
+`axelix.sbs.enabled` es el interruptor global de todo el starter. Es `true` por defecto, por lo que añadir la dependencia
+basta para activar todo lo descrito en esta página. Si se establece en `false`, se desactiva toda la autoconfiguración de Axelix:
+sin endpoints Actuator de Axelix, sin filtro de autorización JWT, sin señales de autorregistro, sin medidores Micrometer y
+sin supervisión de transacciones. La aplicación se inicia como si el starter no estuviera en el classpath, aunque la
+propia dependencia permanece en la compilación.
+
+Utilice esta opción si desea desactivar Axelix en un entorno concreto —por ejemplo, localmente o en un perfil de pruebas—
+sin mantener un conjunto separado de dependencias. También permite descartar rápidamente al starter al investigar
+problemas de inicio.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+La propiedad se lee una vez, durante el inicio. Por tanto, modificarla requiere reiniciar la aplicación.
+
+:::note
+Con el starter desactivado, Master deja de ver la instancia: fallan los sondeos de descubrimiento automático a `/actuator/axelix-metadata`
+y cesan las señales de autorregistro, por lo que la instancia desaparece de la interfaz y de las respuestas MCP.
+:::
+
+<div className={styles.SharedTable}>
+
+| Propiedad | Valor predeterminado | Descripción |
+|----------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.enabled` | `true`  | Interruptor global de todo el starter. Establézcalo en `false` para desactivar toda la autoconfiguración de Axelix. Se comporta de forma idéntica en los starters de Spring Boot 2, 3 y 4. |
+
+</div>
+
+### Autenticación: JWT [#authentication--jwt]
+
+<div className={styles.SharedTable}>
+| Propiedad                          | Valor predeterminado                                              | Descripción                                                                                                                  |
+|-----------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.auth.jwt.algorithm`   | `HMAC512` (1.2.0+; obligatorio antes) | Algoritmo de firma. Uno de `HMAC256`, `HMAC384` o `HMAC512`. Debe coincidir con `axelix.master.auth.jwt.algorithm` de Master.        |
+| `axelix.sbs.auth.jwt.signing-key` | clave integrada (1.2.0+; obligatoria antes) | Secreto compartido utilizado para verificar los tokens emitidos por Master y firmar las señales de autorregistro. Debe coincidir con la clave de firma de Master. |
+| `axelix.sbs.auth.jwt.duration`    | `5m`                                                 | Solo se utiliza antes de 1.3 para la duración del token de autorregistro. Desde 1.3, esta opción no tiene efecto y puede eliminarse. Se emite un nuevo token de usuario técnico por solicitud con una duración fija de un minuto. |
+</div>
+
+### Autorregistro [#self-registration]
+
+El autorregistro está **desactivado por defecto** (`axelix.sbs.discovery.self-registration=false`): manténgalo así cuando Master pueda encontrar la
+instancia mediante descubrimiento automático desde Master.
+
+Cuando `axelix.sbs.discovery.self-registration=true`, las siguientes propiedades pasan a ser **obligatorias**:
+
+- `axelix.sbs.discovery.master-url`
+- `axelix.sbs.discovery.instance-actuator-url`
+- `axelix.sbs.discovery.instance-name`
+
+El receptor de estas señales en Master —endpoint, tiempo de espera para expulsión y programación del barrido de expulsión— se documenta en
+la página de Master, en [Descubrimiento:
+autorregistro](../../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--self-registration). La clave de firma JWT
+configurada en `axelix.sbs.auth.jwt.signing-key` debe coincidir con `axelix.master.auth.jwt.signing-key` de Master; de lo contrario,
+las señales se rechazan con `401`.
+
+<div className={styles.SharedTable}>
+
+| Propiedad | Valor predeterminado | Descripción |
+|----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.discovery.self-registration`     | `false`                                              | Interruptor principal. Establézcalo en `true` para activar el autorregistro; mantenga `false` para depender del descubrimiento automático desde Master. |
+| `axelix.sbs.discovery.master-url`            | *(sin establecer)* <span className="Required">obligatoria</span> | URL completa del endpoint de autorregistro de Master, por ejemplo `http://master:2935/api/internal/service/register`. Obligatoria cuando `self-registration=true`. |
+| `axelix.sbs.discovery.instance-actuator-url` | *(sin establecer)* <span className="Required">obligatoria</span> | URL de este servicio accesible desde Master, incluida la ruta base configurada de Actuator (normalmente `/actuator`). Obligatoria cuando `self-registration=true`. |
+| `axelix.sbs.discovery.instance-name`         | *(sin establecer)* <span className="Required">obligatoria</span> | Nombre visible en la interfaz de Axelix y en las respuestas MCP. Obligatorio cuando `self-registration=true`. |
+| `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                | Intervalo entre señales de actividad. Debería ser menor que el `heartbeat-timeout` de expulsión de Master. |
+
+</div>
+
+### Enmascaramiento de valores en endpoints [#endpoint-value-sanitization]
+
+<div className={styles.SharedTable}>
+
+| Propiedad | Valor predeterminado | Descripción |
+|----------------------------------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.endpoints.config.sanitized-properties` | *(lista vacía)* | Claves de propiedades cuyos valores se enmascaran como `******` para llamantes sin `environment.values:read` (en `axelix-env`) o `config-properties.values:read` (en `axelix-configprops`). Una lista vacía significa que se enmascaran **todos** los valores. Consulte [Enmascarar valores sensibles de propiedades](#sanitize-sensitive-property-values) para conocer las reglas de coincidencia. |
+
+</div>
+
+### Gestión de cachés [#cache-management]
+
+<ReleasedInNotice version="1.2.0" />
+
+La gestión de cachés proporciona los datos de la página Caches y los medidores `axelix_cache_*`: el starter envuelve cada bean `CacheManager`
+de la aplicación en un proxy que registra las consultas a la caché y permite activar, desactivar y vaciar cachés durante la
+ejecución, y expone esos datos mediante el endpoint Actuator `axelix-caches`. Está **activada por defecto** cuando el
+starter está en el classpath.
+
+Establezca `axelix.sbs.cache.management.enabled` en `false` para desactivarla por completo: sin proxies de `CacheManager`, sin
+endpoint `axelix-caches` y sin medidores de caché. Los beans `CacheManager` quedan entonces exactamente como los definió la
+aplicación.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    cache:
+      management:
+        enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.cache.management.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.SharedTable}>
+
+| Propiedad | Valor predeterminado | Descripción |
+|---------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.cache.management.enabled` | `true`  | Interruptor principal de la gestión de cachés. Establézcalo en `false` para desactivar toda la autoconfiguración de gestión de cachés. Se comporta de forma idéntica en los starters de Spring Boot 2, 3 y 4. |
+
+</div>
+
+:::note
+Con la gestión de cachés desactivada, la página Caches de Master no tiene datos que mostrar para esta instancia y las herramientas MCP
+de caché fallan para ella.
+:::
+
+### Entradas de registro [#log-entries]
+
+<ReleasedInNotice version="1.3.0" />
+
+El endpoint `axelix-logs` sirve las entradas de registro más recientes de la aplicación para poder leerlas sin
+acceder al equipo anfitrión. El starter conserva estas entradas en memoria desde el inicio de la aplicación. Cuando el búfer está
+lleno, cada nueva entrada desplaza a la más antigua. Como el búfer reside en memoria, vuelve a estar vacío después de un reinicio.
+
+Por defecto, el starter conserva las últimas 1000 entradas. Aumente `axelix.sbs.logs.max-entries` si un servicio con mucha actividad genera
+tantos registros que 1000 entradas solo cubren unos segundos. Redúzcalo si hay poca memoria, porque cada entrada conservada permanece en
+el heap.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    logs:
+      max-entries: 5000
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.logs.max-entries=5000
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.SharedTable}>
+
+| Propiedad | Valor predeterminado | Descripción |
+|-------------------------------|---------|-------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.logs.max-entries` | `1000`  | Número máximo de las entradas de registro más recientes que el starter conserva en memoria. Debe ser mayor que `0`. |
+
+</div>
+
+:::note
+El starter comprueba el valor una vez iniciada la aplicación. Si es `0` o negativo, el inicio falla con una
+`IllegalArgumentException` cuyo mensaje es `axelix.sbs.logs.max-entries must be positive`.
+:::
+
+### Supervisión de transacciones [#transaction-monitoring]
+
+La supervisión de transacciones proporciona los datos de la página Transaction Control y los medidores asociados: envuelve los métodos `@Transactional`, crea un proxy de la fuente de datos para contar consultas, limpia la pila de transacciones por solicitud y registra el integrador N+1 de Hibernate. El registro inicial incluye la información recopilada. Las actualizaciones posteriores utilizan `axelix-ping` cuando Master sondea starters desde 1.3.0, o señales de actividad enviadas por las instancias autorregistradas; los starters anteriores siguen proporcionando los metadatos de registro completos. Exponga `axelix-ping` para sondear starters desde 1.3.0; no se necesita ningún endpoint adicional específico para transacciones. La supervisión de transacciones está **activada por defecto** cuando el starter está en el classpath.
+
+La supervisión de transacciones solo funciona en aplicaciones servlet (Spring MVC). En una aplicación reactiva (WebFlux), el starter
+no la activa, independientemente del valor de la propiedad. Consulte [Aplicaciones reactivas (WebFlux)](#reactive-webflux-applications).
+
+Establezca `axelix.sbs.transaction.monitoring.enabled` en `false` para desactivarla por completo: sin posprocesadores de beans, sin proxies de la fuente
+ de datos, sin filtro de limpieza y sin integrador de Hibernate. Utilícelo para reducir la sobrecarga asociada, para descartar
+interferencias al investigar la configuración de la fuente de datos o de Hibernate, o simplemente si no utiliza la función.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    transaction:
+      monitoring:
+        enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.transaction.monitoring.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.configTable}>
+
+| Propiedad | Valor predeterminado | Descripción |
+|----------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.transaction.monitoring.enabled`  | `true`  | Interruptor principal de la supervisión de transacciones. Establézcalo en `false` para desactivar toda la autoconfiguración de supervisión de transacciones. Se comporta de forma idéntica en los starters de Spring Boot 2, 3 y 4. |
+
+</div>
+
+:::note
+Desactivar la supervisión de transacciones también desactiva la detección de paginación en memoria descrita a continuación, ya que forma parte
+de la misma autoconfiguración.
+:::
+
+### Detección de paginación en memoria [#in-memory-pagination-detection]
+
+Detecta la paginación en memoria de Hibernate causada por utilizar
+[setFirstResult/setMaxResults](https://docs.hibernate.org/orm/current/javadocs/org/hibernate/query/Query.html?#setMaxResults(int))
+junto con la carga de una colección.
+
+Por defecto, la supervisión de transacciones registra un appender que intercepta las advertencias de Hibernate (HHH000104 en Hibernate 5.x
+y HHH90003004 en Hibernate 6.x–7.3.x). El starter elige el appender que corresponde al sistema de registro activo de la
+aplicación, por lo que la detección funciona tanto con Logback como con Log4j2:
+
+- **Logback**: el starter registra
+  `com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppender`. Es el
+  caso de una configuración estándar de Spring Boot, cuyo sistema de registro es Logback.
+- **Log4j2**: si la aplicación utiliza Log4j2 (normalmente tras añadir `spring-boot-starter-log4j2` y
+  excluir el starter predeterminado de Logback), el starter registra
+  `com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.Log4j2InMemoryPaginationAppender`.
+
+No hay que elegir entre ellos: el starter detecta el sistema de registro activo y registra el appender adecuado.
+
+Establezca `axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled` en `false` si desea impedir que se registre cualquiera de los
+appenders.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    transaction:
+      monitoring:
+        in-memory-pagination-detection:
+          enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+## Información relacionada [#related]
+
+- [Configuración del plugin de compilación](../../setting-up-spring-boot-service/build-plugin/configuration.mdx): la segunda parte de integrar un servicio; es obligatoria
+  para que la instancia se registre.
+- [Configuración de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx): dónde se establecen la clave de firma, el tiempo de espera de expulsión y
+  la exploración de Kubernetes.
+- [¿Qué es Master?](../../setting-up-master-ui/what-is-master.mdx): contexto sobre cómo Master utiliza los datos que expone el
+  starter.
+- [Autenticación](../../setting-up-master-ui/authentication/authentication.mdx): explicación más detallada de JWT y la resolución de
+  permisos en ambos lados.

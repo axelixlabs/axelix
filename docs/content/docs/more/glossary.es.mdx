@@ -1,0 +1,27 @@
+---
+title: Glosario
+description: "Este documento define los principales términos y abreviaturas utilizados en la documentación y el código de Axelix."
+---
+
+## Términos [#terms]
+
+### Axelix [#axelix]
+Nombre del proyecto. También se utiliza como término general para referirse al sistema en su conjunto.
+
+### Axelix Master [#axelix-master]
+Aplicación independiente que se despliega por separado y que:
+- Proporciona la interfaz web de Axelix
+- Interactúa con los servicios gestionados
+- Actúa como punto central de gestión
+- Gestiona el descubrimiento y el registro de servicios
+- Contiene un servidor MCP integrado
+
+### Axelix Spring Boot Starter [#axelix-spring-boot-starter]
+Starter de Spring Boot que se incluye en las aplicaciones Spring Boot para habilitar la integración con Axelix. Proporciona las
+capacidades necesarias que invoca Axelix Master.
+
+### Servicio gestionado [#managed-service]
+Aplicación Spring Boot que:
+- Integra el Axelix Spring Boot Starter
+- Está registrada en Axelix Master y este la conoce
+- Puede supervisarse y gestionarse mediante Axelix

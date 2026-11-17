@@ -1,0 +1,132 @@
+---
+title: Configuración del plugin de compilación de Axelix
+description: "Aplicar el plugin de compilación de Axelix incorpora las coordenadas de compilación al artefacto para que Axelix Master pueda identificar la instancia."
+---
+
+Aplicar el plugin de compilación de Axelix es la segunda parte de hacer visible un servicio para
+[Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx); la primera es
+[conectar el starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx). El plugin no tiene nada que configurar: se aplica
+y añade las coordenadas de compilación al artefacto para que Master pueda identificar la instancia. Consulte [¿Qué es el plugin de
+compilación de Axelix?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) para conocer qué produce y por qué es obligatorio.
+
+:::warning[Obligatorio para el registro]
+Master identifica cada aplicación por su `groupId` + `artifactId`. Sin el plugin, falta el archivo
+`META-INF/axelix-info.properties`, las coordenadas están vacías y **Master rechaza el registro**:
+la instancia nunca aparece en la interfaz. Las mismas coordenadas también identifican los [análisis de
+persistencia](../../setting-up-master-ui/mcp/mcp-tools.mdx) (análisis de N+1 y de mapeo de entidades). Aplique el plugin a todos los
+servicios que desee gestionar con Axelix.
+:::
+
+:::note
+Actualmente, los plugins se publican **solo en Maven Central**. La publicación en Gradle Plugin Portal está prevista;
+hasta entonces, las compilaciones de Gradle deben resolver el plugin desde Maven Central (véase el bloque `pluginManagement` siguiente). Mantenga la
+versión del plugin sincronizada con la del starter.
+:::
+
+## Aplicar el plugin [#apply-the-plugin]
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+Como el plugin todavía no está en Gradle Plugin Portal, añada `mavenCentral()` a `pluginManagement` en su
+`settings.gradle.kts`:
+
+```kotlin title="settings.gradle.kts"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+Después, aplique el plugin en `build.gradle.kts`:
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "AXELIX_VERSION_PLACEHOLDER"
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+Como el plugin todavía no está en Gradle Plugin Portal, añada `mavenCentral()` a `pluginManagement` en su
+`settings.gradle`:
+
+```groovy title="settings.gradle"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+Después, aplique el plugin en `build.gradle`:
+
+```groovy title="build.gradle"
+plugins {
+    id 'com.axelixlabs.axelix' version 'AXELIX_VERSION_PLACEHOLDER'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>AXELIX_VERSION_PLACEHOLDER</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+El objetivo `axelix-generate-project-info` se vincula a la fase `prepare-package` por defecto, por lo que se ejecuta automáticamente durante
+una compilación normal con `package`/`install`, sin configuración adicional de fases.
+
+  </Tab>
+</Tabs>
+
+Ninguno de los plugins ofrece opciones de configuración. El plugin de Gradle solo necesita que esté establecida la propiedad estándar `version`
+del proyecto (antes de Axelix `1.2.0` también provocaba un fallo de compilación si `group` estaba vacío; véase la siguiente sección); Maven siempre dispone de sus
+coordenadas GAV, por lo que no se necesita nada más.
+
+## Coordenada `group` opcional [#optional-group-coordinate]
+
+<ReleasedInNotice version="1.2.0" />
+
+En sus primeras versiones, Axelix exigía que todas las aplicaciones Java que gestionaba tuvieran `groupId` (la G de GAV). Sin embargo,
+desde la versión `1.2.0` esto ya no es necesario.
+
+Técnicamente, toda aplicación Java que se empaqueta y despliega debería ser un artefacto Maven. No obstante, hay
+casos en los que la aplicación no está destinada a publicarse en un repositorio binario compatible con Maven. Por ejemplo,
+puede ensamblarse directamente como imagen Docker y desplegarse en un clúster K8S.
+
+En ese caso, la aplicación Java no necesita ser un artefacto Maven completo (ya que técnicamente no se publica
+en Nexus/Artifactory) y, en particular, no necesita tener `groupId`. Precisamente por ello,
+Gradle permite omitir `groupId` en las aplicaciones Java que no se publicarán como artefactos Maven.
+
+Por tanto, Axelix ahora puede gestionar proyectos sin groupId. En ese caso, Axelix considera simplemente que
+esas aplicaciones tienen un `groupId` vacío (es decir, `""`). Por ello, si su organización omite `groupId` en sus
+microservicios Java, debe asegurarse de que los nombres de los microservicios (es decir, el atributo `name` de sus archivos `build.gradle.kts`,
+que se resuelve como `artifactId`) sean únicos. Si los nombres no son únicos, el comportamiento de Axelix Master con sus aplicaciones
+Spring Boot queda indefinido.
+
+## Información relacionada [#related]
+
+- [¿Qué es el plugin de compilación de Axelix?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx): qué genera el plugin y por qué el registro
+  depende de él.
+- [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx): el componente de ejecución que lee las
+  coordenadas generadas y las comunica a Master.

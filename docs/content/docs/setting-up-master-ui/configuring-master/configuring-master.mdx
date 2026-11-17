@@ -886,6 +886,8 @@ docker.io/axelixlabs/axelix@sha256:<digest>
 
 A minimal run, suitable for a first look:
 
+Host-loopback publication is for local trials. Containers on the same Docker network should reach Master by its container/service name and port `2935`. A container using a host-gateway address needs a host interface reachable from that container; a loopback-only publication is not reachable through that address.
+
 <Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
   <Tab value="Docker GHCR">
 
@@ -893,7 +895,7 @@ A minimal run, suitable for a first look:
   <Tab value="Built-in key (local trial)">
 
 ```bash
-docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+docker run --rm -p 127.0.0.1:2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
 With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
@@ -919,7 +921,7 @@ docker run --rm -p 2935:2935 \
   <Tab value="Built-in key (local trial)">
 
 ```bash
-docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+docker run --rm -p 127.0.0.1:2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
 ```
 
 With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
@@ -1259,7 +1261,7 @@ helm install axelix axelix/axelix \
   --values values.yaml
 ```
 
-Put your overrides — at minimum `axelix.master.auth.jwt.signing-key`, the super-admin password, and the database
+Put your overrides — at minimum `axelix.master.auth.jwt.signingKey`, the super-admin password, and the database
 connection — into `values.yaml`. The chart wires the ServiceAccount + RBAC required for in-cluster autodiscovery for
 you.
 

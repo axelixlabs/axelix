@@ -1,0 +1,61 @@
+---
+title: Licencias
+description: "Qué licencia corresponde a cada componente de Axelix y qué implican estas licencias al utilizar Axelix en sus proyectos."
+---
+
+Axelix es de código abierto, pero no todas sus partes se distribuyen con la misma licencia. Esta página enumera la licencia de cada
+componente y explica qué implica para las aplicaciones con las que utiliza Axelix.
+
+## Licencias por componente [#licenses-by-component]
+
+Casi todo Axelix se distribuye bajo la **GNU Lesser General Public License, versión 3** (LGPLv3). La única
+excepción es el chart de Helm oficial, que utiliza la **licencia MIT**.
+
+| Componente | Licencia |
+|---|---|
+| Axelix Master, incluidas su interfaz web y su servidor MCP | LGPLv3 |
+| Starters de Spring Boot de Axelix (Spring Boot 2, 3 y 4) | LGPLv3 |
+| Plugins de compilación de Axelix para Gradle y Maven | LGPLv3 |
+| Chart de Helm oficial de Axelix | MIT |
+
+La licencia se aplica a todos los formatos de distribución del componente. Por ejemplo, el JAR de Master y su imagen Docker
+incluyen LGPLv3, y los artefactos de los starters y plugins en Maven Central declaran LGPLv3 en los metadatos POM. El texto completo
+de LGPLv3 está en el archivo [`LICENSE`](https://github.com/axelixlabs/axelix/blob/master/LICENSE) del
+[repositorio de Axelix](https://github.com/axelixlabs/axelix), y el chart de Helm incluye su propio texto de licencia MIT.
+El titular de los derechos de autor de todos los componentes es Axelix Labs.
+
+## Qué implica LGPLv3 para su aplicación [#what-lgplv3-means-for-your-application]
+
+**Sí, puede utilizar los starters y plugins de compilación de Axelix en una aplicación propietaria de código cerrado, sin coste.**
+No se pagan cuotas ni se firma ningún acuerdo con Axelix Labs.
+
+LGPLv3 es una licencia de copyleft débil. Añadir un starter a su servicio Spring Boot o un plugin de compilación a su proceso de compilación no exige por sí solo publicar el código fuente de su aplicación ni cambiar su licencia. La distribución está sujeta a las condiciones de la licencia descritas a continuación.
+
+El uso interno es distinto de la distribución. LGPLv3 no tiene cláusula de red, por lo que modificar Master y ejecutarlo únicamente en servidores propios no constituye por sí solo distribución.
+
+**Distribuir un componente de Axelix puede generar obligaciones aunque no se haya modificado.** Por ejemplo, la sección 4 del archivo `LICENSE` del repositorio establece condiciones para distribuir una obra combinada (Combined Work), incluidos avisos y copias de GNU GPL y LGPL, además de las demás condiciones de esa sección. Si modifica el starter y distribuye el JAR modificado a clientes, también debe poner a su disposición el código fuente de sus cambios bajo LGPLv3.
+
+:::note[No es asesoramiento jurídico]
+Esta sección es un breve resumen orientativo. El texto de la licencia es la única fuente vinculante. Si su caso depende de los
+detalles, por ejemplo al integrar Axelix en un producto comercial, consúltelo con su equipo jurídico.
+:::
+
+## El chart de Helm bajo MIT [#the-helm-chart-under-mit]
+
+El chart de Helm solo describe cómo desplegar Master en Kubernetes, por lo que utiliza la licencia MIT, más
+permisiva. Puede copiarlo a su repositorio interno de charts, modificarlo o integrarlo en su propio
+chart agrupador sin compartir los cambios. La única condición es conservar el aviso de derechos de autor y de licencia en las
+copias. Master, que se despliega mediante el chart, sigue bajo LGPLv3.
+
+## Axelix Enterprise [#axelix-enterprise]
+
+La próxima edición de pago **Axelix Enterprise** no es de código abierto. Se distribuye bajo un acuerdo de licencia comercial
+independiente con Axelix Labs y sus funciones adicionales no están cubiertas por LGPLv3. Axelix OSS, descrita en
+la tabla anterior, sigue bajo LGPLv3. Consulte [Axelix OSS y Enterprise](../product/introduction.mdx#axelix-oss-and-enterprise)
+para obtener más información sobre ambas ediciones.
+
+## Véase también [#see-also]
+
+- [Introducción](../product/introduction.mdx)
+- [Política de soporte](./support-policy.mdx)
+- [Compatibilidad y versiones](./compatibility-and-versioning.mdx)

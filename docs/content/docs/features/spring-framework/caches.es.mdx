@@ -1,0 +1,107 @@
+---
+title: Cachés
+description: "La página Caches enumera todas las cachés de Spring de la aplicación y muestra cómo funciona cada una. También permite vaciar o desactivar una caché en tiempo de ejecución, en una instancia o en varias a la vez."
+---
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal de cachés](/img/feature/caches/caches-main-page.png)
+
+</ScreenshotsNotice>
+
+***Página Caches tal como aparece en la interfaz de Axelix***
+
+Es difícil detectar desde fuera una caché que devuelve datos obsoletos o que rara vez obtiene aciertos: la aplicación sigue funcionando, pero de forma incorrecta o lenta. La página Caches muestra el rendimiento de cada caché y permite vaciarla o desactivarla sin reiniciar.
+
+La página está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla y consultar las estadísticas de las cachés. Vaciar una caché requiere el permiso `caches:clear`; activarla o desactivarla requiere `caches:toggle`. Ambos se conceden a los roles integrados **EDITOR**, **ADMIN** y **SUPER_ADMIN**. Los usuarios que no los tienen ven los mismos controles, pero Axelix los mantiene deshabilitados y explica el motivo al pasar el cursor. Consulte [Roles y permisos](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+La página enumera las cachés agrupadas por gestor de cachés. Para cada una se muestra su nombre y la clase de la caché nativa subyacente, por ejemplo `java.util.concurrent.ConcurrentHashMap` para una `ConcurrentMapCache`. Se puede buscar por nombre de caché o de gestor de cachés.
+
+## Detalles de la caché [#cache-details]
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Detalles de una caché](/img/feature/caches/caches-details-page.png)
+
+</ScreenshotsNotice>
+
+***Detalles de la caché tal como aparecen en la interfaz de Axelix***
+
+Cuando la aplicación ha consultado una caché al menos una vez, se puede desplegar para ver cómo funciona. Las cachés sin consultas registradas permanecen en la lista, pero no se pueden desplegar.
+
+El gráfico **Hits/Total Ratio** muestra la proporción de aciertos a lo largo del tiempo, de 0 a 1. Una proporción que permanece baja indica que la mayoría de las consultas no encuentran un valor en la caché, por lo que esta consume memoria sin ahorrar mucho trabajo. Al pasar el cursor por el gráfico se muestra la proporción exacta en un momento dado.
+
+Debajo del gráfico, **Statistics** resume las consultas registradas:
+
+- **Hits** y **Misses**: cuántas consultas encontraron un valor y cuántas no, con su proporción respecto al total.
+- **Entries count**: el número estimado de entradas de la caché. Solo aparece cuando la caché puede informar de su tamaño; actualmente, las cachés Caffeine `Cache` y las basadas en `ConcurrentHashMap`, como `ConcurrentMapCache`.
+
+## Gestión de cachés [#managing-caches]
+
+Cada una de las siguientes acciones pide confirmación antes de modificar la aplicación en ejecución.
+
+### Vaciar una caché [#clear-a-cache]
+
+Vacíe una caché cuando contenga datos obsoletos, por ejemplo después de cambiar un registro directamente en la base de datos. Pulse **Clear** junto a una caché para eliminar todas sus entradas, o **Clear All Caches** para vaciar todas las cachés de la aplicación. La aplicación vuelve a llenarlas en las siguientes consultas.
+
+### Activar o desactivar una caché [#enable-or-disable-a-cache]
+
+Utilice el interruptor **Status** para desactivar una caché en tiempo de ejecución. Mientras está desactivada, ninguna consulta obtiene un acierto y no se almacenan nuevos valores, por lo que la aplicación obtiene los datos del origen en cada llamada. Esto permite comprobar si un error procede de datos almacenados en caché. Vuelva a activarla para reanudar el almacenamiento en caché.
+
+## Gestionar cachés en varias instancias [#manage-caches-on-several-instances]
+
+<ReleasedInNotice version="1.3.0" />
+
+Cada réplica de una aplicación mantiene su propia copia de una caché, por lo que vaciarla en una réplica deja entradas obsoletas en las demás. Abra **Instances**, junto al campo de búsqueda, para elegir a qué instancias de la aplicación se aplica una acción. La lista muestra cada instancia con su commit y estado.
+
+La instancia abierta siempre está incluida y no se puede desmarcar. Marque otras instancias una a una o utilice **Select all other instances**. El botón muestra cuántas instancias están seleccionadas, o **All** cuando lo están todas.
+
+La selección se aplica a todas las acciones de la página: **Clear All Caches**, vaciar una sola caché y el interruptor **Status**. Si no se puede acceder a algunas instancias seleccionadas, la acción se sigue aplicando a las demás. Las estadísticas de la página siempre corresponden a la instancia abierta.
+
+El selector solo aparece cuando la aplicación tiene más de una instancia. La selección vuelve a la instancia actual al cambiar a otra instancia.
+
+## Herramientas MCP [#mcp-tools]
+
+Un agente de IA también puede consultar y vaciar las cachés mediante MCP. Consulte el [catálogo de herramientas MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#caches).
+
+## Propiedades [#properties]
+
+La gestión de cachés está activada de forma predeterminada. Para desactivarla por completo, establezca `axelix.sbs.cache.management.enabled=false`. Consulte [Gestión de cachés](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#cache-management) para más información.
+
+## Habilitar el endpoint dedicado de Actuator [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>En Axelix 1.2.0 o posterior, nada de esto es necesario: el starter registra por sí mismo sus endpoints personalizados de Actuator y Axelix ya no requiere habilitar los endpoints <code>health</code>/<code>info</code>. Funciona correctamente sin ellos. No se necesita ninguna configuración aquí.</>}
+/>
+
+La página utiliza el endpoint de Actuator `axelix-caches`, aportado por Axelix Spring Boot Starter. Expóngalo mediante las propiedades estándar de Spring Boot Actuator. Consulte [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) para ver la lista completa de endpoints de Axelix y el resto de la configuración:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-caches
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-caches
+```
+
+  </Tab>
+</Tabs>
+
+## Véase también [#see-also]
+
+- [Configuración de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

@@ -1,0 +1,42 @@
+---
+title: Persistencia
+description: "El panel Persistence muestra qué servicios del conjunto gestionado presentan más consultas N+1 y paginación en memoria."
+---
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Panel de persistencia](/img/feature/dashboard/dashboard-persistance.png)
+
+</ScreenshotsNotice>
+
+***Panel Persistence tal como aparece en la interfaz de Axelix***
+
+Las consultas N+1 y la paginación en memoria no impiden que la aplicación funcione, pero consumen consultas y memoria adicionales. [Transaction Control](../../../features/spring-framework/transaction-control.mdx) las muestra para un servicio. El panel Persistence muestra dónde se concentran en el conjunto, para identificar qué servicios conviene examinar primero.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+La página muestra dos problemas uno junto al otro:
+
+- **N+1**: una asociación de carga diferida se carga mediante una consulta independiente por cada registro.
+- **In-Memory Pagination**: Hibernate carga todo el conjunto de resultados y selecciona la página en memoria.
+
+Para cada problema se puede ver:
+
+- Cuántos casos hay en todo el conjunto.
+- Qué servicio tiene más casos.
+- Cómo se distribuyen los casos entre los servicios.
+
+Los servicios sin casos no se muestran. Para más detalles de cada problema, consulte [Problemas detectados](../../../features/spring-framework/transaction-control.mdx#detected-problems) en Transaction Control.
+
+## Cómo funciona [#how-it-works]
+
+El panel contabiliza lo que Transaction Control ha encontrado en cada servicio. Master lo registra una vez al día y utiliza el último registro. Cada servicio cuenta una vez, independientemente del número de instancias que ejecute.
+
+Los datos solo aparecen para servicios con Hibernate y la monitorización de transacciones activada. Consulte [Propiedades](../../../features/spring-framework/transaction-control.mdx#properties) en Transaction Control.
+
+## Véase también [#see-also]
+
+- [Transaction Control](../../../features/spring-framework/transaction-control.mdx)
+- [Entities Map](../../../features/spring-framework/entities-map.mdx)

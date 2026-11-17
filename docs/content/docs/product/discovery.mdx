@@ -37,6 +37,10 @@ starter.
 | Where it works      | Kubernetes only                                  | Anywhere the service can reach Master                   |
 | How to turn it on   | `axelix.master.discovery.auto.enabled` on Master | `axelix.sbs.discovery.self-registration` on the service |
 
+Self-registration must also be enabled on Master. Its application property `axelix.master.discovery.self-registration.enabled`
+defaults to `true`, but the official Helm chart disables it by default. For Helm deployments, set
+`axelix.master.discovery.selfRegistration.enabled=true` in the chart values, including when combining both discovery modes.
+
 When Master runs in the same Kubernetes cluster as your services, auto-discovery needs no setup on the service side.
 Self-registration covers everything else, such as plain VMs, Docker Compose, or a network that Master cannot scan.
 

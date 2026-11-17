@@ -1,0 +1,74 @@
+---
+title: Usuarios
+description: "La pantalla Users muestra quién puede iniciar sesión en Axelix Master y qué roles tiene cada cuenta. Cuando está habilitada la autenticación local, también permite crear, editar y eliminar cuentas. Se accede desde el enlace Users de la barra de navegación superior."
+---
+
+## Quién puede abrir esta página [#who-can-open-this-page]
+
+El enlace **Users** solo aparece para cuentas con el permiso `users:read`. De forma predeterminada, solo lo incluye el rol integrado `SUPER_ADMIN`: `ADMIN`, `EDITOR` y `VIEWER` no pueden ver el enlace ni cargar la página. Consulte [Roles y permisos](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la tabla completa de concesiones.
+
+El botón **Create User** y los controles de edición y eliminación de la pantalla de perfil requieren además el permiso `users:manage`, también reservado para `SUPER_ADMIN`.
+
+## La lista de usuarios [#the-users-list]
+
+La sección superior ofrece tres formas de filtrar la tabla:
+
+- **Search** filtra por nombre de usuario o correo electrónico. El contador a la derecha del campo muestra `<matches> / <total>`, para comparar los usuarios visibles con la lista completa.
+- **Roles**: desplegable de selección múltiple. Al elegir uno o más roles, solo se mantienen los usuarios que tienen al menos uno de ellos.
+- **Origin**: desplegable de selección múltiple con dos valores, `LOCAL` y `OIDC`. Las cuentas creadas en Master aparecen como `LOCAL`. Las cuentas que inician sesión mediante OIDC aparecen como `OIDC` tras su primer inicio de sesión correcto en el navegador, por lo que el filtro solo devuelve usuarios OIDC que han iniciado sesión al menos una vez.
+
+Debajo de los filtros, la tabla enumera todos los usuarios visibles con estas columnas:
+
+- **Username**: el nombre utilizado en la pantalla de inicio de sesión.
+- **Email**: el correo asociado a la cuenta. Puede estar vacío.
+- **Last login**: fecha y hora del último inicio de sesión correcto, con el formato `DD.MM.YYYY HH:mm`. Las cuentas que nunca han iniciado sesión muestran **Not logged in**.
+- **Origin**: `LOCAL` para cuentas creadas en Master; `OIDC` para cuentas materializadas por el flujo de inicio de sesión OIDC.
+- **Roles**: etiquetas de colores para cada rol concedido al usuario (`ADMIN`, `EDITOR`, `VIEWER`).
+
+Pulse una fila para abrir el [perfil del usuario](#user-profile) de esa cuenta.
+
+## Crear un usuario [#creating-a-user]
+
+El botón **Create User** solo se muestra cuando está habilitada la autenticación local en Master (`axelix.master.auth.options.local.enabled=true`). Está oculto en despliegues que usan únicamente OIDC, porque las cuentas nuevas proceden del proveedor de identidad y no de la interfaz de Axelix.
+
+Al pulsarlo se abre un cuadro de diálogo con los siguientes campos:
+
+- **Username**: nombre de inicio de sesión. Debe ser único.
+- **Email**: opcional. Si se deja vacío, la cuenta se guarda sin correo.
+- **Password**: contraseña inicial. El usuario puede cambiarla después desde su perfil.
+- **Roles**: seleccione uno o más roles: `ADMIN`, `EDITOR` y `VIEWER`. Puede cambiar la selección después desde el perfil.
+
+Si la creación finaliza correctamente, se cierra el cuadro de diálogo, aparece la notificación **User created successfully** y se actualiza la lista.
+
+## Perfil de usuario [#user-profile]
+
+Al seleccionar una fila de la lista se abre el perfil de esa cuenta, con sus datos y roles.
+
+Para una cuenta local, elija **Edit user** para abrir el cuadro de edición. Puede cambiar el nombre, los apellidos, el nombre de usuario, el correo electrónico y la contraseña. **Confirm** guarda todos los campos juntos; **Cancel** descarta los cambios.
+
+- **Username**: nombre de inicio de sesión. Editarlo cambia cómo inicia sesión el usuario.
+- **Email**: correo electrónico. Guardar un valor vacío elimina el correo de la cuenta.
+- **Password**: introduzca y confirme una contraseña nueva para sustituir la actual. Déjela en blanco para conservar la contraseña actual. La contraseña actual no puede mostrarse porque Master nunca la guarda en texto claro.
+
+Para actualizar los roles asignados, elija **Change roles** en la sección **Roles**. Seleccione uno o más de `ADMIN`, `EDITOR` y `VIEWER` y elija **Confirm**. Los permisos efectivos del usuario son la unión de los permisos concedidos por esos roles.
+
+Debajo de la tarjeta hay dos botones de acción:
+
+- **Delete user**: abre un cuadro de confirmación (**Are you sure you want to delete this user?**). Confirmar elimina la cuenta inmediatamente; la página vuelve a la lista y aparece la notificación **User deleted successfully**. No se puede deshacer.
+- **Access Log**: actualmente deshabilitado. El control está reservado para una funcionalidad futura de Axelix Enterprise. Tanto Access Log como el propio Axelix Enterprise siguen en desarrollo, por lo que hoy no se puede pulsar el botón.
+
+:::warning
+La acción **Delete user** es irreversible. La cuenta se elimina de la base de datos; no hay eliminación lógica ni restauración.
+:::
+
+## Sesiones OIDC [#oidc-sessions]
+
+Cuando OIDC está habilitado, un inicio de sesión correcto en el navegador crea o actualiza una fila de usuario `OIDC` en la base de datos de Master. Master actualiza **Last login**, guarda el correo del contenido OIDC `userinfo` cuando está presente y muestra la cuenta en la tabla con origen `OIDC`.
+
+En cada inicio de sesión OIDC, Master vuelve a evaluar `axelix.master.auth.options.oauth2.role-attribute-path` y actualiza la asignación de roles almacenada con ese resultado. Por tanto, las cuentas OIDC aparecen en esta pantalla, pero su rol efectivo sigue procediendo del mapeo del proveedor de identidad.
+
+:::warning
+Si un nombre de usuario OIDC coincide con una cuenta existente que no es OIDC, Master rechaza el inicio de sesión en lugar de fusionar las identidades. Resuelva primero la coincidencia en el proveedor de identidad o cambie el nombre de la cuenta local.
+:::
+
+Para conocer toda la configuración de autenticación, consulte [Autenticación](../setting-up-master-ui/authentication/authentication.mdx).

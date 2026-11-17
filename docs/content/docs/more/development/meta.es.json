@@ -1,0 +1,8 @@
+{
+    "title": "Desarrollo",
+    "defaultOpen": false,
+    "pages": [
+        "branching-model",
+        "releases"
+    ]
+}

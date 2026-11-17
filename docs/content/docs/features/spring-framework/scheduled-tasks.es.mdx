@@ -1,0 +1,141 @@
+---
+title: Tareas programadas
+description: "La página Scheduled Tasks enumera todas las tareas @Scheduled de una aplicación Spring Boot y muestra el resultado de sus ejecuciones recientes. También permite activar o desactivar una tarea, cambiar su programación y ejecutarla bajo demanda."
+---
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal de tareas programadas](/img/feature/scheduled-tasks/scheduled-tasks-main-page.png)
+
+</ScreenshotsNotice>
+
+***Scheduled Tasks tal como aparece en la interfaz de Axelix***
+
+Una tarea `@Scheduled` se ejecuta en segundo plano, de modo que nadie advierte que empieza a fallar o a ralentizarse hasta que dejan de aparecer sus efectos. Esta página muestra todas las tareas programadas de la aplicación, cómo han ido sus ejecuciones recientes y permite cambiar su programación sin volver a desplegar la aplicación.
+
+Activar o desactivar una tarea, editar su disparador y ejecutarla bajo demanda requiere el permiso `scheduled-tasks:write`, concedido a los roles integrados **EDITOR**, **ADMIN** y **SUPER_ADMIN**. Los usuarios que no tienen este permiso ven los mismos controles, pero Axelix los mantiene deshabilitados y explica el motivo al pasar el cursor.
+
+## Qué muestra la página [#what-the-page-shows]
+
+La página enumera las tareas agrupadas por tipo de disparador:
+
+- Las tareas **Cron** se ejecutan en los momentos descritos por una expresión cron, por ejemplo `0 0/15 9-17 * * MON-FRI`.
+- Las tareas **Fixed delay** esperan el intervalo indicado después de que termine cada ejecución, por lo que las ejecuciones nunca se solapan.
+- Las tareas **Fixed rate** comienzan cada cierto intervalo, contado desde el inicio de la ejecución anterior.
+
+Se puede buscar por nombre de clase o método. Junto a cada tarea se muestra su porcentaje de éxito entre las ejecuciones almacenadas, para identificar las que fallan sin abrirlas. Un porcentaje del 90% o más se considera saludable. Las tareas desactivadas muestran **OFF** en lugar de un porcentaje.
+
+Al seleccionar una tarea, la página muestra el nombre completo de su clase y su programación en lenguaje natural, como "Every 3 seconds". Para una tarea cron, la expresión también aparece junto a la descripción.
+
+## Historial de ejecuciones [#execution-history]
+
+<ReleasedInNotice version="1.3.0" />
+
+Se registra cada ejecución de una tarea, tanto si la inició la programación como si se pulsó **Run now**. Master recopila las ejecuciones de todas las instancias de la aplicación, de modo que el historial de una tarea se comparte entre instancias. El resumen abarca todas las ejecuciones almacenadas:
+
+- **Last run**: cuánto tiempo ha pasado desde que comenzó la última ejecución.
+- **Success**: la proporción de ejecuciones que terminaron sin una excepción.
+- **Failed**: el número de ejecuciones que lanzaron una excepción.
+- **Avg** y **p95**: la duración media y la duración dentro de la cual termina el 95% de las ejecuciones. Un p95 muy superior a la media indica que algunas ejecuciones se atascan de vez en cuando.
+
+El gráfico **Duration** muestra las últimas 30 ejecuciones, de la más antigua a la más reciente, con las fallidas marcadas. La altura de las barras no es lineal, por lo que las ejecuciones cortas siguen siendo visibles junto a una excepcionalmente lenta. Pase el cursor por una barra para ver cuándo comenzó la ejecución, cuánto duró y el tipo de error si falló.
+
+Cuando una tarea ha fallado, **Failures by error type** agrupa los fallos por clase de excepción, empezando por la más frecuente. Cada grupo muestra el último mensaje de error y cuándo se produjo. Esto permite ver de un vistazo si una causa se repite o si los fallos no están relacionados.
+
+La tabla **Executions** enumera las mismas últimas 30 ejecuciones con la hora de inicio, la instancia que ejecutó la tarea, la duración y el resultado. Cambie a **Failed** para ver solo las ejecuciones fallidas.
+
+El historial no se actualiza automáticamente mientras la página está abierta. Para ver nuevas ejecuciones, vuelva a seleccionar la tarea. Hasta que Master recibe la primera ejecución de una tarea, la página muestra **No execution data for this task** en lugar del historial.
+
+### Conservación del historial de ejecuciones [#execution-history-retention]
+
+Master guarda el historial en su base de datos y elimina las ejecuciones antiguas según una programación. Estas propiedades de Master controlan cuánto historial conserva (consulte también [Configuración de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx#scheduled-tasks-history)):
+
+| Propiedad | Valor predeterminado | Descripción |
+| --- | --- | --- |
+| `axelix.master.scheduled-tasks.history.retention` | `30d` | Cuánto tiempo conserva Master una ejecución. Las ejecuciones más antiguas se eliminan en la siguiente limpieza. |
+| `axelix.master.scheduled-tasks.history.max-executions-per-task` | `50` | Cuántas de las ejecuciones más recientes conserva Master para cada tarea. |
+| `axelix.master.scheduled-tasks.history.cleanup.schedule` | `0 */10 * * * *` | Expresión cron de la tarea de limpieza. De forma predeterminada, se ejecuta cada 10 minutos. |
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.master.scheduled-tasks.history.retention=7d
+axelix.master.scheduled-tasks.history.max-executions-per-task=100
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  master:
+    scheduled-tasks:
+      history:
+        retention: 7d
+        max-executions-per-task: 100
+```
+
+  </Tab>
+</Tabs>
+
+## Gestión de tareas [#managing-tasks]
+
+Estas acciones se aplican a la instancia abierta. Las demás instancias de la misma aplicación mantienen su estado y programación actuales.
+
+### Activar o desactivar una tarea [#enable-or-disable-a-task]
+
+Utilice el interruptor **ON** / **OFF** para impedir que una tarea se ejecute según su programación, por ejemplo mientras un sistema del que depende está en mantenimiento. Axelix pide confirmación primero. Si desactiva una tarea durante una ejecución, esa ejecución termina y, después, la tarea ignora su programación. Vuelva a ponerla en **ON** para reanudar la programación.
+
+### Editar el disparador [#edit-the-trigger]
+
+Pulse **Edit trigger** para cambiar cuándo se ejecuta la tarea. La nueva programación tiene efecto inmediatamente, sin reiniciar la aplicación.
+
+- Para una tarea cron, introduzca una nueva expresión con seis campos: segundo, minuto, hora, día, mes y día de la semana. Axelix comprueba la expresión mientras se escribe. La vista previa muestra cuándo se ejecutará la tarea (**Runs:**) o por qué la expresión es incorrecta (**Invalid:**).
+- Para una tarea **Fixed delay** o **Fixed rate**, introduzca el nuevo intervalo como un número entero de milisegundos mayor que 0.
+
+**Apply trigger** permanece deshabilitado hasta que el valor sea válido y distinto del actual.
+
+### Ejecutar una tarea ahora [#run-a-task-now]
+
+Pulse **Run now** y confirme para ejecutar la tarea una vez, de inmediato. Esto no cambia su programación, por lo que permite reintentar una tarea fallida o comprobar una corrección sin esperar a la siguiente ejecución programada.
+
+## Herramientas MCP [#mcp-tools]
+
+Un agente de IA también puede consultar las tareas programadas mediante MCP. Consulte el [catálogo de herramientas MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
+
+## Habilitar el endpoint dedicado de Actuator [#enable-dedicated-actuator-endpoint]
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>En Axelix 1.2.0 o posterior, nada de esto es necesario: el starter registra por sí mismo sus endpoints personalizados de Actuator y Axelix ya no requiere habilitar los endpoints <code>health</code>/<code>info</code>. Funciona correctamente sin ellos. No se necesita ninguna configuración aquí.</>}
+/>
+
+La página utiliza el endpoint de Actuator `axelix-scheduled-tasks`, aportado por Axelix Spring Boot Starter. Expóngalo mediante las propiedades estándar de Spring Boot Actuator. Consulte [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) para ver la lista completa de endpoints de Axelix y el resto de la configuración:
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-scheduled-tasks
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-scheduled-tasks
+```
+
+  </Tab>
+</Tabs>
+
+## Véase también [#see-also]
+
+- [Configuración de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuración de Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

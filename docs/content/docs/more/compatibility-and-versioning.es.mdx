@@ -1,0 +1,195 @@
+---
+title: Compatibilidad y versiones
+description: "Esta página explica cómo se versiona Axelix y cómo mantiene la compatibilidad con las partes principales: la versión de Java que ejecutan los servicios, la versión principal de Spring Boot con la que se compilan y los propios componentes de Axelix entre sí."
+---
+
+## Una versión para cada componente [#one-version-for-every-component]
+
+Axelix se publica como una distribución única y coordinada. Todos los componentes comparten **exactamente la misma versión**.
+
+Cuando se publica una nueva distribución de Axelix (por ejemplo, **Axelix OSS 3.1.2**), todos los componentes publicados llevan
+esa misma versión `3.1.2`:
+
+- Los **starters de Spring Boot** (publicados como artefactos Maven).
+- Los **plugins** (también publicados como artefactos Maven).
+- El JAR independiente de **Axelix Master**.
+- La imagen Docker de **Axelix Master**.
+- El chart de Helm de **Axelix Master**.
+
+No hay versiones independientes por componente. Si conoce la versión de un artefacto de Axelix, conoce la de todos los demás
+en esa publicación.
+
+Esto también se aplica a las **versiones de parche**: un parche vuelve a publicar todos los componentes bajo `X.Y.Z`, desde la rama
+de parches de la línea de versiones menores. Consulte [modelo de ramas](./development/branching-model.mdx) y [publicación de versiones](./development/releases.mdx)
+para conocer el procedimiento.
+
+### Nombres de los artefactos [#artifact-names]
+
+Cada versión se etiqueta como `v<version>` en el repositorio, por ejemplo `v1.3.0`. Master se distribuye como JAR, imagen Docker
+y chart de Helm; los tres se llaman `axelix` seguido de la versión publicada. Por tanto, al conocer la versión también conoce
+el nombre de cada archivo y etiqueta. Para Axelix `1.3.0`, los artefactos son:
+
+| Artefacto | Nombre | Dónde obtenerlo |
+|---|---|---|
+| JAR de Master | `axelix-1.3.0.jar` | **Assets** de la [versión `v1.3.0`](https://github.com/axelixlabs/axelix/releases/tag/v1.3.0) |
+| Imagen Docker de Master | `axelix:1.3.0` | `ghcr.io/axelixlabs/axelix` y `docker.io/axelixlabs/axelix` |
+| Chart de Helm de Master | Chart `axelix`, versión `1.3.0`, empaquetado como `axelix-1.3.0.tgz` | Repositorio Helm de Axelix; consulte [ejecución en Kubernetes](../setting-up-master-ui/configuring-master/configuring-master.mdx#run-on-kubernetes). El archivo y su archivo de procedencia `axelix-1.3.0.tgz.prov` también están en **Assets** de la versión. |
+| Starters de Spring Boot | `com.axelixlabs:axelix-spring-boot-4-starter:1.3.0`, y lo mismo para `2` y `3` | Maven Central |
+| Plugin de Maven | `com.axelixlabs:axelix-maven-plugin:1.3.0` | Maven Central |
+| Plugin de Gradle | Identificador `com.axelixlabs.axelix`, versión `1.3.0` | Maven Central |
+
+## Qué significa el número de versión [#what-the-version-number-means]
+
+Una versión de Axelix tiene tres partes, `MAJOR.MINOR.PATCH`, por ejemplo `1.4.2`. Se parece al
+[versionado semántico](https://semver.org/), pero Axelix no lo sigue estrictamente. En semver, solo una versión principal
+puede introducir incompatibilidades, mientras que una versión menor solo añade funciones. Axelix sigue en cambio el
+[enfoque de versionado de Spring Boot](https://github.com/spring-projects/spring-boot/wiki/Team-Practices#versioning),
+en el que una versión menor también puede contener cambios incompatibles. La política de
+[versiones con soporte](https://github.com/spring-projects/spring-boot/wiki/Supported-Versions) de Spring Boot lo indica directamente:
+«Las versiones menores y principales pueden contener cambios de API incompatibles con versiones anteriores».
+
+### Por qué no seguimos estrictamente el versionado semántico [#why-not-strict-semantic-versioning]
+
+La razón es el tamaño de la API pública. Axelix, como Spring Boot, es un proyecto grande. Sus starters se ejecutan dentro de la
+aplicación, Master tiene muchas propiedades de configuración y los componentes se comunican mediante sus propios protocolos.
+Con una superficie tan grande, casi cualquier cambio afecta a algo de lo que un usuario podría depender. Con semver estricto,
+casi todas las publicaciones tendrían que ser principales y el número principal dejaría de aportar información útil.
+
+El equipo de Spring Boot describe exactamente este problema en sus
+[prácticas de equipo](https://github.com/spring-projects/spring-boot/wiki/Team-Practices#versioning): «No es realmente
+posible que Spring Boot utilice versionado semántico, porque todas las publicaciones tendrían que ser principales».
+
+### El índice de esfuerzo [#the-pain-index]
+
+En lugar de prometer «ningún cambio incompatible», Axelix utiliza el número de versión como un **índice de esfuerzo**.
+La parte de la versión que cambia indica cuánto trabajo puede requerir la actualización. Es la misma idea que Spring Boot
+[describe](https://github.com/spring-projects/spring-boot/wiki/Team-Practices#versioning) para sus versiones: «intentamos
+utilizar el número de versión como indicador del esfuerzo que supondrá una actualización».
+
+| Actualización | Ejemplo | Qué esperar |
+|---|---|---|
+| Parche | `1.4.2` → `1.4.3` | Sustitución directa. Incluye correcciones de errores y seguridad o mejoras de rendimiento, sin necesidad de cambiar nada. |
+| Menor | `1.4.x` → `1.5.0` | Nuevas funciones y, posiblemente, algunos cambios incompatibles. En la mayoría de los casos no hay que cambiar nada. Cuando es necesario, el ajuste es pequeño. |
+| Principal | `1.x.x` → `2.0.0` | Muchas funciones nuevas y, casi con certeza, cambios incompatibles que afectan a la configuración. Reserve tiempo para la migración: cada versión principal dispone de una guía específica. |
+
+Las partes de Axelix que pueden cambiar en una versión menor y las que se mantienen hasta la siguiente principal se detallan en
+[compatibilidad entre componentes](#compatibility-between-components) y
+[garantías de compatibilidad con versiones anteriores](#backward-compatibility-guarantees-between-releases). Para el procedimiento de
+actualización, consulte [actualización de Axelix](./upgrading.mdx).
+
+## Un starter específico por versión principal de Spring Boot [#a-dedicated-starter-per-spring-boot-major-version]
+
+Axelix incluye un **starter específico para cada versión principal de Spring Boot**. Hay un artefacto independiente para
+cada versión principal admitida:
+
+- `axelix-spring-boot-2-starter`: para servicios con Spring Boot **2.x**.
+- `axelix-spring-boot-3-starter`: para servicios con Spring Boot **3.x**.
+- `axelix-spring-boot-4-starter`: para servicios con Spring Boot **4.x**.
+
+Actualmente, Axelix admite las **versiones principales 2 a 4** de Spring Boot. Elija el starter que corresponda a la
+versión principal de Spring Boot de su servicio.
+
+Los **plugins** son diferentes: están diseñados para una compatibilidad amplia, por lo que no hay que elegir un artefacto
+específico por versión:
+
+- El **plugin de Gradle** se prueba con las versiones principales **5 a 9** de Gradle.
+- El **plugin de Maven** es compatible con **Maven 3**, utilizado actualmente por prácticamente todos los proyectos Maven.
+
+:::info[La versión mínima de Spring Boot 2 es 2.7.x]
+`axelix-spring-boot-2-starter` admite Spring Boot 2 a partir de **2.7**, no toda la línea 2.x. Si el servicio utiliza
+una versión anterior de Spring Boot 2.x (algunos servicios siguen en **2.5.15**), debe actualizar al menos a
+**Spring Boot 2.7** antes de añadir Axelix.
+:::
+
+## Compatibilidad con versiones de Java [#java-version-compatibility]
+
+**Axelix Master** es una aplicación Spring Boot escrita en **Java 25**. Esto solo resulta relevante si
+quiere ejecutar Axelix Master como JAR. En los demás casos no supone ninguna diferencia.
+
+Los **starters** siguen la compatibilidad de Java de la versión de Spring Boot a la que se dirigen. Cada starter es compatible con **cualquier
+versión de Java admitida por su versión principal de Spring Boot**. Por ejemplo, Spring Boot 3 admite como mínimo Java **17** y
+hasta Java **25** (con Spring Boot 3.5), según la versión menor utilizada, y `axelix-spring-boot-3-starter`
+sigue exactamente ese mismo intervalo.
+
+:::info[La versión mínima de Java es 11]
+La única excepción a «seguir el soporte de Java de Spring Boot» es un **mínimo obligatorio de Java 11** para los **starters y
+plugins** de Axelix. Los usuarios de Spring Boot 2 que, en teoría, aún pueden utilizar **Java 8** no pueden usar Axelix:
+deben actualizar al menos a **Java 11**.
+:::
+
+## Compatibilidad entre componentes [#compatibility-between-components]
+
+Axelix se [publica de forma coordinada](#one-version-for-every-component), pero puede **actualizar** los componentes en momentos distintos. Se aplican dos reglas de compatibilidad:
+
+- **Master y starter:** dentro de una misma versión principal, Master admite starters de las últimas **4 versiones menores, incluida la suya**. El starter no debe tener una versión menor más reciente que Master. Esta ventana se aplica desde Axelix 1.1; consulte [Actualización de Axelix](./upgrading.mdx).
+- **Starter y plugin de compilación:** dentro de un servicio, ambos deben compartir la misma versión `major.minor`.
+
+**Las versiones de parche no afectan a ninguna de las dos reglas.**
+
+- ✅ Master `1.4.2`, starter `1.4.5`, plugin `1.4.0`: compatibilidad garantizada.
+- ✅ Starter `1.4.3` con plugin `1.4.0`: mismo `1.4`, compatibilidad garantizada.
+- ✅ Master `1.4.2` con starter `1.3.4`: dentro de la ventana `1.1`–`1.4` de Master, compatibilidad garantizada.
+- ⚠️ Master `1.4.x` con starter `1.0.x` o `1.5.x`: fuera de la ventana admitida.
+- ⚠️ Starter `3.1.x` con plugin `3.3.x`: distintas versiones menores, sin garantía ni soporte.
+- ⚠️ Master y starter con distintas versiones principales: fuera de la ventana de compatibilidad; siga la guía de migración de versión principal.
+
+Mantener todos los componentes en la misma versión exacta `X.Y.Z` es la política más sencilla. Si actualiza los componentes por separado, mantenga cada starter dentro de la ventana admitida por Master y alineado con su plugin.
+
+### Por qué las diferencias de parche son seguras y las de versión menor o principal no [#why-patch-drift-is-safe-but-minormajor-drift-is-not]
+
+Los contratos entre un starter y su plugin de compilación pueden cambiar entre versiones menores, por lo que solo se admiten versiones `major.minor` coincidentes. La comunicación entre Master y el starter tiene la ventana más amplia de cuatro versiones menores descrita arriba.
+
+Las versiones de parche pueden incluir una **corrección de una CVE crítica, una corrección de errores o una mejora de rendimiento**. Un parche vuelve a publicar **todos los componentes**, aunque la corrección real suele afectar solo a algunos. Actualizar únicamente un componente afectado y dejar los demás en un parche anterior sigue siendo compatible conforme a las dos reglas anteriores.
+
+:::warning[Mantenga cada combinación dentro de su intervalo admitido]
+No ejecute un starter con una versión menor más reciente que Master ni con más de tres versiones menores de retraso, y no mezcle versiones principales entre Master y starter. La ventana entre Master y starter no se aplica a la compatibilidad entre starter y plugin: mantenga esos dos componentes en la misma versión `major.minor`.
+:::
+
+## Garantías de compatibilidad con versiones anteriores [#backward-compatibility-guarantees-between-releases]
+
+### Axelix Master [#axelix-master]
+
+Axelix Master es una aplicación Java concebida para **ejecutarse como proceso independiente**: en Kubernetes, en Docker o como
+un JAR. **No** está concebida para utilizarse como biblioteca. Por eso, **no** consideramos su superficie pública Java
+un contrato público: **las clases públicas, métodos públicos, constructores, campos, enumeraciones y constantes se
+consideran internos**.
+
+En la práctica, esto significa que podemos cambiar esa API pública Java en versiones **menores e incluso de parche**. Partimos de que
+nadie depende de Master como biblioteca, por lo que modificar libremente su API Java nos permite **acelerar el desarrollo**. Es una
+concesión deliberada que, en la práctica, afecta a muy pocas personas y favorece mucho el ritmo del proyecto.
+
+Lo que **sí** consideramos contrato público de Master es su **configuración**:
+
+- Los **nombres** de las propiedades, tanto del **chart de Helm** de Axelix Master como de Axelix Master ejecutado como **JAR independiente**.
+- Sus **valores predeterminados**.
+- Sus **tipos**.
+
+Estos solo cambian en **versiones principales**.
+
+:::info[Regla práctica para Master]
+Puede depender de las **propiedades** de Master (nombres, valores predeterminados y tipos): son estables dentro de una versión principal.
+**No** dependa de las clases Java, métodos ni otros elementos de código de Master: pueden cambiar en cualquier versión.
+:::
+
+### Starters [#starters]
+
+Los starters **sí** se utilizan como bibliotecas. Son starters de Spring Boot, por lo que incorporan autoconfiguraciones con beans
+a la aplicación (configuración de componentes durante el arranque, estrategia interna de proxies, etc.). Esta realidad determina dos reglas.
+
+**No sustituya los beans de Axelix.** Deliberadamente **no** permitimos que los usuarios sustituyan los beans internos declarados por Axelix
+para modificar el arranque, la estrategia de proxies u otros detalles internos. Es una decisión
+consciente. Axelix se esfuerza por **no introducir sobrecarga medible** en la aplicación y ser lo más eficiente y libre de errores
+posible; permitir sustituir beans como `BeanPostProcessor` o instancias de `ProxyFactoryBean` abriría una vía
+a errores sutiles y a un peor rendimiento. Por tanto, no intente sustituir los beans de Axelix.
+
+**No dependa de la API pública Java de un starter.** Reconocemos que los starters se ejecutan dentro de aplicaciones reales, por lo que
+técnicamente su API pública Java *puede* utilizarse desde su código, pero **no es su finalidad** y lo desaconsejamos
+firmemente. Para avanzar con rapidez y mantener la competitividad, **podemos** cambiar también la API pública Java de los starters.
+Intentaremos evitarlo a toda costa, pero, si lo consideramos necesario, podemos modificarla en una versión **menor**.
+
+:::tip[¿Falta una función? Abra una incidencia en lugar de modificar los componentes internos]
+La regla es sencilla: si necesita algo o falta una función, **no modifique los componentes internos del starter**. Abra
+una incidencia en nuestro [gestor de incidencias de GitHub](https://github.com/axelixlabs/axelix/issues). Nos comprometemos a revisarla.
+Cuando añadamos la función solicitada, ofreceremos una **propiedad** para controlar ese comportamiento: una opción estable y con soporte,
+en lugar de sustituir un bean o depender de su código.
+:::

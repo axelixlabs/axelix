@@ -1,0 +1,32 @@
+---
+title: Java
+description: "El panel Java muestra qué funcionalidades de la JVM utilizan los servicios del conjunto gestionado: Project Leyden, recolectores de basura, registro de GC y Project Lilliput."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>El panel Java se elimina en Axelix 1.2.0.</>}
+/>
+
+En un conjunto de decenas de servicios es difícil saber cuáles ya utilizan el arranque más rápido con AppCDS o la caché AOT, qué recolector de basura ejecuta cada uno y dónde está activado el registro de GC. El panel Java responde para todo el conjunto a la vez.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+Para cada funcionalidad de la JVM, la página muestra la proporción de servicios que la utilizan:
+
+- **Project Leyden**: servicios que arrancan con AppCDS (`-XX:SharedArchiveFile`) o con la caché AOT (`-XX:AOTCache`), por separado y en conjunto.
+- **Garbage collectors**: qué recolector de basura utiliza cada proporción de servicios, por ejemplo G1, Parallel o ZGC. El más común se destaca por separado.
+- **GC logging**: servicios en los que el registro de GC está activado en ese momento, incluidos los servicios donde se activó desde Axelix. Consulte [Activar el registro de GC](../../../features/jvm/garbage-collector.mdx#enabling-gc-logging).
+- **Project Lilliput**: servicios con cabeceras compactas de objetos (`-XX:+UseCompactObjectHeaders`).
+
+## Cómo funciona [#how-it-works]
+
+El panel contabiliza lo que comunica cada servicio sobre su JVM. Master lo registra una vez al día y utiliza el último registro. Cada servicio cuenta una vez, independientemente del número de instancias que ejecute.
+
+## Véase también [#see-also]
+
+- [Garbage Collector](../../../features/jvm/garbage-collector.mdx)
+- [Languages Profile](../languages-profile.mdx)
+- [Persistence](./persistence.mdx)

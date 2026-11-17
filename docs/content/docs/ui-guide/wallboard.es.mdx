@@ -1,0 +1,56 @@
+---
+title: Wallboard
+description: "Wallboard es la página de inicio predeterminada de Axelix."
+---
+
+<ScreenshotsNotice text="Las capturas muestran la última versión menor de Axelix.">
+
+![Página principal de Wallboard](/img/feature/wallboard/wallboard-main-page.png)
+
+</ScreenshotsNotice>
+
+***Wallboard tal como aparece en la interfaz de Axelix***
+
+Muestra todas las instancias de Spring Boot descubiertas por Axelix Master como una cuadrícula de tarjetas compactas, cada una con el estado de salud actual de la instancia y un breve resumen de su entorno de ejecución. Al pulsar una tarjeta se abre el [Service Profile](./service-profile.mdx) de esa instancia.
+
+## Tarjetas de servicios [#service-cards]
+
+Cada tarjeta representa una instancia descubierta. La cabecera contiene el nombre del servicio y un indicador de estado a la derecha:
+
+- Un punto **verde** fijo: la instancia está **UP**.
+- Un punto **rojo** intermitente: la instancia está **DOWN**.
+- Un **icono de interrogación**: Axelix Master no pudo determinar el estado de la instancia (**UNKNOWN**).
+
+Las tarjetas que no están **UP** tienen un fondo del color de su estado para destacar en la cuadrícula.
+
+El cuerpo de la tarjeta enumera los detalles de ejecución recopilados por Axelix cuando se registró la instancia:
+
+- **Version**: la versión del propio servicio (la versión del artefacto Maven/Gradle).
+- **Spring Boot**: la versión de Spring Boot contra la que se compiló la instancia.
+- **Java**: la versión de Java de la JVM en ejecución, por ejemplo `21.0.10`.
+
+La línea inferior muestra a la izquierda el SHA corto de Git de la compilación, como **Commit: 315897f** (a partir de metadatos del estilo `git-commit-id`, cuando la aplicación los expone). A la derecha muestra cuánto tiempo lleva registrada la instancia en Master, por ejemplo `27d 4h`.
+
+Al pulsar cualquier parte de la tarjeta se abre la pantalla **Details** del [Service Profile](./service-profile.mdx) de esa instancia.
+
+## Búsqueda y filtros [#search-and-filters]
+
+El campo de búsqueda sobre la cuadrícula filtra tarjetas por nombre de servicio (coincidencia de subcadena sin distinguir mayúsculas y minúsculas). El contador de la derecha muestra `<matches> / <total>`.
+
+El botón **+ Add filter**, junto a la búsqueda, abre un panel emergente con tres campos:
+
+- **Field**: uno de **Spring Boot**, **Java**, **Spring Framework** o **Kotlin**.
+- **Comparison**: **Equal**, **Less than or equal** o **Greater than or equal**. La comparación interpreta las versiones semánticas, por lo que `<= 3.2` interpreta el parche omitido como cero: coincide con `3.1.x` y `3.2.0`, pero no con `3.2.1` ni versiones posteriores.
+- **Value**: una versión obtenida de las instancias actuales del conjunto de aplicaciones. Solo se ofrecen versiones que existen en al menos una tarjeta, de modo que no se puede crear un filtro sin coincidencias.
+
+Guardar el filtro añade una etiqueta eliminable entre la búsqueda y la cuadrícula, reduce las tarjetas mostradas y escribe el filtro en la URL como parámetro de consulta `?f=Field:Operator:Value`. Las URL de Wallboard con filtros se pueden guardar como marcadores y compartir. Repita la acción para añadir más filtros: una tarjeta solo aparece si cumple todos los filtros activos.
+
+## Acceso mediante MCP [#mcp-access]
+
+Los datos de Wallboard están disponibles como herramienta MCP, por lo que un agente de IA conectado al servidor MCP integrado de Axelix Master puede enumerar todas las instancias gestionadas con los mismos campos que muestran las tarjetas. [Consulte el catálogo MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#instances)
+
+## Relacionado [#related]
+
+- [Service Profile](./service-profile.mdx)
+- [Spring Portfolio](./dashboard/spring-portfolio.mdx)
+- [MCP](./mcp.mdx)

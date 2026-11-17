@@ -184,6 +184,86 @@ export const translations = i18n
             "Copied Text(code block)(aria-label)": "Texte copié",
             "Copy Anchor Link(heading anchor)(aria-label)": "Copier le lien vers cette section",
         },
+        es: {
+            displayName: "Español",
+            "Ask AI(AI chat button)": "Preguntar a la IA",
+            "Back to Home(404 not found page)": "Volver al inicio",
+            "Page Not Found(404 not found page)": "Página no encontrada",
+            "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.(404 not found page)":
+                "La página que busca puede haberse eliminado, haber cambiado de nombre o no estar disponible temporalmente.",
+            "Close Banner(banner)(aria-label)": "Cerrar aviso",
+            "Copy Link(accordion)(aria-label)": "Copiar enlace",
+            "Layout Tab(layout tab trigger)": "Pestaña de navegación",
+            "Default(type table)": "Valor predeterminado",
+            "Parameters(type table)": "Parámetros",
+            "Prop(type table)": "Propiedad",
+            "Returns(type table)": "Devuelve",
+            "Type(type table)": "Tipo",
+
+            // search
+            "Search(search trigger)": "Buscar",
+            "Search(search dialog)": "Buscar",
+            "No results found(search dialog)": "No se encontraron resultados",
+            "Open Search(search trigger)(aria-label)": "Abrir búsqueda",
+            "Close Search(search dialog)(aria-label)": "Cerrar búsqueda",
+
+            // table of contents
+            "On this page(table of contents)": "En esta página",
+            "No Headings(table of contents)": "No hay encabezados",
+            "Table of Contents(inline table of contents)": "Contenido",
+
+            // page footer & pagination
+            "Last updated on(page footer)": "Última actualización",
+            "Next Page(pagination)": "Página siguiente",
+            "Previous Page(pagination)": "Página anterior",
+            "Edit on GitHub(edit page)": "Editar en GitHub",
+
+            // sidebar
+            "Hide Sidebar(sidebar)": "Ocultar menú lateral",
+            "Show Sidebar(sidebar)": "Mostrar menú lateral",
+            "Open Sidebar(sidebar)(aria-label)": "Abrir menú lateral",
+            "Close Sidebar(sidebar)(aria-label)": "Cerrar menú lateral",
+            "Collapse Sidebar(sidebar)(aria-label)": "Contraer menú lateral",
+            "Open Sidebar(aria-label)": "Abrir menú lateral",
+            "Close Sidebar(aria-label)": "Cerrar menú lateral",
+            "Toggle Menu(home layout header)(aria-label)": "Alternar menú",
+
+            // language switcher
+            "Choose a language(language switcher)": "Elegir idioma",
+            "Choose a language(language switcher)(aria-label)": "Elegir idioma",
+            "Docs(header)": "Documentación",
+
+            // theme switcher
+            "Toggle Theme(theme switcher)(aria-label)": "Cambiar tema",
+            "Light(theme switcher)(aria-label)": "Claro",
+            "Dark(theme switcher)(aria-label)": "Oscuro",
+            "System(theme switcher)(aria-label)": "Sistema",
+
+            // page actions
+            "Report an issue(page)": "Informar de un problema",
+            "Copy Markdown(page actions)": "Copiar Markdown",
+            "View as Markdown(page actions)": "Ver como Markdown",
+            "Open(page actions)": "Abrir",
+            "Open in GitHub(page actions)": "Abrir en GitHub",
+            "Open in ChatGPT(page actions)": "Abrir en ChatGPT",
+            "Open in Claude(page actions)": "Abrir en Claude",
+            "Open in Cursor(page actions)": "Abrir en Cursor",
+            "Open in Scira AI(page actions)": "Abrir en Scira AI",
+            "Read {url}, I want to ask questions about it.(page actions)":
+                "Lea {url}; quiero hacer preguntas sobre su contenido.",
+
+            // AI install prompt
+            "Copy prompt(ai prompt)": "Copiar instrucción",
+            "Copied!(ai prompt)": "¡Copiado!",
+            "Prompt copied(ai prompt)": "Instrucción copiada",
+            "Install Axelix with AI(ai prompt)": "Instalar Axelix con IA",
+            "Copy prompt for your AI agent(ai prompt)(aria-label)": "Copiar instrucción para su agente de IA",
+
+            // code block & headings
+            "Copy Text(code block)(aria-label)": "Copiar texto",
+            "Copied Text(code block)(aria-label)": "Texto copiado",
+            "Copy Anchor Link(heading anchor)(aria-label)": "Copiar enlace a la sección",
+        },
         ru: {
             displayName: "Русский",
 

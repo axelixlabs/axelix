@@ -1,0 +1,26 @@
+---
+title: Spring Framework
+description: "El panel Spring Framework muestra cuántos servicios del conjunto gestionado se ejecutan con Open Session in View activado."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>El panel Spring Framework se elimina en Axelix 1.2.0.</>}
+/>
+
+Open Session in View (OSIV) mantiene abiertas la sesión de Hibernate y la conexión de base de datos hasta que se genera toda la respuesta HTTP. Las asociaciones de carga diferida se cargan entonces de forma silenciosa fuera de la transacción y cada petición retiene una conexión más tiempo del necesario. Spring Boot activa OSIV de forma predeterminada en aplicaciones web con JPA, por lo que a menudo permanece activado por accidente. El panel Spring Framework muestra cuánto se ha extendido en el conjunto de servicios.
+
+La página es de solo lectura y está disponible para cualquier usuario autenticado: **VIEWER**, **EDITOR**, **ADMIN** y **SUPER_ADMIN** pueden abrirla. Consulte [Roles y permisos](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) para ver la matriz completa de roles y permisos.
+
+## Qué muestra la página [#what-the-page-shows]
+
+La página muestra la proporción de servicios que se ejecutan con OSIV activado y la de aquellos que lo tienen desactivado.
+
+## Cómo funciona [#how-it-works]
+
+OSIV se considera activado cuando la aplicación registra el interceptor o filtro Open Session in View. Master lo registra una vez al día y utiliza el último registro. Cada servicio cuenta una vez, independientemente del número de instancias que ejecute.
+
+## Véase también [#see-also]
+
+- [Persistence](./persistence.mdx)
+- [Transaction Control](../../../features/spring-framework/transaction-control.mdx)

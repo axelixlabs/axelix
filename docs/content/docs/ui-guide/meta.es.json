@@ -1,0 +1,10 @@
+{
+    "title": "Guía de la interfaz",
+    "pages": [
+        "dashboard",
+        "wallboard",
+        "service-profile",
+        "users",
+        "mcp"
+    ]
+}

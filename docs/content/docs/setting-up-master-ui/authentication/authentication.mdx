@@ -218,7 +218,9 @@ configuration.
 | `SUPER_ADMIN` | Every authority defined by Master, including `users:read` and `users:manage`.                                                                 | The built-in super-admin account.                                                                   |
 | `ADMIN`       | `environment.values:read`, `config-properties.values:read`, `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`, `heap-dump:read`. | Local DB users with role `admin`. OIDC users whose `role-attribute-path` resolves to `admin`.       |
 | `EDITOR`      | `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`.                                                                        | Local DB users with role `editor`. OIDC users whose `role-attribute-path` resolves to `editor`.     |
-| `VIEWER`      | None: read-only view of everything not gated by an authority.                                                                                 | Local DB users with role `viewer`. OIDC users with no `role-attribute-path` set or unmapped values. |
+| `VIEWER`      | None: read-only view of everything not gated by an authority.                                                                                 | Local DB users with role `viewer`. OIDC users with an unset or blank `role-attribute-path`. |
+
+If a configured `role-attribute-path` returns no role or an unknown role, authentication fails.
 
 </div>
 
@@ -246,9 +248,10 @@ to the handler matching the scheme.
 - **`Basic`**: `BasicMcpAuthenticationHandler` decodes `Authorization: Basic <base64(user:pass)>` and delegates to the
   same `CompositeUserAuthenticator` the UI uses. Super-admin and local accounts both work. The role mapping is identical
   to a browser sign-in.
-- **`Bearer`**: `BearerMcpAuthenticationHandler` treats the credential as an OIDC access token. It runs the token
-  through `JmesPathOidcRoleExtractor` (same path as the browser OIDC flow) to derive a role, then issues a synthetic
-  `PasswordlessUser` named `AI_AGENT` carrying that role. Only available when
+- **`Bearer`**: `BearerMcpAuthenticationHandler` treats the credential as an OIDC access token. It validates the token with the OIDC provider
+  and uses `UserInfoJsonAccessor` to derive a role from the UserInfo response, then creates a
+  `PasswordlessUser` with that role and the persisted account’s ID and username. The user must first sign in
+  through the browser to create the account; the role is evaluated from the current userinfo response. Only available when
   `axelix.master.auth.options.oauth2.enabled=true`.
 
 Once the user is identified, the filter performs the same authority check as the web filter: per-tool authority

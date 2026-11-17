@@ -46,9 +46,9 @@ Docker image, and packages and signs the Helm chart. Only then does it create an
 updating the Helm chart repository. Artifacts can therefore already be published if the pipeline fails before tag creation.
 
 :::info[Release notes are written by hand]
-The pipeline creates the **tag** — it does **not** write the release notes. Composing the release notes for the
-freshly created `vX.Y.0` tag is left to the **developer** cutting the release, who writes them manually against
-that tag.
+The pipeline creates the **tag** and a **draft GitHub release** with the JAR and Helm assets attached.
+The developer cutting the release must edit the draft's notes for `vX.Y.0` and then **publish the draft release** manually.
+Writing the notes alone does not publish it.
 :::
 
 ## Patch releases
@@ -77,8 +77,8 @@ change the docs.
 4. **Launch the release pipeline.** It is the **same pipeline** as for a minor release, launched from the
    patch branch instead of `master`. It follows the same checks and publication, packaging, and tagging sequence
    described above, using version `X.Y.Z` and tag `vX.Y.Z`. Like every Axelix tag it carries the `v` prefix.
-   As with a minor release, the pipeline creates the tag but **not** the release notes; the developer writes
-   those manually against the new tag.
+   As with a minor release, it creates a draft GitHub release with the JAR and Helm assets. The developer must
+   edit the draft notes for the new tag and then **publish the draft release** manually.
 
 ### Worked example
 

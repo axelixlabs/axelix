@@ -1,0 +1,190 @@
+---
+title: Actualización de Axelix
+description: "El procedimiento que permite actualizar un conjunto real de servicios de forma segura y predecible cuando Master y los starters avanzan a ritmos distintos."
+---
+
+Axelix se [publica de forma coordinada](./compatibility-and-versioning.mdx): cada publicación distribuye todos los componentes bajo
+una versión. Pero los despliegues reales nunca se **actualizan** todos a la vez: el equipo de plataforma actualiza **Axelix Master** de una vez,
+mientras decenas de servicios incluyen el **starter** y el **plugin de compilación** como dependencias normales y los actualizan cuando
+sus equipos pueden hacerlo. Esta página describe el procedimiento que hace que esa realidad sea segura y predecible.
+
+:::info[Desde Axelix 1.1]
+La política de actualización siguiente se introdujo en **Axelix 1.1** y se aplica a esa versión y todas las posteriores.
+Esta política cubre las actualizaciones entre **versiones menores de una misma principal de Axelix**. Cada migración de versión principal
+tiene una guía específica.
+:::
+
+## La ventana de compatibilidad [#the-compatibility-window]
+
+Todo el procedimiento se basa en una garantía:
+
+> **Axelix Master admite starters de las últimas 4 versiones menores, incluida la suya.**
+
+Por ejemplo, Master `1.4.x` admite servicios con starters desde `1.1.x` hasta `1.4.x`. Un servicio con starter `1.0.x`
+está **fuera de la ventana** de Master `1.4.x` y ya no tiene garantizado funcionar con él:
+
+![Ventana de compatibilidad de Axelix](/img/more/axelix-compatibility-window.png) ***Master `1.4` admite servicios cuyo
+starter está dentro de la ventana `1.1`–`1.4`. El servicio que sigue utilizando el starter `1.0` queda fuera y ya no
+tiene soporte.***
+
+Es un **mínimo garantizado**: en la práctica podemos admitir un intervalo mayor, pero prometemos al menos estas 4 versiones menores
+y no reduciremos la ventana dentro de una versión principal.
+
+De esta ventana se derivan dos reglas:
+
+- **Primero Master.** La ventana mira hacia atrás: un Master nuevo admite starters anteriores, nunca al contrario.
+  No ejecute un starter cuya versión sea posterior a la de Master.
+- **El starter y el plugin avanzan juntos.** Dentro de un servicio, el starter y el plugin de compilación deben compartir la misma
+  versión `major.minor`: actualícelos en el mismo cambio. La ventana se aplica entre **Master y los servicios**, no
+  dentro de un servicio.
+
+## Frecuencia de publicación [#release-cadence]
+
+Axelix tiene como objetivo unas **7–9 versiones menores por año natural**, una aproximadamente cada 1,5 meses, y una
+versión **principal** coordinada al año.
+
+Combinada con la ventana de compatibilidad, esta frecuencia convierte una regla abstracta en un margen de tiempo concreto: como Master
+admite starters de las últimas 4 versiones menores, un servicio que permanezca dentro de la ventana solo necesita actualizarse **aproximadamente una vez
+cada medio año**. Además, como los componentes cliente se mantienen deliberadamente simples, la actualización suele ser
+trivial: cambiar la versión de una dependencia y volver a desplegar.
+
+## El procedimiento de actualización [#the-upgrade-procedure]
+
+### 1. Averiguar hasta qué versión se puede actualizar [#1-find-out-how-far-you-can-upgrade]
+
+Abra **Administration → Upgrading** en la interfaz de Master. Muestra la versión máxima de Master a la que puede actualizar sin
+que ningún servicio quede fuera de la ventana de compatibilidad, calculada a partir de la versión de starter más antigua que Master ha observado
+en el conjunto de servicios.
+
+Como la ventana es puramente aritmética, Master calcula este resultado **de forma totalmente local**: no consulta páginas de versiones
+ni necesita acceso a Internet. Funciona igual en entornos aislados de la red.
+
+La página también enumera los servicios que limitan el resultado, los que ejecutan los starters más antiguos, para que sepa
+exactamente con qué equipos debe hablar si quiere avanzar más.
+
+### 2. Actualizar Axelix Master [#2-upgrade-axelix-master]
+
+Actualice Master en todos los entornos: primero desarrollo, después preproducción y, por último, producción. Master es un despliegue independiente
+(JAR, imagen Docker o chart de Helm), por lo que este paso depende enteramente del equipo de plataforma y no modifica ningún servicio.
+Los detalles de este paso —detención, copia de seguridad, actualización y restauración— se describen más abajo en
+[actualización del propio Axelix Master](#upgrading-axelix-master-itself).
+
+Los servicios siguen funcionando durante todo el proceso: están dentro de la ventana, que es precisamente el objetivo del paso 1.
+
+### 3. Permitir que los equipos actualicen sus servicios [#3-let-the-teams-bump-their-services]
+
+Ahora traslade la tarea a los equipos de los servicios: actualizar el **starter** y el **plugin** a la nueva versión,
+ambos a la misma y en el mismo cambio, y volver a desplegar. Para un servicio típico, basta con cambiar las versiones de las dependencias.
+
+No es casualidad, sino una **regla de diseño deliberada**: Axelix Master es la parte **inteligente**, y los componentes
+cliente —starter y plugin— se mantienen **lo más simples posible**. Toda la interpretación y la lógica compleja residen en Master;
+los componentes cliente solo recopilan y envían datos sin procesar. Esto mantiene las actualizaciones de los servicios rápidas y sencillas:
+idealmente, intentamos que los componentes cliente de Axelix tengan muy pocas opciones de configuración.
+
+Los equipos realizan esta tarea **de forma independiente y a su ritmo**. La ventana es su margen de tiempo: con 4 versiones menores garantizadas,
+un servicio puede saltarse un par de actualizaciones de Master antes de tener que ponerse al día.
+
+### 4. Observar cómo se actualizan los servicios [#4-watch-the-fleet-catch-up]
+
+La página **Upgrading** muestra la distribución de versiones de los starters en los servicios. Tras actualizar Master, observe cómo
+avanza hacia la nueva versión y vea de un vistazo qué servicios se quedan atrás, incluidos los creados a partir de
+plantillas desactualizadas que incluyen una versión antigua del starter.
+
+## Actualización del propio Axelix Master [#upgrading-axelix-master-itself]
+
+Las actualizaciones de Master son **solo hacia adelante**: siempre se avanza a una versión posterior y, deliberadamente, no existe un procedimiento
+para bajar de versión. Este es el modelo habitual de los planos de control con estado, y la razón es la base de datos. Master tiene una,
+y sus [migraciones de esquema](../setting-up-master-ui/migrations/migrations.mdx) se aplican automáticamente al arrancar. Diseñamos
+estas migraciones para que sean **simples, no reversibles**: una migración que reorganiza una tabla normalmente solo puede deshacerse
+perdiendo datos. Por eso, en lugar de fingir que se puede bajar de versión, ofrecemos un camino fiable de vuelta: una **copia de seguridad
+de la base de datos realizada durante la actualización**, que se restaura si algo falla.
+
+Solo hacia adelante **no** significa una versión menor cada vez. Se admite actualizar de cualquier versión anterior a cualquier posterior **dentro
+de una principal** en un solo salto: pasar directamente de `1.1` a `1.4` es válido. Al arrancar, el nuevo Master
+encuentra todas las migraciones que aún no se han aplicado a la base de datos y ejecuta la cadena completa en orden; da igual que abarque
+una o tres versiones menores. La única excepción es cruzar el límite de una versión **principal**: cada publicación principal incluye
+su guía específica de migración; siga esa guía en lugar de este procedimiento.
+
+Otro detalle antes de empezar: es un procedimiento de **detención completa**. Comienza deteniendo el Master en ejecución,
+por lo que existe un breve **periodo de indisponibilidad**, normalmente de pocos minutos, durante el cual la interfaz y la API de Master
+no están disponibles. Sin embargo, los servicios no lo perciben.
+
+### Qué ocurre con los servicios durante la indisponibilidad [#what-happens-to-your-services-during-the-downtime]
+
+Nada, por diseño. El starter de cada servicio informa a Master **periódicamente** mediante mensajes de actividad, no solo una vez al
+arrancar. Mientras Master está detenido, esos mensajes simplemente no reciben respuesta: el servicio sigue atendiendo su tráfico, no almacena
+nada en búfer y reintenta con su periodicidad habitual. Cuando el nuevo Master arranca, el siguiente mensaje de cada servicio
+lo registra de nuevo desde cero, por lo que el conjunto se reconstruye en un intervalo de actividad. Por eso, los pasos siguientes
+no mencionan los servicios: no hace falta coordinarse con sus equipos, drenar tráfico ni reiniciarlos.
+Para un servicio, actualizar Master es indistinguible de una breve interrupción de red. Consulte [cómo funciona
+el descubrimiento](../product/discovery.mdx) para conocer el registro y los mensajes de actividad.
+
+### Paso a paso [#step-by-step]
+
+1. **Detener el Master en ejecución.** Independientemente de cómo se ejecute —Deployment de Kubernetes, contenedor o
+   JAR—, deténgalo por completo. Aquí comienza el periodo de indisponibilidad.
+
+2. **Hacer una copia de seguridad de la base de datos.** Utilice las herramientas habituales del motor: un volcado para **PostgreSQL** o **MySQL**,
+   una copia del archivo para **SQLite**. Haga la copia **después** de detener Master: al no haber escrituras,
+   se garantiza la coherencia de la instantánea. No omita este paso aunque la actualización parezca rutinaria:
+   esta copia **es** el procedimiento de restauración.
+
+3. **Iniciar la nueva versión de Master.** Al arrancar, aplica automáticamente todas las
+   [migraciones de base de datos](../setting-up-master-ui/migrations/migrations.mdx) pendientes y después empieza a atender
+   tráfico. Espere a que termine: no reinicie ni finalice Master mientras se aplican las migraciones.
+
+4. **Verificar.** La interfaz debe estar disponible y mostrar la nueva versión, y los servicios deben
+   reaparecer por sí solos en un intervalo de actividad. Si el conjunto parece completo y los servicios se han registrado correctamente,
+   puede considerar terminada la actualización de Axelix Master.
+
+### Restauración de la versión anterior [#rolling-back]
+
+Si la nueva versión falla por cualquier motivo, el camino de vuelta es la copia del paso 2:
+
+1. Detener el nuevo Master.
+2. Restaurar la base de datos desde la copia.
+3. Iniciar la versión anterior a la actualización.
+
+Todo lo escrito en la base de datos entre la copia y la restauración se pierde y, para Master, esa pérdida es insignificante,
+**por diseño**.
+
+El registro de servicios se **reconstruye automáticamente** a partir de los mensajes de actividad en un intervalo. Los datos que *no*
+se reconstruyen solos —usuarios, roles y ajustes— rara vez cambian en un periodo tan corto. Recuerde que restaurar es una
+medida temporal, no un destino: solo hacia adelante significa que el camino a largo plazo siempre lleva a versiones posteriores. Si una actualización
+falla, [abra una incidencia](https://github.com/axelixlabs/axelix/issues): la corrección real llegará en una versión más reciente.
+
+### Reglas que deben mantenerse [#invariants]
+
+- **Nunca ejecute dos versiones distintas de Master contra la misma base de datos al mismo tiempo.** La nueva versión modifica
+  el esquema en cuanto arranca y la anterior no está preparada para esos cambios. Mantener el código antiguo
+  compatible con esquemas futuros es precisamente la complejidad que evitamos con el modelo solo hacia adelante. En Kubernetes, esto significa
+  que el Deployment de Master debe utilizar la estrategia `Recreate`: la predeterminada, `RollingUpdate`, ejecuta brevemente el pod antiguo y el nuevo
+  a la vez, incluso con una sola réplica, y ese solapamiento coincide con la aplicación de las migraciones.
+
+- **Se espera una breve indisponibilidad de Master.** Deliberadamente no prometemos actualizaciones sin interrupciones: requerirían
+  migraciones reversibles en varias fases y un Master de alta disponibilidad, y preferimos mantener simples tanto el producto
+  como el procedimiento. Durante ese periodo solo están indisponibles la interfaz y la API de Master; los servicios siguen funcionando
+  sin cambios.
+
+- **Una réplica de Master cada vez.** Actualmente Master está diseñado como aplicación de una sola instancia: sus tareas
+  en segundo plano —exploración de descubrimiento y eliminación de instancias inactivas— y sus cachés en memoria presuponen que se ejecuta
+  exactamente un Master. Varias réplicas duplicarían el trabajo y competirían entre sí. Está previsto un Master de alta disponibilidad
+  con varias réplicas.
+
+## Servicios que se quedan atrás [#services-that-fall-behind]
+
+Los servicios rezagados **nunca bloquean** una actualización de Master: la decisión siempre corresponde al equipo de plataforma.
+La contrapartida se expone de antemano: antes de actualizar, la página **Upgrading** enumera exactamente qué servicios quedarían fuera
+de la ventana de compatibilidad al superar el límite seguro, para que sepa qué implica la actualización y con quién
+debe hablar.
+
+Tenga presente ese coste: un servicio cuyo starter queda fuera de la ventana **pierde todo el soporte**.
+Desaparece de la interfaz de Master y permanece invisible hasta que su starter se actualice a una versión dentro de la ventana.
+La advertencia aparece **antes** de la actualización, no después: una vez superada la compatibilidad con un servicio, nada en la interfaz
+recordará que existe.
+
+## Actualizaciones de versión principal [#major-version-upgrades]
+
+La ventana de compatibilidad se define **dentro de una versión principal**. Cada publicación principal incluye una guía específica
+que detalla la ruta de actualización desde la principal anterior, incluidas las últimas versiones menores de aquella con las que
+el nuevo Master puede seguir comunicándose durante la transición.
