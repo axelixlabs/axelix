@@ -18,6 +18,8 @@
 package com.axelixlabs.axelix.master.autoconfiguration.ecosystem;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
@@ -25,6 +27,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.axelixlabs.axelix.master.repository.ApplicationDependenciesRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardCaches;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardRefreshScheduler;
+import com.axelixlabs.axelix.master.service.dashboard.DashboardService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultDependencyAnalysisService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultLanguagesProfileService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultSpringPortfolioService;
@@ -38,6 +43,7 @@ import com.axelixlabs.axelix.master.service.ecosystem.projects.DefaultSoftwarePr
 import com.axelixlabs.axelix.master.service.ecosystem.projects.SoftwareProjectsCatalog;
 import com.axelixlabs.axelix.master.service.ecosystem.projects.SoftwareProjectsManifestLoader;
 import com.axelixlabs.axelix.master.service.ecosystem.sbom.SbomParser;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -47,8 +53,10 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * the boot instead of surfacing at request time.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @AutoConfiguration
+@EnableCaching
 public class EcosystemAutoConfiguration {
 
     @Bean
@@ -108,5 +116,35 @@ public class EcosystemAutoConfiguration {
     @Bean
     public LanguagesProfileService languagesProfileService(HistoricalApplicationSnapshotRepository snapshotRepository) {
         return new DefaultLanguagesProfileService(snapshotRepository);
+    }
+
+    @Bean
+    public CacheManager cacheManager() {
+        return DashboardCaches.cacheManager();
+    }
+
+    @Bean
+    public DashboardService dashboardService(
+            SpringPortfolioService springPortfolioService,
+            LanguagesProfileService languagesProfileService,
+            DatabaseHistoricalApplicationSnapshotService snapshotService,
+            DependencyAnalysisService dependencyAnalysisService) {
+        return new DashboardService(
+                springPortfolioService, languagesProfileService, snapshotService, dependencyAnalysisService);
+    }
+
+    @Bean
+    public DashboardRefreshScheduler dashboardRefreshScheduler(
+            SpringPortfolioService springPortfolioService,
+            LanguagesProfileService languagesProfileService,
+            DatabaseHistoricalApplicationSnapshotService snapshotService,
+            DependencyAnalysisService dependencyAnalysisService,
+            CacheManager cacheManager) {
+        return new DashboardRefreshScheduler(
+                springPortfolioService,
+                languagesProfileService,
+                snapshotService,
+                dependencyAnalysisService,
+                cacheManager);
     }
 }

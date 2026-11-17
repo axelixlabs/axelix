@@ -74,6 +74,7 @@ dependencies {
 
     api("org.slf4j:slf4j-api")
     api("com.github.ben-manes.caffeine:caffeine")
+    implementation("org.springframework:spring-context-support")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 
     // TODO:

@@ -76,6 +76,8 @@ axelix:
         location: classpath:/spa/
     mcp-server:
       enabled: true
+    dashboard:
+      refresh-schedule: "0 */5 * * * *"
     database:
       url: jdbc:sqlite:axelix.db
       username: ""
