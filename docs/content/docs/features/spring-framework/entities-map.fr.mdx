@@ -1,0 +1,79 @@
+---
+title: Carte des entités
+description: "La page Carte des entités vérifie le mapping JPA de chaque entité d’une instance Spring Boot et montre les
+              associations dont le mapping entraîne des requêtes supplémentaires : chargement eager, @ManyToMany reposant sur une
+              List, cascade REMOVE ou ALL et @OneToMany unidirectionnel."
+---
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![Page principale de la carte des entités](/img/feature/entity/entity-main-page.png)
+
+</ScreenshotsNotice>
+
+***Carte des entités dans l’interface Axelix***
+
+Les erreurs de mapping des associations JPA ne font pas échouer l’application. Elles entraînent plutôt des requêtes et
+des chargements supplémentaires à chaque utilisation de l’entité, et passent facilement inaperçues lors d’une revue de
+code. La Carte des entités vérifie le mapping de toutes les entités et indique où se trouvent ces erreurs.
+
+La page est en lecture seule et accessible à tous les utilisateurs authentifiés : **VIEWER**, **EDITOR**, **ADMIN** et
+**SUPER_ADMIN** peuvent tous l’ouvrir. Consultez [Rôles et
+autorités](../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour obtenir la matrice
+complète des rôles et autorités.
+
+## Contenu de la page
+
+Un résumé en haut indique combien d’entités l’instance mappe, combien présentent des
+[problèmes](#problèmes-détectés) et combien n’en présentent pas. En dessous, la page répertorie les entités
+présentant des problèmes.
+
+Ouvrez une entité pour voir :
+
+- Le nom de table issu de `@Table`, ou le nom de l’entité lorsque `@Table` n’en définit pas.
+- Chaque association problématique, par exemple `Owner.pets`, avec ses problèmes.
+- Le mapping de cette association avec les valeurs effectives, y compris les valeurs par défaut, par exemple
+  `@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL) @JoinColumn(name = "owner_id") List<Pet>`.
+
+Lorsqu’aucune entité ne présente de problème, la page l’indique au lieu d’afficher la liste.
+
+## Problèmes détectés
+
+- **Chargement EAGER** : l’association est chargée à chaque lecture de l’entité, que les données soient utilisées ou
+  non. Cela inclut `@ManyToOne` et `@OneToOne` sans `fetch` explicite, car JPA les rend eager par défaut.
+- **List pour @ManyToMany** : une relation `@ManyToMany` reposant sur une `List` amène Hibernate à vider et à
+  réinsérer toute la table de jointure à chaque modification.
+- **CascadeType incorrect** : sur une relation `@OneToMany` ou `@ManyToMany`, `CascadeType.REMOVE` ou
+  `CascadeType.ALL` amène Hibernate à supprimer les enregistrements associés un par un, ce qui produit des requêtes
+  N+1.
+- **@OneToMany unidirectionnel** : une relation `@OneToMany` sans `mappedBy` nécessite une table de jointure
+  supplémentaire ou une instruction `UPDATE` distincte pour chaque enregistrement.
+
+## Fonctionnement
+
+L’Axelix Spring Boot Starter lit le métamodèle JPA de l’application et vérifie chaque association. Contrairement à
+[Contrôle des transactions](./transaction-control.mdx), le résultat ne dépend pas du trafic : Axelix vérifie le mapping
+des entités, et non les requêtes exécutées. Hibernate doit être présent dans l’application pour que la page fonctionne.
+
+## Outils MCP
+
+Les agents IA peuvent obtenir les entités et leurs problèmes de mapping via MCP, pour toute l’application ou pour une
+entité. Consultez le [catalogue des outils
+MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#analyse-de-la-persistance).
+
+## Propriétés
+
+La Carte des entités fonctionne avec la surveillance des transactions et est activée par défaut. Pour la désactiver,
+définissez `axelix.sbs.transaction.monitoring.enabled=false`. Consultez [Surveillance des
+transactions](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#surveillance-des-transactions)
+pour plus de détails.
+
+La Carte des entités n’est pas disponible dans les applications réactives (WebFlux), car la surveillance des
+transactions ne fonctionne pas dans celles-ci. Consultez [Applications réactives
+(WebFlux)](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#applications-réactives-webflux).
+
+## Voir aussi
+
+- [Contrôle des transactions](./transaction-control.mdx)
+- [Configurer Spring Boot
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

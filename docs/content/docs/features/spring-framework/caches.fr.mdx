@@ -1,0 +1,148 @@
+---
+title: Caches
+description: "La page Caches répertorie tous les caches Spring de l’application et montre l’efficacité de chacun. Vous
+              pouvez également vider un cache ou le désactiver à l’exécution, sur une instance ou sur plusieurs à la fois."
+---
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![Page principale des caches](/img/feature/caches/caches-main-page.png)
+
+</ScreenshotsNotice>
+
+***Page Caches dans l’interface Axelix***
+
+Un cache qui renvoie des données obsolètes ou dont les accès aboutissent rarement est difficile à repérer de
+l’extérieur : l’application continue de fonctionner, mais de manière incorrecte ou lente. La page Caches montre les
+performances de chaque cache et vous permet de le vider ou de le désactiver sans redémarrage.
+
+La page est accessible à tous les utilisateurs authentifiés : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN**
+peuvent tous l’ouvrir et consulter les statistiques des caches. Vider un cache exige l’autorité `caches:clear`, et
+activer ou désactiver un cache exige `caches:toggle`. Ces deux autorités sont accordées par les rôles intégrés
+**EDITOR**, **ADMIN** et **SUPER_ADMIN**. Les utilisateurs qui ne les possèdent pas voient les mêmes contrôles, mais
+Axelix les laisse désactivés et explique pourquoi dans une info-bulle au survol. Consultez [Rôles et
+autorités](../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour obtenir la matrice
+complète des rôles et autorités.
+
+## Contenu de la page
+
+La page répertorie les caches regroupés par gestionnaire de cache. Pour chaque cache, vous voyez son nom et la classe
+du cache natif sous-jacent, par exemple `java.util.concurrent.ConcurrentHashMap` pour un `ConcurrentMapCache`. Vous
+pouvez rechercher dans la liste par nom de cache ou de gestionnaire de cache.
+
+## Détails du cache
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![Page des détails du cache](/img/feature/caches/caches-details-page.png)
+
+</ScreenshotsNotice>
+
+***Détails du cache dans l’interface Axelix***
+
+Lorsque l’application a accédé à un cache au moins une fois, vous pouvez l’ouvrir pour voir son efficacité. Les caches
+sans accès enregistré restent dans la liste, mais ne peuvent pas être ouverts.
+
+Le graphique **Hits/Total Ratio** montre la proportion d’accès ayant abouti au fil du temps, de 0 à 1. Un ratio qui
+reste faible signifie que la plupart des accès n’aboutissent pas : le cache consomme donc de la mémoire sans éviter
+beaucoup de travail. Survolez le graphique pour voir le ratio exact à un moment donné.
+
+Sous le graphique, **Statistics** résume les accès enregistrés :
+
+- **Hits** et **Misses** : nombre d’accès ayant trouvé une valeur et nombre de ceux qui n’en ont pas trouvé, avec leur
+  part de l’ensemble des accès.
+- **Entries count** : nombre estimé d’entrées dans le cache. Cette information n’apparaît que lorsque le cache peut
+  indiquer sa taille, ce qui est actuellement le cas de `Cache` de Caffeine et des caches reposant sur
+  `ConcurrentHashMap`, comme `ConcurrentMapCache`.
+
+## Gestion des caches
+
+Chaque action ci-dessous demande une confirmation avant de modifier l’application en cours d’exécution.
+
+### Vider un cache
+
+Videz un cache lorsqu’il contient des données obsolètes, par exemple après avoir modifié un enregistrement directement
+dans la base de données. Cliquez sur **Clear** à côté d’un cache pour supprimer toutes ses entrées, ou sur **Clear All
+Caches** pour vider tous les caches de l’application. L’application remplit à nouveau les caches lors des accès
+suivants.
+
+### Activer ou désactiver un cache
+
+Utilisez le commutateur **Status** pour désactiver un cache à l’exécution. Tant qu’un cache est désactivé, aucun accès
+n’aboutit et les nouvelles valeurs ne sont pas stockées : l’application récupère donc les données à la source à chaque
+appel. Cela permet de vérifier si un bug provient des données mises en cache. Réactivez le cache pour reprendre la mise
+en cache.
+
+## Gérer les caches sur plusieurs instances
+
+<ReleasedInNotice version="1.3.0" />
+
+Chaque réplica d’une application conserve sa propre copie d’un cache : le vider sur un réplica laisse donc des entrées
+obsolètes sur les autres. Ouvrez **Instances** à côté du champ de recherche pour choisir les instances de l’application
+auxquelles une action s’applique. La liste affiche chaque instance avec son commit et son état.
+
+L’instance que vous avez ouverte est toujours incluse et ne peut pas être désélectionnée. Cochez les autres instances
+une par une ou utilisez **Select all other instances**. Le bouton indique le nombre d’instances sélectionnées, ou
+**All** lorsque toutes le sont.
+
+La sélection s’applique à toutes les actions de la page : **Clear All Caches**, le vidage d’un seul cache et le
+commutateur **Status**. Si certaines instances sélectionnées sont injoignables, l’action s’applique néanmoins aux
+autres. Les statistiques de la page appartiennent toujours à l’instance que vous avez ouverte.
+
+Le sélecteur n’apparaît que lorsque l’application possède plusieurs instances. Il est réinitialisé à l’instance actuelle
+lorsque vous passez à une autre instance.
+
+## Outils MCP
+
+Les caches peuvent également être inspectés et vidés par un agent IA via MCP. Consultez le [catalogue des outils
+MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#caches).
+
+## Propriétés
+
+La gestion des caches est activée par défaut. Pour la désactiver entièrement, définissez
+`axelix.sbs.cache.management.enabled=false`. Consultez [Gestion du
+cache](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#gestion-des-caches) pour plus de
+détails.
+
+## Activer l’endpoint Actuator dédié
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Si vous utilisez Axelix 1.2.0 ou une version ultérieure, rien de tout cela n’est nécessaire : le starter
+    enregistre lui-même ses endpoints Actuator personnalisés et Axelix n’exige plus que les endpoints
+    <code>health</code>/<code>info</code> soient activés. Il fonctionne parfaitement sans eux. Aucune configuration
+    n’est nécessaire ici.</>}
+/>
+
+La page s’appuie sur l’endpoint Actuator `axelix-caches` fourni par l’Axelix Spring Boot Starter. Exposez-le via les
+propriétés standard de Spring Boot Actuator. Consultez [Configurer Spring Boot
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) pour obtenir la liste complète
+des endpoints Axelix et la configuration associée :
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-caches
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-caches
+```
+
+  </Tab>
+</Tabs>
+
+## Voir aussi
+
+- [Configurer Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configurer Spring Boot
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

@@ -1,0 +1,104 @@
+---
+title: Users
+description: "L’écran **Users** permet de voir qui peut se connecter à Axelix Master et quel rôle est attribué à chaque compte ; lorsque
+              l’authentification locale est activée, il permet également de créer, modifier et supprimer ces comptes. Cette page est accessible via le lien **Users**
+              de la barre de navigation supérieure."
+---
+
+## Qui peut ouvrir cette page
+
+Le lien **Users** apparaît uniquement pour les comptes disposant de l’autorité `users:read`. Par défaut, cette autorité est associée
+uniquement au rôle intégré `SUPER_ADMIN` — `ADMIN`, `EDITOR` et `VIEWER` ne peuvent ni voir le lien ni charger la page. Consultez
+[Rôles et autorités](../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour connaître le tableau complet
+des autorisations.
+
+Le bouton **Create User**, ainsi que les commandes de modification et de suppression de l’écran de profil, requièrent en outre l’autorité
+`users:manage`, également réservée à `SUPER_ADMIN`.
+
+## La liste des utilisateurs
+
+La section supérieure propose trois moyens de restreindre le tableau :
+
+- **Search** filtre par nom d’utilisateur ou adresse e-mail. Le compteur à droite du champ de recherche affiche `<matches> / <total>` afin
+  que vous puissiez voir combien d’utilisateurs sont actuellement visibles par rapport à la liste complète.
+- **Roles** — liste déroulante à sélection multiple. La sélection d’un ou plusieurs rôles conserve uniquement les utilisateurs disposant d’au moins un des rôles
+  sélectionnés.
+- **Origin** — liste déroulante à sélection multiple avec deux valeurs : `LOCAL` et `OIDC`. Les comptes créés dans Master apparaissent comme
+  `LOCAL`. Les comptes qui se connectent via OIDC apparaissent comme `OIDC` après leur première connexion réussie dans le navigateur ; ce
+  filtre renvoie donc uniquement les utilisateurs OIDC qui se sont connectés au moins une fois.
+
+Sous les filtres, le tableau répertorie chaque utilisateur visible avec les colonnes suivantes :
+
+- **Username** — le nom de connexion utilisé sur l’écran de connexion.
+- **Email** — l’adresse e-mail associée au compte. Elle peut être vide.
+- **Last login** — la date et l’heure de la dernière connexion réussie, au format `DD.MM.YYYY HH:mm`. Les comptes qui ne se sont
+  jamais connectés affichent **Not logged in**.
+- **Origin** — `LOCAL` pour les comptes créés dans Master, `OIDC` pour les comptes matérialisés par le flux de connexion OIDC.
+- **Roles** — tags colorés pour chaque rôle attribué à l’utilisateur (`ADMIN`, `EDITOR`, `VIEWER`).
+
+Cliquez sur une ligne pour ouvrir le [User Profile](#user-profile) de ce compte.
+
+## Création d’un utilisateur
+
+Le bouton **Create User** s’affiche uniquement lorsque l’authentification locale est activée dans Master
+(`axelix.master.auth.options.local.enabled=true`). Il est masqué dans les déploiements utilisant uniquement OIDC, car les nouveaux comptes proviennent alors
+du fournisseur d’identité et non de l’interface utilisateur d’Axelix.
+
+Cliquer sur le bouton ouvre une boîte de dialogue modale avec les champs suivants :
+
+- **Username** — le nom de connexion. Il doit être unique.
+- **Email** — facultatif. Si vous le laissez vide, le compte est enregistré sans adresse e-mail.
+- **Password** — le mot de passe initial. L’utilisateur peut le modifier ultérieurement depuis son profil.
+- **Role** — exactement un rôle : `ADMIN`, `EDITOR` ou `VIEWER`. Plusieurs rôles peuvent être attribués ultérieurement depuis l’écran de
+  profil.
+
+Une création réussie ferme la boîte de dialogue, affiche une notification **User created successfully** et actualise la liste.
+
+## User Profile
+
+La sélection d’une ligne dans la liste des utilisateurs ouvre la page de profil de ce compte. Elle présente la carte **User Profile** avec quatre
+champs modifiables directement, suivis d’une zone d’actions pour gérer le compte lui-même.
+
+Chaque ligne de la carte comporte un crayon de modification à droite. Cliquer dessus remplace la valeur par un champ de saisie accompagné d’une action de confirmation et
+d’une action d’annulation. L’enregistrement envoie immédiatement la nouvelle valeur à Master ; l’annulation rétablit le champ sans
+rien conserver.
+
+- **Username** — le nom de connexion. Le modifier change l’identifiant utilisé par l’utilisateur pour se connecter.
+- **Email** — l’adresse e-mail. Enregistrer une valeur vide efface l’adresse e-mail du compte.
+- **Roles** — la liste déroulante à sélection multiple permet d’attribuer n’importe quelle combinaison de `ADMIN`, `EDITOR` et `VIEWER`. Les
+  permissions effectives de l’utilisateur correspondent à l’union des autorités accordées par ces rôles.
+- **Password** — la valeur est toujours masquée sous la forme `••••••••••`. Le modifier définit un tout nouveau mot de passe ; il n’existe aucune option pour
+  afficher la valeur actuelle, car Master ne stocke jamais le mot de passe en clair. Laisser le champ vide et confirmer enregistre une
+  chaîne vide, que le backend rejette.
+
+Deux boutons d’action se trouvent sous la carte :
+
+- **Delete user** — ouvre une boîte de dialogue de confirmation (**Are you sure you want to delete this user?**). La confirmation supprime
+  immédiatement le compte ; la page revient à la liste des utilisateurs et une notification **User deleted successfully** apparaît.
+  Cette opération ne peut pas être annulée.
+- **Access Log** — actuellement désactivé. Cette commande est réservée à une prochaine fonctionnalité qui sera fournie avec Axelix
+  Enterprise. L’Access Log et Axelix Enterprise sont tous deux encore en développement ; le bouton ne peut donc pas être utilisé
+  aujourd’hui.
+
+:::warning
+L’action **Delete user** est irréversible. Le compte est supprimé de la base de données — il n’existe ni suppression logique ni
+restauration.
+:::
+
+## Sessions OIDC
+
+Lorsque OIDC est activé, une connexion réussie dans le navigateur crée ou met à jour une ligne d’utilisateur `OIDC` dans la base de données de Master. Master
+met à jour **Last login**, enregistre l’adresse e-mail fournie dans la charge utile `userinfo` d’OIDC lorsqu’elle est présente, et affiche le compte dans
+ce tableau avec l’origine `OIDC`.
+
+À chaque connexion OIDC, Master réévalue `axelix.master.auth.options.oauth2.role-attribute-path` et actualise l’attribution de rôle enregistrée
+à partir du résultat. Par conséquent, les comptes OIDC apparaissent bien sur cet écran, mais leur rôle effectif
+provient toujours du mapping configuré dans votre fournisseur d’identité.
+
+:::warning
+Si un nom d’utilisateur OIDC correspond à un compte non OIDC existant, Master refuse la connexion au lieu de fusionner les identités.
+Résolvez d’abord le conflit dans le fournisseur d’identité ou renommez le compte local.
+:::
+
+Pour une présentation complète de la configuration de l’authentification, consultez
+[Authentification](../setting-up-master-ui/authentication/authentication.mdx).

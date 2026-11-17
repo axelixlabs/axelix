@@ -1,0 +1,69 @@
+---
+title: Politique de support
+description: "Fréquence de publication des nouvelles versions d’Axelix, versions open source qui reçoivent encore des correctifs et durée de ce support."
+---
+
+import { SupportTimeline } from './SupportTimeline';
+
+Chaque ligne de versions d’Axelix reçoit des correctifs pendant une durée limitée. Cette page explique à quelle
+fréquence les nouvelles versions sont publiées, quelles versions open source sont actuellement prises en charge et ce
+que comprend le support.
+
+## Cadence des versions
+
+Axelix publie une nouvelle version mineure ou majeure environ tous les **1 à 1,5 mois**. L’une de ces versions est
+**majeure** chaque année : une année civile comprend donc généralement environ 8 ou 9 versions mineures et une version
+majeure.
+
+Entre ces versions, une ligne prise en charge peut également recevoir des **versions correctives** (`1.2.1`, `1.2.2`,
+etc.). Les versions correctives n’ont pas de calendrier fixe : elles sont publiées lorsqu’un correctif est prêt. Les
+changements permis dans chaque type de version sont décrits dans
+[Compatibilité et versionnement](./compatibility-and-versioning.mdx#indice-de-pénibilité).
+
+## Durée de support d’une version
+
+L’édition open source prend en charge **uniquement la dernière ligne de versions**. Une ligne mineure `X.Y` est prise en
+charge à compter de la publication de `X.Y.0` et jusqu’à celle de la version suivante, `X.Y+1.0` ou d’une nouvelle
+version majeure. Compte tenu de la cadence de publication, cette durée est généralement d’environ **1,5 mois**.
+
+Par exemple, `1.1.0` a été publiée le 10 septembre 2026 et `1.2.0` le 10 octobre 2026. La ligne `1.1` a donc été prise
+en charge pendant ce mois et, depuis le 10 octobre, seule la ligne `1.2` est prise en charge.
+
+Pendant qu’une ligne est prise en charge, elle reçoit :
+
+- des correctifs pour les vulnérabilités de sécurité, tant dans Axelix lui-même que dans ses dépendances ;
+- des correctifs pour les bogues critiques.
+
+Ces correctifs sont publiés sous forme de versions correctives de la ligne prise en charge, par exemple `1.2.1`. Les
+nouvelles fonctionnalités ne sont jamais intégrées à une version corrective : elles attendent la prochaine version
+mineure. Lorsqu’une ligne n’est plus prise en charge, elle ne reçoit plus de versions correctives ; pour résoudre un
+problème que vous y rencontrez, vous devez donc effectuer une mise à niveau vers la dernière version.
+
+:::note[Le support ne signifie pas la compatibilité]
+La fin du support ne signifie pas qu’une version antérieure cesse de fonctionner. Master continue de fonctionner avec
+des services utilisant des starters issus des 4 dernières versions mineures, comme décrit dans
+[la fenêtre de compatibilité](./upgrading.mdx#fenêtre-de-compatibilité). Le support définit uniquement quelles versions
+reçoivent encore des correctifs.
+:::
+
+## Versions prises en charge
+
+| Version | Publication initiale | Fin du support OSS                  |
+|---------|----------------------|-------------------------------------|
+| `1.2.x` | 10 octobre 2026      | À la publication de la version suivante |
+| `1.1.x` | 10 septembre 2026    | 10 octobre 2026                     |
+| `1.0.x` | 29 juillet 2026      | 10 septembre 2026                   |
+
+Le graphique ci-dessous présente ces mêmes périodes dans le temps. La fin de la ligne actuelle est une estimation fondée
+sur l’intervalle habituel entre les versions ; elle évolue en fonction de la date de publication réelle.
+
+<SupportTimeline locale="fr" />
+
+Pour rester sur une version prise en charge, effectuez une mise à niveau vers chaque nouvelle version mineure. Les
+étapes sont décrites dans [Mise à niveau d’Axelix](./upgrading.mdx).
+
+## Voir aussi
+
+- [Compatibilité et versionnement](./compatibility-and-versioning.mdx)
+- [Mise à niveau d’Axelix](./upgrading.mdx)
+- [Modèle de branches](./development/branching-model.mdx)

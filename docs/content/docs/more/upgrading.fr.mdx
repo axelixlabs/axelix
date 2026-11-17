@@ -1,0 +1,113 @@
+---
+title: Mise à niveau d’Axelix
+description: "La procédure qui rend les mises à niveau d’un parc réel sûres et prévisibles lorsque Master et les starters évoluent à des rythmes différents."
+---
+
+Axelix est [publié avec des versions synchronisées](./compatibility-and-versioning.mdx) : chaque publication fournit tous les composants sous une même version. Mais dans un parc réel, les **mises à niveau** ne sont jamais synchronisées : l’équipe plateforme met à niveau **Axelix Master** en une seule opération, tandis que des dizaines de services utilisent le **starter** et le **plugin de build** comme dépendances ordinaires et les mettent à jour lorsque leurs équipes peuvent s’en charger. Cette page décrit la procédure qui rend cette réalité sûre et prévisible.
+
+:::info[Depuis Axelix 1.1]
+La politique de mise à niveau décrite ci-dessous a été introduite dans **Axelix 1.1** et s’applique à cette version ainsi qu’aux suivantes. Elle couvre les mises à niveau **entre versions mineures d’une même version majeure d’Axelix**. Chaque migration vers une version majeure dispose d’un guide dédié.
+:::
+
+## Fenêtre de compatibilité
+
+Toute la procédure repose sur une garantie :
+
+> **Axelix Master prend en charge les starters des 4 dernières versions mineures, la sienne comprise.**
+
+Par exemple, Master `1.4.x` prend en charge les services utilisant des starters de `1.1.x` à `1.4.x`. Un service utilisant un starter `1.0.x` se trouve **hors de la fenêtre** de Master `1.4.x` et son fonctionnement avec celui-ci n’est plus garanti :
+
+![Fenêtre de compatibilité d’Axelix](/img/more/axelix-compatibility-window.png) ***Master `1.4` prend en charge les services dont le starter se situe dans la fenêtre `1.1`–`1.4`. Le service utilisant encore le starter `1.0` est hors de cette fenêtre et n’est plus pris en charge.***
+
+C’est un **minimum garanti** : nous pouvons prendre en charge une plage plus large en pratique, mais nous garantissons au moins ces 4 versions mineures et ne réduirons pas cette fenêtre au sein d’une version majeure.
+
+Deux règles en découlent :
+
+- **Master passe en premier.** La fenêtre s’étend vers les versions antérieures : un Master plus récent prend en charge des starters plus anciens, jamais l’inverse. N’utilisez pas un starter dont la version est plus récente que celle de votre Master.
+- **Le starter et le plugin évoluent ensemble.** Au sein d’un service, le starter et le plugin de build doivent partager la même version `major.minor` : mettez-les à niveau dans le même changement. La fenêtre s’applique entre **Master et vos services**, pas à l’intérieur d’un service.
+
+## Cadence des versions
+
+Axelix vise environ **7 à 9 versions mineures par année civile**, soit une nouvelle version mineure environ tous les 1,5 mois, et une publication synchronisée **majeure** par an.
+
+Associée à la fenêtre de compatibilité, cette cadence transforme une fenêtre abstraite en un délai concret : puisque Master prend en charge les starters des 4 dernières versions mineures, un service qui reste dans cette fenêtre ne doit être mis à jour **qu’environ tous les six mois**. Et comme les composants clients restent volontairement simples, cette mise à jour est généralement triviale : changer une version de dépendance et redéployer.
+
+## Procédure de mise à niveau
+
+### 1. Déterminer jusqu’à quelle version vous pouvez aller
+
+Ouvrez **Administration → Upgrading** dans l’interface de Master. Cette page indique la version de Master la plus élevée vers laquelle vous pouvez migrer sans qu’aucun service ne sorte de la fenêtre de compatibilité. Elle est calculée à partir de la version de starter la plus ancienne observée par Master dans votre parc.
+
+La fenêtre étant purement arithmétique, Master calcule ce résultat **entièrement en local** : aucun appel à une page de publication, aucun accès Internet nécessaire. Le fonctionnement est identique dans les environnements isolés d’Internet.
+
+La page répertorie également les services qui limitent ce résultat — ceux qui utilisent les starters les plus anciens — pour que vous sachiez exactement quelles équipes solliciter si vous souhaitez aller plus loin.
+
+### 2. Mettre à niveau Axelix Master
+
+Mettez à niveau Master dans chaque environnement : développement d’abord, puis préproduction, puis production. Master est un déploiement autonome (JAR, image Docker ou chart Helm) ; cette étape relève donc entièrement de l’équipe plateforme et ne touche aucun service. Les opérations nécessaires — arrêt, sauvegarde, passage à la nouvelle version et retour arrière — sont décrites ci-dessous dans [Mise à niveau de Master lui-même](#mise-à-niveau-de-master-lui-même).
+
+Vos services continuent de fonctionner pendant toute l’opération : ils se trouvent dans la fenêtre, c’est précisément l’objectif de l’étape 1.
+
+### 3. Laisser les équipes mettre à niveau leurs services
+
+Confiez ensuite la tâche aux équipes des services : mettez le **starter** et le **plugin** à la nouvelle version — tous deux à la même version, dans le même changement — puis redéployez. Pour un service classique, cela se limite à modifier une version de dépendance.
+
+Ce n’est pas un hasard, mais une **règle de conception délibérée** : Axelix Master est le côté **intelligent**, tandis que les composants clients — le starter et le plugin — restent **aussi simples que possible**. Toute l’interprétation et la logique complexe résident dans Master ; les composants clients se contentent de collecter et de transmettre des données brutes. C’est ce qui rend la mise à niveau d’un service rapide et simple ; dans l’idéal, nous cherchons à limiter au maximum les options de configuration des composants clients d’Axelix.
+
+Les équipes effectuent cette opération **indépendamment et à leur propre rythme**. La fenêtre leur donne un délai : avec 4 versions mineures garanties, un service peut laisser passer quelques mises à niveau de Master avant de devoir rattraper son retard.
+
+### 4. Suivre la mise à niveau du parc
+
+La page **Upgrading** présente la répartition des versions de starters dans le parc. Après une mise à niveau de Master, observez cette répartition évoluer vers la nouvelle version et repérez immédiatement les services en retard, y compris ceux créés à partir de modèles obsolètes qui intègrent une ancienne version du starter.
+
+## Mise à niveau de Master lui-même
+
+Les mises à niveau de Master se font **uniquement vers une version plus récente** : il n’existe volontairement aucune procédure de rétrogradation. C’est le modèle habituel des plans de contrôle avec état, pour une raison liée à la base de données. Master possède sa propre base ; les [migrations de schéma](../setting-up-master-ui/migrations/migrations.mdx) s’y appliquent automatiquement au démarrage, et nous les concevons pour être **simples, sans être réversibles**. Une migration qui restructure une table ne peut généralement être annulée qu’en supprimant des données. Nous privilégions donc un moyen de retour fiable : une **sauvegarde de la base de données réalisée pendant la mise à niveau**, à restaurer en cas de problème.
+
+Cela ne signifie **pas** qu’il faut avancer d’une seule version mineure à la fois. Le passage direct de n’importe quelle ancienne version à une version plus récente **au sein d’une même version majeure** est pris en charge : vous pouvez passer de `1.1` directement à `1.4`. Au démarrage, le nouveau Master repère toutes les migrations qui n’ont pas encore été appliquées à votre base et exécute la chaîne complète dans l’ordre ; qu’elle couvre une ou trois versions mineures ne change rien. La seule exception est le franchissement d’une version **majeure** : chaque publication majeure fournit un guide de migration dédié, à suivre à la place de cette procédure.
+
+Un dernier point avant les étapes : cette procédure exige un **arrêt complet**. Elle commence par l’arrêt du Master en cours d’exécution ; il y a donc une courte **période d’indisponibilité**, généralement de quelques minutes, pendant laquelle l’interface et l’API de Master sont inaccessibles. Vos services, en revanche, n’en sont pas affectés.
+
+### Ce qui arrive à vos services pendant l’indisponibilité
+
+Rien, par conception. Le starter de chaque service envoie à Master un **signal de présence périodique**, et pas uniquement au démarrage. Pendant l’arrêt de Master, ces signaux restent sans réponse : le service continue de traiter son propre trafic, ne met rien en tampon et réessaie selon sa fréquence habituelle. Dès que le nouveau Master fonctionne, le signal de présence suivant de chaque service le réenregistre intégralement ; le parc se reconstitue donc en un intervalle de signal de présence. C’est pourquoi les étapes ci-dessous ne mentionnent jamais vos services : aucune coordination avec leurs équipes, aucune mise hors trafic et aucun redémarrage ne sont nécessaires. Du point de vue d’un service, une mise à niveau de Master ressemble à une brève interruption réseau. Consultez [Fonctionnement de la découverte](../product/discovery.mdx) pour comprendre l’enregistrement et les signaux de présence des services.
+
+### Étape par étape
+
+1. **Arrêtez le Master en cours d’exécution.** Quel que soit son mode d’exécution — Deployment Kubernetes, conteneur ou simple JAR — arrêtez-le complètement. La période d’indisponibilité commence ici.
+
+2. **Sauvegardez la base de données.** Utilisez les outils habituels de votre moteur : un export pour **PostgreSQL** ou **MySQL**, une copie du fichier de base pour **SQLite**. Réalisez la sauvegarde **après** l’arrêt de Master : sans aucune écriture dans la base, la cohérence de l’instantané est garantie. Ne sautez pas cette étape, même pour une mise à niveau qui semble banale : cette sauvegarde **constitue** la procédure de retour arrière.
+
+3. **Démarrez la nouvelle version de Master.** Au démarrage, elle applique automatiquement toutes les [migrations de base de données](../setting-up-master-ui/migrations/migrations.mdx) en attente, puis commence à traiter les requêtes. Laissez-lui le temps de terminer : ne redémarrez pas Master et ne tuez pas son processus pendant l’application des migrations.
+
+4. **Vérifiez.** L’interface est accessible et affiche la nouvelle version ; vos services réapparaissent d’eux-mêmes en un intervalle de signal de présence. Si le parc semble complet et que les services se sont réenregistrés correctement, vous pouvez considérer la mise à niveau d’Axelix Master comme terminée.
+
+### Retour arrière
+
+Si la nouvelle version fonctionne mal pour une raison quelconque, utilisez la sauvegarde de l’étape 2 :
+
+1. Arrêtez le nouveau Master.
+2. Restaurez la base de données depuis la sauvegarde.
+3. Démarrez la version que vous utilisiez avant la mise à niveau.
+
+Tout ce qui a été écrit dans la base entre la sauvegarde et le retour arrière est perdu ; pour Master, cette perte est négligeable, **par conception**.
+
+Le registre des services **se reconstitue automatiquement** à partir des signaux de présence en un seul intervalle. Les éléments qui **ne se reconstituent pas** — utilisateurs, rôles, paramètres — changent rarement sur une période aussi courte. Gardez toutefois à l’esprit qu’un retour arrière est une solution temporaire : la trajectoire à long terme va toujours vers des versions plus récentes. Si une mise à niveau a échoué pour vous, [ouvrez un ticket](https://github.com/axelixlabs/axelix/issues) : la correction sera apportée dans une version ultérieure.
+
+### Invariants
+
+- **N’exécutez jamais deux versions différentes de Master sur la même base de données en même temps.** La nouvelle version restructure le schéma dès son démarrage, et l’ancienne n’est pas conçue pour fonctionner avec ce nouveau schéma. Maintenir l’ancien code compatible avec des schémas futurs est précisément la complexité que ce modèle permet d’éviter. Sur Kubernetes, le Deployment de Master doit donc utiliser la stratégie `Recreate` : la stratégie par défaut `RollingUpdate` exécute brièvement l’ancien et le nouveau pod côte à côte, même avec un seul réplica, et ce chevauchement intervient exactement pendant l’application des migrations.
+
+- **Une courte indisponibilité de Master est prévue.** Nous ne promettons volontairement pas de mises à niveau de Master sans interruption : cela nécessiterait des migrations réversibles en plusieurs phases et un Master hautement disponible ; nous préférons conserver la simplicité du produit et de cette procédure. Seuls l’interface et l’API de Master sont indisponibles pendant cette période ; vos services continuent de fonctionner sans intervention.
+
+- **Un seul réplica de Master à la fois.** Master est actuellement conçu comme une application à instance unique : ses tâches en arrière-plan — interrogation pour la découverte, éviction des instances mortes — et ses caches en mémoire supposent tous qu’un seul Master est en cours d’exécution. Plusieurs réplicas dupliqueraient ce travail et entreraient en concurrence. Un Master hautement disponible avec plusieurs réplicas figure sur la feuille de route.
+
+## Services en retard
+
+Une mise à niveau de Master **n’est jamais bloquée** par des services en retard : la décision revient toujours à l’équipe plateforme. Le compromis est annoncé à l’avance : avant la mise à niveau, la page **Upgrading** répertorie exactement les services qui sortiraient de la fenêtre de compatibilité si vous dépassiez la version sûre indiquée. Vous savez donc précisément ce qu’implique la mise à niveau et à qui vous adresser.
+
+Comprenez bien cette conséquence : un service dont le starter est hors de la fenêtre **n’est plus du tout pris en charge**. Il disparaît de l’interface de Master et reste invisible jusqu’à ce que son starter soit mis à niveau pour revenir dans la fenêtre. L’avertissement intervient **avant** la mise à niveau, et non après : une fois que vous avez dépassé la limite d’un service, rien dans l’interface ne vous rappellera son existence.
+
+## Mises à niveau vers une version majeure
+
+La fenêtre de compatibilité est définie **au sein d’une version majeure**. Chaque version majeure est accompagnée d’un guide de migration dédié qui précise la procédure depuis la version majeure précédente, notamment les dernières versions mineures de cette ancienne version majeure que le nouveau Master peut encore prendre en charge pendant la transition.

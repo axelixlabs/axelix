@@ -1,0 +1,97 @@
+---
+title: Service Profile
+description: "Le Service Profile est l’espace consacré à chaque instance dans Axelix. Il regroupe tous les écrans de diagnostic et d’inspection d’une même
+              instance Spring Boot derrière une barre latérale unique, ce qui vous permet de passer de Beans à Loggers, Thread Dumps et aux autres écrans sans
+              perdre le contexte de l’instance consultée."
+---
+
+Vous accédez à un Service Profile en cliquant sur la carte d’un service dans le [Wallboard](./wallboard.mdx). Le premier écran affiché est
+toujours [Details](../features/insights/details.mdx).
+
+## Disposition
+
+Un Service Profile comprend deux zones :
+
+- La **barre latérale gauche** répertorie toutes les pages de fonctionnalités disponibles pour l’instance.
+- La **zone de contenu principale** affiche la page de fonctionnalité actuellement sélectionnée.
+
+## Groupes de la barre latérale
+
+La barre latérale est divisée en trois groupes. Chaque groupe peut être développé ou réduit indépendamment, et la page actuellement ouverte
+est mise en évidence.
+
+### Insights
+
+Informations générales sur l’exécution de l’instance.
+
+- [Details](../features/insights/details.mdx) : la carte d’identité de l’instance. Affiche les coordonnées de build, la révision Git, le fournisseur du JDK
+  et les métadonnées d’exécution, ainsi qu’une action **Download state** qui exporte une archive ZIP contenant une sélection de diagnostics (dump de heap,
+  dump de threads, logs, beans, caches, etc.) pour une analyse hors ligne.
+- [Metrics](../features/insights/metrics.mdx) : les métriques Micrometer en direct exposées par l’instance, automatiquement regroupées par préfixe en
+  catégories logiques telles que JVM, HTTP et JDBC. Vous pouvez examiner chaque métrique en détail pour consulter sa valeur actuelle et les
+  dimensions de ses tags.
+- [Loggers](../features/insights/loggers/loggers.mdx) : répertorie tous les loggers et groupes de loggers configurés dans l’application avec leur
+  niveau actuel. Vous pouvez modifier un niveau à la volée (par exemple, passer un package à DEBUG pendant la reproduction d’un bug),
+  appliquer ce niveau jusqu’à une heure choisie, puis rétablir sa valeur d’origine une fois terminé. [Également disponible sous forme d’outil
+  MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#loggers)
+- [Dependencies Analyzer](../features/insights/dependencies-analyzer.mdx) : les dépendances résolues par l’application,
+  regroupées par écosystème (persistance, web, sécurité, etc.), avec l’état de maintenance de chaque projet et la
+  période de support OSS de la ligne Spring Boot utilisée par l’application. Cette entrée apparaît uniquement lorsque le starter de l’instance prend en charge cette fonctionnalité.
+
+### Spring Framework
+
+Inspection spécifique à Spring.
+
+- [Properties](../features/spring-framework/properties.mdx) : l’`Environment` Spring résolu de l’instance. Chaque propriété active est
+  regroupée par source (propriétés système, `application.yaml`, arguments de ligne de commande, etc.), ce qui vous permet de voir non
+  seulement la valeur effective, mais aussi la source de propriétés qui l’a fournie, les valeurs masquées par une source de
+  priorité supérieure et les propriétés obsolètes. [Également disponible sous forme d’outil
+  MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#introspection-dune-instance)
+- [Beans](../features/spring-framework/beans.mdx) : chaque bean du contexte d’application avec sa portée (Singleton, Prototype, Request,
+  Session, etc.), ses dépendances, ses alias, ses qualificateurs et son origine (`@Component`, méthode `@Bean`, `FactoryBean`,
+  synthétique). Les beans associés à `@ConfigurationProperties` renvoient directement à l’entrée correspondante de la page Configuration
+  Properties. [Également disponible sous forme d’outil MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#introspection-dune-instance)
+- [Configuration Properties](../features/spring-framework/configuration-properties.mdx) : tous les beans annotés avec `@ConfigurationProperties`
+  et la valeur actuelle de chacun de leurs champs. Vous pouvez ainsi voir ce que contiennent réellement vos objets de configuration typés
+  à l’exécution au lieu de le déduire du YAML. [Également disponible sous forme d’outil
+  MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#introspection-dune-instance)
+- [Scheduled Tasks](../features/spring-framework/scheduled-tasks.mdx) : chaque tâche `@Scheduled` de l’application, regroupée par type de déclencheur
+  (**cron**, **fixed delay**, **fixed rate**). Vous pouvez suspendre ou reprendre une tâche, modifier sa planification et déclencher manuellement
+  une exécution ponctuelle. [Également disponible sous forme d’outil MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#introspection-dune-instance)
+- [Conditions](../features/spring-framework/conditions.mdx) : le résultat de l’évaluation de `@Conditional` par Spring pour chaque bean candidat,
+  réparti entre correspondances **positive** et **negative**. Cette page est le moyen le plus rapide de déterminer quelle condition a empêché une
+  auto-configuration de fournir un bean attendu. [Également disponible sous forme d’outil
+  MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#introspection-dune-instance)
+- [Caches](../features/spring-framework/caches.mdx) : les caches Spring enregistrés dans l’instance, regroupés par `CacheManager`. Affiche les taux de réussite
+  et d’échec du cache, le nombre estimé d’entrées, et permet de vider des caches individuels ou tous les caches à la fois. [Également disponible sous forme d’outil
+  MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#caches)
+- [Transaction Control](../features/spring-framework/transaction-control.mdx) : chaque méthode `@Transactional` exécutée par
+  l’application, avec son temps d’exécution et les problèmes détectés dans la transaction : appels réseau bloquants,
+  requêtes N+1 et pagination en mémoire. [Également disponible sous forme d’outil
+  MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#analyse-de-la-persistance)
+- [Entities Map](../features/spring-framework/entities-map.mdx) : vérifie le mapping JPA de chaque entité et montre les
+  associations dont le mapping entraîne des requêtes supplémentaires : chargement eager, `@ManyToMany` reposant sur une `List`, cascade `REMOVE`
+  ou `ALL`, et `@OneToMany` unidirectionnel. [Également disponible sous forme d’outil
+  MCP.](../setting-up-master-ui/mcp/mcp-tools.mdx#analyse-de-la-persistance)
+
+### JVM
+
+Diagnostics au niveau de la JVM.
+
+- [Thread Dump](../features/jvm/thread-dump.mdx) : instantané de chaque thread JVM actif avec son état, sa stack trace, ses compteurs
+  de blocage et d’attente, et les informations sur le propriétaire du verrou. La page permet également d’activer ou de désactiver la surveillance de la contention des threads sur la JVM en cours d’exécution.
+- [Garbage Collector](../features/jvm/garbage-collector.mdx) : logs du ramasse-miettes diffusés en continu depuis l’instance. La journalisation GC est
+  généralement désactivée par défaut sur les JVM de production ; la page expose donc une action **Enable GC Logging** qui l’active
+  sans redémarrer l’application.
+
+## Accès MCP
+
+Plusieurs des fonctionnalités ci-dessus sont également exposées sous forme d’outils par le serveur MCP intégré à Axelix Master, ce qui permet à un agent IA
+connecté via MCP de lire les mêmes données. Le catalogue complet des outils enregistrés est consultable sur l’[écran
+MCP](./mcp.mdx), et la liste de référence à jour avec les noms, les tags et les restrictions par rôle se trouve dans [MCP
+Tools](../setting-up-master-ui/mcp/mcp-tools.mdx).
+
+## Voir aussi
+
+- [Wallboard](./wallboard.mdx)
+- [Spring Portfolio](./dashboard/spring-portfolio.mdx)

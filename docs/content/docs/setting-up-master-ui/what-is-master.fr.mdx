@@ -1,0 +1,49 @@
+---
+title: Qu’est-ce que Master ?
+description: "Axelix Master (ou simplement « Master ») est l’application centrale de l’écosystème Axelix, dotée de fonctionnalités avancées
+              pour gérer et surveiller des applications Spring Boot dans divers environnements."
+---
+
+## Objectif principal
+
+Axelix Master est l’application centrale d’Axelix, la plateforme open source nativement conçue pour l’IA et destinée au développement
+et à l’évolution d’écosystèmes de microservices Java Spring Boot. Elle détecte, enregistre et surveille les services, et fournit à la fois
+l’interface web destinée aux ingénieurs et le serveur MCP intégré destiné aux agents IA. Ces deux types d’utilisateurs ont ainsi accès à
+l’analyse et au débogage des applications ; les fonctionnalités MCP disponibles sont répertoriées dans le
+[catalogue d’outils](./mcp/mcp-tools.mdx).
+
+## Fonctionnalités clés
+
+### 🔍 **Découverte de services**
+Master détecte les applications Spring Boot grâce à deux mécanismes complémentaires :
+
+**Auto-enregistrement (tout environnement) :**
+Les applications qui intègrent Axelix Spring Boot Starter se déclarent auprès de Master et envoient périodiquement des signaux de vie.
+Cela fonctionne partout où l’application peut joindre Master, notamment avec Docker Compose, sur des machines physiques, des machines
+virtuelles, Kubernetes, etc. Ce mécanisme est **activé individuellement pour chaque application** : activez-le dans votre application avec
+`axelix.sbs.discovery.self-registration=true` (il est désactivé par défaut). Master accepte ces enregistrements sans configuration
+supplémentaire (le paramètre `axelix.master.discovery.self-registration.enabled` de Master est activé par défaut).
+
+**Découverte automatique (Kubernetes uniquement) :**
+Lorsqu’elle est activée (au moyen de la propriété `axelix.master.discovery.auto.enabled`), Master analyse activement la plateforme pour
+trouver les services éligibles. L’analyse de la plateforme n’est actuellement implémentée que pour **Kubernetes**. Elle est désactivée par
+défaut dans la configuration de Master, mais le [chart Helm](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) officiel
+l’active par défaut.
+
+**Fonctionnement de la découverte :**
+1. **Auto-enregistrement** : les applications dotées d’Axelix Starter s’enregistrent et envoient des signaux de vie
+2. **Analyse de la plateforme** (Kubernetes) : Master interroge le cluster pour trouver les services exposant des endpoints Axelix SBS
+3. **Maintien de la liste à jour** : Master actualise les instances découvertes automatiquement à chaque analyse et supprime les instances
+   auto-enregistrées qui cessent d’envoyer des signaux de vie
+
+Pour en savoir plus, consultez [Fonctionnement de la découverte](../product/discovery.mdx).
+
+### 🖥️ **Interface web unifiée**
+Une interface unique pour toutes vos applications Spring Boot :
+
+**Fonctionnalités disponibles :**
+- Tableau de bord regroupant toutes les applications enregistrées
+- Serveur MCP intégré fournissant ces informations aux agents IA
+- Inspection des propriétés de configuration et de l’environnement
+- Analyse détaillée des beans
+- Et bien plus encore ; consultez la section Fonctionnalités

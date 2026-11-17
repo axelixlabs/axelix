@@ -1,0 +1,409 @@
+---
+title: Premiers pas
+description: "Cette page décrit la méthode recommandée pour déployer Axelix dans une organisation : les environnements par lesquels commencer,
+              l’ordre d’installation des composants et la manière d’atteindre la production en toute sécurité. Chaque étape fournit les commandes
+              concrètes et la configuration minimale, avec des liens vers la page de configuration détaillée pour consulter la référence complète."
+---
+
+:::note
+Les extraits de cette page utilisent la version `AXELIX_VERSION_PLACEHOLDER` à titre d’exemple. Consultez la [page des
+versions](https://github.com/axelixlabs/axelix/releases) pour connaître le dernier tag publié et utilisez-le dans vos propres
+commandes.
+:::
+
+## Axelix et vos environnements
+
+Un cycle de développement logiciel type couvre plusieurs environnements. Quels que soient leurs noms exacts — dev,
+sandbox, QA, UAT, staging — chaque environnement appartient à l’une de deux catégories : **production** et **hors production**.
+
+La première question que les équipes se posent donc généralement est la suivante : Axelix Master est-il censé s’exécuter en production ? **Oui.** Master est conçu
+pour s’exécuter à la fois en production et dans les environnements de test, du point de vue des performances, de la sécurité et de la
+tolérance aux pannes. L’exécution de Master en production est une pratique établie, et non une utilisation détournée.
+
+Toutefois, nous vous recommandons vivement de séparer le déploiement de production d’Axelix de celui qui gère
+vos environnements de test. En d’autres termes : n’utilisez pas un Master unique pour gérer tous les environnements. Voici pourquoi :
+
+1. **Le contrôle d’accès diffère.** La configuration RBAC d’un environnement de test ne correspond presque certainement pas à
+   celle de la production. La liste des personnes autorisées à modifier les niveaux de journalisation, à activer ou désactiver des caches ou à générer un heap dump en production est
+   beaucoup plus courte que dans l’environnement de staging. Consultez [Rôles et
+   autorités](../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités).
+2. **Les règles réseau diffèrent.** Les règles déterminant qui peut accéder à l’interface utilisateur de Master et à son serveur MCP sont généralement
+   beaucoup plus strictes en production que dans les environnements de test.
+3. **Les politiques différeront.** Les politiques d’Axelix Enterprise, actuellement en cours de développement, devraient également être
+   propres à chaque environnement.
+
+:::tip
+Chaque déploiement de Master peut indiquer l’environnement qu’il dessert via la propriété `axelix.master.environment` (par
+exemple `production` ou `staging`). Aujourd’hui, cette étiquette alimente uniquement la [journalisation
+structurée](../setting-up-master-ui/configuring-master/configuring-master.mdx#journalisation-structurée), mais la définir dès le
+premier jour permet à vos déploiements de se décrire eux-mêmes.
+:::
+
+Avec cette séparation à l’esprit, l’adoption commence par les environnements de test. Ainsi, lorsque Axelix arrive en production,
+la configuration et les habitudes de votre équipe ont déjà fait leurs preuves.
+
+## Étape 1 — Préparer la base de données
+
+Master nécessite une base de données relationnelle. Par défaut, il embarque [SQLite](https://www.sqlite.org/) et utilise
+l’URL `jdbc:sqlite:axelix.db`, de sorte qu’une première exécution ne nécessite **aucune configuration de base de données**. Cette valeur par défaut
+permet de démarrer rapidement.
+
+Si vous ne souhaitez plus simplement expérimenter et voulez tirer réellement parti de l’installation, choisissez un moteur dans la liste des moteurs pris en charge :
+**PostgreSQL**, **MySQL** ou **SQLite**. Pour toute utilisation allant au-delà d’un essai sur un seul nœud, choisissez PostgreSQL ou MySQL :
+SQLite stocke les données dans un fichier local, qui ne survit donc pas aux redémarrages de conteneurs sans volume monté et ne peut pas
+prendre en charge plusieurs réplicas de Master. Nous prévoyons d’élargir la liste des moteurs pris en charge dans les futures versions.
+
+Provisionnez la base de données et un utilisateur disposant des privilèges nécessaires aux migrations de schéma, car Master applique lui-même son schéma :
+[Liquibase](https://www.liquibase.com/) s’exécute à chaque démarrage et vous n’avez jamais à lancer les migrations manuellement ; consultez [Migrations de
+base de données](../setting-up-master-ui/migrations/migrations.mdx). La connexion se configure au moyen de trois propriétés
+décrites dans la section [Base de données](./configuring-master.mdx#base-de-données).
+
+Une fois la base de données prête, passez à l’étape suivante.
+
+## Étape 2 — Installer Master dans un environnement de test
+
+Installez d’abord Master dans un environnement de test (ou dans plusieurs, si vous conservez des déploiements Axelix distincts pour chaque
+environnement de test). Tous les formats de distribution conviennent ; choisissez celui qui correspond à votre infrastructure : [un simple
+JAR](./configuring-master.mdx#exécuter-sous-forme-de-jar), [Docker](./configuring-master.mdx#exécuter-avec-docker), [Docker
+Compose](./configuring-master.mdx#exécuter-avec-docker-compose) ou [Kubernetes avec le chart Helm
+officiel](./configuring-master.mdx#exécuter-sur-kubernetes). Voici le lancement minimal pour chacun :
+
+<Tabs items={['Docker GHCR', 'Docker Hub', 'Kubernetes (Helm)', 'JAR']}>
+  <Tab value="Docker GHCR">
+
+L’image est publiée sur GitHub Container Registry. Les commandes ci-dessous utilisent la dernière version,
+`AXELIX_VERSION_PLACEHOLDER` ; remplacez le tag pour exécuter une autre version :
+
+<Tabs groupId="jwt-key" items={['Clé intégrée (essai local)', 'Votre propre clé']}>
+  <Tab value="Clé intégrée (essai local)">
+
+```bash
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+Si aucune propriété JWT n’est définie, Master utilise la clé de signature intégrée. Réservez cette option à un essai local ; consultez [Exécuter sans
+clé de signature](./configuring-master.mdx#exécution-sans-clé-de-signature).
+
+  </Tab>
+  <Tab value="Votre propre clé">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+Consultez [Exécuter avec Docker](./configuring-master.mdx#exécuter-avec-docker) pour fournir la connexion à la base de données et le reste de
+la configuration, et [Exécuter avec Docker Compose](./configuring-master.mdx#exécuter-avec-docker-compose) pour la variante
+Compose.
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+L’image est publiée sur Docker Hub. Les commandes ci-dessous utilisent la dernière version,
+`AXELIX_VERSION_PLACEHOLDER` ; remplacez le tag pour exécuter une autre version :
+
+<Tabs groupId="jwt-key" items={['Clé intégrée (essai local)', 'Votre propre clé']}>
+  <Tab value="Clé intégrée (essai local)">
+
+```bash
+docker run --rm -p 2935:2935 docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+Si aucune propriété JWT n’est définie, Master utilise la clé de signature intégrée. Réservez cette option à un essai local ; consultez [Exécuter sans
+clé de signature](./configuring-master.mdx#exécution-sans-clé-de-signature).
+
+  </Tab>
+  <Tab value="Votre propre clé">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+Consultez [Exécuter avec Docker](./configuring-master.mdx#exécuter-avec-docker) pour fournir la connexion à la base de données et le reste de
+la configuration, et [Exécuter avec Docker Compose](./configuring-master.mdx#exécuter-avec-docker-compose) pour la variante
+Compose.
+
+  </Tab>
+  <Tab value="Kubernetes (Helm)">
+
+Axelix fournit un [chart Helm](https://github.com/axelixlabs/axelix/tree/master/charts/axelix) officiel :
+
+```bash
+helm repo add axelix https://axelixlabs.github.io/axelix
+helm repo update
+helm install axelix axelix/axelix \
+  --namespace axelix --create-namespace \
+  --values values.yaml
+```
+
+Définissez vos propres valeurs — au minimum la clé de signature JWT, le mot de passe du super-administrateur et la connexion à la base de données — dans
+`values.yaml` ; le
+[`values.yaml`](https://github.com/axelixlabs/axelix/blob/master/charts/axelix/values.yaml) du chart documente chaque valeur. Le chart configure également le ServiceAccount et
+le RBAC nécessaires à l’autodécouverte dans le cluster. Consultez [Exécuter sur
+Kubernetes](./configuring-master.mdx#exécuter-sur-kubernetes).
+
+  </Tab>
+  <Tab value="JAR">
+
+Téléchargez `axelix-AXELIX_VERSION_PLACEHOLDER.jar` depuis les **Assets** de la version sur la [page des
+versions](https://github.com/axelixlabs/axelix/releases). Le JAR intègre déjà l’interface utilisateur et son nom suit les
+[conventions de nommage des artefacts](../more/compatibility-and-versioning.mdx#noms-des-artefacts) de chaque version. Lancez-le :
+
+<Tabs groupId="jwt-key" items={['Clé intégrée (essai local)', 'Votre propre clé']}>
+  <Tab value="Clé intégrée (essai local)">
+
+```bash
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+Si aucune propriété JWT n’est définie, Master utilise la clé de signature intégrée. Réservez cette option à un essai local ; consultez [Exécuter sans
+clé de signature](./configuring-master.mdx#exécution-sans-clé-de-signature).
+
+  </Tab>
+  <Tab value="Votre propre clé">
+
+```bash
+export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
+export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
+
+java -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+  </Tab>
+</Tabs>
+
+Consultez [Exécuter en tant que JAR](./configuring-master.mdx#exécuter-sous-forme-de-jar) pour découvrir les autres méthodes de transmission de la configuration.
+
+  </Tab>
+</Tabs>
+
+Master est ensuite accessible à l’adresse `http://localhost:2935` (ou derrière votre Ingress sur Kubernetes). Connectez-vous avec le compte
+[super-administrateur](../setting-up-master-ui/authentication/authentication.mdx#super-admin).
+
+:::note
+`2935` est le port par défaut depuis Axelix `1.2.0`. Avant cette version, Master écoutait sur le port `8080` ; consultez
+[Général](./configuring-master.mdx#général) pour connaître les raisons de ce changement et la marche à suivre pour rétablir l’ancien port.
+:::
+
+Configurez ensuite Master. Il accepte une configuration provenant de nombreuses sources : variables d’environnement, fichier de configuration externe,
+Spring Cloud Config Server ou HashiCorp Vault. Son intégration à votre pipeline de configuration existant ne devrait donc pas
+poser de difficulté particulière. Consultez [Fournir les propriétés](./configuring-master.mdx#fourniture-de-propriétés).
+
+Les deux valeurs JWT des extraits de lancement ci-dessus sont `axelix.master.auth.jwt.algorithm` et
+`axelix.master.auth.jwt.signing-key` ; consultez [Authentification — JWT](./configuring-master.mdx#authentification--jwt). Protégez
+soigneusement la clé de signature dès le premier jour : il s’agit du secret partagé que chaque service géré présentera ensuite à Master.
+Générez donc une longue valeur aléatoire et conservez-la dans votre gestionnaire de secrets plutôt que dans un fichier suivi par Git.
+
+:::warning[À partir d’Axelix 1.2.0]
+Les deux valeurs JWT sont facultatives. Sans elles, Master et vos services utilisent une clé de signature intégrée, ce qui vous permet
+d’essayer Axelix localement sans en générer une. Cette clé est publiquement connue : n’importe qui peut donc l’utiliser pour se connecter à Master et
+appeler les endpoints Axelix de vos services. Réservez-la à un essai local et définissez votre propre clé partout ailleurs. Consultez
+[Exécuter sans clé de signature](./configuring-master.mdx#exécution-sans-clé-de-signature).
+:::
+
+Au-delà de la connexion à la base de données et de la clé de signature, deux décisions méritent d’être prises en connaissance de cause à cette étape :
+
+- **Mode de découverte.** Avec l’
+  [autodécouverte](./configuring-master.mdx#découverte--découverte-automatique), Master analyse son environnement Kubernetes et
+  interroge les services qu’il trouve. Avec l’
+  [auto-enregistrement](./configuring-master.mdx#découverte--auto-enregistrement), chaque service envoie plutôt des signaux de présence à Master.
+  Les deux modes peuvent être combinés, par exemple l’autodécouverte pour les services du cluster et l’auto-enregistrement
+  pour les services que Master ne peut pas analyser. Consultez [Fonctionnement de la découverte](../product/discovery.mdx) pour comprendre le comportement de chaque mode.
+- **Connexion et RBAC.** Pour les petites équipes, les [utilisateurs locaux](../setting-up-master-ui/authentication/authentication.mdx#utilisateurs-locaux),
+  dont les comptes sont stockés par Master dans sa propre base de données, suffiront probablement. Pour les grandes organisations,
+  [OAuth2 / OIDC](../setting-up-master-ui/authentication/authentication.mdx#oauth2--oidc) auprès de votre fournisseur
+  d’identité constitue généralement la meilleure option. Dans tous les cas, le compte
+  [super-administrateur](../setting-up-master-ui/authentication/authentication.mdx#super-admin) initial vous permet d’accéder à l’interface utilisateur
+  dès le premier jour.
+
+## Étape 3 — Ajouter le starter et le plugin de build à vos services
+
+Ajoutez ensuite progressivement les composants côté client aux services que Master doit gérer. Il y en a deux, et
+ils sont tous deux obligatoires : le [starter Axelix Spring Boot](./configuring-spring-boot-starter.mdx) correspondant à la
+version majeure de Spring Boot du service et le [plugin de build Axelix](./configuring-build-plugin.mdx) pour Maven ou Gradle. Tous deux
+sont publiés sur [Maven Central](https://central.sonatype.com/) ; leur ajout constitue donc une simple modification de dépendances, sans
+référentiels privés. Axelix utilise une gestion synchrone des versions : utilisez la même version d’Axelix pour Master, les
+starters et le plugin de build. Consultez [Compatibilité et gestion des versions](../more/compatibility-and-versioning.mdx) pour connaître
+la correspondance entre les starters et Spring Boot ainsi que les règles précises en cas d’écart de versions.
+
+Pour un service Spring Boot 4, les modifications du build se présentent comme suit (remplacez `4` par `2` ou `3` pour correspondre à la
+version majeure de Spring Boot du service) :
+
+<Tabs items={['Gradle (Kotlin DSL)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "AXELIX_VERSION_PLACEHOLDER"
+}
+
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:AXELIX_VERSION_PLACEHOLDER")
+}
+```
+
+Comme le plugin n’est pas encore disponible sur le Gradle Plugin Portal, ajoutez `mavenCentral()` à `pluginManagement` dans votre
+`settings.gradle.kts` ; consultez [Configuration du plugin de build](./configuring-build-plugin.mdx).
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-4-starter</artifactId>
+    <version>AXELIX_VERSION_PLACEHOLDER</version>
+  </dependency>
+</dependencies>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>AXELIX_VERSION_PLACEHOLDER</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+  </Tab>
+</Tabs>
+
+L’ajout des dépendances ne suffit pas. Chaque service nécessite également deux éléments de configuration, tous
+décrits en détail sur la [page de configuration du starter](./configuring-spring-boot-starter.mdx). Dans Axelix **1.2.0 et
+les versions ultérieures**, les endpoints actuator eux-mêmes ne nécessitent aucune configuration ici : le starter les ajoute automatiquement à
+`management.endpoints.web.exposure.include` ; consultez [Endpoints
+actuator](./configuring-spring-boot-starter.mdx#endpoints-actuator). Dans les versions plus anciennes, leur exposition constitue un troisième
+élément de configuration obligatoire ; consultez la note située sous les extraits.
+
+- **Définissez la clé de signature JWT partagée** de l’étape 2 sous `axelix.sbs.auth.jwt.*`. Une incompatibilité de clé entre Master et
+  le service est la cause la plus fréquente de réponses `401` ; consultez [Partager la clé de signature JWT avec
+  Master](./configuring-spring-boot-starter.mdx#partager-la-clé-de-signature-jwt-avec-master) et
+  [Résolution des problèmes](../more/troubleshooting.mdx). Dans Axelix 1.2.0 et les versions ultérieures, vous pouvez ignorer cette étape pour un essai local ;
+  le service utilise alors la clé intégrée. Consultez [Exécuter sans clé de
+  signature](./configuring-spring-boot-starter.mdx#fonctionnement-sans-clé-de-signature).
+- **Configurez la découverte, uniquement si vous avez choisi l’auto-enregistrement.** Faites pointer les propriétés `axelix.sbs.discovery.*` vers
+  votre Master, comme indiqué dans [Permettre à Master de trouver
+  l’instance](./configuring-spring-boot-starter.mdx#permettre-à-master-de-trouver-linstance). Avec l’autodécouverte côté Master,
+  aucune configuration supplémentaire n’est nécessaire dans le service.
+
+Une fois ces éléments réunis, voici la configuration minimale du service :
+
+<Tabs items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </Tab>
+</Tabs>
+
+:::note[Versions d’Axelix antérieures à 1.2.0]
+Les starters antérieurs à la version 1.2.0 n’ajoutent pas eux-mêmes leurs endpoints à `management.endpoints.web.exposure.include`.
+Dans ces versions, la liste des endpoints fait donc également partie de la configuration minimale. L’endpoint `axelix-metadata` est celui que
+Master interroge pour détecter l’instance ; sans lui, le service n’apparaît jamais, quel que soit le mode de découverte :
+
+<Tabs items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+```
+
+  </Tab>
+</Tabs>
+
+Ces versions du starter fournissent également l’ancien endpoint `axelix-feign`. Il est volontairement exclu de la liste :
+Master ne le lit jamais et cet endpoint est supprimé dans Axelix 1.3.0 ; consultez [L’endpoint `axelix-feign` est
+supprimé](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#lendpoint-axelix-feign-est-supprimé).
+:::
+
+Déployez ces changements service par service. À mesure que chaque service est redéployé dans un environnement de test, il apparaît dans le Master de test
+et l’équipe peut immédiatement commencer à utiliser l’[interface utilisateur](../ui-guide/dashboard/spring-portfolio.mdx) et MCP avec lui.
+
+Un détail lié à la production mérite d’être anticipé. Les services déploient généralement le même artefact successivement dans les environnements de test et
+de production ; le starter arrive donc en production avant Master. Si un tel service s’exécute avec l’auto-enregistrement
+activé, son starter continuera de tenter de s’enregistrer auprès d’un Master qui n’existe pas encore. Pour ces services, définissez
+`axelix.sbs.enabled=false` dans la configuration de production afin de laisser le starter inactif ; consultez [Désactiver le
+starter](./configuring-spring-boot-starter.mdx#désactiver-le-starter).
+
+## Étape 4 — Installer Master en production
+
+Enfin, lorsque le déploiement de test a fait ses preuves, déployez Axelix en production. Répétez les étapes 1 et 2 sous la forme d’un
+**déploiement distinct** : sa propre base de données, une configuration RBAC adaptée à la production et les règles d’accès réseau plus strictes à l’interface utilisateur et
+au serveur MCP qu’exige la production.
+
+Une fois le Master de production opérationnel, supprimez tous les remplacements temporaires `axelix.sbs.enabled=false` de l’étape 3 afin que les
+instances de production s’enregistrent et deviennent visibles.
+
+## Voir aussi
+
+- [Qu’est-ce que Master ?](../setting-up-master-ui/what-is-master.mdx) — informations générales sur ce que Master fait des services qu’il
+  gère.
+- [Configuration de Master](./configuring-master.mdx) — toutes les propriétés de Master, les options de distribution et les sources de configuration.
+- [Configuration de Spring Boot Starter](./configuring-spring-boot-starter.mdx) — connexion détaillée d’un service.
+- [Configuration du plugin de build](./configuring-build-plugin.mdx) — le second composant côté client obligatoire.
+- [Authentification](../setting-up-master-ui/authentication/authentication.mdx) — options de connexion, rôles et
+  autorités.
+- [Compatibilité et gestion des versions](../more/compatibility-and-versioning.mdx) — correspondance entre chaque starter et les versions de Spring Boot
+  et de Java, et maintien de la compatibilité entre les versions des composants.
+- [Résolution des problèmes](../more/troubleshooting.mdx) — les problèmes d’installation les plus courants (réponses `401`, mauvais
+  module de starter, service qui ne s’enregistre jamais) et leurs solutions.

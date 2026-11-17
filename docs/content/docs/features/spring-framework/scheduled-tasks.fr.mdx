@@ -1,0 +1,183 @@
+---
+title: Tâches planifiées
+description: "La page Tâches planifiées répertorie toutes les tâches @Scheduled d’une application Spring Boot et montre
+              le déroulement de leurs exécutions récentes. Vous pouvez également activer ou désactiver une tâche, modifier sa
+              planification et l’exécuter à la demande."
+---
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![Page principale des tâches planifiées](/img/feature/scheduled-tasks/scheduled-tasks-main-page.png)
+
+</ScreenshotsNotice>
+
+***Tâches planifiées dans l’interface Axelix***
+
+Une tâche `@Scheduled` s’exécute en arrière-plan : personne ne remarque qu’elle commence à échouer ou à ralentir tant
+que ses effets ne disparaissent pas. Cette page présente toutes les tâches planifiées de l’application et le déroulement
+de leurs exécutions récentes, et vous permet de modifier leur planification sans redéploiement.
+
+L’activation ou la désactivation d’une tâche, la modification de son déclencheur et son exécution à la demande exigent
+l’autorité `scheduled-tasks:write`, accordée par les rôles intégrés **EDITOR**, **ADMIN** et **SUPER_ADMIN**. Les
+utilisateurs ne disposant pas de cette autorité voient les mêmes contrôles, mais Axelix les laisse désactivés et
+explique pourquoi dans une info-bulle au survol.
+
+## Contenu de la page
+
+La page répertorie les tâches regroupées par type de déclencheur :
+
+- Les tâches **Cron** s’exécutent aux moments décrits par une expression cron, par exemple `0 0/15 9-17 * * MON-FRI`.
+- Les tâches **Fixed delay** attendent l’intervalle indiqué après la fin de chaque exécution, si bien que les
+  exécutions ne se chevauchent jamais.
+- Les tâches **Fixed rate** démarrent à chaque intervalle indiqué, calculé à partir du début de l’exécution précédente.
+
+Vous pouvez rechercher dans la liste par nom de classe ou de méthode. À côté de chaque tâche, la page affiche son taux
+de réussite sur les exécutions conservées, ce qui permet de repérer une tâche en échec sans l’ouvrir. Un taux de 90 %
+ou plus est considéré comme sain. Les tâches désactivées affichent **OFF** à la place du taux.
+
+Lorsque vous sélectionnez une tâche, la page affiche le nom complet de sa classe et sa planification en langage courant,
+par exemple « Every 3 seconds ». Pour une tâche cron, l’expression elle-même apparaît à côté de la description.
+
+## Historique d’exécution
+
+<ReleasedInNotice version="1.3.0" />
+
+Chaque exécution d’une tâche est enregistrée, qu’elle ait été lancée par la planification ou par un clic sur **Run
+now**. Master collecte les exécutions de toutes les instances de l’application : l’historique d’une tâche est donc
+partagé entre les instances. Le résumé couvre toutes les exécutions conservées :
+
+- **Last run** : temps écoulé depuis le début de la dernière exécution.
+- **Success** : proportion d’exécutions terminées sans exception.
+- **Failed** : nombre d’exécutions ayant levé une exception.
+- **Avg** et **p95** : durée moyenne d’exécution et durée dans laquelle s’inscrivent 95 % des exécutions. Un p95 très
+  supérieur à la moyenne signifie que certaines exécutions se bloquent de temps en temps.
+
+Le graphique **Duration** présente les 30 dernières exécutions, de la plus ancienne à la plus récente, en signalant
+celles qui ont échoué. La hauteur des barres n’est pas linéaire, afin que les exécutions courtes restent visibles à
+côté d’une exécution lente atypique. Survolez une barre pour voir le début de l’exécution, sa durée et le type d’erreur
+en cas d’échec.
+
+Lorsqu’une tâche a échoué, **Failures by error type** regroupe les échecs par classe d’exception, du plus fréquent au
+moins fréquent. Pour chaque groupe, vous voyez le dernier message d’erreur et sa date. Vous pouvez ainsi déterminer
+d’un coup d’œil si une même cause se répète ou si les échecs sont sans rapport.
+
+Le tableau **Executions** répertorie les mêmes 30 dernières exécutions avec l’heure de début, l’instance qui a exécuté
+la tâche, la durée et le résultat. Passez à **Failed** pour n’afficher que les exécutions ayant échoué.
+
+L’historique ne s’actualise pas automatiquement tant que la page est ouverte. Pour voir les nouvelles exécutions,
+sélectionnez à nouveau la tâche. Tant que Master n’a pas reçu la première exécution d’une tâche, la page affiche **No
+execution data for this task** à la place de l’historique.
+
+### Rétention de l’historique d’exécution
+
+Master conserve l’historique dans sa base de données et supprime les anciennes exécutions selon une planification. Les
+propriétés Master suivantes déterminent la quantité d’historique conservée (voir aussi [Configurer
+Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx#historique-des-tâches-planifiées)) :
+
+| Propriété                                                       | Valeur par défaut | Description                                                                      |
+|-----------------------------------------------------------------|-------------------|----------------------------------------------------------------------------------|
+| `axelix.master.scheduled-tasks.history.retention`               | `30d`             | Durée de conservation d’une exécution par Master. Les exécutions plus anciennes sont supprimées lors du prochain nettoyage. |
+| `axelix.master.scheduled-tasks.history.max-executions-per-task` | `50`              | Nombre des dernières exécutions que Master conserve pour chaque tâche.            |
+| `axelix.master.scheduled-tasks.history.cleanup.schedule`        | `0 */10 * * * *`  | Expression cron de la tâche de nettoyage. Par défaut, elle s’exécute toutes les 10 minutes. |
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.master.scheduled-tasks.history.retention=7d
+axelix.master.scheduled-tasks.history.max-executions-per-task=100
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  master:
+    scheduled-tasks:
+      history:
+        retention: 7d
+        max-executions-per-task: 100
+```
+
+  </Tab>
+</Tabs>
+
+## Gestion des tâches
+
+Ces actions s’appliquent à l’instance que vous avez ouverte. Les autres instances de la même application conservent
+leur état et leur planification actuels.
+
+### Activer ou désactiver une tâche
+
+Utilisez le commutateur **ON** / **OFF** pour empêcher une tâche de s’exécuter selon sa planification, par exemple
+pendant la maintenance d’un système en aval. Axelix demande d’abord une confirmation. Si vous désactivez une tâche
+pendant une exécution, celle-ci se termine, puis la tâche ignore sa planification. Repassez le commutateur sur **ON**
+pour reprendre la planification.
+
+### Modifier le déclencheur
+
+Cliquez sur **Edit trigger** pour modifier le moment d’exécution de la tâche. La nouvelle planification prend effet
+immédiatement, sans redémarrage de l’application.
+
+- Pour une tâche cron, saisissez une nouvelle expression comportant six champs : seconde, minute, heure, jour, mois,
+  jour de la semaine. Axelix vérifie l’expression pendant la saisie. L’aperçu indique quand la tâche s’exécutera
+  (**Runs:**) ou pourquoi l’expression est incorrecte (**Invalid:**).
+- Pour une tâche à délai fixe ou à fréquence fixe, saisissez le nouvel intervalle sous la forme d’un nombre entier de
+  millisecondes supérieur à 0.
+
+**Apply trigger** reste désactivé tant que la valeur n’est pas valide ou qu’elle ne diffère pas de la valeur actuelle.
+
+### Exécuter une tâche maintenant
+
+Cliquez sur **Run now** et confirmez pour exécuter la tâche une fois, immédiatement. Cela ne modifie pas sa
+planification : cette action est donc utile pour relancer une tâche ayant échoué ou vérifier un correctif sans attendre
+la prochaine exécution planifiée.
+
+## Outils MCP
+
+Les tâches planifiées peuvent également être inspectées par un agent IA via MCP. Consultez le [catalogue des outils
+MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#introspection-dune-instance).
+
+## Activer l’endpoint Actuator dédié
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Si vous utilisez Axelix 1.2.0 ou une version ultérieure, rien de tout cela n’est nécessaire : le starter
+    enregistre lui-même ses endpoints Actuator personnalisés et Axelix n’exige plus que les endpoints
+    <code>health</code>/<code>info</code> soient activés. Il fonctionne parfaitement sans eux. Aucune configuration
+    n’est nécessaire ici.</>}
+/>
+
+La page s’appuie sur l’endpoint Actuator `axelix-scheduled-tasks` fourni par l’Axelix Spring Boot Starter. Exposez-le
+via les propriétés standard de Spring Boot Actuator. Consultez [Configurer Spring Boot
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) pour obtenir la liste complète
+des endpoints Axelix et la configuration associée :
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-scheduled-tasks
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-scheduled-tasks
+```
+
+  </Tab>
+</Tabs>
+
+## Voir aussi
+
+- [Configurer Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configurer Spring Boot
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

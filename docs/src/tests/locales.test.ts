@@ -11,6 +11,10 @@ describe("splitLocale", () => {
         ["/ru", "ru", "/"],
         ["/ru/test", "ru", "/test"],
         ["/ru/product/guide", "ru", "/product/guide"],
+        ["/fr", "fr", "/"],
+        ["/fr/test", "fr", "/test"],
+        ["/fr/product/guide", "fr", "/product/guide"],
+        ["/fr/llms.txt", "fr", "/llms.txt"],
         // `en` is served without a prefix, but the proxy still has to recognise it
         ["/en/test", "en", "/test"],
         // not a locale, so the whole path belongs to the default locale

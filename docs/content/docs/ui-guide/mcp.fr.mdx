@@ -1,0 +1,71 @@
+---
+title: MCP
+description: "L’écran MCP répertorie tous les outils exposés par Axelix Master via son serveur Model Context Protocol intégré. Chaque
+              carte correspond à un outil qu’un agent IA connecté via MCP peut appeler sur n’importe quelle instance Spring Boot enregistrée."
+---
+
+## Quand l’onglet MCP s’affiche
+
+Le lien **MCP** de la barre de navigation s’affiche uniquement lorsque le serveur MCP est activé dans Master. Cet affichage dépend de la
+propriété `axelix.master.mcp-server.enabled`, qui vaut `true` par défaut. Dans les déploiements où le serveur est désactivé, le lien
+est masqué et `/mcp-server` est inaccessible. Pour en savoir plus sur cette propriété, consultez [Configuration du serveur
+MCP](../setting-up-master-ui/configuring-master/configuring-master.mdx#serveur-mcp).
+
+Le serveur MCP authentifie les agents IA séparément de la session du navigateur — les identifiants, les schémas `Basic`
+et `Bearer` pris en charge, ainsi que les restrictions d’accès par autorité pour chaque outil sont présentés dans
+[Authentification du serveur MCP](../setting-up-master-ui/authentication/authentication.mdx#authentification-du-serveur-mcp). Cette page
+décrit uniquement le catalogue en lecture seule ; elle ne modifie pas les outils qu’un agent peut appeler.
+
+## Le catalogue des outils
+
+Le catalogue se présente sous la forme d’une grille de cartes. Le champ de recherche situé en haut filtre les cartes par titre et le compteur à droite affiche
+`<matches> / <total>`. La recherche porte sur n’importe quelle partie du titre de l’outil et ne tient pas compte de la casse.
+
+Chaque carte comporte les trois mêmes parties :
+
+- **En-tête** avec le titre de l’outil et un point d’état coloré — vert lorsque l’outil est enregistré auprès du serveur MCP, rouge
+  lorsqu’il est actuellement indisponible.
+- **Description** — le court descriptif que l’outil présente aux clients MCP. Les descriptions longues sont tronquées à une hauteur fixe ;
+  survolez la description pour afficher l’intégralité du texte dans une info-bulle.
+- **Pied de carte** avec les balises d’annotation — voir [Annotations des outils](#annotations-des-outils) ci-dessous.
+
+## Annotations des outils
+
+Chaque outil déclare quatre indications booléennes qui précisent aux clients MCP le type d’effets secondaires à attendre lors de son
+appel. Le pied de carte affiche deux d’entre elles directement et expose les quatre dans une fenêtre contextuelle.
+
+**Balises affichées directement** (toujours visibles) :
+
+- **Read-only** — l’outil ne modifie aucun état dans l’instance Spring Boot cible.
+- **Idempotent** — appeler l’outil plusieurs fois avec les mêmes arguments a le même effet que l’appeler une seule fois.
+
+Chaque balise est verte lorsque l’indication vaut <code style={{color: 'green'}}>true</code> et orange lorsqu’elle vaut <code
+style={{color: 'orange'}}>false</code>. La valeur visible correspond à ce que déclare l’outil lui-même — elle ne garantit pas le comportement
+réel de l’endpoint sous-jacent.
+
+**Fenêtre contextuelle contenant toutes les annotations** — cliquez sur le bouton burger à droite du pied de carte pour ouvrir un panneau présentant les quatre indications
+avec leurs valeurs booléennes :
+
+- **Read-only** — l’outil ne modifie aucun état dans l’instance Spring Boot cible.
+- **Idempotent** — appeler l’outil plusieurs fois avec les mêmes arguments a le même effet que l’appeler une seule fois.
+- **Destructive** — l’outil peut supprimer des données ou appliquer d’autres modifications impossibles à annuler depuis l’interface utilisateur.
+- **Open-world** — l’outil accède à des ressources extérieures à Master et aux instances Spring Boot enregistrées (par exemple, un appel
+  HTTP externe).
+
+## Ce que cet écran ne permet pas
+
+La page MCP sert à découvrir les outils, pas à les exécuter. Vous ne pouvez pas :
+
+- Appeler un outil sur une instance Spring Boot — cette opération s’effectue depuis votre client MCP (Claude Desktop, Cursor, un agent
+  personnalisé, etc.).
+- Activer ou désactiver des outils individuellement — le catalogue reflète ce que Master a enregistré au démarrage.
+- Consulter les appels précédents ou les métriques par outil.
+
+Pour utiliser le catalogue, configurez votre client MCP pour qu’il pointe vers `<master-base-url>/api/mcp` et authentifiez-vous comme indiqué dans
+[Authentification du serveur MCP](../setting-up-master-ui/authentication/authentication.mdx#authentification-du-serveur-mcp).
+
+:::info
+Un **Access Log** des appels aux outils MCP figure dans la feuille de route et sera fourni avec Axelix Enterprise. L’Access Log
+et Axelix Enterprise sont tous deux encore en développement ; pour l’instant, l’écran MCP reste donc un catalogue en lecture seule, sans
+historique ni métriques par outil.
+:::

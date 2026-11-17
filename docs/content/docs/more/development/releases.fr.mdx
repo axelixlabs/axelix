@@ -1,0 +1,104 @@
+---
+title: Versions
+description: "Cette page décrit la procédure exacte que nous suivons pour publier Axelix."
+---
+
+Il existe deux types de versions, qui suivent le même principe : toutes deux publient **l’ensemble des composants** en
+même temps, sous une seule version :
+
+- Une version **mineure** est créée à partir de `master` et ouvre une nouvelle ligne `X.Y`.
+- Une version **corrective** est créée à partir de la **branche de correctifs** de cette ligne (`X.Y.x`) et fait passer
+  l’ensemble des composants à `X.Y.Z`.
+
+Bien entendu, il y aura également des versions majeures. Nous documenterons aussi leur procédure de publication le
+moment venu.
+
+Pour connaître l’organisation des branches sous-jacente, consultez [Modèle de branches](./branching-model.mdx).
+
+## Versions mineures
+
+Une version mineure publie tous les composants ensemble sous une seule version `X.Y.0` et la marque avec un tag
+`vX.Y.0` sur `master` (voir
+[une version pour chaque composant](../compatibility-and-versioning.mdx#une-version-pour-tous-les-composants)). Voici la
+procédure, dans l’ordre :
+
+### 1. Tâches préparatoires
+
+Les tâches préparatoires sont l’ensemble des **modifications manuelles** effectuées avant la publication. Elles sont
+toutes regroupées dans **un seul commit sur `master`**, afin que l’ensemble de la publication puisse être annulé ou
+récupéré proprement par cherry-pick si nous devons la reporter.
+
+- **Définir la version de l’ensemble des composants.** Entre deux publications, `axelixVersion` dans le fichier
+  `gradle.properties` **racine** contient la prochaine version avec le suffixe `-SNAPSHOT`, par exemple
+  `3.1.0-SNAPSHOT` pendant le développement de `3.1.0`. Les tâches préparatoires suppriment ce suffixe pour définir la
+  version exacte à publier : pour `3.1.0`, la valeur devient `3.1.0`. C’est cette valeur que lit le pipeline de
+  publication et qui donne son nom au tag résultant ; le pipeline **refuse** de publier une version `-SNAPSHOT`. Le
+  `gradle.properties` racine est le **seul** endroit où la version est définie : tous les composants en héritent.
+- **Mettre à jour les playgrounds.** Les applications d’exemple situées sous `playgrounds/` sont, par conception, des
+  **projets distincts** : elles n’héritent **pas** d’`axelixVersion` et épinglent explicitement les versions du starter
+  et du plugin Axelix qu’elles utilisent. Mettez à jour ces versions épinglées vers la version en cours de publication.
+- **Mettre à jour la documentation.** La documentation n’est versionnée que par ligne **majeure**. Par exemple, pendant
+  le développement d’une version mineure, nous ajoutons des notices « version à venir » pour les fonctionnalités qu’elle
+  fournira ; lors de la création de la version mineure qui les publie effectivement, ces notices sont remplacées par les
+  notices « publiée dans » correspondantes.
+
+### 2. Lancer le pipeline de publication
+
+**Nous ne créons pas le tag manuellement.** Le pipeline de publication lit la version dans `gradle.properties`, exécute
+ses contrôles préalables et, uniquement si tout est au vert, crée le tag `vX.Y.0` et publie tous les composants : les
+artefacts Maven (starters et plugins) comme l’image Docker de Master.
+
+:::info[Les notes de version sont rédigées manuellement]
+Le pipeline crée le **tag**, mais ne rédige **pas** les notes de version. La rédaction des notes pour le tag `vX.Y.0`
+qui vient d’être créé incombe au **développeur** chargé de la publication, qui les écrit manuellement pour ce tag.
+:::
+
+## Versions correctives
+
+Une version corrective, comme toute version d’Axelix, publie **l’ensemble des composants** sous une seule version : il
+n’existe pas de correctifs par composant. La procédure reprend celle d’une version mineure, avec une différence
+structurelle : elle est créée à partir de la **branche de correctifs** de la ligne mineure, et non de `master`. L’étape
+relative à la documentation est ignorée, car les versions correctives ne modifient pas la documentation.
+
+1. **Extraire la branche de correctifs.** Les travaux de correctifs résident sur l’unique branche de la ligne, nommée
+   `X.Y.x`. Le `x` littéral indique qu’il s’agit de toute la ligne de correctifs et, contrairement à un tag, le nom de
+   la branche ne comporte **pas** de préfixe `v`. Elle est créée à partir du tag `vX.Y.0` de la version mineure (voir
+   [Modèle de branches → Où se trouvent les travaux de correctifs](./branching-model.mdx#où-se-trouvent-les-travaux-de-correctifs)).
+   Créez-la à partir du tag s’il s’agit du premier correctif de la ligne ; sinon, elle existe déjà.
+
+2. **Intégrer les correctifs à cette branche.** Un correctif est généralement intégré d’abord à `master`, puis rétroporté
+   vers la branche de correctifs ; seuls les éléments effectivement corrigés par la version changent.
+
+3. **Effectuer les tâches préparatoires sur la branche (un seul commit).**
+   - **Définir la version de l’ensemble des composants.** Dans le `gradle.properties` **racine**, définissez
+     `axelixVersion` sur la nouvelle version corrective `X.Y.Z`. Contrairement à `master`, la branche de correctifs ne
+     comporte pas de suffixe `-SNAPSHOT` entre deux publications : elle conserve simplement la dernière version publiée
+     de sa ligne jusqu’à ce que le prochain correctif la mette à jour.
+   - **Mettre à jour le ou les playgrounds.** Mettez à jour les applications playgrounds vers la nouvelle version
+     corrective, pour la même raison que pour une version mineure : elles épinglent explicitement leurs versions Axelix
+     et n’héritent pas d’`axelixVersion`.
+
+4. **Lancer le pipeline de publication.** Il s’agit du **même pipeline** que pour une version mineure, mais lancé à
+   partir de la branche de correctifs plutôt que de `master`. Il exécute les mêmes contrôles préalables, publie tous les
+   composants sous `X.Y.Z` et crée le tag `vX.Y.Z` pour l’ensemble. Comme tout tag Axelix, celui-ci comporte le préfixe
+   `v`. Comme pour une version mineure, le pipeline crée le tag, mais **pas** les notes de version : le développeur les
+   rédige manuellement pour le nouveau tag.
+
+### Exemple concret
+
+Supposons que la version `3.1.0` nécessite un correctif dans **Axelix Spring Boot 3 Starter** :
+
+1. Le correctif réside sur la branche `3.1.x`, créée à partir du tag `v3.1.0`. Si la ligne `3.1` a déjà reçu un
+   correctif, cette branche existe déjà ; sinon, nous la créons à partir de `v3.1.0`.
+2. Nous rétroportons le correctif de `master` vers cette branche.
+3. Dans le `gradle.properties` racine, nous définissons `axelixVersion` sur `3.1.1`, la version corrective à publier,
+   et mettons à jour les playgrounds vers `3.1.1`.
+4. Nous lançons le pipeline de publication à partir de la branche `3.1.x`. Il crée le tag `v3.1.1` pour l’ensemble et
+   publie **tous** les composants (starters, plugins et Master) sous `3.1.1`, même si un seul starter a réellement changé.
+
+Le résultat correspond à ce que promet
+[une version pour chaque composant](../compatibility-and-versioning.mdx#une-version-pour-tous-les-composants) : après la
+publication, `3.1.1` existe pour l’ensemble des composants. À vous de décider si *vous* mettez à niveau tous les
+composants déployés en même temps ou uniquement celui qui a effectivement été corrigé :
+[la compatibilité est garantie par `major.minor`](../compatibility-and-versioning.mdx#compatibilité-entre-les-composants),
+de sorte qu’un écart de version corrective entre les composants déployés est toujours sans risque.

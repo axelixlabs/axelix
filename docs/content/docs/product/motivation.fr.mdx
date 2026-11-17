@@ -1,0 +1,178 @@
+---
+title: Motivation
+description: "Ce document explique les principaux problèmes qu’Axelix résout pour les développeurs Spring Boot et les organisations. À travers
+              des exemples concrets, nous examinerons les difficultés qui ont inspiré la création d’Axelix."
+---
+
+Axelix réunit l’analyse de l’exécution, le débogage et l’évolution de l’écosystème dans une plateforme open source conçue nativement pour l’IA.
+Les équipes doivent comprendre à la fois ce qui se passe dans un service et comment leurs services évoluent ensemble.
+Cela implique de détecter les erreurs de configuration, d’évaluer la santé des dépendances, de suivre les migrations Java et Spring Boot
+et de contrôler les tâches planifiées. Axelix est conçu pour permettre aux ingénieurs et aux agents IA de participer à ces workflows
+via son interface web et son serveur MCP intégré. Consultez l’[introduction](./introduction.mdx) pour obtenir une vue d’ensemble.
+
+## Motivation. Prologue
+
+Une entreprise type possède de nombreux logiciels développés en interne. Ces logiciels résolvent divers problèmes et sont généralement
+écrits dans plusieurs langages de programmation, tels que JavaScript, Java, Go, etc. L’un des choix les plus populaires pour les
+applications côté serveur (backend) dans les grandes entreprises [est
+Java](https://en.wikipedia.org/wiki/Programming_languages_used_in_most_popular_websites). Cela est particulièrement vrai dans le
+domaine bancaire.
+
+Par ailleurs, le framework le plus populaire pour écrire des applications Java côté backend [est, incontestablement,
+Spring Boot](https://en.wikipedia.org/wiki/Spring_Boot). Il s’agit d’une couche supplémentaire au-dessus de [Spring
+Framework](https://spring.io/) qui simplifie la configuration de ce dernier. C’est de loin le choix le plus populaire dans les
+entreprises, pour diverses raisons. Par exemple, Netflix [a migré son écosystème (plus de 3 000 applications)
+vers Spring Boot 3](https://www.youtube.com/watch?v=IMGcD08rdVw). Une fois encore, l’idée est que Spring Boot constitue un choix très
+populaire côté backend pour écrire des applications Java.
+
+## Motivation. Difficultés
+
+Comme indiqué précédemment, Spring Boot était au départ une simple couche d’abstraction supplémentaire au-dessus de Spring Framework, mais
+il est désormais bien plus que cela. Et toutes les applications Java exécutées sur Spring Boot reposent sur les mêmes abstractions Spring Boot.
+
+Par exemple :
+- Chaque application Java Spring Boot se compose d’un certain nombre de _beans_, qui sont simplement des objets Java dont la gestion est
+  en partie assurée par Spring Framework.
+- Chaque application Spring Boot possède un `ApplicationContext`, dont l’objectif principal est de gérer les beans de
+  l’application et l’état global de l’application Spring Boot en cours d’exécution.
+- Chaque application Spring Boot possède un grand nombre de propriétés qui peuvent provenir de diverses sources
+  (fichier `application.properties`, environnement du processus du système d’exploitation, propriétés système Java, etc.).
+
+L’idée est donc que Spring est assez vaste et crée de nombreux éléments interdépendants, chacun influençant les autres (par exemple,
+les propriétés influencent la création des beans, et les beans créés peuvent à leur tour introduire d’autres propriétés).
+
+**L’une des principales raisons d’être de ce projet est qu’une application Spring Boot qui fonctionne localement comme prévu et dont tous
+les tests réussissent ne fonctionnera pas nécessairement parfaitement une fois déployée en production ou dans un environnement de test.
+Nous savons tous qu’il ne faut pas simplement supposer que tout se passera bien.**
+
+Par conséquent, lorsque nous, développeurs Java utilisant Spring Boot, déployons nos applications dans un environnement, nous rencontrons
+souvent les mêmes problèmes encore et encore. Examinons quelques exemples qui illustrent le problème.
+
+### Exemple 1. Journalisation granulaire
+
+Pour bien comprendre ce qu’Axelix cherche précisément à résoudre, examinons quelques exemples de code Java. Imaginons
+que notre application contienne la classe Java suivante. Il s’agit d’un bean Spring que nous utilisons pour déterminer l’ensemble des
+autorisations dont dispose un client hypothétique :
+
+```java
+@Slf4j
+@Service
+public class PermissionsResolver {
+
+    @Value("${permission.caching.enabled:true}")
+    private boolean cacheLookupsEnabled;
+
+    @Autowired
+    private ExternalPermissionsResolver delegate;
+
+    @Autowired
+    private PermissionsCache cache;
+
+    @PostConstruct
+    void init() {
+        log.debug("Permissions cache lookup enabled: {}", cacheLookupsEnabled);
+    }
+
+    public Set<Permission> resolveClientPermissions(Client client) {
+        log.debug("Resolving permissions for the client {}", client.getId());
+
+        try {
+            return delegate.resolve(client);
+        } catch (SomeExpectedException e) {
+            // if we can, we do a cache lookup
+            if (featureFlag && client.getStatus() == ClientStatus.EXISTING) {
+                return cache.get(client.getId());
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+```
+
+Nous avons écrit ce code. Nous avons également écrit ses tests. Nous l’avons testé localement. Il fonctionnait. Nous déployons maintenant
+ce code dans notre environnement sandbox.
+
+Mais, en raison de la loi de Murphy :\ ***Tout ce qui est susceptible de mal tourner tournera mal***, quelque chose ne fonctionne pas
+correctement dans notre environnement sandbox/de test. Pourtant, nous l’avons testé localement et il fonctionnait, mais dans l’environnement
+de test, il ne fonctionne soudainement plus. Bien que les journaux présents dans la classe nous aideraient à comprendre ce qui se passe
+réellement dans l’application déployée, ces instructions de journalisation sont au niveau `DEBUG`, et seul le niveau `INFO` est activé.
+**Il serait très utile de pouvoir modifier temporairement (!) le niveau de journalisation, à chaud, uniquement pour cette classe Java
+spécifique ou pour un package Java spécifique.** Nous pouvons certes modifier le niveau de journalisation dans la configuration de
+l’application et redéployer celle-ci, mais voulons-nous vraiment recommencer tout le processus de build et de redéploiement uniquement
+pour consulter les journaux ? Et si les journaux ne nous aident pas ? Faut-il reconstruire et redéployer à nouveau ?
+
+**Chez Axelix, nous comprenons parfaitement cette difficulté.** Et nous voulons fournir un moyen de la résoudre.
+
+### Exemple 2. Sources de configuration
+
+Supposons que nous ayons résolu le premier problème et que nous soyons parvenus à activer la journalisation via l’interface utilisateur
+d’Axelix pour cette classe Java spécifique. Un autre problème se présente alors. Imaginons que nous ayons compris que, dans notre cas,
+le problème vient de l’injection d’une valeur incorrecte dans la propriété `cacheLookupsEnabled`. Nous nous attendions à ce que les
+données du client _XYZ_ soient extraites du cache, mais ce n’était pas le cas, car `cacheLookupsEnabled` était défini sur `false`.
+
+Que devons-nous faire alors ? Nous savons seulement que cette propriété est définie sur `false` et que ce n’est pas nous qui l’avons fait.
+Cela signifie donc que, _quelque part_, dans une source de configuration de notre application, elle a été définie sur `false`. Mais où
+exactement ?
+
+**Et soyons honnêtes : en tant que développeurs dans une grande entreprise, nous ne comprenons pas toujours exactement comment notre
+application est déployée dans l’environnement.** Nous ne comprenons pas toujours parfaitement comment notre application est empaquetée
+dans un conteneur Docker, comment elle est ensuite déployée via un chart Helm dans nos clusters K8S, quelles sources de configuration
+supplémentaires lui sont appliquées, etc. **Nous avons _une certaine_ compréhension du déploiement de notre application, mais cette
+compréhension est incomplète ; c’est là le cœur du problème.**
+
+Dans Axelix, nous fournissons non seulement les moyens de voir exactement de quelle source de configuration provient la valeur d’une
+propriété, mais aussi ceux de modifier cette valeur à chaud sur l’application Java en cours d’exécution, en rechargeant le contexte
+applicatif sur la JVM active, sans reconstruction ni redéploiement.
+
+### Exemple 3. État de l’application
+
+Nous avons maintenant remplacé la valeur de `cacheLookupsEnabled` par `true`, et tout devrait fonctionner, n’est-ce pas ? **Faux**. Cela
+ne fonctionne toujours pas, car `PermissionsCache` est en réalité une interface :
+
+```java
+
+public interface PermissionsCache {
+
+    Set<Permission> get(UUID clientId);
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "in-memory", matchIfMissing = true)
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class InMemoryPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "redis")
+@ConditionalOnRedisPresent
+@ConditionalOnMissingBean(PermissionsCache.class)
+public class RedisPermissionsCache implements PermissionsCache {
+
+    @Override
+    public Set<Permission> get(UUID clientId) {
+        // implementation
+    }
+}
+
+```
+
+Je pense que tout le monde conviendra qu’il est très courant d’avoir une `interface` qui définit le contrat et plusieurs implémentations
+de cette interface Java, chacune étant un bean Spring. Nous nous attendons à ce que ces beans Spring ne soient initialisés que lorsque
+certaines conditions sont remplies. Les fameux `ConditionalOnProperty`, `ConditionalOnMissingBean`, etc. sont familiers à presque tous
+les développeurs Spring.
+
+Supposons que, dans notre cas, nous nous attendions à ce que les autorisations d’un client donné soient extraites du cache Redis, et non
+d’une structure de données en mémoire. Mais en réalité, c’est `InMemoryPermissionsCache` qui a été interrogé. Sommes-nous même certains
+qu’il s’agissait d’un `InMemoryPermissionsCache` ? Peut-être qu’une bibliothèque d’entreprise que nous importons comme dépendance
+fournit son propre `ThreadSafeInMemoryPermissionsCache` ? En d’autres termes, nous voulons répondre aux questions suivantes :
+
+- ***Quels*** beans sont actuellement actifs dans l’application Spring ?
+- ***Pourquoi*** ces beans précis sont-ils actifs, et pas les autres ?
+
+**Axelix vous aide également à y répondre.**

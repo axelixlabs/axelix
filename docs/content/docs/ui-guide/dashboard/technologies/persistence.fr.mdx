@@ -1,0 +1,52 @@
+---
+title: Persistence
+description: "Le tableau de bord Persistence indique quels services du parc présentent le plus de requêtes N+1 et de
+              pagination en mémoire."
+---
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![tableau de bord Persistence](/img/feature/dashboard/dashboard-persistance.png)
+
+</ScreenshotsNotice>
+
+***Le tableau de bord Persistence dans l’interface utilisateur d’Axelix***
+
+Les requêtes N+1 et la pagination en mémoire n’empêchent pas l’application de fonctionner, mais elles entraînent des requêtes et une consommation de mémoire supplémentaires.
+[Transaction Control](../../../features/spring-framework/transaction-control.mdx) les présente pour un service. Le
+tableau de bord Persistence montre où elles sont les plus nombreuses dans le parc, afin que vous sachiez quels services examiner
+en premier.
+
+La page est en lecture seule et accessible à tous les utilisateurs authentifiés : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN**
+peuvent tous l’ouvrir. Consultez [Rôles et
+autorités](../../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour connaître la matrice complète
+des rôles et autorités.
+
+## Contenu de la page
+
+La page présente deux problèmes côte à côte :
+
+- **N+1** : une association lazy est chargée avec une requête distincte pour chaque enregistrement.
+- **In-Memory Pagination** : Hibernate charge l’intégralité du jeu de résultats et découpe la page en mémoire.
+
+Pour chaque problème, vous pouvez voir :
+
+- Combien de cas existent dans l’ensemble du parc.
+- Quel service présente le plus de cas.
+- Comment les cas se répartissent entre les services.
+
+Les services sans cas ne sont pas affichés. Pour plus de détails sur chaque problème, consultez [Problèmes
+détectés](../../../features/spring-framework/transaction-control.mdx#problèmes-détectés) dans Transaction Control.
+
+## Fonctionnement
+
+Le tableau de bord comptabilise ce que Transaction Control a détecté dans chaque service. Master l’enregistre une fois par jour et utilise le
+dernier enregistrement. Un service ne compte qu’une fois, quel que soit le nombre d’instances qu’il exécute.
+
+Les données apparaissent uniquement pour les services utilisant Hibernate et dont la surveillance des transactions est activée. Consultez
+[Properties](../../../features/spring-framework/transaction-control.mdx#propriétés) dans Transaction Control.
+
+## Voir aussi
+
+- [Transaction Control](../../../features/spring-framework/transaction-control.mdx)
+- [Entities Map](../../../features/spring-framework/entities-map.mdx)
