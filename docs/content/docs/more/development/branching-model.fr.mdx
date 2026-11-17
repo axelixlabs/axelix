@@ -1,0 +1,68 @@
+---
+title: Modèle de branches
+description: "Axelix est développé publiquement sous forme de monorepo : comprendre l’évolution du code source permet donc aussi
+              de comprendre le mode de publication des versions."
+---
+
+Cette page décrit les branches que nous utilisons, la manière dont les changements sont intégrés et leur correspondance
+avec les [versions](../compatibility-and-versioning.mdx) que vous utilisez.
+
+## Le tronc
+
+Axelix suit un modèle de **développement basé sur le tronc**, avec quelques exceptions délibérées. Il existe un tronc
+principal : la branche **`master`**.
+
+- Pour développer une nouvelle fonctionnalité ou un correctif, nous créons une branche _à partir de_ `master`.
+- Nous la fusionnons _dans_ `master` au moyen d’une Pull Request.
+
+`master` fait toujours foi pour déterminer « ce qu’est Axelix actuellement ». **Les versions mineures et majeures sont
+créées directement à partir de cette branche en ajoutant au tronc** un tag de la forme `vX.Y.0`, par exemple `v3.1.0`.
+Le numéro de version corrective d’un tel tag est **toujours `0`**.
+
+Les versions correctives, quant à elles, sont créées sous forme de tags à partir des branches de correctifs dédiées,
+dont le nom suit le modèle `X.Y.x` (voir plus bas).
+
+Ces tags, qu’ils soient créés à partir du tronc `master` ou d’une branche de correctifs, marquent la création coordonnée
+d’une version pour l’ensemble des composants, tous publiés ensemble sous [une même version](../compatibility-and-versioning.mdx#une-version-pour-tous-les-composants).
+
+## Changements incompatibles
+
+Tout changement finalisé n’est pas immédiatement fusionné. Si une modification introduit des **changements
+incompatibles**, nous ne la fusionnons pas dans `master` dans le cadre du flux normal. À la place, nous :
+
+1. reportons la Pull Request ;
+2. lui ajoutons le label `breaking-changes` ;
+3. la fusionnons plus tard, au moment opportun, généralement lorsque nous commençons à travailler sur la prochaine
+   version **majeure**.
+
+`master` reste ainsi **publiable à tout moment sous forme de version mineure ou corrective**, tandis que les travaux
+incompatibles attendent le passage à une version majeure. C’est l’une des principales raisons pour lesquelles vous
+pouvez être certain qu’une nouvelle version **mineure** n’introduit jamais de changement incompatible à votre insu.
+
+## Où se trouvent les travaux de correctifs
+
+Les correctifs destinés à une ligne mineure déjà publiée ne sont **pas** publiés directement à partir de `master` :
+lorsqu’un correctif est nécessaire, le tronc a généralement déjà évolué et contient des travaux destinés à la version
+mineure *suivante*. À la place, chaque ligne mineure publiée reçoit une unique **branche de correctifs pérenne**, qui
+coexiste avec le tronc `master`.
+
+La branche de correctifs est créée à partir du tag `vX.Y.0` de la version mineure et son nom suit le modèle `X.Y.x`. Le
+`x` littéral représente toute la ligne de correctifs et, contrairement au tag dont elle est issue, le nom de la branche
+ne comporte **pas** de préfixe `v`. Par exemple, la ligne de correctifs de la version `1.0.0` correspond à la branche
+`1.0.x`, créée à partir du tag `v1.0.0`. Vous pouvez l’examiner dans le dépôt pour voir concrètement ce modèle.
+
+Un correctif est généralement intégré d’abord à `master` (selon le flux normal des Pull Requests), puis **rétroporté**
+vers la branche de correctifs de la ligne concernée. Chaque version corrective de l’ensemble des composants (`vX.Y.1`,
+`vX.Y.2`, etc.) est ensuite créée à partir de cette branche et, comme toute version d’Axelix, elle publie **tous les
+composants ensemble** sous la même version (voir
+[une version pour chaque composant](../compatibility-and-versioning.mdx#une-version-pour-tous-les-composants)).
+
+:::note[Une branche de correctifs par ligne mineure, et non par composant]
+Il existe exactement **une** branche de correctifs par ligne mineure publiée, partagée par l’ensemble des composants.
+Tous les correctifs de la ligne `3.1`, qu’ils concernent un starter, un plugin ou Master, résident sur l’unique branche
+`3.1.x`, créée à partir du tag `v3.1.0`. Il n’existe pas de branches par composant, car il n’existe pas de versions par
+composant : l’ensemble est versionné et publié comme un tout.
+:::
+
+Les étapes exactes de création d’une version (tâches préparatoires, définition du numéro de version et lancement du
+pipeline) sont décrites sur la page [Versions](./releases.mdx).

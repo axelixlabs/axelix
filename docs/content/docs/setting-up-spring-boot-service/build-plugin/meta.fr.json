@@ -1,0 +1,5 @@
+{
+    "title": "Plugin de build",
+    "defaultOpen": false,
+    "pages": ["what-is-build-plugin", "configuration"]
+}

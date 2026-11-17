@@ -1,0 +1,126 @@
+---
+title: Loggers
+description: "La page Loggers affiche le niveau de journalisation de chaque logger et groupe de loggers dans une instance Spring Boot et
+              permet de le modifier à l’exécution, de façon permanente ou pour une durée limitée."
+---
+
+import {TargetThemeIcon} from './TargetThemeIcon';
+import { INFO, DEBUG, WARN } from './StatePaletteForLoggingLevel';
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![page principale des loggers](/img/feature/loggers/loggers-main-page.png)
+
+</ScreenshotsNotice>
+
+***Page Loggers dans l’interface Axelix***
+
+Pour diagnostiquer un problème sur un service en cours d’exécution, vous avez souvent besoin de journaux plus détaillés provenant d’une
+partie de celui-ci. La page Loggers vous permet d’augmenter immédiatement le niveau d’un logger, sans modifier la configuration ni
+redémarrer le service, puis de rétablir son niveau précédent.
+
+Cette page est accessible à tout utilisateur authentifié : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN** peuvent tous l’ouvrir,
+modifier les niveaux et les réinitialiser. Consultez [Rôles et
+autorités](../../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour obtenir la matrice complète
+des rôles et des autorités.
+
+## Ce que montre la page
+
+La page répertorie tous les loggers et groupes de loggers de l’instance avec leur niveau actuel. Une icône de cible <TargetThemeIcon />
+à côté d’un niveau signifie que celui-ci est défini explicitement pour ce logger ou ce groupe, dans la configuration de l’application
+ou dans Axelix. Un niveau sans cette icône est hérité d’un logger parent.
+
+Vous pouvez modifier le niveau :
+
+- D’un logger. Ses enfants qui n’ont pas leur propre niveau héritent du nouveau niveau : lorsque vous faites passer
+  `com.axelixlabs.axelix` de <INFO /> à <DEBUG />, `com.axelixlabs.axelix.sbs` passe également à <DEBUG />.
+- D’un groupe de loggers. Le niveau s’applique à chaque logger du groupe : définir le groupe `web` sur <WARN /> définit également
+  <WARN /> pour tous ses loggers.
+
+Le bouton de réinitialisation <Image src="/img/feature/loggers/reset.svg" alt="icône de réinitialisation" width={20} height={20}/> rétablit le niveau qu’avait un logger avant votre première modification dans Axelix. Il fonctionne pour les loggers modifiés à
+l’exécution : sur cette page, via MCP ou par une requête directe à l’endpoint actuator `axelix-loggers`. Les groupes de loggers ne
+peuvent pas être réinitialisés.
+
+## Modifier les niveaux sur plusieurs instances
+
+<ReleasedInNotice version="1.3.0" />
+
+Lorsque l’application s’exécute sous la forme de plusieurs réplicas, le même problème se manifeste généralement sur chacun d’eux, et
+augmenter le niveau sur un réplica à la fois prend du temps. Ouvrez **Instances** à côté du champ de recherche pour choisir les
+instances de l’application auxquelles une modification s’applique. La liste affiche chaque instance avec son commit et son statut, ce
+qui vous permet de sélectionner, par exemple, uniquement les réplicas qui exécutent le même build.
+
+L’instance que vous avez ouverte est toujours incluse et ne peut pas être désélectionnée. Cochez les autres instances une par une ou
+utilisez **Select all other instances**. Le bouton indique le nombre d’instances sélectionnées, ou **All** lorsqu’elles le sont toutes.
+
+La sélection s’applique à chaque modification effectuée sur la page : niveau d’un logger, niveau temporaire, niveau d’un groupe de
+loggers et réinitialisation. Si certaines des instances sélectionnées sont injoignables, la modification s’applique néanmoins aux
+autres. La page elle-même affiche toujours les niveaux de l’instance que vous avez ouverte.
+
+Le sélecteur n’apparaît que lorsque l’application comporte plusieurs instances. Il est réinitialisé à l’instance actuelle lorsque vous
+passez à une autre instance.
+
+## Niveau de journalisation temporaire
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+<Image src="/img/feature/loggers/loggers-edit-time-level-page.png" alt="fenêtre contextuelle de niveau de journalisation temporaire" width={304} height={380}/>
+
+</ScreenshotsNotice>
+
+***Définition d’un niveau de journalisation temporaire dans l’interface Axelix***
+
+Lorsque vous n’avez besoin de journaux détaillés que pendant un certain temps, par exemple pour détecter un bug, définissez plutôt un
+niveau temporaire et n’ayez plus à penser à le désactiver. Cliquez sur l’icône de minuterie à côté du logger, puis choisissez le niveau
+et l’heure à laquelle il doit prendre fin. Si cette heure est déjà passée aujourd’hui, le niveau reste actif jusqu’à cette heure demain.
+
+Lorsque l’heure est atteinte, le logger retrouve son niveau précédent. Pour mettre fin au niveau temporaire plus tôt, réinitialisez le
+logger. Les niveaux temporaires ne sont pas disponibles pour les groupes de loggers.
+
+## Outils MCP
+
+La lecture de l’arborescence des loggers et la modification des niveaux à l’exécution (pour un seul logger, pour un groupe de loggers
+ou pour réinitialiser un logger individuel) sont également accessibles aux agents IA via MCP. Consultez le [catalogue des outils
+MCP](../../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers).
+
+## Activer l’endpoint Actuator dédié
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Si vous utilisez Axelix 1.2.0 ou une version ultérieure, aucune de ces étapes n’est nécessaire : le starter enregistre
+    lui-même ses endpoints actuator personnalisés, et Axelix ne nécessite plus l’activation des endpoints <code>health</code>/<code>info</code> :
+    il fonctionne parfaitement sans eux. Aucune configuration n’est nécessaire ici.</>}
+/>
+
+Cette page repose sur l’endpoint actuator `axelix-loggers` fourni par l’Axelix Spring Boot Starter. Exposez-le à l’aide des propriétés
+standard de Spring Boot Actuator. Consultez [Configuration du Spring Boot
+Starter](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) pour obtenir la liste complète des endpoints
+Axelix et les informations de configuration associées :
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-loggers
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-loggers
+```
+
+  </Tab>
+</Tabs>
+
+## Voir aussi
+
+- [Configuration de Master](../../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuration du Spring Boot
+  Starter](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

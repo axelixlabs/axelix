@@ -1,0 +1,149 @@
+---
+title: Propriétés de configuration
+description: "La page Propriétés de configuration répertorie tous les beans @ConfigurationProperties enregistrés dans
+              l’instance Spring Boot, regroupés par classe de bean, avec le préfixe de propriété et les valeurs que Spring lie
+              actuellement au bean."
+---
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![Page principale des propriétés de configuration](/img/feature/configprops/configprops-main-page.png)
+
+</ScreenshotsNotice>
+
+***Propriétés de configuration telles qu’elles apparaissent dans l’interface Axelix***
+
+Une liste déroulante de tous les beans `@ConfigurationProperties` actifs, organisée en accordéons extensibles (ouverts
+par défaut), avec un champ de recherche au-dessus qui filtre les beans et les entrées, ainsi qu’un compteur au format
+`<matching> / <total>`.
+
+## Détails des propriétés de configuration
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![Détails des propriétés de configuration](/img/feature/configprops/configprops-details-page.png)
+
+</ScreenshotsNotice>
+
+***Détails des propriétés de configuration dans l’interface Axelix***
+
+L’en-tête de chaque accordéon affiche la classe du bean et son préfixe ; chaque ligne interne affiche une propriété et
+la valeur que Spring a résolue pour elle.
+
+- **Bean Name** : la classe annotée avec `@ConfigurationProperties`.
+- **Prefix** : le préfixe de propriété lié à ce bean (par exemple `spring.jpa`).
+- **Properties** : une ligne par champ du bean. La clé affichée est le nom du champ (par exemple `showSql`).
+- **Value** : la valeur que Spring a résolue pour le champ. Les propriétés sans valeur sont affichées comme `null`.
+
+:::info
+Par défaut, chaque valeur est masquée par `******` pour les appelants qui ne disposent pas de l’autorité
+`config-properties.values:read`. Consultez [Masquage des valeurs](#masquage-des-valeurs) ci-dessous pour savoir comment
+choisir les clés masquées et qui peut voir les valeurs originales.
+:::
+
+## Masquage des valeurs
+
+Axelix ne s’appuie jamais sur le paramètre Spring Boot `management.endpoint.configprops.show-values` : il demande
+toujours à Spring Boot de renvoyer les valeurs brutes (`Show.ALWAYS`) et applique son propre masquage, en fonction
+d’une vérification d’autorité.
+
+**Qui voit les valeurs brutes.** Les appelants disposant de l’autorité `config-properties.values:read`, accordée par
+les rôles intégrés **ADMIN** et **SUPER_ADMIN**, reçoivent les valeurs originales. Tous les autres reçoivent des
+valeurs remplacées par `******`. Consultez [Rôles et
+autorités](../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour obtenir la matrice
+complète des rôles et autorités.
+
+**Quelles clés sont masquées.** Une seule propriété du starter,
+`axelix.sbs.endpoints.config.sanitized-properties`, contrôle cet ensemble. Elle s’applique à la fois à
+`axelix-configprops` (cette page) et à `axelix-env` (la page [Propriétés](./properties.mdx)) :
+
+- **Liste vide (par défaut)** — toutes les valeurs sont masquées pour les appelants ne disposant pas de l’autorité.
+- **Liste non vide** — seules les clés répertoriées sont masquées ; les autres sont renvoyées telles quelles.
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+```
+
+  </Tab>
+</Tabs>
+
+Consultez [Masquer les valeurs de propriétés
+sensibles](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#masquer-les-valeurs-de-propriétés-sensibles)
+dans le guide de configuration du Spring Boot Starter pour retrouver cette propriété avec le reste de la configuration
+du starter.
+
+:::note
+Les propriétés standard de Spring Boot Actuator pour le masquage — `management.endpoint.configprops.show-values`,
+`management.endpoint.configprops.keys-to-sanitize` et leurs équivalents `env` — ne sont pas consultées. Utilisez
+`axelix.sbs.endpoints.config.sanitized-properties` à la place.
+:::
+
+## Outils MCP
+
+La liste de tous les beans `@ConfigurationProperties` et de leurs valeurs liées est également exposée aux agents IA via
+MCP. Consultez le [catalogue des outils
+MCP](../../setting-up-master-ui/mcp/mcp-tools.mdx#introspection-dune-instance).
+
+## Activer l’endpoint Actuator dédié
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Si vous utilisez Axelix 1.2.0 ou une version ultérieure, rien de tout cela n’est nécessaire : le starter
+    enregistre lui-même ses endpoints Actuator personnalisés et Axelix n’exige plus que les endpoints
+    <code>health</code>/<code>info</code> soient activés — il fonctionne parfaitement sans eux. Aucune configuration
+    n’est nécessaire ici.</>}
+/>
+
+La page s’appuie sur l’endpoint Actuator `axelix-configprops` fourni par l’Axelix Spring Boot Starter. Exposez-le via
+les propriétés standard de Spring Boot Actuator — consultez [Configurer Spring Boot
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) pour obtenir la liste complète
+des endpoints Axelix et la configuration associée :
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-configprops
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-configprops
+```
+
+  </Tab>
+</Tabs>
+
+## Voir aussi
+
+- [Propriétés](./properties.mdx) — vue à l’exécution de chaque propriété résolue, avec la configuration de masquage
+  partagée avec cette page.
+- [Configurer Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configurer Spring Boot
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

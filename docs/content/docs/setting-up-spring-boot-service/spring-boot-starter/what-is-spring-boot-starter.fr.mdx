@@ -1,0 +1,41 @@
+---
+title: Qu’est-ce que l’Axelix Spring Boot Starter ?
+description: "Axelix Starter (également appelé ASBS - Axelix Spring Boot Starter) est une dépendance Spring Boot Starter qui permet à
+              vos applications Spring Boot de s’intégrer parfaitement à la plateforme Axelix. Il fait le lien entre vos applications et
+              la console de gestion Axelix Master."
+---
+
+## Vue d’ensemble
+
+Axelix Starter transforme votre application Spring Boot standard en un « service géré » qui peut être surveillé,
+débogué et contrôlé via l’interface Axelix Master. Pour cela, il étend les fonctionnalités natives de Spring Boot
+et fournit des endpoints et des fonctionnalités supplémentaires.
+
+## Fonctionnalités clés
+
+### **Découverte et enregistrement automatiques des services**
+- **Découverte automatique** : Axelix Master enregistre automatiquement les instances
+- **Prise en charge de plusieurs environnements** : fonctionne avec Kubernetes et Docker Compose
+- **Enregistrement avec récupération automatique** : réenregistrement automatique en cas d’interruption des connexions
+
+### **Supervision et débogage avancés**
+- **Analyse des beans en temps réel** : consultez tous les beans Spring.
+- **Inspection des propriétés de configuration** : consultez les valeurs des propriétés et leurs sources
+- **Métriques d’exécution** : métriques de performance et de santé de l’application
+- **Export de l’état** : exportez l’état d’une instance d’application (y compris heap-dump, thread-dump, env, etc.)
+
+## Quand utiliser Axelix Starter
+
+### **Développement et tests**
+- **Déboguez les problèmes de configuration** dans différents environnements (local, recette, production)
+- **Comprenez le câblage et les dépendances des beans** sans inspecter le code en profondeur
+- **Testez les modifications de configuration** sans redéploiement ni redémarrage
+- **Validez la résolution des propriétés** à travers plusieurs sources de configuration
+- **Activez ou désactivez les tâches planifiées** : testez différents scénarios de planification en activant ou désactivant les méthodes `@Scheduled`
+- **Gestion des caches** : vérifiez le comportement des caches en les vidant ou en les désactivant pendant les tests
+
+### **Opérations en production**
+- **Surveillez la santé des applications** dans plusieurs environnements et instances
+- **Effectuez un débogage d’urgence** lors d’incidents en production
+- **Gérez la configuration** de plusieurs instances d’application
+- **Auditez l’état et la configuration des applications** pour résoudre les problèmes

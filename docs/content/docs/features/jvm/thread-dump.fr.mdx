@@ -1,0 +1,130 @@
+---
+title: Dump de threads
+description: "La page Thread Dump présente un instantané en direct de tous les threads de l’instance Spring Boot gérée. La page interroge
+              périodiquement l’instance : la liste, les états des threads et la chronologie reflètent donc l’état récent de la JVM,
+              plutôt qu’une capture figée."
+---
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![page principale du dump de threads](/img/feature/thread-dump/thread-dump-main-page.png)
+
+</ScreenshotsNotice>
+
+***Page Thread Dump dans l’interface Axelix***
+
+Cette page est accessible à tout utilisateur authentifié : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN** peuvent tous
+l’ouvrir et activer ou désactiver **Thread Contention Monitoring**. Consultez [Rôles et
+autorités](../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour obtenir la matrice complète
+des rôles et des autorités.
+
+La partie supérieure de la page comporte trois contrôles :
+
+- Un champ de **search** qui filtre la liste des threads par nom ; le compteur adjacent affiche `<matching> / <total>`.
+- Un bouton **Settings** <Image src="/img/feature/icons/settings-icon.png" alt="icône des paramètres" width={20} height={20}/>
+  qui ouvre une fenêtre modale contenant le commutateur **Thread Contention Monitoring** (voir [Paramètres](#paramètres) ci-dessous).
+- Une bande de **timeline** coulissante permettant de choisir le moment à examiner : la sélection d’une plage dans cette bande
+  détermine la vue détaillée de chaque thread affichée en dessous.
+
+Les threads sont triés par priorité JVM et présentés sous forme de panneaux accordéon. L’en-tête de chaque panneau affiche le nom
+du thread, son état actuel et un indicateur d’état assorti d’un code couleur (voir [Couleurs des états des
+threads](#couleurs-des-états-des-threads) ci-dessous).
+
+## Détails du dump de threads
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![page de détails du dump de threads](/img/feature/thread-dump/thread-dump-details-page.png)
+
+</ScreenshotsNotice>
+
+***Page de détails Thread Dump dans l’interface Axelix***
+
+Dépliez un thread pour afficher son instantané détaillé correspondant à la plage temporelle choisie dans la chronologie :
+
+- **Thread id** : identifiant du thread attribué par la JVM.
+- **Thread name** : nom du thread.
+- **Thread state** : état du thread dans la JVM (`RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED`, …).
+- **Priority** : priorité du thread dans la JVM.
+- **Blocked count** : nombre total de blocages du thread. Renseigné uniquement lorsque **Thread Contention Monitoring**
+  est activé ; sinon, la valeur affichée est *Not Available*.
+- **Blocked time** : temps passé par le thread en état de blocage, en millisecondes. Renseigné uniquement lorsque **Thread Contention
+  Monitoring** est activé ; sinon, la valeur affichée est *Not Available*.
+- **Waited count** : nombre total d’attentes de notification par le thread. Renseigné uniquement lorsque **Thread Contention
+  Monitoring** est activé ; sinon, la valeur affichée est *Not Available*.
+- **Waited time** : temps passé par le thread en attente, en millisecondes. Renseigné uniquement lorsque **Thread Contention
+  Monitoring** est activé ; sinon, la valeur affichée est *Not Available*.
+- **Daemon** : indique si le thread est un thread daemon.
+- **Locked by** : informations sur l’objet de verrouillage que le thread attend, le cas échéant :
+    - **Class** : nom complet de la classe de l’objet de verrouillage.
+    - **Identity hash code** : code de hachage d’identité de l’objet de verrouillage.
+- **Stacktrace** : trace de la pile capturée pour le moment sélectionné.
+
+### Couleurs des états des threads
+
+| Indication                                                                                  | État                |
+|:-------------------------------------------------------------------------------------------:|---------------------|
+| <Image src="/img/feature/thread-dump/running-green-state.png" width={25} height={25}/>        | RUNNABLE            |
+| <Image src="/img/feature/thread-dump/running-blue-state.png" width={25} height={25}/>         | RUNNABLE (natif)    |
+| <Image src="/img/feature/thread-dump/waiting-yellow-state.png" width={25} height={25}/>       | WAITING             |
+| <Image src="/img/feature/thread-dump/waiting-orange-state.png" width={25} height={25}/>       | WAITING (suspendu)  |
+| <Image src="/img/feature/thread-dump/timed-waiting-orange-state.png" width={25} height={25}/> | TIMED_WAITING       |
+| <Image src="/img/feature/thread-dump/blocked-red-state.png" width={25} height={25}/>                     | BLOCKED             |
+| <Image src="/img/feature/thread-dump/terminated-grey-state.png" width={25} height={25}/>      | TERMINATED          |
+| <Image src="/img/feature/thread-dump/other-purple-state.png" width={25} height={25}/>         | autre               |
+
+
+## Paramètres
+
+Cliquer sur <Image src="/img/feature/icons/settings-icon.png" alt="icône des paramètres" width={20} height={20}/> ouvre une fenêtre
+modale contenant un seul commutateur :
+
+- **Thread Contention Monitoring** — active la surveillance JMX de la contention sur le `ThreadMXBean` de l’instance. Lorsqu’elle est
+  activée, la JVM mesure le temps passé par chaque thread dans les états **BLOCKED** et **WAITING**, ce qui renseigne les champs
+  `Blocked count` / `Blocked time` / `Waited count` / `Waited time` ci-dessus. Lorsqu’elle est désactivée, ces quatre champs
+  conservent la valeur *Not Available*.
+
+Notez que la surveillance de la contention entraîne une surcharge mesurable pour la JVM. Les instances de production la laissent donc
+généralement désactivée et ne l’activent que pendant une investigation ciblée.
+
+## Activer l’endpoint Actuator dédié
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Si vous utilisez Axelix 1.2.0 ou une version ultérieure, aucune de ces étapes n’est nécessaire : le starter enregistre
+    lui-même ses endpoints actuator personnalisés, et Axelix ne nécessite plus l’activation des endpoints <code>health</code>/<code>info</code> :
+    il fonctionne parfaitement sans eux. Aucune configuration n’est nécessaire ici.</>}
+/>
+
+Cette page repose sur l’endpoint actuator `axelix-thread-dump` fourni par l’Axelix Spring Boot Starter. Exposez-le à l’aide des
+propriétés standard de Spring Boot Actuator. Consultez [Configuration du Spring Boot
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) pour obtenir la liste complète des endpoints
+Axelix et les informations de configuration associées :
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-thread-dump
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-thread-dump
+```
+
+  </Tab>
+</Tabs>
+
+## Voir aussi
+
+- [Configuration de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuration du Spring Boot
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

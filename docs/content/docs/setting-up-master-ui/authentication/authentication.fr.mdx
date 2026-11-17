@@ -1,0 +1,276 @@
+---
+title: Authentification
+description: "Cette page explique le fonctionnement réel de la connexion à Axelix Master : les options d’authentification disponibles, la manière
+              dont la session de navigateur est établie et vérifiée à chaque requête, le modèle de rôles et d’autorités qui régit l’accès à
+              l’interface, ainsi que la façon dont le serveur MCP authentifie les agents IA."
+---
+
+import signInOptionsStyles from './_signInOptionsTable.module.css';
+import rolesStyles from './_rolesTable.module.css';
+import oauth2Styles from './_oauth2PropertiesTable.module.css';
+
+Les clés de propriétés sont présentées dans [Configurer Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx#référence-de-configuration) ;
+cette page vise à expliquer le modèle conceptuel.
+
+## Les trois options de connexion
+
+Master est fourni avec trois fournisseurs d’authentification indépendants. N’importe quelle combinaison peut être activée simultanément ;
+l’écran de connexion `/login` affiche les contrôles correspondant aux fournisseurs actifs.
+
+<div className={signInOptionsStyles.SignInOptionsTable}>
+
+| Option        | Par défaut     | Propriété d’activation                                                                     | À utiliser lorsque                                                                       |
+|---------------|----------------|--------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| Super-admin   | Toujours actif | (contrôlé par `axelix.master.auth.options.super-admin.credentials.{username,password}`)    | Première configuration, compte de secours, déploiements exploités par une seule personne. |
+| Local users   | Désactivé      | `axelix.master.auth.options.local.enabled=true`                                            | Master gère le stockage des mots de passe.                                                |
+| OAuth2 / OIDC | Désactivé      | `axelix.master.auth.options.oauth2.enabled=true`                                           | Production. SSO via Keycloak, Auth0, Okta, Google ou tout fournisseur compatible OIDC.    |
+
+</div>
+
+Lorsque plusieurs options sont activées, l’écran les superpose : le formulaire de nom d’utilisateur et de mot de passe apparaît pour le
+super-admin et les utilisateurs locaux, suivi d’un bouton **Sign in with OAuth2/OIDC Provider** unique lorsque OIDC est activé.
+
+### Super-admin
+
+Le super-admin intégré est le seul compte qui soit toujours actif. Vous pouvez considérer le super-admin comme l’utilisateur en
+_« mode Dieu »_ dans Axelix :
+
+1. Il détient toutes les autorités possibles.
+2. Il est intégré et _toujours_ actif. Il ne peut être ni désactivé ni supprimé (voir ci-dessous pourquoi).
+3. Il ne peut être ni modifié ni édité, mais vous pouvez (et devriez !) changer son nom d’utilisateur et son mot de passe au moyen des
+   paramètres `axelix.master.auth.options.super-admin.credentials.username` / `.password`. Notez que **ces paramètres sont réappliqués à chaque
+   démarrage d’Axelix Master**, et pas uniquement lors de la configuration initiale !
+
+#### Quand l’utiliser
+
+Le super-admin existe pour deux situations, et non pour une utilisation quotidienne :
+
+1. **Configuration initiale.** Sur une nouvelle installation de Master, aucun autre compte n’existe encore. Connectez-vous en tant que
+   super-admin pour effectuer les opérations de premier lancement : configurer la licence, créer vos premiers utilisateurs locaux et définir
+   les rôles privilégiés que votre équipe utilisera ensuite.
+2. **Récupération d’urgence.** Lorsque les comptes habituellement utilisés par votre équipe cessent de fonctionner, le super-admin constitue
+   un recours. Par exemple, un mappage de rôles OIDC peut attribuer `VIEWER` à tout le monde, ou un administrateur peut être supprimé
+   accidentellement. Comme le super-admin ne dépend jamais de la base de données ni d’un fournisseur d’identité externe, il vous permet de
+   continuer à vous connecter pendant que vous corrigez le problème.
+
+Pour le travail quotidien, connectez-vous plutôt avec un compte local ou OIDC. Réservez le super-admin à la configuration et au dépannage.
+
+#### Différences avec les autres comptes
+
+Les deux autres options de connexion laissent un enregistrement dans la base de données de Master ; ce n’est pas le cas du super-admin.
+
+- **Les utilisateurs locaux** résident entièrement dans la base de données de Master et sont gérés depuis l’écran **Users**.
+- **Les utilisateurs OIDC** sont gérés par votre fournisseur d’identité, mais Master conserve tout de même un enregistrement pour chacun
+  d’eux, y compris le rôle déterminé à partir de `role-attribute-path`, afin de pouvoir les afficher sur l’écran **Users** et réutiliser le
+  mappage.
+- **Le super-admin** n’a aucun enregistrement en base de données. Ses identifiants résident uniquement dans la configuration. Il n’apparaît
+  jamais sur l’écran **Users**, et son nom d’utilisateur est réservé : aucun utilisateur local ou OIDC ne peut être créé, renommé, modifié
+  ou supprimé de manière à utiliser ce nom. Par conséquent, le compte super-admin lui-même ne peut être ni modifié ni supprimé depuis
+  l’interface.
+
+:::tip
+Pour changer le nom d’utilisateur ou le mot de passe du super-admin, modifiez `axelix.master.auth.options.super-admin.credentials` et
+redémarrez Master. Il est volontairement impossible d’effectuer cette opération dans l’application.
+:::
+
+Remplacez les valeurs par défaut avant d’exposer Master à qui que ce soit : `admin / admin` donne un contrôle total sur tous les services
+surveillés.
+
+Le mot de passe peut être fourni dans l’un des formats suivants :
+
+* **En clair** : la valeur brute du mot de passe.
+* **Encodé** : préfixez la valeur d’un identifiant entre accolades pour indiquer comment elle doit être vérifiée : `{noop}` pour un mot de
+  passe en clair, `{bcrypt}` pour un hachage BCrypt.
+
+En l’absence de préfixe, la valeur est traitée comme un mot de passe en clair.
+Pour des raisons de sécurité, il est fortement recommandé d’utiliser un format de mot de passe haché (comme `{bcrypt}`) plutôt qu’un mot de
+passe en clair.
+
+Voici des exemples de mots de passe encodés :
+
+* `{bcrypt}$2a$10$KjkxE0Tt8L4B2kDYlSWcme0o/AjKE7LqyDaTqPr0sESbF85e3bDTC` : mot de passe encodé avec bcrypt
+* `{noop}password` : mot de passe en clair encodé (identique à `password` seul).
+
+### Utilisateurs locaux
+
+Les utilisateurs locaux résident dans la base de données propre à Master (`UserEntity`). Les mots de passe sont hachés avec BCrypt. Lorsque
+`axelix.master.auth.options.local.enabled=true`, `DatabaseUserAuthenticator` recherche le nom d’utilisateur envoyé, vérifie le mot de passe
+avec BCrypt et mappe la chaîne de rôle stockée (`admin`, `editor`, `viewer`) à l’un des rôles intégrés. Les chaînes de rôle inconnues lèvent
+`UserRoleNotFoundException` au moment de la connexion.
+
+Les utilisateurs locaux sont gérés depuis l’écran **Users** de l’interface : leur création, leur modification et leur suppression nécessitent
+l’autorité `users:manage`, que seul `SUPER_ADMIN` détient par défaut.
+
+### OAuth2 / OIDC
+
+Master implémente le flux standard Authorization Code Flow. Activez-le avec `axelix.master.auth.options.oauth2.enabled=true` et fournissez
+`issuer-uri`, `client-id`, `client-secret`, ainsi que l’URL `base-url` publique de ce déploiement de Master.
+
+Le déroulement complet est le suivant :
+
+1. L’utilisateur clique sur **Sign in with OAuth2/OIDC Provider** sur `/login`. Le navigateur est redirigé vers l’endpoint d’autorisation de
+   l’IdP avec `client-id` et `redirect_uri` défini sur `<base-url>/api/external/oauth2/callback`.
+2. L’IdP authentifie l’utilisateur et le redirige vers le callback avec un `code`.
+3. `OAuth2CallbackController` échange le code contre un jeton d’ID et un jeton d’accès via l’endpoint de jetons de l’IdP, valide le jeton
+   d’ID et extrait le nom d’utilisateur.
+4. Le rôle est déterminé en évaluant l’expression JMESPath de `axelix.master.auth.options.oauth2.role-attribute-path` sur la réponse userinfo.
+   Le résultat est mappé à `admin`, `editor` ou `viewer`. Si `role-attribute-path` n’est pas défini, le rôle `VIEWER` est attribué à tous les
+   utilisateurs OIDC.
+5. Avant de générer le cookie de session, Master crée ou met à jour l’utilisateur dans sa propre base de données avec l’origine `OIDC`,
+   actualise l’adresse e-mail stockée à partir de userinfo lorsqu’elle est présente et met à jour `Last login`.
+6. Master génère son propre JWT de session (avec le même encodeur que pour les flux par mot de passe) et redirige le navigateur vers
+   `/wallboard` en définissant les cookies de session.
+
+Le flux Authorization Code Flow ne s’exécute que dans le navigateur. Les jetons OIDC eux-mêmes ne sont jamais stockés : Master les utilise
+une fois pour identifier l’utilisateur, puis émet son propre JWT de session.
+
+Chaque connexion réussie dans le navigateur laisse donc un compte `OIDC` persistant sur l’écran **Users**. Si le même nom d’utilisateur
+appartient déjà à un compte non OIDC, Master rejette la connexion au lieu de fusionner les identités.
+
+**Lorsque `axelix.master.auth.options.oauth2.enabled=true`, les propriétés suivantes doivent être fournies :** `issuer-uri`, `client-id`,
+`client-secret`, `base-url`. `scopes` a pour valeur par défaut `openid` et ne doit être remplacé que si votre IdP exige des scopes
+supplémentaires. `role-attribute-path` est facultatif : ne le définissez pas pour attribuer le rôle `VIEWER` à chaque utilisateur connecté.
+
+<div className={oauth2Styles.ConfigTable}>
+
+| Propriété                                               | Par défaut                                               | Description                                                                                                                                                         |
+|---------------------------------------------------------|----------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled`             | `false`                                                  | Active la connexion OIDC.                                                                                                                                            |
+| `axelix.master.auth.options.oauth2.issuer-uri`          | *(non défini)* <span className="Required">obligatoire</span> | URL de base de l’émetteur OIDC. Master y lit `/.well-known/openid-configuration` pour découvrir les endpoints. Obligatoire dès que `oauth2.enabled=true`.       |
+| `axelix.master.auth.options.oauth2.client-id`           | *(non défini)* <span className="Required">obligatoire</span> | Identifiant client enregistré auprès du fournisseur OIDC. Obligatoire dès que `oauth2.enabled=true`.                                                               |
+| `axelix.master.auth.options.oauth2.client-secret`       | *(non défini)* <span className="Required">obligatoire</span> | Secret client enregistré auprès du fournisseur OIDC. Obligatoire dès que `oauth2.enabled=true`.                                                                    |
+| `axelix.master.auth.options.oauth2.base-url`            | *(non défini)* <span className="Required">obligatoire</span> | URL de base publique de cette instance de Master. Utilisée pour construire l’URI de redirection du callback OAuth2. Obligatoire dès que `oauth2.enabled=true`.    |
+| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                                 | Scopes séparés par des espaces, demandés pendant le flux Authorization Code Flow. `openid` est ajouté automatiquement s’il est absent.                           |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | *(non défini)*                                           | Expression JMESPath évaluée sur la réponse userinfo pour déterminer un rôle Axelix. Si elle n’est pas définie, chaque utilisateur OIDC devient un `VIEWER`.      |
+
+</div>
+
+:::warning
+Attribuer `VIEWER` à chaque utilisateur connecté est pratique pour une première découverte, mais en production, cela signifie que **toute
+personne capable de s’authentifier auprès de votre IdP obtient un accès en lecture à toutes les données de supervision** de chaque service
+découvert. À moins que la population de l’IdP corresponde exactement à l’ensemble des personnes autorisées à voir Master, définissez
+`role-attribute-path` afin que les utilisateurs sans rôle Axelix explicite ne reçoivent pas silencieusement `VIEWER`.
+:::
+
+## La session : cookies et JWT
+
+Tous les modes de connexion aboutissent au même résultat : Master génère un JWT et le renvoie dans un cookie. Ce même cookie contrôle chaque
+requête ultérieure de l’interface.
+
+### Résultat de la connexion
+
+`POST /api/external/users/login` (et le callback OIDC) émet deux cookies avec `Set-Cookie` :
+
+- **`auth_token`** : le JWT lui-même. `HttpOnly`, `SameSite=Strict`, `Path=/`, `MaxAge=axelix.master.auth.jwt.lifespan`
+  (par défaut `12h`). L’attribut `Secure` dépend de `axelix.master.auth.cookie.secure` : ne conservez la valeur `false` que sur localhost en
+  HTTP non chiffré.
+- **`authorities`** : un tableau JSON encodé en Base64 contenant les noms des autorités détenues par l’utilisateur connecté, par exemple
+  `["environment.values:read","scheduled-tasks:write"]`. Il n’est *pas* `HttpOnly`, car le front-end le lit pour savoir quels boutons afficher.
+  Il s’agit uniquement d’une indication pour l’interface. Le backend recalcule les autorités à partir du JWT à chaque requête ; modifier ce
+  cookie ne change donc que ce que propose l’interface, et non ce qu’autorise le serveur.
+
+Le JWT lui-même est signé par HMAC (`HMAC256`, `HMAC384` ou `HMAC512`, défini via `axelix.master.auth.jwt.algorithm`) avec le secret contenu
+dans `axelix.master.auth.jwt.signing-key`. Ses revendications sont le nom d’utilisateur (`sub`), les horodatages d’émission et d’expiration,
+ainsi qu’une revendication `roles` qui encode chaque rôle accordé avec ses autorités et ses composants imbriqués.
+
+### Traitement de chaque requête
+
+`CookieBasedJwtAuthorizationFilter` s’exécute pour chaque requête `/api/...`, à l’exception d’une courte liste blanche (l’endpoint de connexion
+lui-même, le callback OAuth2, l’endpoint public des paramètres, l’endpoint d’auto-enregistrement et `/api/mcp/**`, qui disposent de leurs
+propres filtres ou sont volontairement anonymes). Pour toutes les autres requêtes :
+
+1. Le filtre lit le cookie `auth_token`. S’il est absent ou vide → `JwtProcessingException`, qui se traduit par `401 Unauthorized`.
+2. `DefaultJwtDecoderService` vérifie la signature et l’expiration à l’aide de `axelix.master.auth.jwt.signing-key`. Un jeton modifié, non
+   signé ou expiré → `401`.
+3. `MasterAuthorityResolver` recherche le chemin de la requête et la méthode HTTP dans une table intégrée de règles du type « cet endpoint
+   exige cette autorité ». Les endpoints absents de la table exigent uniquement un jeton valide.
+4. `DefaultAuthorizer` aplatit les rôles de l’utilisateur pour obtenir l’ensemble complet de ses autorités et vérifie qu’il couvre les
+   autorités requises. S’il en manque une → `AuthorizationException`, qui se traduit par `403 Forbidden`.
+5. En cas de succès, la requête s’exécute dans un `DefaultSecurityContext` contenant l’`User` authentifié et le jeton brut, afin que le code
+   en aval puisse lire l’appelant sans l’analyser à nouveau.
+
+### Déconnexion et rotation
+
+`POST /api/external/users/logout` remplace les deux cookies par des valeurs vides avec `MaxAge=0`, ce qui amène le navigateur à les supprimer
+immédiatement. Le JWT lui-même reste techniquement valide jusqu’au dépassement de sa revendication `exp` : Master ne gère pas de liste de
+blocage côté serveur.
+
+Pour forcer la fin de toutes les sessions actives (après la compromission d’une clé, avec un secret partagé obsolète ou lors d’une rotation
+trimestrielle), modifiez `axelix.master.auth.jwt.signing-key`. Dès la requête suivante, la vérification de chaque jeton émis échoue
+immédiatement, car sa signature ne correspond plus au nouveau secret. Les utilisateurs sont redirigés vers `/login`.
+
+## Rôles et autorités
+
+Axelix 1.3 introduit de nouveaux noms d’autorités RBAC, inspirés du
+[modèle RBAC de Grafana](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/access-control/).
+Les modèles de nommage `resource:action` et `resource.sub-resource:action` s’appliquent uniquement à Axelix 1.3 et aux versions ultérieures.
+Les versions antérieures utilisent d’anciens noms tels que `CACHES_CLEAR`.
+Par exemple, `caches:clear` permet de vider les caches, et `environment.values:read` désigne l’accès aux valeurs des propriétés.
+Les rôles continuent de déterminer les actions que les utilisateurs peuvent effectuer. Avec les starters antérieurs à la version 1.3, Master
+convertit automatiquement les noms de code en anciens noms tels que `CACHES_CLEAR` ; aucune modification de la configuration du service n’est
+nécessaire.
+
+Master utilise un ensemble fixe de rôles et un ensemble fixe d’autorités. Les rôles regroupent des autorités, et le contrôle d’autorisation
+porte toujours sur les autorités, jamais sur les noms de rôles. Cela signifie qu’un rôle personnalisé fourni par le mappage OIDC ou la couche
+de base de données doit correspondre à l’un des noms intégrés : il est actuellement impossible de définir une nouvelle autorité dans la
+configuration.
+
+<div className={rolesStyles.RolesTable}>
+
+| Rôle          | Autorités accordées                                                                                                                              | Attribution                                                                                              |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| `SUPER_ADMIN` | Toutes les autorités définies par Master, y compris `users:read` et `users:manage`.                                                             | Le compte super-admin intégré.                                                                           |
+| `ADMIN`       | `environment.values:read`, `config-properties.values:read`, `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`, `heap-dump:read`. | Utilisateurs de la base locale ayant le rôle `admin`. Utilisateurs OIDC dont `role-attribute-path` renvoie `admin`. |
+| `EDITOR`      | `scheduled-tasks:write`, `caches:clear`, `caches:toggle`, `gc:manage`.                                                                            | Utilisateurs de la base locale ayant le rôle `editor`. Utilisateurs OIDC dont `role-attribute-path` renvoie `editor`. |
+| `VIEWER`      | Aucune : vue en lecture seule de tout ce qui n’est pas protégé par une autorité.                                                                  | Utilisateurs de la base locale ayant le rôle `viewer`. Utilisateurs OIDC sans `role-attribute-path` défini ou avec des valeurs non mappées. |
+
+</div>
+
+Actions contrôlées par chaque autorité :
+
+- **`environment.values:read`** : afficher les valeurs des propriétés sur l’écran **Environment**.
+- **`config-properties.values:read`** : afficher les valeurs des propriétés sur l’écran **Configuration Properties**.
+- **`scheduled-tasks:write`** : activer, désactiver, forcer l’exécution et replanifier des tâches planifiées.
+- **`caches:clear`** : vider des caches individuels, des gestionnaires de cache ou l’ensemble du cache de l’application.
+- **`caches:toggle`** : activer et désactiver des caches individuels et des gestionnaires de cache au moment de l’exécution.
+- **`gc:manage`** : déclencher le GC, activer et désactiver la surveillance des logs du GC.
+- **`heap-dump:read`** : télécharger directement des dumps de heap ou les inclure dans un état d’application exporté.
+- **`users:read`** : consulter le flux Users.
+- **`users:manage`** : créer, modifier et supprimer des utilisateurs locaux.
+
+`users:read` et `users:manage` sont aujourd’hui réservées à `SUPER_ADMIN` ; `ADMIN` ne peut pas gérer les utilisateurs sans élévation de
+privilèges.
+
+## Authentification du serveur MCP
+
+Le serveur MCP intégré sur `/api/mcp` est protégé par son propre filtre, `McpAuthorizationFilter`, car les identifiants transmis par les
+clients MCP ne sont pas le cookie de session du navigateur. Le filtre analyse l’en-tête `Authorization` et délègue au gestionnaire correspondant
+au schéma.
+
+- **`Basic`** : `BasicMcpAuthenticationHandler` décode `Authorization: Basic <base64(user:pass)>` et délègue au même
+  `CompositeUserAuthenticator` que celui utilisé par l’interface. Les comptes super-admin et locaux fonctionnent tous les deux. Le mappage des
+  rôles est identique à celui d’une connexion dans le navigateur.
+- **`Bearer`** : `BearerMcpAuthenticationHandler` traite l’identifiant comme un jeton d’accès OIDC. Il transmet le jeton à
+  `JmesPathOidcRoleExtractor` (par le même chemin que le flux OIDC du navigateur) pour en déduire un rôle, puis crée un `PasswordlessUser`
+  synthétique nommé `AI_AGENT` portant ce rôle. Disponible uniquement lorsque `axelix.master.auth.options.oauth2.enabled=true`.
+
+Une fois l’utilisateur identifié, le filtre effectue le même contrôle d’autorités que le filtre web : les autorisations requises par outil sont
+résolues via `McpEndpointResolver` + `McpEndpointAuthorityResolver`. Un outil que l’appelant n’est pas autorisé à exécuter renvoie
+`403 Forbidden`. Un identifiant inconnu ou invalide renvoie `401 Unauthorized`.
+
+Lorsque OIDC est activé et qu’une requête arrive sans en-tête `Authorization`, la réponse `401` contient également :
+
+```
+WWW-Authenticate: Bearer resource_metadata="<base-url>/api/external/mcp-oauth2/.well-known/oauth-protected-resource"
+```
+
+Les clients MCP qui implémentent la RFC 9728 utilisent cet en-tête pour découvrir la configuration OAuth2 de Master et guider eux-mêmes
+l’utilisateur dans le flux d’autorisation.
+
+## Voir aussi
+
+- [Configurer Master : propriétés d’authentification](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentification--jwt) :
+  chaque clé de propriété et chaque valeur par défaut mentionnées sur cette page.
+- [Configurer Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) : le côté starter de la même clé
+  de signature JWT.
+- [Qu’est-ce que Master ?](../what-is-master.mdx) : une présentation plus générale de ce que fait Master une fois la session active.

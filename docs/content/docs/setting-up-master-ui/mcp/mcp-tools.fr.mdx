@@ -1,0 +1,135 @@
+---
+title: Outils MCP
+description: "Liste de référence de tous les outils que le serveur MCP intégré à Axelix Master expose aux agents IA."
+---
+
+import styles from './styles.module.css';
+
+Chaque entrée présente le nom de l’outil, les annotations qu’il déclare, son état d’activation, les rôles autorisés à l’appeler et une brève description de son action. Le même catalogue est accessible dans le navigateur sur l’[écran MCP](../../ui-guide/mcp.mdx). Cette page constitue la liste de référence pour les opérateurs qui définissent qui peut appeler quels outils.
+
+Cette liste suppose que le serveur MCP est activé (`axelix.master.mcp-server.enabled=true`, valeur par défaut). Lorsque cette propriété vaut `false`, le serveur n’est pas enregistré, aucun des outils ci-dessous n’est accessible et le lien **MCP** est masqué dans l’interface utilisateur. Consultez [Configuration du serveur MCP](../configuring-master/configuring-master.mdx#serveur-mcp).
+
+## État des outils
+
+Tous les outils ci-dessous sont intégrés à Master et enregistrés auprès du serveur MCP au démarrage. Aucun interrupteur ne permet d’activer ou de désactiver un outil individuellement : le catalogue est fixé lors du build. Un outil devient inaccessible uniquement lorsque le serveur MCP lui-même est désactivé ou que le processus Master n’est pas en cours d’exécution. Dans le [catalogue de l’interface utilisateur](../../ui-guide/mcp.mdx#le-catalogue-des-outils), le point d’état de chaque carte reflète cet enregistrement en temps réel : vert lorsque le serveur a enregistré l’outil, rouge lorsqu’il est indisponible.
+
+## Annotations des outils
+
+Chaque outil déclare quatre annotations booléennes qui indiquent aux clients MCP les effets de bord à prévoir. Les valeurs ci-dessous sont celles déclarées par les outils d’Axelix : ce sont des indications pour l’agent appelant, et non des contrôles d’autorisation appliqués par Master.
+
+- **read-only** — l’outil ne modifie aucun état dans l’instance Spring Boot cible.
+- **idempotent** — appeler plusieurs fois l’outil avec les mêmes arguments produit le même effet qu’un seul appel.
+- **destructive** — l’outil peut supprimer des données ou appliquer des changements impossibles à annuler depuis l’interface utilisateur.
+- **open-world** — l’outil accède à des ressources extérieures à Master et aux instances Spring Boot enregistrées.
+
+## Contrôle par rôle
+
+Le filtre MCP (`McpAuthorizationFilter`) authentifie l’agent de la même manière que l’interface utilisateur authentifie une session de navigateur. Consultez [Authentification du serveur MCP](../authentication/authentication.mdx#authentification-du-serveur-mcp) pour les mécanismes d’authentification.
+
+## Catalogue
+
+:::info
+Le catalogue ci-dessous présente les outils MCP actuellement livrés avec Master. D’autres outils sont en cours de développement et la liste s’enrichira dans les prochaines versions.
+:::
+
+La colonne **Depuis** indique la version d’Axelix Master dans laquelle un outil a été livré pour la première fois. `1.0.0` étant la première version d’Axelix, un outil marqué `1.0.0` est présent depuis le début. Une version marquée _à venir_ n’est pas encore publiée : l’outil sera disponible dans la prochaine version d’Axelix, mineure ou majeure.
+
+### Instances
+
+L’unique outil de ce groupe renvoie le registre complet des instances Spring Boot gérées par Master. C’est le point d’entrée de toute tâche qui commence par « trouver le service par son nom et obtenir son `instanceId` » : tous les autres outils ont besoin de cet `instanceId`.
+
+Voir aussi : [Guide du wallboard](../../ui-guide/wallboard.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titre | Nom de l’outil | Depuis | Annotations | Rôles autorisés | Description |
+|----------------|----------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Instances Feed | `getInstances` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Instantané de toutes les instances gérées : noms de service lisibles associés à leur `instanceId`, état en temps réel (UP/DOWN), versions de Spring Boot et de Java, durée du déploiement et SHA du commit Git. |
+
+</div>
+
+#### `getWallboard` est renommé en `getInstances`
+
+<ReleasedInNotice version="1.3.0" />
+
+Jusqu’à Axelix 1.2.x inclus, cet outil s’appelait `getWallboard`. À partir d’Axelix 1.3.0, il s’appelle `getInstances` et `getWallboard` n’existe plus. Son comportement, ses paramètres et sa réponse restent identiques.
+
+Les agents IA découvrent les outils auprès du serveur MCP à la connexion et prennent donc automatiquement en compte le nouveau nom. Si vous appelez directement l’outil par son nom, par exemple depuis vos propres scripts ou des instructions destinées aux agents, remplacez `getWallboard` par `getInstances`.
+
+### Introspection d’une instance
+
+Vues en lecture seule d’une instance Spring Boot : beans Spring, propriétés d’environnement, beans `@ConfigurationProperties`, rapport d’auto-configuration et tâches planifiées enregistrées. Chaque outil de ce groupe reçoit un `instanceId` obtenu via `getInstances`.
+
+Voir aussi : [Beans](../../features/spring-framework/beans.mdx), [Propriétés d’environnement](../../features/spring-framework/properties.mdx), [Propriétés de configuration](../../features/spring-framework/configuration-properties.mdx), [Conditions](../../features/spring-framework/conditions.mdx), [Tâches planifiées](../../features/spring-framework/scheduled-tasks.mdx), [Guide du profil de service](../../ui-guide/service-profile.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titre | Nom de l’outil | Depuis | Annotations | Rôles autorisés | Description |
+|----------------------|-----------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Beans Feed | `getInstanceBeans` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liste tous les beans Spring de l’instance avec leur type et leurs dépendances. |
+| Properties | `getInstanceEnvironment` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Renvoie l’environnement complet : propriétés de l’application, propriétés système et variables d’environnement — utile pour les questions relatives à `@Value` et `@ConditionalOnProperty`. |
+| Config Props Beans | `getInstanceConfigProps` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Renvoie tous les beans `@ConfigurationProperties` de l’instance avec leurs valeurs liées. |
+| `@Conditional` Feed | `getInstanceConditions` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Rapport de configuration : configurations Spring Boot et personnalisées appliquées ou ignorées, avec la raison de chaque décision. |
+| Scheduled Tasks | `getInstanceScheduledTasks` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liste les tâches `@Scheduled` cron, à fréquence fixe, à délai fixe et personnalisées enregistrées dans l’instance. |
+| Logs | `getInstanceLogs` | `1.3.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Renvoie les entrées de journal les plus récentes de l’instance (toutes celles du tampon, ou seulement le nombre demandé), avec les traces de pile des exceptions journalisées. |
+
+</div>
+
+### Caches
+
+Inspectez tous les gestionnaires de cache et tous les caches d’une instance Spring Boot, et évincez leurs entrées : soit tous les caches de tous les gestionnaires à la fois, soit un cache nommé dans un gestionnaire donné.
+
+Voir aussi : [Fonctionnalité Caches](../../features/spring-framework/caches.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titre | Nom de l’outil | Depuis | Annotations | Rôles autorisés | Description |
+|----------------------|----------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Caches Feed | `getAllCaches` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liste tous les gestionnaires de cache de l’instance et leurs caches, avec l’indicateur `enabled` de chaque cache. Point de départ de toute tâche liée aux caches : association des noms aux gestionnaires, vérification d’état et résolution des ambiguïtés. |
+| Clear All Cache | `clearAllCaches` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`              | Évince toutes les entrées de tous les caches de tous les gestionnaires de l’instance donnée. Opération destructive de grande portée, réservée à une demande explicite de vidage de tous les caches. |
+| Clear Specific Cache | `clearSpecificCacheEntity` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`              | Évince une seule entrée de cache identifiée par le nom du cache dans un gestionnaire précis. Les autres entrées restent intactes. |
+
+</div>
+
+### Loggers
+
+Consultez l’arborescence des loggers d’une instance Spring Boot — loggers individuels, groupes et niveaux de journalisation disponibles — et modifiez les niveaux pendant l’exécution : pour un logger, pour un groupe entier, ou en rétablissant le niveau par défaut défini par l’application.
+
+Voir aussi : [Fonctionnalité Loggers](../../features/insights/loggers/loggers.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titre | Nom de l’outil | Depuis | Annotations | Rôles autorisés | Description |
+|----------------------------|----------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Available Logging Levels | `getAvailableLoggingLevels` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Renvoie les niveaux de journalisation acceptés par l’instance (par exemple `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `OFF`). Sert à valider les entrées avant de changer un niveau. |
+| Logger Groups Feed | `getLoggerGroupsFeed` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liste tous les groupes de loggers configurés, leurs membres et le niveau actuellement défini pour chaque groupe. |
+| Loggers Feed | `getLoggersFeed` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Liste tous les loggers individuels configurés dans l’instance et leur niveau de journalisation effectif. |
+| Find Logger | `findLoggersByName` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Recherche un ou plusieurs loggers individuels par nom exact ou partiel. Renvoie les niveaux configurés et effectifs de chaque résultat. |
+| Find Loggers Group | `findGroupsByName` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Recherche un ou plusieurs groupes de loggers par nom exact ou partiel. Renvoie le nom, le niveau et les loggers membres de chaque groupe. |
+| Change Logger Level | `changeLoggingLevelByLoggerName` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Définit le niveau de journalisation d’un logger individuel. Utilisez d’abord [Rechercher un logger](#loggers) si son nom est incertain. |
+| Change Group Loggers Level | `changeLoggingLevelByGroupName` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Définit le niveau de journalisation de tous les loggers d’un groupe. Utilisez d’abord [Rechercher un groupe de loggers](#loggers) si son nom est incertain. |
+| Reset Loggers Level | `resetLoggingLevelByLoggerName` | `1.0.0`| read-only: <span className={styles.TagFalse}>false</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagTrue}>true</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Rétablit le niveau par défaut déclaré dans la configuration de l’application pour un logger individuel. La réinitialisation d’un groupe n’est pas disponible. |
+
+</div>
+
+### Analyse de la persistance
+
+Problèmes de persistance détectés par Axelix dans la couche d’accès aux données d’une application. Contrairement aux outils précédents, ceux-ci utilisent les coordonnées de build de l’application — `groupId` et `artifactId` (le G et le A des coordonnées GAV), tous deux obligatoires — plutôt qu’un `instanceId`. Ils lisent l’instantané enregistré de l’application au lieu d’interroger une instance active.
+
+Voir aussi : [Transaction Control](../../features/spring-framework/transaction-control.mdx).
+
+<div className={styles.McpToolsTable}>
+
+| Titre | Nom de l’outil | Depuis | Annotations | Rôles autorisés | Description |
+|----------------------|--------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Transactions Profile | `getApplicationTransactionsProfile` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Problèmes N+1 de chargement différé et de pagination en mémoire détectés dans les méthodes transactionnelles de l’application (`@Transactional`, `TransactionTemplate`, etc.). Peut être limité à une classe (`className`) ou à une méthode (`className` + `methodName`). |
+| Entities Profile | `getApplicationEntitiesProfile` | `1.0.0`| read-only: <span className={styles.TagTrue}>true</span><br/>idempotent: <span className={styles.TagTrue}>true</span><br/>destructive: <span className={styles.TagFalse}>false</span><br/>open-world: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Entités JPA cartographiées par Axelix dans l’application et problèmes de mapping des associations détectés dans chacune (chargement immédiat, `@ManyToMany` basé sur une liste, cascade REMOVE/ALL, `@OneToMany` unidirectionnel). Peut être limité à une entité via `entityName`. |
+
+</div>
+
+## Voir aussi
+
+- [Écran du catalogue MCP](../../ui-guide/mcp.mdx) — vue du même catalogue en lecture seule dans le navigateur, avec des points d’état par outil et une fenêtre d’annotations.
+- [Authentification du serveur MCP](../authentication/authentication.mdx#authentification-du-serveur-mcp) — acceptation des identifiants MCP (`Basic`, `Bearer`) et association d’une identité à un rôle.
+- [Rôles et autorités](../authentication/authentication.mdx#rôles-et-autorités) — opérations contrôlées par chaque autorité et rôles intégrés qui en disposent.
+- [Configuration du serveur MCP](../configuring-master/configuring-master.mdx#serveur-mcp) — propriétés `axelix.master.mcp-server.*`.

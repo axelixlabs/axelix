@@ -46,6 +46,75 @@ export const translations = i18n
             "Install Axelix with AI(ai prompt)": "Install Axelix with AI",
             "Copy prompt for your AI agent(ai prompt)(aria-label)": "Copy prompt for your AI agent",
         },
+        fr: {
+            displayName: "Français",
+
+            // search
+            "Search(search trigger)": "Recherche",
+            "Search(search dialog)": "Recherche",
+            "No results found(search dialog)": "Aucun résultat trouvé",
+            "Open Search(search trigger)(aria-label)": "Ouvrir la recherche",
+            "Close Search(search dialog)(aria-label)": "Fermer la recherche",
+
+            // table of contents
+            "On this page(table of contents)": "Sur cette page",
+            "No Headings(table of contents)": "Aucun titre",
+            "Table of Contents(inline table of contents)": "Table des matières",
+
+            // page footer & pagination
+            "Last updated on(page footer)": "Dernière mise à jour",
+            "Next Page(pagination)": "Page suivante",
+            "Previous Page(pagination)": "Page précédente",
+            "Edit on GitHub(edit page)": "Modifier sur GitHub",
+
+            // sidebar
+            "Hide Sidebar(sidebar)": "Masquer la barre latérale",
+            "Show Sidebar(sidebar)": "Afficher la barre latérale",
+            "Open Sidebar(sidebar)(aria-label)": "Ouvrir la barre latérale",
+            "Close Sidebar(sidebar)(aria-label)": "Fermer la barre latérale",
+            "Collapse Sidebar(sidebar)(aria-label)": "Réduire la barre latérale",
+            "Open Sidebar(aria-label)": "Ouvrir la barre latérale",
+            "Close Sidebar(aria-label)": "Fermer la barre latérale",
+            "Toggle Menu(home layout header)(aria-label)": "Menu",
+
+            // language switcher
+            "Choose a language(language switcher)": "Choisissez une langue",
+            "Choose a language(language switcher)(aria-label)": "Choisissez une langue",
+
+            // header breadcrumb
+            "Docs(header)": "Documentation",
+
+            // theme switcher
+            "Toggle Theme(theme switcher)(aria-label)": "Changer de thème",
+            "Light(theme switcher)(aria-label)": "Clair",
+            "Dark(theme switcher)(aria-label)": "Sombre",
+            "System(theme switcher)(aria-label)": "Système",
+
+            // page actions
+            "Report an issue(page)": "Signaler un problème",
+            "Copy Markdown(page actions)": "Copier le Markdown",
+            "View as Markdown(page actions)": "Afficher en Markdown",
+            "Open(page actions)": "Ouvrir",
+            "Open in GitHub(page actions)": "Ouvrir dans GitHub",
+            "Open in ChatGPT(page actions)": "Ouvrir dans ChatGPT",
+            "Open in Claude(page actions)": "Ouvrir dans Claude",
+            "Open in Cursor(page actions)": "Ouvrir dans Cursor",
+            "Open in Scira AI(page actions)": "Ouvrir dans Scira AI",
+            "Read {url}, I want to ask questions about it.(page actions)":
+                "Lisez {url}, je souhaite poser des questions à son sujet.",
+
+            // AI install prompt
+            "Copy prompt(ai prompt)": "Copier le prompt",
+            "Copied!(ai prompt)": "Copié !",
+            "Prompt copied(ai prompt)": "Prompt copié",
+            "Install Axelix with AI(ai prompt)": "Installer Axelix avec l’IA",
+            "Copy prompt for your AI agent(ai prompt)(aria-label)": "Copier le prompt pour votre agent IA",
+
+            // code block & headings
+            "Copy Text(code block)(aria-label)": "Copier le texte",
+            "Copied Text(code block)(aria-label)": "Texte copié",
+            "Copy Anchor Link(heading anchor)(aria-label)": "Copier le lien vers cette section",
+        },
         ru: {
             displayName: "Русский",
 

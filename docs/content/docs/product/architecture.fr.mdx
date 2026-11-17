@@ -1,0 +1,160 @@
+---
+title: Architecture
+description: "Axelix repose sur une application centrale — **Axelix Master** — qui communique avec chaque service Spring Boot que vous souhaitez gérer
+              via une dépendance **Axelix Starter** côté service. L’interface web et le serveur MCP résident tous deux dans Master, de sorte qu’un
+              processus unique fournit les mêmes données à un navigateur et à un agent IA."
+---
+
+
+```
+                                         ┌───────────────────────┐
+                                         │ Spring Boot 2 Service │
+                         ┌──────────────▶│  + Axelix Starter     │
+                         │               └───────────────────────┘
+┌──────────┐         ┌───┴────────┐      ┌───────────────────────┐
+│    UI    │─REST───▶│            │─────▶│ Spring Boot 3 Service │
+└──────────┘         │   Axelix   │      │  + Axelix Starter     │
+                     │   Master   │      └───────────────────────┘
+                     │ (UI + MCP) │      ┌───────────────────────┐
+┌──────────┐         │            │─────▶│ Spring Boot 2 Service │
+│ AI Agent │─MCP────▶│            │      │  + Axelix Starter     │
+└──────────┘         └───┬────────┘      └───────────────────────┘
+                         │               ┌───────────────────────┐
+                         └──────────────▶│ Spring Boot 3 Service │
+                                         │  + Axelix Starter     │
+                                         └───────────────────────┘
+```
+
+## Composants
+
+- **[Axelix Master](../setting-up-master-ui/what-is-master.mdx)** : sert l’interface utilisateur, expose l’API REST utilisée par celle-ci,
+  exécute le serveur MCP intégré, communique avec chaque service géré via HTTP et conserve le registre des instances.
+- **[Axelix Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx)** : des modules de starter
+  distincts existent pour [Spring Boot
+  2](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#ajouter-la-dépendance),
+  [Spring Boot
+  3](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#ajouter-la-dépendance)
+  et [Spring Boot
+  4](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#ajouter-la-dépendance) —
+  choisissez celui qui correspond à votre application. Le starter expose les endpoints dont Master a besoin (beans, environnement,
+  caches, tâches planifiées, etc.) et peut éventuellement s’auto-enregistrer auprès de Master au démarrage.
+
+## Communication
+
+- **Navigateur ⇄ Master** : REST/JSON via la même origine que celle depuis laquelle Master sert le front-end statique.
+- **Agent IA ⇄ Master** : [Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro) via HTTP.
+  Consultez [Authentification du serveur MCP](../setting-up-master-ui/authentication/authentication.mdx#authentification-du-serveur-mcp)
+  pour découvrir les modes d’authentification.
+- **Master → service géré** : HTTP vers les endpoints d’Axelix Starter sur le service. Chaque lecture (beans, environnement,
+  tâches planifiées, etc.) et chaque action de modification (définir le niveau d’un logger, vider un cache, déclencher une tâche) est un
+  appel HTTP synchrone.
+- **Service géré → Master** : utilisé uniquement lorsque l’auto-enregistrement est activé. Le starter envoie un enregistrement au démarrage,
+  puis des signaux de présence ; la charge utile contient l’URL à laquelle Master doit joindre le service.
+
+## Découverte de services
+
+Un service apparaît dans le registre d’instances de Master selon l’une de deux méthodes :
+
+- [Autodécouverte
+  côté Master](../setting-up-master-ui/configuring-master/configuring-master.mdx#découverte--découverte-automatique) : Master
+  interroge l’API de la plateforme pour trouver les services qui intègrent Axelix Starter. La découverte automatique n’est actuellement possible que dans
+  [Kubernetes](../setting-up-master-ui/configuring-master/configuring-master.mdx#découverte--découverte-automatique)
+  et elle est activée par défaut dans le [chart Helm officiel d’Axelix](https://artifacthub.io/packages/helm/axelix/axelix).
+- [Auto-enregistrement
+  côté Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#option-b--auto-enregistrement) :
+  Axelix Starter envoie une demande d’enregistrement à Master au démarrage, puis des signaux de présence à intervalle régulier.
+
+Pour savoir ce qui se produit avec chaque méthode, consultez [Fonctionnement de la découverte](./discovery.mdx).
+
+## Déploiement et montée en charge
+
+- **Master est le processus central.** Il fait office de cerveau : il accepte toutes les requêtes entrantes de l’interface utilisateur, puis
+  les transmet au service concerné.
+- **La base de données constitue la frontière de persistance.** Axelix Master doit conserver un certain état et a donc besoin d’une
+  base de données. Par défaut, SQLite est utilisé. Bien que SQLite suffise pour de petits déploiements, n’oubliez pas que
+  son fichier de base de données ne survit pas au redémarrage d’un conteneur sans volume monté. PostgreSQL ou MySQL est la configuration
+  recommandée pour tout déploiement plus important — consultez [Base de données](../setting-up-master-ui/configuring-master/configuring-master.mdx#base-de-données).
+- **L’accessibilité réseau relève de l’opérateur.** Master doit pouvoir appeler chaque service géré via HTTP depuis son propre
+  réseau : c’est le canal utilisé pour chaque lecture et modification. Les signaux de présence liés à l’auto-enregistrement constituent les seuls appels
+  dans le sens inverse.
+
+## Déploiements multi-Master
+
+Il est possible de déployer plusieurs instances d’Axelix Master. Dans ce cas, il incombe aux utilisateurs finaux de
+mettre en place la base de données partagée (par exemple, le même fichier SQLite monté ou une base de données PostgreSQL commune) :
+
+```
+              ┌──────────────┐                  ┌──────────────┐
+              │      UI      │                  │  AI Agents   │
+              └──────┬───────┘                  └──────┬───────┘
+                     │REST                             │MCP
+                     │                                 │
+ ┌───────────────────┴─────────────────────────────────┴───────────────────┐
+ │                         Load Balancer (K8S Service)                     │
+ └──────────┬───────────────────────────────────────────────────┬──────────┘
+            │                                                   │
+            │                                                   │
+ ┌──────────┴──────────┐                             ┌──────────┴──────────┐
+ │    Axelix Master    │                             │    Axelix Master    │
+ │       pod "A"       │                             │       pod "B"       │
+ └──┬─────────────┬────┘                             └─┬─────────────┬─────┘
+    │             │                                    │             │
+    │             │                                    │             │
+    │     ┌───────┴────────────────────────────────────┴────────┐    │
+    │     │                      Shared DB                      │    │
+    │     │                                                     │    │
+    │     └─────────────────────────────────────────────────────┘    │
+    │                                                                │
+┌───┴──────────────────────┐                       ┌─────────────────┴─────┐
+│ Spring Boot Services     │                       │ Spring Boot Services  │
+│ (Spring Boot 2 - 4)      │                       │ (Spring Boot 2 - 4)   │
+└──────────────────────────┘                       └───────────────────────┘
+```
+
+## Modèle de sécurité
+
+L’authentification des agents IA utilisant MCP et des humains utilisant l’interface utilisateur est possible via
+l’[authentification Basic](https://datatracker.ietf.org/doc/html/rfc7617) ou
+[OAuth2/OIDC](https://datatracker.ietf.org/doc/html/rfc7617). Ce qui suit n’est qu’un bref aperçu ; consultez
+[Authentification](../setting-up-master-ui/authentication/authentication.mdx) pour découvrir le modèle complet des identifiants.
+
+### Authentification Basic
+
+Dans ce cas, les utilisateurs sont censés être créés dans la base de données à laquelle Axelix Master est connecté. Le profil
+utilisateur sera stocké dans la base de données d’Axelix Master, ce qui convient aux petits déploiements.
+
+:::note
+Actuellement, les utilisateurs ne peuvent être créés que manuellement via l’interface utilisateur par un ingénieur humain. Le provider Terraform est en cours de développement.
+:::
+
+Lors de la connexion, l’utilisateur ou l’agent IA sera invité à fournir ses identifiants, qui seront ensuite
+vérifiés par rapport à la base de données. En cas de connexion via le formulaire de l’interface utilisateur, le backend enverra un cookie
+d’authentification dédié contenant le jeton d’accès JWT.
+
+En cas d’utilisation par des agents IA, ces identifiants sont simplement fournis dans l’en-tête personnalisé <code>"Basic ..."</code>,
+comme défini dans la [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
+
+:::important
+Comme il n’existe pas de norme concernant le schéma d’authentification <code>"Basic"</code> pour un agent IA via un serveur MCP, l’agent
+IA doit présenter ses identifiants dans l’en-tête <code>"Basic"</code> **dans chaque requête** lorsque l’authentification Basic
+est utilisée pour l’agent.
+:::
+
+### OAuth2 et OIDC
+
+Dans les entreprises modernes, le SSO (Single Sign-On) est un modèle IAM courant. Il est souvent mis en œuvre via OAuth2 et OIDC.
+
+Axelix Master peut être configuré pour authentifier l’utilisateur auprès d’un fournisseur d’identité OIDC externe. Dans ce cas, Axelix
+Master fera confiance au jeton du fournisseur OIDC et _pourra_ également demander des informations supplémentaires sur l’utilisateur actuel
+auprès de ce fournisseur (par exemple, en interrogeant l’endpoint <code>/userinfo</code>, s’il est disponible).
+
+### IAM. Points importants
+
+- **Clé de signature JWT partagée.** Master et chaque Axelix Starter doivent utiliser la même clé de signature et le même algorithme HMAC.
+  Master vérifie les autorités de l’utilisateur connecté pour les requêtes de l’interface utilisateur et de MCP. Lorsqu’il appelle un starter à partir de la version 1.3,
+  il envoie un JWT de courte durée l’identifiant comme `AXELIX.MASTER`, sans les rôles ni les autorités de l’utilisateur.
+  Le starter vérifie la signature, l’expiration et l’identité de Master. Pour les starters plus anciens, Master réémet le jeton de
+  l’utilisateur avec les anciens noms d’autorités, car ces starters vérifient encore eux-mêmes les autorisations.
+  Le starter signe également les demandes d’enregistrement et les signaux de présence avec la clé partagée. Une incompatibilité de clé produit une réponse `401`.
+- **TLS relève de la responsabilité de l’opérateur.** Master écoute en HTTP non chiffré par défaut. Placez-le derrière un proxy assurant
+  la terminaison TLS et définissez `axelix.master.auth.cookie.secure=true` pour tout déploiement non local.

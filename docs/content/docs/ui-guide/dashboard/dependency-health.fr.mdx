@@ -1,0 +1,102 @@
+---
+title: Dependency Health
+description: "Le tableau de bord Dependency Health présente toutes les bibliothèques utilisées par les applications du parc, la répartition
+              de leurs versions et celles qui ne font plus l’objet d’un développement actif."
+---
+
+<ReleasedInNotice version="1.3.0" />
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![tableau de bord Dependency Health](/img/feature/dashboard/dashboard-dependency-health.png)
+
+</ScreenshotsNotice>
+
+***Dependency Health dans l’interface utilisateur d’Axelix***
+
+Dependency Health indique l’état des bibliothèques utilisées par vos applications : celles qui ne font plus l’objet d’un développement actif,
+celles qui ne reçoivent plus que des correctifs critiques et celles qui ne bénéficient probablement plus d’aucun correctif. Vous savez ainsi à l’avance
+où vous n’obtiendrez probablement pas de correctif si une [CVE](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) est publiée demain. La
+page ne recherche pas de vulnérabilités et ne modifie rien dans vos applications. Son rôle est de vous sensibiliser à ce risque
+avant qu’il ne devienne un problème.
+
+La page est en lecture seule et accessible à tous les utilisateurs authentifiés : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN**
+peuvent tous l’ouvrir. Consultez [Rôles et
+autorités](../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour connaître la matrice complète
+des rôles et autorités.
+
+## Contenu de la page
+
+Une synthèse en haut de la page indique combien d’applications ont transmis leurs dépendances et combien d’entre elles utilisent une bibliothèque dans chacun
+des statuts à risque :
+
+- **Discontinued** : le projet a annoncé la fin de son développement ou archivé son dépôt. Aucune autre version n’est
+  prévue, y compris pour les correctifs de sécurité.
+- **Maintenance mode** : le projet a déclaré qu’il ne publiait plus que des correctifs critiques de bugs et de sécurité. Il n’ajoute aucune nouvelle
+  fonctionnalité et un successeur est généralement recommandé.
+- **Dormant** : aucune version n’a été publiée pendant une période prolongée et le projet n’a déclaré ni statut de maintenance ni statut de fin de vie. Il
+  peut encore fonctionner, mais personne n’est connu pour y apporter des correctifs.
+
+En dessous, la page examine le même risque sous deux angles. Le premier porte sur les applications : combien utilisent une
+dépendance à risque, quelle part du parc correspond à chaque statut et combien utilisent **None of these**. Une application apparaît
+dans chaque statut qui s’applique à elle ; une application utilisant à la fois une bibliothèque abandonnée et une bibliothèque dormante compte donc deux fois. Par conséquent,
+les pourcentages peuvent totaliser plus de 100 %.
+
+Le second angle porte sur les bibliothèques : combien de bibliothèques utilisées présentent un risque et quelles catégories en contiennent le plus,
+par exemple Persistence, Logging ou Security. La page représente graphiquement les cinq catégories contenant le plus de bibliothèques à risque.
+
+## Recherche d’une bibliothèque
+
+La liste des bibliothèques commence par celles à risque et, au sein de chaque groupe, les plus largement utilisées apparaissent en premier. Les problèmes
+qui affectent le plus grand nombre d’applications se trouvent donc en haut. Pour chaque bibliothèque, vous pouvez voir :
+
+- Son statut, s’il s’agit d’un statut à risque.
+- Si le projet a un successeur, lorsque son statut est à risque.
+- Sa catégorie.
+- Combien d’applications l’utilisent et quelle part du parc cela représente.
+
+Vous pouvez restreindre la liste par catégorie et par statut. Par exemple, sélectionnez
+**Discontinued** et la catégorie Security pour voir quelles bibliothèques de sécurité ne reçoivent plus de correctifs. Cliquer sur une catégorie dans
+le graphique applique le même filtre de catégorie à la liste.
+
+Une bibliothèque sans statut dans la liste fait soit l’objet d’un développement actif, soit est inconnue d’Axelix ; voir [Fonctionnement](#fonctionnement).
+Les bibliothèques inconnues d’Axelix n’ont ni catégorie ni statut, donc tout filtre de catégorie ou de statut les masque.
+
+## Détails d’une bibliothèque
+
+Dépliez une bibliothèque pour décider de la conduite à tenir. Pour une bibliothèque à risque, vous pouvez voir :
+
+- Un résumé du statut du projet.
+- Le projet qui le remplace ou le remplacement recommandé, le cas échéant.
+- Un lien vers la page du projet en amont qui justifie ce statut.
+
+Pour toute bibliothèque, vous pouvez également voir quelles versions le parc utilise, de la plus récente à la plus ancienne, combien d’applications exécutent chaque
+version et quelle part des applications de la bibliothèque cela représente. Cela indique le retard du parc, même pour une bibliothèque
+saine, et combien d’applications seraient concernées par une mise à niveau.
+
+## Fonctionnement
+
+Lors du build, le [plugin de build Axelix](../../setting-up-spring-boot-service/build-plugin/configuration.mdx) écrit le graphe
+des dépendances d’exécution de l’application dans son archive sous la forme d’un [SBOM CycloneDX](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx#sbom-des-dépendances-gradle). L’application transmet ce
+SBOM à Master une seule fois, lors de son enregistrement. Une transmission ultérieure de la même application remplace la précédente, de sorte que la page
+reflète le dernier build enregistré. Lorsque vous ouvrez la page, Master calcule les chiffres à partir des rapports enregistrés.
+
+Une application ne compte qu’une fois, quel que soit le nombre d’instances qu’elle exécute. Une application qui a cessé de transmettre des données reste sur la page avec
+les dépendances de sa dernière transmission.
+
+Seules les applications utilisant la version 1.3.0 ou ultérieure du [starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)
+Axelix transmettent leurs dépendances lors de leur enregistrement ; les applications utilisant des versions antérieures ne sont donc pas comptabilisées. Lorsqu’aucune
+application ne les a transmises, la page indique qu’il n’y a aucune donnée à afficher. Pour effectuer la mise à niveau, consultez [Mise à niveau
+d’Axelix](../../more/upgrading.mdx).
+
+Master compare les bibliothèques à son catalogue de projets. Le statut appartient au projet derrière la bibliothèque, et non
+à une version spécifique ; mettre à niveau une bibliothèque abandonnée vers sa dernière version ne change donc pas son statut. Une bibliothèque
+dont le projet ne figure pas dans le catalogue, comme une bibliothèque interne à votre organisation, compte néanmoins dans le nombre total
+de bibliothèques. Cela signifie qu’Axelix ne se prononce pas à son sujet, et non que le projet est sain.
+
+## Voir aussi
+
+- [Dependencies Analyzer](../../features/insights/dependencies-analyzer.mdx)
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Configuration du plugin de build](../../setting-up-spring-boot-service/build-plugin/configuration.mdx)
+- [Mise à niveau d’Axelix](../../more/upgrading.mdx)

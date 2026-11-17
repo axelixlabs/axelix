@@ -1,0 +1,115 @@
+---
+title: Ramasse-miettes (GC)
+description: "La page Garbage Collector permet d’activer la journalisation du GC de la JVM sur une instance Spring Boot gérée, de
+              déclencher une collecte à la demande et de télécharger le fichier de journalisation obtenu. La journalisation du GC est
+              normalement désactivée en production. Cette page permet de l’activer pour une investigation ciblée, puis de la désactiver."
+---
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![page principale du ramasse-miettes](/img/feature/garbage-collector/gc-main-page.png)
+
+</ScreenshotsNotice>
+
+***Page Garbage Collector dans l’interface Axelix***
+
+## Accès
+
+La lecture du fichier de journalisation du GC et la consultation de l’état de la journalisation sont accessibles à tout utilisateur
+authentifié : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN** peuvent tous ouvrir la page et télécharger un journal existant.
+Les contrôles actifs sont protégés par une autorité distincte :
+
+- **Trigger GC**, **Enable GC Logging** et **Disable GC Logging** nécessitent l’autorité `gc:manage`.
+
+L’autorité `gc:manage` est accordée par les rôles intégrés **EDITOR**, **ADMIN** et **SUPER_ADMIN**. **VIEWER** voit les boutons,
+mais ceux qui ont un effet destructeur restent désactivés. Consultez [Rôles et
+autorités](../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour obtenir la matrice complète
+des rôles et des autorités.
+
+Lorsqu’un bouton de contrôle est visible, mais que votre compte ne dispose pas de cette autorité, Axelix le laisse désactivé et
+affiche une info-bulle contenant le message correspondant au survol.
+
+## Activer la journalisation du GC
+
+La journalisation du GC est désactivée par défaut. La page affiche un état vide avec un bouton **Enable GC Logging** tant que la
+journalisation n’est pas activée. Cliquer sur ce bouton ouvre une fenêtre modale dans laquelle vous choisissez le niveau de
+journalisation de la JVM :
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+<Image src="/img/feature/garbage-collector/enable-gc-logging.png" alt="activation de la journalisation du GC" width={490} height={280}/>
+
+</ScreenshotsNotice>
+
+La liste des niveaux est obtenue à l’exécution à partir de `jcmd VM.log list` sur l’instance cible. Elle contient généralement
+`error`, `warning`, `info`, `debug` et `trace`.
+
+## Utilisation des journaux
+
+Une fois la journalisation activée, l’en-tête de la page propose trois actions :
+
+1. **Trigger GC** <Image src="/img/feature/icons/play-icon.png" width={20} height={20}/> — force une collecte en appelant
+   `System.gc()` sur l’instance, ce qui évite d’attendre qu’un événement naturel du GC produise des entrées. Nécessite
+   `gc:manage`.
+2. **Download GC Log** <Image src="/img/feature/icons/download-icon.png" width={25} height={27}/> — transmet le fichier de
+   journalisation actuel du GC au navigateur sous forme de `text/plain`. Action en lecture seule, accessible à tous.
+3. **Disable GC Logging** <Image src="/img/feature/icons/disable-icon.png" width={25} height={27}/> — désactive à nouveau la
+   journalisation du GC sans modifier le fichier de journalisation déjà écrit. Nécessite `gc:manage`.
+
+Voici une ligne représentative d’un journal du GC téléchargé, accompagnée d’annotations :
+
+```
+[2026-03-02T17:38:55.009+0000][info][gc] GC(428) Pause Full (System.gc()) 29M->28M(97M) 82.955ms
+              │                  │    │    │               │               │    │   │       │
+              │                  │    │    │               │               │    │   │       └─ GC pause duration
+              │                  │    │    │               │               │    │   └─ Total heap
+              │                  │    │    │               │               │    └─ After heap
+              │                  │    │    │               │               └─ Before heap
+              │                  │    │    │               └─ GC event description
+              │                  │    │    └─ GC event ID
+              │                  │    └─ Log tag (subsystem)
+              │                  └─ Log level
+              └─ Timestamp (ISO-8601 with timezone)
+```
+
+## Activer l’endpoint Actuator dédié
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Si vous utilisez Axelix 1.2.0 ou une version ultérieure, aucune de ces étapes n’est nécessaire : le starter enregistre
+    lui-même ses endpoints actuator personnalisés, et Axelix ne nécessite plus l’activation des endpoints <code>health</code>/<code>info</code> :
+    il fonctionne parfaitement sans eux. Aucune configuration n’est nécessaire ici.</>}
+/>
+
+Cette page repose sur l’endpoint actuator `axelix-gc` fourni par l’Axelix Spring Boot Starter. Exposez-le à l’aide des propriétés
+standard de Spring Boot Actuator. Consultez [Configuration du Spring Boot
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) pour obtenir la liste complète des endpoints
+Axelix et les informations de configuration associées :
+
+<Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
+  <Tab value="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-gc
+```
+
+  </Tab>
+  <Tab value="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-gc
+```
+
+  </Tab>
+</Tabs>
+
+## Voir aussi
+
+- [Configuration de Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuration du Spring Boot
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

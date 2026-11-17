@@ -1,0 +1,14 @@
+{
+    "title": "Spring Framework",
+    "defaultOpen": false,
+    "pages": [
+        "properties",
+        "beans",
+        "configuration-properties",
+        "scheduled-tasks",
+        "conditions",
+        "caches",
+        "transaction-control",
+        "entities-map"
+    ]
+}

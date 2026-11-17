@@ -1,0 +1,43 @@
+---
+title: Overview
+description: "Le tableau de bord Overview indique quelles versions de Spring Boot, Spring Framework, Java et Kotlin les
+              applications du parc utilisent."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Le tableau de bord Overview est supprimé dans Axelix 1.2.0. Les versions de Spring Boot et Spring Framework du parc
+    sont affichées à la place sur le tableau de bord Spring Portfolio.</>}
+/>
+
+Dans un parc de dizaines d’applications, il est difficile de déterminer quelles versions des composants clés sont utilisées et laquelle
+est la plus courante. Le tableau de bord Overview répond à cette question pour l’ensemble du parc et vous permet de passer d’une
+version à la liste des instances qui l’exécutent.
+
+La page est en lecture seule et accessible à tous les utilisateurs authentifiés : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN**
+peuvent tous l’ouvrir. Consultez [Rôles et
+autorités](../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour connaître la matrice complète
+des rôles et autorités.
+
+## Contenu de la page
+
+La page indique quelles versions de Spring Boot, Spring Framework, Java et Kotlin le parc utilise et quelle part des
+instances exécute chacune d’elles :
+
+- **Spring Boot** et **Spring Framework** : par ligne, par exemple `3.5`.
+- **Java** : par numéro de version, par exemple `21`.
+- **Kotlin** : par ligne, uniquement parmi les instances ayant Kotlin sur leur classpath. Lorsque le parc n’en contient aucune, Kotlin n’est pas
+  affiché.
+
+Pour chaque composant, la version la plus courante est mise en évidence séparément.
+
+## Ouverture des applications sur le Wallboard
+
+Cliquez sur une version pour ouvrir le [Wallboard](../wallboard.mdx) filtré sur les instances qui exécutent cette version, par exemple
+`Spring Boot = 3.5`. Maintenez la touche Ctrl, Cmd ou Maj enfoncée pendant le clic pour l’ouvrir dans un nouvel onglet.
+
+## Voir aussi
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Mise à niveau d’Axelix](../../more/upgrading.mdx)

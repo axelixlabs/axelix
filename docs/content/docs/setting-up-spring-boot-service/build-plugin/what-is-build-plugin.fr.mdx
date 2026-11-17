@@ -1,0 +1,107 @@
+---
+title: Qu’est-ce que le plugin de build Axelix ?
+description: "Le plugin de build Axelix est un petit plugin Gradle ou Maven à appliquer à chaque service que vous souhaitez faire gérer
+              par Axelix. Il s’exécute au moment du build et écrit un fichier `META-INF/axelix-info.properties` dans l’artefact de votre
+              application. Ce fichier contient l’identité que Master utilise pour distinguer les applications les unes des autres."
+---
+
+Il complète le [Axelix Spring Boot Starter](../spring-boot-starter/what-is-spring-boot-starter.mdx) : le
+starter est le composant d’exécution qui communique avec Master, tandis que le plugin de build est le composant qui, au moment du build,
+fournit au starter les informations à transmettre. Les deux sont indispensables : un service doté du starter mais dépourvu du plugin **ne peut pas s’enregistrer**.
+
+## Ce qu’il produit
+
+Au moment du build, le plugin génère `META-INF/axelix-info.properties` et y enregistre :
+
+- **Les coordonnées de build** — `groupId`, `artifactId` et `version`. Elles constituent l’identité à laquelle Master rattache toutes les données.
+- **Un horodatage du build** — le moment où l’artefact a été assemblé.
+- **Des métadonnées Git** — lorsque le build s’exécute dans un dépôt Git, le commit, la branche et l’auteur actuels.
+
+À l’exécution, le [starter](../spring-boot-starter/what-is-spring-boot-starter.mdx) lit ce fichier et transmet les
+coordonnées à Master dans les métadonnées d’enregistrement de l’instance.
+
+## Worktrees Git
+
+<ReleasedInNotice version="1.3.0" />
+
+Le plugin lit les métadonnées Git lorsque le build s’exécute dans un [worktree lié](https://git-scm.com/docs/git-worktree),
+c’est-à-dire un répertoire de travail créé avec `git worktree add`. Le commit, la branche et l’auteur enregistrés sont ceux du worktree
+dans lequel le build s’exécute, et non ceux du checkout principal. Si le worktree se trouve sur un `HEAD` détaché, l’identifiant du commit
+est enregistré à la place du nom de la branche. Le fonctionnement est identique dans les plugins Gradle et Maven.
+
+## SBOM des dépendances (Gradle)
+
+<ReleasedInNotice version="1.2.0" />
+
+En plus du fichier d’identité, le plugin Gradle génère un **SBOM des dépendances** : un document JSON
+[CycloneDX](https://cyclonedx.org/) 1.6 décrivant le graphe des dépendances d’exécution de l’application. Il est intégré à l’artefact à
+l’emplacement `META-INF/axelix/dependencies.cdx.json`, aux côtés des informations de build. Master le lit pour déterminer quelles
+bibliothèques l’application embarque réellement et comment chacune se retrouve dans le classpath.
+
+Le document est produit par la tâche `generateAxelixDependenciesSbom`. **Vous n’êtes pas censé l’exécuter manuellement** : les tâches `jar`,
+`bootJar` et `processResources` en dépendent toutes, de sorte qu’un build classique intègre automatiquement le SBOM, tandis que `test` et
+`bootRun` le voient également dans le classpath. La tâche ne se réexécute que lorsque le graphe de dépendances résolu change.
+
+Le SBOM décrit le `runtimeClasspath` entièrement résolu, c’est-à-dire l’ensemble exact des bibliothèques embarquées, et non les versions que
+vous avez déclarées :
+
+- **Uniquement les versions résolues.** Lorsque deux dépendances demandent des versions différentes d’une même bibliothèque, le document
+  enregistre la version sélectionnée par Gradle. Les déclarations dynamiques telles que `2.0.+` apparaissent sous la forme de la version
+  concrète résolue, et les versions fixées par un BOM (`platform(...)`) apparaissent telles qu’elles ont été fixées.
+- **Portée d’exécution.** Les dépendances `runtimeOnly` sont incluses. Les dépendances `compileOnly` ne sont jamais embarquées et sont donc
+  exclues.
+- **Chemins de résolution.** Chaque bibliothèque comporte des liens `dependsOn` vers les bibliothèques qu’elle a introduites, de sorte que la
+  chaîne allant de votre application à chaque dépendance transitive est conservée.
+- **Vos propres modules sont exclus.** Dans un build multiprojet, les sous-projets dont dépend l’application ne sont pas répertoriés comme des
+  bibliothèques : les bibliothèques qu’ils introduisent sont directement attribuées à l’application. Chaque projet qui applique le plugin
+  obtient son propre SBOM, décrivant son propre classpath d’exécution.
+
+Comme le reste du plugin, le SBOM ne nécessite aucune configuration. Le **plugin Maven** produit le même document au même emplacement : il
+n’y a pas de tâche distincte, son goal `axelix-generate-project-info` génère le SBOM en même temps que le fichier d’identité.
+
+## Les artefacts générés sont internes
+
+Tout ce que le plugin de build écrit dans votre artefact — `META-INF/axelix-info.properties`, le
+[SBOM des dépendances](#sbom-des-dépendances-gradle) et tout fichier ajouté dans de futures versions — est destiné à un seul consommateur : le
+[Axelix Spring Boot Starter](../spring-boot-starter/what-is-spring-boot-starter.mdx). Le starter lit ces fichiers et
+transmet leur contenu à Master. Tel est l’intégralité du contrat.
+
+:::warning[Soyez prudent si vous vous appuyez sur les artefacts générés]
+Considérez les fichiers générés comme des éléments internes d’Axelix. Leurs noms, emplacements, formats et contenus peuvent changer dans une
+version mineure ou majeure sans grand préavis, et un tel changement n’est pas considéré comme incompatible. Si vos propres outils analysent
+`axelix-info.properties` ou `dependencies.cdx.json` dans l’artefact, attendez-vous à ce qu’ils cessent de fonctionner lors d’une mise à niveau.
+:::
+
+Cela concerne particulièrement le SBOM des dépendances. Il utilise le format standard CycloneDX, mais il est généré pour les besoins de
+Master : par exemple, vos propres modules sont retirés du graphe. Il ne s’agit pas d’un SBOM de niveau conformité ; ne l’utilisez donc pas
+avec des outils d’audit ou de chaîne d’approvisionnement.
+
+## Pourquoi est-il indispensable
+
+Master identifie chaque application par son `groupId` + `artifactId`. Ces coordonnées lui permettent de regrouper les instances,
+d’attribuer les états et d’associer les [informations sur la persistance](../../setting-up-master-ui/mcp/mcp-tools.mdx) (analyses N+1 et
+du mapping des entités).
+
+Sans le plugin, le fichier de propriétés est absent, les coordonnées sont vides et **Master rejette l’enregistrement** :
+l’instance n’apparaît jamais dans l’UI, quelle que soit la configuration du starter. L’application du plugin constitue donc un prérequis
+strict pour chaque service géré, et non une amélioration facultative.
+
+## Gradle et Maven
+
+Le plugin existe en deux variantes, une par outil de build :
+
+- **Gradle** — le plugin `com.axelixlabs.axelix`. Seule la propriété standard `version` du projet doit être définie. Avant Axelix
+  `1.2.0`, le build échouait également si `group` était vide ; depuis `1.2.0`, `group` est facultatif — voir
+  [Coordonnée `group` facultative](./configuration.mdx#coordonnée-group-facultative).
+- **Maven** — le `axelix-maven-plugin`, dont le goal `axelix-generate-project-info` est lié à la phase `prepare-package`.
+  Maven dispose toujours de ses coordonnées GAV, donc rien de supplémentaire n’est nécessaire.
+
+Aucune des deux variantes n’expose d’options de configuration : vous appliquez le plugin et il fait son travail. Les deux variantes génèrent
+également le [SBOM des dépendances](#sbom-des-dépendances-gradle). Consultez [Configurer le plugin de build](./configuration.mdx) pour
+obtenir les extraits exacts.
+
+## Voir aussi
+
+- [Configurer le plugin de build](./configuration.mdx) — comment l’appliquer avec Gradle ou Maven.
+- [Qu’est-ce que l’Axelix Spring Boot Starter ?](../spring-boot-starter/what-is-spring-boot-starter.mdx) — le composant d’exécution
+  qui lit les coordonnées générées et les transmet à Master.

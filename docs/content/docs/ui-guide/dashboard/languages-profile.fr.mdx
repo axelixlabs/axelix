@@ -1,0 +1,51 @@
+---
+title: Languages Profile
+description: "Le tableau de bord Languages Profile indique quelles versions de Java, builds de JDK et versions de Kotlin les
+              applications du parc exécutent."
+---
+
+<ReleasedInNotice version="1.2.0" />
+
+<ScreenshotsNotice text="Les captures d’écran correspondent à la dernière version mineure d’Axelix.">
+
+![tableau de bord Languages Profile](/img/feature/dashboard/dashboard-languages-profile.png)
+
+</ScreenshotsNotice>
+
+***Languages Profile dans l’interface utilisateur d’Axelix***
+
+Dans un parc de dizaines d’applications, chacune peut utiliser sa propre version de Java, un JDK provenant de son propre fournisseur, et inclure
+ou non Kotlin. Languages Profile présente ces informations pour l’ensemble du parc : combien d’applications utilisent encore des versions
+Java non LTS, combien de fournisseurs de JDK sont représentés et dans quelle mesure Kotlin est adopté.
+
+La page est en lecture seule et accessible à tous les utilisateurs authentifiés : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN**
+peuvent tous l’ouvrir. Consultez [Rôles et
+autorités](../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour connaître la matrice complète
+des rôles et autorités.
+
+## Contenu de la page
+
+Une synthèse en haut de la page indique le nombre total d’applications du parc, ainsi que combien d’entre elles exécutent une version LTS de Java et
+combien n’en exécutent pas.
+
+En dessous, la page présente :
+
+- La répartition des applications entre les versions de Java, par exemple Java `21` ou `25`, et les versions qui sont LTS.
+- Les fournisseurs des JDK utilisés par les applications, par exemple Eclipse Temurin, Amazon Corretto ou Azul Zulu.
+- Combien d’applications contiennent du code Kotlin et comment elles se répartissent entre les versions de Kotlin, par exemple `2.1`.
+
+Lorsqu’aucune application ne contient de code Kotlin, la page l’indique au lieu d’afficher les graphiques Kotlin.
+
+## Fonctionnement
+
+Master détecte la version de Java, le fournisseur du JDK et la version de Kotlin de chaque application à l’exécution. Il les enregistre
+une fois par jour et utilise le dernier enregistrement. Une application ne compte qu’une fois, quel que soit le nombre d’instances qu’elle exécute. Une application qui
+a cessé de transmettre des données reste sur la page avec les données de sa dernière transmission.
+
+Java 11 et 17 sont des versions LTS et, à partir de Java 21, une version sur quatre est LTS : 21, 25, 29, et ainsi de suite. Un JDK
+qu’Axelix ne reconnaît pas est affiché comme Unknown.
+
+## Voir aussi
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)

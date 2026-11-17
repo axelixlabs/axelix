@@ -1,0 +1,217 @@
+---
+title: Migrations de base de données
+description: "Master gère le schéma de sa base de données et le maintient en phase avec la version en cours d’exécution."
+---
+
+À chaque démarrage, il exécute [Liquibase](https://www.liquibase.com/) pour appliquer les changements de schéma requis par la version actuelle.
+Vous n’avez jamais à exécuter les migrations manuellement.
+
+## Fonctionnement des migrations
+
+Les migrations font partie du démarrage ; elles ne constituent pas une étape distincte à déclencher.
+
+- **À chaque démarrage.** Avant que Master ne commence à servir l’interface et l’API, Liquibase inspecte la base de données et applique les
+  changesets manquants.
+- **Sur la base de données configurée.** Les migrations s’exécutent sur le même moteur que celui utilisé par Master au moment de l’exécution :
+  SQLite, PostgreSQL ou MySQL, sélectionné d’après le préfixe de l’URL JDBC. Consultez la section
+  [Base de données](../configuring-master/configuring-master.mdx#base-de-données) pour savoir comment le moteur est sélectionné.
+- **Une seule fois par changement.** Liquibase enregistre chaque changeset appliqué dans sa propre table de suivi
+  (`DATABASECHANGELOG`). Un changeset déjà exécuté est ignoré ; redémarrer Master est donc sûr et peu coûteux.
+- **Échec rapide (fail-fast).** Si une migration ne peut pas être appliquée, le démarrage échoue avec une erreur au lieu de poursuivre avec
+  un schéma partiellement migré.
+
+## Identifiants utilisés pour les migrations
+
+Par défaut, les migrations utilisent **les mêmes identifiants que ceux employés par Master pour se connecter** :
+`axelix.master.database.username` et `axelix.master.database.password`. Comme les migrations créent et modifient des tables, cet utilisateur
+de base de données doit disposer de privilèges de modification du schéma (DDL), en plus des accès en lecture et en écriture utilisés par Master
+au moment de l’exécution.
+
+### Utilisation d’un utilisateur dédié aux migrations
+
+<ReleasedInNotice version="1.1.0" />
+
+Certaines équipes exécutent l’application au quotidien avec un utilisateur aux privilèges minimaux, qui peut uniquement lire et écrire des
+lignes, et appliquent les changements de schéma avec un utilisateur distinct disposant de privilèges plus élevés. Master prend en charge ce
+scénario grâce à deux propriétés :
+
+| Propriété                           | Par défaut                          | Description                                                                                                  |
+|-------------------------------------|-------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `axelix.master.migrations.username` | `axelix.master.database.username`   | Utilisateur sous lequel Liquibase s’authentifie pour appliquer les migrations. Privilèges DDL requis.         |
+| `axelix.master.migrations.password` | `axelix.master.database.password`   | Mot de passe de l’utilisateur de migration.                                                                  |
+
+Par défaut, ces deux propriétés reprennent la valeur de la propriété `axelix.master.database.*` correspondante. Si vous ne les définissez pas,
+les migrations s’exécutent avec le même utilisateur que le reste de l’application, comme décrit ci-dessus. Lorsque vous les définissez, Master
+se connecte à la **même base de données** (l’URL JDBC et le pilote de `axelix.master.database.url` sont réutilisés), mais authentifie
+l’exécution de la migration avec l’utilisateur de migration. Après le démarrage, tout continue de s’exécuter avec
+`axelix.master.database.*`.
+
+:::note[SQLite ne gère pas les utilisateurs]
+SQLite stocke les données dans un fichier local et ne connaît pas la notion d’utilisateur de base de données. Par conséquent,
+`axelix.master.migrations.*` est ignoré lorsque `axelix.master.database.url` commence par `jdbc:sqlite:`. Ces propriétés s’appliquent uniquement
+à PostgreSQL et MySQL.
+:::
+
+## Définition des identifiants de migration
+
+Les propriétés de migration sont des paramètres Master ordinaires : vous les fournissez donc de la même manière que tous les autres. Les exemples
+ci-dessous utilisent PostgreSQL ; MySQL fonctionne à l’identique avec une URL `jdbc:mysql://`.
+
+### Exécution sous forme de JAR
+
+Transmettez-les sous forme de propriétés système `-D`, ou placez-les dans un fichier de configuration situé à côté du JAR.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  master:
+    database:
+      url: jdbc:postgresql://db.internal:5432/axelix
+      username: axelix_app        # runtime user (DML only)
+      password: ${AXELIX_DB_PASSWORD}
+    migrations:
+      username: axelix_migrator    # migration user (DDL)
+      password: ${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix
+axelix.master.database.username=axelix_app
+axelix.master.database.password=${AXELIX_DB_PASSWORD}
+axelix.master.migrations.username=axelix_migrator
+axelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </Tab>
+</Tabs>
+
+Vous pouvez également les passer entièrement sur la ligne de commande :
+
+```bash
+java \
+  -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+  -Daxelix.master.database.username=axelix_app \
+  -Daxelix.master.database.password=... \
+  -Daxelix.master.migrations.username=axelix_migrator \
+  -Daxelix.master.migrations.password=... \
+  -jar axelix-AXELIX_VERSION_PLACEHOLDER.jar
+```
+
+:::warning
+La ligne de commande complète d’un processus est lisible par tout autre utilisateur de l’hôte (`ps -ef`, `/proc/<pid>/cmdline`). Les mots de
+passe de la forme `-D` ci-dessus sont donc exposés à tous les processus locaux. Ne l’utilisez que pour un essai local ; conservez les mots de
+passe dans un fichier de configuration alimenté par l’environnement (comme dans l’exemple `application.yaml` ci-dessus) ou transmettez-les sous
+forme de variables d’environnement dans tous les autres cas. Consultez
+[Fournir les secrets en toute sécurité](../configuring-master/configuring-master.mdx#fourniture-de-propriétés).
+:::
+
+### Exécution avec Docker
+
+L’image applique automatiquement `JAVA_TOOL_OPTIONS` à la JVM ; c’est donc le mécanisme à utiliser pour transmettre des propriétés `-D` au
+conteneur.
+
+:::warning
+`JAVA_TOOL_OPTIONS` est intégralement affiché sur stderr au démarrage (`Picked up JAVA_TOOL_OPTIONS: ...`). Par conséquent, chaque valeur `-D`
+qu’il contient, y compris les mots de passe de la base de données et de migration, se retrouve dans `docker logs` et dans tout collecteur de
+logs. N’y placez que des options `-D` non sensibles et fournissez plutôt les mots de passe dans des variables d’environnement `-e` distinctes
+(`AXELIX_MASTER_DATABASE_PASSWORD`, `AXELIX_MASTER_MIGRATIONS_PASSWORD`), liées selon les mêmes règles de liaison assouplie. Consultez
+[Fournir les secrets en toute sécurité](../configuring-master/configuring-master.mdx#fourniture-de-propriétés).
+:::
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e JAVA_TOOL_OPTIONS="\
+    -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+    -Daxelix.master.database.username=axelix_app \
+    -Daxelix.master.database.password=... \
+    -Daxelix.master.migrations.username=axelix_migrator \
+    -Daxelix.master.migrations.password=..." \
+  ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```bash
+docker run --rm -p 2935:2935 \
+  -e JAVA_TOOL_OPTIONS="\
+    -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+    -Daxelix.master.database.username=axelix_app \
+    -Daxelix.master.database.password=... \
+    -Daxelix.master.migrations.username=axelix_migrator \
+    -Daxelix.master.migrations.password=..." \
+  docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+```
+
+  </Tab>
+</Tabs>
+
+:::note
+Master écoute sur le port `2935` par défaut depuis Axelix `1.2.0`. Avant cette version, le port par défaut était `8080` ; publiez donc le port
+`8080` si vous exécutez une image plus ancienne. Consultez [Généralités](../configuring-master/configuring-master.mdx#général).
+:::
+
+### Exécution avec Docker Compose
+
+Ajoutez les propriétés de migration à `JAVA_TOOL_OPTIONS` du service `master`, avec les paramètres de base de données.
+
+<Tabs groupId="docker-registry" items={['Docker GHCR', 'Docker Hub']}>
+  <Tab value="Docker GHCR">
+
+```yaml title="docker-compose.yaml"
+services:
+  master:
+    image: ghcr.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    ports:
+      - "2935:2935"
+    environment:
+      JAVA_TOOL_OPTIONS: >-
+        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
+        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
+        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
+        -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
+        -Daxelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </Tab>
+  <Tab value="Docker Hub">
+
+```yaml title="docker-compose.yaml"
+services:
+  master:
+    image: docker.io/axelixlabs/axelix:AXELIX_VERSION_PLACEHOLDER
+    ports:
+      - "2935:2935"
+    environment:
+      JAVA_TOOL_OPTIONS: >-
+        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
+        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
+        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
+        -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
+        -Daxelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </Tab>
+</Tabs>
+
+Fournissez les valeurs dans un fichier `.env` placé à côté du fichier Compose :
+
+```bash title=".env"
+AXELIX_DB_USERNAME=axelix_app
+AXELIX_DB_PASSWORD=...
+AXELIX_MIGRATIONS_USERNAME=axelix_migrator
+AXELIX_MIGRATIONS_PASSWORD=...
+```
+
+## Voir aussi
+
+- [Configurer Master](../configuring-master/configuring-master.mdx) : la référence complète des propriétés, y compris les paramètres de connexion
+  `axelix.master.database.*`.

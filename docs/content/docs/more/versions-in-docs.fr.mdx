@@ -1,0 +1,46 @@
+---
+title: Versions dans la documentation
+description: "Comment la documentation indique les versions et à quelle version correspondent les captures d’écran."
+---
+
+Cette page explique comment la documentation indique les versions d’Axelix et à quelle version correspondent les
+captures d’écran. Certains titres sont immédiatement suivis d’une courte notice. Celle-ci précise à quelle version
+d’Axelix la section s’applique. La documentation n’est versionnée que par version majeure : une même page décrit donc
+toutes les versions mineures de cette ligne, et les notices signalent les différences entre ces versions.
+
+## Publié
+
+<ReleasedInNotice version="1.1.0" />
+
+La section décrit une fonctionnalité fournie dans la version indiquée. Elle n’existe pas encore dans une version
+antérieure : effectuez une mise à niveau pour l’utiliser.
+
+## À venir
+
+<UpcomingReleaseNotice />
+
+La section décrit une fonctionnalité déjà finalisée, mais pas encore publiée. Elle sera fournie dans la prochaine
+version mineure. Lors de sa publication, la notice devient **Publié** et indique le numéro de la version.
+
+## Versions antérieures
+
+<LegacyNotice version="1.2.0" />
+
+La section est nécessaire uniquement pour les versions antérieures à celle indiquée. À partir de cette version,
+ignorez-la. Certaines notices expliquent également pourquoi la section n’est plus nécessaire.
+
+## Captures d’écran
+
+<ScreenshotsNotice text="Les captures d’écran présentent la dernière version mineure d’Axelix." />
+
+Les captures d’écran présentent l’interface Axelix de la dernière version mineure. Lorsqu’une version mineure modifie
+un écran, nous mettons à jour ses captures et nous efforçons de maintenir chaque page en accord avec la dernière
+version mineure. Les versions correctives ne modifient pas l’interface présentée dans les captures d’écran.
+
+Si vous utilisez une version antérieure, un écran peut différer de sa capture : certains contrôles peuvent être absents
+ou se trouver à un autre endroit.
+
+## Voir aussi
+
+- [Compatibilité et versionnement](./compatibility-and-versioning.mdx)
+- [Mise à niveau d’Axelix](./upgrading.mdx)

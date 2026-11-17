@@ -1,0 +1,183 @@
+---
+title: Pourquoi ne pas simplement utiliser Spring Boot Admin ?
+description: "Spring Boot Admin a inspiré Axelix. Découvrez comment Axelix enrichit la gestion habituelle des applications avec un RBAC intégré, des diagnostics d’exécution plus approfondis, le suivi de l’évolution de l’écosystème et des workflows conçus pour l’IA."
+---
+
+[Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) (SBA) a été l’une des premières sources
+d’inspiration d’Axelix. Les ingénieurs qui développent Axelix ont utilisé SBA dans des environnements réels pendant des
+années. Une interface centralisée pour Spring Boot Actuator constitue un point de départ utile, mais les problèmes que
+les équipes doivent résoudre vont bien au-delà de l’affichage des données Actuator.
+
+Cette expérience a conduit à un périmètre plus large : **Axelix est la plateforme open source, conçue pour l’IA, destinée
+au développement et à l’évolution d’écosystèmes de microservices Java Spring Boot.** Elle couvre les workflows habituels
+de gestion des applications avec un contrôle d’accès basé sur les rôles intégré, ajoute des capacités d’inspection et de
+contrôle de l’exécution plus approfondies et aide les équipes à gérer les changements entre les services. La plateforme
+est destinée tant aux ingénieurs humains qu’aux agents IA.
+
+## Workflows de gestion habituels, avec RBAC intégré
+
+Axelix couvre les workflows quotidiens pour lesquels les équipes ont recours à SBA : inspection de l’état des
+applications, consultation des métriques, modification des niveaux de log, examen de la configuration et utilisation des
+caches. Ces fonctionnalités s’accompagnent d’un modèle intégré d’identités et d’autorisations.
+
+Master fournit des utilisateurs locaux, une connexion OAuth2/OIDC, un mapping des rôles et des autorités au niveau des
+opérations. Par exemple, les autorisations régissent le vidage des caches, la modification des tâches planifiées et la
+lecture des valeurs de propriétés sensibles. Master authentifie les clients humains et MCP, vérifie les accès et utilise
+des JWT signés lorsqu’il appelle les services gérés. Consultez
+[Authentification](../setting-up-master-ui/authentication/authentication.mdx) pour découvrir le modèle d’autorisations.
+
+SBA fournit des points d’intégration pour Spring Security, mais **votre équipe doit implémenter et maintenir
+l’intégration IAM ainsi que les règles d’autorisation pour son déploiement**. Cela implique d’écrire la configuration de
+sécurité, d’associer les identités des utilisateurs aux rôles et de mettre en place les contrôles qui déterminent qui peut
+lire les données sensibles ou invoquer des actions de gestion. Vous devez également sécuriser les endpoints Actuator des
+applications gérées. La
+[documentation de sécurité de SBA](https://docs.spring-boot-admin.com/4.1.4/docs/security/) présente la configuration et
+le code nécessaires.
+
+L’intégration de la sécurité est un travail minutieux, qu’il n’est pas toujours facile de réaliser correctement. Un
+contrôle d’autorisation manquant ou un mapping de rôles incorrect peut exposer des informations sensibles ou autoriser
+des modifications involontaires de services en cours d’exécution. Votre équipe est responsable de l’implémentation, des
+tests et de la maintenance continue de ces contrôles.
+
+**Axelix fournit ce modèle de sécurité comme partie intégrante du produit.** La gestion des utilisateurs, l’intégration
+du fournisseur d’identité, le mapping des rôles et les contrôles d’accès au niveau des opérations sont déjà intégrés à
+Master. Vous configurez votre fournisseur d’identité et votre politique d’accès à l’aide des mécanismes fournis, au lieu
+d’écrire et de maintenir vous-même l’intégration des autorisations.
+
+Axelix Master peut également être déployé directement sous forme de JAR autonome intégrant l’interface et le serveur MCP,
+d’image Docker officielle ou de chart Helm officiel. Consultez
+[Configuration de Master](../setting-up-master-ui/configuring-master/configuring-master.mdx). Vous ajoutez le starter et
+le plugin de build Axelix à chaque application gérée.
+
+## Inspection et contrôle plus approfondis au sein de chaque application
+
+SBA présente principalement les capacités de gestion exposées par les endpoints Spring Boot et Spring Cloud Actuator
+standard. Son [guide d’installation](https://docs.spring-boot-admin.com/3.5.1/docs/installation-and-setup/) décrit ce
+modèle. **Cela limite considérablement la profondeur de l’inspection et du contrôle offerts par SBA dès l’installation** :
+il ne peut afficher que les informations et proposer que les actions exposées par ces endpoints natifs.
+
+Lors d’un incident, ces informations sont souvent insuffisantes pour expliquer ce qui s’est produit dans l’application.
+Par exemple, une liste de tâches n’explique pas pourquoi une exécution particulière a échoué et ne permet pas d’exécuter
+à la demande la tâche planifiée concernée. Des extensions personnalisées peuvent combler ces lacunes, mais votre équipe
+doit écrire et maintenir du code supplémentaire dans l’application et la console.
+
+Le [Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx) d’Axelix
+collecte des informations d’exécution supplémentaires et implémente des actions qui vont au-delà de ces endpoints
+standard. Certains collecteurs enrichissent les données Actuator ; d’autres instrumentent directement le comportement de
+l’application. Axelix peut ainsi répondre à des questions plus détaillées et offrir davantage de contrôle dans le même
+workflow de débogage.
+
+:::note[Abandon prévu des endpoints Actuator personnalisés]
+Aujourd’hui, le starter expose ses propres endpoints Actuator `axelix-*`. Ceux-ci offrent des capacités qui vont au-delà
+de l’API Actuator standard. Le [ticket #1858](https://github.com/axelixlabs/axelix/issues/1858) suit la migration prévue
+vers des API Axelix indépendantes, en raison d’interférences de configuration, de problèmes de sécurité, des contraintes
+imposées par les abstractions d’Actuator et de questions de portabilité. La conception de l’API de remplacement est
+encore en cours de discussion. Il s’agit d’un changement prévu, et non du mécanisme de transport actuel.
+:::
+
+### Tâches planifiées et leurs exécutions
+
+L’affichage d’une expression cron n’est que le point de départ pour comprendre une tâche planifiée. Axelix enregistre les
+exécutions des tâches, y compris leur durée et leurs échecs, afin que vous puissiez analyser ce qui s’est produit lors
+de l’exécution d’une tâche. Vous pouvez également exécuter une tâche à la demande, l’activer ou la désactiver et modifier
+son expression cron, son délai fixe ou sa fréquence fixe sans redéploiement. Consultez
+[Tâches planifiées](../features/spring-framework/scheduled-tasks.mdx).
+
+### Modifications temporaires des logs sur plusieurs répliques
+
+Lorsqu’un problème peut survenir sur n’importe quelle réplique, modifier une instance à la fois complique l’analyse.
+Axelix vous permet de modifier le niveau d’un logger sur des instances sélectionnées d’une même application pendant une
+durée limitée. À l’expiration de ce délai, le niveau précédent est automatiquement rétabli. Les groupes de loggers
+peuvent également être modifiés sur plusieurs instances, tandis que les niveaux temporaires s’appliquent à des loggers
+individuels. Consultez [Loggers](../features/insights/loggers/loggers.mdx).
+
+### Valeurs effectives des propriétés et beans qui les utilisent
+
+Une propriété définie dans `application.yaml` ne détermine pas nécessairement la valeur utilisée par l’application en
+cours d’exécution. Axelix indique la source de propriété qui l’emporte et les valeurs masquées par des sources de priorité
+supérieure. Il associe les propriétés à leurs consommateurs `@Value` et aux beans `@ConfigurationProperties`, et affiche
+les valeurs de configuration liées.
+
+Parce que l’inspection doit également aider à détecter les erreurs, Axelix signale les valeurs effectives connues pour
+être dangereuses et les propriétés marquées comme obsolètes dans les métadonnées de configuration de Spring Boot. Les
+valeurs sensibles restent soumises aux autorisations d’accès et au masquage. Consultez
+[Propriétés](../features/spring-framework/properties.mdx) et
+[Propriétés de configuration](../features/spring-framework/configuration-properties.mdx).
+
+### Beans et raison de leur existence
+
+Axelix ajoute du contexte à la liste des beans : dépendances, origine, qualificateurs, type de proxy et liens vers
+l’auto-configuration concernée. Associé au rapport de conditions, ce contexte aide à expliquer pourquoi Spring a créé un
+bean et comment il s’intègre à l’application. Consultez [Beans](../features/spring-framework/beans.mdx) et
+[Conditions](../features/spring-framework/conditions.mdx).
+
+### Exécutions des transactions et anti-patrons
+
+Axelix surveille les exécutions des transactions et agrège leurs durées moyenne, minimale et maximale. Il détecte les
+appels `RestTemplate` bloquants au sein des transactions, les requêtes N+1 dues au chargement paresseux et la pagination
+en mémoire d’Hibernate, avec des détails qui aident à localiser le problème dans le code. Il s’agit de diagnostics au
+niveau de l’application qui vont au-delà de l’inspection Actuator standard. Consultez
+[Contrôle des transactions](../features/spring-framework/transaction-control.mdx).
+
+## Des services individuels à l’évolution de l’écosystème
+
+Le débogage à l’exécution ne constitue qu’une partie du périmètre d’Axelix. Les équipes doivent également comprendre les
+dépendances de leur écosystème et la manière dont celui-ci évolue.
+
+- **Migrations Java et Spring Boot.** [Spring Portfolio](../ui-guide/dashboard/spring-portfolio.mdx) et
+  [Languages Profile](../ui-guide/dashboard/languages-profile.mdx) indiquent les versions de Spring et de Java utilisées
+  dans les applications, ce qui permet aux équipes de suivre l’avancement des migrations.
+- **Santé des dépendances.** Le tableau de bord [Dependency Health](../ui-guide/dashboard/dependency-health.mdx) présente
+  l’utilisation des bibliothèques, leurs versions et leur état de maintenance dans tout l’écosystème.
+  L’[analyse des dépendances](../features/insights/dependencies-analyzer.mdx) par instance aide à examiner les
+  bibliothèques d’une application donnée.
+
+Ces vues relient un problème dans un service aux travaux à mener dans tout l’écosystème, comme le remplacement d’une
+bibliothèque non maintenue ou la migration d’applications vers une génération de Spring Boot prise en charge.
+
+## Workflows conçus pour l’IA
+
+Axelix est conçu pour permettre aux ingénieurs et aux agents IA d’exploiter directement les diagnostics des applications.
+Son serveur MCP intégré expose aux agents l’inspection de l’exécution, les métadonnées des applications, les problèmes de
+persistance détectés et les actions d’exécution prises en charge, avec des contrôles d’accès intégrés à Master. Un agent
+peut trouver un service, inspecter ses beans et sa configuration, analyser les problèmes de persistance détectés ou
+modifier le niveau d’un logger à l’aide d’outils.
+
+Le [catalogue d’outils MCP](../setting-up-master-ui/mcp/mcp-tools.mdx) répertorie la couverture actuelle. Celle-ci
+n’inclut pas encore toutes les opérations de l’interface. L’orientation d’Axelix, conçu pour l’IA, consiste à rendre ses
+capacités d’analyse et de contrôle utilisables par les agents comme par les humains.
+
+SBA documente désormais également une
+[intégration MCP expérimentale](https://docs.spring-boot-admin.com/4.1.4/docs/mcp/). La différence réside donc dans la
+profondeur et le périmètre des informations et actions exposées, ainsi que dans le modèle d’autorisations intégré et les
+capacités plus étendues d’Axelix pour l’écosystème.
+
+## Comparaison des fonctionnalités
+
+Cette comparaison porte sur les workflows SBA standard et les fonctionnalités fournies dans Axelix OSS. SBA peut être
+étendu et ses fonctionnalités varient selon la version. Son intégration MCP plus récente est explicitement mentionnée
+plutôt que considérée comme absente.
+
+| Domaine | Spring Boot Admin | Axelix |
+|---------|-------------------|--------|
+| État des applications, métriques, configuration, loggers | Gestion standard reposant sur Actuator | Intégrées, avec des informations et des contrôles d’exécution supplémentaires |
+| Gestion des utilisateurs et RBAC au niveau des opérations | Implémenter et maintenir l’intégration IAM et les règles d’autorisation via Spring Security | Utilisateurs locaux intégrés, mapping des rôles OIDC et autorités |
+| Authentification auprès des services gérés | Configurer la sécurité Actuator et les identifiants | Authentification JWT intégrée entre Master et le starter |
+| Niveaux de log temporaires avec rétablissement automatique sur plusieurs répliques | — | Intégrés ([Loggers](../features/insights/loggers/loggers.mdx)) |
+| Inspection des propriétés | Environnement Actuator et propriétés de configuration | Valeurs effectives et masquées, liens vers les beans, métadonnées d’obsolescence, contrôles des valeurs dangereuses |
+| Inspection des beans | Descripteurs de beans Actuator | Origine enrichie, qualificateurs, informations sur les proxies et liens vers l’auto-configuration |
+| Tâches planifiées | Liste des tâches Actuator | Historique des exécutions, durées, échecs, exécutions à la demande, activation/désactivation, replanification |
+| Diagnostics des transactions | — | Statistiques d’exécution et anti-patrons détectés |
+| Gestion des caches | Inspection et vidage Actuator standard | Inspection, vidage et activation/désactivation à l’exécution ([Caches](../features/spring-framework/caches.mdx)) |
+| Suivi des migrations Java / Spring Boot | — | Spring Portfolio et Languages Profile à l’échelle de l’écosystème |
+| Santé de la maintenance des dépendances | — | Analyse par instance et tableau de bord de l’écosystème |
+| Accès des agents IA | Module MCP expérimental dans les versions plus récentes de SBA | Serveur MCP intégré avec inspection des applications, diagnostics et actions prises en charge |
+| Distribution prête à l’emploi | Assembler et configurer une application SBA | JAR autonome, image Docker officielle, chart Helm officiel |
+
+## Voir aussi
+
+- [Introduction](../product/introduction.mdx) : présentation d’Axelix.
+- [Motivation](../product/motivation.mdx) : problèmes qu’Axelix a été créé pour résoudre.
+- [Qu’est-ce que Master](../setting-up-master-ui/what-is-master.mdx) : découverte et console de gestion.
+- [Configuration de Master](../setting-up-master-ui/configuring-master/configuring-master.mdx) : JAR, Docker, Helm, Compose.
+- [Fonctionnalités](../features/insights/details.mdx) : référence des fonctionnalités par instance.

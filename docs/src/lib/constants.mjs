@@ -17,6 +17,6 @@ export const versions = ["1.x"];
 /**
  * Locales served under a URL prefix. The default locale is served without one.
  *
- * @type {['ru']}
+ * @type {("ru" | "fr")[]}
  */
-export const prefixedLocales = ["ru"];
+export const prefixedLocales = ["ru", "fr"];

@@ -1,0 +1,42 @@
+---
+title: Java
+description: "Le tableau de bord Java indique quelles fonctionnalités JVM les services du parc utilisent : Project Leyden, les
+              ramasse-miettes, la journalisation GC et Project Lilliput."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Le tableau de bord Java est supprimé dans Axelix 1.2.0.</>}
+/>
+
+Dans un parc de dizaines de services, il est difficile de déterminer lesquels bénéficient déjà d’un démarrage plus rapide avec AppCDS ou le cache
+AOT, quel ramasse-miettes chacun exécute et où la journalisation GC est activée. Le tableau de bord Java répond à ces questions pour
+l’ensemble du parc.
+
+La page est en lecture seule et accessible à tous les utilisateurs authentifiés : **VIEWER**, **EDITOR**, **ADMIN** et **SUPER_ADMIN**
+peuvent tous l’ouvrir. Consultez [Rôles et
+autorités](../../../setting-up-master-ui/authentication/authentication.mdx#rôles-et-autorités) pour connaître la matrice complète
+des rôles et autorités.
+
+## Contenu de la page
+
+Pour chaque fonctionnalité JVM, la page indique la part des services qui l’utilisent :
+
+- **Project Leyden** : services qui démarrent avec AppCDS (`-XX:SharedArchiveFile`) ou avec le cache AOT (`-XX:AOTCache`),
+  séparément pour chacun et pour les deux ensemble.
+- **Garbage collectors** : quel ramasse-miettes quelle part des services exécute, par exemple G1, Parallel ou ZGC. Le
+  plus courant est mis en évidence séparément.
+- **GC logging** : services où la journalisation GC est actuellement activée, y compris ceux où elle a été activée depuis Axelix. Consultez
+  [Activation de la journalisation GC](../../../features/jvm/garbage-collector.mdx#activer-la-journalisation-du-gc).
+- **Project Lilliput** : services avec en-têtes d’objets compacts (`-XX:+UseCompactObjectHeaders`).
+
+## Fonctionnement
+
+Le tableau de bord comptabilise ce que chaque service transmet au sujet de sa JVM. Master l’enregistre une fois par jour et utilise le dernier enregistrement.
+Un service ne compte qu’une fois, quel que soit le nombre d’instances qu’il exécute.
+
+## Voir aussi
+
+- [Garbage Collector](../../../features/jvm/garbage-collector.mdx)
+- [Languages Profile](../languages-profile.mdx)
+- [Persistence](./persistence.mdx)
