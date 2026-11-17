@@ -17,6 +17,7 @@
  */
 import cronstrue from "cronstrue";
 
+import "cronstrue/locales/fr";
 import "cronstrue/locales/ru";
 
 import dayjs from "dayjs";

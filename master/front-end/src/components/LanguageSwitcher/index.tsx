@@ -32,6 +32,7 @@ export const LanguageSwitcher = () => {
                 onChange={handleChange}
                 options={[
                     { value: "en", label: "English" },
+                    { value: "fr", label: "Français" },
                     { value: "ru", label: "Русский" },
                 ]}
             />
