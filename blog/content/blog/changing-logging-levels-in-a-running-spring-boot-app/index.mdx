@@ -23,7 +23,7 @@ Let's compare these approaches using a single example, temporarily enabling `DEB
 
 Spring Boot sets the initial logging levels from `logging.level.*` and the configuration of Logback, Log4j2, or another supported logging system. While the application is running, these levels can be changed through [`LoggingSystem`](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/logging/LoggingSystem.html). The assigned logging level applies to subsequent events and is stored in the process's memory. Configuration files remain unchanged, and the value is usually lost after a restart.
 
-The logging level is stored separately in each instance. With Actuator and Spring Boot Admin, you change it one instance at a time. Axelix can change an individual logger's level across all managed instances of an application in one operation.
+The logging level is stored separately in each instance. A direct Actuator request changes one instance. Spring Boot Admin and Axelix can apply a logger-level change across all registered instances of an application in one operation.
 
 ## 1. Spring Boot Actuator: a direct request to the application
 
@@ -70,13 +70,13 @@ An empty object `{}` clears the explicitly configured level and makes the logger
 
 ## 2. Spring Boot Admin: managing instances through a web interface
 
-[Spring Boot Admin](https://docs.spring-boot-admin.com/4.1.2/docs/reference/actuator-endpoints/) allows all the same operations to be performed through a web interface: finding `com.example.orderservice` and selecting `DEBUG` is enough, without composing a request manually. Spring Boot Admin runs these operations through the managed instance's Actuator endpoint.
+[Spring Boot Admin](https://docs.spring-boot-admin.com/4.1.2/docs/reference/actuator-endpoints/) allows all the same operations to be performed through a web interface: finding `com.example.orderservice` and selecting `DEBUG` is enough, without composing a request manually. Spring Boot Admin runs these operations through the Actuator endpoints of the target instances.
 
 <video src="/blog/posts/changing-logging-levels-in-a-running-spring-boot-app/SpringBootAdminChangeLoggersLevel.mp4" controls muted playsInline preload="metadata" />
 
 Because Spring Boot Admin uses Actuator, its reset also clears the explicitly configured level. In the same example, the logger inherits `WARN`. To restore the original `INFO` setting, select `INFO` manually.
 
-The change still applies to a specific instance. In the [Spring Boot Admin REST API](https://docs.spring-boot-admin.com/4.1.2/docs/reference/rest-api/), this is evident from the request path `POST /instances/{id}/actuator/loggers/{name}`. For multiple replicas, the operation has to be repeated.
+Spring Boot Admin added application-wide logger changes in version 2.2.0. On the **Loggers** page, use **Application** scope to apply a change to all registered instances, or **Instance** scope to change only the instance you opened. See the [upstream implementation](https://github.com/codecentric/spring-boot-admin/commit/a3ce30bf8f4129595448f46d5bd563f80274ed56).
 
 A single dashboard allows registered instances to be viewed, loggers to be searched, and their levels to be changed without direct `curl` requests to the services. This requires deploying and securing an Admin Server, registering applications, and giving it access to their Actuator endpoints. Spring Boot Admin does not include a built-in RBAC policy for logger operations. You can define role-based rules in the Admin Server's [Spring Security configuration](https://docs.spring-boot-admin.com/4.1.2/docs/security/).
 
@@ -129,7 +129,7 @@ public void rollbackManually() {
 
 ### Change the level across all instances
 
-Suppose `orderservice` runs on six replicas. On the Axelix Loggers page, open **Instances** next to the search field and choose **Select all other instances**. The instance you opened is already included. Set the logger to `DEBUG` once to apply the change to all six managed replicas. Actuator and Spring Boot Admin require a separate logger update for each replica.
+Suppose `orderservice` runs on six replicas. On the Axelix Loggers page, open **Instances** next to the search field and choose **Select all other instances**. The instance you opened is already included. Set the logger to `DEBUG` once to apply the change to all six managed replicas. You can also select a subset of replicas from the same list.
 
 To make the same bulk change programmatically, use `POST /api/external/loggers/logger` with the instance IDs in `instanceIds`, the logger name in `loggerName`, and the new level in `configuredLevel`. Add `ttlSeconds` to have each instance restore its own saved level automatically.
 
@@ -143,14 +143,18 @@ Connect an MCP client to Axelix Master and give the agent this prompt:
 2. It calls `changeLoggingLevelByLoggerName` with that instance ID, the logger name, `loggerLevel: DEBUG`, and `ttlSeconds: 120`. It checks the logger again to verify that the effective level is `DEBUG`.
 3. After two minutes, the starter restores the saved level automatically. Ask the agent to check again to verify that the logger has returned to `INFO`. To end diagnostics early, ask the agent to reset the logger using `resetLoggingLevelByLoggerName`.
 
+### Auditing and access policies in Axelix Enterprise
+
+Axelix Enterprise records who changed or reset a logger level, what action they took, and when they took it. The audit log covers actions initiated from both the UI and the MCP server. Teams can define custom access policies by action, service, and environment. For example, a production policy can allow on-call engineers to view logger levels and reserve changes and resets for production operators. See [Axelix Enterprise](https://axelix.io/enterprise).
+
 ### Conclusion
 
 | Capability | Spring Boot Actuator | Spring Boot Admin | Axelix |
 | --- | --- | --- | --- |
 | Web UI for loggers | No | Yes | Yes |
 | AI agent integration via MCP | No | Experimental, opt-in module since 4.1.3 | Yes |
-| Built-in RBAC | No, configure Spring Security | No, configure Spring Security | Yes |
+| Access control for logger operations | Configure Spring Security | Configure Spring Security | Built-in RBAC, with custom policies in Enterprise |
 | Dependency in the managed application | Spring Boot Actuator | Spring Boot Actuator, Admin Client optional with discovery | Axelix Spring Boot Starter required |
 | Reset an individual logger | Clears the explicit level | Clears the explicit level through Actuator | Restores the saved level or inheritance |
 | Automatic timer-based reset | No | No | Yes |
-| Change a logger across all managed instances in one operation | No | No | Yes, via the UI or bulk API |
+| Change a logger across all managed instances in one operation | No | Yes, via Application scope since 2.2.0 | Yes, via the UI or bulk API |
