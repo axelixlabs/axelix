@@ -25,19 +25,13 @@ repositories {
 dependencies {
     // Axelix Spring Boot 4 starter (lockstep version, resolved from mavenLocal).
     implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.4.0-SNAPSHOT")
+    implementation("org.springframework.boot:spring-boot-starter-quartz")
 
-    // This is a stateless edge / API-gateway service: web + actuator only.
-    //
-    // There is DELIBERATELY no spring-boot-starter-data-jpa / -jdbc and no JDBC driver here, so the
-    // whole spring-tx module (org.springframework:spring-tx) never reaches the runtime classpath.
-    // That is the exact setup that used to crash the Axelix starter on boot (see GH-1708): the
-    // TransactionMonitoringBeanPostProcessor references org.springframework.transaction.* and failed
-    // to load. This playground verifies the starter now boots cleanly in that configuration.
+    // Stateless gateway: no database, JDBC driver or data starter.
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     // Spring Boot 4 split RestClient auto-configuration into its own module; the gateway forwards
-    // outbound calls with it (and this exercises Axelix's outbound-call monitoring, which stays
-    // active without spring-tx).
+    // outbound calls with it and exercises Axelix's outbound-call monitoring.
     implementation("org.springframework.boot:spring-boot-restclient")
     // Deliberately a maintenance-mode dependency (demo): Apache HttpClient 4.x only receives security
     // fixes now that HttpClient 5 is the active line, so Axelix reports it as MAINTENANCE.

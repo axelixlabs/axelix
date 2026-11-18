@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.4.0-SNAPSHOT")
+    implementation("org.springframework.boot:spring-boot-starter-quartz")
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")

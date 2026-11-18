@@ -64,6 +64,7 @@ extra["testcontainers.version"] = "1.20.4"
 
 dependencies {
     implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.4.0-SNAPSHOT")
+    implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-validation")
