@@ -80,6 +80,8 @@ The change still applies to a specific instance. In the [Spring Boot Admin REST 
 
 A single dashboard allows registered instances to be viewed, loggers to be searched, and their levels to be changed without direct `curl` requests to the services. This requires deploying and securing an Admin Server, registering applications, and giving it access to their Actuator endpoints. Spring Boot Admin does not include a built-in RBAC policy for logger operations. You can define role-based rules in the Admin Server's [Spring Security configuration](https://docs.spring-boot-admin.com/4.1.2/docs/security/).
 
+Starting with Spring Boot Admin 4.1.3, an optional MCP module gives AI agents experimental access to the same Actuator logger operations. Once enabled on the Admin Server, agents can list loggers, inspect a logger’s level, and change it on a selected instance. Passing `null` to `set-logger-level` clears the explicit level and restores inheritance. See the [Spring Boot Admin MCP documentation](https://docs.spring-boot-admin.com/4.1.3/docs/mcp/#loggers).
+
 ## 3. Axelix: management through the UI and MCP tools
 Each managed application needs the [Axelix Spring Boot Starter](https://axelix.io/docs/start/configuring-spring-boot-starter). The starter supplies the dedicated logger endpoint used by Axelix. Axelix Master includes built-in RBAC. Its default roles all grant access to the logger operations shown here, including changing and resetting a level.
 
@@ -146,7 +148,7 @@ Connect an MCP client to Axelix Master and give the agent this prompt:
 | Capability | Spring Boot Actuator | Spring Boot Admin | Axelix |
 | --- | --- | --- | --- |
 | Web UI for loggers | No | Yes | Yes |
-| Built-in AI agent integration via MCP | No | No | Yes |
+| AI agent integration via MCP | No | Experimental, opt-in module since 4.1.3 | Yes |
 | Built-in RBAC | No, configure Spring Security | No, configure Spring Security | Yes |
 | Dependency in the managed application | Spring Boot Actuator | Spring Boot Actuator, Admin Client optional with discovery | Axelix Spring Boot Starter required |
 | Reset an individual logger | Clears the explicit level | Clears the explicit level through Actuator | Restores the saved level or inheritance |
