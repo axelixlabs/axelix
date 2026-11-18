@@ -15,7 +15,13 @@ Hello everyone! My name is Sergey Cherkasov, and I am a Developer Advocate in Ax
 
 When investigating an incident, `INFO` logs are often not enough, `DEBUG` needs to be temporarily enabled for a specific package or class.
 
-Spring Boot allows the logging level to be changed directly in a running process. There are three ways to do this: send a request to Actuator, use the Spring Boot Admin interface, or manage connected services through Axelix. Actuator is usually sufficient for direct management. A centralized interface becomes useful when there are many services and replicas.
+Spring Boot allows the logging level to be changed directly in a running process. There are three ways to do this: send a request to Actuator, use the Spring Boot Admin interface, or manage connected services through Axelix.
+
+:::!Note
+We're currently discussing only the **Open Source solutions**, that can be used free of any charge.
+:::
+
+Actuator is usually sufficient for direct management. A centralized interface becomes useful when there are many services and replicas.
 
 Let's compare these approaches using a single example, temporarily enabling `DEBUG` for the `com.example.orderservice` package and restoring the previous level after diagnostics.
 
@@ -74,87 +80,80 @@ An empty object `{}` clears the explicitly configured level and makes the logger
 
 <video src="/blog/posts/changing-logging-levels-in-a-running-spring-boot-app/SpringBootAdminChangeLoggersLevel.mp4" controls muted playsInline preload="metadata" />
 
-Because Spring Boot Admin uses Actuator, its reset also clears the explicitly configured level. In the same example, the logger inherits `WARN`. To restore the original `INFO` setting, select `INFO` manually.
+Because Spring Boot Admin uses Actuator, **reset action triggers the reset to the `LoggingSystem` default, not the logging level you've confined**. In the same example, the logger that was initially in `TRACE` was reset to `INFO`, because `INFO` is the common `LoggingSystem` default. That may easily surprise you,
+essentially if the default logging system level is more verbose than the configured one.
 
-Spring Boot Admin added application-wide logger changes in version 2.2.0. On the **Loggers** page, use **Application** scope to apply a change to all registered instances, or **Instance** scope to change only the instance you opened. See the [upstream implementation](https://github.com/codecentric/spring-boot-admin/commit/a3ce30bf8f4129595448f46d5bd563f80274ed56).
+To clarify - this is the behavior of Spring Boot Actuator endpoints, Spring Boot Admin here just acts as a proxy, so it inherits the behavior of Spring Boot Actuator endpoints.
 
-A single dashboard allows registered instances to be viewed, loggers to be searched, and their levels to be changed without direct `curl` requests to the services. This requires deploying and securing an Admin Server, registering applications, and giving it access to their Actuator endpoints. Spring Boot Admin does not include a built-in RBAC policy for logger operations. You can define role-based rules in the Admin Server's [Spring Security configuration](https://docs.spring-boot-admin.com/4.1.2/docs/security/).
+A single dashboard allows registered instances to be viewed, loggers to be searched, and their levels to be changed without direct `curl` requests to the services. This requires deploying and securing an Admin Server, registering applications, and giving it access to their Actuator endpoints. **Spring Boot Admin does not include a built-in RBAC policy for logger operations**. In case you need RBAC, [then you have to add and maintain it yourself](https://docs.spring-boot-admin.com/4.1.2/docs/security/).
 
-Starting with Spring Boot Admin 4.1.3, an optional MCP module gives AI agents experimental access to the same Actuator logger operations. Once enabled on the Admin Server, agents can list loggers, inspect a logger’s level, and change it on a selected instance. Passing `null` to `set-logger-level` clears the explicit level and restores inheritance. See the [Spring Boot Admin MCP documentation](https://docs.spring-boot-admin.com/4.1.3/docs/mcp/#loggers).
+Apart from that, if somebody will forget to turn the logging level back off to its original value (which is not always possible with "reset" as we saw), the system may flood the system with logs until somebody notices.
+
+A final note here - starting with Spring Boot Admin 4.1.3, an optional MCP module gives AI agents **experimental** access to the same Actuator logger operations. Once enabled on the Admin Server, agents can list loggers, inspect a logger’s level, and change it on a selected instance. See the [Spring Boot Admin MCP documentation](https://docs.spring-boot-admin.com/4.1.3/docs/mcp/#loggers).
 
 ## 3. Axelix: management through the UI and MCP tools
-Each managed application needs the [Axelix Spring Boot Starter](https://axelix.io/docs/start/configuring-spring-boot-starter). The starter supplies the dedicated logger endpoint used by Axelix. Axelix Master includes built-in RBAC. Its default roles all grant access to the logger operations shown here, including changing and resetting a level.
+Each managed application needs a thin [Spring Boot Starter](https://axelix.io/docs/start/configuring-spring-boot-starter). The starter supplies the dedicated logger endpoint used by Axelix. Because Axelix works
+on its own, custom Spring Actuator endpoints (although, we're planning to migrate from them in part to support other ecosystems, like Micronaut or Quarkus or framework-less environments), it is capable to fix all
+of the gaps of Spring Boot native actuator endpoints.
 
-When you reset an individual logger in Axelix, it restores the explicitly configured level saved before the first Axelix change. In the example above, changing the logger from `INFO` to `DEBUG` and then resetting it brings it back to `INFO`, even though its parent is set to `WARN`.
+For example, **Axelix Master includes built-in. configurable RBAC**. Its default roles all grant access to the logger operations shown here, including changing and resetting a level.
 
-This mechanism is implemented in the starter on the managed application's side. Before the first change through Axelix, [`DefaultLoggersService`](https://github.com/axelixlabs/axelix/blob/master/sbs/axelix-spring-boot-3-starter/src/main/java/com/axelixlabs/axelix/sbs/spring/core/loggers/DefaultLoggersService.java) saves the original `configuredLevel` in the process's memory - in a cache with the logger name as the key. To restore it, the service calls [LoggingSystem.setLogLevel()](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/logging/LoggingSystem.html#setLogLevel(java.lang.String,org.springframework.boot.logging.LogLevel)) with the saved value and then removes the entry from the cache. If there was no explicitly configured level initially, `null` is saved, and a reset restores inheritance of the parent's level.
+When you reset an individual logger in Axelix, it restores the previous logging level that was effective/configured explicitly, not `LoggingSystem` default, which is often the desired behavior.
 
 <video src="/blog/posts/changing-logging-levels-in-a-running-spring-boot-app/AxelixDefaultChangeLoggersLevel.mp4" controls muted playsInline preload="metadata" />
 
-If returning to restore the logging level after diagnostics is inconvenient, a timer can be set to specify immediately when the previous level should be restored. Once the specified time has elapsed, Axelix resets the level automatically. This reduces the risk of leaving `DEBUG` enabled after the investigation is complete.
+In order to avoid accidentally flooding the system with logs as discussed above, Axelix allows a timer can be set to specify immediately when the previous level should be restored. Once the specified time has elapsed, Axelix resets the level automatically. This reduces the risk of leaving `DEBUG` enabled after the investigation is complete.
 
-The timer also runs inside the managed application. The duration of the change is passed to the starter, and [`DefaultLoggerChange`](https://github.com/axelixlabs/axelix/blob/master/sbs/starter-domain/src/main/java/com/axelixlabs/axelix/sbs/spring/core/loggers/state/DefaultLoggerChange.java) schedules the restoration of the original level through `ScheduledExecutorService`. Once this time has elapsed, the same action as in a manual reset is performed. If the reset occurs earlier, the scheduled task is canceled.
+This is especially important for performance considerations as well as cloud bill, since the cloud logs are often analyzed by the cloud provider, such as AWS CloudWatch.
 
-`DefaultLoggersService` creates a `DefaultLoggerChange` object with the restoration action. Below is an implementation excerpt with the original comments omitted:
-
-```java
-return new DefaultLoggerChange(
-        () -> {
-            loggingSystem.setLogLevel(
-                    loggerName,
-                    Optional.ofNullable(initiallyConfiguredLevel)
-                            .map(LogLevel::valueOf)
-                            .orElse(null));
-            configuredLevelsCache.remove(loggerName);
-        },
-        ofNullable(ttlSeconds).map(Duration::ofSeconds).orElse(null),
-        ofNullable(initiallyConfiguredLevel).orElse(null));
-```
-
-The saved level is converted from a string to [`LogLevel`](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/logging/LogLevel.html), while `null` restores inheritance. The duration is passed as a `Duration`. In the `DefaultLoggerChange` constructor, the task is scheduled only when a duration is specified.
-
-A manual reset calls a method that cancels the scheduled task and performs the restoration immediately:
-
-```java
-@Override
-public void rollbackManually() {
-    if (automaticRollbackTask != null) {
-        automaticRollbackTask.cancel(false);
-    }
-    this.rollbackAction.run();
-}
-```
+This timer is guaranteed to fire, since the timer to reset log back will run inside the managed application, and thus will fire even if the connection from Axelix Master --> Starter is lost.
 
 <video src="/blog/posts/changing-logging-levels-in-a-running-spring-boot-app/AxelixTimeChaneLoggersLevel.mp4" controls muted playsInline preload="metadata" />
 
 ### Change the level across all instances
 
-Suppose `orderservice` runs on six replicas. On the Axelix Loggers page, open **Instances** next to the search field and choose **Select all other instances**. The instance you opened is already included. Set the logger to `DEBUG` once to apply the change to all six managed replicas. You can also select a subset of replicas from the same list.
+One of the other concerns that teams have is that they often have not a single, but many instances of the app running in production/staging environment. For example, hypothetical `order-service` may run six replicas.
 
-To make the same bulk change programmatically, use `POST /api/external/loggers/logger` with the instance IDs in `instanceIds`, the logger name in `loggerName`, and the new level in `configuredLevel`. Add `ttlSeconds` to have each instance restore its own saved level automatically.
+Axelix allows to select the exact instances (the default is _"all"_) where the log level change must take place.
+
+On the Axelix Loggers page, open **Instances** next to the search field and choose **Select all other instances**. The instance you opened is already included. Set the logger to `DEBUG` once to apply the change to all managed replicas. You can also select a subset of replicas from the same list.
+
+<video src="/blog/posts/changing-logging-levels-in-a-running-spring-boot-app/Axelix-loggers-multi-instance-debug-40m-sound.mp4" controls muted playsInline preload="metadata" />
 
 ### Try it with an AI agent
 
+All of the operations that Axelix provides are available for humans via UI, and for AI Agents via embedded MCP server. It is embedded into Axelix Master by default, so installing
+Axelix Master is sufficient.
+
 Connect an MCP client to Axelix Master and give the agent this prompt:
 
-> On the `orderservice-1` instance, set the `com.example.orderservice` logger to `DEBUG` for two minutes. Verify the effective level after the change.
+> Please, see the status of the 'payment-processing' job, why it failed?
 
-1. The agent calls `getWallboard` to find the instance ID and `findLoggersByName` to check the logger's current level.
-2. It calls `changeLoggingLevelByLoggerName` with that instance ID, the logger name, `loggerLevel: DEBUG`, and `ttlSeconds: 120`. It checks the logger again to verify that the effective level is `DEBUG`.
-3. After two minutes, the starter restores the saved level automatically. Ask the agent to check again to verify that the logger has returned to `INFO`. To end diagnostics early, ask the agent to reset the logger using `resetLoggingLevelByLoggerName`.
+This is how the typical prompt will look like.
 
-### Auditing and access policies in Axelix Enterprise
+1. AI Agent will retrieve the log feed of the specific instance of the app, understand that it does not have the logs required
+2. After that, the temporary logger level change will be request, just for the time to debug
+3. The AI Agent will then call the mcp tool for running the scheduled task (which is also possible in Axelix)
+4. And then retrieve the new logs to pinpoint the problem and make necessary code changes, if needed.
 
-Axelix Enterprise records who changed or reset a logger level, what action they took, and when they took it. The audit log covers actions initiated from both the UI and the MCP server. Teams can define custom access policies by action, service, and environment. For example, a production policy can allow on-call engineers to view logger levels and reserve changes and resets for production operators. See [Axelix Enterprise](https://axelix.io/enterprise).
+Access to MCP server is also covered with RBAC, allowing to control who have access to what operations.
 
 ### Conclusion
 
+Generally, in Open Source, we can either interact with Spring Boot actuator endpoints directly, or use external tooling, e.g Spring Boot Admin or Axelix.
+
+To finally compare the approaches, lets look at the following table below:
+
 | Capability | Spring Boot Actuator | Spring Boot Admin | Axelix |
 | --- | --- | --- | --- |
-| Web UI for loggers | No | Yes | Yes |
-| AI agent integration via MCP | No | Experimental, opt-in module since 4.1.3 | Yes |
-| Access control for logger operations | Configure Spring Security | Configure Spring Security | Built-in RBAC, with custom policies in Enterprise |
-| Dependency in the managed application | Spring Boot Actuator | Spring Boot Actuator, Admin Client optional with discovery | Axelix Spring Boot Starter required |
-| Reset an individual logger | Clears the explicit level | Clears the explicit level through Actuator | Restores the saved level or inheritance |
-| Automatic timer-based reset | No | No | Yes |
-| Change a logger across all managed instances in one operation | No | Yes, via Application scope since 2.2.0 | Yes, via the UI or bulk API |
+| Web UI for loggers | - | Yes | Yes |
+| AI agent integration via MCP | - | Experimental, opt-in module since 4.1.3 | Yes |
+| Access control for logger operations | - | - | Built-in RBAC |
+| Dependency in the managed application | Spring Boot Actuator | Spring Boot Actuator, Admin Client optional with discovery | Spring Boot Actuator, Axelix Spring Boot Starter required |
+| Reset an individual logger | Clears to logging system default | Clears to logging system default | Restores the original level |
+| Automatic timer-based reset | - | - | Yes |
+| Change a logger across all managed instances in one operation | - | Yes, via Application scope since 2.2.0 | Yes, via the UI or bulk API |
+
+Hope you found this article helpful. If you're interested in Axelix, you can find the source code [over on GitHub](https://github.com/axelixlabs/axelix).
+
+Have a nice day!
