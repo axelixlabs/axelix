@@ -1,5 +1,5 @@
 ---
-title: Сhanging logging levels in a running Spring Boot app
+title: Changing logging levels in a running Spring Boot app
 date: 2026-10-07
 authors:
   - Sergey Cherkasov
@@ -89,7 +89,10 @@ A single dashboard allows registered instances to be viewed, loggers to be searc
 
 Apart from that, if somebody will forget to turn the logging level back off to its original value (which is not always possible with "reset" as we saw), the system may flood the system with logs until somebody notices.
 
-A final note here - starting with Spring Boot Admin 4.1.3, an optional MCP module gives AI agents **experimental** access to the same Actuator logger operations. Once enabled on the Admin Server, agents can list loggers, inspect a logger’s level, and change it on a selected instance. See the [Spring Boot Admin MCP documentation](https://docs.spring-boot-admin.com/4.1.3/docs/mcp/#loggers).
+A final note here - starting with Spring Boot Admin 4.1.3, an optional MCP module gives AI agents **experimental** access to the same Actuator logger operations. Once enabled on the Admin Server, agents can list loggers, inspect a logger’s level, and change it on a selected instance. **Also note, that by default anyone
+will have access to MCP Tools in unauthenticated manner**.
+
+See the [Spring Boot Admin MCP documentation](https://docs.spring-boot-admin.com/4.1.3/docs/mcp/#loggers) for more information.
 
 ## 3. Axelix: management through the UI and MCP tools
 Each managed application needs a thin [Spring Boot Starter](https://axelix.io/docs/start/configuring-spring-boot-starter). The starter supplies the dedicated logger endpoint used by Axelix. Because Axelix works
