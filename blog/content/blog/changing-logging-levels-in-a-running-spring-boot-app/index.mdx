@@ -17,7 +17,7 @@ When investigating an incident, `INFO` logs are often not enough, `DEBUG` needs 
 
 Spring Boot allows the logging level to be changed directly in a running process. There are three ways to do this: send a request to Actuator, use the Spring Boot Admin interface, or manage connected services through Axelix.
 
-:::!Note
+:::note[Note]
 We're currently discussing only the **Open Source solutions**, that can be used free of any charge.
 :::
 
@@ -153,6 +153,11 @@ To finally compare the approaches, lets look at the following table below:
 | Reset an individual logger | Clears to logging system default | Clears to logging system default | Restores the original level |
 | Automatic timer-based reset | - | - | Yes |
 | Change a logger across all managed instances in one operation | - | Yes, via Application scope since 2.2.0 | Yes, via the UI or bulk API |
+
+:::note[Important]
+Worth mentioning that in case of Axelix presence of Axelix Spring Boot starter is necessary, and in case of Spring Boot Admin, the client library of Spring Boot
+admin is optional.
+:::
 
 Hope you found this article helpful. If you're interested in Axelix, you can find the source code [over on GitHub](https://github.com/axelixlabs/axelix).
 
