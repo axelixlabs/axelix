@@ -124,19 +124,12 @@ const AUTHOR_PROFILES: Record<string, AuthorProfile> = {
     ],
   },
   "sergey-cherkasov": {
-    title: "Developer Advocate · Axelix Core Team",
-    bio: "Developer Advocate in the Axelix Core Team. Actively involved in development of the Axelix's core.",
-    links: [
-      { kind: "github", label: "GitHub", url: "https://github.com/sergeycherkasovv" },
-      { kind: "x", label: "X", url: "https://x.com/iamcherkasov" },
-      { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/sergei-cherkasov-968721210" },
-    ],
-  },
-  "sergey-cherkasov": {
     title: "Developer Advocate at Axelix Labs",
     bio: "Java developer in the Spring Boot ecosystem with a focus on developer experience — helping teams understand, debug, and get the most out of their applications in production. Interested in architecture, infrastructure, and automation.",
     links: [
       { kind: "github", label: "GitHub", url: "https://github.com/sergeycherkasovv" },
+      { kind: "x", label: "X", url: "https://x.com/iamcherkasov" },
+      { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/sergei-cherkasov-968721210" },
     ],
   },
   "artemy-degtyarev": {
