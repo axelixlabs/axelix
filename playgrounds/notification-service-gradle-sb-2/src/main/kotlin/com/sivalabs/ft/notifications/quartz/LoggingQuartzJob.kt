@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
  * Logs each execution so the scheduler's execution counter.
  */
 class LoggingQuartzJob : Job {
-
     override fun execute(context: JobExecutionContext) {
         log.info("Quartz playground job executed by {}", context.fireInstanceId)
     }
