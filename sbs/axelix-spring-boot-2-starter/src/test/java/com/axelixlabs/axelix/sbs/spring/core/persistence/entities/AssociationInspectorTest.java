@@ -126,7 +126,7 @@ class AssociationInspectorTest {
             // Order carries exactly the problems detected across its associations.
             MappedEntity order = entity(profile, "Order");
             assertThat(order.getTable()).isEqualTo("orders");
-            assertThat(order.getOrdinalEnumAttributes()).containsExactly("status");
+            assertThat(order.getOrdinalEnumAttributes()).containsExactly("ordinalStatus", "status");
             assertThat(order.getAssociationsCount()).isEqualTo(8);
             assertThat(order.getFlaggedAssociations())
                     .extracting(
@@ -197,6 +197,9 @@ class AssociationInspectorTest {
         @Enumerated
         private Status status;
 
+        @Enumerated(EnumType.ORDINAL)
+        private Status ordinalStatus;
+
         @Enumerated(EnumType.STRING)
         private Status stringStatus;
 
@@ -228,6 +231,10 @@ class AssociationInspectorTest {
         @ManyToMany
         @JoinTable(name = "orders_tags_set")
         private Set<Tag> tagSet;
+
+        public Status getOrdinalStatus() {
+            return ordinalStatus;
+        }
 
         @Override
         public String toString() {
