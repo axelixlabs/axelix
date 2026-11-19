@@ -29,6 +29,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
 
+import org.springframework.util.ClassUtils;
+
 import com.axelixlabs.axelix.common.contract.metadata.Association;
 import com.axelixlabs.axelix.common.contract.metadata.FlaggedAssociation;
 import com.axelixlabs.axelix.common.contract.metadata.JpaEntities;
@@ -40,8 +42,8 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.EntityInspecto
  * Scans the JPA metamodel of an {@link EntityManagerFactory} to build the {@link JpaEntities}: every
  * mapped entity together with the problems detected in its mappings.
  *
- * <p>The scan relies only on the standard {@code jakarta.persistence} metamodel and annotations, so
- * it works with any JPA provider and does not require Hibernate or Spring Data JPA.
+ * <p>The scan works with any JPA provider. Hibernate mappings receive an additional check for
+ * ineffective lazy one-to-one associations.
  *
  * @author Mikhail Polivakha
  * @author Dmitry Mazurov
@@ -53,7 +55,12 @@ public class EntityMappingScanner {
 
     public EntityMappingScanner(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
-        this.entityInspector = new EntityInspector();
+        this.entityInspector = new EntityInspector(
+                ClassUtils.isPresent(
+                                "org.hibernate.engine.spi.SessionFactoryImplementor",
+                                getClass().getClassLoader())
+                        ? HibernateLazyOneToOne.check(entityManagerFactory)
+                        : (entity, attribute) -> false);
     }
 
     /**

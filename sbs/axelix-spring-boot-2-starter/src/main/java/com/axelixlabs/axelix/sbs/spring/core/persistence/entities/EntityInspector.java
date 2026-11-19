@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 import javax.persistence.metamodel.Attribute;
@@ -44,6 +45,12 @@ class EntityInspector {
 
     private static final Logger log = LoggerFactory.getLogger(EntityInspector.class);
 
+    private final BiPredicate<EntityType<?>, Attribute<?, ?>> ineffectiveLazyOneToOne;
+
+    EntityInspector(BiPredicate<EntityType<?>, Attribute<?, ?>> ineffectiveLazyOneToOne) {
+        this.ineffectiveLazyOneToOne = ineffectiveLazyOneToOne;
+    }
+
     EntityInspection inspect(EntityType<?> entityType) {
         String entityName = entityType.getName();
         List<? extends Attribute<?, ?>> associations = findEntityAssociations(entityType);
@@ -60,6 +67,9 @@ class EntityInspector {
 
             AssociationInspector inspector = new AssociationInspector(attribute, (AnnotatedElement) member);
             Set<AssociationProblem> problems = inspector.detectProblems();
+            if (ineffectiveLazyOneToOne.test(entityType, attribute)) {
+                problems.add(AssociationProblem.INEFFECTIVE_LAZY_ONE_TO_ONE);
+            }
 
             if (associationsReadByToString.contains(attribute.getName())) {
                 problems.add(AssociationProblem.ACCESSED_IN_TO_STRING);
