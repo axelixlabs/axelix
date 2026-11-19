@@ -17,7 +17,7 @@
  */
 
 /**
- * A neutral category of a problem detected in a JPA association mapping while Axelix scanned the entities of an
+ * A neutral category of a problem detected in a JPA entity mapping while Axelix scanned the entities of an
  * instance. The categories are not ranked against each other, they merely describe the kind of mapping smell found.
  */
 export enum EAssociationProblem {
@@ -26,4 +26,5 @@ export enum EAssociationProblem {
     CASCADE_REMOVE_OR_ALL = "CASCADE_REMOVE_OR_ALL",
     UNIDIRECTIONAL_ONE_TO_MANY = "UNIDIRECTIONAL_ONE_TO_MANY",
     ACCESSED_IN_TO_STRING = "ACCESSED_IN_TO_STRING",
+    ORDINAL_ENUM = "ORDINAL_ENUM",
 }

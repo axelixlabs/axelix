@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 
 import { HintTooltip } from "@/components";
 import { orderAssociationProblems } from "@/helpers";
-import type { IMappedEntity } from "@/models";
+import { EAssociationProblem, type IMappedEntity } from "@/models";
 import {
     associationProblemClassToken,
     associationProblemColor,
@@ -44,6 +44,15 @@ export const EntityDetail = ({ entity }: IProps) => {
     const flaggedCount = entity.flaggedAssociations.length;
     const mappedLabel = entity.associationsCount === null ? "—" : String(entity.associationsCount);
 
+    const flaggedMappings = [
+        ...entity.flaggedAssociations,
+        ...(entity.ordinalEnumAttributes ?? []).map((field) => ({
+            association: { entity: entity.name, field },
+            mapping: "@Enumerated(EnumType.ORDINAL)",
+            problems: [EAssociationProblem.ORDINAL_ENUM],
+        })),
+    ];
+
     return (
         <div className={styles.Detail}>
             <div className={styles.Meta}>
@@ -60,7 +69,7 @@ export const EntityDetail = ({ entity }: IProps) => {
                 </div>
             </div>
 
-            {entity.flaggedAssociations.map((flagged) => {
+            {flaggedMappings.map((flagged) => {
                 const problems = orderAssociationProblems(flagged.problems);
                 const primary = problems[0];
 

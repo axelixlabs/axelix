@@ -17,12 +17,18 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 
 import com.axelixlabs.axelix.common.contract.metadata.Association;
@@ -32,7 +38,7 @@ import com.axelixlabs.axelix.common.contract.metadata.MappedEntity;
 
 /**
  * Scans the JPA metamodel of an {@link EntityManagerFactory} to build the {@link JpaEntities}: every
- * mapped entity together with the problems detected in its association mappings.
+ * mapped entity together with the problems detected in its mappings.
  *
  * <p>The scan relies only on the standard {@code javax.persistence} metamodel and annotations, so
  * it works with any JPA provider and does not require Hibernate or Spring Data JPA.
@@ -49,7 +55,7 @@ public class EntityMappingScanner {
     }
 
     /**
-     * @return the map of every mapped entity, ordered by entity name, with the association problems
+     * @return the map of every mapped entity, ordered by entity name, with the mapping problems
      *     detected inside each.
      */
     public JpaEntities scan() {
@@ -79,7 +85,24 @@ public class EntityMappingScanner {
                 .name(entityName)
                 .table(resolveTable(entityType.getJavaType(), entityName))
                 .associationsCount(inspection.getAssociationsCount())
-                .flaggedAssociations(flagged);
+                .flaggedAssociations(flagged)
+                .ordinalEnumAttributes(findOrdinalEnumAttributes(entityType));
+    }
+
+    private static List<String> findOrdinalEnumAttributes(EntityType<?> entityType) {
+        return entityType.getAttributes().stream()
+                .filter(attribute -> {
+                    Member javaMember = attribute.getJavaMember();
+                    if (!(javaMember instanceof AnnotatedElement)) {
+                        return false;
+                    }
+                    AnnotatedElement member = (AnnotatedElement) javaMember;
+                    Enumerated enumerated = member.getAnnotation(Enumerated.class);
+                    return enumerated != null && enumerated.value() == EnumType.ORDINAL;
+                })
+                .map(Attribute::getName)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     private static String resolveTable(Class<?> javaType, String entityName) {

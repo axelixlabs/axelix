@@ -10,6 +10,8 @@
     --problem-unidirectional-bg: #ecfeff;
     --problem-to-string: #db2777;
     --problem-to-string-bg: #fdf2f8;
+    --problem-ordinal-enum: var(--axelix-blue-700);
+    --problem-ordinal-enum-bg: var(--axelix-blue-50);
 
     display: flex;
     flex-direction: column;

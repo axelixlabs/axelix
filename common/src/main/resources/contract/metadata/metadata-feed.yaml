@@ -549,7 +549,7 @@ components:
       type: object
       description: >-
         A single JPA entity that Axelix mapped while scanning an instance, together with the
-        association problems detected inside it.
+        mapping problems detected inside it.
       required:
         - name
         - table
@@ -570,6 +570,12 @@ components:
             The total number of associations mapped by the entity. Absent when it could not be
             determined (e.g. an older agent that did not report it).
           x-axelix-introduced-in: 1.2.0
+        ordinalEnumAttributes:
+          type: array
+          description: Persistent attributes explicitly annotated with @Enumerated using EnumType.ORDINAL.
+          x-axelix-introduced-in: 1.4.0
+          items:
+            type: string
         flaggedAssociations:
           type: array
           description: The associations of this entity in which a problem was detected.

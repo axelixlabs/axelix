@@ -54,7 +54,6 @@ export interface IFlaggedAssociation {
 
 /**
  * A single JPA entity that Axelix mapped while scanning an instance, together with the problems detected inside it.
- * An entity with an empty {@link IMappedEntity.flaggedAssociations} list is clean.
  */
 export interface IMappedEntity {
     /**
@@ -76,10 +75,13 @@ export interface IMappedEntity {
      * The associations of this entity in which a problem was detected.
      */
     flaggedAssociations: IFlaggedAssociation[];
+
+    /** Persistent attributes explicitly mapped with @Enumerated using EnumType.ORDINAL. */
+    ordinalEnumAttributes?: string[];
 }
 
 /**
- * The scan-first registry of every JPA entity Axelix mapped in an instance, together with the association-mapping
+ * The scan-first registry of every JPA entity Axelix mapped in an instance, together with the mapping
  * problems detected inside each.
  */
 export interface IJpaEntities {

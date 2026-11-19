@@ -78,6 +78,10 @@
     --card-color: var(--problem-to-string);
 }
 
+.OrdinalEnum {
+    --card-color: var(--problem-ordinal-enum);
+}
+
 .ProblemHeader {
     display: flex;
     align-items: center;
