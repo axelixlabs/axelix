@@ -74,7 +74,8 @@ class EntitiesMcpServerToolsTest extends AbstractMcpServerToolsTest {
             // given.
             MappedEntity order =
                     entity("Order", "orders", 2, List.of(flagged("Order", "items", AssociationProblem.EAGER_FETCHING)));
-            MappedEntity customer = entity("Customer", "customers", 0, List.of());
+            MappedEntity customer =
+                    entity("Customer", "customers", 0, List.of()).ordinalEnumAttributes(List.of("status"));
             stubApplication(new JpaEntities().entities(List.of(order, customer)));
 
             // when.
@@ -88,6 +89,7 @@ class EntitiesMcpServerToolsTest extends AbstractMcpServerToolsTest {
                         "name": "Order",
                         "table": "orders",
                         "associationsCount": 2,
+                        "ordinalEnumAttributes": [],
                         "flaggedAssociations": [
                           {
                             "association": { "entity": "Order", "field": "items" },
@@ -100,6 +102,7 @@ class EntitiesMcpServerToolsTest extends AbstractMcpServerToolsTest {
                         "name": "Customer",
                         "table": "customers",
                         "associationsCount": 0,
+                        "ordinalEnumAttributes": ["status"],
                         "flaggedAssociations": []
                       }
                     ]
@@ -128,6 +131,7 @@ class EntitiesMcpServerToolsTest extends AbstractMcpServerToolsTest {
                       "name": "Order",
                       "table": "orders",
                       "associationsCount": 3,
+                      "ordinalEnumAttributes": [],
                       "flaggedAssociations": [
                         {
                           "association": { "entity": "Order", "field": "items" },
@@ -172,6 +176,7 @@ class EntitiesMcpServerToolsTest extends AbstractMcpServerToolsTest {
                         "name": "Customer",
                         "table": "customers",
                         "associationsCount": 0,
+                        "ordinalEnumAttributes": [],
                         "flaggedAssociations": []
                       }
                     ]
