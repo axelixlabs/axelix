@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { EAssociationProblem, type IMappedEntity } from "@/models";
+import type { EAssociationProblem, IMappedEntity } from "@/models";
 import { ASSOCIATION_PROBLEM_ORDER } from "@/utils";
 
 /**
- * A problem type together with how many of the entity's mappings exhibit it.
+ * A problem type together with how many of the entity's associations exhibit it.
  */
 export interface IGroupedAssociationProblem {
     /**
@@ -28,20 +28,20 @@ export interface IGroupedAssociationProblem {
     type: EAssociationProblem;
 
     /**
-     * How many of the entity's mappings exhibit the problem.
+     * How many of the entity's flagged associations exhibit the problem.
      */
     count: number;
 }
 
 /**
- * Whether the entity has a mapping problem.
+ * Whether the entity has at least one flagged association.
  */
 export const isEntityProblematic = (entity: IMappedEntity): boolean => {
-    return entity.flaggedAssociations.length > 0 || (entity.ordinalEnumAttributes?.length ?? 0) > 0;
+    return entity.flaggedAssociations.length > 0;
 };
 
 /**
- * Groups the problems of an entity by type, counting how many mappings exhibit each, in the canonical order.
+ * Groups the problems of an entity by type, counting how many associations exhibit each, in the canonical order.
  */
 export const groupEntityProblems = (entity: IMappedEntity): IGroupedAssociationProblem[] => {
     const counts = new Map<EAssociationProblem, number>();
@@ -50,10 +50,6 @@ export const groupEntityProblems = (entity: IMappedEntity): IGroupedAssociationP
         for (const problem of flagged.problems) {
             counts.set(problem, (counts.get(problem) ?? 0) + 1);
         }
-    }
-
-    if (entity.ordinalEnumAttributes?.length) {
-        counts.set(EAssociationProblem.ORDINAL_ENUM, entity.ordinalEnumAttributes.length);
     }
 
     return ASSOCIATION_PROBLEM_ORDER.filter((type) => counts.has(type)).map((type) => ({
@@ -91,9 +87,6 @@ export const filterEntities = (
 
         if (activeProblemTypes.length > 0) {
             const entityProblemTypes = entity.flaggedAssociations.flatMap((flagged) => flagged.problems);
-            if (entity.ordinalEnumAttributes?.length) {
-                entityProblemTypes.push(EAssociationProblem.ORDINAL_ENUM);
-            }
             return activeProblemTypes.every((type) => entityProblemTypes.includes(type));
         }
 

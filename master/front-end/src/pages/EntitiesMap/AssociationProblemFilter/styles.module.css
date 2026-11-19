@@ -57,10 +57,6 @@
     --dot-color: var(--problem-to-string);
 }
 
-.OrdinalEnum {
-    --dot-color: var(--problem-ordinal-enum);
-}
-
 .ActiveChip {
     color: var(--dot-color);
     border-color: var(--dot-color);

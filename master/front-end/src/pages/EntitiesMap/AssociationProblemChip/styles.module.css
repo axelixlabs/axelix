@@ -42,11 +42,6 @@
     background-color: var(--problem-to-string-bg);
 }
 
-.OrdinalEnum {
-    color: var(--problem-ordinal-enum);
-    background-color: var(--problem-ordinal-enum-bg);
-}
-
 .Outlined {
     background-color: var(--axelix-white);
     border: 1px solid currentcolor;
