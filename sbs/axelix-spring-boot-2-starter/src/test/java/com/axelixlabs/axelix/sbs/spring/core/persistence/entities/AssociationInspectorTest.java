@@ -24,6 +24,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -124,6 +126,7 @@ class AssociationInspectorTest {
             // Order carries exactly the problems detected across its associations.
             MappedEntity order = entity(profile, "Order");
             assertThat(order.getTable()).isEqualTo("orders");
+            assertThat(order.getOrdinalEnumAttributes()).containsExactly("status");
             assertThat(order.getAssociationsCount()).isEqualTo(8);
             assertThat(order.getFlaggedAssociations())
                     .extracting(
@@ -151,11 +154,13 @@ class AssociationInspectorTest {
                             flagged -> Set.copyOf(flagged.getProblems()))
                     .containsExactly(tuple("customer", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
 
-            // every other entity is clean.
+            // the other entities have no association problems.
             assertThat(entity(profile, "Customer").getFlaggedAssociations()).isEmpty();
             assertThat(entity(profile, "OrderItem").getFlaggedAssociations()).isEmpty();
             assertThat(entity(profile, "OrderEvent").getFlaggedAssociations()).isEmpty();
-            assertThat(entity(profile, "Shipment").getFlaggedAssociations()).isEmpty();
+            MappedEntity shipment = entity(profile, "Shipment");
+            assertThat(shipment.getFlaggedAssociations()).isEmpty();
+            assertThat(shipment.getOrdinalEnumAttributes()).containsExactly("status");
             assertThat(entity(profile, "Tag").getFlaggedAssociations()).isEmpty();
         });
     }
@@ -178,12 +183,24 @@ class AssociationInspectorTest {
     @EntityScan(basePackageClasses = Order.class)
     static class JpaTestConfiguration {}
 
+    enum Status {
+        CREATED
+    }
+
     @Entity
     @Table(name = "orders")
     static class Order {
 
         @Id
         private Long id;
+
+        @Enumerated
+        private Status status;
+
+        @Enumerated(EnumType.STRING)
+        private Status stringStatus;
+
+        private Status unannotatedStatus;
 
         @ManyToOne
         private Customer customer;
@@ -252,8 +269,27 @@ class AssociationInspectorTest {
     @Table(name = "shipments")
     static class Shipment {
 
-        @Id
         private Long id;
+
+        private Status status;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        @Enumerated(EnumType.ORDINAL)
+        public Status getStatus() {
+            return status;
+        }
+
+        public void setStatus(Status status) {
+            this.status = status;
+        }
     }
 
     @Entity
