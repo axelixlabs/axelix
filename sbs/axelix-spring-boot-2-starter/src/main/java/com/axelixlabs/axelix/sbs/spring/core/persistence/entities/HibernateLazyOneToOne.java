@@ -55,6 +55,7 @@ final class HibernateLazyOneToOne {
                 || !(attribute.getJavaMember() instanceof AnnotatedElement)) {
             return false;
         }
+        // Only mappings that explicitly request lazy loading are candidates for this warning.
         OneToOne annotation = ((AnnotatedElement) attribute.getJavaMember()).getAnnotation(OneToOne.class);
         if (annotation == null || annotation.fetch() != FetchType.LAZY) {
             return false;
@@ -73,6 +74,7 @@ final class HibernateLazyOneToOne {
         if (associationType instanceof OneToOneType && ((OneToOneType) associationType).isNullable()) {
             return true;
         }
+        // With no override (null), Hibernate returns its stored eager flag for the mapping that requested LAZY.
         if (associationType.isEager(null)) {
             return true;
         }

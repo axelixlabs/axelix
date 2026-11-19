@@ -55,6 +55,7 @@ final class HibernateLazyOneToOne {
                 || !(attribute.getJavaMember() instanceof AnnotatedElement member)) {
             return false;
         }
+        // Only mappings that explicitly request lazy loading are candidates for this warning.
         OneToOne annotation = member.getAnnotation(OneToOne.class);
         if (annotation == null || annotation.fetch() != FetchType.LAZY) {
             return false;

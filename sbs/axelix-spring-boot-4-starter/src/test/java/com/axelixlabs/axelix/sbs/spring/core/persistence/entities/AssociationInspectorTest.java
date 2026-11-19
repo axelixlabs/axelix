@@ -175,7 +175,7 @@ class AssociationInspectorTest {
             MappedEntity order = entity(profile, "Order");
             assertThat(order.getTable()).isEqualTo("orders");
             assertThat(order.getOrdinalEnumAttributes()).containsExactly("ordinalStatus", "status");
-            assertThat(order.getAssociationsCount()).isEqualTo(10);
+            assertThat(order.getAssociationsCount()).isEqualTo(11);
             assertThat(order.getFlaggedAssociations())
                     .extracting(
                             flagged -> flagged.getAssociation().getField(),
@@ -187,6 +187,7 @@ class AssociationInspectorTest {
                                             AssociationProblem.EAGER_FETCHING,
                                             AssociationProblem.ACCESSED_IN_TO_STRING)),
                             tuple("coCustomer", Set.of(AssociationProblem.EAGER_FETCHING)),
+                            tuple("defaultFetchShipment", Set.of(AssociationProblem.EAGER_FETCHING)),
                             tuple("primaryShipment", Set.of(AssociationProblem.INEFFECTIVE_LAZY_ONE_TO_ONE)),
                             tuple(
                                     "items",
@@ -265,6 +266,9 @@ class AssociationInspectorTest {
 
         @OneToOne(fetch = FetchType.LAZY)
         private Shipment primaryShipment;
+
+        @OneToOne
+        private Shipment defaultFetchShipment;
 
         @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
         private Customer manager;
