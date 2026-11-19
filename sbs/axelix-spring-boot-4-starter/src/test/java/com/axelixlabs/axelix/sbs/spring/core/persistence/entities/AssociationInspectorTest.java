@@ -74,6 +74,31 @@ class AssociationInspectorTest {
     @Nested
     class DetectProblems {
 
+        @Test // GH-2034
+        void shouldFlagOnlyTheIneffectiveSideOfALazyOneToOne() {
+            jpaContextRunner.run(context -> {
+                // given.
+                EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
+
+                // when.
+                JpaEntities profile = new EntityMappingScanner(entityManagerFactory).scan();
+
+                // then.
+                assertThat(entity(profile, "Customer").getFlaggedAssociations())
+                        .singleElement()
+                        .satisfies(flagged -> {
+                            assertThat(flagged.getAssociation().getField()).isEqualTo("order");
+                            assertThat(flagged.getMapping())
+                                    .isEqualTo("@OneToOne(mappedBy = \"billingCustomer\", fetch = FetchType.LAZY)");
+                            assertThat(flagged.getProblems())
+                                    .containsExactly(AssociationProblem.INEFFECTIVE_LAZY_ONE_TO_ONE);
+                        });
+                assertThat(entity(profile, "Order").getFlaggedAssociations())
+                        .noneMatch(
+                                flagged -> flagged.getAssociation().getField().equals("billingCustomer"));
+            });
+        }
+
         @Test
         void shouldDetectAssociationReadByToString() {
             jpaContextRunner.run(context -> {
@@ -150,7 +175,7 @@ class AssociationInspectorTest {
             MappedEntity order = entity(profile, "Order");
             assertThat(order.getTable()).isEqualTo("orders");
             assertThat(order.getOrdinalEnumAttributes()).containsExactly("ordinalStatus", "status");
-            assertThat(order.getAssociationsCount()).isEqualTo(8);
+            assertThat(order.getAssociationsCount()).isEqualTo(11);
             assertThat(order.getFlaggedAssociations())
                     .extracting(
                             flagged -> flagged.getAssociation().getField(),
@@ -162,6 +187,8 @@ class AssociationInspectorTest {
                                             AssociationProblem.EAGER_FETCHING,
                                             AssociationProblem.ACCESSED_IN_TO_STRING)),
                             tuple("coCustomer", Set.of(AssociationProblem.EAGER_FETCHING)),
+                            tuple("defaultFetchShipment", Set.of(AssociationProblem.EAGER_FETCHING)),
+                            tuple("primaryShipment", Set.of(AssociationProblem.INEFFECTIVE_LAZY_ONE_TO_ONE)),
                             tuple(
                                     "items",
                                     Set.of(
@@ -178,8 +205,7 @@ class AssociationInspectorTest {
                             flagged -> Set.copyOf(flagged.getProblems()))
                     .containsExactly(tuple("customer", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
 
-            // the other entities have no association problems.
-            assertThat(entity(profile, "Customer").getFlaggedAssociations()).isEmpty();
+            // These entities have no flagged associations.
             assertThat(entity(profile, "OrderItem").getFlaggedAssociations()).isEmpty();
             assertThat(entity(profile, "OrderEvent").getFlaggedAssociations()).isEmpty();
             MappedEntity shipment = entity(profile, "Shipment");
@@ -235,6 +261,15 @@ class AssociationInspectorTest {
         @OneToOne(fetch = FetchType.EAGER)
         private Customer coCustomer;
 
+        @OneToOne(fetch = FetchType.LAZY)
+        private Customer billingCustomer;
+
+        @OneToOne(fetch = FetchType.LAZY)
+        private Shipment primaryShipment;
+
+        @OneToOne
+        private Shipment defaultFetchShipment;
+
         @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
         private Customer manager;
 
@@ -272,6 +307,9 @@ class AssociationInspectorTest {
 
         @Id
         private Long id;
+
+        @OneToOne(mappedBy = "billingCustomer", fetch = FetchType.LAZY)
+        private Order order;
     }
 
     @Entity
@@ -305,7 +343,7 @@ class AssociationInspectorTest {
         private Status status;
 
         @Id
-        public Long getId() {
+        public final Long getId() {
             return id;
         }
 

@@ -31,6 +31,8 @@ import javax.persistence.Table;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 
+import org.springframework.util.ClassUtils;
+
 import com.axelixlabs.axelix.common.contract.metadata.Association;
 import com.axelixlabs.axelix.common.contract.metadata.FlaggedAssociation;
 import com.axelixlabs.axelix.common.contract.metadata.JpaEntities;
@@ -40,8 +42,8 @@ import com.axelixlabs.axelix.common.contract.metadata.MappedEntity;
  * Scans the JPA metamodel of an {@link EntityManagerFactory} to build the {@link JpaEntities}: every
  * mapped entity together with the problems detected in its mappings.
  *
- * <p>The scan relies only on the standard {@code javax.persistence} metamodel and annotations, so
- * it works with any JPA provider and does not require Hibernate or Spring Data JPA.
+ * <p>The scan works with any JPA provider. Hibernate mappings receive an additional check for
+ * ineffective lazy one-to-one associations.
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
@@ -49,9 +51,16 @@ import com.axelixlabs.axelix.common.contract.metadata.MappedEntity;
 public class EntityMappingScanner {
 
     private final EntityManagerFactory entityManagerFactory;
+    private final EntityInspector entityInspector;
 
     public EntityMappingScanner(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
+        this.entityInspector = new EntityInspector(
+                ClassUtils.isPresent(
+                                "org.hibernate.engine.spi.SessionFactoryImplementor",
+                                getClass().getClassLoader())
+                        ? HibernateLazyOneToOne.check(entityManagerFactory)
+                        : (entity, attribute) -> false);
     }
 
     /**
@@ -71,7 +80,7 @@ public class EntityMappingScanner {
 
     private MappedEntity scanEntity(EntityType<?> entityType) {
         String entityName = entityType.getName();
-        EntityInspector.EntityInspection inspection = new EntityInspector().inspect(entityType);
+        EntityInspector.EntityInspection inspection = entityInspector.inspect(entityType);
         List<FlaggedAssociation> flagged = new ArrayList<>();
 
         for (EntityInspector.AssociationInspection association : inspection.getFlaggedAssociations()) {

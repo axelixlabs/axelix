@@ -85,6 +85,8 @@ class AssociationInspector {
         }
         if (effectiveFetch() == FetchType.EAGER) {
             attributes.add("fetch = FetchType.EAGER");
+        } else if (type == PersistentAttributeType.ONE_TO_ONE) {
+            attributes.add("fetch = FetchType.LAZY");
         }
         String cascade = renderCascade();
         if (!cascade.isEmpty()) {

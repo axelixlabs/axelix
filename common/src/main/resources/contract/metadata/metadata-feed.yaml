@@ -636,6 +636,7 @@ components:
         the entities of an instance.
       enum:
         - EAGER_FETCHING
+        - INEFFECTIVE_LAZY_ONE_TO_ONE
         - LIST_BACKED_MANY_TO_MANY
         - CASCADE_REMOVE_OR_ALL
         - UNIDIRECTIONAL_ONE_TO_MANY
