@@ -6,8 +6,8 @@ info:
     Schemas for the basic service metadata required for both auto-discovery and self-registration.
 components:
   schemas:
-    # BasicRegistrationMetadata and everything below it is duplicated verbatim in
-    # heartbeat/heartbeat.yaml (no cross-document schema reuse yet, see GH-1666). Keep both in sync.
+    # Keep the shared registration schemas in initial-registration-request.yaml in sync (see GH-1666).
+    # The legacy heartbeat schema describes the payload sent by older starters.
     BasicRegistrationMetadata:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
