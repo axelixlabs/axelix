@@ -672,41 +672,52 @@
         }
     },
     "EntitiesMap": {
-        "summary": {
-            "mapped": "Entités mappées",
-            "withProblems": "Avec des problèmes",
-            "clean": "Sans problème"
-        },
-        "problemType": "Type de problème :",
-        "columns": {
-            "entity": "Entité",
+        "description": "Parcourez les entités JPA et consultez les problèmes détectés lors des vérifications de leur mappage.",
+        "checkFilter": "Vérification",
+        "allChecks": "Toutes les vérifications",
+        "locationFilter": "Emplacement du problème",
+        "allLocations": "Tous les emplacements",
+        "locations": {
+            "association": "Association",
             "associations": "Associations",
-            "problems": "Problèmes détectés"
+            "attribute": "Attribut",
+            "attributes": "Attributs"
         },
-        "mapped": "{{count}} mappées",
-        "flagged": "{{count}} signalées",
+        "entities": "Entités",
+        "search": "Rechercher par entité ou table",
+        "withFindings": "Avec des problèmes",
+        "withoutFindings": "Aucun problème signalé",
+        "noMatches": "Aucune entité correspondante.",
+        "noFindings": "Aucun problème signalé pour cette entité.",
+        "findings": "Problèmes détectés",
+        "findingCount_one": "{{count}} problème",
+        "findingCount_many": "{{count}} de problèmes",
+        "findingCount_other": "{{count}} problèmes",
+        "associationCount_one": "{{count}} association",
+        "associationCount_many": "{{count}} d’associations",
+        "associationCount_other": "{{count}} associations",
+        "summary": "{{findings}} · Entités concernées ({{matching}} sur {{total}})",
+        "filteredSummary": "{{findings}} · {{entities}} dans les résultats",
+        "entityCount_one": "{{count}} entité",
+        "entityCount_many": "{{count}} d’entités",
+        "entityCount_other": "{{count}} entités",
         "problems": {
             "eager": "Chargement EAGER",
             "listManyToMany": "List pour @ManyToMany",
-            "cascade": "CascadeType inadapté",
+            "cascade": "Cascade REMOVE ou ALL",
             "unidirectional": "@OneToMany unidirectionnel",
-            "toString": "Lue par toString()"
+            "toString": "Lue par toString()",
+            "ineffectiveLazyOneToOne": "Chargement différé inefficace pour @OneToOne",
+            "ordinalEnum": "Mappage ordinal d’une énumération"
         },
         "problemFixes": {
             "eager": "Les données sont récupérées à chaque chargement, qu’elles soient utilisées ou non. Utilisez toujours FetchType.LAZY et chargez explicitement les relations avec un JOIN FETCH si nécessaire.",
             "listManyToMany": "Un @ManyToMany reposant sur une List oblige Hibernate à vider toute la table de jointure et à en réinsérer les données à chaque modification. Modélisez plutôt ManyToMany avec un Set.",
             "cascade": "CascadeType.REMOVE (et donc CascadeType.ALL) oblige Hibernate à effectuer N + 1 requêtes lors de la suppression de la relation, car Hibernate doit respecter les callbacks du cycle de vie de l’entité. Gérez la suppression manuellement.",
             "unidirectional": "Un @OneToMany sans 'mappedBy' nécessite une table de jointure supplémentaire ou des UPDATE par ligne. Rendez-le bidirectionnel ou faites du côté @ManyToOne le propriétaire de la relation.",
-            "toString": "Lire une association depuis toString() peut initialiser de manière inattendue une relation à chargement différé, entraînant des requêtes SQL supplémentaires, une LazyInitializationException ou un OutOfMemoryError lorsqu’une grande partie du graphe d’entités est chargée en mémoire. Excluez les associations de toString()."
-        },
-        "detail": {
-            "table": "Table",
-            "associations": "Associations",
-            "associationsValue": "{{mapped}} mappées · {{flagged}} signalées"
-        },
-        "clean": {
-            "title": "Aucun problème de mappage",
-            "description": "Les {{count}} entités mappées ne présentent aucun problème : aucun chargement immédiat, aucun @ManyToMany reposant sur une List, aucune cascade dangereuse, aucun @OneToMany unidirectionnel et aucune association lue par toString()."
+            "toString": "Lire une association depuis toString() peut initialiser de manière inattendue une relation à chargement différé, entraînant des requêtes SQL supplémentaires, une LazyInitializationException ou un OutOfMemoryError lorsqu’une grande partie du graphe d’entités est chargée en mémoire. Excluez les associations de toString().",
+            "ineffectiveLazyOneToOne": "Hibernate peut charger cette association immédiatement malgré FetchType.LAZY. Vérifiez si l’instrumentation du bytecode ou un autre mappage permet de différer son chargement.",
+            "ordinalEnum": "La base de données stocke la position de la constante dans l’énumération. Réordonner les constantes peut changer l’interprétation des valeurs déjà stockées. Prévoyez une migration des données avant de passer à EnumType.STRING."
         }
     },
     "DependenciesAnalyzer": {

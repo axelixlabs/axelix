@@ -15,81 +15,47 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EAssociationProblem, IMappedEntity } from "@/models";
-import { ASSOCIATION_PROBLEM_ORDER } from "@/utils";
+import { EAssociationProblem, type IMappedEntity } from "@/models";
 
-/**
- * A problem type together with how many of the entity's associations exhibit it.
- */
-export interface IGroupedAssociationProblem {
-    /**
-     * The problem type.
-     */
-    type: EAssociationProblem;
+export const ENTITY_CHECK_LABELS = new Map<string, string>([
+    [EAssociationProblem.EAGER_FETCHING, "eager"],
+    [EAssociationProblem.INEFFECTIVE_LAZY_ONE_TO_ONE, "ineffectiveLazyOneToOne"],
+    [EAssociationProblem.LIST_BACKED_MANY_TO_MANY, "listManyToMany"],
+    [EAssociationProblem.CASCADE_REMOVE_OR_ALL, "cascade"],
+    [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY, "unidirectional"],
+    [EAssociationProblem.ACCESSED_IN_TO_STRING, "toString"],
+    ["ORDINAL_ENUM", "ordinalEnum"],
+]);
 
-    /**
-     * How many of the entity's flagged associations exhibit the problem.
-     */
-    count: number;
+export type TEntityFindingLocation = "association" | "attribute";
+
+export interface IEntityFinding {
+    /** The check identifier reported by the starter or derived from its metadata. */
+    check: string;
+    /** The kind of member where the check found a problem. */
+    location: TEntityFindingLocation;
+    /** The name of the affected member. */
+    member: string;
+    /** The mapping evidence shown in the finding. */
+    mapping: string;
 }
 
 /**
- * Whether the entity has at least one flagged association.
+ * Converts the available metadata into one finding per affected member and check.
  */
-export const isEntityProblematic = (entity: IMappedEntity): boolean => {
-    return entity.flaggedAssociations.length > 0;
-};
-
-/**
- * Groups the problems of an entity by type, counting how many associations exhibit each, in the canonical order.
- */
-export const groupEntityProblems = (entity: IMappedEntity): IGroupedAssociationProblem[] => {
-    const counts = new Map<EAssociationProblem, number>();
-
-    for (const flagged of entity.flaggedAssociations) {
-        for (const problem of flagged.problems) {
-            counts.set(problem, (counts.get(problem) ?? 0) + 1);
-        }
-    }
-
-    return ASSOCIATION_PROBLEM_ORDER.filter((type) => counts.has(type)).map((type) => ({
-        type,
-        count: counts.get(type) ?? 0,
-    }));
-};
-
-/**
- * Reorders the problems of a single association into the canonical presentation order.
- */
-export const orderAssociationProblems = (problems: EAssociationProblem[]): EAssociationProblem[] => {
-    return ASSOCIATION_PROBLEM_ORDER.filter((type) => problems.includes(type));
-};
-
-/**
- * Filters entities by a free-text search over the entity name and its flagged {@code Entity.field} associations and,
- * when at least one problem type is active, keeps only the entities that exhibit a problem of one of those types.
- */
-export const filterEntities = (
-    entities: IMappedEntity[],
-    search: string,
-    activeProblemTypes: EAssociationProblem[],
-): IMappedEntity[] => {
-    const formattedSearch = search.toLowerCase().trim();
-
-    return entities.filter((entity) => {
-        if (formattedSearch) {
-            const matchesName = entity.name.toLowerCase().includes(formattedSearch);
-
-            if (!matchesName) {
-                return false;
-            }
-        }
-
-        if (activeProblemTypes.length > 0) {
-            const entityProblemTypes = entity.flaggedAssociations.flatMap((flagged) => flagged.problems);
-            return activeProblemTypes.every((type) => entityProblemTypes.includes(type));
-        }
-
-        return true;
-    });
-};
+export const getEntityFindings = (entity: IMappedEntity): IEntityFinding[] => [
+    ...(entity.ordinalEnumAttributes ?? []).map((member): IEntityFinding => ({
+        check: "ORDINAL_ENUM",
+        location: "attribute",
+        member,
+        mapping: "@Enumerated(EnumType.ORDINAL)",
+    })),
+    ...entity.flaggedAssociations.flatMap(({ association, mapping, problems }) =>
+        problems.map((check): IEntityFinding => ({
+            check,
+            location: "association",
+            member: association.field,
+            mapping,
+        })),
+    ),
+];

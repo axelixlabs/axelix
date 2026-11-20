@@ -674,41 +674,55 @@
         }
     },
     "EntitiesMap": {
-        "summary": {
-            "mapped": "Всего сущностей",
-            "withProblems": "С проблемами",
-            "clean": "Без проблем"
-        },
-        "problemType": "Тип проблемы:",
-        "columns": {
-            "entity": "Сущность",
+        "description": "Просматривайте сущности JPA и проблемы, выявленные при проверке их маппинга.",
+        "checkFilter": "Проверка",
+        "allChecks": "Все проверки",
+        "locationFilter": "Где обнаружена проблема",
+        "allLocations": "Все места обнаружения",
+        "locations": {
+            "association": "Ассоциация",
             "associations": "Ассоциации",
-            "problems": "Обнаруженные проблемы"
+            "attribute": "Атрибут",
+            "attributes": "Атрибуты"
         },
-        "mapped": "{{count}} всего",
-        "flagged": "{{count}} с проблемами",
+        "entities": "Сущности",
+        "search": "Поиск по сущности или таблице",
+        "withFindings": "С проблемами",
+        "withoutFindings": "Проблемы не обнаружены",
+        "noMatches": "Подходящих сущностей нет.",
+        "noFindings": "Для этой сущности проблем не обнаружено.",
+        "findings": "Обнаруженные проблемы",
+        "findingCount_one": "{{count}} проблема",
+        "findingCount_few": "{{count}} проблемы",
+        "findingCount_many": "{{count}} проблем",
+        "findingCount_other": "{{count}} проблемы",
+        "associationCount_one": "{{count}} ассоциация",
+        "associationCount_few": "{{count}} ассоциации",
+        "associationCount_many": "{{count}} ассоциаций",
+        "associationCount_other": "{{count}} ассоциации",
+        "summary": "{{findings}} · Сущности с проблемами ({{matching}} из {{total}})",
+        "filteredSummary": "{{findings}} · {{entities}} в результатах",
+        "entityCount_one": "{{count}} сущность",
+        "entityCount_few": "{{count}} сущности",
+        "entityCount_many": "{{count}} сущностей",
+        "entityCount_other": "{{count}} сущности",
         "problems": {
             "eager": "Жадная загрузка (EAGER)",
             "listManyToMany": "List для @ManyToMany",
-            "cascade": "Некорректный CascadeType",
+            "cascade": "Каскадирование REMOVE или ALL",
             "unidirectional": "Однонаправленный @OneToMany",
-            "toString": "Читается в toString()"
+            "toString": "Читается в toString()",
+            "ineffectiveLazyOneToOne": "Ленивая загрузка @OneToOne может не сработать",
+            "ordinalEnum": "Хранение enum по порядковому номеру"
         },
         "problemFixes": {
             "eager": "Загружается при каждом чтении независимо от того, используются ли данные. Всегда используйте FetchType.LAZY и загружайте связи явно через JOIN FETCH при необходимости.",
             "listManyToMany": "@ManyToMany на основе List заставляет Hibernate очищать и заново вставлять всю связующую таблицу при любом изменении. Моделируйте ManyToMany как Set.",
             "cascade": "CascadeType.REMOVE (а значит и CascadeType.ALL) заставляет Hibernate выполнять N + 1 при удалении связи (так как Hibernate обязан соблюдать колбэки жизненного цикла сущности). Управляйте удалением вручную.",
             "unidirectional": "@OneToMany без 'mappedBy' требует дополнительной связующей таблицы или построчных UPDATE. Сделайте его двунаправленным или перенесите владение на сторону @ManyToOne.",
-            "toString": "Чтение ассоциации в toString() может неожиданно инициализировать ленивую связь, вызывая дополнительные SQL-запросы, LazyInitializationException или OutOfMemoryError, если значительная часть графа сущностей будет загружена в память. Исключите ассоциации из toString()."
-        },
-        "detail": {
-            "table": "Таблица",
-            "associations": "Ассоциации",
-            "associationsValue": "{{mapped}} всего · {{flagged}} с проблемами"
-        },
-        "clean": {
-            "title": "Проблем в маппинге нет",
-            "description": "Все {{count}} сопоставленных сущностей чисты — нет жадной загрузки, нет @ManyToMany на основе List, нет опасных каскадов, нет однонаправленных @OneToMany и нет ассоциаций, читаемых в toString()."
+            "toString": "Чтение ассоциации в toString() может неожиданно инициализировать ленивую связь, вызывая дополнительные SQL-запросы, LazyInitializationException или OutOfMemoryError, если значительная часть графа сущностей будет загружена в память. Исключите ассоциации из toString().",
+            "ineffectiveLazyOneToOne": "Hibernate может загрузить эту ассоциацию сразу, несмотря на FetchType.LAZY. Проверьте, можно ли включить ленивую загрузку с помощью инструментирования байт-кода или изменения маппинга.",
+            "ordinalEnum": "В базе данных хранится порядковый номер константы enum. Изменение порядка констант может изменить интерпретацию уже сохранённых значений. Запланируйте миграцию данных перед переходом на EnumType.STRING."
         }
     },
     "DependenciesAnalyzer": {

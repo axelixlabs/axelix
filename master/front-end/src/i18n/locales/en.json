@@ -668,41 +668,50 @@
         }
     },
     "EntitiesMap": {
-        "summary": {
-            "mapped": "Entities mapped",
-            "withProblems": "With problems",
-            "clean": "Clean"
-        },
-        "problemType": "Problem type:",
-        "columns": {
-            "entity": "Entity",
+        "description": "Browse JPA entities and inspect findings from their mapping checks.",
+        "checkFilter": "Check",
+        "allChecks": "All checks",
+        "locationFilter": "Finding location",
+        "allLocations": "All locations",
+        "locations": {
+            "association": "Association",
             "associations": "Associations",
-            "problems": "Problems detected"
+            "attribute": "Attribute",
+            "attributes": "Attributes"
         },
-        "mapped": "{{count}} mapped",
-        "flagged": "{{count}} flagged",
+        "entities": "Entities",
+        "search": "Search by entity or table",
+        "withFindings": "With findings",
+        "withoutFindings": "No findings reported",
+        "noMatches": "No matching entities.",
+        "noFindings": "No findings reported for this entity.",
+        "findings": "Findings",
+        "findingCount_one": "{{count}} finding",
+        "findingCount_other": "{{count}} findings",
+        "associationCount_one": "{{count}} association",
+        "associationCount_other": "{{count}} associations",
+        "summary_one": "{{findings}} in {{matching}} of {{total}} entity",
+        "summary_other": "{{findings}} in {{matching}} of {{total}} entities",
+        "filteredSummary": "{{findings}} · {{entities}} shown",
+        "entityCount_one": "{{count}} entity",
+        "entityCount_other": "{{count}} entities",
         "problems": {
             "eager": "EAGER fetching",
             "listManyToMany": "List for @ManyToMany",
-            "cascade": "Bad CascadeType",
+            "cascade": "Cascade REMOVE or ALL",
             "unidirectional": "Unidirectional @OneToMany",
-            "toString": "Read by toString()"
+            "toString": "Read by toString()",
+            "ineffectiveLazyOneToOne": "Ineffective lazy @OneToOne",
+            "ordinalEnum": "Ordinal enum mapping"
         },
         "problemFixes": {
             "eager": "Fetched on every load whether or not the data is used. Always use FetchType.LAZY and load relations explicitly with a JOIN FETCH when needed.",
             "listManyToMany": "A List-backed @ManyToMany makes Hibernate clear and re-insert the whole join table on any change. Model ManyToMany as a Set instead.",
             "cascade": "CascadeType.REMOVE (and thus CascadeType.ALL) force Hibernate to perform N + 1 when removing the relation (because Hibernate has to honor the entity Lifecycle callbacks). Manage removal manually.",
             "unidirectional": "A @OneToMany with no 'mappedBy' needs an extra join table or per-row UPDATEs. Make it bidirectional or move ownership to the @ManyToOne side.",
-            "toString": "Reading an association from toString() can initialize a lazy relation unexpectedly, causing extra SQL queries, a LazyInitializationException, or an OutOfMemoryError when a large part of the entity graph is loaded into memory. Exclude associations from toString()."
-        },
-        "detail": {
-            "table": "Table",
-            "associations": "Associations",
-            "associationsValue": "{{mapped}} mapped · {{flagged}} flagged"
-        },
-        "clean": {
-            "title": "No mapping problems",
-            "description": "All {{count}} mapped entities are clean — no eager fetching, no List-backed @ManyToMany, no dangerous cascades, no unidirectional @OneToMany, and no associations read by toString()."
+            "toString": "Reading an association from toString() can initialize a lazy relation unexpectedly, causing extra SQL queries, a LazyInitializationException, or an OutOfMemoryError when a large part of the entity graph is loaded into memory. Exclude associations from toString().",
+            "ineffectiveLazyOneToOne": "Hibernate may still load this association eagerly despite FetchType.LAZY. Check whether bytecode enhancement or a different mapping can make it lazy.",
+            "ordinalEnum": "The database stores the position of the enum constant. Reordering constants can change how existing values are read. Plan a data migration before switching to EnumType.STRING."
         }
     },
     "DependenciesAnalyzer": {

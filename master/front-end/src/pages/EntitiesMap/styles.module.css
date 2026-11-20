@@ -1,23 +1,235 @@
 .MainWrapper {
-    /* TODO: Improve in future */
-    --problem-eager: #ea580c;
-    --problem-eager-bg: #fff7ed;
-    --problem-list-mtm: #7c3aed;
-    --problem-list-mtm-bg: #f5f3ff;
-    --problem-cascade: var(--axelix-red-600);
-    --problem-cascade-bg: var(--axelix-red-50);
-    --problem-unidirectional: #0891b2;
-    --problem-unidirectional-bg: #ecfeff;
-    --problem-to-string: #db2777;
-    --problem-to-string-bg: #fdf2f8;
+    display: grid;
+    gap: var(--axelix-space-4);
+    font-size: var(--axelix-font-size-body);
+}
 
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+.Description,
+.Metadata {
+    margin-top: var(--axelix-space-1);
+    color: var(--axelix-grey-600);
 }
 
 .Toolbar {
     display: flex;
-    flex-direction: column;
-    gap: 18px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--axelix-space-2);
+    margin-top: var(--axelix-space-1);
+}
+
+.CheckSelect {
+    width: 255px;
+    max-width: 100%;
+}
+
+.LocationSelect {
+    width: 180px;
+    max-width: 100%;
+}
+
+.Summary {
+    margin-inline-start: auto;
+    color: var(--axelix-grey-600);
+}
+
+.Split {
+    display: grid;
+    grid-template-columns: minmax(200px, 276px) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--axelix-space-4);
+}
+
+.Panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+}
+
+.Panel:first-child {
+    max-height: max(320px, 68vh);
+    overflow: auto;
+}
+
+.PanelHeader,
+.Findings {
+    padding: var(--axelix-space-4);
+}
+
+.PanelHeader {
+    overflow-wrap: anywhere;
+}
+
+.PanelHeader h2,
+.Findings h3 {
+    font-size: inherit;
+}
+
+.PanelHeader .EntityTitle {
+    font-size: var(--axelix-font-size-title);
+}
+
+.Search {
+    margin-top: var(--axelix-space-2);
+}
+
+.GroupLabel {
+    padding: var(--axelix-space-2) var(--axelix-space-3);
+    border-block: 1px solid var(--axelix-grey-200);
+    background: var(--axelix-grey-50);
+    color: var(--axelix-grey-700);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Entity {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--axelix-space-2);
+    padding: var(--axelix-space-3);
+    border: 0;
+    border-bottom: 1px solid var(--axelix-grey-100);
+    background: var(--axelix-white);
+    color: inherit;
+    font: inherit;
+    overflow-wrap: anywhere;
+    text-align: start;
+    cursor: pointer;
+}
+
+.Entity:hover,
+.Entity[aria-pressed="true"] {
+    background: var(--axelix-green-50);
+}
+
+.Entity[aria-pressed="true"] {
+    box-shadow: inset 3px 0 var(--axelix-green-600);
+}
+
+.Entity:focus-visible {
+    outline: 2px solid var(--axelix-green-600);
+    outline-offset: -2px;
+}
+
+.Table,
+.Metadata code,
+.Location code,
+.FindingBody code {
+    font-family: var(--axelix-font-family-code);
+}
+
+.Table {
+    display: block;
+    margin-top: var(--axelix-space-1);
+    color: var(--axelix-grey-600);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Count {
+    min-width: 24px;
+    padding: 0 var(--axelix-space-1);
+    border: 1px solid var(--axelix-yellow-200);
+    border-radius: var(--axelix-border-radius-pill);
+    background: var(--axelix-yellow-50);
+    color: var(--axelix-yellow-800);
+    text-align: center;
+}
+
+.Findings {
+    display: grid;
+    gap: var(--axelix-space-2);
+    border-top: 1px solid var(--axelix-grey-200);
+    background: var(--axelix-grey-50);
+}
+
+.Finding {
+    min-width: 0;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+    overflow-wrap: anywhere;
+}
+
+.Finding summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--axelix-space-3);
+    padding: var(--axelix-space-3);
+    list-style: none;
+    cursor: pointer;
+}
+
+.Finding summary::-webkit-details-marker {
+    display: none;
+}
+
+.Finding summary::after {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    margin-inline-end: var(--axelix-space-1);
+    border: solid var(--axelix-grey-600);
+    border-width: 0 1px 1px 0;
+    transform: rotate(45deg);
+    content: "";
+}
+
+.Finding[open] summary::after {
+    transform: rotate(225deg);
+}
+
+.Finding summary:focus-visible {
+    outline: 2px solid var(--axelix-green-600);
+    outline-offset: -2px;
+}
+
+.Location {
+    display: block;
+    margin-top: var(--axelix-space-1);
+    color: var(--axelix-grey-600);
+}
+
+.Metadata code,
+.Location code,
+.FindingBody code {
+    padding: 2px var(--axelix-space-1);
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-grey-100);
+    color: var(--axelix-grey-800);
+}
+
+.Location code {
+    margin-inline-start: var(--axelix-space-1);
+}
+
+.FindingBody {
+    display: grid;
+    justify-items: start;
+    gap: var(--axelix-space-2);
+    padding: 0 var(--axelix-space-3) var(--axelix-space-3);
+    color: var(--axelix-grey-700);
+}
+
+.FindingBody code {
+    max-width: 100%;
+    white-space: pre-wrap;
+}
+
+@media (width <= 760px) {
+    .Split {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .Panel:first-child {
+        max-height: 320px;
+    }
+
+    .Summary {
+        width: 100%;
+        margin-inline-start: 0;
+    }
 }
