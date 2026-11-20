@@ -24,6 +24,7 @@ export const ENTITY_CHECK_LABELS = new Map<string, string>([
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL, "cascade"],
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY, "unidirectional"],
     [EAssociationProblem.ACCESSED_IN_TO_STRING, "toString"],
+    [EAssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE, "equalsOrHashCode"],
     ["ORDINAL_ENUM", "ordinalEnum"],
 ]);
 

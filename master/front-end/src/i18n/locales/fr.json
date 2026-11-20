@@ -707,6 +707,7 @@
             "cascade": "Cascade REMOVE ou ALL",
             "unidirectional": "@OneToMany unidirectionnel",
             "toString": "Lue par toString()",
+            "equalsOrHashCode": "Lue par equals() ou hashCode()",
             "ineffectiveLazyOneToOne": "Chargement différé inefficace pour @OneToOne",
             "ordinalEnum": "Mappage ordinal d’une énumération"
         },
@@ -717,6 +718,7 @@
             "unidirectional": "Un @OneToMany sans 'mappedBy' nécessite une table de jointure supplémentaire ou des UPDATE par ligne. Rendez-le bidirectionnel ou faites du côté @ManyToOne le propriétaire de la relation.",
             "toString": "Lire une association depuis toString() peut initialiser de manière inattendue une relation à chargement différé, entraînant des requêtes SQL supplémentaires, une LazyInitializationException ou un OutOfMemoryError lorsqu’une grande partie du graphe d’entités est chargée en mémoire. Excluez les associations de toString().",
             "ineffectiveLazyOneToOne": "Hibernate peut charger cette association immédiatement malgré FetchType.LAZY. Vérifiez si l’instrumentation du bytecode ou un autre mappage permet de différer son chargement.",
+            "equalsOrHashCode": "Lire une association dans equals() ou hashCode() peut déclencher un chargement différé lors d’une comparaison ou de l’utilisation de collections basées sur le hachage. Excluez les associations des deux méthodes.",
             "ordinalEnum": "La base de données stocke la position de la constante dans l’énumération. Réordonner les constantes peut changer l’interprétation des valeurs déjà stockées. Prévoyez une migration des données avant de passer à EnumType.STRING."
         }
     },

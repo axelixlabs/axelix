@@ -701,6 +701,7 @@
             "cascade": "Cascade REMOVE or ALL",
             "unidirectional": "Unidirectional @OneToMany",
             "toString": "Read by toString()",
+            "equalsOrHashCode": "Read by equals() or hashCode()",
             "ineffectiveLazyOneToOne": "Ineffective lazy @OneToOne",
             "ordinalEnum": "Ordinal enum mapping"
         },
@@ -711,6 +712,7 @@
             "unidirectional": "A @OneToMany with no 'mappedBy' needs an extra join table or per-row UPDATEs. Make it bidirectional or move ownership to the @ManyToOne side.",
             "toString": "Reading an association from toString() can initialize a lazy relation unexpectedly, causing extra SQL queries, a LazyInitializationException, or an OutOfMemoryError when a large part of the entity graph is loaded into memory. Exclude associations from toString().",
             "ineffectiveLazyOneToOne": "Hibernate may still load this association eagerly despite FetchType.LAZY. Check whether bytecode enhancement or a different mapping can make it lazy.",
+            "equalsOrHashCode": "Reading an association in equals() or hashCode() can trigger lazy loading during comparisons or when using hash-based collections. Exclude associations from both methods.",
             "ordinalEnum": "The database stores the position of the enum constant. Reordering constants can change how existing values are read. Plan a data migration before switching to EnumType.STRING."
         }
     },
