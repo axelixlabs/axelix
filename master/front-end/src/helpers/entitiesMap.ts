@@ -42,6 +42,14 @@ export interface IEntityFinding {
 }
 
 /**
+ * A mapped entity and the findings currently shown for it.
+ */
+export interface IEntityResult {
+    entity: IMappedEntity;
+    findings: IEntityFinding[];
+}
+
+/**
  * Converts the available metadata into one finding per affected member and check.
  */
 export const getEntityFindings = (entity: IMappedEntity): IEntityFinding[] => [

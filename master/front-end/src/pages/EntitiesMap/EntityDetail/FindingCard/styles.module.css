@@ -1,0 +1,39 @@
+.Finding {
+    min-width: 0;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+    overflow-wrap: anywhere;
+}
+
+.FindingHeading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--axelix-space-3);
+    padding: var(--axelix-space-3);
+    list-style: none;
+}
+
+.Location {
+    display: block;
+    margin-top: var(--axelix-space-1);
+    color: var(--axelix-grey-600);
+}
+
+.Location code {
+    margin-inline-start: var(--axelix-space-1);
+}
+
+.FindingBody {
+    display: grid;
+    justify-items: start;
+    gap: var(--axelix-space-2);
+    padding: 0 var(--axelix-space-3) var(--axelix-space-3);
+    color: var(--axelix-grey-700);
+}
+
+.FindingBody code {
+    max-width: 100%;
+    white-space: pre-wrap;
+}

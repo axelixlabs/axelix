@@ -1,0 +1,7 @@
+.Title {
+    font-size: inherit;
+}
+
+.Search {
+    margin-top: var(--axelix-space-2);
+}

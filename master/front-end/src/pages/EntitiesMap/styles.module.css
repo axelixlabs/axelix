@@ -1,35 +1,3 @@
-.MainWrapper {
-    display: grid;
-    gap: var(--axelix-space-4);
-    font-size: var(--axelix-font-size-body);
-}
-
-.Description,
-.Metadata {
-    margin-top: var(--axelix-space-1);
-    color: var(--axelix-grey-600);
-}
-
-.Toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--axelix-space-2);
-    margin-top: var(--axelix-space-1);
-}
-
-.Summary {
-    margin-inline-start: auto;
-    color: var(--axelix-grey-600);
-}
-
-.Split {
-    display: grid;
-    grid-template-columns: minmax(200px, 276px) minmax(0, 1fr);
-    align-items: start;
-    gap: var(--axelix-space-4);
-}
-
 .Panel {
     min-width: 0;
     overflow: hidden;
@@ -38,175 +6,20 @@
     background: var(--axelix-white);
 }
 
-.EntityList {
-    position: relative;
-}
-
-.EntityListViewport {
-    max-height: max(320px, 68vh);
-    overflow: auto;
-    scrollbar-width: none;
-}
-
-.EntityListScrollbar {
-    position: absolute;
-    inset: 0 0 0 auto;
-    width: 14px;
-    height: 100%;
-    margin: 0;
-    appearance: none;
-    direction: ltr;
-    writing-mode: vertical-lr;
-    background: transparent;
-    cursor: pointer;
-}
-
-.EntityListScrollbar::-webkit-slider-thumb {
-    width: 6px;
-    height: max(24px, var(--thumb-height));
-    border: 0;
-    border-radius: var(--axelix-border-radius-pill);
-    appearance: none;
-    background: var(--axelix-grey-300);
-    transform: translateX(3px);
-}
-
-.EntityListScrollbar::-moz-range-thumb {
-    width: 6px;
-    height: max(24px, var(--thumb-height));
-    border: 0;
-    border-radius: var(--axelix-border-radius-pill);
-    background: var(--axelix-grey-300);
-    transform: translateX(3px);
-}
-
-.EntityListScrollbar:focus-visible {
-    outline: 2px solid var(--axelix-green-600);
-    outline-offset: -2px;
-}
-
-.PanelHeader,
-.Findings {
-    padding: var(--axelix-space-4);
-}
-
 .PanelHeader {
+    padding: var(--axelix-space-4);
     overflow-wrap: anywhere;
 }
 
-.PanelHeader h2,
-.Findings h3 {
-    font-size: inherit;
-}
-
-.PanelHeader .EntityTitle {
-    font-size: var(--axelix-font-size-title);
-}
-
-.Search {
-    margin-top: var(--axelix-space-2);
-}
-
-.GroupLabel {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--axelix-space-2);
-    padding: var(--axelix-space-2) var(--axelix-space-3);
-    border-block: 1px solid var(--axelix-grey-200);
-    background: var(--axelix-grey-50);
-    color: var(--axelix-grey-700);
-    font-size: var(--axelix-font-size-caption);
-    font-weight: var(--axelix-font-weight-semibold);
-    list-style: none;
-    cursor: pointer;
-}
-
-.Entity {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--axelix-space-2);
-    padding: var(--axelix-space-3);
-    border: 0;
-    border-bottom: 1px solid var(--axelix-grey-100);
-    background: var(--axelix-white);
-    color: inherit;
-    font: inherit;
-    overflow-wrap: anywhere;
-    text-align: start;
-    cursor: pointer;
-}
-
-.Entity:hover,
-.Entity[aria-pressed="true"] {
-    background: var(--axelix-green-50);
-}
-
-.Entity[aria-pressed="true"] {
-    box-shadow: inset 3px 0 var(--axelix-green-600);
-}
-
-.Entity:focus-visible {
-    outline: 2px solid var(--axelix-green-600);
-    outline-offset: -2px;
-}
-
-.Table,
-.Metadata code,
-.Location code,
-.FindingBody code {
+.Code {
+    padding: 2px var(--axelix-space-1);
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-grey-100);
+    color: var(--axelix-grey-800);
     font-family: var(--axelix-font-family-code);
 }
 
-.Table {
-    display: block;
-    margin-top: var(--axelix-space-1);
-    color: var(--axelix-grey-600);
-    font-size: var(--axelix-font-size-caption);
-}
-
-.Count {
-    min-width: 24px;
-    padding: 0 var(--axelix-space-1);
-    border: 1px solid var(--axelix-yellow-200);
-    border-radius: var(--axelix-border-radius-pill);
-    background: var(--axelix-yellow-50);
-    color: var(--axelix-yellow-800);
-    text-align: center;
-}
-
-.Findings {
-    display: grid;
-    gap: var(--axelix-space-2);
-    border-top: 1px solid var(--axelix-grey-200);
-    background: var(--axelix-grey-50);
-}
-
-.Finding {
-    min-width: 0;
-    border: 1px solid var(--axelix-grey-200);
-    border-radius: var(--axelix-border-radius-large);
-    background: var(--axelix-white);
-    overflow-wrap: anywhere;
-}
-
-.FindingHeading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--axelix-space-3);
-    padding: var(--axelix-space-3);
-    list-style: none;
-}
-
-.Finding summary {
-    cursor: pointer;
-}
-
-.EntityGroup::details-content,
-.Finding::details-content {
+.Disclosure::details-content {
     display: grid;
     grid-template-rows: 0fr;
     overflow: hidden;
@@ -215,8 +28,7 @@
         content-visibility 240ms allow-discrete;
 }
 
-.EntityGroup[open]::details-content,
-.Finding[open]::details-content {
+.Disclosure[open]::details-content {
     grid-template-rows: 1fr;
 }
 
@@ -225,13 +37,16 @@
     overflow: hidden;
 }
 
-.Finding summary::-webkit-details-marker,
-.GroupLabel::-webkit-details-marker {
+.DisclosureHeader {
+    list-style: none;
+    cursor: pointer;
+}
+
+.DisclosureHeader::-webkit-details-marker {
     display: none;
 }
 
-.Finding summary::after,
-.GroupLabel::after {
+.DisclosureHeader::after {
     flex: 0 0 auto;
     width: 8px;
     height: 8px;
@@ -243,69 +58,18 @@
     content: "";
 }
 
-.Finding[open] summary::after,
-.EntityGroup[open] > .GroupLabel::after {
+.Disclosure[open] > .DisclosureHeader::after {
     transform: rotate(225deg);
 }
 
-.Finding summary:focus-visible,
-.GroupLabel:focus-visible {
+.DisclosureHeader:focus-visible {
     outline: 2px solid var(--axelix-green-600);
     outline-offset: -2px;
 }
 
-.Location {
-    display: block;
-    margin-top: var(--axelix-space-1);
-    color: var(--axelix-grey-600);
-}
-
-.Metadata code,
-.Location code,
-.FindingBody code {
-    padding: 2px var(--axelix-space-1);
-    border-radius: var(--axelix-border-radius-small);
-    background: var(--axelix-grey-100);
-    color: var(--axelix-grey-800);
-}
-
-.Location code {
-    margin-inline-start: var(--axelix-space-1);
-}
-
-.FindingBody {
-    display: grid;
-    justify-items: start;
-    gap: var(--axelix-space-2);
-    padding: 0 var(--axelix-space-3) var(--axelix-space-3);
-    color: var(--axelix-grey-700);
-}
-
-.FindingBody code {
-    max-width: 100%;
-    white-space: pre-wrap;
-}
-
 @media (prefers-reduced-motion: reduce) {
-    .EntityGroup::details-content,
-    .Finding::details-content,
-    .Finding summary::after,
-    .GroupLabel::after {
+    .Disclosure::details-content,
+    .DisclosureHeader::after {
         transition: none;
-    }
-}
-
-@media (width <= 760px) {
-    .Split {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .EntityListViewport {
-        max-height: 320px;
-    }
-
-    .Summary {
-        width: 100%;
-        margin-inline-start: 0;
     }
 }

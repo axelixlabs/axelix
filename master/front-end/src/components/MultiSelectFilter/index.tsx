@@ -15,13 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button, Checkbox, Input, Popover, Tag } from "antd";
+import { Button, Popover, Tag } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { toggleItem } from "@/helpers";
 
+import { FilterOptions } from "./FilterOptions";
 import styles from "./styles.module.css";
+import type { IFilterOption } from "./types";
 
 interface IProps<T extends string> {
     /** The name of the filter shown on the trigger. */
@@ -29,7 +31,7 @@ interface IProps<T extends string> {
     /** The footer message shown when no option is selected. */
     allLabel: string;
     /** The available choices and their localized labels. */
-    options: { value: T; label: string }[];
+    options: IFilterOption<T>[];
     /** The currently selected values. */
     selected: T[];
     /** Replaces the selection when an option is toggled or the filter is cleared. */
@@ -49,8 +51,6 @@ export const MultiSelectFilter = <T extends string>({
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
-    const query = search.trim().toLowerCase();
-    const visibleOptions = options.filter((option) => option.label.toLowerCase().includes(query));
     const toggle = (value: T): void => onChange(toggleItem(selected, value));
 
     return (
@@ -69,44 +69,14 @@ export const MultiSelectFilter = <T extends string>({
                 align={{ offset: [0, 6] }}
                 styles={{ container: { padding: 6, borderRadius: 9 } }}
                 content={
-                    <div className={styles.MainWrapper} data-searchable={searchable || undefined}>
-                        {searchable && (
-                            <Input
-                                className={styles.Search}
-                                aria-label={t("search")}
-                                placeholder={t("search")}
-                                value={search}
-                                onChange={(event) => setSearch(event.target.value)}
-                            />
-                        )}
-                        <div className={`ThinScrollbar ${styles.Options}`}>
-                            {visibleOptions.map((option) => (
-                                <Checkbox
-                                    key={option.value}
-                                    checked={selected.includes(option.value)}
-                                    onChange={() => toggle(option.value)}
-                                    className={`TextSmall ${styles.Option}`}
-                                >
-                                    {option.label}
-                                </Checkbox>
-                            ))}
-                            {visibleOptions.length === 0 && <span className={styles.Empty}>{t("noData")}</span>}
-                        </div>
-
-                        <div className={`TextUltraSmall ${styles.Footer}`}>
-                            <span>
-                                {selected.length
-                                    ? t("MultiSelectFilter.selectedOfTotal", {
-                                          count: selected.length,
-                                          total: options.length,
-                                      })
-                                    : allLabel}
-                            </span>
-                            <button type="button" className={styles.Clear} onClick={() => onChange([])}>
-                                {t("MultiSelectFilter.clear")}
-                            </button>
-                        </div>
-                    </div>
+                    <FilterOptions
+                        allLabel={allLabel}
+                        options={options}
+                        selected={selected}
+                        onToggle={toggle}
+                        onClear={() => onChange([])}
+                        searchField={searchable ? { value: search, onChange: setSearch } : undefined}
+                    />
                 }
             >
                 <Button
