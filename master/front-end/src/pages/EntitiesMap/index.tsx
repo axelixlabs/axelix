@@ -18,7 +18,7 @@
 import { SearchOutlined } from "@ant-design/icons";
 
 import { Input, Select } from "antd";
-import { useEffect, useState } from "react";
+import { type CSSProperties, type PropsWithChildren, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
@@ -182,7 +182,7 @@ const EntityBrowser = ({ entities }: IEntityBrowserProps) => {
             </div>
 
             <div className={styles.Split}>
-                <section className={`ThinScrollbar ${styles.Panel}`} aria-labelledby="entities-map-list">
+                <EntityListScroll>
                     <div className={styles.PanelHeader}>
                         <h2 id="entities-map-list">{t("EntitiesMap.entities")}</h2>
                         <Input
@@ -198,13 +198,74 @@ const EntityBrowser = ({ entities }: IEntityBrowserProps) => {
                     {renderEntityGroup(t("EntitiesMap.withFindings"), withFindings)}
                     {renderEntityGroup(t("EntitiesMap.withoutFindings"), withoutFindings)}
                     {results.length === 0 && <p className={styles.PanelHeader}>{t("EntitiesMap.noMatches")}</p>}
-                </section>
+                </EntityListScroll>
 
                 {selected && (
                     <EntityDetail key={selected.entity.name} entity={selected.entity} findings={selected.findings} />
                 )}
             </div>
         </div>
+    );
+};
+
+const EntityListScroll = ({ children }: PropsWithChildren) => {
+    const viewport = useRef<HTMLDivElement>(null);
+    const content = useRef<HTMLDivElement>(null);
+    const [metrics, setMetrics] = useState({ maxScroll: 0, thumbHeight: 0 });
+    const [scrollTop, setScrollTop] = useState(0);
+
+    useEffect(() => {
+        const scroller = viewport.current;
+        const list = content.current;
+
+        if (!scroller || !list) {
+            return;
+        }
+
+        const observer = new ResizeObserver(() => {
+            const { clientHeight, scrollHeight, scrollTop: currentTop } = scroller;
+            setMetrics({
+                maxScroll: scrollHeight - clientHeight,
+                thumbHeight: (clientHeight / Math.max(scrollHeight, 1)) * clientHeight,
+            });
+            setScrollTop(currentTop);
+        });
+
+        observer.observe(scroller);
+        observer.observe(list);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <section className={`${styles.Panel} ${styles.EntityList}`} aria-labelledby="entities-map-list">
+            <div
+                id="entities-map-scroll"
+                ref={viewport}
+                className={styles.EntityListViewport}
+                onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+            >
+                <div ref={content}>{children}</div>
+            </div>
+            {metrics.maxScroll > 0 && (
+                <input
+                    type="range"
+                    aria-labelledby="entities-map-list"
+                    aria-controls="entities-map-scroll"
+                    aria-orientation="vertical"
+                    className={styles.EntityListScrollbar}
+                    style={{ "--thumb-height": `${metrics.thumbHeight}px` } as CSSProperties}
+                    min={0}
+                    max={metrics.maxScroll}
+                    step="any"
+                    value={scrollTop}
+                    onChange={(event) => {
+                        const top = event.currentTarget.valueAsNumber;
+                        viewport.current?.scrollTo({ top, behavior: "instant" });
+                        setScrollTop(top);
+                    }}
+                />
+            )}
+        </section>
     );
 };
 

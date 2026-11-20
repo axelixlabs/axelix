@@ -48,9 +48,50 @@
     background: var(--axelix-white);
 }
 
-.Panel:first-child {
+.EntityList {
+    position: relative;
+}
+
+.EntityListViewport {
     max-height: max(320px, 68vh);
     overflow: auto;
+    scrollbar-width: none;
+}
+
+.EntityListScrollbar {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: 14px;
+    height: 100%;
+    margin: 0;
+    appearance: none;
+    direction: ltr;
+    writing-mode: vertical-lr;
+    background: transparent;
+    cursor: pointer;
+}
+
+.EntityListScrollbar::-webkit-slider-thumb {
+    width: 6px;
+    height: max(24px, var(--thumb-height));
+    border: 0;
+    border-radius: var(--axelix-border-radius-pill);
+    appearance: none;
+    background: var(--axelix-grey-300);
+}
+
+.EntityListScrollbar::-moz-range-thumb {
+    width: 6px;
+    height: max(24px, var(--thumb-height));
+    border: 0;
+    border-radius: var(--axelix-border-radius-pill);
+    background: var(--axelix-grey-300);
+}
+
+.EntityListScrollbar:focus-visible {
+    outline: 2px solid var(--axelix-green-600);
+    outline-offset: -2px;
 }
 
 .PanelHeader,
@@ -238,7 +279,7 @@
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .Panel:first-child {
+    .EntityListViewport {
         max-height: 320px;
     }
 
