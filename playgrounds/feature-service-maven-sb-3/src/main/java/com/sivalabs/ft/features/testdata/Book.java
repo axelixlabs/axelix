@@ -15,6 +15,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -71,6 +72,27 @@ public class Book {
 
     public Set<Genre> getGenres() {
         return genres;
+    }
+
+    // Deliberately traverses a lazy association to demonstrate the equality check.
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Book that)) {
+            return false;
+        }
+        return Objects.equals(title, that.title) && Objects.equals(authorName(), that.authorName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, authorName());
+    }
+
+    private String authorName() {
+        return author == null ? null : author.getName();
     }
 
     private enum BindingType {

@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -68,6 +69,27 @@ public class Employee {
 
 	public Set<Project> getProjects() {
 		return projects;
+	}
+
+	// Deliberately traverses a lazy association to demonstrate the equality check.
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (!(other instanceof Employee that)) {
+			return false;
+		}
+		return Objects.equals(name, that.name) && Objects.equals(departmentName(), that.departmentName());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, departmentName());
+	}
+
+	private String departmentName() {
+		return department == null ? null : department.getName();
 	}
 
 	private enum EmploymentType {
