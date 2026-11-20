@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -33,6 +34,8 @@ import lombok.Data;
 import lombok.ToString;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.crosspackage.CrossPackageAssociationParent;
 
@@ -179,6 +182,37 @@ class EntityMethodsInspectorTest {
         void shouldReportInheritedAssociationReadViaSuperGetter() {
             assertThat(inspectPropertyAssociation(PropertyChildWithSuperGetter.class, "customer", "getCustomer"))
                     .isTrue();
+        }
+    }
+
+    @Nested
+    class EqualityMethods {
+
+        @ParameterizedTest // GH-2029
+        @ValueSource(classes = {AssociationReadInEquals.class, AssociationReadInHashCode.class, LombokDataEntity.class})
+        void detectsAssociationReads(Class<?> entityClass) {
+            // given.
+            AssociationMember association = new AssociationMember("items", findField(entityClass, "items"));
+            EntityMethodsInspector inspector = new EntityMethodsInspector(entityClass, Set.of(association));
+
+            // when.
+            Set<String> detected = inspector.detectAssociationsReadByEqualsOrHashCode();
+
+            // then.
+            assertThat(detected).containsExactly("items");
+        }
+
+        @Test // GH-2029
+        void ignoresAssociationReadOnlyInToString() {
+            // given.
+            AssociationMember association = new AssociationMember("items", findField(DirectToString.class, "items"));
+            EntityMethodsInspector inspector = new EntityMethodsInspector(DirectToString.class, Set.of(association));
+
+            // when.
+            Set<String> detected = inspector.detectAssociationsReadByEqualsOrHashCode();
+
+            // then.
+            assertThat(detected).isEmpty();
         }
     }
 
@@ -636,6 +670,34 @@ class EntityMethodsInspectorTest {
         @Override
         public String toString() {
             return "PropertyGetterWithAmbiguousHelpers{primary=" + primaryCustomer + "}";
+        }
+    }
+
+    static final class AssociationReadInEquals {
+
+        @OneToMany
+        private List<ItemEntity> items;
+
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof AssociationReadInEquals
+                    && Objects.equals(items, ((AssociationReadInEquals) other).items);
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+    }
+
+    static final class AssociationReadInHashCode {
+
+        @OneToMany
+        private List<ItemEntity> items;
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(items);
         }
     }
 

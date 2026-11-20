@@ -43,7 +43,8 @@ import org.springframework.asm.ClassReader;
 import org.springframework.asm.Type;
 
 /**
- * Inspects entity bytecode to detect associations read by {@code toString()}.
+ * Inspects entity bytecode to detect associations read by {@code toString()}, {@code equals(Object)},
+ * or {@code hashCode()}.
  *
  * <p>The inspector follows method calls within the entity class hierarchy and supports both
  * field-based and property-based JPA associations.
@@ -62,6 +63,8 @@ public class EntityMethodsInspector {
 
     // method key, combined from name and method descriptor, see MethodRef
     private static final String TO_STRING_METHOD = "toString()Ljava/lang/String;";
+    private static final String EQUALS_METHOD = "equals(Ljava/lang/Object;)Z";
+    private static final String HASH_CODE_METHOD = "hashCode()I";
 
     private final Class<?> entityClass;
     private final String entityInternalName;
@@ -82,19 +85,24 @@ public class EntityMethodsInspector {
     }
 
     public Set<String> detectAssociationsReadByToString() {
+        return detectAssociationsReadBy(TO_STRING_METHOD);
+    }
+
+    public Set<String> detectAssociationsReadByEqualsOrHashCode() {
+        Set<String> result = new HashSet<>(detectAssociationsReadBy(EQUALS_METHOD));
+        result.addAll(detectAssociationsReadBy(HASH_CODE_METHOD));
+        return result;
+    }
+
+    private Set<String> detectAssociationsReadBy(String methodKey) {
         if (associations.isEmpty()) {
             return Set.of();
         }
 
         initialize();
 
-        MethodInfo effectiveToStringMethod = resolveVirtual(new MethodRef(entityInternalName, TO_STRING_METHOD));
-
-        if (effectiveToStringMethod == null) {
-            return Set.of();
-        }
-
-        return detectAssociations(effectiveToStringMethod);
+        MethodInfo method = resolveVirtual(new MethodRef(entityInternalName, methodKey));
+        return method == null ? Set.of() : detectAssociations(method);
     }
 
     private void initialize() {
@@ -118,13 +126,13 @@ public class EntityMethodsInspector {
     }
 
     // Traverse the fields/acessors via BFS algorithm
-    private Set<String> detectAssociations(MethodInfo toString) {
+    private Set<String> detectAssociations(MethodInfo root) {
         Set<String> result = new HashSet<>();
 
         // visited wavefront
         Set<MethodRef> visited = new HashSet<>();
         Deque<MethodInfo> queue = new ArrayDeque<>();
-        queue.add(toString);
+        queue.add(root);
 
         while (!queue.isEmpty()) {
             MethodInfo method = queue.removeFirst();

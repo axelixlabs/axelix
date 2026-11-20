@@ -42,6 +42,11 @@
     background-color: var(--problem-to-string-bg);
 }
 
+.EqualsOrHashCode {
+    color: var(--problem-equals-or-hash-code);
+    background-color: var(--problem-equals-or-hash-code-bg);
+}
+
 .Outlined {
     background-color: var(--axelix-white);
     border: 1px solid currentcolor;

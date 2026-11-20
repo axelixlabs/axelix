@@ -690,14 +690,16 @@
             "listManyToMany": "List pour @ManyToMany",
             "cascade": "CascadeType inadapté",
             "unidirectional": "@OneToMany unidirectionnel",
-            "toString": "Lue par toString()"
+            "toString": "Lue par toString()",
+            "equalsOrHashCode": "Lue par equals() ou hashCode()"
         },
         "problemFixes": {
             "eager": "Les données sont récupérées à chaque chargement, qu’elles soient utilisées ou non. Utilisez toujours FetchType.LAZY et chargez explicitement les relations avec un JOIN FETCH si nécessaire.",
             "listManyToMany": "Un @ManyToMany reposant sur une List oblige Hibernate à vider toute la table de jointure et à en réinsérer les données à chaque modification. Modélisez plutôt ManyToMany avec un Set.",
             "cascade": "CascadeType.REMOVE (et donc CascadeType.ALL) oblige Hibernate à effectuer N + 1 requêtes lors de la suppression de la relation, car Hibernate doit respecter les callbacks du cycle de vie de l’entité. Gérez la suppression manuellement.",
             "unidirectional": "Un @OneToMany sans 'mappedBy' nécessite une table de jointure supplémentaire ou des UPDATE par ligne. Rendez-le bidirectionnel ou faites du côté @ManyToOne le propriétaire de la relation.",
-            "toString": "Lire une association depuis toString() peut initialiser de manière inattendue une relation à chargement différé, entraînant des requêtes SQL supplémentaires, une LazyInitializationException ou un OutOfMemoryError lorsqu’une grande partie du graphe d’entités est chargée en mémoire. Excluez les associations de toString()."
+            "toString": "Lire une association depuis toString() peut initialiser de manière inattendue une relation à chargement différé, entraînant des requêtes SQL supplémentaires, une LazyInitializationException ou un OutOfMemoryError lorsqu’une grande partie du graphe d’entités est chargée en mémoire. Excluez les associations de toString().",
+            "equalsOrHashCode": "Lire une association dans equals() ou hashCode() peut déclencher des requêtes SQL supplémentaires ou provoquer une LazyInitializationException. Excluez les associations des deux méthodes."
         },
         "detail": {
             "table": "Table",

@@ -57,6 +57,10 @@
     --dot-color: var(--problem-to-string);
 }
 
+.EqualsOrHashCode {
+    --dot-color: var(--problem-equals-or-hash-code);
+}
+
 .ActiveChip {
     color: var(--dot-color);
     border-color: var(--dot-color);

@@ -37,6 +37,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.Attribute;
 
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -198,12 +199,16 @@ class AssociationInspectorTest {
                             tuple("shipments", Set.of(AssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY)),
                             tuple("tagSet", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
 
-            // the association read by a Lombok-generated toString() is flagged too, through the same path.
+            // Both warnings are reported for the association read by Lombok-generated methods.
             assertThat(entity(profile, "LombokOrder").getFlaggedAssociations())
                     .extracting(
                             flagged -> flagged.getAssociation().getField(),
                             flagged -> Set.copyOf(flagged.getProblems()))
-                    .containsExactly(tuple("customer", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
+                    .containsExactly(tuple(
+                            "customer",
+                            Set.of(
+                                    AssociationProblem.ACCESSED_IN_TO_STRING,
+                                    AssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE)));
 
             // These entities have no flagged associations.
             assertThat(entity(profile, "OrderItem").getFlaggedAssociations()).isEmpty();
@@ -372,6 +377,7 @@ class AssociationInspectorTest {
     @Entity
     @Table(name = "lombok_orders")
     @ToString
+    @EqualsAndHashCode
     static class LombokOrder {
 
         @Id

@@ -22,6 +22,7 @@ import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
@@ -55,8 +56,8 @@ class EntityInspector {
     EntityInspection inspect(EntityType<?> entityType) {
         String entityName = entityType.getName();
         List<? extends Attribute<?, ?>> associations = findEntityAssociations(entityType);
-        Set<String> associationsReadByToString =
-                detectAssociationsReadByToString(entityType.getJavaType(), associations, entityName);
+        Map<AssociationProblem, Set<String>> methodAccessProblems =
+                detectMethodAccessProblems(entityType.getJavaType(), associations, entityName);
         List<AssociationInspection> flaggedAssociations = new ArrayList<>();
 
         for (Attribute<?, ?> attribute : associations) {
@@ -72,9 +73,11 @@ class EntityInspector {
                 problems.add(AssociationProblem.INEFFECTIVE_LAZY_ONE_TO_ONE);
             }
 
-            if (associationsReadByToString.contains(attribute.getName())) {
-                problems.add(AssociationProblem.ACCESSED_IN_TO_STRING);
-            }
+            methodAccessProblems.forEach((problem, associationNames) -> {
+                if (associationNames.contains(attribute.getName())) {
+                    problems.add(problem);
+                }
+            });
 
             if (!problems.isEmpty()) {
                 flaggedAssociations.add(
@@ -91,17 +94,18 @@ class EntityInspector {
                 .toList();
     }
 
-    private static Set<String> detectAssociationsReadByToString(
+    private static Map<AssociationProblem, Set<String>> detectMethodAccessProblems(
             Class<?> entityClass, List<? extends Attribute<?, ?>> associations, String entityName) {
         try {
             Set<AssociationMember> associationMembers = collectAssociationMembers(associations, entityName);
-            return new EntityMethodsInspector(entityClass, associationMembers).detectAssociationsReadByToString();
+            EntityMethodsInspector inspector = new EntityMethodsInspector(entityClass, associationMembers);
+            return Map.of(
+                    AssociationProblem.ACCESSED_IN_TO_STRING, inspector.detectAssociationsReadByToString(),
+                    AssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE,
+                            inspector.detectAssociationsReadByEqualsOrHashCode());
         } catch (RuntimeException e) {
-            log.warn(
-                    "Could not detect associations read by toString() for {}, toString inspection is skipped",
-                    entityName,
-                    e);
-            return Set.of();
+            log.warn("Could not inspect entity methods for association access in {}", entityName, e);
+            return Map.of();
         }
     }
 

@@ -37,6 +37,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.metamodel.Attribute;
 
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -183,7 +184,11 @@ class AssociationInspectorTest {
                     .extracting(
                             flagged -> flagged.getAssociation().getField(),
                             flagged -> Set.copyOf(flagged.getProblems()))
-                    .containsExactly(tuple("customer", Set.of(AssociationProblem.ACCESSED_IN_TO_STRING)));
+                    .containsExactly(tuple(
+                            "customer",
+                            Set.of(
+                                    AssociationProblem.ACCESSED_IN_TO_STRING,
+                                    AssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE)));
 
             // These entities have no flagged associations.
             assertThat(entity(profile, "OrderItem").getFlaggedAssociations()).isEmpty();
@@ -352,6 +357,7 @@ class AssociationInspectorTest {
     @Entity
     @Table(name = "lombok_orders")
     @ToString
+    @EqualsAndHashCode
     static class LombokOrder {
 
         @Id
