@@ -99,6 +99,14 @@ public enum DangerousPropertyValue {
                             + "the libraries it is built upon and their versions to whoever is on the other side of the wire.",
                     "never"))),
 
+    IMMEDIATE_SHUTDOWN(
+            "server.shutdown",
+            Set.of(new DangerousValue(
+                    "immediate",
+                    "Immediate shutdown can interrupt in-flight HTTP requests during restarts and deployments. "
+                            + "Graceful shutdown gives active requests time to complete.",
+                    "graceful"))),
+
     EXPOSURE_INCLUDE_ALL(
             "management.endpoints.web.exposure.include",
             Set.of(new DangerousValue(
