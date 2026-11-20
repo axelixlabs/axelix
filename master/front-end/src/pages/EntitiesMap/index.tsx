@@ -106,39 +106,38 @@ const EntityBrowser = ({ entities }: IEntityBrowserProps) => {
     const findingCount = withFindings.reduce((total, result) => total + result.findings.length, 0);
     const findingsLabel = t("EntitiesMap.findingCount", { count: findingCount });
 
-    const renderEntityGroup = (label: string, group: typeof results) =>
-        group.length > 0 && (
-            <>
-                <h3 className={styles.GroupLabel}>
-                    {label} · {group.length}
-                </h3>
-                <ul>
-                    {group.map(({ entity, findings }) => (
-                        <li key={entity.name}>
-                            <button
-                                type="button"
-                                className={styles.Entity}
-                                aria-pressed={selected?.entity === entity}
-                                onClick={() => setSelectedName(entity.name)}
-                            >
-                                <span>
-                                    <strong>{entity.name}</strong>
-                                    <code className={styles.Table}>{entity.table}</code>
+    const renderEntityGroup = (label: string, group: typeof results) => (
+        <details className={styles.EntityGroup} hidden={group.length === 0} open>
+            <summary className={styles.GroupLabel}>
+                {label} · {group.length}
+            </summary>
+            <ul>
+                {group.map(({ entity, findings }) => (
+                    <li key={entity.name}>
+                        <button
+                            type="button"
+                            className={styles.Entity}
+                            aria-pressed={selected?.entity === entity}
+                            onClick={() => setSelectedName(entity.name)}
+                        >
+                            <span>
+                                <strong>{entity.name}</strong>
+                                <code className={styles.Table}>{entity.table}</code>
+                            </span>
+                            {findings.length > 0 && (
+                                <span
+                                    className={styles.Count}
+                                    aria-label={t("EntitiesMap.findingCount", { count: findings.length })}
+                                >
+                                    {findings.length}
                                 </span>
-                                {findings.length > 0 && (
-                                    <span
-                                        className={styles.Count}
-                                        aria-label={t("EntitiesMap.findingCount", { count: findings.length })}
-                                    >
-                                        {findings.length}
-                                    </span>
-                                )}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            </>
-        );
+                            )}
+                        </button>
+                    </li>
+                ))}
+            </ul>
+        </details>
+    );
 
     return (
         <div className={styles.MainWrapper}>
@@ -183,7 +182,7 @@ const EntityBrowser = ({ entities }: IEntityBrowserProps) => {
             </div>
 
             <div className={styles.Split}>
-                <section className={styles.Panel} aria-labelledby="entities-map-list">
+                <section className={`ThinScrollbar ${styles.Panel}`} aria-labelledby="entities-map-list">
                     <div className={styles.PanelHeader}>
                         <h2 id="entities-map-list">{t("EntitiesMap.entities")}</h2>
                         <Input

@@ -72,6 +72,12 @@ a {
     }
 }
 
+.ThinScrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--axelix-grey-300) transparent;
+    scrollbar-gutter: stable;
+}
+
 .MainContainer {
     background-color: var(--axelix-white);
     max-width: 1450px;

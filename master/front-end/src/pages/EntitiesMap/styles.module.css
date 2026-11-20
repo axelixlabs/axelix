@@ -76,11 +76,18 @@
 }
 
 .GroupLabel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--axelix-space-2);
     padding: var(--axelix-space-2) var(--axelix-space-3);
     border-block: 1px solid var(--axelix-grey-200);
     background: var(--axelix-grey-50);
     color: var(--axelix-grey-700);
     font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    list-style: none;
+    cursor: pointer;
 }
 
 .Entity {
@@ -166,11 +173,13 @@
     cursor: pointer;
 }
 
-.Finding summary::-webkit-details-marker {
+.Finding summary::-webkit-details-marker,
+.GroupLabel::-webkit-details-marker {
     display: none;
 }
 
-.Finding summary::after {
+.Finding summary::after,
+.GroupLabel::after {
     flex: 0 0 auto;
     width: 8px;
     height: 8px;
@@ -181,11 +190,13 @@
     content: "";
 }
 
-.Finding[open] summary::after {
+.Finding[open] summary::after,
+.EntityGroup[open] > .GroupLabel::after {
     transform: rotate(225deg);
 }
 
-.Finding summary:focus-visible {
+.Finding summary:focus-visible,
+.GroupLabel:focus-visible {
     outline: 2px solid var(--axelix-green-600);
     outline-offset: -2px;
 }
