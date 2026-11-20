@@ -17,19 +17,13 @@
  */
 import { SearchOutlined } from "@ant-design/icons";
 
-import { Input, Select } from "antd";
+import { Input } from "antd";
 import { type CSSProperties, type PropsWithChildren, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader } from "@/components";
-import {
-    ENTITY_CHECK_LABELS,
-    type IEntityFinding,
-    type TEntityFindingLocation,
-    fetchData,
-    getEntityFindings,
-} from "@/helpers";
+import { EmptyHandler, Loader, MultiSelectFilter } from "@/components";
+import { ENTITY_CHECK_LABELS, type IEntityFinding, fetchData, getEntityFindings } from "@/helpers";
 import { type IMappedEntity, type IPersistenceInsights, StatefulRequest } from "@/models";
 import { getTransactionalData } from "@/services";
 
@@ -73,8 +67,8 @@ interface IEntityBrowserProps {
 const EntityBrowser = ({ entities }: IEntityBrowserProps) => {
     const { t } = useTranslation();
     const [search, setSearch] = useState("");
-    const [check, setCheck] = useState("");
-    const [location, setLocation] = useState<TEntityFindingLocation | "">("");
+    const [selectedChecks, setSelectedChecks] = useState<string[]>([]);
+    const hasCheckFilter = selectedChecks.length > 0;
     const [selectedName, setSelectedName] = useState("");
 
     const query = search.trim().toLowerCase();
@@ -93,11 +87,9 @@ const EntityBrowser = ({ entities }: IEntityBrowserProps) => {
         .filter(({ entity }) => [entity.name, entity.table].some((field) => field.toLowerCase().includes(query)))
         .map(({ entity, findings }) => ({
             entity,
-            findings: findings.filter(
-                (finding) => (!check || finding.check === check) && (!location || finding.location === location),
-            ),
+            findings: findings.filter((finding) => !hasCheckFilter || selectedChecks.includes(finding.check)),
         }))
-        .filter(({ findings }) => (!check && !location) || findings.length > 0);
+        .filter(({ findings }) => !hasCheckFilter || findings.length > 0);
 
     const withFindings = results.filter(({ findings }) => findings.length > 0);
     const withoutFindings = results.filter(({ findings }) => findings.length === 0);
@@ -149,27 +141,16 @@ const EntityBrowser = ({ entities }: IEntityBrowserProps) => {
             </header>
 
             <div className={styles.Toolbar}>
-                <Select
-                    aria-label={t("EntitiesMap.checkFilter")}
-                    className={styles.CheckSelect}
-                    showSearch={{ optionFilterProp: "label" }}
-                    value={check}
-                    onChange={setCheck}
-                    options={[{ value: "", label: t("EntitiesMap.allChecks") }, ...checkOptions]}
-                />
-                <Select
-                    aria-label={t("EntitiesMap.locationFilter")}
-                    className={styles.LocationSelect}
-                    value={location}
-                    onChange={setLocation}
-                    options={[
-                        { value: "", label: t("EntitiesMap.allLocations") },
-                        { value: "association", label: t("EntitiesMap.locations.associations") },
-                        { value: "attribute", label: t("EntitiesMap.locations.attributes") },
-                    ]}
+                <MultiSelectFilter
+                    label={t("EntitiesMap.checkFilter")}
+                    allLabel={t("EntitiesMap.allChecks")}
+                    options={checkOptions}
+                    selected={selectedChecks}
+                    onChange={setSelectedChecks}
+                    searchable
                 />
                 <p className={styles.Summary} role="status">
-                    {check || location || query
+                    {hasCheckFilter || query
                         ? t("EntitiesMap.filteredSummary", {
                               findings: findingsLabel,
                               entities: t("EntitiesMap.entityCount", { count: results.length }),

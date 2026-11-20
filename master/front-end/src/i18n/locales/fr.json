@@ -449,10 +449,6 @@
             "librariesCaption": "Bibliothèques utilisées",
             "librariesLegend": "Le statut concerne le projet de la bibliothèque, pas une version · Part = applications qui résolvent la bibliothèque",
             "categoryPlaceholder": "Toutes les catégories",
-            "categoriesSelected": "{{count}} sur {{total}} sélectionnées",
-            "selected": "{{count}} sélectionnées",
-            "all": "Toutes",
-            "clear": "Effacer",
             "statusFilter": "Statut",
             "columns": {
                 "library": "Bibliothèque",
@@ -671,17 +667,19 @@
             "description": "Les {{count}} transactions analysées ne présentent aucun problème : aucun appel bloquant, aucune requête N+1 et aucune pagination en mémoire."
         }
     },
+    "MultiSelectFilter": {
+        "all": "Toutes",
+        "selected": "{{count}} sélectionnées",
+        "selectedOfTotal": "{{count}} sur {{total}} sélectionnées",
+        "clear": "Effacer"
+    },
     "EntitiesMap": {
         "description": "Parcourez les entités JPA et consultez les problèmes détectés lors des vérifications de leur mappage.",
         "checkFilter": "Vérification",
         "allChecks": "Toutes les vérifications",
-        "locationFilter": "Emplacement du problème",
-        "allLocations": "Tous les emplacements",
         "locations": {
             "association": "Association",
-            "associations": "Associations",
-            "attribute": "Attribut",
-            "attributes": "Attributs"
+            "attribute": "Attribut"
         },
         "entities": "Entités",
         "search": "Rechercher par entité ou table",

@@ -448,10 +448,6 @@
             "librariesCaption": "Libraries in use",
             "librariesLegend": "Status applies to the project behind the library, not a version · Share = applications that resolve the library",
             "categoryPlaceholder": "All categories",
-            "categoriesSelected": "{{count}} of {{total}} selected",
-            "selected": "{{count}} selected",
-            "all": "All",
-            "clear": "Clear",
             "statusFilter": "Status",
             "columns": {
                 "library": "Library",
@@ -667,17 +663,19 @@
             "description": "All {{count}} analyzed transactions are clean — no blocking calls, no N+1 queries, and no in-memory pagination."
         }
     },
+    "MultiSelectFilter": {
+        "all": "All",
+        "selected": "{{count}} selected",
+        "selectedOfTotal": "{{count}} of {{total}} selected",
+        "clear": "Clear"
+    },
     "EntitiesMap": {
         "description": "Browse JPA entities and inspect findings from their mapping checks.",
         "checkFilter": "Check",
         "allChecks": "All checks",
-        "locationFilter": "Finding location",
-        "allLocations": "All locations",
         "locations": {
             "association": "Association",
-            "associations": "Associations",
-            "attribute": "Attribute",
-            "attributes": "Attributes"
+            "attribute": "Attribute"
         },
         "entities": "Entities",
         "search": "Search by entity or table",

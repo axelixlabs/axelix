@@ -18,16 +18,6 @@
     margin-top: var(--axelix-space-1);
 }
 
-.CheckSelect {
-    width: 255px;
-    max-width: 100%;
-}
-
-.LocationSelect {
-    width: 180px;
-    max-width: 100%;
-}
-
 .Summary {
     margin-inline-start: auto;
     color: var(--axelix-grey-600);

@@ -452,10 +452,6 @@
             "librariesCaption": "Используемые библиотеки",
             "librariesLegend": "Статус относится к проекту библиотеки, а не к версии · Доля = приложения, в которых используется библиотека",
             "categoryPlaceholder": "Все категории",
-            "categoriesSelected": "Выбрано {{count}} из {{total}}",
-            "selected": "Выбрано: {{count}}",
-            "all": "Все",
-            "clear": "Очистить",
             "statusFilter": "Статус",
             "columns": {
                 "library": "Библиотека",
@@ -673,17 +669,19 @@
             "description": "Все {{count}} проанализированных транзакций чисты — нет блокирующих вызовов, запросов N+1 и пагинации в памяти."
         }
     },
+    "MultiSelectFilter": {
+        "all": "Все",
+        "selected": "Выбрано: {{count}}",
+        "selectedOfTotal": "Выбрано {{count}} из {{total}}",
+        "clear": "Очистить"
+    },
     "EntitiesMap": {
         "description": "Просматривайте сущности JPA и проблемы, выявленные при проверке их маппинга.",
         "checkFilter": "Проверка",
         "allChecks": "Все проверки",
-        "locationFilter": "Где обнаружена проблема",
-        "allLocations": "Все места обнаружения",
         "locations": {
             "association": "Ассоциация",
-            "associations": "Ассоциации",
-            "attribute": "Атрибут",
-            "attributes": "Атрибуты"
+            "attribute": "Атрибут"
         },
         "entities": "Сущности",
         "search": "Поиск по сущности или таблице",
