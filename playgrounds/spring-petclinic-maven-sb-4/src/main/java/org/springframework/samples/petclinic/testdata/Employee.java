@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.testdata;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,11 +26,16 @@ public class Employee {
 
 	private String name;
 
+	// @Enumerated defaults to ORDINAL.
+	@Enumerated
+	private EmploymentType employmentType;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "department_id")
 	private Department department;
 
-	@OneToOne(mappedBy = "employee")
+	// Hibernate must check whether this optional inverse association exists.
+	@OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
 	private Contract contract;
 
 	@OneToMany(mappedBy = "employee")
@@ -62,6 +68,12 @@ public class Employee {
 
 	public Set<Project> getProjects() {
 		return projects;
+	}
+
+	private enum EmploymentType {
+
+		FULL_TIME, PART_TIME
+
 	}
 
 }

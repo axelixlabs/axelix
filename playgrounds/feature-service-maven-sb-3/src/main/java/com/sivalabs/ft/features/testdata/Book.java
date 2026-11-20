@@ -1,6 +1,8 @@
 package com.sivalabs.ft.features.testdata;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,11 +27,16 @@ public class Book {
 
     private String title;
 
+    // Deliberate ordinal enum mapping for the JPA inspection demo.
+    @Enumerated(EnumType.ORDINAL)
+    private BindingType bindingType;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private Author author;
 
-    @OneToOne(mappedBy = "book")
+    // Hibernate must check whether this optional inverse association exists.
+    @OneToOne(mappedBy = "book", fetch = FetchType.LAZY)
     private Edition edition;
 
     @OneToMany(mappedBy = "book")
@@ -64,5 +71,10 @@ public class Book {
 
     public Set<Genre> getGenres() {
         return genres;
+    }
+
+    private enum BindingType {
+        PAPERBACK,
+        HARDCOVER
     }
 }

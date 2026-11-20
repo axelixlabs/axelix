@@ -13,6 +13,7 @@ CREATE TABLE departments (
 CREATE TABLE employees (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    employment_type SMALLINT,
     department_id BIGINT,
     FOREIGN KEY (department_id) REFERENCES departments(id)
 );
