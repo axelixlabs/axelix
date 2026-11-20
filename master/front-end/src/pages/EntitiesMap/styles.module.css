@@ -60,8 +60,7 @@
 
 .EntityListScrollbar {
     position: absolute;
-    inset-block: 0;
-    inset-inline-end: 0;
+    inset: 0 0 0 auto;
     width: 14px;
     height: 100%;
     margin: 0;
