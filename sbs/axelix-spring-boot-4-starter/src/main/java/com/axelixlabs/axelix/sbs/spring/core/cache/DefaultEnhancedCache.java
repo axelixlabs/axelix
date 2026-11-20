@@ -21,13 +21,14 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.cache.Cache;
 
-import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup.Outcome;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
@@ -42,32 +43,25 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 public class DefaultEnhancedCache implements EnhancedCache {
 
     private final Cache delegate;
-    private final AtomicBoolean enabled;
-    private final SlidingWindow<@NonNull CacheLookup> cacheLookupHistory;
-
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
+    private final Supplier<Boolean> isEnabledFunction;
+    private final SlidingWindow<CacheLookup> lookupHistory;
 
-    public DefaultEnhancedCache(@NonNull Cache delegate, @Nullable AxelixMetricsPublisher metricsPublisher) {
+    public DefaultEnhancedCache(
+            @NonNull Cache delegate,
+            @Nullable AxelixMetricsPublisher metricsPublisher,
+            Supplier<Boolean> isEnabledFunction,
+            SlidingWindow<CacheLookup> lookupHistory
+    ) {
         this.delegate = delegate;
-        this.enabled = new AtomicBoolean(true);
-        // TODO: We need to find a way to allow for configuring those values
-        this.cacheLookupHistory = new SlidingWindow<>(200);
+        this.isEnabledFunction = isEnabledFunction;
         this.metricsPublisher = metricsPublisher;
-    }
-
-    @Override
-    public void disable() {
-        this.enabled.compareAndSet(true, false);
-    }
-
-    @Override
-    public void enable() {
-        this.enabled.compareAndSet(false, true);
+        this.lookupHistory = lookupHistory;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.enabled.get();
+        return this.isEnabledFunction.get();
     }
 
     @Override
@@ -85,20 +79,20 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public ValueWrapper get(@NonNull Object key) {
-        if (!enabled.get()) {
+        if (!isEnabledFunction.get()) {
             return null;
         }
 
         ValueWrapper result = delegate.get(key);
 
         if (result == null) {
-            cacheLookupHistory.put(CacheLookup.miss());
+            lookupHistory.put(CacheLookup.miss());
 
             if (metricsPublisher != null) {
                 metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
             }
         } else {
-            cacheLookupHistory.put(CacheLookup.hit());
+            lookupHistory.put(CacheLookup.hit());
 
             if (metricsPublisher != null) {
                 metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
@@ -110,7 +104,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @Nullable Class<T> type) {
-        if (enabled.get()) {
+        if (isEnabledFunction.get()) {
             return delegate.get(key, type);
         } else {
             return null;
@@ -122,7 +116,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
     public <T> T get(@NonNull Object key, @NonNull Callable<T> valueLoader) {
         T value = null;
 
-        if (enabled.get()) {
+        if (isEnabledFunction.get()) {
             AtomicBoolean miss = new AtomicBoolean();
 
             value = delegate.get(key, () -> {
@@ -131,13 +125,13 @@ public class DefaultEnhancedCache implements EnhancedCache {
             });
 
             if (miss.get()) {
-                cacheLookupHistory.put(CacheLookup.miss());
+                lookupHistory.put(CacheLookup.miss());
 
                 if (metricsPublisher != null) {
                     metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
                 }
             } else {
-                cacheLookupHistory.put(CacheLookup.hit());
+                lookupHistory.put(CacheLookup.hit());
 
                 if (metricsPublisher != null) {
                     metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
@@ -175,15 +169,15 @@ public class DefaultEnhancedCache implements EnhancedCache {
 
     @Override
     public List<CacheLookup> getCacheLookups() {
-        return cacheLookupHistory.get();
+        return lookupHistory.get();
     }
 
     private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {
-        return enabled.get() && supplier.getAsBoolean();
+        return isEnabledFunction.get() && supplier.getAsBoolean();
     }
 
     private void executeIfEnabled(Runnable runnable) {
-        if (enabled.get()) {
+        if (isEnabledFunction.get()) {
             runnable.run();
         }
     }

@@ -65,5 +65,4 @@ public interface EnhancedCacheManager extends CacheManager {
 
     void disableAll();
 
-    boolean isEnabled(String cacheName);
 }

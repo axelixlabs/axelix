@@ -73,7 +73,7 @@ class DefaultEnhancedCacheTest {
         axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(meterRegistry);
 
         Mockito.lenient().when(delegate.getName()).thenReturn(CACHE_NAME);
-        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher);
+        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher, new CacheManagementState());
     }
 
     @Nested
@@ -98,64 +98,6 @@ class DefaultEnhancedCacheTest {
             assertThat(isEnabled).isTrue();
             checkMeterRegistryCacheStatusGauge(isEnabled);
         }
-
-        @Test
-        void shouldDisableCache() {
-            // given.
-            assertThat(enhancedCache.isEnabled()).isTrue();
-            checkMeterRegistryCacheStatusGauge(true);
-
-            // when.
-            enhancedCache.disable();
-
-            // then.
-            assertThat(enhancedCache.isEnabled()).isFalse();
-            checkMeterRegistryCacheStatusGauge(false);
-        }
-
-        @Test
-        void shouldReEnableCache() {
-            // given.
-            enhancedCache.disable();
-            assertThat(enhancedCache.isEnabled()).isFalse();
-            checkMeterRegistryCacheStatusGauge(false);
-
-            // when.
-            enhancedCache.enable();
-
-            // then.
-            assertThat(enhancedCache.isEnabled()).isTrue();
-            checkMeterRegistryCacheStatusGauge(true);
-        }
-
-        @Test
-        void shouldBeNoOpWhenCacheIsAlreadyEnabled() {
-            // given.
-            assertThat(enhancedCache.isEnabled()).isTrue();
-            checkMeterRegistryCacheStatusGauge(true);
-
-            // when.
-            enhancedCache.enable();
-
-            // then.
-            assertThat(enhancedCache.isEnabled()).isTrue();
-            checkMeterRegistryCacheStatusGauge(true);
-        }
-
-        @Test
-        void shouldBeNoOpWhenCacheIsAlreadyDisabled() {
-            // given.
-            enhancedCache.disable();
-            assertThat(enhancedCache.isEnabled()).isFalse();
-            checkMeterRegistryCacheStatusGauge(false);
-
-            // when.
-            enhancedCache.disable();
-
-            // then.
-            assertThat(enhancedCache.isEnabled()).isFalse();
-            checkMeterRegistryCacheStatusGauge(false);
-        }
     }
 
     @Nested
@@ -173,19 +115,6 @@ class DefaultEnhancedCacheTest {
             assertThat(result).isNotNull();
             assertThat(result.get()).isEqualTo(VALUE);
             verify(delegate).get(KEY);
-        }
-
-        @Test
-        void shouldReturnNullWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            Cache.ValueWrapper result = enhancedCache.get(KEY);
-
-            // then.
-            assertThat(result).isNull();
-            verify(delegate, never()).get(any());
         }
 
         @Test
@@ -230,19 +159,6 @@ class DefaultEnhancedCacheTest {
             assertThat(result).isEqualTo(VALUE);
             verify(delegate).get(KEY, String.class);
         }
-
-        @Test
-        void shouldReturnNullWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            String result = enhancedCache.get(KEY, String.class);
-
-            // then.
-            assertThat(result).isNull();
-            verify(delegate, never()).get(any(), any(Class.class));
-        }
     }
 
     @Nested
@@ -262,19 +178,6 @@ class DefaultEnhancedCacheTest {
             // then.
             assertThat(result).isEqualTo(VALUE);
             verify(delegate).get(eq(KEY), any(Callable.class));
-        }
-
-        @Test
-        void shouldReturnNullWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            String result = enhancedCache.get(KEY, () -> VALUE);
-
-            // then.
-            assertThat(result).isNull();
-            verify(delegate, never()).get(any(), any(Callable.class));
         }
 
         @Test
@@ -323,18 +226,6 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldNotDelegateWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            enhancedCache.put(KEY, VALUE);
-
-            // then.
-            verify(delegate, never()).put(any(), any());
-        }
-
-        @Test
         void shouldHandleNullValue() {
             // given.
             // cache is enabled by default
@@ -361,18 +252,6 @@ class DefaultEnhancedCacheTest {
             // then.
             verify(delegate).evict(KEY);
         }
-
-        @Test
-        void shouldNotDelegateWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            enhancedCache.evict(KEY);
-
-            // then.
-            verify(delegate, never()).evict(any());
-        }
     }
 
     @Nested
@@ -388,18 +267,6 @@ class DefaultEnhancedCacheTest {
 
             // then.
             verify(delegate).clear();
-        }
-
-        @Test
-        void shouldNotDelegateWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            enhancedCache.clear();
-
-            // then.
-            verify(delegate, never()).clear();
         }
     }
 
@@ -418,19 +285,6 @@ class DefaultEnhancedCacheTest {
             assertThat(result).isTrue();
             verify(delegate).invalidate();
         }
-
-        @Test
-        void shouldReturnFalseWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            boolean result = enhancedCache.invalidate();
-
-            // then.
-            assertThat(result).isFalse();
-            verify(delegate, never()).invalidate();
-        }
     }
 
     @Nested
@@ -447,19 +301,6 @@ class DefaultEnhancedCacheTest {
             // then.
             assertThat(result).isTrue();
             verify(delegate).evictIfPresent(KEY);
-        }
-
-        @Test
-        void shouldReturnFalseWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            boolean result = enhancedCache.evictIfPresent(KEY);
-
-            // then.
-            assertThat(result).isFalse();
-            verify(delegate, never()).evictIfPresent(any());
         }
 
         @Test
@@ -520,18 +361,6 @@ class DefaultEnhancedCacheTest {
                     .containsOnly(CacheLookup.Outcome.MISS);
             // and then.
             checkMeterRegistryCacheLookup(0d, 3d);
-        }
-
-        @Test
-        void shouldNotTrackWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            enhancedCache.get(KEY);
-
-            // then.
-            assertThat(enhancedCache.getCacheLookups()).isEmpty();
         }
 
         @Test
