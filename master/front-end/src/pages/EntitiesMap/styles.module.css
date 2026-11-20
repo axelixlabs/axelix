@@ -78,6 +78,7 @@
     border-radius: var(--axelix-border-radius-pill);
     appearance: none;
     background: var(--axelix-grey-300);
+    transform: translateX(3px);
 }
 
 .EntityListScrollbar::-moz-range-thumb {
@@ -86,6 +87,7 @@
     border: 0;
     border-radius: var(--axelix-border-radius-pill);
     background: var(--axelix-grey-300);
+    transform: translateX(3px);
 }
 
 .EntityListScrollbar:focus-visible {
