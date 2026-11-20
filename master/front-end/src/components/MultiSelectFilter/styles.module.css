@@ -18,6 +18,11 @@
     border-color: var(--axelix-green-200);
 }
 
+.Trigger.Trigger[data-searchable] {
+    min-width: 148px;
+    justify-content: space-between;
+}
+
 .TriggerValue {
     font-weight: var(--axelix-font-weight-regular);
     color: var(--axelix-grey-500);
@@ -42,6 +47,11 @@
     display: flex;
     flex-direction: column;
     width: 238px;
+}
+
+.MainWrapper[data-searchable] {
+    width: 300px;
+    max-width: calc(100vw - 36px);
 }
 
 .Option {

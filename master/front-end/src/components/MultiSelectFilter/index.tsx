@@ -69,7 +69,7 @@ export const MultiSelectFilter = <T extends string>({
                 align={{ offset: [0, 6] }}
                 styles={{ container: { padding: 6, borderRadius: 9 } }}
                 content={
-                    <div className={styles.MainWrapper}>
+                    <div className={styles.MainWrapper} data-searchable={searchable || undefined}>
                         {searchable && (
                             <Input
                                 className={styles.Search}
@@ -109,7 +109,11 @@ export const MultiSelectFilter = <T extends string>({
                     </div>
                 }
             >
-                <Button className={`${styles.Trigger} ${selected.length ? styles.Filtered : ""}`} aria-expanded={open}>
+                <Button
+                    className={`${styles.Trigger} ${selected.length ? styles.Filtered : ""}`}
+                    data-searchable={searchable || undefined}
+                    aria-expanded={open}
+                >
                     {label}
                     <span className={styles.TriggerValue}>
                         {selected.length
