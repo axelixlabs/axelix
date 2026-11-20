@@ -244,22 +244,33 @@ const EntityDetail = ({ entity, findings }: IEntityDetailProps) => {
                     {t("EntitiesMap.findings")} · {findings.length}
                 </h3>
                 {findings.length === 0 && <p>{t("EntitiesMap.noFindings")}</p>}
-                {findings.map(({ check: id, location: kind, member, mapping }, index) => {
+                {findings.map(({ check: id, location: kind, member, annotation }, index) => {
                     const label = ENTITY_CHECK_LABELS.get(id);
 
+                    const key = JSON.stringify([id, kind, member]);
+                    const heading = (
+                        <span>
+                            <strong>{label ? t(`EntitiesMap.problems.${label}`) : id}</strong>
+                            <span className={styles.Location}>
+                                {t(`EntitiesMap.locations.${kind}`)} <code>{member}</code>
+                            </span>
+                        </span>
+                    );
+
+                    if (!label) {
+                        return (
+                            <div className={styles.Finding} key={key}>
+                                <div className={styles.FindingHeading}>{heading}</div>
+                            </div>
+                        );
+                    }
+
                     return (
-                        <details className={styles.Finding} key={JSON.stringify([id, kind, member])} open={index === 0}>
-                            <summary>
-                                <span>
-                                    <strong>{label ? t(`EntitiesMap.problems.${label}`) : id}</strong>
-                                    <span className={styles.Location}>
-                                        {t(`EntitiesMap.locations.${kind}`)} <code>{member}</code>
-                                    </span>
-                                </span>
-                            </summary>
+                        <details className={styles.Finding} key={key} open={index === 0}>
+                            <summary className={styles.FindingHeading}>{heading}</summary>
                             <div className={styles.FindingBody}>
-                                {mapping && <code>{mapping}</code>}
-                                {label && <p>{t(`EntitiesMap.problemFixes.${label}`)}</p>}
+                                {annotation && <code>{annotation}</code>}
+                                <p>{t(`EntitiesMap.problemFixes.${label}`)}</p>
                             </div>
                         </details>
                     );

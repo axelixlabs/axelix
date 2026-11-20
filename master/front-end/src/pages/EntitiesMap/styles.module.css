@@ -153,13 +153,16 @@
     overflow-wrap: anywhere;
 }
 
-.Finding summary {
+.FindingHeading {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: var(--axelix-space-3);
     padding: var(--axelix-space-3);
     list-style: none;
+}
+
+.Finding summary {
     cursor: pointer;
 }
 

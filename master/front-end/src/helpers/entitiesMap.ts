@@ -37,8 +37,8 @@ export interface IEntityFinding {
     location: TEntityFindingLocation;
     /** The name of the affected member. */
     member: string;
-    /** The mapping evidence shown in the finding. */
-    mapping: string;
+    /** The annotation shown for an attribute finding, when available. */
+    annotation?: string;
 }
 
 /**
@@ -49,14 +49,13 @@ export const getEntityFindings = (entity: IMappedEntity): IEntityFinding[] => [
         check: "ORDINAL_ENUM",
         location: "attribute",
         member,
-        mapping: "@Enumerated(EnumType.ORDINAL)",
+        annotation: "@Enumerated(EnumType.ORDINAL)",
     })),
-    ...entity.flaggedAssociations.flatMap(({ association, mapping, problems }) =>
+    ...entity.flaggedAssociations.flatMap(({ association, problems }) =>
         problems.map((check): IEntityFinding => ({
             check,
             location: "association",
             member: association.field,
-            mapping,
         })),
     ),
 ];
