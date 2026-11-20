@@ -19,13 +19,16 @@
 }
 
 .Trigger.Trigger[data-searchable] {
-    min-width: 148px;
-    justify-content: space-between;
+    min-width: 128px;
 }
 
 .TriggerValue {
     font-weight: var(--axelix-font-weight-regular);
     color: var(--axelix-grey-500);
+}
+
+.Trigger[data-searchable] .TriggerValue {
+    margin-inline-start: auto;
 }
 
 .Caret {
@@ -50,7 +53,7 @@
 }
 
 .MainWrapper[data-searchable] {
-    width: 300px;
+    width: 270px;
     max-width: calc(100vw - 36px);
 }
 
