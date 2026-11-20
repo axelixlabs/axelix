@@ -51,13 +51,7 @@ final class HibernateLazyOneToOne {
 
     private static boolean isIneffective(
             SessionFactoryImplementor factory, EntityType<?> entity, Attribute<?, ?> attribute) {
-        if (attribute.getPersistentAttributeType() != PersistentAttributeType.ONE_TO_ONE
-                || !(attribute.getJavaMember() instanceof AnnotatedElement)) {
-            return false;
-        }
-        // Only mappings that explicitly request lazy loading are candidates for this warning.
-        OneToOne annotation = ((AnnotatedElement) attribute.getJavaMember()).getAnnotation(OneToOne.class);
-        if (annotation == null || annotation.fetch() != FetchType.LAZY) {
+        if (!requestsLazyOneToOne(attribute)) {
             return false;
         }
 
@@ -81,5 +75,15 @@ final class HibernateLazyOneToOne {
 
         EntityPersister target = factory.getMetamodel().entityPersister(associationType.getAssociatedEntityName());
         return !target.hasProxy() && !target.getBytecodeEnhancementMetadata().isEnhancedForLazyLoading();
+    }
+
+    private static boolean requestsLazyOneToOne(Attribute<?, ?> attribute) {
+        if (attribute.getPersistentAttributeType() != PersistentAttributeType.ONE_TO_ONE
+                || !(attribute.getJavaMember() instanceof AnnotatedElement)) {
+            return false;
+        }
+        // Only mappings that explicitly request lazy loading are candidates for this warning.
+        OneToOne annotation = ((AnnotatedElement) attribute.getJavaMember()).getAnnotation(OneToOne.class);
+        return annotation != null && annotation.fetch() == FetchType.LAZY;
     }
 }
