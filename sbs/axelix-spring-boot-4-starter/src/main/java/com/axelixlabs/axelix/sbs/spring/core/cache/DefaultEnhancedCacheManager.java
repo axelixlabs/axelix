@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,8 +33,7 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
 /**
  * Default {@link EnhancedCacheManager} implementation that delegates the core
- * {@link CacheManager} contract to an underlying manager and maintains a map of
- * {@link EnhancedCache} instances on top of the underlying caches.
+ * {@link CacheManager} contract to an underlying manager and shares management state by cache name across wrappers of the underlying caches.
  *
  * @since 11.05.2026
  * @author Nikita Kirillov
@@ -45,7 +45,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     private final String cacheManagerBeanName;
     private final CacheManager delegate;
-    private final Map<String, EnhancedCache> caches = new ConcurrentHashMap<>();
+    private final Map<String, CacheManagementState> cacheStates = new ConcurrentHashMap<>();
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
 
     public DefaultEnhancedCacheManager(
@@ -73,31 +73,34 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     /** Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency. */
     @Override
     public void clearAll() {
-        this.getCacheNames().forEach(this::getCache);
-
-        caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.clear());
+        this.getCacheNames().forEach(this::clear);
     }
 
     @Override
     public Collection<EnhancedCache> getAll() {
-        return caches.values();
+        Collection<String> currentCacheNames = delegate.getCacheNames();
+        return cacheStates.keySet().stream()
+                .filter(currentCacheNames::contains)
+                .map(this::getCache)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Override
     @Nullable
     public EnhancedCache getCache(@NonNull String name) {
-        return caches.computeIfAbsent(name, s -> {
-            Cache cache = delegate.getCache(s);
-            if (cache == null) {
-                return null;
-            }
-
-            EnhancedCache enhancedCache = new DefaultEnhancedCache(cache, metricsPublisher);
+        Cache cache = delegate.getCache(name);
+        if (cache == null) {
+            return null;
+        }
+        CacheManagementState state = cacheStates.computeIfAbsent(name, cacheName -> {
+            CacheManagementState created = new CacheManagementState();
             if (metricsPublisher != null) {
-                metricsPublisher.registerCacheStatusGauge(enhancedCache);
+                metricsPublisher.registerCacheStatusGauge(cacheName, created.getEnabled()::get);
             }
-            return enhancedCache;
+            return created;
         });
+        return new DefaultEnhancedCache(cache, metricsPublisher, state);
     }
 
     @Override
@@ -142,7 +145,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     public void enableAll() {
         this.getCacheNames().forEach(this::getCache);
 
-        this.caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.enable());
+        this.cacheStates.forEach((cacheName, state) -> state.getEnabled().set(true));
     }
 
     /**
@@ -153,7 +156,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     public void disableAll() {
         this.getCacheNames().forEach(this::getCache);
 
-        this.caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.disable());
+        this.cacheStates.forEach((cacheName, state) -> state.getEnabled().set(false));
     }
 
     /**

@@ -17,8 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
+import java.util.function.BooleanSupplier;
+
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup;
-import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 
 /**
@@ -46,10 +47,10 @@ public interface AxelixMetricsPublisher {
     void incrementCacheLookup(String cacheName, CacheLookup.Outcome outcome);
 
     /**
-     * Registers a gauge to dynamically monitor the current cache execution status (enabled or disabled).
+     * Registers a gauge backed by shared cache management state.
      *
-     * @see   EnhancedCache
-     * @param enhancedCache the enhanced cache instance to monitor
+     * @param cacheName the name of the cache to monitor
+     * @param enabled supplies the current enabled status of the cache
      */
-    void registerCacheStatusGauge(EnhancedCache enhancedCache);
+    void registerCacheStatusGauge(String cacheName, BooleanSupplier enabled);
 }

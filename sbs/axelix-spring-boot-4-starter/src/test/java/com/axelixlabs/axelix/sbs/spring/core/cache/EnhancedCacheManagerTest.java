@@ -17,12 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
+import java.util.Collection;
+import java.util.List;
+
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
@@ -307,5 +311,120 @@ class EnhancedCacheManagerTest {
         assertThat(subject.isEnabled("cache1")).isTrue();
         assertThat(subject.isEnabled("cache2")).isFalse();
         assertThat(subject.isEnabled("cache3")).isTrue();
+    }
+
+    @Test
+    void getCache_shouldResolveCurrentDelegateWithoutChangingEarlierWrappers() {
+        // given.
+        SwitchingCacheManager underlyingCacheManager = new SwitchingCacheManager();
+        EnhancedCacheManager enhancedCacheManager =
+                new DefaultEnhancedCacheManager("test", underlyingCacheManager, null);
+        EnhancedCache originalCacheWrapper = enhancedCacheManager.getCache("cache");
+        Cache originalCache = underlyingCacheManager.currentCache;
+        underlyingCacheManager.currentCache = new ConcurrentMapCache("cache");
+
+        // when.
+        EnhancedCache replacementCacheWrapper = enhancedCacheManager.getCache("cache");
+        replacementCacheWrapper.put("key", "current");
+        originalCacheWrapper.put("key", "original");
+
+        // then.
+        assertThat(replacementCacheWrapper.getNativeCache())
+                .isSameAs(underlyingCacheManager.currentCache.getNativeCache());
+        assertThat(originalCacheWrapper.getNativeCache()).isSameAs(originalCache.getNativeCache());
+        assertThat(underlyingCacheManager.currentCache.get("key", String.class)).isEqualTo("current");
+        assertThat(originalCache.get("key", String.class)).isEqualTo("original");
+    }
+
+    @Test
+    void getCache_shouldShareManagementStateAcrossDelegates() {
+        // given.
+        SwitchingCacheManager underlyingCacheManager = new SwitchingCacheManager();
+        EnhancedCacheManager enhancedCacheManager =
+                new DefaultEnhancedCacheManager("test", underlyingCacheManager, null);
+        EnhancedCache originalCacheWrapper = enhancedCacheManager.getCache("cache");
+        originalCacheWrapper.get("missing");
+        originalCacheWrapper.disable();
+        underlyingCacheManager.currentCache = new ConcurrentMapCache("cache");
+
+        // when.
+        EnhancedCache replacementCacheWrapper = enhancedCacheManager.getCache("cache");
+        replacementCacheWrapper.put("key", "value");
+
+        // then.
+        assertThat(replacementCacheWrapper.isEnabled()).isFalse();
+        assertThat(replacementCacheWrapper.getCacheLookups())
+                .containsExactlyElementsOf(originalCacheWrapper.getCacheLookups())
+                .hasSize(1);
+        assertThat(underlyingCacheManager.currentCache.get("key")).isNull();
+    }
+
+    @Test
+    void clearAll_shouldClearCurrentDelegate() {
+        // given.
+        SwitchingCacheManager underlyingCacheManager = new SwitchingCacheManager();
+        EnhancedCacheManager enhancedCacheManager =
+                new DefaultEnhancedCacheManager("test", underlyingCacheManager, null);
+        enhancedCacheManager.getCache("cache").put("key", "original");
+        Cache originalCache = underlyingCacheManager.currentCache;
+        underlyingCacheManager.currentCache = new ConcurrentMapCache("cache");
+        underlyingCacheManager.currentCache.put("key", "current");
+
+        // when.
+        enhancedCacheManager.clearAll();
+
+        // then.
+        assertThat(underlyingCacheManager.currentCache.get("key")).isNull();
+        assertThat(originalCache.get("key", String.class)).isEqualTo("original");
+    }
+
+    @Test
+    void getAll_shouldResolveCurrentDelegate() {
+        // given.
+        SwitchingCacheManager underlyingCacheManager = new SwitchingCacheManager();
+        EnhancedCacheManager enhancedCacheManager =
+                new DefaultEnhancedCacheManager("test", underlyingCacheManager, null);
+        enhancedCacheManager.getCache("cache");
+        underlyingCacheManager.currentCache = new ConcurrentMapCache("cache");
+
+        // when.
+        Collection<EnhancedCache> resolvedCacheWrappers = enhancedCacheManager.getAll();
+
+        // then.
+        assertThat(resolvedCacheWrappers)
+                .singleElement()
+                .satisfies(cacheWrapper -> assertThat(cacheWrapper.getNativeCache())
+                        .isSameAs(underlyingCacheManager.currentCache.getNativeCache()));
+    }
+
+    @Test
+    void getAll_shouldNotRecreateRemovedCache() {
+        // given.
+        ConcurrentMapCacheManager underlyingCacheManager = new ConcurrentMapCacheManager();
+        EnhancedCacheManager enhancedCacheManager =
+                new DefaultEnhancedCacheManager("test", underlyingCacheManager, null);
+        enhancedCacheManager.getCache("cache");
+        underlyingCacheManager.removeCache("cache");
+
+        // when.
+        Collection<EnhancedCache> resolvedCacheWrappers = enhancedCacheManager.getAll();
+
+        // then.
+        assertThat(resolvedCacheWrappers).isEmpty();
+        assertThat(underlyingCacheManager.getCacheNames()).isEmpty();
+    }
+
+    private static class SwitchingCacheManager implements CacheManager {
+        private Cache currentCache = new ConcurrentMapCache("cache");
+
+        @Override
+        public Cache getCache(String name) {
+            return currentCache;
+        }
+
+        @Override
+        public Collection<String> getCacheNames() {
+            return List.of("cache");
+        }
     }
 }

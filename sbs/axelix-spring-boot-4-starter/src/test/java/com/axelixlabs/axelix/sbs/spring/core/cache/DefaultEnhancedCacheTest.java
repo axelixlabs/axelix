@@ -73,7 +73,7 @@ class DefaultEnhancedCacheTest {
         axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(meterRegistry);
 
         Mockito.lenient().when(delegate.getName()).thenReturn(CACHE_NAME);
-        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher);
+        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher, new CacheManagementState());
     }
 
     @Nested
