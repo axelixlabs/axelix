@@ -75,7 +75,6 @@ a {
 .ThinScrollbar {
     scrollbar-width: thin;
     scrollbar-color: var(--axelix-grey-300) transparent;
-    scrollbar-gutter: stable;
 }
 
 .MainContainer {

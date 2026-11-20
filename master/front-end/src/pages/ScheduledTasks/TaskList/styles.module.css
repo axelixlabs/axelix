@@ -15,6 +15,7 @@
     gap: 12px;
     min-height: 0;
     overflow-y: auto;
+    scrollbar-gutter: stable;
 }
 
 @media (width <= 900px) {
