@@ -215,6 +215,26 @@
     cursor: pointer;
 }
 
+.EntityGroup::details-content,
+.Finding::details-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    transition:
+        grid-template-rows 240ms ease,
+        content-visibility 240ms allow-discrete;
+}
+
+.EntityGroup[open]::details-content,
+.Finding[open]::details-content {
+    grid-template-rows: 1fr;
+}
+
+.DisclosureContent {
+    min-height: 0;
+    overflow: hidden;
+}
+
 .Finding summary::-webkit-details-marker,
 .GroupLabel::-webkit-details-marker {
     display: none;
@@ -229,6 +249,7 @@
     border: solid var(--axelix-grey-600);
     border-width: 0 1px 1px 0;
     transform: rotate(45deg);
+    transition: transform 240ms ease;
     content: "";
 }
 
@@ -273,6 +294,15 @@
 .FindingBody code {
     max-width: 100%;
     white-space: pre-wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .EntityGroup::details-content,
+    .Finding::details-content,
+    .Finding summary::after,
+    .GroupLabel::after {
+        transition: none;
+    }
 }
 
 @media (width <= 760px) {

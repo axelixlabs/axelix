@@ -111,31 +111,33 @@ const EntityBrowser = ({ entities }: IEntityBrowserProps) => {
             <summary className={styles.GroupLabel}>
                 {label} · {group.length}
             </summary>
-            <ul>
-                {group.map(({ entity, findings }) => (
-                    <li key={entity.name}>
-                        <button
-                            type="button"
-                            className={styles.Entity}
-                            aria-pressed={selected?.entity === entity}
-                            onClick={() => setSelectedName(entity.name)}
-                        >
-                            <span>
-                                <strong>{entity.name}</strong>
-                                <code className={styles.Table}>{entity.table}</code>
-                            </span>
-                            {findings.length > 0 && (
-                                <span
-                                    className={styles.Count}
-                                    aria-label={t("EntitiesMap.findingCount", { count: findings.length })}
-                                >
-                                    {findings.length}
+            <div className={styles.DisclosureContent}>
+                <ul>
+                    {group.map(({ entity, findings }) => (
+                        <li key={entity.name}>
+                            <button
+                                type="button"
+                                className={styles.Entity}
+                                aria-pressed={selected?.entity === entity}
+                                onClick={() => setSelectedName(entity.name)}
+                            >
+                                <span>
+                                    <strong>{entity.name}</strong>
+                                    <code className={styles.Table}>{entity.table}</code>
                                 </span>
-                            )}
-                        </button>
-                    </li>
-                ))}
-            </ul>
+                                {findings.length > 0 && (
+                                    <span
+                                        className={styles.Count}
+                                        aria-label={t("EntitiesMap.findingCount", { count: findings.length })}
+                                    >
+                                        {findings.length}
+                                    </span>
+                                )}
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </details>
     );
 
@@ -328,9 +330,11 @@ const EntityDetail = ({ entity, findings }: IEntityDetailProps) => {
                     return (
                         <details className={styles.Finding} key={key} open={index === 0}>
                             <summary className={styles.FindingHeading}>{heading}</summary>
-                            <div className={styles.FindingBody}>
-                                {annotation && <code>{annotation}</code>}
-                                <p>{t(`EntitiesMap.problemFixes.${label}`)}</p>
+                            <div className={styles.DisclosureContent}>
+                                <div className={styles.FindingBody}>
+                                    {annotation && <code>{annotation}</code>}
+                                    <p>{t(`EntitiesMap.problemFixes.${label}`)}</p>
+                                </div>
                             </div>
                         </details>
                     );
