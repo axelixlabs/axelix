@@ -78,10 +78,6 @@
     --card-color: var(--problem-to-string);
 }
 
-.EqualsOrHashCode {
-    --card-color: var(--problem-equals-or-hash-code);
-}
-
 .ProblemHeader {
     display: flex;
     align-items: center;

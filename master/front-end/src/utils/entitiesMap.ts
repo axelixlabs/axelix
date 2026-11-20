@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { EAssociationProblem } from "@/models";
-import { palette } from "@/theme/tokens";
 
 /**
  * The association problem types in the order they should be presented across the page.
@@ -27,7 +26,6 @@ export const ASSOCIATION_PROBLEM_ORDER: EAssociationProblem[] = [
     EAssociationProblem.CASCADE_REMOVE_OR_ALL,
     EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY,
     EAssociationProblem.ACCESSED_IN_TO_STRING,
-    EAssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE,
 ];
 
 /**
@@ -39,7 +37,6 @@ export const associationProblemLabelKey: Record<EAssociationProblem, string> = {
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL]: "EntitiesMap.problems.cascade",
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY]: "EntitiesMap.problems.unidirectional",
     [EAssociationProblem.ACCESSED_IN_TO_STRING]: "EntitiesMap.problems.toString",
-    [EAssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE]: "EntitiesMap.problems.equalsOrHashCode",
 };
 
 /**
@@ -51,7 +48,6 @@ export const associationProblemFixKey: Record<EAssociationProblem, string> = {
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL]: "EntitiesMap.problemFixes.cascade",
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY]: "EntitiesMap.problemFixes.unidirectional",
     [EAssociationProblem.ACCESSED_IN_TO_STRING]: "EntitiesMap.problemFixes.toString",
-    [EAssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE]: "EntitiesMap.problemFixes.equalsOrHashCode",
 };
 
 /**
@@ -59,14 +55,13 @@ export const associationProblemFixKey: Record<EAssociationProblem, string> = {
  */
 export const associationProblemClassToken: Record<
     EAssociationProblem,
-    "Eager" | "ListManyToMany" | "Cascade" | "Unidirectional" | "ToString" | "EqualsOrHashCode"
+    "Eager" | "ListManyToMany" | "Cascade" | "Unidirectional" | "ToString"
 > = {
     [EAssociationProblem.EAGER_FETCHING]: "Eager",
     [EAssociationProblem.LIST_BACKED_MANY_TO_MANY]: "ListManyToMany",
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL]: "Cascade",
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY]: "Unidirectional",
     [EAssociationProblem.ACCESSED_IN_TO_STRING]: "ToString",
-    [EAssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE]: "EqualsOrHashCode",
 };
 
 /**
@@ -79,5 +74,4 @@ export const associationProblemColor: Record<EAssociationProblem, string> = {
     [EAssociationProblem.CASCADE_REMOVE_OR_ALL]: "#dc2626",
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY]: "#0891b2",
     [EAssociationProblem.ACCESSED_IN_TO_STRING]: "#db2777",
-    [EAssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE]: palette.blue[700],
 };
