@@ -1,0 +1,20 @@
+.EntityTitle {
+    font-size: var(--axelix-font-size-title);
+}
+
+.Metadata {
+    margin-top: var(--axelix-space-1);
+    color: var(--axelix-grey-600);
+}
+
+.Findings {
+    display: grid;
+    gap: var(--axelix-space-2);
+    padding: var(--axelix-space-4);
+    border-top: 1px solid var(--axelix-grey-200);
+    background: var(--axelix-grey-50);
+}
+
+.Findings h3 {
+    font-size: inherit;
+}

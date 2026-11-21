@@ -43,3 +43,4 @@ export { Copy } from "./Copy";
 
 export { ActionInstancesSelector } from "./ActionInstancesSelector";
 export { PropertyTriageFilters } from "./PropertyTriageFilters";
+export { MultiSelectFilter } from "./MultiSelectFilter";

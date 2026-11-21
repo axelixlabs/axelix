@@ -71,7 +71,7 @@ export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, setSearch }
             <PageSearch setSearch={setSearch} placeholder={t("ScheduledTasks.searchTasks")} removeBottomGutter />
 
             <EmptyHandler isEmpty={isEmpty(scheduledTasks)}>
-                <div className={styles.Groups}>
+                <div className={`ThinScrollbar ${styles.Groups}`}>
                     {TASK_TYPES.filter((type) => scheduledTasks[type].length > 0).map((type) => (
                         <div className={styles.Group} key={type}>
                             <span className={styles.GroupTitle}>

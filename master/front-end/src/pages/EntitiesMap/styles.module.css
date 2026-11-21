@@ -1,23 +1,75 @@
-.MainWrapper {
-    /* TODO: Improve in future */
-    --problem-eager: #ea580c;
-    --problem-eager-bg: #fff7ed;
-    --problem-list-mtm: #7c3aed;
-    --problem-list-mtm-bg: #f5f3ff;
-    --problem-cascade: var(--axelix-red-600);
-    --problem-cascade-bg: var(--axelix-red-50);
-    --problem-unidirectional: #0891b2;
-    --problem-unidirectional-bg: #ecfeff;
-    --problem-to-string: #db2777;
-    --problem-to-string-bg: #fdf2f8;
-
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+.Panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
 }
 
-.Toolbar {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+.PanelHeader {
+    padding: var(--axelix-space-4);
+    overflow-wrap: anywhere;
+}
+
+.Code {
+    padding: 2px var(--axelix-space-1);
+    border-radius: var(--axelix-border-radius-small);
+    background: var(--axelix-grey-100);
+    color: var(--axelix-grey-800);
+    font-family: var(--axelix-font-family-code);
+}
+
+.Disclosure::details-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    transition:
+        grid-template-rows 240ms ease,
+        content-visibility 240ms allow-discrete;
+}
+
+.Disclosure[open]::details-content {
+    grid-template-rows: 1fr;
+}
+
+.DisclosureContent {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.DisclosureHeader {
+    list-style: none;
+    cursor: pointer;
+}
+
+.DisclosureHeader::-webkit-details-marker {
+    display: none;
+}
+
+.DisclosureHeader::after {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    margin-inline-end: var(--axelix-space-1);
+    border: solid var(--axelix-grey-600);
+    border-width: 0 1px 1px 0;
+    transform: rotate(45deg);
+    transition: transform 240ms ease;
+    content: "";
+}
+
+.Disclosure[open] > .DisclosureHeader::after {
+    transform: rotate(225deg);
+}
+
+.DisclosureHeader:focus-visible {
+    outline: 2px solid var(--axelix-green-600);
+    outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Disclosure::details-content,
+    .DisclosureHeader::after {
+        transition: none;
+    }
 }

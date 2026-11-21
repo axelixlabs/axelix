@@ -1,0 +1,23 @@
+.MainWrapper {
+    display: grid;
+    gap: var(--axelix-space-4);
+    font-size: var(--axelix-font-size-body);
+}
+
+.Description {
+    margin-top: var(--axelix-space-1);
+    color: var(--axelix-grey-600);
+}
+
+.Split {
+    display: grid;
+    grid-template-columns: minmax(200px, 276px) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--axelix-space-4);
+}
+
+@media (width <= 760px) {
+    .Split {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

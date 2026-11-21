@@ -15,8 +15,6 @@
     gap: 12px;
     min-height: 0;
     overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--axelix-grey-300) transparent;
     scrollbar-gutter: stable;
 }
 

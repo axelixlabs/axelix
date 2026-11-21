@@ -15,27 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
-
-import styles from "./styles.module.css";
-
-interface IProps {
-    /**
-     * The total number of mapped entities, all of which are clean.
-     */
-    analyzed: number;
+export interface IFilterOption<T extends string> {
+    value: T;
+    label: string;
 }
-
-export const CleanState = ({ analyzed }: IProps) => {
-    const { t } = useTranslation();
-
-    return (
-        <>
-            <div className={styles.MainWrapper}>
-                <span className={styles.Check} />
-                <h2 className={`TextMedium ${styles.Title}`}>{t("EntitiesMap.clean.title")}</h2>
-                <p className={styles.Description}>{t("EntitiesMap.clean.description", { count: analyzed })}</p>
-            </div>
-        </>
-    );
-};
