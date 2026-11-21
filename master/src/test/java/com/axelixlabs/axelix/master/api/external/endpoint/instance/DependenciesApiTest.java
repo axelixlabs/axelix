@@ -85,10 +85,10 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
           "commercialSupportEndsAt": "2032-06-30"
         },
         "latestKnownLine": {
-          "line": "4.1.x",
-          "releasedAt": "2026-06-30",
-          "ossSupportEndsAt": "2027-07-31",
-          "commercialSupportEndsAt": "2028-07-31"
+          "line": "4.2.x",
+          "releasedAt": "2026-11-19",
+          "ossSupportEndsAt": "2027-12-31",
+          "commercialSupportEndsAt": "2028-12-31"
         }
       },
       "dependencies": [
