@@ -1,0 +1,7 @@
+.Toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--axelix-space-2);
+    margin-top: var(--axelix-space-1);
+}

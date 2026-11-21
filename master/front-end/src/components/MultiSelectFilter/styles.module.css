@@ -18,9 +18,17 @@
     border-color: var(--axelix-green-200);
 }
 
+.Trigger.Trigger[data-searchable] {
+    min-width: 128px;
+}
+
 .TriggerValue {
     font-weight: var(--axelix-font-weight-regular);
     color: var(--axelix-grey-500);
+}
+
+.Trigger[data-searchable] .TriggerValue {
+    margin-inline-start: auto;
 }
 
 .Caret {

@@ -1,0 +1,52 @@
+.EntityList {
+    position: relative;
+}
+
+.EntityListViewport {
+    max-height: max(320px, 68vh);
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+.EntityListScrollbar {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 14px;
+    height: 100%;
+    margin: 0;
+    appearance: none;
+    direction: ltr;
+    writing-mode: vertical-lr;
+    background: transparent;
+    cursor: pointer;
+}
+
+.EntityListScrollbar::-webkit-slider-thumb {
+    width: 6px;
+    height: max(24px, var(--thumb-height));
+    border: 0;
+    border-radius: var(--axelix-border-radius-pill);
+    appearance: none;
+    background: var(--axelix-grey-300);
+    transform: translateX(3px);
+}
+
+.EntityListScrollbar::-moz-range-thumb {
+    width: 6px;
+    height: max(24px, var(--thumb-height));
+    border: 0;
+    border-radius: var(--axelix-border-radius-pill);
+    background: var(--axelix-grey-300);
+    transform: translateX(3px);
+}
+
+.EntityListScrollbar:focus-visible {
+    outline: 2px solid var(--axelix-green-600);
+    outline-offset: -2px;
+}
+
+@media (width <= 760px) {
+    .EntityListViewport {
+        max-height: 320px;
+    }
+}

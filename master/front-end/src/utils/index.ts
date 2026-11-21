@@ -21,7 +21,6 @@ export * from "./dashboard/dashboardDependencies";
 export * from "./transactional";
 export * from "./dependencies";
 export * from "./environments";
-export * from "./entitiesMap";
 export * from "./threadDump";
 export * from "./siderMenu";
 export * from "./wallboard";

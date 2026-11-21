@@ -4,6 +4,11 @@
     width: 238px;
 }
 
+.MainWrapper[data-searchable] {
+    width: 270px;
+    max-width: calc(100vw - 36px);
+}
+
 .Option {
     padding: 6px 8px;
     margin: 0;
@@ -37,4 +42,20 @@
     &:hover {
         text-decoration: underline;
     }
+}
+
+.Search {
+    margin-bottom: 4px;
+}
+
+.Options {
+    display: flex;
+    max-height: 300px;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.Empty {
+    padding: 6px 8px;
+    color: var(--axelix-grey-600);
 }

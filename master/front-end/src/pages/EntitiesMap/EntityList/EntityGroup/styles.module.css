@@ -1,0 +1,61 @@
+.GroupLabel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--axelix-space-2);
+    padding: var(--axelix-space-2) var(--axelix-space-3);
+    border-block: 1px solid var(--axelix-grey-200);
+    background: var(--axelix-grey-50);
+    color: var(--axelix-grey-700);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Entity {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--axelix-space-2);
+    padding: var(--axelix-space-3);
+    border: 0;
+    border-bottom: 1px solid var(--axelix-grey-100);
+    background: var(--axelix-white);
+    color: inherit;
+    font: inherit;
+    overflow-wrap: anywhere;
+    text-align: start;
+    cursor: pointer;
+}
+
+.Entity:hover,
+.Entity[aria-pressed="true"] {
+    background: var(--axelix-green-50);
+}
+
+.Entity[aria-pressed="true"] {
+    box-shadow: inset 3px 0 var(--axelix-green-600);
+}
+
+.Entity:focus-visible {
+    outline: 2px solid var(--axelix-green-600);
+    outline-offset: -2px;
+}
+
+.Table {
+    display: block;
+    font-family: var(--axelix-font-family-code);
+    margin-top: var(--axelix-space-1);
+    color: var(--axelix-grey-600);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Count {
+    min-width: 24px;
+    padding: 0 var(--axelix-space-1);
+    border: 1px solid var(--axelix-yellow-200);
+    border-radius: var(--axelix-border-radius-pill);
+    background: var(--axelix-yellow-50);
+    color: var(--axelix-yellow-800);
+    text-align: center;
+}

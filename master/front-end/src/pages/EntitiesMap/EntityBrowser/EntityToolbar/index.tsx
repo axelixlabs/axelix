@@ -17,38 +17,32 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { EmptyHandler } from "@/components";
-import type { IMappedEntity } from "@/models";
+import { MultiSelectFilter } from "@/components";
+import { ENTITY_CHECK_LABELS } from "@/helpers";
 
-import { EntityRow } from "./EntityRow";
 import styles from "./styles.module.css";
 
 interface IProps {
-    /**
-     * The entities to display, already filtered.
-     */
-    entities: IMappedEntity[];
+    selectedChecks: string[];
+    onChecksChange: (checks: string[]) => void;
 }
 
-export const EntitiesTable = ({ entities }: IProps) => {
+export const EntityToolbar = ({ selectedChecks, onChecksChange }: IProps) => {
     const { t } = useTranslation();
 
-    if (entities.length === 0) {
-        return <EmptyHandler isEmpty />;
-    }
-
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.Table}>
-                <div className={`TextUltraSmall ${styles.HeaderRow}`}>
-                    <span>{t("EntitiesMap.columns.entity")}</span>
-                    <span>{t("EntitiesMap.columns.associations")}</span>
-                    <span>{t("EntitiesMap.columns.problems")}</span>
-                </div>
-                {entities.map((entity) => (
-                    <EntityRow key={entity.name} entity={entity} />
-                ))}
-            </div>
+        <div className={styles.Toolbar}>
+            <MultiSelectFilter
+                label={t("EntitiesMap.checkFilter")}
+                allLabel={t("EntitiesMap.allChecks")}
+                options={Array.from(ENTITY_CHECK_LABELS, ([value, label]) => ({
+                    value,
+                    label: t(`EntitiesMap.problems.${label}`),
+                }))}
+                selected={selectedChecks}
+                onChange={onChecksChange}
+                searchable
+            />
         </div>
     );
 };

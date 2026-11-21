@@ -22,8 +22,18 @@
  */
 export enum EAssociationProblem {
     EAGER_FETCHING = "EAGER_FETCHING",
+    INEFFECTIVE_LAZY_ONE_TO_ONE = "INEFFECTIVE_LAZY_ONE_TO_ONE",
     LIST_BACKED_MANY_TO_MANY = "LIST_BACKED_MANY_TO_MANY",
     CASCADE_REMOVE_OR_ALL = "CASCADE_REMOVE_OR_ALL",
     UNIDIRECTIONAL_ONE_TO_MANY = "UNIDIRECTIONAL_ONE_TO_MANY",
     ACCESSED_IN_TO_STRING = "ACCESSED_IN_TO_STRING",
+    ACCESSED_IN_EQUALS_OR_HASH_CODE = "ACCESSED_IN_EQUALS_OR_HASH_CODE",
+}
+
+/**
+ * A neutral category of a problem detected in a JPA attribute (scalar value, not association) mapping while Axelix scanned the entities of an
+ * instance. The categories are not ranked against each other, they merely describe the kind of mapping smell found.
+ */
+export enum EAttributeProblem {
+    ORDINAL_ENUM = "ORDINAL_ENUM",
 }

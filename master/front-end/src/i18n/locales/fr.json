@@ -449,10 +449,6 @@
             "librariesCaption": "Bibliothèques utilisées",
             "librariesLegend": "Le statut concerne le projet de la bibliothèque, pas une version · Part = applications qui résolvent la bibliothèque",
             "categoryPlaceholder": "Toutes les catégories",
-            "categoriesSelected": "{{count}} sur {{total}} sélectionnées",
-            "selected": "{{count}} sélectionnées",
-            "all": "Toutes",
-            "clear": "Effacer",
             "statusFilter": "Statut",
             "columns": {
                 "library": "Bibliothèque",
@@ -671,42 +667,52 @@
             "description": "Les {{count}} transactions analysées ne présentent aucun problème : aucun appel bloquant, aucune requête N+1 et aucune pagination en mémoire."
         }
     },
+    "MultiSelectFilter": {
+        "all": "Toutes",
+        "selected": "{{count}} sélectionnées",
+        "selectedOfTotal": "{{count}} sur {{total}} sélectionnées",
+        "clear": "Effacer"
+    },
     "EntitiesMap": {
-        "summary": {
-            "mapped": "Entités mappées",
-            "withProblems": "Avec des problèmes",
-            "clean": "Sans problème"
+        "description": "Parcourez les entités JPA et consultez les problèmes détectés lors des vérifications de leur mappage.",
+        "checkFilter": "Vérification",
+        "allChecks": "Toutes les vérifications",
+        "locations": {
+            "association": "Association",
+            "attribute": "Attribut"
         },
-        "problemType": "Type de problème :",
-        "columns": {
-            "entity": "Entité",
-            "associations": "Associations",
-            "problems": "Problèmes détectés"
-        },
-        "mapped": "{{count}} mappées",
-        "flagged": "{{count}} signalées",
+        "entities": "Entités",
+        "search": "Rechercher par entité ou table",
+        "withFindings": "Avec des problèmes",
+        "withoutFindings": "Aucun problème signalé",
+        "noMatches": "Aucune entité correspondante.",
+        "noFindings": "Aucun problème signalé pour cette entité.",
+        "findings": "Problèmes détectés",
+        "findingCount_one": "{{count}} problème",
+        "findingCount_many": "{{count}} de problèmes",
+        "findingCount_other": "{{count}} problèmes",
+        "associationCount_one": "{{count}} association",
+        "associationCount_many": "{{count}} d’associations",
+        "associationCount_other": "{{count}} associations",
         "problems": {
             "eager": "Chargement EAGER",
             "listManyToMany": "List pour @ManyToMany",
-            "cascade": "CascadeType inadapté",
+            "cascade": "Cascade REMOVE ou ALL",
             "unidirectional": "@OneToMany unidirectionnel",
-            "toString": "Lue par toString()"
+            "toString": "Lue par toString()",
+            "equalsOrHashCode": "Lue par equals() ou hashCode()",
+            "ineffectiveLazyOneToOne": "Chargement différé inefficace pour @OneToOne",
+            "ordinalEnum": "Mappage ordinal d’une énumération"
         },
         "problemFixes": {
             "eager": "Les données sont récupérées à chaque chargement, qu’elles soient utilisées ou non. Utilisez toujours FetchType.LAZY et chargez explicitement les relations avec un JOIN FETCH si nécessaire.",
             "listManyToMany": "Un @ManyToMany reposant sur une List oblige Hibernate à vider toute la table de jointure et à en réinsérer les données à chaque modification. Modélisez plutôt ManyToMany avec un Set.",
             "cascade": "CascadeType.REMOVE (et donc CascadeType.ALL) oblige Hibernate à effectuer N + 1 requêtes lors de la suppression de la relation, car Hibernate doit respecter les callbacks du cycle de vie de l’entité. Gérez la suppression manuellement.",
             "unidirectional": "Un @OneToMany sans 'mappedBy' nécessite une table de jointure supplémentaire ou des UPDATE par ligne. Rendez-le bidirectionnel ou faites du côté @ManyToOne le propriétaire de la relation.",
-            "toString": "Lire une association depuis toString() peut initialiser de manière inattendue une relation à chargement différé, entraînant des requêtes SQL supplémentaires, une LazyInitializationException ou un OutOfMemoryError lorsqu’une grande partie du graphe d’entités est chargée en mémoire. Excluez les associations de toString()."
-        },
-        "detail": {
-            "table": "Table",
-            "associations": "Associations",
-            "associationsValue": "{{mapped}} mappées · {{flagged}} signalées"
-        },
-        "clean": {
-            "title": "Aucun problème de mappage",
-            "description": "Les {{count}} entités mappées ne présentent aucun problème : aucun chargement immédiat, aucun @ManyToMany reposant sur une List, aucune cascade dangereuse, aucun @OneToMany unidirectionnel et aucune association lue par toString()."
+            "toString": "Lire une association depuis toString() peut initialiser de manière inattendue une relation à chargement différé, entraînant des requêtes SQL supplémentaires, une LazyInitializationException ou un OutOfMemoryError lorsqu’une grande partie du graphe d’entités est chargée en mémoire. Excluez les associations de toString().",
+            "ineffectiveLazyOneToOne": "Hibernate peut charger cette association immédiatement malgré FetchType.LAZY. Vérifiez si l’instrumentation du bytecode ou un autre mappage permet de différer son chargement.",
+            "equalsOrHashCode": "Lire une association dans equals() ou hashCode() peut déclencher un chargement différé lors d’une comparaison ou de l’utilisation de collections basées sur le hachage. Excluez les associations des deux méthodes.",
+            "ordinalEnum": "La base de données stocke la position de la constante dans l’énumération. Réordonner les constantes peut changer l’interprétation des valeurs déjà stockées. Prévoyez une migration des données avant de passer à EnumType.STRING."
         }
     },
     "DependenciesAnalyzer": {
