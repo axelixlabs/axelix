@@ -30,7 +30,7 @@ interface IProps {
 
 export const FindingCard = ({ finding, initiallyOpen }: IProps) => {
     const { t } = useTranslation();
-    const { check, location, member, annotation } = finding;
+    const { check, location, member } = finding;
     const label = ENTITY_CHECK_LABELS.get(check);
     const heading = (
         <span>
@@ -53,10 +53,7 @@ export const FindingCard = ({ finding, initiallyOpen }: IProps) => {
         <details className={`${styles.Finding} ${panelStyles.Disclosure}`} open={initiallyOpen}>
             <summary className={`${styles.FindingHeading} ${panelStyles.DisclosureHeader}`}>{heading}</summary>
             <div className={panelStyles.DisclosureContent}>
-                <div className={styles.FindingBody}>
-                    {annotation && <code className={panelStyles.Code}>{annotation}</code>}
-                    <p>{t(`EntitiesMap.problemFixes.${label}`)}</p>
-                </div>
+                <p className={styles.FindingBody}>{t(`EntitiesMap.problemFixes.${label}`)}</p>
             </div>
         </details>
     );

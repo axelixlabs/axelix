@@ -26,14 +26,6 @@
 }
 
 .FindingBody {
-    display: grid;
-    justify-items: start;
-    gap: var(--axelix-space-2);
     padding: 0 var(--axelix-space-3) var(--axelix-space-3);
     color: var(--axelix-grey-700);
-}
-
-.FindingBody code {
-    max-width: 100%;
-    white-space: pre-wrap;
 }
