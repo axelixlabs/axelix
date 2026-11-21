@@ -29,3 +29,11 @@ export enum EAssociationProblem {
     ACCESSED_IN_TO_STRING = "ACCESSED_IN_TO_STRING",
     ACCESSED_IN_EQUALS_OR_HASH_CODE = "ACCESSED_IN_EQUALS_OR_HASH_CODE",
 }
+
+/**
+ * A neutral category of a problem detected in a JPA attribute (scalar value, not association) mapping while Axelix scanned the entities of an
+ * instance. The categories are not ranked against each other, they merely describe the kind of mapping smell found.
+ */
+export enum EAttributeProblem {
+    ORDINAL_ENUM = "ORDINAL_ENUM",
+}

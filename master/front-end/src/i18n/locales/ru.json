@@ -698,12 +698,6 @@
         "associationCount_few": "{{count}} ассоциации",
         "associationCount_many": "{{count}} ассоциаций",
         "associationCount_other": "{{count}} ассоциации",
-        "summary": "{{findings}} · Сущности с проблемами ({{matching}} из {{total}})",
-        "filteredSummary": "{{findings}} · {{entities}} в результатах",
-        "entityCount_one": "{{count}} сущность",
-        "entityCount_few": "{{count}} сущности",
-        "entityCount_many": "{{count}} сущностей",
-        "entityCount_other": "{{count}} сущности",
         "problems": {
             "eager": "Жадная загрузка (EAGER)",
             "listManyToMany": "List для @ManyToMany",

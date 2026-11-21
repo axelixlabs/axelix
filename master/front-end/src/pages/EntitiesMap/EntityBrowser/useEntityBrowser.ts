@@ -17,7 +17,7 @@
  */
 import { useState } from "react";
 
-import { ENTITY_CHECK_LABELS, getEntityFindings } from "@/helpers";
+import { getEntityFindings } from "@/helpers";
 import type { IMappedEntity } from "@/models";
 
 export const useEntityBrowser = (entities: IMappedEntity[]) => {
@@ -28,8 +28,6 @@ export const useEntityBrowser = (entities: IMappedEntity[]) => {
     const query = search.trim().toLowerCase();
     const hasCheckFilter = selectedChecks.length > 0;
     const inventory = entities.map((entity) => ({ entity, findings: getEntityFindings(entity) }));
-    const reportedCheckIds = inventory.flatMap(({ findings }) => findings.map(({ check }) => check));
-    const checkIds = [...new Set([...ENTITY_CHECK_LABELS.keys(), ...reportedCheckIds])];
 
     const results = inventory
         .filter(({ entity }) => [entity.name, entity.table].some((field) => field.toLowerCase().includes(query)))
@@ -50,11 +48,8 @@ export const useEntityBrowser = (entities: IMappedEntity[]) => {
         selectedChecks,
         setSelectedChecks,
         setSelectedName,
-        checkIds,
         withFindings,
         withoutFindings,
         selected,
-        filtered: hasCheckFilter || query.length > 0,
-        findingCount: withFindings.reduce((total, result) => total + result.findings.length, 0),
     };
 };

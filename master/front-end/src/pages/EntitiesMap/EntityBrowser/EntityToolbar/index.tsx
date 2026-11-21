@@ -23,55 +23,26 @@ import { ENTITY_CHECK_LABELS } from "@/helpers";
 import styles from "./styles.module.css";
 
 interface IProps {
-    checkIds: string[];
     selectedChecks: string[];
     onChecksChange: (checks: string[]) => void;
-    filtered: boolean;
-    findingCount: number;
-    matchingEntities: number;
-    visibleEntities: number;
-    totalEntities: number;
 }
 
-export const EntityToolbar = ({
-    checkIds,
-    selectedChecks,
-    onChecksChange,
-    filtered,
-    findingCount,
-    matchingEntities,
-    visibleEntities,
-    totalEntities,
-}: IProps) => {
+export const EntityToolbar = ({ selectedChecks, onChecksChange }: IProps) => {
     const { t } = useTranslation();
-    const findings = t("EntitiesMap.findingCount", { count: findingCount });
 
     return (
         <div className={styles.Toolbar}>
             <MultiSelectFilter
                 label={t("EntitiesMap.checkFilter")}
                 allLabel={t("EntitiesMap.allChecks")}
-                options={checkIds.map((value) => {
-                    const label = ENTITY_CHECK_LABELS.get(value);
-                    return { value, label: label ? t(`EntitiesMap.problems.${label}`) : value };
-                })}
+                options={Array.from(ENTITY_CHECK_LABELS, ([value, label]) => ({
+                    value,
+                    label: t(`EntitiesMap.problems.${label}`),
+                }))}
                 selected={selectedChecks}
                 onChange={onChecksChange}
                 searchable
             />
-            <p className={styles.Summary} role="status">
-                {filtered
-                    ? t("EntitiesMap.filteredSummary", {
-                          findings,
-                          entities: t("EntitiesMap.entityCount", { count: visibleEntities }),
-                      })
-                    : t("EntitiesMap.summary", {
-                          findings,
-                          matching: matchingEntities,
-                          total: totalEntities,
-                          count: totalEntities,
-                      })}
-            </p>
         </div>
     );
 };

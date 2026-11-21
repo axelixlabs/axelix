@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { EAssociationProblem, type IMappedEntity } from "@/models";
+import { EAssociationProblem, EAttributeProblem, type IMappedEntity } from "@/models";
 
 export const ENTITY_CHECK_LABELS = new Map<string, string>([
     [EAssociationProblem.EAGER_FETCHING, "eager"],
@@ -25,7 +25,7 @@ export const ENTITY_CHECK_LABELS = new Map<string, string>([
     [EAssociationProblem.UNIDIRECTIONAL_ONE_TO_MANY, "unidirectional"],
     [EAssociationProblem.ACCESSED_IN_TO_STRING, "toString"],
     [EAssociationProblem.ACCESSED_IN_EQUALS_OR_HASH_CODE, "equalsOrHashCode"],
-    ["ORDINAL_ENUM", "ordinalEnum"],
+    [EAttributeProblem.ORDINAL_ENUM, "ordinalEnum"],
 ]);
 
 export type TEntityFindingLocation = "association" | "attribute";
@@ -52,7 +52,7 @@ export interface IEntityResult {
  */
 export const getEntityFindings = (entity: IMappedEntity): IEntityFinding[] => [
     ...(entity.ordinalEnumAttributes ?? []).map((member): IEntityFinding => ({
-        check: "ORDINAL_ENUM",
+        check: EAttributeProblem.ORDINAL_ENUM,
         location: "attribute",
         member,
     })),

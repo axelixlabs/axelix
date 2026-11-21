@@ -5,15 +5,3 @@
     gap: var(--axelix-space-2);
     margin-top: var(--axelix-space-1);
 }
-
-.Summary {
-    margin-inline-start: auto;
-    color: var(--axelix-grey-600);
-}
-
-@media (width <= 760px) {
-    .Summary {
-        width: 100%;
-        margin-inline-start: 0;
-    }
-}

@@ -42,16 +42,7 @@ export const EntityBrowser = ({ entities }: IProps) => {
                 <p className={styles.Description}>{t("EntitiesMap.description")}</p>
             </header>
 
-            <EntityToolbar
-                checkIds={browser.checkIds}
-                selectedChecks={browser.selectedChecks}
-                onChecksChange={browser.setSelectedChecks}
-                filtered={browser.filtered}
-                findingCount={browser.findingCount}
-                matchingEntities={browser.withFindings.length}
-                visibleEntities={browser.withFindings.length + browser.withoutFindings.length}
-                totalEntities={entities.length}
-            />
+            <EntityToolbar selectedChecks={browser.selectedChecks} onChecksChange={browser.setSelectedChecks} />
 
             <div className={styles.Split}>
                 <EntityList

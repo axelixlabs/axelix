@@ -694,11 +694,6 @@
         "associationCount_one": "{{count}} association",
         "associationCount_many": "{{count}} d’associations",
         "associationCount_other": "{{count}} associations",
-        "summary": "{{findings}} · Entités concernées ({{matching}} sur {{total}})",
-        "filteredSummary": "{{findings}} · {{entities}} dans les résultats",
-        "entityCount_one": "{{count}} entité",
-        "entityCount_many": "{{count}} d’entités",
-        "entityCount_other": "{{count}} entités",
         "problems": {
             "eager": "Chargement EAGER",
             "listManyToMany": "List pour @ManyToMany",

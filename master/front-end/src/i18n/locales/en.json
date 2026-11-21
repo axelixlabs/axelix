@@ -688,11 +688,6 @@
         "findingCount_other": "{{count}} findings",
         "associationCount_one": "{{count}} association",
         "associationCount_other": "{{count}} associations",
-        "summary_one": "{{findings}} in {{matching}} of {{total}} entity",
-        "summary_other": "{{findings}} in {{matching}} of {{total}} entities",
-        "filteredSummary": "{{findings}} · {{entities}} shown",
-        "entityCount_one": "{{count}} entity",
-        "entityCount_other": "{{count}} entities",
         "problems": {
             "eager": "EAGER fetching",
             "listManyToMany": "List for @ManyToMany",
