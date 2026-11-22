@@ -18,9 +18,9 @@
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,10 +34,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
-import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.CACHE_ENABLED;
 import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.CACHE_REQUESTS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -65,7 +65,11 @@ class DefaultEnhancedCacheTest {
     @Mock
     private Cache delegate;
 
+    @Mock
+    private EnhancedCacheManager cacheManager;
+
     private EnhancedCache enhancedCache;
+    private AtomicBoolean cacheEnabled;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +77,28 @@ class DefaultEnhancedCacheTest {
         axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(meterRegistry);
 
         Mockito.lenient().when(delegate.getName()).thenReturn(CACHE_NAME);
-        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher);
+        cacheEnabled = new AtomicBoolean(true);
+        SlidingWindow<CacheLookup> lookupHistory = new SlidingWindow<>(200);
+        Mockito.lenient().when(cacheManager.getLookupHistory(CACHE_NAME)).thenReturn(lookupHistory);
+        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher, cacheEnabled::get, cacheManager);
+    }
+
+    @Test
+    void getByKey_shouldUseCurrentHistoryAfterHistoryReplacement() {
+        // given.
+        SlidingWindow<CacheLookup> originalHistory = new SlidingWindow<>(200);
+        SlidingWindow<CacheLookup> replacementHistory = new SlidingWindow<>(200);
+        when(cacheManager.getLookupHistory(CACHE_NAME)).thenReturn(originalHistory, replacementHistory);
+        EnhancedCache cache = new DefaultEnhancedCache(delegate, null, () -> true, cacheManager);
+        cache.get(KEY);
+
+        // when.
+        cache.get(KEY);
+
+        // then.
+        assertThat(originalHistory.get()).hasSize(1);
+        assertThat(replacementHistory.get()).hasSize(1);
+        assertThat(cache.getCacheLookups()).containsExactlyElementsOf(replacementHistory.get());
     }
 
     @Nested
@@ -96,65 +121,6 @@ class DefaultEnhancedCacheTest {
 
             // then.
             assertThat(isEnabled).isTrue();
-            checkMeterRegistryCacheStatusGauge(isEnabled);
-        }
-
-        @Test
-        void shouldDisableCache() {
-            // given.
-            assertThat(enhancedCache.isEnabled()).isTrue();
-            checkMeterRegistryCacheStatusGauge(true);
-
-            // when.
-            enhancedCache.disable();
-
-            // then.
-            assertThat(enhancedCache.isEnabled()).isFalse();
-            checkMeterRegistryCacheStatusGauge(false);
-        }
-
-        @Test
-        void shouldReEnableCache() {
-            // given.
-            enhancedCache.disable();
-            assertThat(enhancedCache.isEnabled()).isFalse();
-            checkMeterRegistryCacheStatusGauge(false);
-
-            // when.
-            enhancedCache.enable();
-
-            // then.
-            assertThat(enhancedCache.isEnabled()).isTrue();
-            checkMeterRegistryCacheStatusGauge(true);
-        }
-
-        @Test
-        void shouldBeNoOpWhenCacheIsAlreadyEnabled() {
-            // given.
-            assertThat(enhancedCache.isEnabled()).isTrue();
-            checkMeterRegistryCacheStatusGauge(true);
-
-            // when.
-            enhancedCache.enable();
-
-            // then.
-            assertThat(enhancedCache.isEnabled()).isTrue();
-            checkMeterRegistryCacheStatusGauge(true);
-        }
-
-        @Test
-        void shouldBeNoOpWhenCacheIsAlreadyDisabled() {
-            // given.
-            enhancedCache.disable();
-            assertThat(enhancedCache.isEnabled()).isFalse();
-            checkMeterRegistryCacheStatusGauge(false);
-
-            // when.
-            enhancedCache.disable();
-
-            // then.
-            assertThat(enhancedCache.isEnabled()).isFalse();
-            checkMeterRegistryCacheStatusGauge(false);
         }
     }
 
@@ -173,19 +139,6 @@ class DefaultEnhancedCacheTest {
             assertThat(result).isNotNull();
             assertThat(result.get()).isEqualTo(VALUE);
             verify(delegate).get(KEY);
-        }
-
-        @Test
-        void shouldReturnNullWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            Cache.ValueWrapper result = enhancedCache.get(KEY);
-
-            // then.
-            assertThat(result).isNull();
-            verify(delegate, never()).get(any());
         }
 
         @Test
@@ -213,6 +166,19 @@ class DefaultEnhancedCacheTest {
             assertThat(enhancedCache.getCacheLookups()).hasSize(1);
             assertThat(enhancedCache.getCacheLookups().get(0).outcome()).isEqualTo(CacheLookup.Outcome.MISS);
         }
+
+        @Test
+        void getByKey_shouldReturnNullWhenCacheIsDisabled() {
+            // given.
+            cacheEnabled.set(false);
+
+            // when.
+            Cache.ValueWrapper result = enhancedCache.get(KEY);
+
+            // then.
+            assertThat(result).isNull();
+            verify(delegate, never()).get(any());
+        }
     }
 
     @Nested
@@ -232,9 +198,9 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldReturnNullWhenCacheIsDisabled() {
+        void getWithType_shouldReturnNullWhenCacheIsDisabled() {
             // given.
-            enhancedCache.disable();
+            cacheEnabled.set(false);
 
             // when.
             String result = enhancedCache.get(KEY, String.class);
@@ -265,19 +231,6 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldReturnNullWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            String result = enhancedCache.get(KEY, () -> VALUE);
-
-            // then.
-            assertThat(result).isNull();
-            verify(delegate, never()).get(any(), any(Callable.class));
-        }
-
-        @Test
         void shouldTrackHitWhenValueExistsInCache() {
             // given.
             when(delegate.get(eq(KEY), any(Callable.class))).thenReturn(VALUE);
@@ -305,6 +258,19 @@ class DefaultEnhancedCacheTest {
             assertThat(enhancedCache.getCacheLookups()).hasSize(1);
             assertThat(enhancedCache.getCacheLookups().get(0).outcome()).isEqualTo(CacheLookup.Outcome.MISS);
         }
+
+        @Test
+        void getWithValueLoader_shouldReturnNullWhenCacheIsDisabled() {
+            // given.
+            cacheEnabled.set(false);
+
+            // when.
+            String result = enhancedCache.get(KEY, () -> VALUE);
+
+            // then.
+            assertThat(result).isNull();
+            verify(delegate, never()).get(any(), any(Callable.class));
+        }
     }
 
     @Nested
@@ -323,18 +289,6 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldNotDelegateWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            enhancedCache.put(KEY, VALUE);
-
-            // then.
-            verify(delegate, never()).put(any(), any());
-        }
-
-        @Test
         void shouldHandleNullValue() {
             // given.
             // cache is enabled by default
@@ -344,6 +298,18 @@ class DefaultEnhancedCacheTest {
 
             // then.
             verify(delegate).put(KEY, null);
+        }
+
+        @Test
+        void put_shouldNotDelegateWhenCacheIsDisabled() {
+            // given.
+            cacheEnabled.set(false);
+
+            // when.
+            enhancedCache.put(KEY, VALUE);
+
+            // then.
+            verify(delegate, never()).put(any(), any());
         }
     }
 
@@ -363,9 +329,9 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldNotDelegateWhenCacheIsDisabled() {
+        void evict_shouldNotDelegateWhenCacheIsDisabled() {
             // given.
-            enhancedCache.disable();
+            cacheEnabled.set(false);
 
             // when.
             enhancedCache.evict(KEY);
@@ -391,9 +357,9 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldNotDelegateWhenCacheIsDisabled() {
+        void clear_shouldNotDelegateWhenCacheIsDisabled() {
             // given.
-            enhancedCache.disable();
+            cacheEnabled.set(false);
 
             // when.
             enhancedCache.clear();
@@ -420,9 +386,9 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldReturnFalseWhenCacheIsDisabled() {
+        void invalidate_shouldReturnFalseWhenCacheIsDisabled() {
             // given.
-            enhancedCache.disable();
+            cacheEnabled.set(false);
 
             // when.
             boolean result = enhancedCache.invalidate();
@@ -450,19 +416,6 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldReturnFalseWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            boolean result = enhancedCache.evictIfPresent(KEY);
-
-            // then.
-            assertThat(result).isFalse();
-            verify(delegate, never()).evictIfPresent(any());
-        }
-
-        @Test
         void shouldReturnFalseWhenDelegateReturnsFalse() {
             // given.
             when(delegate.evictIfPresent(KEY)).thenReturn(false);
@@ -473,6 +426,19 @@ class DefaultEnhancedCacheTest {
             // then.
             assertThat(result).isFalse();
             verify(delegate).evictIfPresent(KEY);
+        }
+
+        @Test
+        void evictIfPresent_shouldReturnFalseWhenCacheIsDisabled() {
+            // given.
+            cacheEnabled.set(false);
+
+            // when.
+            boolean result = enhancedCache.evictIfPresent(KEY);
+
+            // then.
+            assertThat(result).isFalse();
+            verify(delegate, never()).evictIfPresent(any());
         }
     }
 
@@ -523,18 +489,6 @@ class DefaultEnhancedCacheTest {
         }
 
         @Test
-        void shouldNotTrackWhenCacheIsDisabled() {
-            // given.
-            enhancedCache.disable();
-
-            // when.
-            enhancedCache.get(KEY);
-
-            // then.
-            assertThat(enhancedCache.getCacheLookups()).isEmpty();
-        }
-
-        @Test
         void multipleOperations_shouldTrackHitsAndMissesCorrectly() {
             // given.
             Cache.ValueWrapper hitWrapper = () -> VALUE;
@@ -564,14 +518,18 @@ class DefaultEnhancedCacheTest {
             // and then.
             checkMeterRegistryCacheLookup(3d, 2d);
         }
-    }
 
-    private void checkMeterRegistryCacheStatusGauge(boolean cacheEnabled) {
-        Gauge gauge = meterRegistry.find(CACHE_ENABLED).tag("cache", CACHE_NAME).gauge();
+        @Test
+        void getByKey_shouldNotTrackWhenCacheIsDisabled() {
+            // given.
+            cacheEnabled.set(false);
 
-        assertThat(gauge).isNotNull();
-        // The value is returned as a double (1.0 for enabled, 0.0 for disabled)
-        assertThat(gauge.value()).isEqualTo(cacheEnabled ? 1.0 : 0.0);
+            // when.
+            enhancedCache.get(KEY);
+
+            // then.
+            assertThat(enhancedCache.getCacheLookups()).isEmpty();
+        }
     }
 
     private void checkMeterRegistryCacheLookup(double expectedHits, double expectedMisses) {
