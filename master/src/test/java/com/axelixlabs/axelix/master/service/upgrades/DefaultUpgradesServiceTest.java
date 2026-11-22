@@ -32,7 +32,7 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.master.api.external.response.upgrades.CeilingBlocker;
+import com.axelixlabs.axelix.master.api.external.response.upgrades.ObservedService;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.StarterVersionUsage;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesResponse;
@@ -89,18 +89,18 @@ class DefaultUpgradesServiceTest {
         assertThat(response.masterVersion()).isEqualTo(masterVersion);
         assertThat(response.compatibilityWindow()).isEqualTo(WindowCompatibilityDetectionStrategy.WINDOW_SIZE);
         assertThat(response.starterVersions()).isEmpty();
-        assertThat(response.ceilingBlockers()).isEmpty();
+        assertThat(response.services()).isEmpty();
     }
 
     @Test
-    void groupsStarterVersionsAndIdentifiesCeilingBlockersFromTheOldestLine() {
-        // given. four services within the 30-day window; app-c and app-d are the oldest, on 1.2.x.
+    void groupsStarterVersionsAndReturnsAllServicesOldestStarterFirst() {
+        // given. four services with different starter versions and observation dates.
         LocalDate today = LocalDate.now(ZoneOffset.UTC);
         jdbcAggregateTemplate.insertAll(List.of(
-                snapshot("app-a", today, "1.4.2"),
+                snapshot("app-a", today, "1.10.2"),
                 snapshot("app-b", today, "1.3.1"),
-                snapshot("app-c", today.minusDays(5), "1.2.1"),
-                snapshot("app-d", today, "1.2.6")));
+                snapshot("app-c", today, "1.2.1"),
+                snapshot("app-d", today.minusDays(5), "1.2.10")));
 
         // when.
         UpgradesResponse response = subject.getUpgrades();
@@ -110,17 +110,19 @@ class DefaultUpgradesServiceTest {
 
         assertThat(response.starterVersions())
                 .extracting(StarterVersionUsage::version, StarterVersionUsage::serviceCount)
-                .containsExactly(Tuple.tuple("1.4", 1), Tuple.tuple("1.3", 1), Tuple.tuple("1.2", 2));
+                .containsExactly(Tuple.tuple("1.10", 1), Tuple.tuple("1.3", 1), Tuple.tuple("1.2", 2));
 
-        assertThat(response.ceilingBlockers())
+        assertThat(response.services())
                 .extracting(
-                        CeilingBlocker::artifactId,
-                        CeilingBlocker::groupId,
-                        CeilingBlocker::starterVersion,
-                        CeilingBlocker::lastSeen)
+                        ObservedService::artifactId,
+                        ObservedService::groupId,
+                        ObservedService::starterVersion,
+                        ObservedService::lastSeen)
                 .containsExactly(
-                        Tuple.tuple("app-c", "com.example", "1.2.1", today.minusDays(5)),
-                        Tuple.tuple("app-d", "com.example", "1.2.6", today));
+                        Tuple.tuple("app-c", "com.example", "1.2.1", today),
+                        Tuple.tuple("app-d", "com.example", "1.2.10", today.minusDays(5)),
+                        Tuple.tuple("app-b", "com.example", "1.3.1", today),
+                        Tuple.tuple("app-a", "com.example", "1.10.2", today));
     }
 
     @Test
@@ -138,6 +140,7 @@ class DefaultUpgradesServiceTest {
         assertThat(response.starterVersions())
                 .extracting(StarterVersionUsage::version)
                 .containsExactly("1.4");
+        assertThat(response.services()).extracting(ObservedService::artifactId).containsExactly("current");
     }
 
     @Test
@@ -151,8 +154,8 @@ class DefaultUpgradesServiceTest {
         UpgradesResponse response = subject.getUpgrades();
 
         // then.
-        assertThat(response.ceilingBlockers())
-                .extracting(CeilingBlocker::starterVersion, CeilingBlocker::lastSeen)
+        assertThat(response.services())
+                .extracting(ObservedService::starterVersion, ObservedService::lastSeen)
                 .containsExactly(Tuple.tuple("1.4.0", today));
     }
 
@@ -170,9 +173,7 @@ class DefaultUpgradesServiceTest {
         assertThat(response.starterVersions())
                 .extracting(StarterVersionUsage::version)
                 .containsExactly("1.4");
-        assertThat(response.ceilingBlockers())
-                .extracting(CeilingBlocker::artifactId)
-                .containsExactly("valid");
+        assertThat(response.services()).extracting(ObservedService::artifactId).containsExactly("valid");
     }
 
     @Test

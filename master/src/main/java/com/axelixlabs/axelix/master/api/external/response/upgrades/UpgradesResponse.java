@@ -28,8 +28,7 @@ import java.util.List;
  *                            with Master for.
  * @param starterVersions     the fleet's starter versions, grouped by {@code major.minor}, newest first. The
  *                            oldest {@code major.minor} in use is {@code starterVersions.getLast().version()}.
- * @param ceilingBlockers     the services running the oldest starter version, i.e. the ones holding the safe
- *                            upgrade ceiling back.
+ * @param services            observed services ordered from oldest to newest starter version.
  *
  * @author Nikita Kirillov
  */
@@ -37,4 +36,4 @@ public record UpgradesResponse(
         String masterVersion,
         int compatibilityWindow,
         List<StarterVersionUsage> starterVersions,
-        List<CeilingBlocker> ceilingBlockers) {}
+        List<ObservedService> services) {}

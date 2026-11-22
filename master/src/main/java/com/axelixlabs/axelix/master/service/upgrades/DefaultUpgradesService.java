@@ -29,7 +29,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.master.api.external.response.upgrades.CeilingBlocker;
+import com.axelixlabs.axelix.master.api.external.response.upgrades.ObservedService;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.StarterVersionUsage;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesResponse;
@@ -69,7 +69,7 @@ public class DefaultUpgradesService implements UpgradesService {
         LocalDate since = LocalDate.now(ZoneOffset.UTC).minusDays(OBSERVATION_WINDOW_DAYS);
         List<LatestStarterVersion> snapshots = snapshotService.getLatestStarterVersionsSince(since);
 
-        SemanticVersion oldest = null;
+        List<ObservedService> services = new ArrayList<>();
         Map<String, Integer> serviceCountByVersion = new HashMap<>();
 
         for (LatestStarterVersion snapshot : snapshots) {
@@ -81,22 +81,16 @@ public class DefaultUpgradesService implements UpgradesService {
 
             serviceCountByVersion.merge(version.majorMinor(), 1, Integer::sum);
 
-            if (oldest == null || version.isOlderThan(oldest)) {
-                oldest = version;
-            }
+            services.add(new ObservedService(
+                    snapshot.artifactId(), snapshot.groupId(), snapshot.starterVersion(), snapshot.date()));
         }
 
-        if (oldest == null) {
-            return new UpgradesResponse(masterVersion, WINDOW_SIZE, List.of(), List.of());
-        }
+        services.sort(Comparator.comparing((ObservedService service) -> SemanticVersion.parse(service.starterVersion()))
+                .thenComparing(ObservedService::lastSeen)
+                .thenComparing(ObservedService::groupId)
+                .thenComparing(ObservedService::artifactId));
 
-        String oldestLabel = oldest.majorMinor();
-
-        return new UpgradesResponse(
-                masterVersion,
-                WINDOW_SIZE,
-                buildStarterVersions(serviceCountByVersion),
-                buildCeilingBlockers(snapshots, oldestLabel));
+        return new UpgradesResponse(masterVersion, WINDOW_SIZE, buildStarterVersions(serviceCountByVersion), services);
     }
 
     @Override
@@ -125,20 +119,6 @@ public class DefaultUpgradesService implements UpgradesService {
 
         starterVersions.sort(DefaultUpgradesService::compareVersionsDescending);
         return starterVersions;
-    }
-
-    private static List<CeilingBlocker> buildCeilingBlockers(List<LatestStarterVersion> snapshots, String oldestLabel) {
-        List<CeilingBlocker> ceilingBlockers = new ArrayList<>();
-        for (LatestStarterVersion snapshot : snapshots) {
-            Optional<SemanticVersion> parsed = SemanticVersion.tryParse(snapshot.starterVersion());
-            if (parsed.isPresent() && parsed.get().majorMinor().equals(oldestLabel)) {
-                ceilingBlockers.add(new CeilingBlocker(
-                        snapshot.artifactId(), snapshot.groupId(), snapshot.starterVersion(), snapshot.date()));
-            }
-        }
-
-        ceilingBlockers.sort(Comparator.comparing(CeilingBlocker::lastSeen));
-        return ceilingBlockers;
     }
 
     /**

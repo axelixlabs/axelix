@@ -114,17 +114,19 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
                 .node("starterVersions[1].serviceCount")
                 .isEqualTo(1);
         assertThatJson(response.getBody())
-                .node("ceilingBlockers[0].artifactId")
+                .node("services[0].artifactId")
                 .isString()
                 .isEqualTo("app-a");
         assertThatJson(response.getBody())
-                .node("ceilingBlockers[0].groupId")
+                .node("services[0].groupId")
                 .isString()
                 .isEqualTo("com.example");
         assertThatJson(response.getBody())
-                .node("ceilingBlockers[0].starterVersion")
+                .node("services[0].starterVersion")
                 .isString()
                 .isEqualTo("1.1.2");
+        assertThatJson(response.getBody()).node("services").isArray().hasSize(2);
+        assertThatJson(response.getBody()).node("services[1].starterVersion").isEqualTo("1.2.1");
         assertSuccessfulCallback(MasterWebEndpoints.UPGRADES_READ, viewer.getActor());
     }
 
@@ -142,7 +144,7 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
                 .node("compatibilityWindow")
                 .isEqualTo(WindowCompatibilityDetectionStrategy.WINDOW_SIZE);
         assertThatJson(response.getBody()).node("starterVersions").isArray().isEmpty();
-        assertThatJson(response.getBody()).node("ceilingBlockers").isArray().isEmpty();
+        assertThatJson(response.getBody()).node("services").isArray().isEmpty();
         assertSuccessfulCallback(MasterWebEndpoints.UPGRADES_READ, viewer.getActor());
     }
 

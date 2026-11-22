@@ -20,8 +20,7 @@ package com.axelixlabs.axelix.master.api.external.response.upgrades;
 import java.time.LocalDate;
 
 /**
- * A service running the oldest starter version observed in the fleet, i.e. one that holds the safe upgrade
- * ceiling back.
+ * A service whose starter version was observed within the observation window.
  *
  * @param artifactId     the artifact id of the service.
  * @param groupId        the group id of the service.
@@ -30,4 +29,4 @@ import java.time.LocalDate;
  *
  * @author Nikita Kirillov
  */
-public record CeilingBlocker(String artifactId, String groupId, String starterVersion, LocalDate lastSeen) {}
+public record ObservedService(String artifactId, String groupId, String starterVersion, LocalDate lastSeen) {}
