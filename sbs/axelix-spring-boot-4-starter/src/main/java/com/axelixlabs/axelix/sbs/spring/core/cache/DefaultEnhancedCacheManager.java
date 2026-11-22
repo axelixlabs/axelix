@@ -21,9 +21,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -31,6 +31,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
 /**
@@ -47,14 +48,16 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     private final String cacheManagerBeanName;
     private final CacheManager delegate;
+    // Collect metrics only for caches present at startup to avoid metrics for dynamically created caches.
+    private final Set<String> cacheNamesWithMetrics;
 
     // state is separated between two maps. The first map is the state, whose allocation remains under our control,
     // and we will not cause the OOM in case of any dynamic caches creation. The second map (lookup history) is the
-    // one that is created dynamically and thus may lead to uncontrollable allocation. That is why we stick to SoftReference
-    // here to avoid OOM in case of unexpected dynamic caches creation event.
+    // one that is created dynamically and thus may lead to uncontrollable allocation. That is why we stick to
+    // SoftReference here to avoid OOM in case of unexpected dynamic caches creation event.
     private final Map<String, Boolean> cacheStates = new ConcurrentHashMap<>();
-    private final Map<String, SlidingWindow<@NonNull CacheLookup>> cacheLookupHistories = new ConcurrentReferenceHashMap<>(
-        16, ConcurrentReferenceHashMap.ReferenceType.SOFT);
+    private final Map<String, SlidingWindow<@NonNull CacheLookup>> cacheLookupHistories =
+            new ConcurrentReferenceHashMap<>(16, ConcurrentReferenceHashMap.ReferenceType.SOFT);
 
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
 
@@ -63,6 +66,11 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
         this.delegate = delegate;
         this.cacheManagerBeanName = cacheManagerBeanName;
         this.metricsPublisher = metricsPublisher;
+        this.cacheNamesWithMetrics = Set.copyOf(delegate.getCacheNames());
+        if (metricsPublisher != null) {
+            cacheNamesWithMetrics.forEach(cacheName -> metricsPublisher.registerCacheStatusGauge(
+                    cacheName, () -> cacheStates.getOrDefault(cacheName, true)));
+        }
     }
 
     @Override
@@ -90,7 +98,10 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     public Collection<EnhancedCache> getAll() {
         Collection<String> currentCacheNames = delegate.getCacheNames();
 
-        return currentCacheNames.stream().map(this::getCache).filter(Objects::nonNull).toList();
+        return currentCacheNames.stream()
+                .map(this::getCache)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Override
@@ -102,11 +113,11 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
             return null;
         }
 
-        SlidingWindow<CacheLookup> lookupHistory = cacheLookupHistories.computeIfAbsent(
-            name,
-            cacheName -> new SlidingWindow<@NonNull CacheLookup>(200));
-
-        return new DefaultEnhancedCache(cache, metricsPublisher, () -> cacheStates.get(name), lookupHistory);
+        return new DefaultEnhancedCache(
+                cache,
+                cacheNamesWithMetrics.contains(name) ? metricsPublisher : null,
+                () -> cacheStates.getOrDefault(name, true),
+                this);
     }
 
     @Override
@@ -123,11 +134,6 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     @Override
     public void enable(String cacheName) {
         cacheStates.put(cacheName, true);
-
-        // TODO: do we need this metric at all?
-        if (metricsPublisher != null) {
-            metricsPublisher.registerCacheStatusGauge(cacheName, () -> cacheStates.get(cacheName));
-        }
     }
 
     /**
@@ -140,21 +146,8 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
         cacheStates.put(cacheName, false);
     }
 
-    /**
-     * Enable all caches.
-     * <p>Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency.
-     */
     @Override
-    public void enableAll() {
-        cacheStates.replaceAll((s, v) -> true);
-    }
-
-    /**
-     * Disable all caches.
-     * <p>Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency.
-     */
-    @Override
-    public void disableAll() {
-        cacheStates.replaceAll((s, v) -> false);
+    public SlidingWindow<CacheLookup> getLookupHistory(String cacheName) {
+        return cacheLookupHistories.computeIfAbsent(cacheName, name -> new SlidingWindow<>(200));
     }
 }

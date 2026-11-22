@@ -23,12 +23,15 @@ import java.util.List;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
@@ -133,40 +136,6 @@ class EnhancedCacheManagerTest {
     void clearWithKey_shouldDoNothing() {
         String cacheName = "nonExistentCache";
         assertThatNoException().isThrownBy(() -> subject.clear(cacheName, "key"));
-    }
-
-    @Test
-    void enableCacheManager_shouldEnableAllCachesWhenEnhancedCacheManager() {
-        Cache cache = subject.getCache("cache");
-        assert cache != null;
-
-        subject.disableAll();
-
-        cache.put("key", "value");
-        assertThat(cache.get("key")).isNull();
-
-        // when.
-        subject.enableAll();
-
-        // then.
-        cache.put("key2", "value2");
-        assertThat(cache.get("key2")).isNotNull();
-    }
-
-    @Test
-    void disableCacheManager_shouldDisableAllCachesWhenEnhancedCacheManager() {
-        // given.
-        Cache cache = subject.getCache("cache");
-        cache.put("key", "value");
-
-        assertThat(cache.get("key")).isNotNull();
-
-        // when.
-        subject.disableAll();
-
-        // then.
-        cache.put("key2", "value2");
-        assertThat(cache.get("key2")).isNull();
     }
 
     @Test
@@ -284,22 +253,6 @@ class EnhancedCacheManagerTest {
     }
 
     @Test
-    void isCacheEnabled_shouldReturnFalseWhenCacheManagerDisabledInEnhancedCacheManager() {
-        // given.
-        String cacheName1 = "cache1";
-        String cacheName2 = "cache2";
-        EnhancedCache cache1 = subject.getCache(cacheName1);
-        EnhancedCache cache2 = subject.getCache(cacheName2);
-
-        // when.
-        subject.disableAll();
-
-        // then.
-        assertThat(cache1.isEnabled()).isFalse();
-        assertThat(cache2.isEnabled()).isFalse();
-    }
-
-    @Test
     void isCacheEnabled_shouldWorkWithMultipleCachesInEnhancedCacheManager() {
         // given.
         EnhancedCache cache1 = subject.getCache("cache1");
@@ -336,6 +289,29 @@ class EnhancedCacheManagerTest {
         assertThat(originalCacheWrapper.getNativeCache()).isSameAs(originalCache.getNativeCache());
         assertThat(underlyingCacheManager.currentCache.get("key", String.class)).isEqualTo("current");
         assertThat(originalCache.get("key", String.class)).isEqualTo("original");
+    }
+
+    @Test
+    void getCache_shouldShareManagementStateAcrossDelegates() {
+        // given.
+        SwitchingCacheManager underlyingCacheManager = new SwitchingCacheManager();
+        EnhancedCacheManager enhancedCacheManager =
+                new DefaultEnhancedCacheManager("test", underlyingCacheManager, null);
+        EnhancedCache originalCacheWrapper = enhancedCacheManager.getCache("cache");
+        originalCacheWrapper.get("missing");
+        enhancedCacheManager.disable("cache");
+        underlyingCacheManager.currentCache = new ConcurrentMapCache("cache");
+
+        // when.
+        EnhancedCache replacementCacheWrapper = enhancedCacheManager.getCache("cache");
+        replacementCacheWrapper.put("key", "value");
+
+        // then.
+        assertThat(replacementCacheWrapper.isEnabled()).isFalse();
+        assertThat(replacementCacheWrapper.getCacheLookups())
+                .containsExactlyElementsOf(originalCacheWrapper.getCacheLookups())
+                .hasSize(1);
+        assertThat(underlyingCacheManager.currentCache.get("key")).isNull();
     }
 
     @Test
@@ -391,6 +367,96 @@ class EnhancedCacheManagerTest {
         // then.
         assertThat(resolvedCacheWrappers).isEmpty();
         assertThat(underlyingCacheManager.getCacheNames()).isEmpty();
+    }
+
+    @Test
+    void getCache_shouldPublishLookupsForCachesPresentAtStartup() {
+        // given.
+        ConcurrentMapCacheManager underlyingCacheManager = new ConcurrentMapCacheManager();
+        underlyingCacheManager.getCache("startupCache").put("key", "value");
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        EnhancedCacheManager enhancedCacheManager = new DefaultEnhancedCacheManager(
+                "test", underlyingCacheManager, new DefaultAxelixMetricsPublisher(meterRegistry));
+
+        // when.
+        EnhancedCache startupCache = enhancedCacheManager.getCache("startupCache");
+        startupCache.get("key");
+        startupCache.get("missing");
+
+        // then.
+        assertThat(meterRegistry
+                        .get(AxelixMetricNames.CACHE_REQUESTS)
+                        .tags("cache", "startupCache", "result", "hit")
+                        .counter()
+                        .count())
+                .isEqualTo(1.0);
+        assertThat(meterRegistry
+                        .get(AxelixMetricNames.CACHE_REQUESTS)
+                        .tags("cache", "startupCache", "result", "miss")
+                        .counter()
+                        .count())
+                .isEqualTo(1.0);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void cacheStatusGauge_shouldTrackCachesPresentAtStartup(boolean enabled) {
+        // given.
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        EnhancedCacheManager enhancedCacheManager = new DefaultEnhancedCacheManager(
+                "test",
+                new ConcurrentMapCacheManager("startupCache"),
+                new DefaultAxelixMetricsPublisher(meterRegistry));
+
+        // when.
+        if (!enabled) {
+            enhancedCacheManager.disable("startupCache");
+        }
+
+        // then.
+        assertThat(meterRegistry
+                        .get(AxelixMetricNames.CACHE_ENABLED)
+                        .tag("cache", "startupCache")
+                        .gauge()
+                        .value())
+                .isEqualTo(enabled ? 1.0 : 0.0);
+    }
+
+    @Test
+    void getCache_shouldKeepHistoryWithoutPublishingMetricsForCachesCreatedAfterStartup() {
+        // given.
+        ConcurrentMapCacheManager underlyingCacheManager = new ConcurrentMapCacheManager();
+        underlyingCacheManager.getCache("startupCache");
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        EnhancedCacheManager enhancedCacheManager = new DefaultEnhancedCacheManager(
+                "test", underlyingCacheManager, new DefaultAxelixMetricsPublisher(meterRegistry));
+
+        // when.
+        EnhancedCache dynamicCache = enhancedCacheManager.getCache("dynamicCache");
+        dynamicCache.put("key", "value");
+        dynamicCache.get("key");
+        dynamicCache.get("missing");
+        enhancedCacheManager.disable("dynamicCache");
+        enhancedCacheManager.enable("dynamicCache");
+
+        // then.
+        assertThat(dynamicCache.getCacheLookups()).hasSize(2);
+        assertThat(dynamicCache.isEnabled()).isTrue();
+        assertThat(meterRegistry
+                        .find(AxelixMetricNames.CACHE_REQUESTS)
+                        .tag("cache", "dynamicCache")
+                        .meters())
+                .isEmpty();
+        assertThat(meterRegistry
+                        .find(AxelixMetricNames.CACHE_ENABLED)
+                        .tag("cache", "dynamicCache")
+                        .gauge())
+                .isNull();
+        assertThat(meterRegistry
+                        .find(AxelixMetricNames.CACHE_ENABLED)
+                        .tag("cache", "startupCache")
+                        .gauge())
+                .isNotNull();
     }
 
     private static class SwitchingCacheManager implements CacheManager {

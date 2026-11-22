@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -45,18 +44,17 @@ public class DefaultEnhancedCache implements EnhancedCache {
     private final Cache delegate;
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
     private final Supplier<Boolean> isEnabledFunction;
-    private final SlidingWindow<CacheLookup> lookupHistory;
+    private final EnhancedCacheManager cacheManager;
 
     public DefaultEnhancedCache(
             @NonNull Cache delegate,
             @Nullable AxelixMetricsPublisher metricsPublisher,
             Supplier<Boolean> isEnabledFunction,
-            SlidingWindow<CacheLookup> lookupHistory
-    ) {
+            EnhancedCacheManager cacheManager) {
         this.delegate = delegate;
         this.isEnabledFunction = isEnabledFunction;
         this.metricsPublisher = metricsPublisher;
-        this.lookupHistory = lookupHistory;
+        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -86,13 +84,13 @@ public class DefaultEnhancedCache implements EnhancedCache {
         ValueWrapper result = delegate.get(key);
 
         if (result == null) {
-            lookupHistory.put(CacheLookup.miss());
+            cacheManager.getLookupHistory(getName()).put(CacheLookup.miss());
 
             if (metricsPublisher != null) {
                 metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
             }
         } else {
-            lookupHistory.put(CacheLookup.hit());
+            cacheManager.getLookupHistory(getName()).put(CacheLookup.hit());
 
             if (metricsPublisher != null) {
                 metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
@@ -125,13 +123,13 @@ public class DefaultEnhancedCache implements EnhancedCache {
             });
 
             if (miss.get()) {
-                lookupHistory.put(CacheLookup.miss());
+                cacheManager.getLookupHistory(getName()).put(CacheLookup.miss());
 
                 if (metricsPublisher != null) {
                     metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
                 }
             } else {
-                lookupHistory.put(CacheLookup.hit());
+                cacheManager.getLookupHistory(getName()).put(CacheLookup.hit());
 
                 if (metricsPublisher != null) {
                     metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
@@ -169,7 +167,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
 
     @Override
     public List<CacheLookup> getCacheLookups() {
-        return lookupHistory.get();
+        return cacheManager.getLookupHistory(getName()).get();
     }
 
     private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {
