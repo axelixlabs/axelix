@@ -17,10 +17,11 @@
  */
 import { useTranslation } from "react-i18next";
 
+import { HintTooltip } from "@/components";
 import { getOldestStarterVersion, getTotalServiceCount, getUnsupportedServiceCount } from "@/helpers";
 import type { IUpgradesData } from "@/models";
 
-import { StarterVersionDonut } from "./StarterVersionDonut";
+import { StarterVersionBars } from "./StarterVersionBars";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -34,7 +35,7 @@ export const UpgradesHeadroomPanel = ({ data }: IProps) => {
     const total = getTotalServiceCount(starterVersions);
     const [major, minor] = masterVersion.split(".").map(Number);
     const currentVersion = `${major}.${minor}`;
-    const currentImpact = getUnsupportedServiceCount(currentVersion, starterVersions, compatibilityWindow);
+    const number = new Intl.NumberFormat(i18n.resolvedLanguage);
     const percent = new Intl.NumberFormat(i18n.resolvedLanguage, { style: "percent", maximumFractionDigits: 1 });
 
     const futureTargets = Array.from({ length: Math.max(3, compatibilityWindow) }, (_, index) => {
@@ -50,8 +51,16 @@ export const UpgradesHeadroomPanel = ({ data }: IProps) => {
             }),
         };
     });
+    const safeTargets = futureTargets.filter(({ isSupported }) => isSupported);
+    const safeTarget = safeTargets.at(-1);
     const safeIndex = futureTargets.findLastIndex(({ isSupported }) => isSupported);
-    const safeTarget = futureTargets[safeIndex];
+    const firstCompatibleMinor = Math.max(0, minor - compatibilityWindow + 1);
+    const countsByVersion = new Map(starterVersions.map(({ version, serviceCount }) => [version, serviceCount]));
+    const windowVersions = Array.from({ length: minor - firstCompatibleMinor + 1 }, (_, index) => {
+        const version = `${major}.${firstCompatibleMinor + index}`;
+
+        return { version, count: countsByVersion.get(version) ?? 0 };
+    });
     // Show three targets by default, extending the ruler through the first release beyond safe headroom.
     const targets = futureTargets.slice(0, Math.max(3, safeIndex + 2));
 
@@ -68,22 +77,60 @@ export const UpgradesHeadroomPanel = ({ data }: IProps) => {
                     {t("Upgrades.HeadroomPanel.oldestVersion", { version: oldestStarter })}
                 </p>
 
-                <div className={styles.Ruler}>
-                    <div className={styles.Tick} data-supported={currentImpact === 0}>
-                        <strong title={masterVersion}>{currentVersion}</strong>
-                        <span>{t("Upgrades.Ruler.masterNow")}</span>
-                    </div>
-                    {targets.map(({ version, isSupported, impact }) => (
-                        <div className={styles.Tick} key={version} data-supported={isSupported}>
-                            <strong>{version}</strong>
-                            <span>{impact}</span>
+                <div
+                    className={styles.Ruler}
+                    style={{
+                        gridTemplateColumns: [windowVersions.length, safeTargets.length]
+                            .filter(Boolean)
+                            .map((length) => `minmax(${length * 52}px, ${length}fr)`)
+                            .join(" "),
+                    }}
+                >
+                    <div className={styles.RulerRange}>
+                        <div className={styles.RangeLabel}>
+                            {t("Upgrades.CompatibilityWindow.title")}
+                            <HintTooltip
+                                content={t("Upgrades.CompatibilityWindow.explanation", {
+                                    master: currentVersion,
+                                    oldest: `${major}.${firstCompatibleMinor}`,
+                                })}
+                            >
+                                <span className={styles.Question}>?</span>
+                            </HintTooltip>
                         </div>
-                    ))}
+                        <ol className={styles.Ticks}>
+                            {windowVersions.map(({ version, count }) => (
+                                <li className={styles.Tick} key={version} data-current={version === currentVersion}>
+                                    <strong>{version === currentVersion ? masterVersion : version}</strong>
+                                    <span title={t("Upgrades.FleetBars.serviceCount", { count })}>
+                                        {t("Upgrades.Ruler.impact", {
+                                            services: number.format(count),
+                                            percentage: percent.format(count / total),
+                                        })}
+                                    </span>
+                                    {version === currentVersion && (
+                                        <span className={styles.CurrentLabel}>{t("Upgrades.Ruler.masterNow")}</span>
+                                    )}
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                    {safeTargets.length > 0 && (
+                        <div className={`${styles.RulerRange} ${styles.SafeRange}`}>
+                            <div className={styles.RangeLabel}>{t("Upgrades.Ruler.safeHeadroom")}</div>
+                            <ol className={styles.Ticks}>
+                                {safeTargets.map(({ version }) => (
+                                    <li className={styles.Tick} key={version}>
+                                        <strong>{version}</strong>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                    )}
                 </div>
-                <p className={`TextUltraSmall ${styles.Meta}`}>{t("Upgrades.Ruler.potentialTargets")}</p>
             </article>
 
-            <article className={styles.Card}>
+            <article className={styles.Card} hidden>
                 <h2 className={styles.ColumnTitle}>{t("Upgrades.HeadroomPanel.impact")}</h2>
                 <table className={styles.ImpactTable}>
                     <thead>
@@ -103,7 +150,7 @@ export const UpgradesHeadroomPanel = ({ data }: IProps) => {
                 </table>
             </article>
 
-            <StarterVersionDonut starterVersions={starterVersions} total={total} />
+            <StarterVersionBars starterVersions={starterVersions} total={total} />
         </section>
     );
 };

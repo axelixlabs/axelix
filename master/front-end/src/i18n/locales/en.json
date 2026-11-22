@@ -956,6 +956,7 @@
         "CompatibilityWindow": {
             "title": "Compatibility window",
             "description": "Includes the target Master release",
+            "explanation": "The compatibility window is the number of consecutive starter minor releases Master supports, including its own minor release. For example, Master {{master}} supports starter versions {{oldest}} through {{master}}.",
             "minorReleases_one": "minor release",
             "minorReleases_other": "minor releases"
         },
@@ -971,7 +972,7 @@
         "Ruler": {
             "masterNow": "Master now",
             "impact": "{{services}} ({{percentage}})",
-            "potentialTargets": "Potential Master minor versions"
+            "safeHeadroom": "Safe upgrade headroom"
         }
     },
     "Administration": {

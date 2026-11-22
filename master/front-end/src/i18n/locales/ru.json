@@ -982,6 +982,7 @@
         "CompatibilityWindow": {
             "title": "Окно совместимости",
             "description": "Включает целевой релиз Master",
+            "explanation": "Окно совместимости — это число последовательных минорных релизов стартера, которые поддерживает Master, включая собственную минорную версию. Например, Master версии {{master}} поддерживает стартеры с {{oldest}} по {{master}} включительно.",
             "minorReleases_one": "минорный релиз",
             "minorReleases_few": "минорных релиза",
             "minorReleases_many": "минорных релизов",
@@ -999,7 +1000,7 @@
         "Ruler": {
             "masterNow": "Master сейчас",
             "impact": "{{services}} ({{percentage}})",
-            "potentialTargets": "Возможные минорные версии Master"
+            "safeHeadroom": "Безопасный диапазон обновления"
         }
     },
     "Administration": {
