@@ -19,18 +19,17 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler, Loader, PagesFirstSection } from "@/components";
-import { fetchData } from "@/helpers";
+import { fetchData, getOldestStarterVersion } from "@/helpers";
 import { type IUpgradesData, StatefulRequest } from "@/models";
 import { getUpgradesData } from "@/services";
 
 import { UpgradesEmptyState } from "./UpgradesEmptyState";
-import { UpgradesFleetBars } from "./UpgradesFleetBars";
 import { UpgradesHeadroomPanel } from "./UpgradesHeadroomPanel";
-import { UpgradesNoBlockersState } from "./UpgradesNoBlockersState";
 import { UpgradesTable } from "./UpgradesTable";
+import styles from "./styles.module.css";
 
 const Upgrades = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [upgradesData, setUpgradesData] = useState(StatefulRequest.loading<IUpgradesData>());
 
@@ -49,25 +48,39 @@ const Upgrades = () => {
     const responseBody = upgradesData.response!;
     const { starterVersions, ceilingBlockers, masterVersion, compatibilityWindow } = responseBody;
 
-    const isEmpty = starterVersions.length === 0;
-    const isFleetUpToDate = ceilingBlockers.length === 0;
+    const oldestStarterVersion = getOldestStarterVersion(starterVersions);
 
     return (
         <>
-            <PagesFirstSection title={t("Upgrades.title")} subtitle={t("Upgrades.subtitle")} />
+            <div className={styles.PageHeader}>
+                <PagesFirstSection title={t("Upgrades.title")} subtitle={t("Upgrades.subtitle")} />
 
-            {isEmpty ? (
-                <UpgradesEmptyState masterVersion={masterVersion} compatibilityWindow={compatibilityWindow} />
-            ) : isFleetUpToDate ? (
-                <UpgradesNoBlockersState data={responseBody} />
-            ) : (
+                <div className={styles.WindowCard} role="group" aria-labelledby="compatibility-window-title">
+                    <div className={styles.WindowSize}>
+                        <strong className="TextLarge">
+                            {new Intl.NumberFormat(i18n.resolvedLanguage).format(compatibilityWindow)}
+                        </strong>
+                        <span className="TextUltraSmall">
+                            {t("Upgrades.CompatibilityWindow.minorReleases", { count: compatibilityWindow })}
+                        </span>
+                    </div>
+                    <div className={styles.WindowDetails}>
+                        <strong id="compatibility-window-title">{t("Upgrades.CompatibilityWindow.title")}</strong>
+                        <span className="TextUltraSmall">{t("Upgrades.CompatibilityWindow.description")}</span>
+                    </div>
+                </div>
+            </div>
+
+            {oldestStarterVersion ? (
                 <>
                     <UpgradesHeadroomPanel data={responseBody} />
 
-                    <UpgradesTable ceilingBlockers={ceilingBlockers} />
-
-                    <UpgradesFleetBars data={responseBody} isFleetUpToDate={false} />
+                    {ceilingBlockers.length > 0 && (
+                        <UpgradesTable ceilingBlockers={ceilingBlockers} oldestStarterVersion={oldestStarterVersion} />
+                    )}
                 </>
+            ) : (
+                <UpgradesEmptyState masterVersion={masterVersion} compatibilityWindow={compatibilityWindow} />
             )}
         </>
     );

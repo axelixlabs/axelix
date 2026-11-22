@@ -1,35 +1,214 @@
-.MainWrapper {
-    display: flex;
-    flex-direction: column;
-    gap: var(--axelix-space-6);
-    margin-bottom: var(--axelix-space-8);
-    padding: var(--axelix-space-6);
+.Panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.76fr) minmax(0, 1.06fr);
+    gap: var(--axelix-space-4);
+    margin-bottom: var(--axelix-space-5);
+}
+
+.Card {
+    min-width: 0;
+    padding: var(--axelix-space-5);
+    border: 1px solid var(--axelix-grey-300);
     border-radius: var(--axelix-border-radius-large);
-    background-color: var(--axelix-grey-900);
+    background-color: var(--axelix-white);
+    box-shadow: var(--axelix-box-shadow-light);
+}
+
+.Eyebrow,
+.Title,
+.Meta,
+.ColumnTitle {
+    margin: 0;
 }
 
 .Eyebrow {
-    color: var(--axelix-green-500);
+    color: var(--axelix-grey-500);
 }
 
 .Title {
-    max-width: 40rem;
-    margin-bottom: var(--axelix-space-3);
-    color: var(--axelix-white);
+    margin-block: var(--axelix-space-2);
+    color: inherit;
+    text-wrap: balance;
 }
 
-.Description {
-    max-width: 46rem;
-    color: var(--axelix-grey-400);
+.Meta {
+    color: var(--axelix-grey-500);
 }
 
-.FirstSectionWrapper {
+.ColumnTitle {
+    margin-bottom: var(--axelix-space-2);
+    color: inherit;
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Ruler {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    margin-block: var(--axelix-space-5) var(--axelix-space-3);
+}
+
+.Tick {
+    position: relative;
     display: flex;
-    gap: var(--axelix-space-8);
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--axelix-space-1);
+    padding: var(--axelix-space-3) 2px 0;
+    text-align: center;
 }
 
-.Divider {
-    height: 1px;
-    background-color: rgb(255 255 255 / 10%);
+.Tick::before,
+.Tick::after {
+    position: absolute;
+    content: "";
+}
+
+.Tick::before {
+    top: 3px;
+    inset-inline: 0;
+    height: 3px;
+    background-color: var(--axelix-grey-200);
+}
+
+.Tick:first-child::before {
+    inset-inline-start: 50%;
+}
+
+.Tick:last-child::before {
+    inset-inline-end: 50%;
+}
+
+.Tick[data-supported="true"]::before {
+    background-color: var(--axelix-green-500);
+}
+
+.Tick[data-supported="true"]:has(+ .Tick[data-supported="false"])::before {
+    background: linear-gradient(to right, var(--axelix-green-500) 50%, var(--axelix-grey-200) 50%);
+}
+
+.Tick:first-child[data-supported="true"]:has(+ .Tick[data-supported="false"])::before {
+    background: var(--axelix-grey-200);
+}
+
+.Tick::after {
+    top: 0;
+    left: calc(50% - 5px);
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--axelix-white);
+    border-radius: 50%;
+    background-color: var(--axelix-grey-500);
+}
+
+.Tick[data-supported="true"]::after {
+    background-color: var(--axelix-green-500);
+}
+
+.Tick span {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.ImpactTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--axelix-font-size-caption);
+    font-variant-numeric: tabular-nums;
+}
+
+.ImpactTable th,
+.ImpactTable td {
+    padding: var(--axelix-space-2) 0;
+    text-align: start;
+}
+
+.ImpactTable th + th,
+.ImpactTable td {
+    padding-inline-start: var(--axelix-space-2);
+    text-align: end;
+}
+
+.ImpactTable thead th {
+    color: var(--axelix-grey-500);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.ImpactTable tbody tr {
+    border-top: 1px solid var(--axelix-grey-200);
+}
+
+.FleetChart {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--axelix-space-3);
+    margin-top: var(--axelix-space-4);
+}
+
+.FleetLegend {
+    min-width: 0;
+    max-height: 150px;
+    flex: 1 1 135px;
+    overflow: auto;
+    font-size: var(--axelix-font-size-caption);
+    font-variant-numeric: tabular-nums;
+}
+
+.FleetLegend table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.FleetLegend table th,
+.FleetLegend table td {
+    padding: var(--axelix-space-1) 0;
+    text-align: start;
+}
+
+.FleetLegend thead th {
+    color: var(--axelix-grey-500);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.FleetLegend table th + th,
+.FleetLegend table td {
+    padding-inline-start: var(--axelix-space-2);
+    text-align: end;
+}
+
+.FleetLegend tbody tr {
+    border-top: 1px solid var(--axelix-grey-200);
+}
+
+.Version {
+    display: flex;
+    align-items: center;
+    gap: var(--axelix-space-1);
+    font-family: var(--axelix-font-family-code);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.Swatch {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: 50%;
+}
+
+@media (width <= 1230px) {
+    .Panel {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .Headroom {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (width <= 850px) {
+    .Panel {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }

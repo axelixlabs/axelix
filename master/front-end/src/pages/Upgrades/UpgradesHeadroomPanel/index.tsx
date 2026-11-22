@@ -17,11 +17,10 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { buildRulerTicks, getOldestStarterVersion } from "@/helpers";
+import { getOldestStarterVersion, getTotalServiceCount, getUnsupportedServiceCount } from "@/helpers";
 import type { IUpgradesData } from "@/models";
 
-import { UpgradesHeadroomPanelRightPart } from "./UpgradesHeadroomPanelRightPart";
-import { UpgradesRuler } from "./UpgradesRuler";
+import { StarterVersionDonut } from "./StarterVersionDonut";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -29,51 +28,82 @@ interface IProps {
 }
 
 export const UpgradesHeadroomPanel = ({ data }: IProps) => {
-    const { t } = useTranslation();
-
+    const { t, i18n } = useTranslation();
     const { masterVersion, starterVersions, compatibilityWindow } = data;
+    const oldestStarter = getOldestStarterVersion(starterVersions);
+    const total = getTotalServiceCount(starterVersions);
+    const [major, minor] = masterVersion.split(".").map(Number);
+    const currentVersion = `${major}.${minor}`;
+    const currentImpact = getUnsupportedServiceCount(currentVersion, starterVersions, compatibilityWindow);
+    const percent = new Intl.NumberFormat(i18n.resolvedLanguage, { style: "percent", maximumFractionDigits: 1 });
 
-    const oldestStarterVersion = getOldestStarterVersion(starterVersions);
+    const futureTargets = Array.from({ length: Math.max(3, compatibilityWindow) }, (_, index) => {
+        const version = `${major}.${minor + index + 1}`;
+        const count = getUnsupportedServiceCount(version, starterVersions, compatibilityWindow);
 
-    if (!oldestStarterVersion) {
-        return null;
-    }
-
-    const { headroomOffset } = buildRulerTicks({
-        masterVersion: masterVersion,
-        oldestStarterVersion: oldestStarterVersion,
-        compatibilityWindowSize: compatibilityWindow,
+        return {
+            version,
+            isSupported: count === 0,
+            impact: t("Upgrades.Ruler.impact", {
+                services: t("Upgrades.FleetBars.serviceCount", { count }),
+                percentage: percent.format(count / total),
+            }),
+        };
     });
+    const safeIndex = futureTargets.findLastIndex(({ isSupported }) => isSupported);
+    const safeTarget = futureTargets[safeIndex];
+    // Show three targets by default, extending the ruler through the first release beyond safe headroom.
+    const targets = futureTargets.slice(0, Math.max(3, safeIndex + 2));
 
     return (
-        <>
-            <div className={styles.MainWrapper}>
-                <div className={`TextCaps ${styles.Eyebrow}`}>{t("Upgrades.HeadroomPanel.eyebrow")}</div>
+        <section className={styles.Panel}>
+            <article className={`${styles.Card} ${styles.Headroom}`}>
+                <h2 className={`TextCaps ${styles.Eyebrow}`}>{t("Upgrades.HeadroomPanel.eyebrow")}</h2>
+                <p className={`TextMedium ${styles.Title}`}>
+                    {safeTarget
+                        ? t("Upgrades.HeadroomPanel.safeTarget", { version: safeTarget.version })
+                        : t("Upgrades.HeadroomPanel.noSafeTarget")}
+                </p>
+                <p className={`TextSmall ${styles.Meta}`}>
+                    {t("Upgrades.HeadroomPanel.oldestVersion", { version: oldestStarter })}
+                </p>
 
-                <div className={styles.FirstSectionWrapper}>
-                    <div>
-                        <div className={`TextMedium ${styles.Title}`}>
-                            {t("Upgrades.HeadroomPanel.title", {
-                                count: headroomOffset,
-                                version: masterVersion,
-                            })}
-                        </div>
-
-                        <div className={`TextSmall ${styles.Description}`}>
-                            {t("Upgrades.HeadroomPanel.description", {
-                                count: headroomOffset,
-                                version: masterVersion,
-                            })}
-                        </div>
+                <div className={styles.Ruler}>
+                    <div className={styles.Tick} data-supported={currentImpact === 0}>
+                        <strong title={masterVersion}>{currentVersion}</strong>
+                        <span>{t("Upgrades.Ruler.masterNow")}</span>
                     </div>
-
-                    <UpgradesHeadroomPanelRightPart data={data} />
+                    {targets.map(({ version, isSupported, impact }) => (
+                        <div className={styles.Tick} key={version} data-supported={isSupported}>
+                            <strong>{version}</strong>
+                            <span>{impact}</span>
+                        </div>
+                    ))}
                 </div>
+                <p className={`TextUltraSmall ${styles.Meta}`}>{t("Upgrades.Ruler.potentialTargets")}</p>
+            </article>
 
-                <div className={styles.Divider} />
+            <article className={styles.Card}>
+                <h2 className={styles.ColumnTitle}>{t("Upgrades.HeadroomPanel.impact")}</h2>
+                <table className={styles.ImpactTable}>
+                    <thead>
+                        <tr>
+                            <th scope="col">{t("Upgrades.HeadroomPanel.targetVersion")}</th>
+                            <th scope="col">{t("Upgrades.HeadroomPanel.outsideSupport")}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {targets.map(({ version, impact }) => (
+                            <tr key={version}>
+                                <th scope="row">{version}</th>
+                                <td>{impact}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </article>
 
-                <UpgradesRuler data={data} />
-            </div>
-        </>
+            <StarterVersionDonut starterVersions={starterVersions} total={total} />
+        </section>
     );
 };

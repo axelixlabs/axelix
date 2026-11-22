@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ILanguagesDonutSegment } from "@/models";
-
 import styles from "./styles.module.css";
 
 interface IProps {
-    segments: ILanguagesDonutSegment[];
+    segments: ReadonlyArray<{ value: number; color: string }>;
     centreTop: string;
     centreBottom: string;
 }
@@ -28,13 +26,19 @@ interface IProps {
 const RADIUS = 52;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-export const LanguageDonut = ({ segments, centreTop, centreBottom }: IProps) => {
+export const DistributionDonut = ({ segments, centreTop, centreBottom }: IProps) => {
     let consumed = 0;
 
     return (
         <>
             <div className={styles.MainWrapper}>
-                <svg width="150" height="150" viewBox="0 0 140 140" className={`${styles.SVG} DonutSpinSettle`}>
+                <svg
+                    aria-hidden="true"
+                    width="150"
+                    height="150"
+                    viewBox="0 0 140 140"
+                    className={`${styles.SVG} DonutSpinSettle`}
+                >
                     {segments.map(({ value, color }, index) => {
                         const length = (value / 100) * CIRCUMFERENCE;
                         const offset = -((consumed / 100) * CIRCUMFERENCE);

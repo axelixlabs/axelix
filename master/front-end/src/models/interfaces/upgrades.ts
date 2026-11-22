@@ -15,20 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ERulerTickAnnotation } from "../enums/upgrades";
-
-export interface IBuildRulerTicksResult {
-    ticks: IRulerTick[];
-    dropVersion: string;
-    headroomOffset: number;
-}
-
-export interface IBuildRulerTicksArgs {
-    masterVersion: string;
-    oldestStarterVersion: string;
-    compatibilityWindowSize: number;
-}
-
 export interface IUpgradeArtifact {
     artifactId: string;
     groupId: string;
@@ -54,33 +40,4 @@ export interface IUpgradesData {
     compatibilityWindow: number;
     starterVersions: IStarterVersion[];
     ceilingBlockers: ICeilingBlocker[];
-}
-
-export interface IParsedVersion {
-    major: number;
-    minor: number;
-}
-
-export interface IRulerTick {
-    version: string;
-    isSupported: boolean;
-    annotation?: ERulerTickAnnotation;
-    offset?: number;
-}
-
-export interface IUpgradesLostApplicationsData {
-    targetVersion: string;
-    lostApplications: number;
-}
-
-export interface IRulerBounds {
-    masterMinor: number;
-    oldestMinor: number;
-    lastSupportedMinor: number;
-    dropMinor: number;
-}
-
-export interface ITickAnnotation {
-    annotation?: ERulerTickAnnotation;
-    offset?: number;
 }

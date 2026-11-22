@@ -20,11 +20,3 @@ import { apiFetch } from "@/api";
 export const getUpgradesData = () => {
     return apiFetch.get("upgrades");
 };
-
-export const getUpgradesLostApplications = (targetVersion: string) => {
-    return apiFetch.get("upgrades/impact", {
-        params: {
-            targetVersion: targetVersion,
-        },
-    });
-};

@@ -19,7 +19,7 @@ import { Menu } from "antd";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 
-import { ShieldIcon, UsersIcon } from "@/assets";
+import { ShieldIcon, UpgradeIcon, UsersIcon } from "@/assets";
 import { useAuthority } from "@/hooks";
 import { EAuthorities, type TMenuItem } from "@/models";
 
@@ -35,6 +35,7 @@ export const AdministrationSiderMenu = () => {
     const items: TMenuItem[] = [
         {
             key: UPGRADES_PATH,
+            icon: <UpgradeIcon width={16} height={16} aria-hidden="true" />,
             label: <Link to={UPGRADES_PATH}>{t("Administration.Sider.upgrades")}</Link>,
         },
     ];

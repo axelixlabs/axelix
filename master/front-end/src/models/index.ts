@@ -62,7 +62,6 @@ export * from "./enums/entitiesMap";
 export * from "./enums/conditions";
 export * from "./enums/threadDump";
 export * from "./enums/wallboard";
-export * from "./enums/upgrades";
 export * from "./enums/details";
 export * from "./enums/globals";
 export * from "./enums/loggers";

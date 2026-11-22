@@ -15,104 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type {
-    IBuildRulerTicksArgs,
-    IBuildRulerTicksResult,
-    IParsedVersion,
-    IRulerBounds,
-    IRulerTick,
-    IStarterVersion,
-    ITickAnnotation,
-} from "@/models";
-import { ERulerTickAnnotation } from "@/models";
-import { UPGRADES_RULER_PADDING_BEFORE } from "@/utils";
+import type { IStarterVersion } from "@/models";
 
-const parseMinorVersion = (version: string): IParsedVersion => {
-    const [major, minor] = version.split(".").map(Number);
+const parseMinorVersion = (version: string): number[] => version.split(".", 2).map(Number);
 
-    return {
-        major: major,
-        minor: minor,
-    };
-};
+export const getUnsupportedServiceCount = (
+    targetVersion: string,
+    starterVersions: IStarterVersion[],
+    compatibilityWindow: number,
+): number => {
+    const [targetMajor, targetMinor] = parseMinorVersion(targetVersion);
 
-const formatMinorVersion = (major: number, minor: number): string => {
-    return `${major}.${minor}`;
-};
+    return starterVersions.reduce((total, { version, serviceCount }) => {
+        const [starterMajor, starterMinor] = parseMinorVersion(version);
+        const age = targetMinor - starterMinor;
+        const isCompatible = targetMajor === starterMajor && age >= 0 && age < compatibilityWindow;
 
-const getTickAnnotation = (minor: number, bounds: IRulerBounds): ITickAnnotation => {
-    const { masterMinor, oldestMinor, lastSupportedMinor, dropMinor } = bounds;
-
-    if (minor === oldestMinor) {
-        return {
-            annotation: ERulerTickAnnotation.OLDEST_SEEN,
-        };
-    }
-
-    if (minor === masterMinor) {
-        return {
-            annotation: ERulerTickAnnotation.MASTER_NOW,
-        };
-    }
-
-    if (minor > masterMinor && minor <= lastSupportedMinor) {
-        return {
-            annotation: ERulerTickAnnotation.SAFE_NEXT,
-            offset: minor - masterMinor,
-        };
-    }
-
-    if (minor === dropMinor) {
-        return {
-            annotation: ERulerTickAnnotation.DROP,
-            offset: minor - masterMinor,
-        };
-    }
-
-    return {};
-};
-
-export const buildRulerTicks = ({
-    masterVersion,
-    oldestStarterVersion,
-    compatibilityWindowSize,
-}: IBuildRulerTicksArgs): IBuildRulerTicksResult => {
-    const master = parseMinorVersion(masterVersion);
-    const oldest = parseMinorVersion(oldestStarterVersion);
-
-    const masterMinor = master.minor;
-    const oldestMinor = oldest.minor;
-
-    const versionsAfterOldest = compatibilityWindowSize - 1;
-    const lastSupportedMinor = oldestMinor + versionsAfterOldest;
-    const dropMinor = lastSupportedMinor + 1;
-
-    const leftmostMinor = Math.min(oldestMinor, masterMinor);
-    const paddedStartMinor = leftmostMinor - UPGRADES_RULER_PADDING_BEFORE;
-    const startMinor = Math.max(0, paddedStartMinor);
-
-    const endMinor = Math.max(dropMinor, masterMinor);
-
-    const bounds: IRulerBounds = { masterMinor, oldestMinor, lastSupportedMinor, dropMinor };
-
-    const ticks: IRulerTick[] = [];
-
-    for (let minor = startMinor; minor <= endMinor; minor += 1) {
-        const version = formatMinorVersion(master.major, minor);
-        const isSupported = minor >= oldestMinor && minor <= lastSupportedMinor;
-
-        ticks.push({
-            version: version,
-            isSupported: isSupported,
-            ...getTickAnnotation(minor, bounds),
-        });
-    }
-
-    return {
-        ticks: ticks,
-        dropVersion: formatMinorVersion(master.major, dropMinor),
-        headroomOffset: lastSupportedMinor - masterMinor,
-    };
+        return total + (isCompatible ? 0 : serviceCount);
+    }, 0);
 };
 
 export const getOldestStarterVersion = (starterVersions: IStarterVersion[]): string | undefined => {
@@ -121,16 +41,9 @@ export const getOldestStarterVersion = (starterVersions: IStarterVersion[]): str
     const sortedVersions = versions.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
     const [oldestVersion] = sortedVersions;
-
     return oldestVersion;
 };
 
 export const getTotalServiceCount = (starterVersions: IStarterVersion[]): number => {
     return starterVersions.reduce((summary, { serviceCount }) => summary + serviceCount, 0);
-};
-
-export const getOldestStarterServiceCount = (starterVersions: IStarterVersion[]): number => {
-    const oldestStarterVersion = getOldestStarterVersion(starterVersions);
-
-    return starterVersions.find(({ version }) => version === oldestStarterVersion)?.serviceCount ?? 0;
 };

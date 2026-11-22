@@ -15,8 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Pagination } from "antd";
 import dayjs from "dayjs";
 import type { TFunction } from "i18next";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { ICeilingBlocker } from "@/models";
@@ -25,6 +27,7 @@ import styles from "./styles.module.css";
 
 interface IProps {
     ceilingBlockers: ICeilingBlocker[];
+    oldestStarterVersion: string;
 }
 
 const formatLastSeen = (lastSeen: string, t: TFunction): string => {
@@ -47,36 +50,114 @@ const formatLastSeen = (lastSeen: string, t: TFunction): string => {
     return t("Upgrades.ArtifactsTable.daysAgo", { count: daysAgo });
 };
 
-export const UpgradesTable = ({ ceilingBlockers }: IProps) => {
+const BOTTOM_SPACING = 24;
+
+export const UpgradesTable = ({ ceilingBlockers, oldestStarterVersion }: IProps) => {
     const { t } = useTranslation();
+    const [firstVisibleIndex, setFirstVisibleIndex] = useState(0);
+    const [pageSize, setPageSize] = useState(1);
+    const rowsRef = useRef<HTMLDivElement>(null);
+    const footerRef = useRef<HTMLDivElement>(null);
+    const total = ceilingBlockers.length;
+    const page = Math.min(Math.floor(firstVisibleIndex / pageSize) + 1, Math.ceil(total / pageSize));
+    const firstIndex = (page - 1) * pageSize;
+    const visibleBlockers = ceilingBlockers.slice(firstIndex, firstIndex + pageSize);
+
+    useLayoutEffect(() => {
+        const rows = rowsRef.current!;
+        const footer = footerRef.current!;
+        const section = rows.closest("section")!;
+        const updatePageSize = (): void => {
+            const rowHeight = rows.firstElementChild?.getBoundingClientRect().height;
+
+            if (!rowHeight) {
+                return;
+            }
+
+            // Measure in document coordinates so scrolling does not change page boundaries.
+            const availableHeight =
+                window.innerHeight -
+                (rows.getBoundingClientRect().top + window.scrollY) -
+                footer.getBoundingClientRect().height -
+                BOTTOM_SPACING -
+                1;
+
+            rows.style.minHeight = `${Math.max(rowHeight, availableHeight)}px`;
+            setPageSize(Math.max(1, Math.floor(availableHeight / rowHeight)));
+        };
+
+        const observer = new ResizeObserver(updatePageSize);
+        observer.observe(section.parentElement!);
+        observer.observe(footer);
+        window.addEventListener("resize", updatePageSize);
+        updatePageSize();
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener("resize", updatePageSize);
+        };
+    }, []);
 
     return (
         <section className={styles.Section}>
             <div className={styles.SectionRow}>
-                <div className={styles.SectionTitle}>{t("Upgrades.ArtifactsTable.sectionTitle")}</div>
-                <p className={styles.SectionNote}>{t("Upgrades.ArtifactsTable.sectionNote")}</p>
+                <h2 className={styles.SectionTitle} id="oldest-starter-services">
+                    {t("Upgrades.ArtifactsTable.sectionTitle")}
+                </h2>
+                <p className={styles.SectionNote}>
+                    {oldestStarterVersion} · {t("Upgrades.FleetBars.serviceCount", { count: total })}
+                </p>
             </div>
 
             <div className={styles.Table}>
-                <div className={`TextCaps ${styles.HeaderRow}`}>
-                    <span>{t("Upgrades.ArtifactsTable.artifact")}</span>
-                    <span>{t("Upgrades.ArtifactsTable.starter")}</span>
-                    <span>{t("Upgrades.ArtifactsTable.lastSeen")}</span>
+                <div role="table" aria-labelledby="oldest-starter-services">
+                    <div role="row" className={`TextCaps ${styles.HeaderRow}`}>
+                        <span role="columnheader">{t("Upgrades.ArtifactsTable.artifact")}</span>
+                        <span role="columnheader">{t("Upgrades.ArtifactsTable.starter")}</span>
+                        <span role="columnheader">{t("Upgrades.ArtifactsTable.lastSeen")}</span>
+                    </div>
+
+                    <div role="rowgroup" ref={rowsRef}>
+                        {visibleBlockers.map(({ artifactId, groupId, starterVersion, lastSeen }) => (
+                            <div role="row" className={styles.Row} key={`${groupId}:${artifactId}`}>
+                                <div role="cell" className={styles.ArtifactCell}>
+                                    <span className={styles.ArtifactId} title={artifactId}>
+                                        {artifactId}
+                                    </span>
+                                    <span className={styles.GroupId} title={groupId}>
+                                        {groupId}
+                                    </span>
+                                </div>
+                                <span role="cell" className={styles.VersionBadge} title={starterVersion}>
+                                    {starterVersion}
+                                </span>
+                                <span role="cell" className={styles.LastSeen}>
+                                    {formatLastSeen(lastSeen, t)}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {ceilingBlockers.map(({ artifactId, groupId, starterVersion, lastSeen }) => (
-                    <div className={styles.Row} key={`${groupId}:${artifactId}`}>
-                        <div className={styles.ArtifactCell}>
-                            <span className={styles.ArtifactId}>{artifactId}</span>
-                            <span className={styles.GroupId}>{groupId}</span>
-                        </div>
-                        <span className={styles.VersionBadge}>{starterVersion}</span>
-                        <span className={styles.LastSeen}>{formatLastSeen(lastSeen, t)}</span>
-                    </div>
-                ))}
+                <div className={`TextUltraSmall ${styles.Footer}`} ref={footerRef}>
+                    <span aria-live="polite">
+                        {t("Upgrades.ArtifactsTable.range", {
+                            from: firstIndex + 1,
+                            to: firstIndex + visibleBlockers.length,
+                            total,
+                        })}
+                    </span>
+                    <Pagination
+                        size="small"
+                        current={page}
+                        pageSize={pageSize}
+                        total={total}
+                        hideOnSinglePage
+                        showSizeChanger={false}
+                        onChange={(nextPage) => setFirstVisibleIndex((nextPage - 1) * pageSize)}
+                    />
+                </div>
             </div>
-
-            <p className={`TextUltraSmall ${styles.FootNote}`}>{t("Upgrades.ArtifactsTable.footNote")}</p>
         </section>
     );
 };
