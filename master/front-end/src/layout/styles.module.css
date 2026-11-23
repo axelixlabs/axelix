@@ -7,22 +7,45 @@
     position: fixed;
     top: var(--axelix-header-height);
     height: calc(100vh - var(--axelix-header-height));
-    background-color: var(--axelix-grey-50);
+    background-color: var(--axelix-grey-25);
+    border-inline-end: 1px solid var(--axelix-grey-200);
     z-index: 10;
 }
 
 .SiderScrollContainer {
-    height: calc(100% + 20px); 
-    margin-top: -10px;
+    height: 100%;
     overflow-y: auto;
-
-    /* Scrollable, but without a scrollbar: a visible one would take width away from the fixed-width sider */
-    scrollbar-width: none;
-    padding-block: 20px 10px; 
+    padding: 16px 12px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--axelix-grey-300) transparent;
 }
 
-.SiderScrollContainer::-webkit-scrollbar {
-    display: none;
+.SiderScrollContainer :global(.ant-menu-inline) {
+    border-inline-end: 0;
+}
+
+.SiderScrollContainer :global(.ant-menu-submenu-title) {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.SiderScrollContainer :global(.ant-menu-submenu:not(:first-child)) {
+    border-block-start: 1px solid var(--axelix-grey-200);
+    margin-block-start: 8px;
+    padding-block-start: 8px;
+}
+
+.SiderScrollContainer :global(.ant-menu-item-selected) {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.SiderScrollContainer :global(.ant-menu-item-selected::before) {
+    position: absolute;
+    inset-block: 8px;
+    inset-inline-start: 0;
+    width: 3px;
+    border-radius: 2px;
+    background-color: var(--axelix-green-600);
+    content: "";
 }
 
 .Content {

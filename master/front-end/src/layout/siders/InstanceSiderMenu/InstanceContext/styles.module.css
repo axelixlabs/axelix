@@ -1,29 +1,23 @@
 .MainWrapper {
     position: relative;
     display: block;
-    width: calc(100% - 36px);
-    margin: 12px 12px 16px 24px;
+    width: 100%;
+    margin: 0 0 16px;
     padding: 12px;
     font: inherit;
     text-align: left;
     background: var(--axelix-white);
-    border: 1px solid var(--axelix-grey-300);
-    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: 4px;
     cursor: pointer;
     transition:
         border-color 180ms,
-        box-shadow 180ms,
-        background 180ms,
-        transform 120ms;
+        background-color 180ms;
 }
 
 .MainWrapper:hover {
-    border-color: var(--axelix-green-200);
-}
-
-.MainWrapper:active {
-    background: var(--axelix-green-50);
-    transform: translateY(1px);
+    border-color: var(--axelix-grey-300);
+    background-color: var(--axelix-grey-50);
 }
 
 .MainWrapper:focus-visible {
@@ -32,9 +26,8 @@
 }
 
 .MainWrapper.Pressed {
-    background: var(--axelix-white);
+    background-color: var(--axelix-grey-50);
     border-color: var(--axelix-green-600);
-    box-shadow: 0 0 0 3px var(--axelix-green-50);
 }
 
 .Name {
