@@ -72,4 +72,13 @@ public interface EnhancedCacheManager extends CacheManager {
      * @return the current lookup history, initially empty if no history is available
      */
     SlidingWindow<CacheLookup> getLookupHistory(String cacheName);
+
+    /**
+     * Returns the enabled status of the named cache.
+     *
+     * @param cacheName the name of the cache whose enabled status is requested
+     * @return {@code true} if the cache is enabled or has not been explicitly toggled,
+     *         {@code false} if it is disabled
+     */
+    boolean isEnabled(String cacheName);
 }

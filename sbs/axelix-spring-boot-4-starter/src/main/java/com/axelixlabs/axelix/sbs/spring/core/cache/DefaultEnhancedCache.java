@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -43,23 +42,20 @@ public class DefaultEnhancedCache implements EnhancedCache {
 
     private final Cache delegate;
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
-    private final Supplier<Boolean> isEnabledFunction;
     private final EnhancedCacheManager cacheManager;
 
     public DefaultEnhancedCache(
             @NonNull Cache delegate,
             @Nullable AxelixMetricsPublisher metricsPublisher,
-            Supplier<Boolean> isEnabledFunction,
             EnhancedCacheManager cacheManager) {
         this.delegate = delegate;
-        this.isEnabledFunction = isEnabledFunction;
         this.metricsPublisher = metricsPublisher;
         this.cacheManager = cacheManager;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.isEnabledFunction.get();
+        return cacheManager.isEnabled(getName());
     }
 
     @Override
@@ -77,7 +73,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public ValueWrapper get(@NonNull Object key) {
-        if (!isEnabledFunction.get()) {
+        if (!isEnabled()) {
             return null;
         }
 
@@ -102,7 +98,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @Nullable Class<T> type) {
-        if (isEnabledFunction.get()) {
+        if (isEnabled()) {
             return delegate.get(key, type);
         } else {
             return null;
@@ -114,7 +110,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
     public <T> T get(@NonNull Object key, @NonNull Callable<T> valueLoader) {
         T value = null;
 
-        if (isEnabledFunction.get()) {
+        if (isEnabled()) {
             AtomicBoolean miss = new AtomicBoolean();
 
             value = delegate.get(key, () -> {
@@ -171,11 +167,11 @@ public class DefaultEnhancedCache implements EnhancedCache {
     }
 
     private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {
-        return isEnabledFunction.get() && supplier.getAsBoolean();
+        return isEnabled() && supplier.getAsBoolean();
     }
 
     private void executeIfEnabled(Runnable runnable) {
-        if (isEnabledFunction.get()) {
+        if (isEnabled()) {
             runnable.run();
         }
     }
