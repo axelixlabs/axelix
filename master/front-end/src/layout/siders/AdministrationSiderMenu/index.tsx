@@ -19,10 +19,11 @@ import { Menu } from "antd";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 
-import { ShieldIcon, UsersIcon } from "@/assets";
+import { ShieldIcon, UpgradeIcon, UsersIcon } from "@/assets";
 import { useAuthority } from "@/hooks";
 import { EAuthorities, type TMenuItem } from "@/models";
 
+const UPGRADES_PATH = "/administration/upgrades";
 const USERS_PATH = "/administration/users";
 const ROLES_PATH = "/administration/roles";
 
@@ -31,7 +32,13 @@ export const AdministrationSiderMenu = () => {
     const { pathname } = useLocation();
     const hasUsersViewAccess = useAuthority(EAuthorities.USERS_VIEW);
 
-    const items: TMenuItem[] = [];
+    const items: TMenuItem[] = [
+        {
+            key: UPGRADES_PATH,
+            icon: <UpgradeIcon width={16} height={16} aria-hidden="true" />,
+            label: <Link to={UPGRADES_PATH}>{t("Administration.Sider.upgrades")}</Link>,
+        },
+    ];
 
     if (hasUsersViewAccess) {
         items.push(

@@ -1,0 +1,54 @@
+.ContentWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 30px;
+}
+
+.PageHeader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--axelix-space-4);
+    margin-bottom: var(--axelix-space-4);
+}
+
+.PageHeader > :first-child {
+    flex: 1 1 340px;
+    margin-bottom: 0;
+}
+
+.WindowCard {
+    display: flex;
+    max-width: 100%;
+    align-items: center;
+    padding: var(--axelix-space-2) var(--axelix-space-4);
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-white);
+}
+
+.WindowSize,
+.WindowDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.WindowSize {
+    align-items: center;
+    padding-inline-end: var(--axelix-space-3);
+    text-align: center;
+}
+
+.WindowSize strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.WindowDetails {
+    padding-inline-start: var(--axelix-space-3);
+    border-inline-start: 1px solid var(--axelix-grey-300);
+}
+
+.WindowCard span {
+    color: var(--axelix-grey-500);
+}

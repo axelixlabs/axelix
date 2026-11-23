@@ -30,6 +30,7 @@ export * from "./interfaces/configProps";
 export * from "./interfaces/conditions";
 export * from "./interfaces/threadDump";
 export * from "./interfaces/wallboard";
+export * from "./interfaces/upgrades";
 export * from "./interfaces/metrics";
 export * from "./interfaces/details";
 export * from "./interfaces/globals";

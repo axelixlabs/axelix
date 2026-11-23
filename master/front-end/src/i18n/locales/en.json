@@ -923,5 +923,61 @@
             "body": "Define your own roles from individual permissions, compose roles from other roles, and manage them as code in a YAML file.",
             "compare": "Compare editions"
         }
+    },
+    "Upgrades": {
+        "title": "Upgrades",
+        "subtitle": "Derived from starter versions observed in service registrations over the last 30 days. No external calls.",
+        "EmptyState": {
+            "label": "NO SERVICES REGISTERED",
+            "title": "Nothing has reported a starter version to Master {{masterVersion}} yet.",
+            "description_one": "A service registers as soon as it starts up with the Axelix starter on its classpath, and this page begins tracking the version it runs. Once registrations exist, it tells you how far Master can be upgraded before any service falls out of the compatibility window of {{count}} release, and which teams are lagging behind.",
+            "description_other": "A service registers as soon as it starts up with the Axelix starter on its classpath, and this page begins tracking the version it runs. Once registrations exist, it tells you how far Master can be upgraded before any service falls out of the compatibility window of {{count}} releases, and which teams are lagging behind.",
+            "readDocumentation": "Read documentation"
+        },
+        "FleetBars": {
+            "title": "Starter versions",
+            "observationWindow": "Observed in the last 30 days",
+            "serviceCount_one": "{{count}} service",
+            "serviceCount_other": "{{count}} services",
+            "serviceLabel_one": "service",
+            "serviceLabel_other": "services"
+        },
+        "ArtifactsTable": {
+            "artifact": "Artifact",
+            "starter": "Starter",
+            "lastSeen": "Last seen",
+            "today": "Today",
+            "yesterday": "Yesterday",
+            "daysAgo_one": "{{count}} day ago",
+            "daysAgo_other": "{{count}} days ago",
+            "sectionTitle": "Observed services",
+            "range": "{{from}}–{{to}} of {{total}}"
+        },
+        "CompatibilityWindow": {
+            "title": "Compatibility window",
+            "description": "Includes the target Master release",
+            "explanation": "The compatibility window is the number of consecutive starter minor releases Master supports, including its own minor release. For example, Master {{master}} supports starter versions {{oldest}} through {{master}}.",
+            "minorReleases_one": "minor release",
+            "minorReleases_other": "minor releases"
+        },
+        "HeadroomPanel": {
+            "eyebrow": "Upgrade headroom",
+            "safeTarget": "Master {{version}} supports every observed service",
+            "noSafeTarget": "No shown target supports every observed service",
+            "oldestVersion": "Oldest starter {{version}}",
+            "impact": "Upgrade impact",
+            "targetVersion": "Target",
+            "outsideSupport": "Services outside support"
+        },
+        "Ruler": {
+            "masterNow": "Master now",
+            "impact": "{{services}} ({{percentage}})",
+            "safeHeadroom": "Safe upgrade headroom"
+        }
+    },
+    "Administration": {
+        "Sider": {
+            "upgrades": "Upgrades"
+        }
     }
 }

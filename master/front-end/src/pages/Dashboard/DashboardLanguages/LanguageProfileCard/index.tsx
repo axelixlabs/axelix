@@ -17,9 +17,8 @@
  */
 import { type ReactNode } from "react";
 
+import { DistributionDonut } from "@/components/DistributionDonut";
 import type { ILanguagesDonutSegment, ILanguagesLegendRow } from "@/models";
-
-import { LanguageDonut } from "../LanguageDonut";
 
 import styles from "./styles.module.css";
 
@@ -60,7 +59,7 @@ export const LanguageProfileCard = ({
                 </div>
 
                 <div className={styles.Body}>
-                    <LanguageDonut segments={segments} centreTop={centreTop} centreBottom={centreBottom} />
+                    <DistributionDonut segments={segments} centreTop={centreTop} centreBottom={centreBottom} />
 
                     <div className={`TextUltraSmall ${styles.Legend} DonutLegendFade`}>
                         {summary && (

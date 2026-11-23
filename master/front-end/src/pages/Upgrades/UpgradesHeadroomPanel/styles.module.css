@@ -1,0 +1,240 @@
+.Panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.06fr);
+    gap: var(--axelix-space-4);
+    margin-bottom: var(--axelix-space-5);
+}
+
+.Card {
+    min-width: 0;
+    padding: var(--axelix-space-5);
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-white);
+    box-shadow: var(--axelix-box-shadow-light);
+}
+
+.Eyebrow,
+.Title,
+.Meta,
+.ColumnTitle {
+    margin: 0;
+}
+
+.Eyebrow {
+    color: var(--axelix-grey-500);
+}
+
+.Title {
+    margin-block: var(--axelix-space-2);
+    color: inherit;
+    text-wrap: balance;
+}
+
+.Meta {
+    color: var(--axelix-grey-500);
+}
+
+.ColumnTitle {
+    margin-bottom: var(--axelix-space-2);
+    color: inherit;
+    font-size: var(--axelix-font-size-body);
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Ruler {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: auto 1fr;
+    margin-top: var(--axelix-space-4);
+    overflow-x: auto;
+}
+
+.RulerRange {
+    display: grid;
+    grid-row: span 2;
+    grid-template-rows: subgrid;
+}
+
+.SafeRange {
+    color: var(--axelix-green-700);
+}
+
+.RangeLabel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--axelix-space-1);
+    padding: var(--axelix-space-2);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    text-align: center;
+}
+
+.Question {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: 50%;
+    color: var(--axelix-grey-500);
+    cursor: help;
+}
+
+.Ticks {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.Tick {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--axelix-space-1);
+    padding: var(--axelix-space-3) 2px 0;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.Tick::before,
+.Tick::after {
+    position: absolute;
+    content: "";
+}
+
+.Tick::before {
+    top: 4px;
+    inset-inline: 0;
+    height: 3px;
+    background: var(--axelix-grey-200);
+}
+
+.SafeRange .Tick::before {
+    background: var(--axelix-green-500);
+}
+
+.RulerRange:first-child .Tick:first-child::before {
+    inset-inline-start: 50%;
+}
+
+.RulerRange:last-child .Tick:last-child::before {
+    inset-inline-end: 50%;
+}
+
+.Ruler:has(.SafeRange) .Tick[data-current="true"]::before {
+    background: linear-gradient(to right, var(--axelix-grey-200) 50%, var(--axelix-green-500) 50%);
+}
+
+.Ruler:has(.SafeRange) .Tick[data-current="true"]:first-child::before {
+    background: var(--axelix-green-500);
+}
+
+.Tick::after {
+    top: 0;
+    left: calc(50% - 5.5px);
+    width: 11px;
+    height: 11px;
+    border: 2px solid var(--axelix-white);
+    border-radius: 50%;
+    background-color: var(--axelix-grey-400);
+}
+
+.Tick[data-current="true"]::after {
+    background-color: var(--axelix-green-500);
+}
+
+.SafeRange .Tick::after {
+    background-color: var(--axelix-green-500);
+}
+
+.Tick span {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Tick[data-current="true"] strong,
+.Tick .CurrentLabel {
+    color: var(--axelix-green-700);
+}
+
+.ImpactTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--axelix-font-size-caption);
+    font-variant-numeric: tabular-nums;
+}
+
+.ImpactTable th,
+.ImpactTable td {
+    padding: var(--axelix-space-2) 0;
+    text-align: start;
+}
+
+.ImpactTable th + th,
+.ImpactTable td {
+    padding-inline-start: var(--axelix-space-2);
+    text-align: end;
+}
+
+.ImpactTable thead th {
+    color: var(--axelix-grey-500);
+    font-weight: var(--axelix-font-weight-regular);
+}
+
+.ImpactTable tbody tr {
+    border-top: 1px solid var(--axelix-grey-200);
+}
+
+.FleetBars {
+    display: grid;
+    max-height: 176px;
+    gap: var(--axelix-space-3);
+    margin: var(--axelix-space-4) 0 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.FleetBarRow {
+    display: grid;
+    gap: var(--axelix-space-1);
+}
+
+.FleetBarLabel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--axelix-space-2);
+    font-size: var(--axelix-font-size-caption);
+    font-variant-numeric: tabular-nums;
+}
+
+.Version {
+    font-family: var(--axelix-font-family-code);
+}
+
+.FleetBarTrack {
+    height: 10px;
+    overflow: hidden;
+    border-radius: var(--axelix-border-radius-small);
+    background-color: var(--axelix-grey-100);
+}
+
+.FleetBarTrack span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+}
+
+@media (width <= 850px) {
+    .Panel {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
