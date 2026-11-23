@@ -21,13 +21,12 @@ import type { TFunction } from "i18next";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { ICeilingBlocker } from "@/models";
+import type { IObservedService } from "@/models";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    ceilingBlockers: ICeilingBlocker[];
-    oldestStarterVersion: string;
+    services: IObservedService[];
 }
 
 const formatLastSeen = (lastSeen: string, t: TFunction): string => {
@@ -52,16 +51,16 @@ const formatLastSeen = (lastSeen: string, t: TFunction): string => {
 
 const BOTTOM_SPACING = 24;
 
-export const UpgradesTable = ({ ceilingBlockers, oldestStarterVersion }: IProps) => {
+export const UpgradesTable = ({ services }: IProps) => {
     const { t } = useTranslation();
     const [firstVisibleIndex, setFirstVisibleIndex] = useState(0);
     const [pageSize, setPageSize] = useState(1);
     const rowsRef = useRef<HTMLDivElement>(null);
     const footerRef = useRef<HTMLDivElement>(null);
-    const total = ceilingBlockers.length;
+    const total = services.length;
     const page = Math.min(Math.floor(firstVisibleIndex / pageSize) + 1, Math.ceil(total / pageSize));
     const firstIndex = (page - 1) * pageSize;
-    const visibleBlockers = ceilingBlockers.slice(firstIndex, firstIndex + pageSize);
+    const visibleServices = services.slice(firstIndex, firstIndex + pageSize);
 
     useLayoutEffect(() => {
         const rows = rowsRef.current!;
@@ -101,16 +100,14 @@ export const UpgradesTable = ({ ceilingBlockers, oldestStarterVersion }: IProps)
     return (
         <section className={styles.Section}>
             <div className={styles.SectionRow}>
-                <h2 className={styles.SectionTitle} id="oldest-starter-services">
+                <h2 className={styles.SectionTitle} id="observed-services">
                     {t("Upgrades.ArtifactsTable.sectionTitle")}
                 </h2>
-                <p className={styles.SectionNote}>
-                    {oldestStarterVersion} · {t("Upgrades.FleetBars.serviceCount", { count: total })}
-                </p>
+                <p className={styles.SectionNote}>{t("Upgrades.FleetBars.serviceCount", { count: total })}</p>
             </div>
 
             <div className={styles.Table}>
-                <div role="table" aria-labelledby="oldest-starter-services">
+                <div role="table" aria-labelledby="observed-services">
                     <div role="row" className={`TextCaps ${styles.HeaderRow}`}>
                         <span role="columnheader">{t("Upgrades.ArtifactsTable.artifact")}</span>
                         <span role="columnheader">{t("Upgrades.ArtifactsTable.starter")}</span>
@@ -118,7 +115,7 @@ export const UpgradesTable = ({ ceilingBlockers, oldestStarterVersion }: IProps)
                     </div>
 
                     <div role="rowgroup" ref={rowsRef}>
-                        {visibleBlockers.map(({ artifactId, groupId, starterVersion, lastSeen }) => (
+                        {visibleServices.map(({ artifactId, groupId, starterVersion, lastSeen }) => (
                             <div role="row" className={styles.Row} key={`${groupId}:${artifactId}`}>
                                 <div role="cell" className={styles.ArtifactCell}>
                                     <span className={styles.ArtifactId} title={artifactId}>
@@ -143,7 +140,7 @@ export const UpgradesTable = ({ ceilingBlockers, oldestStarterVersion }: IProps)
                     <span aria-live="polite">
                         {t("Upgrades.ArtifactsTable.range", {
                             from: firstIndex + 1,
-                            to: firstIndex + visibleBlockers.length,
+                            to: firstIndex + visibleServices.length,
                             total,
                         })}
                     </span>

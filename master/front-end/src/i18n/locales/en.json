@@ -950,7 +950,7 @@
             "yesterday": "Yesterday",
             "daysAgo_one": "{{count}} day ago",
             "daysAgo_other": "{{count}} days ago",
-            "sectionTitle": "Services on the oldest starter",
+            "sectionTitle": "Observed services",
             "range": "{{from}}–{{to}} of {{total}}"
         },
         "CompatibilityWindow": {

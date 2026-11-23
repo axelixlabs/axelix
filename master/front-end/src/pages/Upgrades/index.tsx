@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler, Loader, PagesFirstSection } from "@/components";
-import { fetchData, getOldestStarterVersion } from "@/helpers";
+import { fetchData } from "@/helpers";
 import { type IUpgradesData, StatefulRequest } from "@/models";
 import { getUpgradesData } from "@/services";
 
@@ -46,9 +46,7 @@ const Upgrades = () => {
     }
 
     const responseBody = upgradesData.response!;
-    const { starterVersions, ceilingBlockers, masterVersion, compatibilityWindow } = responseBody;
-
-    const oldestStarterVersion = getOldestStarterVersion(starterVersions);
+    const { starterVersions, services, masterVersion, compatibilityWindow } = responseBody;
 
     return (
         <>
@@ -71,13 +69,11 @@ const Upgrades = () => {
                 </div>
             </div>
 
-            {oldestStarterVersion ? (
+            {starterVersions.length > 0 ? (
                 <>
                     <UpgradesHeadroomPanel data={responseBody} />
 
-                    {ceilingBlockers.length > 0 && (
-                        <UpgradesTable ceilingBlockers={ceilingBlockers} oldestStarterVersion={oldestStarterVersion} />
-                    )}
+                    {services.length > 0 && <UpgradesTable services={services} />}
                 </>
             ) : (
                 <UpgradesEmptyState masterVersion={masterVersion} compatibilityWindow={compatibilityWindow} />

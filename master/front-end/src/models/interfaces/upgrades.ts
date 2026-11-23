@@ -28,7 +28,7 @@ export interface IStarterVersion {
     serviceCount: number;
 }
 
-export interface ICeilingBlocker {
+export interface IObservedService {
     artifactId: string;
     groupId: string;
     starterVersion: string;
@@ -39,5 +39,5 @@ export interface IUpgradesData {
     masterVersion: string;
     compatibilityWindow: number;
     starterVersions: IStarterVersion[];
-    ceilingBlockers: ICeilingBlocker[];
+    services: IObservedService[];
 }

@@ -976,7 +976,7 @@
             "daysAgo_few": "{{count}} дня назад",
             "daysAgo_many": "{{count}} дней назад",
             "daysAgo_other": "{{count}} дня назад",
-            "sectionTitle": "Сервисы с самой старой версией стартера",
+            "sectionTitle": "Обнаруженные сервисы",
             "range": "{{from}}–{{to}} из {{total}}"
         },
         "CompatibilityWindow": {
