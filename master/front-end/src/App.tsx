@@ -16,7 +16,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { App as AntdApp, ConfigProvider, type ThemeConfig } from "antd";
+import deDE from "antd/locale/de_DE";
 import frFR from "antd/locale/fr_FR";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Provider } from "react-redux";
 
@@ -27,8 +29,16 @@ import { AppRoutes } from "./routes";
 
 import "./i18n/i18n";
 
+const antdLocales = { de: deDE, fr: frFR };
+
 export const App = () => {
     const { i18n } = useTranslation();
+    const language = i18n.resolvedLanguage;
+
+    useEffect(() => {
+        document.documentElement.lang = language ?? "en";
+    }, [language]);
+
     const theme: ThemeConfig = {
         token: {
             colorPrimary: palette.green[600],
@@ -68,7 +78,7 @@ export const App = () => {
     return (
         <>
             <ConfigProvider
-                locale={i18n.resolvedLanguage === "fr" ? frFR : undefined}
+                locale={language === "de" || language === "fr" ? antdLocales[language] : undefined}
                 theme={theme}
                 tooltip={{
                     styles: {

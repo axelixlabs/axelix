@@ -1,0 +1,983 @@
+{
+    "ActionInstancesSelector": {
+        "all": "Alle",
+        "current": "Aktuell",
+        "alwaysIncluded": "Die aktuelle Instanz ist immer enthalten",
+        "selectAllOthers": "Alle anderen Instanzen auswählen",
+        "selectedCount": "Ausgewählt: {{count}} / {{total}}",
+        "instances": "Instanzen"
+    },
+    "InstanceContext": {
+        "instancesCount": "Instanzen · {{count}}",
+        "commit": "Commit-Hash",
+        "uptime": "Laufzeit"
+    },
+    "search": "Suchen",
+    "noData": "Keine Daten",
+    "copied": "Kopiert",
+    "copyFailed": "Kopieren fehlgeschlagen",
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen",
+    "status": "Status",
+    "on": "AN",
+    "off": "AUS",
+    "documentation": "Dokumentation",
+    "value": "Wert",
+    "blog": "Blog",
+    "unknownError": "Unbekannter Fehler. Laden Sie die Seite neu.",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "notEnoughAuthorities": "Ihnen fehlen die erforderlichen Berechtigungen",
+    "license": "Lizenz",
+    "version": "Version",
+    "or": "oder",
+    "LicenseStatusAlert": {
+        "licenseExpiringSoonAlertTitle_one": "Ihre Axelix-Enterprise-Lizenz läuft in {{count}} Tag ab ({{date}}). Danach stehen die Enterprise-Funktionen nicht mehr zur Verfügung.",
+        "licenseExpiringSoonAlertTitle_other": "Ihre Axelix-Enterprise-Lizenz läuft in {{count}} Tagen ab ({{date}}). Danach stehen die Enterprise-Funktionen nicht mehr zur Verfügung.",
+        "licenseAlertActionText": "Schlüssel aktualisieren"
+    },
+    "Details": {
+        "downloadState": "Zustand herunterladen",
+        "Components": {
+            "HEAP_DUMP": "Heap-Dump",
+            "THREAD_DUMP": "Thread-Dump",
+            "BEANS": "Beans",
+            "CACHES": "Caches",
+            "CONDITIONS": "Bedingungen",
+            "CONFIG_PROPS": "Konfigurationseigenschaften",
+            "ENV": "Umgebung",
+            "SCHEDULED_TASKS": "Geplante Aufgaben"
+        },
+        "DownloadState": {
+            "title": "Zustand herunterladen",
+            "subtitle": {
+                "pick": "Wählen Sie aus, was enthalten sein soll. Alles wird in eine einzige .zip-Datei gepackt.",
+                "run": "Daten der laufenden Instanz werden erfasst.",
+                "done": "Ihr Download ist bereit."
+            },
+            "groups": {
+                "jvm": "JVM",
+                "spring": "Spring"
+            },
+            "count": "{{selected}} von {{total}}",
+            "descriptions": {
+                "HEAP_DUMP": "Alle Objekte im Speicher als .hprof-Datei. Zur Analyse von Speicherlecks.",
+                "THREAD_DUMP": "Stacktraces aller Threads. Zur Analyse von Hängern und konkurrierenden Zugriffen.",
+                "BEANS": "Alle Beans mit Gültigkeitsbereich, Typ und Abhängigkeiten.",
+                "CONDITIONS": "Gründe dafür, warum die jeweiligen Autokonfigurationen angewendet oder übersprungen wurden.",
+                "CONFIG_PROPS": "@ConfigurationProperties-Beans und die an sie gebundenen Werte. Sensible Werte werden maskiert.",
+                "ENV": "Eigenschaftsquellen in Reihenfolge ihrer Priorität. Sensible Werte werden maskiert.",
+                "CACHES": "Cache-Manager und Caches.",
+                "SCHEDULED_TASKS": "Aufgaben mit Cron-Ausdruck, fester Rate oder fester Verzögerung."
+            },
+            "itemSize": {
+                "heap": "Bis zur Heap-Größe",
+                "small": "< 1 MB"
+            },
+            "heapWarning": {
+                "title": "Die Anwendung pausiert, während der Heap-Dump geschrieben wird",
+                "body": "Die Datei ist etwa so groß wie der belegte Heap, oft mehrere hundert MB oder mehr. Während sie geschrieben wird, reagiert die Anwendung nicht. Die Datei enthält den gesamten Speicherinhalt, einschließlich Passwörtern und Tokens. Bewahren Sie sie so geschützt auf wie Zugangsdaten."
+            },
+            "collecting": "Erfassung läuft: {{count}} Elemente",
+            "collectingItem": "wird erfasst…",
+            "writingHeap": "wird geschrieben… Anwendung pausiert",
+            "saved": "Im Download-Ordner gespeichert",
+            "selected": "Ausgewählt",
+            "sizeZipped": "Komprimierte Größe",
+            "size": {
+                "heap": "Heap-Größe",
+                "heapPlus": "Heap-Größe + < {{mb}} MB",
+                "small": "< {{mb}} MB"
+            },
+            "download": ".zip-Datei herunterladen",
+            "close": "Schließen"
+        },
+        "spring": {
+            "springBootVersion": "Spring Boot",
+            "springFrameworkVersion": "Spring Framework",
+            "springCloudVersion": "Spring Cloud"
+        },
+        "runtime": {
+            "javaVersion": "Java",
+            "kotlinVersion": "Kotlin",
+            "jdkVendor": "JDK-Anbieter",
+            "garbageCollector": "Garbage Collector"
+        },
+        "os": {
+            "name": "Betriebssystemfamilie",
+            "version": "Kernel-Version",
+            "arch": "CPU-Architektur",
+            "pid": "PID",
+            "processUser": "Prozessbenutzer"
+        },
+        "build": {
+            "group": "Gruppen-ID",
+            "version": "Version",
+            "artifact": "Artefakt-ID",
+            "time": "Build-Zeitpunkt"
+        },
+        "garbageCollectors": {
+            "G1": "G1",
+            "SHENADOAH": "Shenandoah",
+            "GEN_SHENADOAH": "Generational Shenandoah",
+            "ZGC": "ZGC",
+            "EPSILONGC": "Epsilon",
+            "PARALLEL": "Parallel",
+            "SERIAL": "Serial",
+            "CMS": "CMS",
+            "UNKNOWN": "Unbekannt"
+        },
+        "git": {
+            "commitShaShort": "Commit-SHA",
+            "branch": "Branch",
+            "authorName": "Autor des Commits",
+            "authorEmail": "E-Mail-Adresse des Autors",
+            "commitTimestamp": "Commit-Zeitpunkt"
+        }
+    },
+    "Environments": {
+        "activeProfiles": "Profile:",
+        "primaryProperty": "Aktiv",
+        "primaryPropertyHint": "Die Anwendung verwendet diesen Wert für die Eigenschaft",
+        "suppressedProperty": "Überschrieben",
+        "suppressedPropertyHint": "Eine Eigenschaftsquelle mit höherer Priorität definiert dieselbe Eigenschaft. Daher kommt dieser Wert nie zum Einsatz.",
+        "deprecated": "Veraltet",
+        "replacedBy": "Ersetzt durch",
+        "dangerousValue": "Gefährlicher Wert",
+        "recommended": "Empfohlen",
+        "description": "Beschreibung",
+        "configProps": "Konfigurationseigenschaften",
+        "injectedIn": "Injiziert in",
+        "profilesCount": "Profile: {{value}}",
+        "profilesPrecedenceHint": "In absteigender Prioritätsreihenfolge. Weiter oben stehende Profile überschreiben Werte weiter unten stehender Profile.",
+        "propertiesCount": "Eigenschaften: {{value}}",
+        "flaggedCount": "{{value}} markiert",
+        "clearFilters": "Zurücksetzen",
+        "triageTags": {
+            "DANGEROUS": "Gefährlicher Wert",
+            "DEPRECATED_ERROR": "Veraltet · Fehler",
+            "DEPRECATED_WARNING": "Veraltet · Warnung",
+            "SUPPRESSED": "Überschrieben"
+        },
+        "definedInSources": "Quellen mit dieser Eigenschaft: {{value}}",
+        "wins": "Setzt sich durch",
+        "highestPrecedence": "Höchste Priorität",
+        "lowestPrecedence": "Niedrigste Priorität",
+        "noMatchingProperties": "Keine Eigenschaften entsprechen der aktuellen Suche und den Filtern.",
+        "noPropertiesInSource": "Diese Eigenschaftsquelle definiert keine Eigenschaften."
+    },
+    "Loggers": {
+        "loggers": "Logger",
+        "loggerGroups": "Logger-Gruppen",
+        "configuredExplicitly": "Explizit konfiguriert",
+        "loggerLevelUpdated": "Die Protokollstufe wurde geändert",
+        "reset": "Der Logger wurde zurückgesetzt",
+        "setTemporaryLevel": "Vorübergehende Protokollstufe",
+        "changedTemporary": "Vorübergehend geändert"
+    },
+    "Header": {
+        "dashboard": "Dashboard",
+        "wallboard": "Wallboard",
+        "administration": "Verwaltung",
+        "users": "Benutzer",
+        "roles": "Rollen und Berechtigungen",
+        "Help": {
+            "title": "Hilfe",
+            "about": "Über Axelix",
+            "feedback": "Feedback geben"
+        }
+    },
+    "Sider": {
+        "general": "Allgemein",
+        "overview": "Übersicht",
+        "metrics": "Metriken",
+        "environment": "Eigenschaften",
+        "beans": "Beans",
+        "configurationProperties": "Konfigurationseigenschaften",
+        "scheduledTasks": "Geplante Aufgaben",
+        "conditions": "Bedingungen",
+        "loggers": "Logger",
+        "dependenciesAnalyzer": "Abhängigkeitsanalyse",
+        "mappings": "Mappings",
+        "caches": "Caches",
+        "transactionControl": "Transaktionskontrolle",
+        "entitiesMap": "Entitätenübersicht",
+        "threadDump": "Thread-Dump",
+        "garbageCollector": "Garbage Collector"
+    },
+    "UnavailableFeature": {
+        "notUsedTitle": "Von dieser Anwendung nicht verwendet",
+        "notAvailableTitle": "Für diese Instanz nicht verfügbar",
+        "caches": "Axelix hat keine Bean vom Typ <0>CacheManager</0> gefunden. Daher können keine Caches angezeigt werden.",
+        "scheduled-tasks": "Axelix hat keine <0>@Scheduled</0>-Methoden gefunden. Daher können keine Aufgaben angezeigt werden.",
+        "entities-map": "Axelix hat keine JPA-Entitäten gefunden. Daher kann keine Entitätenübersicht angezeigt werden.",
+        "transactions": "Axelix hat keine Bean vom Typ <0>PlatformTransactionManager</0> gefunden. Daher können keine Transaktionen angezeigt werden.",
+        "dependency-analysis": "Diese Instanz verwendet einen Axelix-Starter vor Version 1.2. Starter-Versionen vor 1.2 melden keine Abhängigkeiten."
+    },
+    "Caches": {
+        "clearAll": "Alle Caches leeren",
+        "target": "Ziel",
+        "name": "Name",
+        "cleared": "Geleert",
+        "clear": "Leeren",
+        "ratio": "Trefferquote",
+        "enabled": "Der Cache ist zur Laufzeit aktiviert",
+        "disabled": "Der Cache ist zur Laufzeit deaktiviert",
+        "estimatedEntrySize": "Anzahl der Einträge",
+        "statistics": "Statistik",
+        "clearAllCachesTitle": "Alle Caches leeren?",
+        "clearAllCachesDescription": "Möchten Sie wirklich alle Caches leeren?",
+        "disableThisCacheTitle": "Diesen Cache deaktivieren?",
+        "enableThisCacheTitle": "Diesen Cache aktivieren?",
+        "disableThisCacheDescription": "Möchten Sie diesen Cache wirklich deaktivieren?",
+        "enableThisCacheDescription": "Möchten Sie diesen Cache wirklich aktivieren?",
+        "clearThisCacheTitle": "Diesen Cache leeren?",
+        "clearThisCacheDescription": "Möchten Sie diesen Cache wirklich leeren?"
+    },
+    "Authentication": {
+        "welcome": "Willkommen",
+        "logout": "Abmelden",
+        "docs": "Dokumentation",
+        "loginPasswordForm": {
+            "enterUsername": "Benutzernamen eingeben",
+            "enterPassword": "Passwort eingeben",
+            "loginButtonText": "Anmelden"
+        },
+        "oidcForm": {
+            "loginButtonText": "Mit OAuth2-/OIDC-Anbieter anmelden"
+        }
+    },
+    "Conditions": {
+        "negativeMatches": "Nicht erfüllte Bedingungen",
+        "positiveMatches": "Erfüllte Bedingungen"
+    },
+    "Beans": {
+        "dependencies": "Abhängigkeiten",
+        "aliases": "Aliasse",
+        "qualifiers": "Qualifier",
+        "isLazyInitBean": "Verzögert initialisiert",
+        "isPrimaryBean": "Primär",
+        "beanProxyType": "Proxy-Strategie",
+        "unknownProxyingType": "Unbekannt",
+        "cglibProxy": "CGLIB",
+        "jdkProxy": "Dynamischer JDK-Proxy",
+        "noProxy": "Kein Proxy",
+        "beanSource": {
+            "tree": {
+                "main": "Herkunft",
+                "beanMethod": "@Bean-Methode",
+                "enclosingClass": "Deklarierende Klasse",
+                "factoryBeanClassName": "FactoryBean",
+                "autoConfigurationEnclosingClass": "Deklarierende Autokonfigurationsklasse",
+                "conditionsPageRef": "Wo wird diese Bean definiert?",
+                "configPropsBean": "@ConfigurationProperties-Bean"
+            },
+            "AUTO_CONFIGURATION_BEAN_METHOD": "@Bean-Methode einer Autokonfiguration",
+            "AUTO_CONFIGURATION_CLASS": "@AutoConfiguration-Klasse",
+            "COMPONENT_ANNOTATION": "@Component oder eine Variante",
+            "SYNTHETIC_BEAN": "Synthetische Bean",
+            "UNKNOWN": "Unbekannt",
+            "FACTORY_BEAN": "Von der FactoryBean erzeugt",
+            "BEAN_METHOD": "@Bean-Methode",
+            "CONFIG_PROPS_BEAN": "@ConfigurationProperties-Bean"
+        }
+    },
+    "ScheduledTasks": {
+        "expression": "Cron-Ausdruck",
+        "interval": "Intervall (ms)",
+        "cron": "Cron",
+        "fixedDelay": "Feste Verzögerung",
+        "fixedRate": "Feste Rate",
+        "enabled": "Aufgabe aktiviert",
+        "disabled": "Aufgabe deaktiviert",
+        "runSuccess": "Die geplante Aufgabe wurde manuell ausgeführt",
+        "fixedTaskIntervalChangeSuccess": "Das Intervall wurde geändert",
+        "cronExpressionChangeSuccess": "Der Cron-Ausdruck wurde geändert",
+        "runThisTaskTitle": "Diese Aufgabe ausführen?",
+        "runThisTaskDescription": "Möchten Sie diese geplante Aufgabe wirklich ausführen?",
+        "disableThisTaskTitle": "Diese Aufgabe deaktivieren?",
+        "enableThisTaskTitle": "Diese Aufgabe aktivieren?",
+        "disableThisTaskDescription": "Möchten Sie diese geplante Aufgabe wirklich deaktivieren?",
+        "enableThisTaskDescription": "Möchten Sie diese geplante Aufgabe wirklich aktivieren?",
+        "searchTasks": "Aufgaben suchen",
+        "statLastRun": "Letzte Ausführung",
+        "statSuccess": "Erfolgreich",
+        "statFailed": "Fehlgeschlagen",
+        "statAvg": "Durchschn.",
+        "statP95": "p95",
+        "runNow": "Jetzt ausführen",
+        "editTrigger": "Trigger bearbeiten",
+        "editCronNote": "Ändern Sie den Cron-Ausdruck.",
+        "editDelayNote": "Ändern Sie die Verzögerung zwischen Ausführungen.",
+        "editRateNote": "Ändern Sie das Intervall zwischen Ausführungen.",
+        "editCronHelp": "Sechs Felder: Sekunde, Minute, Stunde, Tag des Monats, Monat, Wochentag",
+        "editCronInvalidError": "Dieser Cron-Ausdruck ist ungültig",
+        "editIntervalError": "Geben Sie eine positive ganze Zahl in Millisekunden ein",
+        "editPreviewRuns": "Ausführung:",
+        "editPreviewInvalid": "Ungültig:",
+        "fixedDelayPreview": "{{duration}} nach Ende jeder Ausführung",
+        "fixedRatePreview": "Alle {{duration}}",
+        "applyTrigger": "Trigger übernehmen",
+        "durationTitle": "Dauer",
+        "durationHint": "Die letzten 30 Ausführungen, von der ältesten zur neuesten. Die Balkenhöhe ist nicht linear skaliert, damit kurze Ausführungen sichtbar bleiben. Zeigen Sie mit dem Mauszeiger auf einen Balken, um die genaue Dauer zu sehen.",
+        "max": "max.",
+        "failuresByType": "Fehlgeschlagene Ausführungen nach Fehlertyp",
+        "last": "zuletzt",
+        "executions": "Ausführungen",
+        "all": "Alle",
+        "failed": "Fehlgeschlagen",
+        "started": "Gestartet",
+        "instance": "Instanz",
+        "duration": "Dauer",
+        "result": "Ergebnis",
+        "succeeded": "Erfolgreich",
+        "executionsShown": "{{from}}–{{to}} von {{total}} Ausführungen",
+        "executionsShownEmpty": "0 Ausführungen",
+        "noHistoryTitle": "Keine Ausführungsdaten für diese Aufgabe",
+        "noHistoryDescription": "Für diese geplante Aufgabe hat Axelix keine Ausführungen erfasst. Sobald Ausführungen gemeldet werden, erscheinen sie hier zusammen mit ihrer Dauer und etwaigen Fehlern.",
+        "readDocs": "Dokumentation lesen"
+    },
+    "Error": {
+        "title": "Fehler",
+        "codes": {
+            "UNKNOWN_ERROR": "Unbekannter Fehler. Laden Sie die Seite neu oder versuchen Sie es später erneut.",
+            "INTERNAL_SERVER_ERROR": "Unerwarteter Serverfehler. Wiederholen Sie die Anfrage später.",
+            "INSTANCE_NOT_FOUND": "Die angeforderte Anwendungsinstanz wurde nicht gefunden. Wahrscheinlich wurde sie seit der letzten Anfrage Ihres Browsers an den Server neu bereitgestellt. Öffnen Sie das Wallboard.",
+            "INVALID_CREDENTIALS": "Ungültiger Benutzername oder ungültiges Passwort",
+            "USERNAME_ALREADY_EXISTS": "Ein Benutzer mit diesem Benutzernamen ist bereits vorhanden. Wählen Sie einen anderen Benutzernamen.",
+            "EMAIL_ALREADY_EXISTS": "Ein Benutzer mit dieser E-Mail-Adresse ist bereits vorhanden. Wählen Sie eine andere E-Mail-Adresse.",
+            "USER_STATUS_CHANGE_NOT_ALLOWED": "Nur lokale Benutzer können gesperrt oder reaktiviert werden.",
+            "SBOM_NOT_AVAILABLE": "Für dieses Projekt sind keine SBOM-Daten verfügbar."
+        }
+    },
+    "Metrics": {
+        "baseUnit": "Basiseinheit",
+        "tags": "Tags",
+        "selectValue": "Wert auswählen",
+        "disabledTag": "Dieser Tag-Wert ist mit den für die anderen Tags ausgewählten Werten ungültig."
+    },
+    "Dashboard": {
+        "NoData": {
+            "badge": "Noch keine Daten",
+            "title": "Keine Daten für dieses Dashboard",
+            "noApplications": "Für dieses Dashboard liegen derzeit offenbar keine Daten vor. Möglicherweise sind in Axelix Master noch keine Anwendungen registriert.",
+            "oldStarter": "In seltenen Fällen kann das daran liegen, dass alle bei Axelix Master registrierten Anwendungen eine ältere Version des Starters und des Plugins verwenden, die keine Daten für dieses Dashboard überträgt.",
+            "readTheDocs": "Dokumentation lesen",
+            "lastScan": "Letzte Erfassung: {{date}}"
+        },
+        "Languages": {
+            "title": "Sprachenprofil",
+            "subtitle": "JVM-Sprachen, Java-Releases und JDK-Builds in den überwachten Anwendungen",
+            "applications": "Anwendungen",
+            "lts": "LTS",
+            "nonLts": "Ohne LTS",
+            "onLtsRelease": "mit einem LTS-Release",
+            "onNonLtsRelease": "mit einem Release ohne LTS",
+            "javaEyebrow": "Java-Version · pro Anwendung",
+            "javaCardTitle": "Java-Nutzung",
+            "javaTitle": "Java",
+            "jdkEyebrow": "JDK-Anbieter · pro Anwendung",
+            "jdkCardTitle": "JDK-Anbieter",
+            "languageMixEyebrow": "Sprachkombination · pro Anwendung",
+            "languageMixTitle": "Kotlin-Nutzung",
+            "kotlinVersionEyebrow": "Kotlin-Version · pro Anwendung",
+            "kotlinCardTitle": "Kotlin-Versionen",
+            "kotlinTitle": "Kotlin",
+            "javaOnly": "Nur Java",
+            "javaAndKotlin": "Java und Kotlin",
+            "ltsReleases": "LTS-Releases",
+            "onJava": "mit Java {{release}}",
+            "singleJdk": "Ein JDK",
+            "useKotlin": "verwenden Kotlin",
+            "applicationsLower": "Anwendungen",
+            "releasesInUse": "<0>{{count}}</0> Releases in <1>{{apps}}</1> Anwendungen im Einsatz",
+            "vendorsAcrossApplications": "<0>{{vendors}}</0> Anbieter bei <1>{{apps}}</1> Anwendungen",
+            "kotlinOfApplications": "<0>{{kotlin}}</0> von <1>{{total}}</1> Anwendungen enthalten Kotlin-Code",
+            "versionsAcrossApplications": "<0>{{count}}</0> Versionen in <1>{{apps}}</1> Anwendungen",
+            "detectedAcrossApplications": "Zur Laufzeit in <0>{{count}}</0> Anwendungen erkannt",
+            "computedAt": "Berechnet am {{date}}",
+            "kotlinBadge": "Kotlin",
+            "noKotlin": "In keiner der <0>{{count}}</0> Anwendungen wurde Kotlin-Code erkannt",
+            "noApplicationsTitle": "Keine Anwendungen erkannt",
+            "noApplicationsText": "Die verwendeten Sprachen werden zur Laufzeit ermittelt. Die Sprachprofile erscheinen hier, sobald sich die erste Anwendung bei Axelix Master registriert.",
+            "readTheDocs": "Dokumentation lesen",
+            "appsRecorded": "<0>{{count}}</0> Anwendungen erfasst"
+        },
+        "Dependencies": {
+            "title": "Wartungsstatus der Abhängigkeiten",
+            "subtitle": "Alle Bibliotheken Ihrer Anwendungen, die Verteilung ihrer Versionen und Bibliotheken, die nicht mehr aktiv weiterentwickelt werden",
+            "applications": "Anwendungen",
+            "libraries": "Bibliotheken",
+            "badges": {
+                "SUNSET": "Eingestellt",
+                "MAINTENANCE": "Im Wartungsmodus",
+                "DORMANT": "Inaktiv"
+            },
+            "usesStatus": {
+                "SUNSET": "verwenden eine eingestellte Bibliothek",
+                "MAINTENANCE": "verwenden eine Bibliothek im Wartungsmodus",
+                "DORMANT": "verwenden eine inaktive Bibliothek"
+            },
+            "applicationsEyebrow": "Wartungsstatus der Abhängigkeiten · Gesamtübersicht",
+            "applicationsDescriptor": "<0>{{risky}}</0> von <1>{{total}}</1> Anwendungen nutzen eine Abhängigkeit mit erhöhtem Risiko",
+            "uses": "Verwendungen",
+            "share": "Anteil",
+            "rowLabels": {
+                "SUNSET": "Eingestellte Bibliotheken",
+                "MAINTENANCE": "Bibliotheken im Wartungsmodus",
+                "DORMANT": "Inaktive Bibliotheken"
+            },
+            "noneOfThese": "Keine davon",
+            "definitions": {
+                "SUNSET": "Das Projekt hat das Ende der Entwicklung angekündigt oder sein Repository archiviert. Weitere Releases sind nicht geplant, auch keine Sicherheitsupdates.",
+                "MAINTENANCE": "Das Projekt hat angekündigt, nur noch kritische Fehler und Sicherheitslücken zu beheben. Neue Funktionen sind nicht vorgesehen. Meist wird ein Nachfolgeprojekt empfohlen.",
+                "DORMANT": "Seit längerer Zeit gab es keine neuen Releases. Das Projekt hat weder einen Wartungsmodus noch das Ende der Entwicklung angekündigt. Die Bibliothek funktioniert möglicherweise weiterhin, aber es ist nicht bekannt, ob jemand Fehler behebt."
+            },
+            "overlapNote": "Insgesamt {{sum}} %. Eine Anwendung kann in mehreren Zeilen erscheinen.",
+            "overlapTitle": "Die Gruppen überschneiden sich",
+            "overlapBody": "Eine Anwendung wird in jeder Zeile mit zutreffendem Status einmal gezählt. Verwendet sie eine eingestellte und eine inaktive Bibliothek, erscheint sie in beiden Zeilen. Dadurch kann die Summe der Anteile über 100 % liegen. Jeder Ring bezieht sich auf alle {{total}} Anwendungen.",
+            "reportedBy": "Von <0>{{count}}</0> Anwendungen gemeldet",
+            "computedAt": "Berechnet am {{date}}",
+            "categoriesEyebrow": "Wartungsstatus der Abhängigkeiten · nach Kategorie",
+            "categoriesDescriptor": "<0>{{risky}}</0> von <1>{{total}}</1> verwendeten Bibliotheken stellen ein Betriebsrisiko dar",
+            "topCategories": "Wichtigste Kategorien",
+            "noRiskyCategories": "Keine Kategorie enthält eine Bibliothek mit erhöhtem Risiko",
+            "moreCategories_one": "+{{count}} weitere Kategorie · siehe Tabelle",
+            "moreCategories_other": "+{{count}} weitere Kategorien · siehe Tabelle",
+            "categoriesFooter": "Status laut Projekt oder von Axelix ermittelt",
+            "librariesCaption": "Verwendete Bibliotheken",
+            "librariesLegend": "Der Status gilt für das Bibliotheksprojekt insgesamt. Der Anteil gibt an, welcher Prozentsatz der Anwendungen die Bibliothek auflöst.",
+            "categoryPlaceholder": "Alle Kategorien",
+            "statusFilter": "Status",
+            "columns": {
+                "library": "Bibliothek",
+                "status": "Status",
+                "succession": "Nachfolge",
+                "category": "Kategorie",
+                "applications": "Apps"
+            },
+            "successor": "Nachfolger",
+            "none": "Kein Eintrag",
+            "detail": {
+                "projectStatus": "Projektstatus",
+                "supersededBy": "Abgelöst durch",
+                "replacement": "Ersatz",
+                "noSuccessor": "Kein Nachfolger veröffentlicht",
+                "reference": "Referenz",
+                "statusTab": "Status",
+                "versionsTab": "Versionen",
+                "olderVersions_one": "+ {{count}} ältere Version · {{applications}} Anwendungen",
+                "olderVersions_other": "+ {{count}} ältere Versionen · {{applications}} Anwendungen",
+                "showFewer": "Weniger anzeigen"
+            },
+            "footer": "{{from}}–{{to}} von {{total}} Bibliotheken",
+            "noMatch": "Keine passenden Bibliotheken"
+        },
+        "Persistence": {
+            "title": "Persistenz-Dashboard",
+            "subtitle": "Datenbankzugriffsmuster · N+1-Erkennung · Paginierung im Arbeitsspeicher",
+            "statFirstLabel": "Vorkommen insgesamt",
+            "statSecondLabel": "Meiste Vorkommen",
+            "nPlusOneChartSubtitle": "Persistenz · problematische Abfragemuster",
+            "tooltipCount": "Anzahl",
+            "inMemoryPaginationChartTitle": "Paginierung im Arbeitsspeicher",
+            "inMemoryPaginationChartSubtitle": "Persistenz · Speicherbelastung"
+        },
+        "SpringPortfolio": {
+            "title": "Spring-Portfolio",
+            "subtitle": "Eingesetzte Versionen im Vergleich zum veröffentlichten OSS-Wartungsplan",
+            "applications": "Anwendungen",
+            "ossOk": "OSS ✓",
+            "ossNo": "OSS ✕",
+            "supportedHint": "Weiterhin Community-Releases",
+            "unsupportedHint": "Wartungszeitraum abgelaufen",
+            "generation": "Generation der Softwarekomponente",
+            "onSupportedLine": "{{supported}} von {{total}} Anwendungen nutzen eine Versionsreihe mit OSS-Support",
+            "detectedAtRuntime": "Zur Laufzeit in {{total}} Anwendungen erkannt",
+            "ladderTitle": "OSS-Wartungszeitraum · eingesetzte Versionsreihen",
+            "ladderHint": "Nach den vom Spring-Team veröffentlichten Wartungsplänen",
+            "line": "Versionsreihe",
+            "ossEnds": "Ende des OSS-Supports",
+            "apps": "Apps",
+            "legendSupported": "Mit OSS-Support – die Community veröffentlicht Fehlerkorrekturen für diese Versionsreihe",
+            "legendUnsupported": "Ohne OSS-Support – nach diesem Datum erscheinen keine Community-Releases mehr"
+        }
+    },
+    "About": {
+        "title": "Über Axelix",
+        "intro": "<0>Axelix</0> dient der Überwachung und Laufzeitdiagnose von Java- und Kotlin-Anwendungen, die mit Spring Boot betrieben werden.",
+        "licensing": "Der Kern von <0>Axelix</0> ist Open Source und steht unter der <1>LGPL 3.0</1>. Den Quellcode des <0>Axelix</0>-Kerns finden Sie auf <2>GitHub</2>.",
+        "contact": "Bei Fragen finden Sie weitere Informationen in der <0>Referenzdokumentation</0>.",
+        "bug": "Wenn Sie einen Fehler gefunden haben, eine Funktion vorschlagen oder einen Pull Request einreichen möchten, verwenden Sie den GitHub-Issue-Tracker. Wir freuen uns auf Ihre Rückmeldung.",
+        "githubSource": "Quellcode auf GitHub"
+    },
+    "LicenseModal": {
+        "active": "Aktiv",
+        "noExpiry": "Unbefristet",
+        "thirdPartyNotices": "Hinweise zu Drittanbietern",
+        "updateKey": "Schlüssel aktualisieren",
+        "enterKey": "Schlüssel eingeben",
+        "ossDescription": "Sie verwenden die Distribution <b>Axelix OSS</b> unter der Lizenz <a>{{license}}</a>. Die Enterprise-Funktionen sind auf dieser Instanz nicht aktiviert.",
+        "licensedTo": "LIZENZIERT FÜR",
+        "licensedId": "LIZENZ-ID",
+        "validFrom": "GÜLTIG AB",
+        "validTo": "GÜLTIG BIS",
+        "included": "ENTHALTEN",
+        "timeLeft": {
+            "days_one": "läuft in {{count}} Tag ab",
+            "days_other": "läuft in {{count}} Tagen ab",
+            "detailed": "läuft in {{days}} T. {{hours}} Std. {{minutes}} Min. ab",
+            "expired": "abgelaufen",
+            "unknown": "Ablaufdatum unbekannt"
+        },
+        "Form": {
+            "enterKeyTitle": "Lizenzschlüssel eingeben",
+            "updateKeyTitle": "Lizenzschlüssel aktualisieren",
+            "enterKeyDescription": "Fügen Sie den für Ihre Organisation ausgestellten Schlüssel ein. Die Prüfung erfolgt lokal ohne ausgehende Verbindung.",
+            "activate": "Aktivieren",
+            "replaceLicense": "Lizenz ersetzen",
+            "availableInEnterprise": "In Axelix Enterprise verfügbar",
+            "uploadFile": ".lic-Datei hochladen",
+            "keyActivated": "Lizenzschlüssel aktiviert",
+            "keyUpdated": "Lizenzschlüssel aktualisiert",
+            "fileReadError": "Die Datei konnte nicht gelesen werden. Versuchen Sie es erneut.",
+            "KeyInfo": {
+                "currentlyActive": "Derzeit aktiv",
+                "validUntil": "bis {{date}}"
+            },
+            "Alert": {
+                "Valid": {
+                    "title": "Neuer Schlüssel ist gültig",
+                    "description": "{{issuedTo}} · gültig bis <0>{{validUntil}}</0>. Die aktuelle Lizenz bleibt aktiv, bis Sie die Änderung bestätigen."
+                },
+                "AlreadyActive": {
+                    "title": "Bereits aktiv",
+                    "description": "Dieser Lizenzschlüssel ist bereits in Gebrauch."
+                },
+                "Expired": {
+                    "title": "Dieser Schlüssel ist am {{date}} abgelaufen",
+                    "description": "Ausgestellt für {{issuedTo}}. Bitten Sie Ihre Ansprechperson bei Axelix um einen neuen Schlüssel oder <0>wenden Sie sich an den Support</0>."
+                },
+                "SignatureInvalid": {
+                    "title": "Signatur konnte nicht geprüft werden",
+                    "description": "Der Schlüssel wurde nach seiner Ausstellung verändert oder stammt nicht von Axelix. Fordern Sie bei Ihrer Ansprechperson bei Axelix eine neue Kopie an."
+                }
+            }
+        }
+    },
+    "ThreadDump": {
+        "id": "Thread-ID",
+        "name": "Thread-Name",
+        "state": "Thread-Status",
+        "blockedCount": "Blockierungen",
+        "blockedTime": "Blockierzeit",
+        "waitedCount": "Wartevorgänge",
+        "waitedTime": "Wartezeit",
+        "lockName": "Name der Sperre",
+        "lockOwnerId": "ID des sperrenden Threads",
+        "lockOwnerName": "Name des sperrenden Threads",
+        "className": "Klasse",
+        "identityHashCode": "Identitäts-Hashcode",
+        "priority": "Priorität",
+        "daemon": "Daemon",
+        "lockInfo": "Gesperrt durch",
+        "lock": "Sperre",
+        "stacktrace": "Stacktrace",
+        "notAvailable": "Nicht verfügbar",
+        "Settings": {
+            "title": "Thread-Dump-Einstellungen",
+            "contentionMonitoring": "Überwachung von Sperrkonflikten",
+            "contentionMonitoringEnabled": "Die Überwachung von Sperrkonflikten ist aktiviert",
+            "contentionMonitoringDisabled": "Die Überwachung von Sperrkonflikten ist deaktiviert"
+        }
+    },
+    "GC": {
+        "disableTitle": "GC-Protokollierung ist deaktiviert",
+        "disableSubtitle": "Klicken Sie unten, um das GC-Protokoll anzuzeigen",
+        "enableButtonText": "GC-Protokollierung aktivieren",
+        "modalWindow": {
+            "title": "GC-Protokollierung aktivieren",
+            "selectLoggingLevel": "Protokollstufe auswählen",
+            "submit": "Aktivieren"
+        },
+        "download": "GC-Protokoll herunterladen",
+        "disable": "GC-Protokollierung deaktivieren",
+        "mainTitle": "GC-Protokoll",
+        "triggerButtonText": "Garbage Collection auslösen",
+        "triggered": "Garbage Collection wurde ausgelöst"
+    },
+    "Wallboard": {
+        "filter": {
+            "save": "Speichern",
+            "addFilter": "Filter hinzufügen",
+            "field": "Feld",
+            "comparison": "Vergleich",
+            "equal": "Gleich",
+            "lessThanOrEqual": "Kleiner oder gleich",
+            "greaterThanOrEqual": "Größer oder gleich"
+        }
+    },
+    "Transactional": {
+        "summary": {
+            "analyzed": "Analysierte Transaktionen",
+            "withProblems": "Mit Problemen",
+            "clean": "Ohne Probleme"
+        },
+        "problemType": "Problemtyp:",
+        "columns": {
+            "transaction": "Transaktion",
+            "access": "Zugriff",
+            "avgTime": "Ø Dauer",
+            "problems": "Erkannte Probleme"
+        },
+        "noProblems": "Keine Probleme",
+        "readOnly": "Nur Lesen",
+        "readWrite": "Lesen und Schreiben",
+        "problems": {
+            "blocking": "Blockierender Netzwerkaufruf",
+            "nPlusOne": "N+1-Abfragen",
+            "inMemoryPagination": "Paginierung im Arbeitsspeicher"
+        },
+        "problemDescriptions": {
+            "blocking": "Ein blockierender E/A-Aufruf läuft, während die Transaktion ihre Datenbankverbindung noch hält. Dadurch bleibt eine Verbindung im Pool belegt.",
+            "nPlusOne": "Eine verzögert geladene Assoziation wird zeilenweise geladen. Solange die Transaktion offen ist, wird für jeden Datensatz eine zusätzliche Abfrage ausgeführt.",
+            "inMemoryPagination": "Pageable wird mit JOIN FETCH kombiniert. Dadurch lädt Hibernate die gesamte Ergebnismenge und teilt sie im Arbeitsspeicher in Seiten ein."
+        },
+        "origin": {
+            "SPRING_INFRASTRUCTURE": "Von Spring verwaltet",
+            "APPLICATION_DECLARATIVE": "@Transactional",
+            "APPLICATION_IMPERATIVE": "Programmatisch"
+        },
+        "detail": {
+            "min": "Min.",
+            "avgDuration": "Ø Dauer",
+            "max": "Max.",
+            "declaredIn": "Deklariert in",
+            "propagation": "Propagation",
+            "isolation": "Isolation",
+            "access": "Zugriff",
+            "noProblems": "Bei dieser Transaktion wurden keine Probleme erkannt."
+        },
+        "clean": {
+            "title": "Keine problematischen Transaktionen",
+            "description": "Bei allen {{count}} analysierten Transaktionen wurden weder blockierende Aufrufe noch N+1-Abfragen oder Paginierung im Arbeitsspeicher festgestellt."
+        }
+    },
+    "MultiSelectFilter": {
+        "all": "Alle",
+        "selected": "{{count}} ausgewählt",
+        "selectedOfTotal": "{{count}} von {{total}} ausgewählt",
+        "clear": "Auswahl aufheben"
+    },
+    "EntitiesMap": {
+        "description": "Durchsuchen Sie die JPA-Entitäten und prüfen Sie die Befunde zu ihren Mappings.",
+        "checkFilter": "Prüfung",
+        "allChecks": "Alle Prüfungen",
+        "locations": {
+            "association": "Assoziation",
+            "attribute": "Attribut"
+        },
+        "entities": "Entitäten",
+        "search": "Nach Entität oder Tabelle suchen",
+        "withFindings": "Mit Befunden",
+        "withoutFindings": "Keine Befunde gemeldet",
+        "noMatches": "Keine passenden Entitäten.",
+        "noFindings": "Für diese Entität wurden keine Befunde gemeldet.",
+        "findings": "Befunde",
+        "findingCount_one": "{{count}} Befund",
+        "findingCount_other": "{{count}} Befunde",
+        "associationCount_one": "{{count}} Assoziation",
+        "associationCount_other": "{{count}} Assoziationen",
+        "problems": {
+            "eager": "EAGER-Laden",
+            "listManyToMany": "List bei @ManyToMany",
+            "cascade": "Kaskadierung mit REMOVE oder ALL",
+            "unidirectional": "Unidirektionales @OneToMany",
+            "toString": "Zugriff durch toString()",
+            "equalsOrHashCode": "Zugriff durch equals() oder hashCode()",
+            "ineffectiveLazyOneToOne": "Verzögertes Laden bei @OneToOne unwirksam",
+            "ordinalEnum": "Enum-Mapping über die Ordinalzahl"
+        },
+        "problemFixes": {
+            "eager": "Die Daten werden bei jedem Ladevorgang mitgeladen, unabhängig davon, ob sie verwendet werden. Verwenden Sie stets FetchType.LAZY und laden Sie Beziehungen bei Bedarf ausdrücklich mit JOIN FETCH.",
+            "listManyToMany": "Bei einer mit List modellierten @ManyToMany-Beziehung leert Hibernate bei jeder Änderung die gesamte Join-Tabelle und fügt alle Einträge erneut ein. Modellieren Sie ManyToMany stattdessen als Set.",
+            "cascade": "Bei CascadeType.REMOVE (und damit auch bei CascadeType.ALL) führt Hibernate beim Entfernen der Beziehung N+1-Abfragen aus, weil es die Lebenszyklus-Callbacks der Entität berücksichtigen muss. Steuern Sie das Entfernen manuell.",
+            "unidirectional": "Ein @OneToMany ohne 'mappedBy' erfordert eine zusätzliche Join-Tabelle oder ein UPDATE pro Zeile. Gestalten Sie die Beziehung bidirektional oder machen Sie die @ManyToOne-Seite zur besitzenden Seite.",
+            "toString": "Wenn toString() auf eine Assoziation zugreift, kann es eine verzögert geladene Beziehung unerwartet initialisieren. Das kann zusätzliche SQL-Abfragen oder eine LazyInitializationException verursachen. Wird dabei ein großer Teil des Entitätsgraphen in den Arbeitsspeicher geladen, kann es zu einem OutOfMemoryError kommen. Schließen Sie Assoziationen aus toString() aus.",
+            "ineffectiveLazyOneToOne": "Hibernate kann diese Assoziation trotz FetchType.LAZY sofort laden. Prüfen Sie, ob Bytecode Enhancement oder ein anderes Mapping verzögertes Laden ermöglicht.",
+            "equalsOrHashCode": "Wenn equals() oder hashCode() auf eine Assoziation zugreift, kann das bei Vergleichen oder beim Einsatz hashbasierter Collections verzögertes Laden auslösen. Schließen Sie Assoziationen aus beiden Methoden aus.",
+            "ordinalEnum": "Die Datenbank speichert die Position der Enum-Konstante. Eine neue Reihenfolge der Konstanten kann verändern, wie vorhandene Werte gelesen werden. Planen Sie vor dem Wechsel zu EnumType.STRING eine Datenmigration."
+        }
+    },
+    "DependenciesAnalyzer": {
+        "framework": {
+            "caption": "Wartungszeitraum für {{framework}}",
+            "source": "Aus der laufenden JVM ausgelesen · {{date}}",
+            "runningLine": "Laufende Versionsreihe {{line}} · Neueste in Axelix erfasste Versionsreihe: {{latest}}",
+            "today": "Heute",
+            "released": "Veröffentlicht am {{date}}",
+            "ossEnded": "OSS-Support endete am {{date}}",
+            "ossEnds": "OSS-Support endet am {{date}}",
+            "commercial": "Kommerzieller Support bis {{date}}",
+            "consequence": "Auswirkung",
+            "outOfOssFor": "Ohne OSS-Support seit",
+            "supportedTarget": "Nächstgelegene unterstützte Versionsreihe",
+            "targetValue": "{{line}} · OSS-Support bis {{date}}"
+        },
+        "frameworkStatus": {
+            "OSS_SUPPORTED": "OSS-Support aktiv",
+            "OUT_OF_OSS_MAINTENANCE": "Außerhalb des OSS-Supports"
+        },
+        "consequences": {
+            "OSS_SUPPORTED": "Diese Versionsreihe erhält weiterhin OSS-Releases, einschließlich Sicherheitspatches.",
+            "OUT_OF_OSS_MAINTENANCE": "Es gibt keine weiteren OSS-Releases, einschließlich Sicherheitspatches. CVEs in dieser Versionsreihe werden nur im Rahmen eines kommerziellen Abonnements behoben."
+        },
+        "duration": {
+            "years_one": "{{count}} Jahr",
+            "years_other": "{{count}} Jahre",
+            "months_one": "{{count}} Monat",
+            "months_other": "{{count}} Monate",
+            "lessThanAMonth": "weniger als ein Monat"
+        },
+        "feed": {
+            "caption": "Aufgelöste Abhängigkeiten",
+            "clear": "Zurücksetzen"
+        },
+        "sbom": {
+            "format": "CycloneDX",
+            "fileName": "dependencies.cdx.json",
+            "download": "SBOM herunterladen",
+            "downloading": "Wird heruntergeladen",
+            "tooltip": "Speichert die vollständige CycloneDX-SBOM für diese Instanz als dependencies.cdx.json, unabhängig von den aktuellen Filtern."
+        },
+        "ecosystems": {
+            "ALL": "Alle",
+            "PERSISTENCE": "Persistenz",
+            "SERIALIZATION": "Serialisierung",
+            "LOGGING": "Protokollierung",
+            "OBSERVABILITY": "Observability",
+            "RESILIENCE": "Resilienz",
+            "SECURITY": "Sicherheit",
+            "MESSAGING": "Messaging",
+            "WEB": "Web",
+            "TESTING": "Tests",
+            "OTHER": "Sonstige"
+        },
+        "statuses": {
+            "MAINTENANCE": "Im Wartungsmodus",
+            "SUNSET": "Eingestellt",
+            "DORMANT": "Inaktiv",
+            "ACTIVE": "Aktiv gepflegt"
+        },
+        "columns": {
+            "dependency": "Abhängigkeit",
+            "scope": "Abhängigkeitstyp"
+        },
+        "scope": {
+            "direct": "Direkt",
+            "transitive": "Transitiv"
+        },
+        "detail": {
+            "resolutionPath": "Auflösungspfad ab der Wurzel",
+            "declaredDirectly": "Direkt in der Build-Datei deklariert",
+            "levelsBelowRoot_one": "{{count}} Ebene unter der Wurzel",
+            "levelsBelowRoot_other": "{{count}} Ebenen unter der Wurzel",
+            "thisApplication": "Diese Anwendung",
+            "resolvedHere": "Hier aufgelöst",
+            "projectStatus": "Projektstatus",
+            "detectedFrom": "Erkannt anhand von",
+            "reference": "Weitere Informationen"
+        }
+    },
+    "Users": {
+        "lastLogin": "Letzte Anmeldung",
+        "provider": "Anbieter",
+        "role": "Rolle",
+        "roles": "Rollen",
+        "origin": "Herkunft",
+        "back": "Zurück",
+        "userInformation": "Benutzerprofil",
+        "selectRoles": "Rollen auswählen",
+        "notLoggedIn": "Nicht angemeldet",
+        "deleteUser": "Benutzer löschen",
+        "deleteModalDescription": "Möchten Sie diesen Benutzer wirklich löschen?",
+        "deleteOidcModalNote": "Dieser Benutzer wird über einen externen OIDC-Anbieter bereitgestellt. Durch das Löschen wird lediglich sein Metadatensatz in Axelix entfernt. Der Benutzer kann sich weiterhin anmelden. Meldet er sich erneut über den OIDC-Anbieter an, wird ein neuer Benutzerdatensatz erstellt.",
+        "accessLog": "Zugriffsprotokoll",
+        "createUser": "Benutzer erstellen",
+        "userCreated": "Benutzer wurde erstellt",
+        "userEdited": "Benutzerdaten wurden aktualisiert",
+        "userDeleted": "Benutzer wurde gelöscht",
+        "userNotFound": "Benutzer nicht gefunden",
+        "title": "Benutzer",
+        "subtitle": "Konten mit Zugriff auf Axelix, ihre Rollen und letzten Aktivitäten",
+        "searchPlaceholder": "Name, Benutzername oder E-Mail-Adresse …",
+        "user": "Benutzer",
+        "status": "Status",
+        "lastActivity": "Letzte Aktivität",
+        "never": "Nie",
+        "originOidc": "OIDC-Anbieter",
+        "originLocal": "Lokal",
+        "originSplit": "{{oidc}} OIDC · {{local}} lokal",
+        "rangeOf": "{{from}}–{{to}} von {{total}}",
+        "rowsPerPage": "Zeilen pro Seite {{count}}",
+        "selectAll": "Alle Benutzer auf dieser Seite auswählen",
+        "selectUser": "{{username}} auswählen",
+        "Statuses": {
+            "ACTIVE": "Aktiv",
+            "DORMANT": "Inaktiv",
+            "SUSPENDED": "Gesperrt"
+        },
+        "Metrics": {
+            "totalUsers": "Benutzer insgesamt",
+            "admins": "Administratoren",
+            "adminsHint": "voller Administrationszugriff",
+            "suspended": "Gesperrt",
+            "suspendedHint": "Anmeldung gesperrt",
+            "dormant": "Seit mind. 90 Tagen inaktiv",
+            "dormantHint": "seit mindestens 90 Tagen keine Anmeldung"
+        },
+        "Selection": {
+            "selected": "{{count}} Benutzer ausgewählt",
+            "suspend": "Sperren",
+            "delete": "Löschen",
+            "clear": "Auswahl aufheben"
+        },
+        "Create": {
+            "title": "Benutzer erstellen",
+            "usersCount_one": "{{count}} Benutzer",
+            "usersCount_other": "{{count}} Benutzer",
+            "firstName": "Vorname",
+            "lastName": "Nachname",
+            "email": "Geschäftliche E-Mail-Adresse",
+            "optional": "optional",
+            "usernameHint": "Dient zur Anmeldung mit einem lokalen Passwort. Der Benutzername muss eindeutig sein.",
+            "confirmPassword": "Passwort bestätigen",
+            "generate": "Generieren",
+            "RoleDescriptions": {
+                "VIEWER": "Ausschließlich Lesezugriff auf Anwendungen und ihre Dashboards",
+                "EDITOR": "Geplante Aufgaben, Caches und Garbage-Collector-Protokollierung verwalten",
+                "ADMIN": "Alle Berechtigungen der Editor-Rolle sowie Lesezugriff auf Werte unter „Eigenschaften“ und „Konfigurationseigenschaften“"
+            }
+        },
+        "ValidationErrors": {
+            "username": "Geben Sie einen Benutzernamen ein.",
+            "emailFormat": "Ungültiges E-Mail-Format.",
+            "password": "Geben Sie ein Passwort ein.",
+            "passwordsMismatch": "Die Passwörter stimmen nicht überein.",
+            "roles": "Wählen Sie Rollen aus."
+        },
+        "Profile": {
+            "editUser": "Benutzer bearbeiten",
+            "editTitle": "Benutzer bearbeiten",
+            "suspend": "Sperren",
+            "reactivate": "Reaktivieren",
+            "changeRoles": "Rollen ändern",
+            "profile": "Profil",
+            "account": "Konto",
+            "email": "E-Mail-Adresse",
+            "lastSignIn": "Letzte Anmeldung",
+            "originLocalDetail": "in Axelix erstellt",
+            "originOidcDetail": "von einem Identitätsanbieter bereitgestellt",
+            "canSignIn": "Anmeldung möglich",
+            "signInBlocked": "Anmeldung gesperrt",
+            "permissions": "Berechtigungen",
+            "permissionsHint": "Durch die oben aufgeführten Rollen erteilt",
+            "passwordKeep": "Lassen Sie das Feld leer, um das aktuelle Passwort beizubehalten.",
+            "changeRolesTitle": "Rollen für {{name}} ändern",
+            "changeRolesSubtitle": "{{name}} erhält alle Berechtigungen der ausgewählten Rollen.",
+            "current": "Aktuell",
+            "adding": "Werden erteilt",
+            "revoking": "Werden entzogen",
+            "takesEffect": "Wird bei der nächsten Anmeldung von {{name}} wirksam.",
+            "suspendTitle": "{{name}} sperren?",
+            "suspendBody": "{{name}} kann sich danach nicht mehr bei Axelix anmelden.",
+            "suspendKept": "Das Konto, die Rollen und der aufgezeichnete Aktivitätsverlauf bleiben unverändert. Nur Axelix Enterprise zeichnet den Aktivitätsverlauf auf. Daher gibt es hier keinen Verlauf.",
+            "suspendLater": "Gesperrte Benutzer können jederzeit reaktiviert oder später gelöscht werden.",
+            "suspendConfirm": "Benutzer sperren",
+            "reactivateTitle": "{{name}} reaktivieren?",
+            "reactivateBody": "{{name}} kann sich wieder anmelden.",
+            "reactivateConfirm": "Reaktivieren",
+            "userSuspended": "Benutzer wurde gesperrt",
+            "userReactivated": "Benutzer wurde reaktiviert"
+        }
+    },
+    "Roles": {
+        "title": "Rollen und Berechtigungen",
+        "subtitle": "Community Edition · drei integrierte Rollen, zuweisbar auf der Seite „Benutzer“",
+        "Builtin": {
+            "ADMIN": {
+                "description": "Alle Berechtigungen der Editor-Rolle sowie Lesezugriff auf Werte unter „Eigenschaften“ und „Konfigurationseigenschaften“.",
+                "grants": "Geplante Aufgaben, Caches, Garbage Collection und sensible Eigenschaftswerte"
+            },
+            "EDITOR": {
+                "description": "Geplante Aufgaben, Caches und Garbage-Collector-Protokollierung verwalten.",
+                "grants": "Geplante Aufgaben aktivieren, deaktivieren und ausführen, Caches leeren und ein- oder ausschalten sowie Garbage Collection auslösen"
+            },
+            "VIEWER": {
+                "description": "Ausschließlich Lesezugriff auf Anwendungen, Dashboards und Wallboards.",
+                "grants": "Keine Berechtigungen zum Ändern"
+            }
+        },
+        "Enterprise": {
+            "title": "Benutzerdefinierte Rollen sind eine Enterprise-Funktion",
+            "body": "Definieren Sie eigene Rollen aus einzelnen Berechtigungen, setzen Sie Rollen aus anderen Rollen zusammen und verwalten Sie sie als Code in einer YAML-Datei.",
+            "compare": "Editionen vergleichen"
+        }
+    },
+    "Upgrades": {
+        "title": "Upgrades",
+        "subtitle": "Basiert auf den Starter-Versionen, die bei Dienstregistrierungen in den letzten 30 Tagen gemeldet wurden. Es erfolgen keine externen Aufrufe.",
+        "EmptyState": {
+            "label": "KEINE DIENSTE REGISTRIERT",
+            "title": "Bei Master {{masterVersion}} wurde noch keine Starter-Version gemeldet.",
+            "description_one": "Ein Dienst registriert sich beim Start, sobald der Axelix-Starter in seinem Klassenpfad liegt. Diese Seite erfasst daraufhin die verwendete Version. Sobald Registrierungen vorliegen, zeigt die Seite, bis zu welcher Version Sie Master aktualisieren können, bevor ein Dienst aus dem Kompatibilitätsfenster fällt, das {{count}} Release umfasst, und welche Teams mit der Aktualisierung im Rückstand sind.",
+            "description_other": "Ein Dienst registriert sich beim Start, sobald der Axelix-Starter in seinem Klassenpfad liegt. Diese Seite erfasst daraufhin die verwendete Version. Sobald Registrierungen vorliegen, zeigt die Seite, bis zu welcher Version Sie Master aktualisieren können, bevor ein Dienst aus dem Kompatibilitätsfenster fällt, das {{count}} Releases umfasst, und welche Teams mit der Aktualisierung im Rückstand sind.",
+            "readDocumentation": "Dokumentation lesen"
+        },
+        "FleetBars": {
+            "title": "Starter-Versionen",
+            "observationWindow": "In den letzten 30 Tagen erfasst",
+            "serviceCount_one": "{{count}} Dienst",
+            "serviceCount_other": "{{count}} Dienste",
+            "serviceLabel_one": "Dienst",
+            "serviceLabel_other": "Dienste"
+        },
+        "ArtifactsTable": {
+            "artifact": "Artefakt",
+            "starter": "Starter",
+            "lastSeen": "Zuletzt erfasst",
+            "today": "Heute",
+            "yesterday": "Gestern",
+            "daysAgo_one": "Vor {{count}} Tag",
+            "daysAgo_other": "Vor {{count}} Tagen",
+            "sectionTitle": "Erfasste Dienste",
+            "range": "{{from}}–{{to}} von {{total}}"
+        },
+        "CompatibilityWindow": {
+            "title": "Kompatibilitätsfenster",
+            "description": "Die Zielversion von Master ist eingeschlossen",
+            "explanation": "Das Kompatibilitätsfenster gibt an, wie viele aufeinanderfolgende Minor-Releases des Starters Master unterstützt. Das eigene Minor-Release von Master zählt mit. Master {{master}} unterstützt beispielsweise die Starter-Versionen {{oldest}} bis {{master}}.",
+            "minorReleases_one": "Minor-Release",
+            "minorReleases_other": "Minor-Releases"
+        },
+        "HeadroomPanel": {
+            "eyebrow": "Upgrade-Spielraum",
+            "safeTarget": "Master {{version}} unterstützt alle erfassten Dienste",
+            "noSafeTarget": "Keine der angezeigten Zielversionen unterstützt alle erfassten Dienste",
+            "oldestVersion": "Älteste Starter-Version {{version}}",
+            "impact": "Auswirkungen des Upgrades",
+            "targetVersion": "Zielversion",
+            "outsideSupport": "Dienste außerhalb des Kompatibilitätsfensters"
+        },
+        "Ruler": {
+            "masterNow": "Aktuelle Master-Version",
+            "impact": "{{services}} ({{percentage}})",
+            "safeHeadroom": "Sicherer Upgrade-Spielraum"
+        }
+    },
+    "Administration": {
+        "Sider": {
+            "upgrades": "Upgrades"
+        }
+    }
+}

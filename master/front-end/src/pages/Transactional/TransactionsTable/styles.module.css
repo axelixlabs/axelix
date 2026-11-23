@@ -3,8 +3,7 @@
 }
 
 .Table {
-    /* TODO: Fix in future */
-    --tx-columns: minmax(0, 2.2fr) 120px 150px minmax(220px, 2.4fr);
+    --tx-columns: minmax(0, 2.2fr) minmax(140px, 0.65fr) 150px minmax(220px, 2.4fr);
 
     min-width: 750px;
     border: 1px solid var(--axelix-grey-100);

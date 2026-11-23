@@ -43,6 +43,7 @@
 
 .Access {
     justify-self: start;
+    max-width: 100%;
     padding: 4px 8px;
     border-radius: var(--axelix-border-radius-small);
     background-color: var(--axelix-grey-100);
@@ -50,7 +51,7 @@
     /* TODO: Fix in the future */
     color: #475569;
     font-weight: 600;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
 }
 
 .Duration {
@@ -68,9 +69,9 @@
 
 .Problems {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     align-items: center;
-    overflow: hidden;
 }
 
 .More {

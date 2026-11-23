@@ -6,7 +6,7 @@
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
 }
 
 .Dot {

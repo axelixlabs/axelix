@@ -1,7 +1,7 @@
 .Footer {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
     gap: 16px;
     margin-top: 8px;
     padding-top: 14px;
@@ -9,10 +9,10 @@
 }
 
 .Summary {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, max-content) 1px minmax(0, max-content);
     align-items: center;
     gap: 20px;
-    min-width: 0;
 }
 
 .Stat {
@@ -20,6 +20,7 @@
     flex-direction: column;
     gap: 2px;
     text-align: start;
+    overflow-wrap: anywhere;
 }
 
 .StatLabel {
@@ -37,7 +38,6 @@
     color: var(--axelix-grey-900);
     font-weight: var(--axelix-font-weight-semibold);
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
 }
 
 .HeapDot {
@@ -56,6 +56,8 @@
 
 .Actions {
     display: flex;
-    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 10px;
+    margin-inline-start: auto;
 }
