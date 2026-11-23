@@ -657,14 +657,24 @@ public class InstanceSelfRegistrationInternalApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
-    private static Stream<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {
-        return Stream.of(
-                        Arguments.of("without token", builder.withoutToken()),
-                        Arguments.of("expired token", builder.withExpiredTokenInAuthHeader()),
-                        Arguments.of("malformed token", builder.withMalformedTokenInAuthHeader()))
-                .flatMap(credentials -> Stream.of("/api/", "/api;/", "/api;param=value/", "/%61pi/")
-                        .map(prefix -> Arguments.of(
-                                credentials.get()[0] + " " + prefix, credentials.get()[1], prefix)));
+    private static List<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {
+        TestRestTemplate withoutToken = builder.withoutToken();
+        TestRestTemplate expiredToken = builder.withExpiredTokenInAuthHeader();
+        TestRestTemplate malformedToken = builder.withMalformedTokenInAuthHeader();
+
+        return List.of(
+                Arguments.of("without token /api/", withoutToken, "/api/"),
+                Arguments.of("without token /api;/", withoutToken, "/api;/"),
+                Arguments.of("without token /api;param=value/", withoutToken, "/api;param=value/"),
+                Arguments.of("without token /%61pi/", withoutToken, "/%61pi/"),
+                Arguments.of("expired token /api/", expiredToken, "/api/"),
+                Arguments.of("expired token /api;/", expiredToken, "/api;/"),
+                Arguments.of("expired token /api;param=value/", expiredToken, "/api;param=value/"),
+                Arguments.of("expired token /%61pi/", expiredToken, "/%61pi/"),
+                Arguments.of("malformed token /api/", malformedToken, "/api/"),
+                Arguments.of("malformed token /api;/", malformedToken, "/api;/"),
+                Arguments.of("malformed token /api;param=value/", malformedToken, "/api;param=value/"),
+                Arguments.of("malformed token /%61pi/", malformedToken, "/%61pi/"));
     }
 
     /**
