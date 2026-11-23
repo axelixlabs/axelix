@@ -126,8 +126,8 @@ class JwtAuthorizationFilterTest {
 
     @BeforeEach
     void setUp() {
-        cacheManager.enableAll();
         for (String cacheName : cacheManager.getCacheNames()) {
+            cacheManager.enable(cacheName);
             cacheManager.getCache(cacheName).invalidate();
         }
     }

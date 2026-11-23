@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -69,7 +68,6 @@ class DefaultEnhancedCacheTest {
     private EnhancedCacheManager cacheManager;
 
     private EnhancedCache enhancedCache;
-    private AtomicBoolean cacheEnabled;
 
     @BeforeEach
     void setUp() {
@@ -77,10 +75,10 @@ class DefaultEnhancedCacheTest {
         axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(meterRegistry);
 
         Mockito.lenient().when(delegate.getName()).thenReturn(CACHE_NAME);
-        cacheEnabled = new AtomicBoolean(true);
+        Mockito.lenient().when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(true);
         SlidingWindow<CacheLookup> lookupHistory = new SlidingWindow<>(200);
         Mockito.lenient().when(cacheManager.getLookupHistory(CACHE_NAME)).thenReturn(lookupHistory);
-        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher, cacheEnabled::get, cacheManager);
+        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher, cacheManager);
     }
 
     @Test
@@ -89,7 +87,7 @@ class DefaultEnhancedCacheTest {
         SlidingWindow<CacheLookup> originalHistory = new SlidingWindow<>(200);
         SlidingWindow<CacheLookup> replacementHistory = new SlidingWindow<>(200);
         when(cacheManager.getLookupHistory(CACHE_NAME)).thenReturn(originalHistory, replacementHistory);
-        EnhancedCache cache = new DefaultEnhancedCache(delegate, null, () -> true, cacheManager);
+        EnhancedCache cache = new DefaultEnhancedCache(delegate, null, cacheManager);
         cache.get(KEY);
 
         // when.
@@ -170,7 +168,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void getByKey_shouldReturnNullWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             Cache.ValueWrapper result = enhancedCache.get(KEY);
@@ -200,7 +198,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void getWithType_shouldReturnNullWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             String result = enhancedCache.get(KEY, String.class);
@@ -262,7 +260,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void getWithValueLoader_shouldReturnNullWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             String result = enhancedCache.get(KEY, () -> VALUE);
@@ -303,7 +301,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void put_shouldNotDelegateWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             enhancedCache.put(KEY, VALUE);
@@ -331,7 +329,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void evict_shouldNotDelegateWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             enhancedCache.evict(KEY);
@@ -359,7 +357,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void clear_shouldNotDelegateWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             enhancedCache.clear();
@@ -388,7 +386,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void invalidate_shouldReturnFalseWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             boolean result = enhancedCache.invalidate();
@@ -431,7 +429,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void evictIfPresent_shouldReturnFalseWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             boolean result = enhancedCache.evictIfPresent(KEY);
@@ -522,7 +520,7 @@ class DefaultEnhancedCacheTest {
         @Test
         void getByKey_shouldNotTrackWhenCacheIsDisabled() {
             // given.
-            cacheEnabled.set(false);
+            when(cacheManager.isEnabled(CACHE_NAME)).thenReturn(false);
 
             // when.
             enhancedCache.get(KEY);

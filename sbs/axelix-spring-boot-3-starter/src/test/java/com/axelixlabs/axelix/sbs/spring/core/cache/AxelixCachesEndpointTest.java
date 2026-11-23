@@ -137,8 +137,8 @@ class AxelixCachesEndpointTest {
     void setUp() {
         for (CacheManager cacheManager : allCacheManagers.values()) {
             if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
-                enhancedCacheManager.enableAll();
                 for (String cacheName : enhancedCacheManager.getCacheNames()) {
+                    enhancedCacheManager.enable(cacheName);
                     Cache cache = enhancedCacheManager.getCache(cacheName);
                     if (cache != null) {
                         cache.clear();
