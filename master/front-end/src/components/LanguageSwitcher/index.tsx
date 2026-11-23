@@ -31,6 +31,7 @@ export const LanguageSwitcher = () => {
                 defaultValue={i18n.language}
                 onChange={handleChange}
                 options={[
+                    { value: "de", label: "Deutsch" },
                     { value: "en", label: "English" },
                     { value: "fr", label: "Français" },
                     { value: "ru", label: "Русский" },

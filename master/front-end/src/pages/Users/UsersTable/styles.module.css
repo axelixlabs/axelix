@@ -14,6 +14,7 @@
 
 .TableHeader {
     min-height: 40px;
+    overflow-wrap: anywhere;
     color: var(--axelix-grey-500);
     border-bottom: 1px solid var(--axelix-grey-200);
 }
