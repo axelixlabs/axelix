@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { ApartmentOutlined } from "@ant-design/icons";
+
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
 
@@ -120,6 +122,11 @@ export const getInstanceItems = (
             icon: <ScheduledTasksIcon />,
             label: t("Sider.scheduledTasks"),
             feature: EInstanceFeature.SCHEDULED_TASKS,
+        },
+        {
+            path: `${basePath}/application-events`,
+            icon: <ApartmentOutlined />,
+            label: t("Sider.applicationEvents"),
         },
         {
             path: `${basePath}/caches`,

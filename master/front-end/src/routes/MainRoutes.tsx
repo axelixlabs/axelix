@@ -29,6 +29,7 @@ const DashboardLanguages = Loadable(lazy(() => import("@/pages/Dashboard/Dashboa
 const DashboardDependencies = Loadable(lazy(() => import("@/pages/Dashboard/DashboardDependencies")));
 const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
 const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
+const ApplicationEvents = Loadable(lazy(() => import("@/pages/ApplicationEvents")));
 const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("@/pages/Transactional")));
 const EntitiesMap = Loadable(lazy(() => import("@/pages/EntitiesMap")));
@@ -86,6 +87,7 @@ export const MainRoutes = () => {
                     <Route path="/instance/:instanceId/config-props" element={<ConfigProps />} />
                     <Route path="/instance/:instanceId/loggers" element={<Loggers />} />
                     <Route path="/instance/:instanceId/caches" element={<Caches />} />
+                    <Route path="/instance/:instanceId/application-events" element={<ApplicationEvents />} />
                     <Route path="/instance/:instanceId/scheduled-tasks" element={<ScheduledTasks />} />
                     <Route path="/instance/:instanceId/conditions" element={<Conditions />} />
                     <Route path="/instance/:instanceId/thread-dump" element={<ThreadDump />} />

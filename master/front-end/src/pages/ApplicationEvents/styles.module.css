@@ -1,0 +1,336 @@
+.Page {
+    display: grid;
+    gap: 16px;
+    color: var(--axelix-grey-900);
+}
+
+.Heading,
+.Toolbar,
+.PanelHeading,
+.Footer,
+.FilterActions,
+.NodeMeta,
+.ListenerSummary li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.Heading {
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.Heading h1,
+.Heading p,
+.Panel h2,
+.Panel h3,
+.Panel p {
+    margin: 0;
+}
+
+.Heading p,
+.PanelHeading span,
+.Footer,
+.Toolbar > span:last-child {
+    color: var(--axelix-grey-500);
+}
+
+.Toolbar {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.Toolbar > :first-child {
+    width: min(240px, 100%);
+}
+
+.Toolbar > span:last-child {
+    margin-left: auto;
+}
+
+.Filters {
+    width: min(420px, calc(100vw - 48px));
+}
+
+.FilterGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.FilterGrid label {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.FilterActions {
+    margin-top: 12px;
+}
+
+.DateError {
+    color: var(--axelix-red-700);
+}
+
+.FeedLayout,
+.DetailLayout {
+    display: grid;
+    gap: 16px;
+    align-items: start;
+}
+
+.FeedLayout {
+    grid-template-columns: minmax(0, 1.85fr) minmax(275px, 1fr);
+}
+
+.DetailLayout {
+    grid-template-columns: minmax(0, 1.85fr) minmax(290px, 1fr);
+}
+
+.Panel {
+    min-width: 0;
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+    overflow: hidden;
+}
+
+.PanelHeading,
+.Footer {
+    padding: 12px 16px;
+}
+
+.PanelHeading {
+    border-bottom: 1px solid var(--axelix-grey-200);
+}
+
+.Panel h2 {
+    font-size: var(--axelix-font-size-subtitle);
+}
+
+.Panel h3 {
+    font-size: var(--axelix-font-size-body);
+}
+
+.EventName {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    font-weight: var(--axelix-font-weight-semibold);
+    cursor: pointer;
+    text-align: left;
+    max-width: 100%;
+}
+
+.EventName,
+.InstanceName {
+    overflow-wrap: anywhere;
+}
+
+.PublicationTimestamp {
+    display: grid;
+    white-space: nowrap;
+}
+
+.PublicationDate {
+    color: var(--axelix-grey-500);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.EventRow {
+    cursor: pointer;
+}
+
+.SelectedRow > td {
+    background: var(--axelix-green-50);
+}
+
+.Outcome {
+    justify-self: start;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.Inspector {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+    padding: 16px;
+}
+
+.Inspector h2,
+.Metadata dd,
+.ListenerSummary code {
+    overflow-wrap: anywhere;
+}
+
+.Metadata {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 6px 12px;
+    margin: 0;
+    width: 100%;
+}
+
+.Metadata dt {
+    color: var(--axelix-grey-500);
+}
+
+.Metadata dd {
+    margin: 0;
+}
+
+.ListenerSummary,
+.Branches {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.ListenerSummary li {
+    border-top: 1px solid var(--axelix-grey-200);
+    padding: 8px 0;
+}
+
+.Tree {
+    display: grid;
+    grid-template-columns: minmax(125px, 0.8fr) minmax(180px, 1fr);
+    align-items: center;
+    gap: 40px;
+    padding: 20px;
+}
+
+.Root,
+.Node {
+    position: relative;
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--axelix-grey-300);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-grey-50);
+    overflow-wrap: anywhere;
+}
+
+.Root > span:first-child {
+    color: var(--axelix-grey-500);
+}
+
+.Root[data-connected="true"]::after,
+.Branches li::before,
+.Branches li::after {
+    content: "";
+    position: absolute;
+}
+
+.Root[data-connected="true"]::after,
+.Branches li::before {
+    top: 50%;
+    width: 20px;
+    border-top: 1px solid var(--axelix-grey-400);
+}
+
+.Root[data-connected="true"]::after {
+    left: 100%;
+    width: 21px;
+}
+
+.Branches li {
+    position: relative;
+    padding-block: 6px;
+}
+
+.Branches li::before {
+    right: 100%;
+}
+
+.Branches li::after {
+    right: calc(100% + 19px);
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid var(--axelix-grey-400);
+}
+
+.Branches li:first-child::after {
+    top: 50%;
+}
+
+.Branches li:last-child::after {
+    bottom: 50%;
+}
+
+.Branches li:only-child::after {
+    display: none;
+}
+
+.Node {
+    width: 100%;
+    color: var(--axelix-grey-900);
+    background: var(--axelix-white);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.Node:hover,
+.Node[aria-pressed="true"] {
+    border-color: var(--axelix-green-600);
+    background: var(--axelix-green-50);
+}
+
+.Error {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-red-50);
+    color: var(--axelix-red-700);
+    overflow-wrap: anywhere;
+}
+
+.Stack {
+    width: 100%;
+}
+
+.Stack summary {
+    color: var(--axelix-green-700);
+    cursor: pointer;
+}
+
+.Stack pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+@media (width <= 1200px) {
+    .FeedLayout,
+    .DetailLayout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (width <= 600px) {
+    .Tree {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .Root[data-connected="true"]::after,
+    .Branches li::before,
+    .Branches li::after {
+        display: none;
+    }
+
+    .Branches {
+        padding-left: 16px;
+        border-left: 1px solid var(--axelix-grey-400);
+    }
+
+    .FilterGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
