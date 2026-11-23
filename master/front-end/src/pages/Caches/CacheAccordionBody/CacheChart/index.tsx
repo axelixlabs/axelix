@@ -64,6 +64,7 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                     />
 
                     <Tooltip
+                        formatter={(value) => (typeof value === "number" ? value.toFixed(2) : value)}
                         labelFormatter={(timestamp) => {
                             if (typeof timestamp !== "number") {
                                 return timestamp;
