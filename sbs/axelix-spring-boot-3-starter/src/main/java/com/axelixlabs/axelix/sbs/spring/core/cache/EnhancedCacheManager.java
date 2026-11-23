@@ -24,6 +24,8 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.cache.CacheManager;
 
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
+
 /**
  * Extension of {@link CacheManager} that exposes management operations on top of an existing
  * {@link CacheManager}. Implementations are typically attached to user-defined {@link CacheManager}
@@ -61,9 +63,22 @@ public interface EnhancedCacheManager extends CacheManager {
 
     void disable(String cacheName);
 
-    void enableAll();
+    /**
+     * Returns the current lookup history shared by caches with the given name.
+     * Obtain it on each access rather than retaining it: GC may clear its soft-referenced map entry,
+     * causing subsequent lookups to create a new history.
+     *
+     * @param cacheName the name of the cache
+     * @return the current lookup history, initially empty if no history is available
+     */
+    SlidingWindow<CacheLookup> getLookupHistory(String cacheName);
 
-    void disableAll();
-
+    /**
+     * Returns the enabled status of the named cache.
+     *
+     * @param cacheName the name of the cache whose enabled status is requested
+     * @return {@code true} if the cache is enabled or has not been explicitly toggled,
+     *         {@code false} if it is disabled
+     */
     boolean isEnabled(String cacheName);
 }

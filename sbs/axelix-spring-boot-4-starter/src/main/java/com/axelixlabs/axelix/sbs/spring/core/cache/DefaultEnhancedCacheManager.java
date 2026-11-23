@@ -113,17 +113,18 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
             return null;
         }
 
-        return new DefaultEnhancedCache(
-                cache,
-                cacheNamesWithMetrics.contains(name) ? metricsPublisher : null,
-                () -> cacheStates.getOrDefault(name, true),
-                this);
+        return new DefaultEnhancedCache(cache, cacheNamesWithMetrics.contains(name) ? metricsPublisher : null, this);
     }
 
     @Override
     @NonNull
     public Collection<String> getCacheNames() {
         return delegate.getCacheNames();
+    }
+
+    @Override
+    public boolean isEnabled(String cacheName) {
+        return cacheStates.getOrDefault(cacheName, true);
     }
 
     /**

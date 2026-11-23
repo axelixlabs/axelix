@@ -18,14 +18,15 @@
 package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup;
-import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 
 /**
@@ -86,9 +87,12 @@ public class DefaultAxelixMetricsPublisher implements AxelixMetricsPublisher {
     }
 
     @Override
-    public void registerCacheStatusGauge(EnhancedCache enhancedCache) {
-        Tags cacheTags = Tags.of("cache", enhancedCache.getName());
+    public void registerCacheStatusGauge(String cacheName, BooleanSupplier enabled) {
+        Tags cacheTags = Tags.of("cache", cacheName);
 
-        meterRegistry.gauge(AxelixMetricNames.CACHE_ENABLED, cacheTags, enhancedCache, c -> c.isEnabled() ? 1.0 : 0.0);
+        Gauge.builder(AxelixMetricNames.CACHE_ENABLED, enabled, c -> c.getAsBoolean() ? 1.0 : 0.0)
+                .tags(cacheTags)
+                .strongReference(true)
+                .register(meterRegistry);
     }
 }
