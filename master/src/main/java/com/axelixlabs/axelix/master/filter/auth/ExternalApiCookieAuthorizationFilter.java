@@ -79,7 +79,7 @@ public class ExternalApiCookieAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
+        String path = request.getServletPath();
 
         // Static content (/, /index.html, /assets/*, etc.) is served at root and does not require auth
         // as well as actuator health endpoints

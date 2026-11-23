@@ -101,7 +101,7 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !request.getRequestURI().startsWith(mcpProperties.getMcpEndpoint());
+        return !request.getServletPath().startsWith(mcpProperties.getMcpEndpoint());
     }
 
     @Override

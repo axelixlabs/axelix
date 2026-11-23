@@ -17,12 +17,15 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint.rbac;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,8 +123,10 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         restTemplate = restTemplate.withCookieHandling(HttpCookieHandling.DISABLE);
     }
 
-    @Test
-    void shouldLoginAsSuperAdmin() {
+    @ParameterizedTest
+    @ValueSource(strings = {"/api/external/users/login", "/api;/external/users/login", "/%61pi/external/users/login"})
+    void shouldLoginAsSuperAdmin(String path) {
+        // given.
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -129,7 +134,10 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate.exchange(
-                "/api/external/users/login", HttpMethod.POST, defaultEntity(loginRequest), String.class);
+                URI.create(restTemplate.getRootUri() + path),
+                HttpMethod.POST,
+                defaultEntity(loginRequest),
+                String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
