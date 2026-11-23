@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
+import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -38,6 +39,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpEntity;
@@ -227,6 +229,9 @@ public class InstanceSelfRegistrationInternalApiTest {
            ]
      }
     """.formatted(TEST_INSTANCE_ID);
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -621,10 +626,12 @@ public class InstanceSelfRegistrationInternalApiTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("invalidTokens")
-    void shouldReturnUnauthorized(String scenario, TestRestTemplate testRestTemplate) {
+    void shouldReturnUnauthorized(String scenario, TestRestTemplate testRestTemplate, String prefix) {
         // when.
         ResponseEntity<Void> response = testRestTemplate.postForEntity(
-                "/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
+                URI.create("http://localhost:" + port + prefix + "internal/service/register"),
+                defaultJsonEntity(JSON_REQUEST),
+                Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -639,10 +646,12 @@ public class InstanceSelfRegistrationInternalApiTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("invalidTokens")
-    void shouldReturnUnauthorizedOnHeartbeat(String scenario, TestRestTemplate testRestTemplate) {
+    void shouldReturnUnauthorizedOnHeartbeat(String scenario, TestRestTemplate testRestTemplate, String prefix) {
         // when.
         ResponseEntity<Void> response = testRestTemplate.postForEntity(
-                "/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT_V2), Void.class);
+                URI.create("http://localhost:" + port + prefix + "internal/service/heartbeat/v2"),
+                defaultJsonEntity(JSON_HEARTBEAT_V2),
+                Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -650,9 +659,12 @@ public class InstanceSelfRegistrationInternalApiTest {
 
     private static Stream<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {
         return Stream.of(
-                Arguments.of("without token", builder.withoutToken()),
-                Arguments.of("expired token", builder.withExpiredTokenInAuthHeader()),
-                Arguments.of("malformed token", builder.withMalformedTokenInAuthHeader()));
+                        Arguments.of("without token", builder.withoutToken()),
+                        Arguments.of("expired token", builder.withExpiredTokenInAuthHeader()),
+                        Arguments.of("malformed token", builder.withMalformedTokenInAuthHeader()))
+                .flatMap(credentials -> Stream.of("/api/", "/api;/", "/api;param=value/", "/%61pi/")
+                        .map(prefix -> Arguments.of(
+                                credentials.get()[0] + " " + prefix, credentials.get()[1], prefix)));
     }
 
     /**

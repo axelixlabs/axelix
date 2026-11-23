@@ -65,7 +65,7 @@ public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
+        String path = request.getServletPath();
 
         return !path.equalsIgnoreCase(REGISTRATION_REQUEST_PATH) && !path.equalsIgnoreCase(HEART_BEAT_REQUEST_PATH);
     }
