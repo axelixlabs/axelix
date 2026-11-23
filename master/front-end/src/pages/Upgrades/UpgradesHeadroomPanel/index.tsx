@@ -53,7 +53,6 @@ export const UpgradesHeadroomPanel = ({ data }: IProps) => {
     });
     const safeTargets = futureTargets.filter(({ isSupported }) => isSupported);
     const safeTarget = safeTargets.at(-1);
-    const safeIndex = futureTargets.findLastIndex(({ isSupported }) => isSupported);
     const firstCompatibleMinor = Math.max(0, minor - compatibilityWindow + 1);
     const countsByVersion = new Map(starterVersions.map(({ version, serviceCount }) => [version, serviceCount]));
     const windowVersions = Array.from({ length: minor - firstCompatibleMinor + 1 }, (_, index) => {
@@ -61,8 +60,6 @@ export const UpgradesHeadroomPanel = ({ data }: IProps) => {
 
         return { version, count: countsByVersion.get(version) ?? 0 };
     });
-    // Show three targets by default, extending the ruler through the first release beyond safe headroom.
-    const targets = futureTargets.slice(0, Math.max(3, safeIndex + 2));
 
     return (
         <section className={styles.Panel}>
@@ -128,26 +125,6 @@ export const UpgradesHeadroomPanel = ({ data }: IProps) => {
                         </div>
                     )}
                 </div>
-            </article>
-
-            <article className={styles.Card} hidden>
-                <h2 className={styles.ColumnTitle}>{t("Upgrades.HeadroomPanel.impact")}</h2>
-                <table className={styles.ImpactTable}>
-                    <thead>
-                        <tr>
-                            <th scope="col">{t("Upgrades.HeadroomPanel.targetVersion")}</th>
-                            <th scope="col">{t("Upgrades.HeadroomPanel.outsideSupport")}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {targets.map(({ version, impact }) => (
-                            <tr key={version}>
-                                <th scope="row">{version}</th>
-                                <td>{impact}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
             </article>
 
             <StarterVersionBars starterVersions={starterVersions} total={total} />
