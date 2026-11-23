@@ -382,7 +382,7 @@ function ApplicationEventsPage() {
                         columns={[
                             {
                                 title: t("ApplicationEvents.published"),
-                                width: 120,
+                                width: 136,
                                 render: (_, event) => (
                                     <time
                                         className={styles.PublicationTimestamp}
