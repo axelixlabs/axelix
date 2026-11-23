@@ -26,6 +26,7 @@ import org.springframework.cache.Cache;
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 public interface EnhancedCache extends Cache {
 

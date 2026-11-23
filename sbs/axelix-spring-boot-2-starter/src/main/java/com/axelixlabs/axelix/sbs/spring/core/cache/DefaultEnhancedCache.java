@@ -27,7 +27,6 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.cache.Cache;
 
-import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup.Outcome;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
@@ -42,37 +41,21 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 public class DefaultEnhancedCache implements EnhancedCache {
 
     private final Cache delegate;
-    private final AtomicBoolean enabled;
-    private final SlidingWindow<CacheLookup> cacheLookupHistory;
-
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
+    private final EnhancedCacheManager cacheManager;
 
-    public DefaultEnhancedCache(@NonNull Cache delegate, @Nullable AxelixMetricsPublisher metricsPublisher) {
+    public DefaultEnhancedCache(
+            @NonNull Cache delegate,
+            @Nullable AxelixMetricsPublisher metricsPublisher,
+            EnhancedCacheManager cacheManager) {
         this.delegate = delegate;
-        this.enabled = new AtomicBoolean(true);
-        // TODO: We need to find a way to allow for configuring those values
-        this.cacheLookupHistory = new SlidingWindow<>(200);
         this.metricsPublisher = metricsPublisher;
-    }
-
-    @Override
-    public void disable() {
-        this.enabled.compareAndSet(true, false);
-    }
-
-    @Override
-    public void enable() {
-        this.enabled.compareAndSet(false, true);
+        this.cacheManager = cacheManager;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.enabled.get();
-    }
-
-    @Override
-    public List<CacheLookup> getCacheLookups() {
-        return cacheLookupHistory.get();
+        return cacheManager.isEnabled(getName());
     }
 
     @Override
@@ -90,20 +73,20 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public ValueWrapper get(@NonNull Object key) {
-        if (!enabled.get()) {
+        if (!isEnabled()) {
             return null;
         }
 
         ValueWrapper result = delegate.get(key);
 
         if (result == null) {
-            cacheLookupHistory.put(CacheLookup.miss());
+            cacheManager.getLookupHistory(getName()).put(CacheLookup.miss());
 
             if (metricsPublisher != null) {
                 metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
             }
         } else {
-            cacheLookupHistory.put(CacheLookup.hit());
+            cacheManager.getLookupHistory(getName()).put(CacheLookup.hit());
 
             if (metricsPublisher != null) {
                 metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
@@ -115,7 +98,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @Nullable Class<T> type) {
-        if (enabled.get()) {
+        if (isEnabled()) {
             return delegate.get(key, type);
         } else {
             return null;
@@ -127,7 +110,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
     public <T> T get(@NonNull Object key, @NonNull Callable<T> valueLoader) {
         T value = null;
 
-        if (enabled.get()) {
+        if (isEnabled()) {
             AtomicBoolean miss = new AtomicBoolean();
 
             value = delegate.get(key, () -> {
@@ -136,13 +119,13 @@ public class DefaultEnhancedCache implements EnhancedCache {
             });
 
             if (miss.get()) {
-                cacheLookupHistory.put(CacheLookup.miss());
+                cacheManager.getLookupHistory(getName()).put(CacheLookup.miss());
 
                 if (metricsPublisher != null) {
                     metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
                 }
             } else {
-                cacheLookupHistory.put(CacheLookup.hit());
+                cacheManager.getLookupHistory(getName()).put(CacheLookup.hit());
 
                 if (metricsPublisher != null) {
                     metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
@@ -178,12 +161,17 @@ public class DefaultEnhancedCache implements EnhancedCache {
         return executeIfEnabledOrElseFalse(() -> delegate.evictIfPresent(key));
     }
 
+    @Override
+    public List<CacheLookup> getCacheLookups() {
+        return cacheManager.getLookupHistory(getName()).get();
+    }
+
     private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {
-        return enabled.get() && supplier.getAsBoolean();
+        return isEnabled() && supplier.getAsBoolean();
     }
 
     private void executeIfEnabled(Runnable runnable) {
-        if (enabled.get()) {
+        if (isEnabled()) {
             runnable.run();
         }
     }
