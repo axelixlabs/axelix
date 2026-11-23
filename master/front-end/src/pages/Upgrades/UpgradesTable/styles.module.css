@@ -25,13 +25,28 @@
     background-color: var(--axelix-white);
 }
 
+.Columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) fit-content(42%) fit-content(27%);
+    column-gap: var(--axelix-space-5);
+}
+
 .HeaderRow,
+.Rows,
 .Row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 120px) minmax(0, 160px);
-    gap: var(--axelix-space-4);
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+}
+
+.HeaderRow,
+.Row {
     align-items: center;
     padding: 12px var(--axelix-space-5);
+}
+
+.Rows {
+    align-content: start;
 }
 
 .HeaderRow {
@@ -45,7 +60,6 @@
     padding-block: 6px;
     border-bottom: 1px solid var(--axelix-grey-100);
 }
-
 
 .ArtifactCell {
     display: flex;
@@ -104,9 +118,7 @@
 }
 
 @media (width <= 820px) {
-    .HeaderRow,
-    .Row {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 90px) minmax(0, 90px);
-        gap: var(--axelix-space-2);
+    .Columns {
+        column-gap: var(--axelix-space-3);
     }
 }

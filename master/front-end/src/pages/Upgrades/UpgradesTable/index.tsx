@@ -81,8 +81,9 @@ export const UpgradesTable = ({ services }: IProps) => {
                 BOTTOM_SPACING -
                 1;
 
-            rows.style.minHeight = `${Math.max(rowHeight, availableHeight)}px`;
-            setPageSize(Math.max(1, Math.floor(availableHeight / rowHeight)));
+            const nextPageSize = Math.max(1, Math.floor(availableHeight / rowHeight));
+            rows.style.minHeight = total > nextPageSize ? `${Math.max(rowHeight, availableHeight)}px` : "";
+            setPageSize(nextPageSize);
         };
 
         const observer = new ResizeObserver(updatePageSize);
@@ -95,7 +96,7 @@ export const UpgradesTable = ({ services }: IProps) => {
             observer.disconnect();
             window.removeEventListener("resize", updatePageSize);
         };
-    }, []);
+    }, [total]);
 
     return (
         <section className={styles.Section}>
@@ -107,14 +108,14 @@ export const UpgradesTable = ({ services }: IProps) => {
             </div>
 
             <div className={styles.Table}>
-                <div role="table" aria-labelledby="observed-services">
+                <div className={styles.Columns} role="table" aria-labelledby="observed-services">
                     <div role="row" className={`TextCaps ${styles.HeaderRow}`}>
                         <span role="columnheader">{t("Upgrades.ArtifactsTable.artifact")}</span>
                         <span role="columnheader">{t("Upgrades.ArtifactsTable.starter")}</span>
                         <span role="columnheader">{t("Upgrades.ArtifactsTable.lastSeen")}</span>
                     </div>
 
-                    <div role="rowgroup" ref={rowsRef}>
+                    <div className={styles.Rows} role="rowgroup" ref={rowsRef}>
                         {visibleServices.map(({ artifactId, groupId, starterVersion, lastSeen }) => (
                             <div role="row" className={styles.Row} key={`${groupId}:${artifactId}`}>
                                 <div role="cell" className={styles.ArtifactCell}>
