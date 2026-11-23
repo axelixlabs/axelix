@@ -72,7 +72,7 @@ public class ExternalAuthenticationApiFilter extends OncePerRequestFilter {
     }
 
     private static boolean shouldFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
+        String path = request.getServletPath();
 
         return path.equalsIgnoreCase("/api/external/users/login") || path.startsWith("/api/external/oauth2/callback");
     }

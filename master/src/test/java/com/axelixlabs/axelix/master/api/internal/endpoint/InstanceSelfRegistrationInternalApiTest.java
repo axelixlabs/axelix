@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
+import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -38,6 +39,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpEntity;
@@ -227,6 +229,9 @@ public class InstanceSelfRegistrationInternalApiTest {
            ]
      }
     """.formatted(TEST_INSTANCE_ID);
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -621,10 +626,12 @@ public class InstanceSelfRegistrationInternalApiTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("invalidTokens")
-    void shouldReturnUnauthorized(String scenario, TestRestTemplate testRestTemplate) {
+    void shouldReturnUnauthorized(String scenario, TestRestTemplate testRestTemplate, String prefix) {
         // when.
         ResponseEntity<Void> response = testRestTemplate.postForEntity(
-                "/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
+                URI.create("http://localhost:" + port + prefix + "internal/service/register"),
+                defaultJsonEntity(JSON_REQUEST),
+                Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -639,20 +646,35 @@ public class InstanceSelfRegistrationInternalApiTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("invalidTokens")
-    void shouldReturnUnauthorizedOnHeartbeat(String scenario, TestRestTemplate testRestTemplate) {
+    void shouldReturnUnauthorizedOnHeartbeat(String scenario, TestRestTemplate testRestTemplate, String prefix) {
         // when.
         ResponseEntity<Void> response = testRestTemplate.postForEntity(
-                "/api/internal/service/heartbeat/v2", defaultJsonEntity(JSON_HEARTBEAT_V2), Void.class);
+                URI.create("http://localhost:" + port + prefix + "internal/service/heartbeat/v2"),
+                defaultJsonEntity(JSON_HEARTBEAT_V2),
+                Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
-    private static Stream<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {
-        return Stream.of(
-                Arguments.of("without token", builder.withoutToken()),
-                Arguments.of("expired token", builder.withExpiredTokenInAuthHeader()),
-                Arguments.of("malformed token", builder.withMalformedTokenInAuthHeader()));
+    private static List<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {
+        TestRestTemplate withoutToken = builder.withoutToken();
+        TestRestTemplate expiredToken = builder.withExpiredTokenInAuthHeader();
+        TestRestTemplate malformedToken = builder.withMalformedTokenInAuthHeader();
+
+        return List.of(
+                Arguments.of("without token /api/", withoutToken, "/api/"),
+                Arguments.of("without token /api;/", withoutToken, "/api;/"),
+                Arguments.of("without token /api;param=value/", withoutToken, "/api;param=value/"),
+                Arguments.of("without token /%61pi/", withoutToken, "/%61pi/"),
+                Arguments.of("expired token /api/", expiredToken, "/api/"),
+                Arguments.of("expired token /api;/", expiredToken, "/api;/"),
+                Arguments.of("expired token /api;param=value/", expiredToken, "/api;param=value/"),
+                Arguments.of("expired token /%61pi/", expiredToken, "/%61pi/"),
+                Arguments.of("malformed token /api/", malformedToken, "/api/"),
+                Arguments.of("malformed token /api;/", malformedToken, "/api;/"),
+                Arguments.of("malformed token /api;param=value/", malformedToken, "/api;param=value/"),
+                Arguments.of("malformed token /%61pi/", malformedToken, "/%61pi/"));
     }
 
     /**
