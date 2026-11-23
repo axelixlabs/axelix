@@ -18,11 +18,18 @@
 package com.axelixlabs.axelix.master.autoconfiguration.web;
 
 import java.io.IOException;
+import java.util.Set;
 
+import jakarta.servlet.ServletContext;
+
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.method.HandlerTypePredicate;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -45,6 +52,25 @@ public class WebAutoConfiguration {
     public static final String EXTERNAL_API_PATH = "/api/external";
 
     public static final String INTERNAL_API_PATH = "/api/internal";
+
+    @Bean
+    public SmartInitializingSingleton dispatcherServletMappingValidator(ServletContext servletContext) {
+        return () -> {
+            // Registrations are complete, but the web server has not started accepting requests yet.
+            servletContext.getServletRegistrations().forEach((name, registration) -> {
+                Class<?> servletClass =
+                        ClassUtils.resolveClassName(registration.getClassName(), servletContext.getClassLoader());
+                if (DispatcherServlet.class.isAssignableFrom(servletClass)) {
+                    Assert.state(
+                            Set.copyOf(registration.getMappings()).equals(Set.of("/")),
+                            "Unsupported DispatcherServlet mapping for '" + name + "': "
+                                    + registration.getMappings()
+                                    + ". Axelix requires only the '/' mapping for authentication filters."
+                                    + " Remove custom spring.mvc.servlet.path and servlet registration mappings.");
+                }
+            });
+        };
+    }
 
     @Bean
     @ConfigurationProperties(prefix = "axelix.master.web.static-resources")
