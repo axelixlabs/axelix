@@ -52,6 +52,21 @@ class WebAutoConfigurationTest {
                     ServerConfiguration.class, DispatcherServletAutoConfiguration.class, WebAutoConfiguration.class);
 
     @Test
+    void startsWithoutServletContext() {
+        // given.
+        ApplicationContextRunner runner = new ApplicationContextRunner()
+                .withConfiguration(AutoConfigurations.of(
+                        ConfigurationPropertiesAutoConfiguration.class, WebAutoConfiguration.class))
+                .withPropertyValues("axelix.master.web.static-resources.location=classpath:/spa/");
+
+        // when.
+        runner.run(context -> {
+            // then.
+            assertThat(context).hasNotFailed();
+        });
+    }
+
+    @Test
     void startsWithDefaultServletMapping() {
         // given / when.
         contextRunner.run(context -> {

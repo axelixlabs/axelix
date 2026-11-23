@@ -24,6 +24,7 @@ import jakarta.servlet.ServletContext;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
@@ -53,7 +54,9 @@ public class WebAutoConfiguration {
 
     public static final String INTERNAL_API_PATH = "/api/internal";
 
+    // Docker AOT training starts Master with spring.main.web-application-type=none, so there is no ServletContext.
     @Bean
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     public SmartInitializingSingleton dispatcherServletMappingValidator(ServletContext servletContext) {
         return () -> {
             // Registrations are complete, but the web server has not started accepting requests yet.
