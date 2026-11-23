@@ -28,6 +28,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager
  * Lincheck test for [DefaultEnhancedCache].
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @Param(name = "value", gen = StringGen::class)
 @Param(name = "key", gen = StringGen::class, conf = "1:3")
