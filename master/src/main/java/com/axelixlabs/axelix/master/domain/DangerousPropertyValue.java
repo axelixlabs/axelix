@@ -73,6 +73,13 @@ public enum DangerousPropertyValue {
                                     + "tool, such as Liquibase or Flyway, is the way to evolve a schema you care about.",
                             "validate"))),
 
+    LIQUIBASE_DROP_FIRST(
+            "spring.liquibase.drop-first",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Liquibase drops existing database objects before applying migrations, which can destroy production data.",
+                    "false"))),
+
     SHOW_SQL(
             "spring.jpa.show-sql",
             Set.of(new DangerousValue(
