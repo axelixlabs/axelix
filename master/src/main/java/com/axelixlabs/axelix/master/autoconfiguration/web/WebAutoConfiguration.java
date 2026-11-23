@@ -61,6 +61,9 @@ public class WebAutoConfiguration {
                 Class<?> servletClass =
                         ClassUtils.resolveClassName(registration.getClassName(), servletContext.getClassLoader());
                 if (DispatcherServlet.class.isAssignableFrom(servletClass)) {
+                    // A custom spring.mvc.servlet.path (e.g. /some-path-here) can move backend endpoints
+                    // outside the paths matched by the authentication filters. Reject custom mappings at
+                    // startup to prevent exposing unauthenticated endpoints, whether intentional or accidental.
                     Assert.state(
                             Set.copyOf(registration.getMappings()).equals(Set.of("/")),
                             "Unsupported DispatcherServlet mapping for '" + name + "': "
