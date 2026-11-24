@@ -37,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzMisfirePolicy;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTrigger;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerType;
@@ -130,12 +131,28 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
                         QuartzTrigger::getName,
                         QuartzTrigger::getGroup,
                         QuartzTrigger::getType,
-                        QuartzTrigger::getState)
+                        QuartzTrigger::getState,
+                        QuartzTrigger::getMisfirePolicy)
                 .containsExactlyInAnyOrder(
-                        tuple("cron", "triggers", QuartzTriggerType.CRON, "NORMAL"),
-                        tuple("simple", "triggers", QuartzTriggerType.SIMPLE, "NORMAL"),
-                        tuple("calendar", "triggers", QuartzTriggerType.CALENDAR_INTERVAL, "NORMAL"),
-                        tuple("daily", "triggers", QuartzTriggerType.DAILY_TIME_INTERVAL, "NORMAL"));
+                        tuple("cron", "triggers", QuartzTriggerType.CRON, "NORMAL", QuartzMisfirePolicy.DO_NOTHING),
+                        tuple(
+                                "simple",
+                                "triggers",
+                                QuartzTriggerType.SIMPLE,
+                                "NORMAL",
+                                QuartzMisfirePolicy.SMART_POLICY),
+                        tuple(
+                                "calendar",
+                                "triggers",
+                                QuartzTriggerType.CALENDAR_INTERVAL,
+                                "NORMAL",
+                                QuartzMisfirePolicy.SMART_POLICY),
+                        tuple(
+                                "daily",
+                                "triggers",
+                                QuartzTriggerType.DAILY_TIME_INTERVAL,
+                                "NORMAL",
+                                QuartzMisfirePolicy.SMART_POLICY));
         assertThat(triggers)
                 .filteredOn("type", QuartzTriggerType.CRON)
                 .singleElement()
