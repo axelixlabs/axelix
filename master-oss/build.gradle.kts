@@ -1,6 +1,6 @@
 plugins {
     id("master-runtime")
-    id("org.springframework.boot") version "4.1.1"
+    id("org.springframework.boot") version "4.2.0"
     id("com.axelixlabs.axelix-internal")
 }
 
