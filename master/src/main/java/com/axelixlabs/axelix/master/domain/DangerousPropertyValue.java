@@ -80,6 +80,20 @@ public enum DangerousPropertyValue {
                     "Liquibase drops existing database objects before applying migrations, which can destroy production data.",
                     "false"))),
 
+    FLYWAY_CLEAN_ENABLED(
+            "spring.flyway.clean-disabled",
+            Set.of(new DangerousValue(
+                    "false",
+                    "This allows Flyway's clean operation to drop all objects in the configured schemas if invoked.",
+                    "true"))),
+
+    H2_CONSOLE_ENABLED(
+            "spring.h2.console.enabled",
+            Set.of(new DangerousValue(
+                    "true",
+                    "The H2 console provides browser-based database access and is intended for development only.",
+                    "false"))),
+
     SHOW_SQL(
             "spring.jpa.show-sql",
             Set.of(new DangerousValue(
@@ -113,6 +127,24 @@ public enum DangerousPropertyValue {
                     "Immediate shutdown can interrupt in-flight HTTP requests during restarts and deployments. "
                             + "Graceful shutdown gives active requests time to complete.",
                     "graceful"))),
+
+    ENV_SHOW_VALUES_ALWAYS(
+            "management.endpoint.env.show-values",
+            Set.of(new DangerousValue(
+                    "always",
+                    "The Actuator env endpoint can return unmasked environment values, including credentials. "
+                            + "Use the Axelix UI or MCP server to inspect environment properties and keep the standard "
+                            + "Actuator env endpoint unexposed.",
+                    "never"))),
+
+    CONFIGPROPS_SHOW_VALUES_ALWAYS(
+            "management.endpoint.configprops.show-values",
+            Set.of(new DangerousValue(
+                    "always",
+                    "The Actuator configprops endpoint can return unmasked configuration values, including credentials. "
+                            + "Use the Axelix UI or MCP server to inspect configuration properties and keep the standard "
+                            + "Actuator configprops endpoint unexposed.",
+                    "never"))),
 
     EXPOSURE_INCLUDE_ALL(
             "management.endpoints.web.exposure.include",
