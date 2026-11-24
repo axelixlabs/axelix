@@ -24,3 +24,4 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointA
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCoreNamingAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixQuartzEndpointAutoConfiguration
