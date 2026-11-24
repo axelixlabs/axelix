@@ -8,8 +8,8 @@ plugins {
     id("java-test-fixtures")
 }
 
-val springBootVersion = "4.1.1"
-val springCloudVersion = "2025.1.2"
+val springBootVersion = "4.2.0"
+val springCloudVersion = "2026.0.0"
 val springAiVersion = "2.0.0"
 
 // Not Managed by Spring BOM
