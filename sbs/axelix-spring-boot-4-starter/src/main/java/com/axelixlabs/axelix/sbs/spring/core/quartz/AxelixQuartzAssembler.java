@@ -30,6 +30,7 @@ import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.TimeOfDay;
 import org.quartz.Trigger;
+import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
@@ -83,17 +84,9 @@ public class AxelixQuartzAssembler {
                     .repeatCount(daily.getRepeatCount())
                     .daysOfWeek(daily.getDaysOfWeek().stream().sorted().toList())
                     .startTimeOfDay(formatTimeOfDay(daily.getStartTimeOfDay()))
-                    .endTimeOfDay(formatTimeOfDay(daily.getEndTimeOfDay()));
+                    .endTimeOfDay(formatEndTimeOfDay(daily.getEndTimeOfDay()));
         }
         return result;
-    }
-
-    private String formatTimeOfDay(TimeOfDay time) {
-        return LocalTime.of(time.getHour(), time.getMinute(), time.getSecond()).toString();
-    }
-
-    private @Nullable String formatTimestamp(@Nullable Date timestamp) {
-        return timestamp != null ? timestamp.toInstant().toString() : null;
     }
 
     public QuartzSchedulerMetadata assembleSchedulerMetadata(SchedulerMetaData metadata) {
@@ -113,5 +106,21 @@ public class AxelixQuartzAssembler {
                 .jobStoreClustered(metadata.isJobStoreClustered())
                 .threadPoolClassName(metadata.getThreadPoolClass().getName())
                 .threadPoolSize(metadata.getThreadPoolSize());
+    }
+
+    /**
+     * Uses the same default end time as
+     * {@link DailyTimeIntervalTriggerImpl#getFireTimeAfter(Date)}.
+     */
+    private String formatEndTimeOfDay(@Nullable TimeOfDay time) {
+        return time == null ? "23:59:59" : formatTimeOfDay(time);
+    }
+
+    private String formatTimeOfDay(TimeOfDay time) {
+        return LocalTime.of(time.getHour(), time.getMinute(), time.getSecond()).toString();
+    }
+
+    private @Nullable String formatTimestamp(@Nullable Date timestamp) {
+        return timestamp != null ? timestamp.toInstant().toString() : null;
     }
 }

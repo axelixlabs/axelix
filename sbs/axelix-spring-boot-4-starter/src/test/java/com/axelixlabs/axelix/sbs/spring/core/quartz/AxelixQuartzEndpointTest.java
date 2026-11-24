@@ -17,47 +17,23 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.quartz;
 
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-import java.util.Properties;
-import java.util.TimeZone;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.quartz.CalendarIntervalScheduleBuilder;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.DailyTimeIntervalScheduleBuilder;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
+import org.quartz.DailyTimeIntervalTrigger;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerMetaData;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.TimeOfDay;
 import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.RemoteScheduler;
 import org.quartz.impl.StdScheduler;
+import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.springframework.test.util.TestSocketUtils;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
@@ -66,13 +42,8 @@ import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerType;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzJobs;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzSchedulers;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpointTest.QuartzTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
-import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.NO_SIBLINGS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -81,23 +52,7 @@ import static org.assertj.core.api.Assertions.tuple;
  *
  * @author Nikita Kirillov
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "management.endpoints.web.exposure.include=axelix-quartz")
-@Import({QuartzTestConfiguration.class, JwtAuthTestConfiguration.class})
-@IgnoreTestContextArchitecture(reason = NO_SIBLINGS)
-class AxelixQuartzEndpointTest {
-
-    @Autowired
-    private TestRestTemplateBuilder restTemplate;
-
-    @Autowired
-    @Qualifier("startedScheduler")
-    private Scheduler scheduler;
-
-    @Autowired
-    @Qualifier("standbyScheduler")
-    private Scheduler standbyScheduler;
+class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
 
     @Test
     void shouldReturnQuartzSchedulers() throws SchedulerException {
@@ -137,53 +92,6 @@ class AxelixQuartzEndpointTest {
             assertThat(metadata.getThreadPoolClassName()).isEqualTo(SimpleThreadPool.class.getName());
             assertThat(metadata.getThreadPoolSize()).isEqualTo(2);
         });
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void shouldSkipUnavailableSchedulers(boolean allUnavailable) throws Exception {
-        // given.
-        int port = TestSocketUtils.findAvailableTcpPort();
-        Registry registry = LocateRegistry.createRegistry(port);
-        try {
-            Scheduler unavailable = new RemoteScheduler("missing", "127.0.0.1", port);
-            List<Scheduler> schedulers = allUnavailable ? List.of(unavailable) : List.of(unavailable, scheduler);
-            AxelixQuartzService service = new DefaultAxelixQuartzService(schedulers, new AxelixQuartzAssembler());
-
-            // when.
-            ServiceQuartzSchedulers result = service.getQuartzSchedulers();
-
-            // then.
-            if (allUnavailable) {
-                assertThat(result.getSchedulers()).isEmpty();
-            } else {
-                assertThat(result.getSchedulers())
-                        .extracting(QuartzSchedulerMetadata::getSchedulerName)
-                        .containsExactly("startedScheduler");
-            }
-        } finally {
-            UnicastRemoteObject.unexportObject(registry, true);
-        }
-    }
-
-    @Test
-    void shouldFindJobsWhenAnotherSchedulerIsUnavailable() throws Exception {
-        // given.
-        int port = TestSocketUtils.findAvailableTcpPort();
-        Registry registry = LocateRegistry.createRegistry(port);
-        try {
-            Scheduler unavailable = new RemoteScheduler("missing", "127.0.0.1", port);
-            AxelixQuartzService service =
-                    new DefaultAxelixQuartzService(List.of(unavailable, standbyScheduler), new AxelixQuartzAssembler());
-
-            // when.
-            ServiceQuartzJobs result = service.getQuartzJobs("standbyScheduler");
-
-            // then.
-            assertThat(result.getJobs()).extracting(QuartzJob::getName).containsExactlyInAnyOrder("job", "orphan");
-        } finally {
-            UnicastRemoteObject.unexportObject(registry, true);
-        }
     }
 
     @Test
@@ -275,6 +183,41 @@ class AxelixQuartzEndpointTest {
     }
 
     @Test
+    void shouldReturnEndOfDayForDailyTriggerWithoutEndTime() throws SchedulerException {
+        // given.
+        JobDetail job = JobBuilder.newJob(TestJob.class)
+                .withIdentity("daily-without-end", "regression")
+                .build();
+        DailyTimeIntervalTriggerImpl trigger = new DailyTimeIntervalTriggerImpl();
+        trigger.setName("daily-without-end");
+        trigger.setJobKey(job.getKey());
+        standbyScheduler.scheduleJob(job, trigger);
+        try {
+            // when.
+            ResponseEntity<ServiceQuartzJobs> response = restTemplate
+                    .asMaster()
+                    .getForEntity("/actuator/axelix-quartz/standbyScheduler", ServiceQuartzJobs.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(((DailyTimeIntervalTrigger) standbyScheduler.getTrigger(trigger.getKey())).getEndTimeOfDay())
+                    .isNull();
+            assertThat(response.getBody().getJobs())
+                    .filteredOn(value -> value.getName().equals("daily-without-end")
+                            && value.getGroup().equals("regression"))
+                    .singleElement()
+                    .satisfies(value -> assertThat(value.getTriggers())
+                            .singleElement()
+                            .satisfies(result -> {
+                                assertThat(result.getType()).isEqualTo(QuartzTriggerType.DAILY_TIME_INTERVAL);
+                                assertThat(result.getEndTimeOfDay()).isEqualTo("23:59:59");
+                            }));
+        } finally {
+            standbyScheduler.deleteJob(job.getKey());
+        }
+    }
+
+    @Test
     void shouldReturnEmptyJobsForSchedulerWithoutJobs() {
         // when.
         ResponseEntity<ServiceQuartzJobs> response = restTemplate
@@ -301,81 +244,4 @@ class AxelixQuartzEndpointTest {
 
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-quartz")
     void negativeAuthTests() {}
-
-    @TestConfiguration
-    static class QuartzTestConfiguration {
-
-        @Bean
-        public SchedulerFactoryBean startedScheduler() {
-            return scheduler("startedScheduler", true);
-        }
-
-        @Bean
-        public SchedulerFactoryBean standbyScheduler() {
-            JobDetail job = JobBuilder.newJob(SerialJob.class)
-                    .withIdentity("job", "jobs")
-                    .withDescription("Test job")
-                    .requestRecovery()
-                    .storeDurably()
-                    .build();
-            SchedulerFactoryBean factory = scheduler("standbyScheduler", false);
-            factory.setJobDetails(
-                    job,
-                    JobBuilder.newJob(TestJob.class)
-                            .withIdentity("orphan", "jobs")
-                            .storeDurably()
-                            .build());
-            factory.setTriggers(
-                    TriggerBuilder.newTrigger()
-                            .withIdentity("cron", "triggers")
-                            .forJob(job)
-                            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 12 * * ?")
-                                    .inTimeZone(TimeZone.getTimeZone("Europe/Paris"))
-                                    .withMisfireHandlingInstructionDoNothing())
-                            .build(),
-                    TriggerBuilder.newTrigger()
-                            .withIdentity("simple", "triggers")
-                            .forJob(job)
-                            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                                    .withIntervalInSeconds(30)
-                                    .withRepeatCount(4))
-                            .build(),
-                    TriggerBuilder.newTrigger()
-                            .withIdentity("calendar", "triggers")
-                            .forJob(job)
-                            .withSchedule(CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
-                                    .withIntervalInDays(1)
-                                    .inTimeZone(TimeZone.getTimeZone("Europe/Paris")))
-                            .build(),
-                    TriggerBuilder.newTrigger()
-                            .withIdentity("daily", "triggers")
-                            .forJob(job)
-                            .withSchedule(DailyTimeIntervalScheduleBuilder.dailyTimeIntervalSchedule()
-                                    .withIntervalInHours(1)
-                                    .onMondayThroughFriday()
-                                    .startingDailyAt(TimeOfDay.hourAndMinuteOfDay(9, 0))
-                                    .endingDailyAt(TimeOfDay.hourAndMinuteOfDay(18, 30))
-                                    .withRepeatCount(5))
-                            .build());
-            return factory;
-        }
-
-        private SchedulerFactoryBean scheduler(String name, boolean autoStartup) {
-            Properties properties = new Properties();
-            properties.setProperty("org.quartz.threadPool.threadCount", "2");
-            SchedulerFactoryBean factory = new SchedulerFactoryBean();
-            factory.setSchedulerName(name);
-            factory.setAutoStartup(autoStartup);
-            factory.setQuartzProperties(properties);
-            return factory;
-        }
-    }
-
-    public static class TestJob implements Job {
-        @Override
-        public void execute(JobExecutionContext context) {}
-    }
-
-    @DisallowConcurrentExecution
-    public static class SerialJob extends TestJob {}
 }

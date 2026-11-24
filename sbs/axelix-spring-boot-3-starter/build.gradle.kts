@@ -38,6 +38,8 @@ dependencies {
 
     compileOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
+    compileOnly("org.quartz-scheduler:quartz")
+
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 
@@ -46,6 +48,7 @@ dependencies {
     testImplementation(testFixtures(project(":sbs:starter-domain")))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-quartz")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
