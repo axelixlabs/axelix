@@ -114,11 +114,76 @@ public enum DangerousPropertyValue {
 
     INCLUDE_STACKTRACE_ALWAYS(
             "server.error.include-stacktrace",
-            Set.of(new DangerousValue(
-                    "always",
-                    "The stack trace is included into every error response, which exposes the internals of the application, "
-                            + "the libraries it is built upon and their versions to whoever is on the other side of the wire.",
-                    "never"))),
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "The stack trace is included into every error response, which exposes the internals of the application, "
+                                    + "the libraries it is built upon and their versions to whoever is on the other side of the wire.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can request stack traces in error responses.",
+                            "never"))),
+
+    INCLUDE_MESSAGE_ALWAYS(
+            "server.error.include-message",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Error responses can expose internal exception messages, including file paths or database details.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can request internal error messages in error responses.",
+                            "never"))),
+
+    INCLUDE_BINDING_ERRORS_ALWAYS(
+            "server.error.include-binding-errors",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Error responses can expose rejected request values in binding or validation errors.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can request binding errors that may contain rejected input in error responses.",
+                            "never"))),
+
+    WEB_INCLUDE_STACKTRACE_ALWAYS(
+            "spring.web.error.include-stacktrace",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Error responses can expose stack traces, including internal application and library details.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can request stack traces in error responses.",
+                            "never"))),
+
+    WEB_INCLUDE_MESSAGE_ALWAYS(
+            "spring.web.error.include-message",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Error responses can expose internal exception messages, including file paths or database details.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can request internal error messages in error responses.",
+                            "never"))),
+
+    WEB_INCLUDE_BINDING_ERRORS_ALWAYS(
+            "spring.web.error.include-binding-errors",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Error responses can expose rejected request values in binding or validation errors.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can request binding errors that may contain rejected input in error responses.",
+                            "never"))),
 
     IMMEDIATE_SHUTDOWN(
             "server.shutdown",
