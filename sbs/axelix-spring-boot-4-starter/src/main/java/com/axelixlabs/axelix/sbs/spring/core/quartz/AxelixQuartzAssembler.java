@@ -33,6 +33,7 @@ import org.quartz.Trigger;
 import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzMisfirePolicy;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTrigger;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerType;
@@ -52,6 +53,8 @@ public class AxelixQuartzAssembler {
                 .description(job.getDescription())
                 .concurrentExecutionDisallowed(job.isConcurrentExecutionDisallowed())
                 .requestsRecovery(job.requestsRecovery())
+                .durable(job.isDurable())
+                .persistJobDataAfterExecution(job.isPersistJobDataAfterExecution())
                 .triggers(triggers);
     }
 
@@ -61,6 +64,7 @@ public class AxelixQuartzAssembler {
                 .group(trigger.getKey().getGroup())
                 .type(QuartzTriggerType.CUSTOM)
                 .state(state.name())
+                .misfirePolicy(assembleMisfirePolicy(trigger))
                 .previousFireTime(formatTimestamp(trigger.getPreviousFireTime()))
                 .nextFireTime(formatTimestamp(trigger.getNextFireTime()));
         if (trigger instanceof CronTrigger cron) {
@@ -106,6 +110,45 @@ public class AxelixQuartzAssembler {
                 .jobStoreClustered(metadata.isJobStoreClustered())
                 .threadPoolClassName(metadata.getThreadPoolClass().getName())
                 .threadPoolSize(metadata.getThreadPoolSize());
+    }
+
+    private QuartzMisfirePolicy assembleMisfirePolicy(Trigger trigger) {
+        int instruction = trigger.getMisfireInstruction();
+        if (instruction == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) {
+            return QuartzMisfirePolicy.IGNORE_MISFIRES;
+        }
+        if (instruction == Trigger.MISFIRE_INSTRUCTION_SMART_POLICY) {
+            return QuartzMisfirePolicy.SMART_POLICY;
+        }
+        if (trigger instanceof SimpleTrigger) {
+            switch (instruction) {
+                case SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW:
+                    return QuartzMisfirePolicy.FIRE_NOW;
+                case SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT:
+                    return QuartzMisfirePolicy.RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT;
+                case SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT:
+                    return QuartzMisfirePolicy.RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT;
+                case SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT:
+                    return QuartzMisfirePolicy.RESCHEDULE_NEXT_WITH_EXISTING_COUNT;
+                case SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT:
+                    return QuartzMisfirePolicy.RESCHEDULE_NEXT_WITH_REMAINING_COUNT;
+                default:
+                    return QuartzMisfirePolicy.UNKNOWN;
+            }
+        }
+        if (trigger instanceof CronTrigger
+                || trigger instanceof CalendarIntervalTrigger
+                || trigger instanceof DailyTimeIntervalTrigger) {
+            switch (instruction) {
+                case CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW:
+                    return QuartzMisfirePolicy.FIRE_ONCE_NOW;
+                case CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING:
+                    return QuartzMisfirePolicy.DO_NOTHING;
+                default:
+                    return QuartzMisfirePolicy.UNKNOWN;
+            }
+        }
+        return QuartzMisfirePolicy.UNKNOWN;
     }
 
     /**

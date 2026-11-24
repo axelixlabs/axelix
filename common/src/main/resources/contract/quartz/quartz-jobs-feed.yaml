@@ -31,6 +31,8 @@ components:
         - className
         - concurrentExecutionDisallowed
         - requestsRecovery
+        - durable
+        - persistJobDataAfterExecution
         - triggers
       properties:
         name:
@@ -57,6 +59,14 @@ components:
           type: boolean
           description: Whether the job requests recovery after a scheduler failure.
           x-axelix-introduced-in: 1.4.0
+        durable:
+          type: boolean
+          description: Whether the job remains stored when it has no associated triggers.
+          x-axelix-introduced-in: 1.4.0
+        persistJobDataAfterExecution:
+          type: boolean
+          description: Whether changes to the job data map are persisted after execution.
+          x-axelix-introduced-in: 1.4.0
         triggers:
           type: array
           description: The triggers associated with the job.
@@ -73,6 +83,7 @@ components:
         - group
         - type
         - state
+        - misfirePolicy
       properties:
         name:
           type: string
@@ -90,6 +101,10 @@ components:
           type: string
           description: The current Quartz trigger state.
           x-axelix-introduced-in: 1.4.0
+        misfirePolicy:
+          description: The policy applied when the trigger misses a scheduled firing.
+          x-axelix-introduced-in: 1.4.0
+          $ref: '#/components/schemas/QuartzMisfirePolicy'
         previousFireTime:
           type: string
           description: The previous fire time in ISO-8601 format, or absent before the first firing.
@@ -146,3 +161,19 @@ components:
         - CALENDAR_INTERVAL
         - DAILY_TIME_INTERVAL
         - CUSTOM
+    QuartzMisfirePolicy:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: string
+      description: A standard Quartz misfire policy, or UNKNOWN for an unsupported policy.
+      enum:
+        - IGNORE_MISFIRES
+        - SMART_POLICY
+        - FIRE_NOW
+        - FIRE_ONCE_NOW
+        - DO_NOTHING
+        - RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT
+        - RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT
+        - RESCHEDULE_NEXT_WITH_EXISTING_COUNT
+        - RESCHEDULE_NEXT_WITH_REMAINING_COUNT
+        - UNKNOWN

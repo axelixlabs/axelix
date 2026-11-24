@@ -29,10 +29,18 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.quartz.CalendarIntervalScheduleBuilder;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.DailyTimeIntervalScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.PersistJobDataAfterExecution;
+import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TimeOfDay;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.RemoteScheduler;
 import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
@@ -41,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.SocketUtils;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzMisfirePolicy;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzJobs;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzSchedulers;
@@ -105,6 +114,71 @@ class DefaultAxelixQuartzServiceTest extends AbstractQuartzSharedContextTest {
     }
 
     @ParameterizedTest
+    @MethodSource("misfirePolicies")
+    void shouldReturnMisfirePolicy(ScheduleBuilder<? extends Trigger> schedule, QuartzMisfirePolicy expected)
+            throws Exception {
+        // given.
+        JobDetail job = JobBuilder.newJob(TestJob.class)
+                .withIdentity("policy", "service-test")
+                .build();
+        standbyScheduler.scheduleJob(
+                job,
+                TriggerBuilder.newTrigger()
+                        .withIdentity("policy", "service-test")
+                        .forJob(job)
+                        .withSchedule(schedule)
+                        .build());
+        try {
+            // when.
+            ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
+
+            // then.
+            assertThat(result.getJobs())
+                    .filteredOn(value ->
+                            value.getName().equals("policy") && value.getGroup().equals("service-test"))
+                    .singleElement()
+                    .satisfies(value -> assertThat(value.getTriggers())
+                            .singleElement()
+                            .satisfies(trigger ->
+                                    assertThat(trigger.getMisfirePolicy()).isEqualTo(expected)));
+        } finally {
+            standbyScheduler.deleteJob(job.getKey());
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("jobBehaviorFlags")
+    void shouldReturnJobBehaviorFlags(boolean durable, boolean persistJobData) throws Exception {
+        // given.
+        JobDetail job = JobBuilder.newJob(persistJobData ? PersistentJob.class : TestJob.class)
+                .withIdentity("behavior", "service-test")
+                .storeDurably(durable)
+                .build();
+        standbyScheduler.scheduleJob(
+                job,
+                TriggerBuilder.newTrigger()
+                        .withIdentity("behavior", "service-test")
+                        .forJob(job)
+                        .build());
+        try {
+            // when.
+            ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
+
+            // then.
+            assertThat(result.getJobs())
+                    .filteredOn(value -> value.getName().equals("behavior")
+                            && value.getGroup().equals("service-test"))
+                    .singleElement()
+                    .satisfies(value -> {
+                        assertThat(value.getDurable()).isEqualTo(durable);
+                        assertThat(value.getPersistJobDataAfterExecution()).isEqualTo(persistJobData);
+                    });
+        } finally {
+            standbyScheduler.deleteJob(job.getKey());
+        }
+    }
+
+    @ParameterizedTest
     @MethodSource("dailyEndTimes")
     void shouldReturnEffectiveDailyEndTime(@Nullable TimeOfDay endTime, String expected) throws Exception {
         // given.
@@ -161,12 +235,68 @@ class DefaultAxelixQuartzServiceTest extends AbstractQuartzSharedContextTest {
         }
     }
 
+    static Stream<Arguments> misfirePolicies() {
+        return Stream.of(
+                Arguments.of(SimpleScheduleBuilder.simpleSchedule(), QuartzMisfirePolicy.SMART_POLICY),
+                Arguments.of(
+                        SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionIgnoreMisfires(),
+                        QuartzMisfirePolicy.IGNORE_MISFIRES),
+                Arguments.of(
+                        SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionFireNow(),
+                        QuartzMisfirePolicy.FIRE_NOW),
+                Arguments.of(
+                        SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionNowWithExistingCount(),
+                        QuartzMisfirePolicy.RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT),
+                Arguments.of(
+                        SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionNowWithRemainingCount(),
+                        QuartzMisfirePolicy.RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT),
+                Arguments.of(
+                        SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionNextWithExistingCount(),
+                        QuartzMisfirePolicy.RESCHEDULE_NEXT_WITH_EXISTING_COUNT),
+                Arguments.of(
+                        SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionNextWithRemainingCount(),
+                        QuartzMisfirePolicy.RESCHEDULE_NEXT_WITH_REMAINING_COUNT),
+                Arguments.of(
+                        CronScheduleBuilder.cronSchedule("0 0 12 * * ?").withMisfireHandlingInstructionFireAndProceed(),
+                        QuartzMisfirePolicy.FIRE_ONCE_NOW),
+                Arguments.of(
+                        CronScheduleBuilder.cronSchedule("0 0 12 * * ?").withMisfireHandlingInstructionDoNothing(),
+                        QuartzMisfirePolicy.DO_NOTHING),
+                Arguments.of(
+                        CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
+                                .withMisfireHandlingInstructionFireAndProceed(),
+                        QuartzMisfirePolicy.FIRE_ONCE_NOW),
+                Arguments.of(
+                        CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
+                                .withMisfireHandlingInstructionDoNothing(),
+                        QuartzMisfirePolicy.DO_NOTHING),
+                Arguments.of(
+                        DailyTimeIntervalScheduleBuilder.dailyTimeIntervalSchedule()
+                                .withMisfireHandlingInstructionFireAndProceed(),
+                        QuartzMisfirePolicy.FIRE_ONCE_NOW),
+                Arguments.of(
+                        DailyTimeIntervalScheduleBuilder.dailyTimeIntervalSchedule()
+                                .withMisfireHandlingInstructionDoNothing(),
+                        QuartzMisfirePolicy.DO_NOTHING));
+    }
+
+    static Stream<Arguments> jobBehaviorFlags() {
+        return Stream.of(
+                Arguments.of(false, false),
+                Arguments.of(false, true),
+                Arguments.of(true, false),
+                Arguments.of(true, true));
+    }
+
     static Stream<Arguments> dailyEndTimes() {
         return Stream.of(
                 Arguments.of(null, "23:59:59"),
                 Arguments.of(new TimeOfDay(18, 30, 0), "18:30"),
                 Arguments.of(new TimeOfDay(23, 59, 59), "23:59:59"));
     }
+
+    @PersistJobDataAfterExecution
+    public static class PersistentJob extends TestJob {}
 
     public static class CustomJobDetail extends JobDetailImpl {
         public boolean isConcurrentExectionDisallowed() {
