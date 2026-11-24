@@ -37,6 +37,8 @@ dependencies {
     compileOnly("com.fasterxml.jackson.core:jackson-databind")
     compileOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
+    compileOnly("org.quartz-scheduler:quartz")
+
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 
@@ -47,6 +49,7 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-quartz")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")

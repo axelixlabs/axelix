@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: quartz-jobs-feed
+  version: ""
+  description: |
+    Schemas for the jobs and triggers of a Quartz scheduler.
+components:
+  schemas:
+    ServiceQuartzJobs:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: The jobs registered in a Quartz scheduler.
+      required:
+        - jobs
+      properties:
+        jobs:
+          type: array
+          description: The jobs and their triggers.
+          x-axelix-introduced-in: 1.4.0
+          items:
+            $ref: '#/components/schemas/QuartzJob'
+    QuartzJob:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A Quartz job and its triggers.
+      required:
+        - name
+        - group
+        - className
+        - concurrentExecutionDisallowed
+        - requestsRecovery
+        - triggers
+      properties:
+        name:
+          type: string
+          description: The job name.
+          x-axelix-introduced-in: 1.4.0
+        group:
+          type: string
+          description: The job group.
+          x-axelix-introduced-in: 1.4.0
+        className:
+          type: string
+          description: The fully qualified name of the job class.
+          x-axelix-introduced-in: 1.4.0
+        description:
+          type: string
+          description: The job description, or absent when none is set.
+          x-axelix-introduced-in: 1.4.0
+        concurrentExecutionDisallowed:
+          type: boolean
+          description: Whether concurrent executions of this job are disallowed.
+          x-axelix-introduced-in: 1.4.0
+        requestsRecovery:
+          type: boolean
+          description: Whether the job requests recovery after a scheduler failure.
+          x-axelix-introduced-in: 1.4.0
+        triggers:
+          type: array
+          description: The triggers associated with the job.
+          x-axelix-introduced-in: 1.4.0
+          items:
+            $ref: '#/components/schemas/QuartzTrigger'
+    QuartzTrigger:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A Quartz trigger with its state and schedule.
+      required:
+        - name
+        - group
+        - type
+        - state
+      properties:
+        name:
+          type: string
+          description: The trigger name.
+          x-axelix-introduced-in: 1.4.0
+        group:
+          type: string
+          description: The trigger group.
+          x-axelix-introduced-in: 1.4.0
+        type:
+          description: The trigger type.
+          x-axelix-introduced-in: 1.4.0
+          $ref: '#/components/schemas/QuartzTriggerType'
+        state:
+          type: string
+          description: The current Quartz trigger state.
+          x-axelix-introduced-in: 1.4.0
+        previousFireTime:
+          type: string
+          description: The previous fire time in ISO-8601 format, or absent before the first firing.
+          x-axelix-introduced-in: 1.4.0
+        nextFireTime:
+          type: string
+          description: The next fire time in ISO-8601 format, or absent when no firing is scheduled.
+          x-axelix-introduced-in: 1.4.0
+        cronExpression:
+          type: string
+          description: The cron expression of a cron trigger.
+          x-axelix-introduced-in: 1.4.0
+        timeZone:
+          type: string
+          description: The time zone id of a cron or calendar interval trigger.
+          x-axelix-introduced-in: 1.4.0
+        interval:
+          type: integer
+          format: int64
+          description: The repeat interval, expressed in intervalUnit.
+          x-axelix-introduced-in: 1.4.0
+        repeatCount:
+          type: integer
+          format: int32
+          description: The number of repeats after the first firing; -1 means indefinite repetition.
+          x-axelix-introduced-in: 1.4.0
+        intervalUnit:
+          type: string
+          description: The repeat interval unit (MILLISECOND, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH or YEAR).
+          x-axelix-introduced-in: 1.4.0
+        daysOfWeek:
+          type: array
+          description: The daily interval trigger's firing days, from 1 (Sunday) to 7 (Saturday).
+          x-axelix-introduced-in: 1.4.0
+          items:
+            type: integer
+            format: int32
+        startTimeOfDay:
+          type: string
+          description: The daily interval trigger's start time in ISO local time format.
+          x-axelix-introduced-in: 1.4.0
+        endTimeOfDay:
+          type: string
+          description: The daily interval trigger's end time in ISO local time format.
+          x-axelix-introduced-in: 1.4.0
+    QuartzTriggerType:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: string
+      description: The kind of a Quartz trigger.
+      enum:
+        - CRON
+        - SIMPLE
+        - CALENDAR_INTERVAL
+        - DAILY_TIME_INTERVAL
+        - CUSTOM
