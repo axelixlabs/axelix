@@ -10,7 +10,7 @@ components:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.4.0
       type: object
-      description: The overview of all Quartz schedulers of the service, with their runtime metadata.
+      description: The overview of available Quartz schedulers of the service, with their runtime metadata.
       required:
         - schedulers
       properties:
