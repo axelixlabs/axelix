@@ -98,7 +98,7 @@ public class ManagedScheduledTask implements AutoCloseable {
         }
     }
 
-    public ScheduledFuture<?> getFuture() {
+    public @Nullable ScheduledFuture<?> getFuture() {
         try {
             return (ScheduledFuture<?>) SCHEDULED_TASK_FUTURE_FIELD.get(scheduledTask);
         } catch (IllegalAccessException e) {
@@ -107,7 +107,8 @@ public class ManagedScheduledTask implements AutoCloseable {
     }
 
     public boolean isEnabled() {
-        return !getFuture().isCancelled();
+        ScheduledFuture<?> future = getFuture();
+        return future != null && !future.isCancelled();
     }
 
     /**
