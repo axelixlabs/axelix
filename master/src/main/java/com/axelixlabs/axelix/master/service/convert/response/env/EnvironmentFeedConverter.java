@@ -31,8 +31,9 @@ import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.contract.env.InjectionPoint;
 import com.axelixlabs.axelix.common.contract.env.Property;
 import com.axelixlabs.axelix.common.contract.env.PropertySource;
+import com.axelixlabs.axelix.master.api.external.response.PropertyFindingResponse;
 import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedResponse;
-import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
+import com.axelixlabs.axelix.master.domain.findings.PropertyFinding;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.env.DangerousPropertyDetector;
 import com.axelixlabs.axelix.master.service.transport.PropertySanitizer;
@@ -58,7 +59,7 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
     @Override
     public @NonNull EnvironmentFeedResponse convertNonNull(@NonNull EnvironmentFeed source) {
         propertySanitizer.sanitize(source);
-        Map<Property, DangerousValue> dangerousProperties = dangerousPropertyDetector.detect(source);
+        Map<Property, List<PropertyFinding>> propertyFindings = dangerousPropertyDetector.detect(source);
         List<EnvironmentFeedResponse.PropertySource> propertySources = new ArrayList<>();
 
         for (PropertySource propertySource : source.getPropertySources()) {
@@ -73,7 +74,9 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
                         property.getDescription(),
                         convertDeprecation(property.getDeprecation()),
                         convertInjectionPoints(property.getInjectionPoints()),
-                        convertDangerousValue(dangerousProperties.get(property))));
+                        propertyFindings.getOrDefault(property, List.of()).stream()
+                                .map(PropertyFindingResponse::from)
+                                .toList()));
             }
 
             propertySources.add(new EnvironmentFeedResponse.PropertySource(
@@ -81,14 +84,6 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
         }
 
         return new EnvironmentFeedResponse(source.getActiveProfiles(), source.getDefaultProfiles(), propertySources);
-    }
-
-    private EnvironmentFeedResponse.@Nullable DangerousValue convertDangerousValue(
-            @Nullable DangerousValue dangerousProperty) {
-        return dangerousProperty == null
-                ? null
-                : new EnvironmentFeedResponse.DangerousValue(
-                        dangerousProperty.rationale(), dangerousProperty.alternative());
     }
 
     private EnvironmentFeedResponse.@Nullable Deprecation convertDeprecation(@Nullable Deprecation deprecation) {

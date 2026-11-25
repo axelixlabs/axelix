@@ -19,7 +19,11 @@ package com.axelixlabs.axelix.master.api.external.response.configprops;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.master.api.external.response.PropertyFindingResponse;
 
 /**
  * The configuration properties of a service.
@@ -38,14 +42,15 @@ public record ConfigurationPropertiesFeedResponse(List<Bean> beans) {
     /**
      * @param key The flattened key in dot/bracket notation.
      * @param value The value, if available.
-     * @param dangerousValue The dangerous value details, if any.
+     * @param findings The findings that matched this property.
      */
-    public record Entry(
-            String key, @Nullable String value, @Nullable DangerousValue dangerousValue) {}
+    public record Entry(String key, @Nullable String value, List<PropertyFindingResponse> findings) {
 
-    /**
-     * @param rationale The reason the value is dangerous.
-     * @param alternativeExample A safer example, if available.
-     */
-    public record DangerousValue(String rationale, String alternativeExample) {}
+        // Compatibility field for console versions that consume a single dangerous value.
+        @JsonProperty("dangerousValue")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        public @Nullable PropertyFindingResponse dangerousValue() {
+            return findings.isEmpty() ? null : findings.getFirst();
+        }
+    }
 }

@@ -20,17 +20,18 @@ package com.axelixlabs.axelix.master.service.convert.response.configprops;
 import java.util.List;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.common.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
+import com.axelixlabs.axelix.master.api.external.response.PropertyFindingResponse;
 import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse;
-import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse.DangerousValue;
 import com.axelixlabs.axelix.master.api.external.response.configprops.ConfigurationPropertiesFeedResponse.Entry;
-import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
+import com.axelixlabs.axelix.master.domain.findings.FindingRegistry;
+import com.axelixlabs.axelix.master.domain.findings.FindingTechnology;
+import com.axelixlabs.axelix.master.domain.findings.PropertyFindingDiscoveryFunction;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.PropertySanitizer;
 
@@ -55,27 +56,31 @@ public class ConfigurationPropertiesFeedConverter
     @Override
     public @NonNull ConfigurationPropertiesFeedResponse convertNonNull(@NonNull ConfigurationPropertiesFeed source) {
         propertySanitizer.sanitize(source);
+        List<PropertyFindingDiscoveryFunction> checks =
+                FindingRegistry.getPropertyChecks(FindingTechnology.CONFIGURATION);
         return new ConfigurationPropertiesFeedResponse(source.getBeans().stream()
                 .map(bean -> new ConfigurationPropertiesFeedResponse.Bean(
-                        bean.getBeanName(), bean.getPrefix(), convertEntries(bean.getProperties(), bean.getPrefix())))
+                        bean.getBeanName(),
+                        bean.getPrefix(),
+                        convertEntries(bean.getProperties(), bean.getPrefix(), checks)))
                 .toList());
     }
 
-    private List<Entry> convertEntries(List<ConfigurationPropertiesEntry> entries, String prefix) {
+    private List<Entry> convertEntries(
+            List<ConfigurationPropertiesEntry> entries, String prefix, List<PropertyFindingDiscoveryFunction> checks) {
         return entries.stream()
-                .map(entry -> new Entry(entry.getKey(), entry.getValue(), detectDangerousValue(prefix, entry)))
+                .map(entry -> new Entry(entry.getKey(), entry.getValue(), findingsFor(prefix, entry, checks)))
                 .toList();
     }
 
-    private @Nullable DangerousValue detectDangerousValue(String prefix, ConfigurationPropertiesEntry entry) {
+    private List<PropertyFindingResponse> findingsFor(
+            String prefix, ConfigurationPropertiesEntry entry, List<PropertyFindingDiscoveryFunction> checks) {
         String entryKey = entry.getKey();
         String name = prefix.isEmpty() ? entryKey : prefix + "." + entryKey;
         // Match collection elements against the dictionary entry without the index, e.g. include[0] -> include.
         String normalizedName = propertyNameNormalizer.normalize(name.replaceAll("\\[\\d+\\]", ""));
-        DangerousPropertyValue.DangerousValue dangerousValue =
-                DangerousPropertyValue.resolve(normalizedName, entry.getValue());
-        return dangerousValue == null
-                ? null
-                : new DangerousValue(dangerousValue.rationale(), dangerousValue.alternative());
+        return FindingRegistry.checkProperty(checks, normalizedName, entry.getValue()).stream()
+                .map(PropertyFindingResponse::from)
+                .toList();
     }
 }
