@@ -10,17 +10,11 @@ description: Performs CodeQL and Trivy security checks for the repository
 runs:
   using: composite
   steps:
-    - name: Set up JDK 27 for Master
+    - name: Set up JDK 27
       uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
         java-version: '27'
-
-    - name: Set up JDK 25
-      uses: actions/setup-java@v5
-      with:
-        distribution: 'liberica'
-        java-version: '25'
 
     - name: Setup Node.js
       uses: actions/setup-node@v6
