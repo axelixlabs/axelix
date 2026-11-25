@@ -1,0 +1,161 @@
+---
+title: "Which Path Does Your Filter See? A High Vulnerability in Axelix Master"
+date: 2026-11-25
+authors: ["Mikhail Polivakha"]
+tags: ["Spring Boot", "Security"]
+heroImagePath: /posts/which-path-does-your-filter-see/preview.png
+description: "This is a very inconspicuous and, nevertheless, extremely dangerous flaw that exists in a large number of Java applications. We had this problem in Axelix Master itself."
+---
+
+Hi everyone!
+
+My name is Mikhail Polivakha, and I am the technical lead of [Axelix - an Open Source platform for diagnostics, management and evolution of Java applications on Spring Boot](https://github.com/axelixlabs/axelix).
+
+[Last time I told you how a separate Actuator port](https://axelix.io/blog/spring-context-hierarchy) led us to dig into the Spring context hierarchy, and how we got a High CVE (7/10 score) for it. Today we have a different story, and we decided to write an article about it too, and I think it will be an important one.
+
+An [external Security Researcher](https://github.com/kta1kri) (many thanks to him) reported a vulnerability to us. We confirmed it, published it and have already fixed it in [1.3.2](https://github.com/axelixlabs/axelix/releases/tag/v1.3.2).
+
+Of course, it's not always pleasant to admit that a High CVE has been found in your product. Nevertheless, Axelix has a policy: we try to be open, and for every case that is important in our opinion we write a post-mortem (like this one) and share the knowledge with the community. I hope you will support us in this 🙏.
+
+Based on my experience, I can say that this is a *very* inconspicuous and, nevertheless, extremely dangerous flaw that exists in a large number of Java applications. I can say almost with certainty that if you dig around in your Java services (not even necessarily on Spring Boot), you will find this problem. We had this problem in Axelix Master itself.
+
+Before moving on to the article itself, let me quickly say the most important thing for Axelix users. The problem affects **Axelix Master before version 1.3.2**. If you have an earlier version of Master installed, upgrade to **1.3.2 or newer**. GitHub rates the vulnerability as **High, 7.1 on CVSS 3.1**, which is generally close to the truth, in our view. So please upgrade.
+
+Well, now on to the debriefing. The article will be an important one. Save it for the future.
+
+### Where it all started. The request passes through the filter, but there is no check
+
+Axelix Master has an API from which the UI gets the list of connected applications. If you open this list without a "session", you expect `401 Unauthorized` from Master. And that is indeed how Master responded.
+
+But the report also contained a second result. The same list, the same Master, the same missing cookie, but the response is now `200 OK` and a list of applications. [Only the representation of the path changed](https://github.com/axelixlabs/axelix/security/advisories/GHSA-g27c-7qjf-5qh4).
+
+The first thing I would do here is go and look at the cookie check. Well, where else? We did get the data without a session. But let's take one step back. Any security filter within a `FilterChain` has two decisions that are important to separate:
+
+1. Is this a request that I am responsible for at all?
+2. If so, does it have valid credentials?
+
+For example, we have a filter that is responsible for IAM for MCP Clients, there is a filter that is responsible for the whole IAM cycle for UI users via OIDC and an external SSO, etc.
+
+And so the filter that handles requests from the UI looks at `getRequestURI()` and decides whether the request belongs to the routes it protects. If the filter decides that the request does not belong to it, the request is passed further down the chain.
+
+This is normal behavior for a filter that is responsible for a specific part of the API. This is also how Spring Security itself works, among others, and this is how a `SecurityFilterChain` is generally supposed to be built.
+
+And, as it turned out, the problem is not in incorrect IAM as such, but in how `getRequestURI()` is designed.
+
+### One HttpServletRequest, two strings
+
+Let's first step away from security and look at an ordinary application. Suppose it is deployed under the context path `/shop`, and the `DispatcherServlet` is registered with the mapping `/` (this is the default). It has the following controller.
+
+```java
+@RestController
+class CatalogController {
+
+    @GetMapping("/catalog/books")
+    List<String> books() {
+        return List.of("Effective Java");
+    }
+}
+```
+
+For a request to `/shop/catalog/books?sort=title`, we will get roughly the following picture.
+
+```text
+getRequestURI()   /shop/catalog/books
+getContextPath()  /shop
+getServletPath()  /catalog/books
+getPathInfo()     null
+getQueryString()  sort=title
+```
+
+Actually, this whole concept of separating servlet-path, context-path, request-path, etc. - **this is just the most typical example of over-engineering at the spec level, which was added to the Jakarta Servlet spec for the future**, and apart from CVEs it doesn't really bring anything to the world. It made sense when we would have different Servlets in our application, virtual hosting, etc. - none of this exists in 99% of Spring Boot applications.
+
+You've all gotten confused by these Servlet/Context/Request etc. paths, haven't you? **Yes, and you are not alone, so have we**. My opinion is that this was a mistake of premature optimization, which is characteristic of all Jakarta specs with their EJB, etc. Well, okay, we've grumbled a bit and that's enough.
+
+Note that `getRequestURI()` kept `/shop`, while in `getServletPath()` it is already gone. Now imagine a typical local run of the same application with an empty context path. For such a request, both methods will return `/catalog/books`. The irony is that for most of our lives we have seen only this case, and, accordingly, it is easy to decide that the choice of method doesn't affect anything at all (see the [HttpServletRequest Javadoc](https://jakarta.ee/specifications/servlet/6.1/apidocs/jakarta.servlet/jakarta/servlet/http/HttpServletRequest.html)).
+
+But we knew this when designing the Axelix Master filters. But there was something else we did not know. **The difference between these methods is far from being just the presence of `/shop`…**
+
+![What can go wrong?](/posts/which-path-does-your-filter-see/what-can-go-wrong.png)
+
+*What can go wrong?*
+
+### What exactly Tomcat decodes
+
+Let's leave filters alone for now. Imagine that our catalog has a public cover named `cover A.png`. A space in a URL is a special character, and accordingly it has to be encoded in a certain way, namely as `%20`.
+
+Have you ever wondered why 20? Where did the number 20 for a space come from at all? In fact, it is the hexadecimal value of the byte that a space is written with. In exactly the same way, `%41` is the byte of the uppercase Latin `A`. And here is a very, *VERY* important point.
+
+The letter `A` can actually be written in a URL as is (and that's what we do), but if the client sends it in encoded form, then for, say, a web server that decodes this URL - **it is exactly the same letter**. [RFC 3986, sections 2.1 and 2.3](https://www.rfc-editor.org/rfc/rfc3986#section-2.1).
+
+Suppose this request is served by the same application on Tomcat with the context path `/shop` and the servlet mapping `/`. Let's look only at the two fields we are interested in.
+
+| How the client wrote the path | `getRequestURI()` | `getServletPath()` |
+|:---|:---|:---|
+| `/shop/covers/cover%20A.png` | `/shop/covers/cover%20A.png` | `/covers/cover A.png` |
+| `/shop/covers/cover%20%41.png` | `/shop/covers/cover%20%41.png` | `/covers/cover A.png` |
+
+And now let's remove `/shop` from both strings. We don't really need it here anymore.
+
+| How the client wrote the path (without `/shop`) | `getRequestURI()` | `getServletPath()` |
+|:---|:---|:---|
+| `/covers/cover%20A.png` | `/covers/cover%20A.png` | `/covers/cover A.png` |
+| `/covers/cover%20%41.png` | `/covers/cover%20%41.png` | `/covers/cover A.png` |
+
+The difference remains: `getRequestURI()` still contains the literal characters `%`, `4` and `1`, while the path that Tomcat processed for the servlet mapping contains `A`.
+
+In other words, **two different URI strings can describe the same path inside the application**. This is exactly what was missing in our model.
+
+### And what about segment parameters?
+
+Percent-encoding was one of the two cases in the security report. The second one is related to segment parameters. Most people never even encounter this in their lives. For example, if I want to pass the parameter `v=2`, why write a semicolon at all? We usually write `?v=2`, i.e. a request parameter.
+
+Let's take the same public cover, only now without the space in the name and without `/shop` for simplicity. Here are two notations that are easy to confuse if you simply say "the parameter `v=2` was passed in the URL".
+
+- In `/covers/cover.png?v=2`, the question mark separates the query string. The path itself ends with `cover.png`.
+- In `/covers/cover.png;v=2`, there is no question mark at all. `;v=2` is written right inside the last path segment, next to the name `cover.png`.
+
+Why, actually, a **segment parameter**? Path segments are separated by slashes. In our example, these are `covers` and `cover.png;v=2`. The parameter is in the second segment and refers specifically to it, specifically to `cover.png`. The query string, in turn, comes after the entire path and refers to the request (see [RFC 3986, sections 3.3 and 3.4](https://www.rfc-editor.org/rfc/rfc3986#section-3.3)).
+
+Well, okay, and now let's look at the result in Tomcat with the same servlet mapping `/`. Let's add an ordinary request without parameters to the table, so that there is something to compare with.
+
+| What the client sent | `getRequestURI()` | `getServletPath()` | `getQueryString()` |
+|:---|:---|:---|:---|
+| `/covers/cover.png` | `/covers/cover.png` | `/covers/cover.png` | `null` |
+| `/covers/cover.png?v=2` | `/covers/cover.png` | `/covers/cover.png` | `v=2` |
+| `/covers/cover.png;v=2` | `/covers/cover.png;v=2` | `/covers/cover.png` | `null` |
+
+Compare the first row first with the second, and then with the third. We added `?v=2`, and only `getQueryString()` changed. We added `;v=2`, and now it was `getRequestURI()` that changed. At the same time, Tomcat removed the segment parameter from the path for the servlet mapping, so `getServletPath()` is the same in all three rows.
+
+Here we have arrived at exactly the same place we arrived at with `%41`. **For the code that compares the original strings, the paths are different. For Tomcat, when choosing a servlet, the path is the same.** Now we can return to the filter and see why this difference mattered to it at all.
+
+### How two strings turned into two different decisions
+
+Okay, let's say we have two strings. So what? For a public cover, actually, nothing. The problem begins exactly at the moment when one of these strings is used to decide **whether access needs to be checked at all**.
+
+Let's take an ordinary request to the Axelix Master API. Tomcat chooses the servlet. Axelix Master is, by and large, an ordinary Spring Boot application with a single `DispatcherServlet`, so everything is quite simple here. And so the request goes through the filter chain.
+
+The filter reads `getRequestURI()`, recognizes in it a route it is responsible for, and [looks for the cookie](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/filter/auth/ExternalApiCookieAuthorizationFilter.java#L144). There is no cookie, the filter returns `401`. It never gets to the controller.
+
+And now the case that was found in our product. I am sure that many people have it, it's just that not everyone knows about it.
+
+Based on the processed path, Tomcat chooses the same `DispatcherServlet`. Then the execution reaches the same filter, but there **the matching is done against the original URI**. This string is different, and the filter's rule does not match it. The filter decides that this is simply not its request and passes control further. Finally, Spring MVC chooses the protected controller, and it returns the data.
+
+That is, the filter simply made the wrong decision that it was not the one responsible for handling the request. This problem [even has a CWE](https://cwe.mitre.org/data/definitions/647.html), that's how common it is.
+
+### How to choose the path for the access check
+
+In Master, we replaced `getRequestURI()` with `getServletPath()`.
+
+Look at the table above. In the `getRequestURI()` column there were several different strings, while in the `getServletPath()` column there was one path in all cases. *Most often*, this is the path you need for matching against rules. In Master, the `DispatcherServlet` is mapped to `/`, so `getServletPath()` contains the path inside the application, by which we can determine which part of the API the request belongs to.
+
+And here is what I would take away from this whole story. **Check that the access rule is triggered for the operation that the application has actually chosen.** If Tomcat and MVC lead two valid paths to the same protected handler, both must require the same credentials. This is what is worth checking.
+
+### Summary
+
+If you have ever written a filter that decides by the path string whether credentials need to be checked, open it at your leisure. Look at what it considers to be the path.
+
+Then look at what the container and the web framework consider to be the route for the same request. **All valid representations of one protected route must have one access policy.** This is the property worth locking in with a test, [here is how we did it](https://github.com/axelixlabs/axelix/commit/7ab025d647942d71278381e113e6d1de4ab82dd1).
+
+That's all. Thanks once again to the researcher for the report, and I'll remind Master users about upgrading to **1.3.2 or newer**. We really do listen to you.
+
+Good luck, everyone!
