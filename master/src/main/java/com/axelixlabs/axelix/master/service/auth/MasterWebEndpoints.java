@@ -119,6 +119,18 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint CACHES_CLEAR_ALL = register(
             "caches:clear-all", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_BULK_CLEAR_ALL, () -> "caches:clear");
 
+    // Quartz
+    public static final MasterWebEndpoint QUARTZ_SCHEDULERS_READ =
+            register("quartz:schedulers:read", HttpMethod.GET, ApiPaths.QuartzApi.SCHEDULERS, null);
+    public static final MasterWebEndpoint QUARTZ_JOBS_READ =
+            register("quartz:jobs:read", HttpMethod.POST, ApiPaths.QuartzApi.JOBS, null);
+    public static final MasterWebEndpoint QUARTZ_JOB_EXECUTE =
+            register("quartz:job:execute", HttpMethod.POST, ApiPaths.QuartzApi.EXECUTE, () -> "quartz:write");
+    public static final MasterWebEndpoint QUARTZ_TRIGGER_PAUSE =
+            register("quartz:trigger:pause", HttpMethod.POST, ApiPaths.QuartzApi.PAUSE, () -> "quartz:write");
+    public static final MasterWebEndpoint QUARTZ_TRIGGER_RESUME =
+            register("quartz:trigger:resume", HttpMethod.POST, ApiPaths.QuartzApi.RESUME, () -> "quartz:write");
+
     // Scheduled tasks
     public static final MasterWebEndpoint SCHEDULED_TASKS_READ =
             register("scheduled-tasks:read", HttpMethod.GET, ApiPaths.ScheduledTasksApi.INSTANCE_ID, null);

@@ -114,6 +114,13 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_METRIC_GROUPS = endpoint("/axelix-metrics", HttpMethod.GET);
     public static final ActuatorEndpoint GET_SINGLE_METRIC = endpoint("/axelix-metrics/{metric.name}", HttpMethod.GET);
 
+    // Quartz
+    public static final ActuatorEndpoint GET_QUARTZ_SCHEDULERS = endpoint("/axelix-quartz", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_QUARTZ_JOBS = endpoint("/axelix-quartz/jobs", HttpMethod.POST);
+    public static final ActuatorEndpoint EXECUTE_QUARTZ_JOB = endpoint("/axelix-quartz/execute", HttpMethod.POST);
+    public static final ActuatorEndpoint PAUSE_QUARTZ_TRIGGER = endpoint("/axelix-quartz/pause", HttpMethod.POST);
+    public static final ActuatorEndpoint RESUME_QUARTZ_TRIGGER = endpoint("/axelix-quartz/resume", HttpMethod.POST);
+
     // @Scheduled tasks
     public static final ActuatorEndpoint GET_SCHEDULED_TASKS = endpoint("/axelix-scheduled-tasks", HttpMethod.GET);
     public static final ActuatorEndpoint MODIFY_CRON_EXPRESSION_SCHEDULED_TASK =

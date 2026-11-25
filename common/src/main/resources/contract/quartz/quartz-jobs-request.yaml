@@ -1,0 +1,19 @@
+openapi: 3.1.0
+info:
+  title: quartz-jobs-request
+  version: ""
+  description: Schemas for requesting Quartz job metadata.
+components:
+  schemas:
+    QuartzJobsRequest:
+      x-axelix-produced-by: master
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A request for job metadata of a selected Quartz scheduler.
+      required:
+        - schedulerName
+      properties:
+        schedulerName:
+          type: string
+          description: The name of the scheduler.
+          x-axelix-introduced-in: 1.4.0

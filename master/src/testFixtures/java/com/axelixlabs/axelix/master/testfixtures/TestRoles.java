@@ -45,6 +45,7 @@ public final class TestRoles {
             "EDITOR",
             Set.of(
                     TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                    TestAuthorities.QUARTZ_MODIFY,
                     TestAuthorities.CACHES_CLEAR,
                     TestAuthorities.CACHES_TOGGLE,
                     TestAuthorities.GARBAGE_COLLECTOR));
@@ -53,6 +54,7 @@ public final class TestRoles {
             "ADMIN",
             Set.of(
                     TestAuthorities.SCHEDULED_TASKS_MODIFY,
+                    TestAuthorities.QUARTZ_MODIFY,
                     TestAuthorities.CACHES_CLEAR,
                     TestAuthorities.CACHES_TOGGLE,
                     TestAuthorities.GARBAGE_COLLECTOR,

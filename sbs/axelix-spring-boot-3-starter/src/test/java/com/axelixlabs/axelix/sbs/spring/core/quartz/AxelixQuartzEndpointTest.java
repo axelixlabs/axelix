@@ -43,6 +43,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobsRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzMisfirePolicy;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTrigger;
@@ -122,7 +123,10 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
             // when.
             ResponseEntity<ServiceQuartzJobs> response = restTemplate
                     .asMaster()
-                    .getForEntity("/actuator/axelix-quartz/jobs/standbyScheduler", ServiceQuartzJobs.class);
+                    .postForEntity(
+                            "/actuator/axelix-quartz/jobs",
+                            new QuartzJobsRequest().schedulerName("standbyScheduler"),
+                            ServiceQuartzJobs.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -223,7 +227,10 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
             // when.
             ResponseEntity<ServiceQuartzJobs> response = restTemplate
                     .asMaster()
-                    .getForEntity("/actuator/axelix-quartz/jobs/startedScheduler", ServiceQuartzJobs.class);
+                    .postForEntity(
+                            "/actuator/axelix-quartz/jobs",
+                            new QuartzJobsRequest().schedulerName("startedScheduler"),
+                            ServiceQuartzJobs.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -234,14 +241,21 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
         @Test
         void shouldReturnNotFoundForUnknownScheduler() {
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asMaster().getForEntity("/actuator/axelix-quartz/jobs/missing", String.class);
+            ResponseEntity<String> response = restTemplate
+                    .asMaster()
+                    .postForEntity(
+                            "/actuator/axelix-quartz/jobs",
+                            new QuartzJobsRequest().schedulerName("missing"),
+                            String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
 
-        @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-quartz/jobs/standbyScheduler")
+        @ProtectedEndpointTests(
+                method = HttpMethod.POST,
+                path = "/actuator/axelix-quartz/jobs",
+                jsonBody = "{\"schedulerName\":\"standbyScheduler\"}")
         void negativeJobsAuthTests() {}
     }
 

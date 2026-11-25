@@ -35,6 +35,7 @@ public enum TestAuthorities implements Authority {
     ENV_VALUES_READ("environment.values:read"),
     CONFIG_PROPS_VALUES_READ("config-properties.values:read"),
     SCHEDULED_TASKS_MODIFY("scheduled-tasks:write"),
+    QUARTZ_MODIFY("quartz:write"),
     CACHES_CLEAR("caches:clear"),
     CACHES_TOGGLE("caches:toggle"),
     GARBAGE_COLLECTOR("gc:manage"),

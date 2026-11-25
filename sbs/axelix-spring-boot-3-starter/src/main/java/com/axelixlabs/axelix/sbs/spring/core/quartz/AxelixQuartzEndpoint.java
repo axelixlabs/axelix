@@ -20,11 +20,11 @@ package com.axelixlabs.axelix.sbs.spring.core.quartz;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobsRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerPauseRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerResumeRequest;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzJobs;
@@ -49,9 +49,12 @@ public class AxelixQuartzEndpoint {
         return quartzService.getQuartzSchedulers();
     }
 
-    @GetMapping("/jobs/{schedulerName}")
-    public ResponseEntity<ServiceQuartzJobs> getQuartzJobs(@PathVariable String schedulerName) {
-        ServiceQuartzJobs jobs = quartzService.getQuartzJobs(schedulerName);
+    @PostMapping("/jobs")
+    public ResponseEntity<ServiceQuartzJobs> getQuartzJobs(@RequestBody QuartzJobsRequest request) {
+        if (request.getSchedulerName() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        ServiceQuartzJobs jobs = quartzService.getQuartzJobs(request.getSchedulerName());
         return jobs == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(jobs);
     }
 
