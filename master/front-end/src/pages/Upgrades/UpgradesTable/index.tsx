@@ -82,7 +82,6 @@ export const UpgradesTable = ({ services }: IProps) => {
                 1;
 
             const nextPageSize = Math.max(1, Math.floor(availableHeight / rowHeight));
-            rows.style.minHeight = total > nextPageSize ? `${Math.max(rowHeight, availableHeight)}px` : "";
             setPageSize(nextPageSize);
         };
 

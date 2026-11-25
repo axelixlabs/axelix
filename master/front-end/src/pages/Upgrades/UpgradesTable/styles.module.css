@@ -45,10 +45,6 @@
     padding: 12px var(--axelix-space-5);
 }
 
-.Rows {
-    align-content: start;
-}
-
 .HeaderRow {
     background-color: var(--axelix-grey-50);
     color: var(--axelix-grey-500);
@@ -58,6 +54,9 @@
 .Row {
     height: 56px;
     padding-block: 6px;
+}
+
+.Row:not(:last-child) {
     border-bottom: 1px solid var(--axelix-grey-100);
 }
 
