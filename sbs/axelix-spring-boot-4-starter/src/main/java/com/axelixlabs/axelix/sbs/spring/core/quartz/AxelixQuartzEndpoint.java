@@ -17,12 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.quartz;
 
-import org.jspecify.annotations.Nullable;
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.boot.actuate.endpoint.annotation.Selector;
-
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerPauseRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerResumeRequest;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzJobs;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzSchedulers;
 
@@ -31,7 +35,7 @@ import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzSchedulers;
  *
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-quartz")
+@RestControllerEndpoint(id = "axelix-quartz")
 public class AxelixQuartzEndpoint {
 
     private final AxelixQuartzService quartzService;
@@ -40,13 +44,54 @@ public class AxelixQuartzEndpoint {
         this.quartzService = quartzService;
     }
 
-    @ReadOperation
+    @GetMapping
     public ServiceQuartzSchedulers getQuartzSchedulers() {
         return quartzService.getQuartzSchedulers();
     }
 
-    @ReadOperation
-    public @Nullable ServiceQuartzJobs getQuartzJobs(@Selector String schedulerName) {
-        return quartzService.getQuartzJobs(schedulerName);
+    @GetMapping("/jobs/{schedulerName}")
+    public ResponseEntity<ServiceQuartzJobs> getQuartzJobs(@PathVariable String schedulerName) {
+        ServiceQuartzJobs jobs = quartzService.getQuartzJobs(schedulerName);
+        return jobs == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(jobs);
+    }
+
+    @PostMapping("/execute")
+    public ResponseEntity<Void> executeQuartzJob(@RequestBody QuartzJobExecuteRequest request) {
+        if (request.getSchedulerName() == null || request.getJobName() == null || request.getJobGroup() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        boolean updated =
+                quartzService.executeQuartzJob(request.getSchedulerName(), request.getJobName(), request.getJobGroup());
+        return updated
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/pause")
+    public ResponseEntity<Void> pauseQuartzTrigger(@RequestBody QuartzTriggerPauseRequest request) {
+        if (request.getSchedulerName() == null
+                || request.getTriggerName() == null
+                || request.getTriggerGroup() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        boolean updated = quartzService.pauseQuartzTrigger(
+                request.getSchedulerName(), request.getTriggerName(), request.getTriggerGroup());
+        return updated
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/resume")
+    public ResponseEntity<Void> resumeQuartzTrigger(@RequestBody QuartzTriggerResumeRequest request) {
+        if (request.getSchedulerName() == null
+                || request.getTriggerName() == null
+                || request.getTriggerGroup() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        boolean updated = quartzService.resumeQuartzTrigger(
+                request.getSchedulerName(), request.getTriggerName(), request.getTriggerGroup());
+        return updated
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

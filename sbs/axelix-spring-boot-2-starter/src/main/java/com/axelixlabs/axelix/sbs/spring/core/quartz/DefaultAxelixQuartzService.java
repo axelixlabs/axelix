@@ -22,15 +22,18 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecution;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTrigger;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzJobs;
@@ -68,20 +71,80 @@ public class DefaultAxelixQuartzService implements AxelixQuartzService {
 
     @Override
     public @Nullable ServiceQuartzJobs getQuartzJobs(String schedulerName) {
-        try {
-            for (Scheduler scheduler : schedulers) {
-                if (schedulerName.equals(getSchedulerName(scheduler))) {
-                    List<QuartzJob> jobs = new ArrayList<>();
-                    for (JobKey key : scheduler.getJobKeys(GroupMatcher.anyJobGroup())) {
-                        JobDetail job = scheduler.getJobDetail(key);
-                        if (job != null) {
-                            jobs.add(quartzAssembler.assembleJob(job, getQuartzTriggers(scheduler, job)));
-                        }
+        for (Scheduler scheduler : schedulers) {
+            if (schedulerName.equals(getSchedulerName(scheduler))) {
+                return getSchedulerJobs(scheduler);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean executeQuartzJob(String schedulerName, String jobName, String jobGroup) {
+        for (Scheduler scheduler : schedulers) {
+            if (schedulerName.equals(getSchedulerName(scheduler))) {
+                try {
+                    JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
+                    if (!scheduler.checkExists(jobKey)) {
+                        return false;
                     }
-                    return new ServiceQuartzJobs().jobs(jobs);
+                    scheduler.triggerJob(jobKey);
+                    return true;
+                } catch (SchedulerException e) {
+                    throw new QuartzAccessException("Could not request Quartz job execution", e);
                 }
             }
-            return null;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean pauseQuartzTrigger(String schedulerName, String triggerName, String triggerGroup) {
+        return setQuartzTriggerPaused(schedulerName, triggerName, triggerGroup, true);
+    }
+
+    @Override
+    public boolean resumeQuartzTrigger(String schedulerName, String triggerName, String triggerGroup) {
+        return setQuartzTriggerPaused(schedulerName, triggerName, triggerGroup, false);
+    }
+
+    private boolean setQuartzTriggerPaused(
+            String schedulerName, String triggerName, String triggerGroup, boolean paused) {
+        for (Scheduler scheduler : schedulers) {
+            if (schedulerName.equals(getSchedulerName(scheduler))) {
+                try {
+                    TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroup);
+                    if (!scheduler.checkExists(triggerKey)) {
+                        return false;
+                    }
+                    if (paused) {
+                        scheduler.pauseTrigger(triggerKey);
+                    } else {
+                        scheduler.resumeTrigger(triggerKey);
+                    }
+                    return true;
+                } catch (SchedulerException e) {
+                    throw new QuartzAccessException("Could not update Quartz trigger pause state", e);
+                }
+            }
+        }
+        return false;
+    }
+
+    private ServiceQuartzJobs getSchedulerJobs(Scheduler scheduler) {
+        try {
+            List<QuartzJob> jobs = new ArrayList<>();
+            for (JobKey key : scheduler.getJobKeys(GroupMatcher.anyJobGroup())) {
+                JobDetail job = scheduler.getJobDetail(key);
+                if (job != null) {
+                    jobs.add(quartzAssembler.assembleJob(job, getQuartzTriggers(scheduler, job)));
+                }
+            }
+            List<QuartzJobExecution> executions = new ArrayList<>();
+            for (JobExecutionContext execution : scheduler.getCurrentlyExecutingJobs()) {
+                executions.add(quartzAssembler.assembleExecution(execution));
+            }
+            return new ServiceQuartzJobs().jobs(jobs).executions(executions);
         } catch (SchedulerException e) {
             throw new QuartzAccessException("Could not retrieve Quartz jobs", e);
         }

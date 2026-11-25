@@ -18,17 +18,23 @@
 package com.axelixlabs.axelix.sbs.spring.core.quartz;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.quartz.DailyTimeIntervalTrigger;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
-import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 
@@ -36,9 +42,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzMisfirePolicy;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTrigger;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerPauseRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerResumeRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerType;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzJobs;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzSchedulers;
@@ -55,210 +64,428 @@ import static org.assertj.core.api.Assertions.tuple;
  */
 class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
 
-    @Test
-    void shouldReturnQuartzSchedulers() throws SchedulerException {
-        // given.
-        SchedulerMetaData expected = scheduler.getMetaData();
+    @Nested
+    class GetQuartzSchedulers {
 
-        // when.
-        ResponseEntity<ServiceQuartzSchedulers> response =
-                restTemplate.asMaster().getForEntity("/actuator/axelix-quartz", ServiceQuartzSchedulers.class);
+        @Test
+        void shouldReturnQuartzSchedulers() throws SchedulerException {
+            // given.
+            SchedulerMetaData expected = scheduler.getMetaData();
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getSchedulers())
-                .extracting(
-                        QuartzSchedulerMetadata::getSchedulerName,
-                        QuartzSchedulerMetadata::getStarted,
-                        QuartzSchedulerMetadata::getInStandbyMode,
-                        QuartzSchedulerMetadata::getShutdown,
-                        QuartzSchedulerMetadata::getStartedAt)
-                .containsExactlyInAnyOrder(
-                        tuple(
-                                "startedScheduler",
-                                true,
-                                false,
-                                false,
-                                expected.getRunningSince().toInstant().toString()),
-                        tuple("standbyScheduler", false, true, false, null));
-        assertThat(response.getBody().getSchedulers()).allSatisfy(metadata -> {
-            assertThat(metadata.getSchedulerInstanceId()).isEqualTo("NON_CLUSTERED");
-            assertThat(metadata.getVersion()).isEqualTo(expected.getVersion());
-            assertThat(metadata.getSchedulerClassName()).isEqualTo(StdScheduler.class.getName());
-            assertThat(metadata.getSchedulerRemote()).isFalse();
-            assertThat(metadata.getNumberOfJobsExecuted()).isZero();
-            assertThat(metadata.getJobStoreClassName()).isEqualTo(RAMJobStore.class.getName());
-            assertThat(metadata.getJobStoreSupportsPersistence()).isFalse();
-            assertThat(metadata.getJobStoreClustered()).isFalse();
-            assertThat(metadata.getThreadPoolClassName()).isEqualTo(SimpleThreadPool.class.getName());
-            assertThat(metadata.getThreadPoolSize()).isEqualTo(2);
-        });
-    }
-
-    @Test
-    void shouldReturnJobsAndTriggers() throws SchedulerException {
-        // given.
-        List<? extends Trigger> expected = standbyScheduler.getTriggersOfJob(JobKey.jobKey("job", "jobs"));
-
-        // when.
-        ResponseEntity<ServiceQuartzJobs> response = restTemplate
-                .asMaster()
-                .getForEntity("/actuator/axelix-quartz/standbyScheduler", ServiceQuartzJobs.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        List<QuartzJob> jobs = response.getBody().getJobs();
-        assertThat(jobs)
-                .extracting(
-                        QuartzJob::getName,
-                        QuartzJob::getGroup,
-                        QuartzJob::getClassName,
-                        QuartzJob::getDescription,
-                        QuartzJob::getConcurrentExecutionDisallowed,
-                        QuartzJob::getRequestsRecovery)
-                .containsExactlyInAnyOrder(
-                        tuple("job", "jobs", SerialJob.class.getName(), "Test job", true, true),
-                        tuple("orphan", "jobs", TestJob.class.getName(), null, false, false));
-        assertThat(jobs)
-                .filteredOn("name", "orphan")
-                .singleElement()
-                .satisfies(job -> assertThat(job.getTriggers()).isEmpty());
-        List<QuartzTrigger> triggers =
-                jobs.stream().flatMap(job -> job.getTriggers().stream()).toList();
-        assertThat(triggers)
-                .extracting(
-                        QuartzTrigger::getName,
-                        QuartzTrigger::getGroup,
-                        QuartzTrigger::getType,
-                        QuartzTrigger::getState,
-                        QuartzTrigger::getMisfirePolicy)
-                .containsExactlyInAnyOrder(
-                        tuple("cron", "triggers", QuartzTriggerType.CRON, "NORMAL", QuartzMisfirePolicy.DO_NOTHING),
-                        tuple(
-                                "simple",
-                                "triggers",
-                                QuartzTriggerType.SIMPLE,
-                                "NORMAL",
-                                QuartzMisfirePolicy.SMART_POLICY),
-                        tuple(
-                                "calendar",
-                                "triggers",
-                                QuartzTriggerType.CALENDAR_INTERVAL,
-                                "NORMAL",
-                                QuartzMisfirePolicy.SMART_POLICY),
-                        tuple(
-                                "daily",
-                                "triggers",
-                                QuartzTriggerType.DAILY_TIME_INTERVAL,
-                                "NORMAL",
-                                QuartzMisfirePolicy.SMART_POLICY));
-        assertThat(triggers)
-                .filteredOn("type", QuartzTriggerType.CRON)
-                .singleElement()
-                .satisfies(trigger -> {
-                    assertThat(trigger.getCronExpression()).isEqualTo("0 0 12 * * ?");
-                    assertThat(trigger.getTimeZone()).isEqualTo("Europe/Paris");
-                    assertThat(trigger.getInterval()).isNull();
-                });
-        assertThat(triggers)
-                .filteredOn("type", QuartzTriggerType.SIMPLE)
-                .singleElement()
-                .satisfies(trigger -> {
-                    assertThat(trigger.getInterval()).isEqualTo(30_000L);
-                    assertThat(trigger.getIntervalUnit()).isEqualTo("MILLISECOND");
-                    assertThat(trigger.getRepeatCount()).isEqualTo(4);
-                    assertThat(trigger.getCronExpression()).isNull();
-                });
-        assertThat(triggers)
-                .filteredOn("type", QuartzTriggerType.CALENDAR_INTERVAL)
-                .singleElement()
-                .satisfies(trigger -> {
-                    assertThat(trigger.getInterval()).isEqualTo(1L);
-                    assertThat(trigger.getIntervalUnit()).isEqualTo("DAY");
-                    assertThat(trigger.getTimeZone()).isEqualTo("Europe/Paris");
-                });
-        assertThat(triggers)
-                .filteredOn("type", QuartzTriggerType.DAILY_TIME_INTERVAL)
-                .singleElement()
-                .satisfies(trigger -> {
-                    assertThat(trigger.getInterval()).isEqualTo(1L);
-                    assertThat(trigger.getIntervalUnit()).isEqualTo("HOUR");
-                    assertThat(trigger.getRepeatCount()).isEqualTo(5);
-                    assertThat(trigger.getDaysOfWeek()).containsExactly(2, 3, 4, 5, 6);
-                    assertThat(trigger.getStartTimeOfDay()).isEqualTo("09:00");
-                    assertThat(trigger.getEndTimeOfDay()).isEqualTo("18:30");
-                });
-        for (QuartzTrigger trigger : triggers) {
-            Trigger original = expected.stream()
-                    .filter(value -> value.getKey().getName().equals(trigger.getName()))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(trigger.getPreviousFireTime()).isNull();
-            assertThat(trigger.getNextFireTime())
-                    .isEqualTo(original.getNextFireTime().toInstant().toString());
-        }
-    }
-
-    @Test
-    void shouldReturnEndOfDayForDailyTriggerWithoutEndTime() throws SchedulerException {
-        // given.
-        JobDetail job = JobBuilder.newJob(TestJob.class)
-                .withIdentity("daily-without-end", "regression")
-                .build();
-        DailyTimeIntervalTriggerImpl trigger = new DailyTimeIntervalTriggerImpl();
-        trigger.setName("daily-without-end");
-        trigger.setJobKey(job.getKey());
-        standbyScheduler.scheduleJob(job, trigger);
-        try {
             // when.
-            ResponseEntity<ServiceQuartzJobs> response = restTemplate
-                    .asMaster()
-                    .getForEntity("/actuator/axelix-quartz/standbyScheduler", ServiceQuartzJobs.class);
+            ResponseEntity<ServiceQuartzSchedulers> response =
+                    restTemplate.asMaster().getForEntity("/actuator/axelix-quartz", ServiceQuartzSchedulers.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(((DailyTimeIntervalTrigger) standbyScheduler.getTrigger(trigger.getKey())).getEndTimeOfDay())
-                    .isNull();
-            assertThat(response.getBody().getJobs())
-                    .filteredOn(value -> value.getName().equals("daily-without-end")
-                            && value.getGroup().equals("regression"))
-                    .singleElement()
-                    .satisfies(value -> assertThat(value.getTriggers())
-                            .singleElement()
-                            .satisfies(result -> {
-                                assertThat(result.getType()).isEqualTo(QuartzTriggerType.DAILY_TIME_INTERVAL);
-                                assertThat(result.getEndTimeOfDay()).isEqualTo("23:59:59");
-                            }));
-        } finally {
-            standbyScheduler.deleteJob(job.getKey());
+            assertThat(response.getBody().getSchedulers())
+                    .extracting(
+                            QuartzSchedulerMetadata::getSchedulerName,
+                            QuartzSchedulerMetadata::getStarted,
+                            QuartzSchedulerMetadata::getInStandbyMode,
+                            QuartzSchedulerMetadata::getShutdown,
+                            QuartzSchedulerMetadata::getStartedAt)
+                    .containsExactlyInAnyOrder(
+                            tuple(
+                                    "startedScheduler",
+                                    true,
+                                    false,
+                                    false,
+                                    expected.getRunningSince().toInstant().toString()),
+                            tuple("standbyScheduler", false, true, false, null));
+            assertThat(response.getBody().getSchedulers()).allSatisfy(metadata -> {
+                assertThat(metadata.getSchedulerInstanceId()).isEqualTo("NON_CLUSTERED");
+                assertThat(metadata.getVersion()).isEqualTo(expected.getVersion());
+                assertThat(metadata.getSchedulerClassName()).isEqualTo(StdScheduler.class.getName());
+                assertThat(metadata.getSchedulerRemote()).isFalse();
+                assertThat(metadata.getNumberOfJobsExecuted()).isZero();
+                assertThat(metadata.getJobStoreClassName()).isEqualTo(RAMJobStore.class.getName());
+                assertThat(metadata.getJobStoreSupportsPersistence()).isFalse();
+                assertThat(metadata.getJobStoreClustered()).isFalse();
+                assertThat(metadata.getThreadPoolClassName()).isEqualTo(SimpleThreadPool.class.getName());
+                assertThat(metadata.getThreadPoolSize()).isEqualTo(2);
+            });
         }
+
+        @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-quartz")
+        void negativeAuthTests() {}
+    }
+
+    @Nested
+    class GetQuartzJobs {
+
+        @Test
+        void shouldReturnJobsAndTriggers() throws SchedulerException {
+            // given.
+            List<? extends Trigger> expected = standbyScheduler.getTriggersOfJob(JobKey.jobKey("job", "jobs"));
+
+            // when.
+            ResponseEntity<ServiceQuartzJobs> response = restTemplate
+                    .asMaster()
+                    .getForEntity("/actuator/axelix-quartz/jobs/standbyScheduler", ServiceQuartzJobs.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            List<QuartzJob> jobs = response.getBody().getJobs();
+            assertThat(jobs)
+                    .extracting(
+                            QuartzJob::getName,
+                            QuartzJob::getGroup,
+                            QuartzJob::getClassName,
+                            QuartzJob::getDescription,
+                            QuartzJob::getConcurrentExecutionDisallowed,
+                            QuartzJob::getRequestsRecovery)
+                    .containsExactlyInAnyOrder(
+                            tuple("job", "jobs", SerialJob.class.getName(), "Test job", true, true),
+                            tuple("orphan", "jobs", TestJob.class.getName(), null, false, false));
+            assertThat(jobs)
+                    .filteredOn("name", "orphan")
+                    .singleElement()
+                    .satisfies(job -> assertThat(job.getTriggers()).isEmpty());
+            List<QuartzTrigger> triggers =
+                    jobs.stream().flatMap(job -> job.getTriggers().stream()).toList();
+            assertThat(triggers)
+                    .extracting(
+                            QuartzTrigger::getName,
+                            QuartzTrigger::getGroup,
+                            QuartzTrigger::getType,
+                            QuartzTrigger::getState,
+                            QuartzTrigger::getMisfirePolicy)
+                    .containsExactlyInAnyOrder(
+                            tuple("cron", "triggers", QuartzTriggerType.CRON, "NORMAL", QuartzMisfirePolicy.DO_NOTHING),
+                            tuple(
+                                    "simple",
+                                    "triggers",
+                                    QuartzTriggerType.SIMPLE,
+                                    "NORMAL",
+                                    QuartzMisfirePolicy.SMART_POLICY),
+                            tuple(
+                                    "calendar",
+                                    "triggers",
+                                    QuartzTriggerType.CALENDAR_INTERVAL,
+                                    "NORMAL",
+                                    QuartzMisfirePolicy.SMART_POLICY),
+                            tuple(
+                                    "daily",
+                                    "triggers",
+                                    QuartzTriggerType.DAILY_TIME_INTERVAL,
+                                    "NORMAL",
+                                    QuartzMisfirePolicy.SMART_POLICY));
+            assertThat(triggers)
+                    .filteredOn("type", QuartzTriggerType.CRON)
+                    .singleElement()
+                    .satisfies(trigger -> {
+                        assertThat(trigger.getCronExpression()).isEqualTo("0 0 12 * * ?");
+                        assertThat(trigger.getTimeZone()).isEqualTo("Europe/Paris");
+                        assertThat(trigger.getInterval()).isNull();
+                    });
+            assertThat(triggers)
+                    .filteredOn("type", QuartzTriggerType.SIMPLE)
+                    .singleElement()
+                    .satisfies(trigger -> {
+                        assertThat(trigger.getInterval()).isEqualTo(30_000L);
+                        assertThat(trigger.getIntervalUnit()).isEqualTo("MILLISECOND");
+                        assertThat(trigger.getRepeatCount()).isEqualTo(4);
+                        assertThat(trigger.getCronExpression()).isNull();
+                    });
+            assertThat(triggers)
+                    .filteredOn("type", QuartzTriggerType.CALENDAR_INTERVAL)
+                    .singleElement()
+                    .satisfies(trigger -> {
+                        assertThat(trigger.getInterval()).isEqualTo(1L);
+                        assertThat(trigger.getIntervalUnit()).isEqualTo("DAY");
+                        assertThat(trigger.getTimeZone()).isEqualTo("Europe/Paris");
+                    });
+            assertThat(triggers)
+                    .filteredOn("type", QuartzTriggerType.DAILY_TIME_INTERVAL)
+                    .singleElement()
+                    .satisfies(trigger -> {
+                        assertThat(trigger.getInterval()).isEqualTo(1L);
+                        assertThat(trigger.getIntervalUnit()).isEqualTo("HOUR");
+                        assertThat(trigger.getRepeatCount()).isEqualTo(5);
+                        assertThat(trigger.getDaysOfWeek()).containsExactly(2, 3, 4, 5, 6);
+                        assertThat(trigger.getStartTimeOfDay()).isEqualTo("09:00");
+                        assertThat(trigger.getEndTimeOfDay()).isEqualTo("18:30");
+                    });
+            for (QuartzTrigger trigger : triggers) {
+                Trigger original = expected.stream()
+                        .filter(value -> value.getKey().getName().equals(trigger.getName()))
+                        .findFirst()
+                        .orElseThrow();
+                assertThat(trigger.getPreviousFireTime()).isNull();
+                assertThat(trigger.getNextFireTime())
+                        .isEqualTo(original.getNextFireTime().toInstant().toString());
+            }
+        }
+
+        @Test
+        void shouldReturnEmptyJobsForSchedulerWithoutJobs() {
+            // when.
+            ResponseEntity<ServiceQuartzJobs> response = restTemplate
+                    .asMaster()
+                    .getForEntity("/actuator/axelix-quartz/jobs/startedScheduler", ServiceQuartzJobs.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getJobs()).isEmpty();
+            assertThat(response.getBody().getExecutions()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNotFoundForUnknownScheduler() {
+            // when.
+            ResponseEntity<String> response =
+                    restTemplate.asMaster().getForEntity("/actuator/axelix-quartz/jobs/missing", String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+
+        @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-quartz/jobs/standbyScheduler")
+        void negativeJobsAuthTests() {}
+    }
+
+    @Nested
+    class ExecuteQuartzJob {
+
+        @Test
+        void shouldRequestJobExecution() throws SchedulerException {
+            // given.
+            JobDetail job = JobBuilder.newJob(TestJob.class)
+                    .withIdentity("manual", "endpoint-test")
+                    .storeDurably()
+                    .build();
+            standbyScheduler.addJob(job, false);
+            QuartzJobExecuteRequest request = new QuartzJobExecuteRequest()
+                    .schedulerName("standbyScheduler")
+                    .jobName("manual")
+                    .jobGroup("endpoint-test");
+            try {
+                // when.
+                ResponseEntity<Void> response =
+                        restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/execute", request, Void.class);
+
+                // then.
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+                assertThat(standbyScheduler.getTriggersOfJob(job.getKey()))
+                        .singleElement()
+                        .satisfies(trigger -> assertThat(trigger.getJobKey()).isEqualTo(job.getKey()));
+            } finally {
+                standbyScheduler.deleteJob(job.getKey());
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpointTest#missingJobs")
+        void shouldReturnNotFoundForExecution(String schedulerName, String jobName, String jobGroup) {
+            // given.
+            QuartzJobExecuteRequest request = new QuartzJobExecuteRequest()
+                    .schedulerName(schedulerName)
+                    .jobName(jobName)
+                    .jobGroup(jobGroup);
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/execute", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+
+        @Test
+        void shouldRejectIncompleteRequest() {
+            // given.
+            Map<String, String> request = Map.of("schedulerName", "standbyScheduler", "jobName", "job");
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/execute", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @ProtectedEndpointTests(
+                method = HttpMethod.POST,
+                path = "/actuator/axelix-quartz/execute",
+                jsonBody = "{\"schedulerName\":\"standbyScheduler\",\"jobName\":\"job\",\"jobGroup\":\"jobs\"}")
+        void negativeExecuteAuthTests() {}
+    }
+
+    @Nested
+    class PauseQuartzTrigger {
+
+        @Test
+        void shouldPauseTrigger() throws SchedulerException {
+            // given.
+            JobDetail job = JobBuilder.newJob(TestJob.class)
+                    .withIdentity("pause", "endpoint-test")
+                    .build();
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity("pause", "endpoint-test")
+                    .forJob(job)
+                    .build();
+            standbyScheduler.scheduleJob(job, trigger);
+            QuartzTriggerPauseRequest request = new QuartzTriggerPauseRequest()
+                    .schedulerName("standbyScheduler")
+                    .triggerName("pause")
+                    .triggerGroup("endpoint-test");
+            try {
+                // when.
+                ResponseEntity<Void> response =
+                        restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pause", request, Void.class);
+
+                // then.
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+                assertThat(standbyScheduler.getTriggerState(trigger.getKey())).isEqualTo(Trigger.TriggerState.PAUSED);
+                assertThat(standbyScheduler.checkExists(job.getKey())).isTrue();
+                assertThat(standbyScheduler.getTriggersOfJob(job.getKey())).hasSize(1);
+                assertThat(standbyScheduler.getTriggerState(TriggerKey.triggerKey("cron", "triggers")))
+                        .isEqualTo(Trigger.TriggerState.NORMAL);
+            } finally {
+                standbyScheduler.deleteJob(job.getKey());
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpointTest#missingTriggers")
+        void shouldReturnNotFoundForTrigger(String schedulerName, String triggerName, String triggerGroup) {
+            // given.
+            QuartzTriggerPauseRequest request = new QuartzTriggerPauseRequest()
+                    .schedulerName(schedulerName)
+                    .triggerName(triggerName)
+                    .triggerGroup(triggerGroup);
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pause", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+
+        @Test
+        void shouldRejectIncompleteRequest() {
+            // given.
+            Map<String, String> request = Map.of("triggerName", "cron", "triggerGroup", "triggers");
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pause", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @ProtectedEndpointTests(
+                method = HttpMethod.POST,
+                path = "/actuator/axelix-quartz/pause",
+                jsonBody =
+                        "{\"schedulerName\":\"standbyScheduler\",\"triggerName\":\"cron\",\"triggerGroup\":\"triggers\"}")
+        void negativeTriggerPauseAuthTests() {}
+    }
+
+    @Nested
+    class ResumeQuartzTrigger {
+
+        @Test
+        void shouldResumeTrigger() throws SchedulerException {
+            // given.
+            JobDetail job = JobBuilder.newJob(TestJob.class)
+                    .withIdentity("pause", "endpoint-test")
+                    .build();
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity("pause", "endpoint-test")
+                    .forJob(job)
+                    .build();
+            standbyScheduler.scheduleJob(job, trigger);
+            standbyScheduler.pauseTrigger(trigger.getKey());
+            QuartzTriggerResumeRequest request = new QuartzTriggerResumeRequest()
+                    .schedulerName("standbyScheduler")
+                    .triggerName("pause")
+                    .triggerGroup("endpoint-test");
+            try {
+                // when.
+                ResponseEntity<Void> response =
+                        restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resume", request, Void.class);
+
+                // then.
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+                assertThat(standbyScheduler.getTriggerState(trigger.getKey())).isEqualTo(Trigger.TriggerState.NORMAL);
+                assertThat(standbyScheduler.checkExists(job.getKey())).isTrue();
+                assertThat(standbyScheduler.getTriggersOfJob(job.getKey())).hasSize(1);
+                assertThat(standbyScheduler.getTriggerState(TriggerKey.triggerKey("cron", "triggers")))
+                        .isEqualTo(Trigger.TriggerState.NORMAL);
+            } finally {
+                standbyScheduler.deleteJob(job.getKey());
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpointTest#missingTriggers")
+        void shouldReturnNotFoundForTrigger(String schedulerName, String triggerName, String triggerGroup) {
+            // given.
+            QuartzTriggerResumeRequest request = new QuartzTriggerResumeRequest()
+                    .schedulerName(schedulerName)
+                    .triggerName(triggerName)
+                    .triggerGroup(triggerGroup);
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resume", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+
+        @Test
+        void shouldRejectIncompleteRequest() {
+            // given.
+            Map<String, String> request = Map.of("triggerName", "cron", "triggerGroup", "triggers");
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resume", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @ProtectedEndpointTests(
+                method = HttpMethod.POST,
+                path = "/actuator/axelix-quartz/resume",
+                jsonBody =
+                        "{\"schedulerName\":\"standbyScheduler\",\"triggerName\":\"cron\",\"triggerGroup\":\"triggers\"}")
+        void negativeTriggerResumeAuthTests() {}
     }
 
     @Test
-    void shouldReturnEmptyJobsForSchedulerWithoutJobs() {
-        // when.
-        ResponseEntity<ServiceQuartzJobs> response = restTemplate
-                .asMaster()
-                .getForEntity("/actuator/axelix-quartz/startedScheduler", ServiceQuartzJobs.class);
+    void shouldRejectUnknownTriggerOperation() {
+        // given.
+        QuartzTriggerPauseRequest request = new QuartzTriggerPauseRequest()
+                .schedulerName("standbyScheduler")
+                .triggerName("cron")
+                .triggerGroup("triggers");
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getJobs()).isEmpty();
-    }
-
-    @Test
-    void shouldReturnNotFoundForUnknownScheduler() {
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asMaster().getForEntity("/actuator/axelix-quartz/missing", String.class);
+        ResponseEntity<Void> response =
+                restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/unknown", request, Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-quartz/standbyScheduler")
-    void negativeJobsAuthTests() {}
+    static Stream<Arguments> missingTriggers() {
+        return Stream.of(
+                Arguments.of("missing", "cron", "triggers"),
+                Arguments.of("standbyScheduler", "missing", "triggers"),
+                Arguments.of("standbyScheduler", "cron", "missing"));
+    }
 
-    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-quartz")
-    void negativeAuthTests() {}
+    static Stream<Arguments> missingJobs() {
+        return Stream.of(
+                Arguments.of("missing", "job", "jobs"),
+                Arguments.of("standbyScheduler", "missing", "jobs"),
+                Arguments.of("standbyScheduler", "job", "missing"));
+    }
 }

@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: quartz-trigger-resume
+  version: ""
+  description: |
+    Schemas for resuming a trigger in a selected Quartz scheduler.
+components:
+  schemas:
+    QuartzTriggerResumeRequest:
+      x-axelix-produced-by: master
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A request to resume a trigger without deleting it or interrupting a running job.
+      required:
+        - triggerName
+        - triggerGroup
+        - schedulerName
+      properties:
+        triggerName:
+          type: string
+          description: The name of the trigger.
+          x-axelix-introduced-in: 1.4.0
+        triggerGroup:
+          type: string
+          description: The group of the trigger.
+          x-axelix-introduced-in: 1.4.0
+        schedulerName:
+          type: string
+          description: The name of the scheduler that owns the trigger.
+          x-axelix-introduced-in: 1.4.0
