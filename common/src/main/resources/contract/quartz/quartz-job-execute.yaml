@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: quartz-job-execute
+  version: ""
+  description: |
+    Schemas for requesting an immediate execution of a Quartz job.
+components:
+  schemas:
+    QuartzJobExecuteRequest:
+      x-axelix-produced-by: master
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A request to execute a registered Quartz job without changing its stored data or schedule.
+      required:
+        - schedulerName
+        - jobName
+        - jobGroup
+      properties:
+        schedulerName:
+          type: string
+          description: The name of the scheduler that owns the job.
+          x-axelix-introduced-in: 1.4.0
+        jobName:
+          type: string
+          description: The name of the job to execute.
+          x-axelix-introduced-in: 1.4.0
+        jobGroup:
+          type: string
+          description: The group of the job to execute.
+          x-axelix-introduced-in: 1.4.0

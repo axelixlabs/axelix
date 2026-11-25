@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: quartz-trigger-pause
+  version: ""
+  description: |
+    Schemas for pausing a trigger in a selected Quartz scheduler.
+components:
+  schemas:
+    QuartzTriggerPauseRequest:
+      x-axelix-produced-by: master
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A request to pause a trigger without deleting it or interrupting a running job.
+      required:
+        - triggerName
+        - triggerGroup
+        - schedulerName
+      properties:
+        triggerName:
+          type: string
+          description: The name of the trigger.
+          x-axelix-introduced-in: 1.4.0
+        triggerGroup:
+          type: string
+          description: The group of the trigger.
+          x-axelix-introduced-in: 1.4.0
+        schedulerName:
+          type: string
+          description: The name of the scheduler that owns the trigger.
+          x-axelix-introduced-in: 1.4.0

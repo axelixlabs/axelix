@@ -28,6 +28,7 @@ import org.quartz.CalendarIntervalTrigger;
 import org.quartz.CronTrigger;
 import org.quartz.DailyTimeIntervalTrigger;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerMetaData;
 import org.quartz.SimpleTrigger;
 import org.quartz.TimeOfDay;
@@ -37,6 +38,7 @@ import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 import org.springframework.util.ReflectionUtils;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecution;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzMisfirePolicy;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTrigger;
@@ -80,6 +82,16 @@ public class AxelixQuartzAssembler {
                 .durable(job.isDurable())
                 .persistJobDataAfterExecution(job.isPersistJobDataAfterExecution())
                 .triggers(triggers);
+    }
+
+    public QuartzJobExecution assembleExecution(JobExecutionContext execution) {
+        return new QuartzJobExecution()
+                .executionId(execution.getFireInstanceId())
+                .jobName(execution.getJobDetail().getKey().getName())
+                .jobGroup(execution.getJobDetail().getKey().getGroup())
+                .triggerName(execution.getTrigger().getKey().getName())
+                .triggerGroup(execution.getTrigger().getKey().getGroup())
+                .startedAt(execution.getFireTime().toInstant().toString());
     }
 
     public QuartzTrigger assembleTrigger(Trigger trigger, Trigger.TriggerState state) {

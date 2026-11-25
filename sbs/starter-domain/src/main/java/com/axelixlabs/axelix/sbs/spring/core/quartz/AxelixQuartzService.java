@@ -36,9 +36,42 @@ public interface AxelixQuartzService {
 
     /**
      * @param schedulerName the scheduler name.
-     * @return the scheduler's jobs and triggers, or {@code null} if no available scheduler has the given name.
-     * @throws QuartzAccessException if jobs or triggers cannot be retrieved.
+     * @return the scheduler metadata, or {@code null} if no available scheduler has the given name.
+     * @throws QuartzAccessException if the metadata cannot be retrieved.
      */
     @Nullable
     ServiceQuartzJobs getQuartzJobs(String schedulerName);
+
+    /**
+     * Requests an immediate job execution without changing its stored data or schedule.
+     *
+     * @param schedulerName the scheduler name.
+     * @param jobName the job name.
+     * @param jobGroup the job group.
+     * @return {@code true} if execution was requested, or {@code false} if the scheduler or job was not found.
+     * @throws QuartzAccessException if the execution cannot be requested.
+     */
+    boolean executeQuartzJob(String schedulerName, String jobName, String jobGroup);
+
+    /**
+     * Pauses a trigger without deleting it or interrupting a running job.
+     *
+     * @param schedulerName the scheduler name.
+     * @param triggerName the trigger name.
+     * @param triggerGroup the trigger group.
+     * @return {@code true} if found and paused, or {@code false} if the scheduler or trigger was not found.
+     * @throws QuartzAccessException if the trigger cannot be paused.
+     */
+    boolean pauseQuartzTrigger(String schedulerName, String triggerName, String triggerGroup);
+
+    /**
+     * Resumes a paused trigger.
+     *
+     * @param schedulerName the scheduler name.
+     * @param triggerName the trigger name.
+     * @param triggerGroup the trigger group.
+     * @return {@code true} if found and resumed, or {@code false} if the scheduler or trigger was not found.
+     * @throws QuartzAccessException if the trigger cannot be resumed.
+     */
+    boolean resumeQuartzTrigger(String schedulerName, String triggerName, String triggerGroup);
 }

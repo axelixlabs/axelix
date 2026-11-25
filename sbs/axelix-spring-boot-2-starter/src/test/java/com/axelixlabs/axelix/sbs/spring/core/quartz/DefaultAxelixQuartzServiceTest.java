@@ -20,10 +20,15 @@ package com.axelixlabs.axelix.sbs.spring.core.quartz;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.Instant;
 import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -32,8 +37,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.quartz.CalendarIntervalScheduleBuilder;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.DailyTimeIntervalScheduleBuilder;
+import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.quartz.PersistJobDataAfterExecution;
 import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
@@ -46,6 +54,7 @@ import org.quartz.impl.RemoteScheduler;
 import org.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.util.SocketUtils;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
@@ -66,172 +75,207 @@ class DefaultAxelixQuartzServiceTest extends AbstractQuartzSharedContextTest {
     @Autowired
     private AxelixQuartzService quartzService;
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void shouldSkipUnavailableSchedulers(boolean allUnavailable) throws Exception {
-        // given.
-        int port = SocketUtils.findAvailableTcpPort();
-        Registry registry = LocateRegistry.createRegistry(port);
-        try {
-            Scheduler unavailable = new RemoteScheduler("missing", "127.0.0.1", port);
-            List<Scheduler> schedulers = allUnavailable ? List.of(unavailable) : List.of(unavailable, scheduler);
-            AxelixQuartzService service = new DefaultAxelixQuartzService(schedulers, new AxelixQuartzAssembler());
+    @Nested
+    class GetQuartzSchedulers {
 
-            // when.
-            ServiceQuartzSchedulers result = service.getQuartzSchedulers();
+        @ParameterizedTest
+        @ValueSource(booleans = {false, true})
+        void shouldSkipUnavailableSchedulers(boolean allUnavailable) throws Exception {
+            // given.
+            int port = SocketUtils.findAvailableTcpPort();
+            Registry registry = LocateRegistry.createRegistry(port);
+            try {
+                Scheduler unavailable = new RemoteScheduler("missing", "127.0.0.1", port);
+                List<Scheduler> schedulers = allUnavailable ? List.of(unavailable) : List.of(unavailable, scheduler);
+                AxelixQuartzService service = new DefaultAxelixQuartzService(schedulers, new AxelixQuartzAssembler());
 
-            // then.
-            if (allUnavailable) {
-                assertThat(result.getSchedulers()).isEmpty();
-            } else {
-                assertThat(result.getSchedulers())
-                        .extracting(QuartzSchedulerMetadata::getSchedulerName)
-                        .containsExactly("startedScheduler");
+                // when.
+                ServiceQuartzSchedulers result = service.getQuartzSchedulers();
+
+                // then.
+                if (allUnavailable) {
+                    assertThat(result.getSchedulers()).isEmpty();
+                } else {
+                    assertThat(result.getSchedulers())
+                            .extracting(QuartzSchedulerMetadata::getSchedulerName)
+                            .containsExactly("startedScheduler");
+                }
+            } finally {
+                UnicastRemoteObject.unexportObject(registry, true);
             }
-        } finally {
-            UnicastRemoteObject.unexportObject(registry, true);
         }
     }
 
-    @Test
-    void shouldFindJobsWhenAnotherSchedulerIsUnavailable() throws Exception {
-        // given.
-        int port = SocketUtils.findAvailableTcpPort();
-        Registry registry = LocateRegistry.createRegistry(port);
-        try {
-            Scheduler unavailable = new RemoteScheduler("missing", "127.0.0.1", port);
-            AxelixQuartzService service =
-                    new DefaultAxelixQuartzService(List.of(unavailable, standbyScheduler), new AxelixQuartzAssembler());
+    @Nested
+    class GetQuartzJobs {
 
-            // when.
-            ServiceQuartzJobs result = service.getQuartzJobs("standbyScheduler");
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.DefaultAxelixQuartzServiceTest#jobBehaviorFlags")
+        void shouldReturnJobsWithCurrentExecutions(boolean durable, boolean persistJobData) throws Exception {
+            // given.
+            CountDownLatch started = new CountDownLatch(1);
+            CountDownLatch release = new CountDownLatch(1);
+            Properties properties = new Properties();
+            properties.setProperty("org.quartz.threadPool.threadCount", "1");
+            SchedulerFactoryBean factory = new SchedulerFactoryBean();
+            factory.setSchedulerName("executions-test");
+            factory.setQuartzProperties(properties);
+            factory.setWaitForJobsToCompleteOnShutdown(true);
+            factory.afterPropertiesSet();
+            Scheduler localScheduler = factory.getScheduler();
+            try {
+                JobDetail job = JobBuilder.newJob(persistJobData ? PersistentBlockingJob.class : BlockingJob.class)
+                        .withIdentity("running", "executions")
+                        .storeDurably(durable)
+                        .build();
+                job.getJobDataMap().put("started", started);
+                job.getJobDataMap().put("release", release);
+                localScheduler.scheduleJob(
+                        job,
+                        TriggerBuilder.newTrigger()
+                                .withIdentity("running-trigger", "executions")
+                                .startAt(java.util.Date.from(Instant.now().plusSeconds(3600)))
+                                .forJob(job)
+                                .build());
+                AxelixQuartzService service =
+                        new DefaultAxelixQuartzService(List.of(localScheduler), new AxelixQuartzAssembler());
+                factory.start();
+                assertThat(service.executeQuartzJob("executions-test", "running", "executions"))
+                        .isTrue();
+                assertThat(started.await(10, TimeUnit.SECONDS)).isTrue();
 
-            // then.
-            assertThat(result.getJobs()).extracting(QuartzJob::getName).containsExactlyInAnyOrder("job", "orphan");
-        } finally {
-            UnicastRemoteObject.unexportObject(registry, true);
+                // when.
+                ServiceQuartzJobs result = service.getQuartzJobs("executions-test");
+
+                // then.
+                assertThat(result.getJobs()).singleElement().satisfies(metadata -> {
+                    assertThat(metadata.getName()).isEqualTo("running");
+                    assertThat(metadata.getGroup()).isEqualTo("executions");
+                    assertThat(metadata.getDurable()).isEqualTo(durable);
+                    assertThat(metadata.getPersistJobDataAfterExecution()).isEqualTo(persistJobData);
+                });
+                assertThat(result.getExecutions()).singleElement().satisfies(execution -> {
+                    assertThat(execution.getExecutionId()).isNotBlank();
+                    assertThat(execution.getJobName()).isEqualTo("running");
+                    assertThat(execution.getJobGroup()).isEqualTo("executions");
+                    assertThat(execution.getTriggerName()).isNotBlank();
+                    assertThat(execution.getTriggerGroup()).isEqualTo(Scheduler.DEFAULT_GROUP);
+                    assertThat(Instant.parse(execution.getStartedAt())).isBeforeOrEqualTo(Instant.now());
+                });
+            } finally {
+                release.countDown();
+                factory.destroy();
+            }
         }
-    }
 
-    @ParameterizedTest
-    @MethodSource("misfirePolicies")
-    void shouldReturnMisfirePolicy(ScheduleBuilder<? extends Trigger> schedule, QuartzMisfirePolicy expected)
-            throws Exception {
-        // given.
-        JobDetail job = JobBuilder.newJob(TestJob.class)
-                .withIdentity("policy", "service-test")
-                .build();
-        standbyScheduler.scheduleJob(
-                job,
-                TriggerBuilder.newTrigger()
-                        .withIdentity("policy", "service-test")
-                        .forJob(job)
-                        .withSchedule(schedule)
-                        .build());
-        try {
-            // when.
-            ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.DefaultAxelixQuartzServiceTest#misfirePolicies")
+        void shouldReturnMisfirePolicy(ScheduleBuilder<? extends Trigger> schedule, QuartzMisfirePolicy expected)
+                throws Exception {
+            // given.
+            JobDetail job = JobBuilder.newJob(TestJob.class)
+                    .withIdentity("policy", "service-test")
+                    .build();
+            standbyScheduler.scheduleJob(
+                    job,
+                    TriggerBuilder.newTrigger()
+                            .withIdentity("policy", "service-test")
+                            .forJob(job)
+                            .withSchedule(schedule)
+                            .build());
+            try {
+                // when.
+                ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
 
-            // then.
-            assertThat(result.getJobs())
-                    .filteredOn(value ->
-                            value.getName().equals("policy") && value.getGroup().equals("service-test"))
-                    .singleElement()
-                    .satisfies(value -> assertThat(value.getTriggers())
-                            .singleElement()
-                            .satisfies(trigger ->
-                                    assertThat(trigger.getMisfirePolicy()).isEqualTo(expected)));
-        } finally {
-            standbyScheduler.deleteJob(job.getKey());
+                // then.
+                assertThat(result.getJobs())
+                        .filteredOn(value -> value.getName().equals("policy")
+                                && value.getGroup().equals("service-test"))
+                        .singleElement()
+                        .satisfies(value -> assertThat(value.getTriggers())
+                                .singleElement()
+                                .satisfies(trigger ->
+                                        assertThat(trigger.getMisfirePolicy()).isEqualTo(expected)));
+            } finally {
+                standbyScheduler.deleteJob(job.getKey());
+            }
         }
-    }
 
-    @ParameterizedTest
-    @MethodSource("jobBehaviorFlags")
-    void shouldReturnJobBehaviorFlags(boolean durable, boolean persistJobData) throws Exception {
-        // given.
-        JobDetail job = JobBuilder.newJob(persistJobData ? PersistentJob.class : TestJob.class)
-                .withIdentity("behavior", "service-test")
-                .storeDurably(durable)
-                .build();
-        standbyScheduler.scheduleJob(
-                job,
-                TriggerBuilder.newTrigger()
-                        .withIdentity("behavior", "service-test")
-                        .forJob(job)
-                        .build());
-        try {
-            // when.
-            ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.DefaultAxelixQuartzServiceTest#dailyEndTimes")
+        void shouldReturnEffectiveDailyEndTime(@Nullable TimeOfDay endTime, String expected) throws Exception {
+            // given.
+            JobDetail job = JobBuilder.newJob(TestJob.class)
+                    .withIdentity("daily-end", "service-test")
+                    .build();
+            DailyTimeIntervalTriggerImpl trigger = new DailyTimeIntervalTriggerImpl();
+            trigger.setName("daily-end");
+            trigger.setJobKey(job.getKey());
+            if (endTime != null) {
+                trigger.setEndTimeOfDay(endTime);
+            }
+            standbyScheduler.scheduleJob(job, trigger);
+            try {
+                // when.
+                ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
 
-            // then.
-            assertThat(result.getJobs())
-                    .filteredOn(value -> value.getName().equals("behavior")
-                            && value.getGroup().equals("service-test"))
-                    .singleElement()
-                    .satisfies(value -> {
-                        assertThat(value.getDurable()).isEqualTo(durable);
-                        assertThat(value.getPersistJobDataAfterExecution()).isEqualTo(persistJobData);
-                    });
-        } finally {
-            standbyScheduler.deleteJob(job.getKey());
+                // then.
+                assertThat(result.getJobs())
+                        .filteredOn(value -> value.getName().equals("daily-end")
+                                && value.getGroup().equals("service-test"))
+                        .singleElement()
+                        .satisfies(value -> assertThat(value.getTriggers())
+                                .singleElement()
+                                .satisfies(item ->
+                                        assertThat(item.getEndTimeOfDay()).isEqualTo(expected)));
+            } finally {
+                standbyScheduler.deleteJob(job.getKey());
+            }
         }
-    }
 
-    @ParameterizedTest
-    @MethodSource("dailyEndTimes")
-    void shouldReturnEffectiveDailyEndTime(@Nullable TimeOfDay endTime, String expected) throws Exception {
-        // given.
-        JobDetail job = JobBuilder.newJob(TestJob.class)
-                .withIdentity("daily-end", "service-test")
-                .build();
-        DailyTimeIntervalTriggerImpl trigger = new DailyTimeIntervalTriggerImpl();
-        trigger.setName("daily-end");
-        trigger.setJobKey(job.getKey());
-        if (endTime != null) {
-            trigger.setEndTimeOfDay(endTime);
+        @Test
+        void shouldRespectCustomConcurrencyFlagWithoutAnnotation() throws Exception {
+            // given.
+            JobDetailImpl job = new CustomJobDetail();
+            job.setName("custom");
+            job.setGroup("service-test");
+            job.setJobClass(TestJob.class);
+            job.setDurability(true);
+            standbyScheduler.addJob(job, false);
+            try {
+                // when.
+                ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
+
+                // then.
+                assertThat(result.getJobs())
+                        .filteredOn(value -> value.getName().equals("custom")
+                                && value.getGroup().equals("service-test"))
+                        .singleElement()
+                        .satisfies(value -> assertThat(value.getConcurrentExecutionDisallowed())
+                                .isTrue());
+            } finally {
+                standbyScheduler.deleteJob(job.getKey());
+            }
         }
-        standbyScheduler.scheduleJob(job, trigger);
-        try {
-            // when.
-            ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
 
-            // then.
-            assertThat(result.getJobs())
-                    .filteredOn(value -> value.getName().equals("daily-end")
-                            && value.getGroup().equals("service-test"))
-                    .singleElement()
-                    .satisfies(value -> assertThat(value.getTriggers())
-                            .singleElement()
-                            .satisfies(
-                                    item -> assertThat(item.getEndTimeOfDay()).isEqualTo(expected)));
-        } finally {
-            standbyScheduler.deleteJob(job.getKey());
-        }
-    }
+        @Test
+        void shouldFindJobsWhenAnotherSchedulerIsUnavailable() throws Exception {
+            // given.
+            int port = SocketUtils.findAvailableTcpPort();
+            Registry registry = LocateRegistry.createRegistry(port);
+            try {
+                Scheduler unavailable = new RemoteScheduler("missing", "127.0.0.1", port);
+                AxelixQuartzService service = new DefaultAxelixQuartzService(
+                        List.of(unavailable, standbyScheduler), new AxelixQuartzAssembler());
 
-    @Test
-    void shouldRespectCustomConcurrencyFlagWithoutAnnotation() throws Exception {
-        // given.
-        JobDetailImpl job = new CustomJobDetail();
-        job.setName("custom");
-        job.setGroup("service-test");
-        job.setJobClass(TestJob.class);
-        job.setDurability(true);
-        standbyScheduler.addJob(job, false);
-        try {
-            // when.
-            ServiceQuartzJobs result = quartzService.getQuartzJobs("standbyScheduler");
+                // when.
+                ServiceQuartzJobs result = service.getQuartzJobs("standbyScheduler");
 
-            // then.
-            assertThat(result.getJobs())
-                    .filteredOn(value ->
-                            value.getName().equals("custom") && value.getGroup().equals("service-test"))
-                    .singleElement()
-                    .satisfies(value ->
-                            assertThat(value.getConcurrentExecutionDisallowed()).isTrue());
-        } finally {
-            standbyScheduler.deleteJob(job.getKey());
+                // then.
+                assertThat(result.getJobs()).extracting(QuartzJob::getName).containsExactlyInAnyOrder("job", "orphan");
+            } finally {
+                UnicastRemoteObject.unexportObject(registry, true);
+            }
         }
     }
 
@@ -295,8 +339,27 @@ class DefaultAxelixQuartzServiceTest extends AbstractQuartzSharedContextTest {
                 Arguments.of(new TimeOfDay(23, 59, 59), "23:59:59"));
     }
 
+    public static class BlockingJob implements Job {
+        @Override
+        public void execute(JobExecutionContext context) throws JobExecutionException {
+            CountDownLatch started =
+                    (CountDownLatch) context.getMergedJobDataMap().get("started");
+            CountDownLatch release =
+                    (CountDownLatch) context.getMergedJobDataMap().get("release");
+            started.countDown();
+            try {
+                if (!release.await(15, TimeUnit.SECONDS)) {
+                    throw new JobExecutionException("Timed out waiting for the test to release the job");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new JobExecutionException(e);
+            }
+        }
+    }
+
     @PersistJobDataAfterExecution
-    public static class PersistentJob extends TestJob {}
+    public static class PersistentBlockingJob extends BlockingJob {}
 
     public static class CustomJobDetail extends JobDetailImpl {
         public boolean isConcurrentExectionDisallowed() {

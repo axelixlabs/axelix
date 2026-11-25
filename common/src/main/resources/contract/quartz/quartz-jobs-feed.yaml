@@ -13,6 +13,7 @@ components:
       description: The jobs registered in a Quartz scheduler.
       required:
         - jobs
+        - executions
       properties:
         jobs:
           type: array
@@ -20,6 +21,12 @@ components:
           x-axelix-introduced-in: 1.4.0
           items:
             $ref: '#/components/schemas/QuartzJob'
+        executions:
+          type: array
+          description: The executions currently running on this scheduler instance, not across the cluster.
+          x-axelix-introduced-in: 1.4.0
+          items:
+            $ref: '#/components/schemas/QuartzJobExecution'
     QuartzJob:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.4.0
@@ -177,3 +184,40 @@ components:
         - RESCHEDULE_NEXT_WITH_EXISTING_COUNT
         - RESCHEDULE_NEXT_WITH_REMAINING_COUNT
         - UNKNOWN
+    QuartzJobExecution:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A job execution currently running on a single scheduler instance.
+      required:
+        - executionId
+        - jobName
+        - jobGroup
+        - triggerName
+        - triggerGroup
+        - startedAt
+      properties:
+        executionId:
+          type: string
+          description: The Quartz fire instance id of the execution.
+          x-axelix-introduced-in: 1.4.0
+        jobName:
+          type: string
+          description: The name of the executing job.
+          x-axelix-introduced-in: 1.4.0
+        jobGroup:
+          type: string
+          description: The group of the executing job.
+          x-axelix-introduced-in: 1.4.0
+        triggerName:
+          type: string
+          description: The name of the trigger that fired the job.
+          x-axelix-introduced-in: 1.4.0
+        triggerGroup:
+          type: string
+          description: The group of the trigger that fired the job.
+          x-axelix-introduced-in: 1.4.0
+        startedAt:
+          type: string
+          description: The actual fire time reported by Quartz, in ISO-8601 format.
+          x-axelix-introduced-in: 1.4.0
