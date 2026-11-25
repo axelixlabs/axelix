@@ -106,6 +106,24 @@ public enum DangerousPropertyValue {
                             + "'org.hibernate.SQL' logger to DEBUG achieves the same goal without any of that.",
                     "false"))),
 
+    HIBERNATE_JDBC_BIND_TRACE(
+            "logging.level.org.hibernate.orm.jdbc.bind",
+            Set.of(new DangerousValue(
+                    "TRACE",
+                    "Hibernate logs the values it binds to SQL parameters, including personal data or tokens. "
+                            + "These values can reach application logs even if the statement fails or the transaction rolls back. "
+                            + "To inspect SQL statements, use the org.hibernate.SQL logger at DEBUG.",
+                    "INFO"))),
+
+    HIBERNATE_JDBC_EXTRACT_TRACE(
+            "logging.level.org.hibernate.orm.jdbc.extract",
+            Set.of(new DangerousValue(
+                    "TRACE",
+                    "Hibernate logs values it reads from JDBC results, which can include sensitive stored data. "
+                            + "Those values can reach application logs even if they are never returned to the caller. "
+                            + "To inspect SQL statements, use the org.hibernate.SQL logger at DEBUG.",
+                    "INFO"))),
+
     ENABLE_LAZY_LOAD_NO_TRANS(
             "spring.jpa.properties.hibernate.enable_lazy_load_no_trans",
             Set.of(new DangerousValue(
