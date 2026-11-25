@@ -32,7 +32,7 @@
 
 .Row {
     display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-columns: fit-content(65%) minmax(0, 1fr);
     align-items: center;
     gap: 16px;
     min-height: 44px;
