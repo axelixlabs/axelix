@@ -157,6 +157,15 @@ public enum DangerousPropertyValue {
                                     + "Those errors can reveal internal field names or echo sensitive input.",
                             "never"))),
 
+    INCLUDE_EXCEPTION(
+            "server.error.include-exception",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Spring Boot can include the fully qualified exception class name in HTTP error responses. "
+                            + "This reveals internal class and package names that can help callers identify the application "
+                            + "components and libraries behind a failure.",
+                    "false"))),
+
     WEB_INCLUDE_STACKTRACE_ALWAYS(
             "spring.web.error.include-stacktrace",
             Set.of(
@@ -198,6 +207,15 @@ public enum DangerousPropertyValue {
                             "Clients can ask Spring Boot to include binding and validation errors in HTTP error responses. "
                                     + "Those errors can reveal internal field names or echo sensitive input.",
                             "never"))),
+
+    WEB_INCLUDE_EXCEPTION(
+            "spring.web.error.include-exception",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Spring Boot can include the fully qualified exception class name in HTTP error responses. "
+                            + "This reveals internal class and package names that can help callers identify the application "
+                            + "components and libraries behind a failure.",
+                    "false"))),
 
     IMMEDIATE_SHUTDOWN(
             "server.shutdown",
