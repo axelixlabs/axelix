@@ -283,6 +283,37 @@ public class EndpointProbersAutoConfiguration {
                 instanceRegistry, ActuatorEndpoints.DISABLE_GC_LOGGING, tokenProvider, httpClient);
     }
 
+    // Quartz
+    @Bean
+    public ProxyingEndpointProber getQuartzSchedulersEndpointProber() {
+        return new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_QUARTZ_SCHEDULERS, tokenProvider, httpClient);
+    }
+
+    @Bean
+    public ProxyingEndpointProber getQuartzJobsEndpointProber() {
+        return new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_QUARTZ_JOBS, tokenProvider, httpClient);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber executeQuartzJobEndpointProber() {
+        return new DiscardingAbstractEndpointProber(
+                instanceRegistry, ActuatorEndpoints.EXECUTE_QUARTZ_JOB, tokenProvider, httpClient);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber pauseQuartzTriggerEndpointProber() {
+        return new DiscardingAbstractEndpointProber(
+                instanceRegistry, ActuatorEndpoints.PAUSE_QUARTZ_TRIGGER, tokenProvider, httpClient);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber resumeQuartzTriggerEndpointProber() {
+        return new DiscardingAbstractEndpointProber(
+                instanceRegistry, ActuatorEndpoints.RESUME_QUARTZ_TRIGGER, tokenProvider, httpClient);
+    }
+
     // Scheduled tasks
     @Bean
     public ProxyingEndpointProber getScheduledTasksEndpointProber() {

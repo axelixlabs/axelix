@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @Deprecated(forRemoval = true, since = "1.3")
 public enum OssAuthority implements Authority {
@@ -52,6 +53,11 @@ public enum OssAuthority implements Authority {
      * <p>Allows modifying individual tasks, forcing their execution, and enabling/disabling them at runtime.</p>
      */
     SCHEDULED_TASKS_MODIFY("scheduled-tasks:write"),
+
+    /**
+     * Grants the right to execute Quartz jobs and pause or resume their triggers.
+     */
+    QUARTZ_MODIFY("quartz:write"),
 
     /**
      * Grants the right to clear caches.

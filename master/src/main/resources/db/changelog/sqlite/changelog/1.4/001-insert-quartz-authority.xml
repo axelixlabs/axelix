@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.4-001-sqlite-insert-quartz-authority" author="Axelix Team">
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000aa"/>
+      <column name="codename" value="quartz:write"/>
+      <column name="display_name" value="Manage Quartz Jobs and Triggers"/>
+      <column name="description" value="Execute Quartz jobs and pause or resume their triggers at runtime."/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b2"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000aa"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000aa"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>

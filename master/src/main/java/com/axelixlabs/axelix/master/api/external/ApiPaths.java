@@ -291,6 +291,34 @@ public final class ApiPaths {
         public static final String METRIC_NAME = "/metrics/{instanceId}/{metric}";
     }
 
+    public static final class QuartzApi {
+
+        /**
+         * Endpoint to retrieve available Quartz schedulers of an instance.
+         */
+        public static final String SCHEDULERS = "/quartz/{instanceId}";
+
+        /**
+         * Endpoint to retrieve Quartz job metadata for a scheduler.
+         */
+        public static final String JOBS = "/quartz/{instanceId}/jobs";
+
+        /**
+         * Endpoint to request an immediate Quartz job execution.
+         */
+        public static final String EXECUTE = "/quartz/{instanceId}/execute";
+
+        /**
+         * Endpoint to pause a Quartz trigger.
+         */
+        public static final String PAUSE = "/quartz/{instanceId}/pause";
+
+        /**
+         * Endpoint to resume a Quartz trigger.
+         */
+        public static final String RESUME = "/quartz/{instanceId}/resume";
+    }
+
     public static final class ScheduledTasksApi {
 
         /**
