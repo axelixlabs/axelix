@@ -157,6 +157,15 @@ public enum DangerousPropertyValue {
                                     + "Those errors can reveal internal field names or echo sensitive input.",
                             "never"))),
 
+    INCLUDE_EXCEPTION(
+            "server.error.include-exception",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Spring Boot can include the fully qualified exception class name in HTTP error responses. "
+                            + "This reveals internal class and package names that can help callers identify the application "
+                            + "components and libraries behind a failure.",
+                    "false"))),
+
     WEB_INCLUDE_STACKTRACE_ALWAYS(
             "spring.web.error.include-stacktrace",
             Set.of(
@@ -198,6 +207,39 @@ public enum DangerousPropertyValue {
                             "Clients can ask Spring Boot to include binding and validation errors in HTTP error responses. "
                                     + "Those errors can reveal internal field names or echo sensitive input.",
                             "never"))),
+
+    WEB_INCLUDE_EXCEPTION(
+            "spring.web.error.include-exception",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Spring Boot can include the fully qualified exception class name in HTTP error responses. "
+                            + "This reveals internal class and package names that can help callers identify the application "
+                            + "components and libraries behind a failure.",
+                    "false"))),
+
+    MVC_LOG_REQUEST_DETAILS(
+            "spring.mvc.log-request-details",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Spring MVC can log unmasked request parameters and headers when DEBUG or TRACE logging is active. "
+                            + "This can put sensitive form values, session cookies, or authorization tokens in application logs.",
+                    "false"))),
+
+    CODEC_LOG_REQUEST_DETAILS(
+            "spring.codec.log-request-details",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Reactive HTTP codecs can log form values at DEBUG and headers at TRACE. "
+                            + "This can put sensitive form values, session cookies, or authorization tokens in application logs.",
+                    "false"))),
+
+    HTTP_CODECS_LOG_REQUEST_DETAILS(
+            "spring.http.codecs.log-request-details",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Reactive HTTP codecs can log form values at DEBUG and headers at TRACE. "
+                            + "This can put sensitive form values, session cookies, or authorization tokens in application logs.",
+                    "false"))),
 
     IMMEDIATE_SHUTDOWN(
             "server.shutdown",
