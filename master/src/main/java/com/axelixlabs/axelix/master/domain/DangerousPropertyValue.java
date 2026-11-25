@@ -73,6 +73,30 @@ public enum DangerousPropertyValue {
                                     + "tool, such as Liquibase or Flyway, is the way to evolve a schema you care about.",
                             "validate"))),
 
+    LIQUIBASE_DROP_FIRST(
+            "spring.liquibase.drop-first",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Liquibase drops existing database objects before running migrations at startup. "
+                            + "If the application points to a production database, a restart can erase tables and their data.",
+                    "false"))),
+
+    FLYWAY_CLEAN_ENABLED(
+            "spring.flyway.clean-disabled",
+            Set.of(new DangerousValue(
+                    "false",
+                    "This permits Flyway's clean operation to run against the configured schemas. "
+                            + "An accidental clean against production can delete tables and their data.",
+                    "true"))),
+
+    H2_CONSOLE_ENABLED(
+            "spring.h2.console.enabled",
+            Set.of(new DangerousValue(
+                    "true",
+                    "This enables the H2 development console over HTTP. "
+                            + "Anyone who can reach the console and sign in can run SQL to read, change, or delete database data.",
+                    "false"))),
+
     SHOW_SQL(
             "spring.jpa.show-sql",
             Set.of(new DangerousValue(
@@ -93,11 +117,87 @@ public enum DangerousPropertyValue {
 
     INCLUDE_STACKTRACE_ALWAYS(
             "server.error.include-stacktrace",
-            Set.of(new DangerousValue(
-                    "always",
-                    "The stack trace is included into every error response, which exposes the internals of the application, "
-                            + "the libraries it is built upon and their versions to whoever is on the other side of the wire.",
-                    "never"))),
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "The stack trace is included into every error response, which exposes the internals of the application, "
+                                    + "the libraries it is built upon and their versions to whoever is on the other side of the wire.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can ask Spring Boot to include stack traces in error responses. "
+                                    + "Those traces reveal internal class names and library details that help callers map the application.",
+                            "never"))),
+
+    INCLUDE_MESSAGE_ALWAYS(
+            "server.error.include-message",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Spring Boot includes internal error messages in HTTP error responses when available. "
+                                    + "Those messages can reveal file paths, SQL statements, or database details to callers.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can ask Spring Boot to include internal error messages in HTTP error responses. "
+                                    + "Those messages can reveal file paths, SQL statements, or database details.",
+                            "never"))),
+
+    INCLUDE_BINDING_ERRORS_ALWAYS(
+            "server.error.include-binding-errors",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Spring Boot includes binding and validation errors in HTTP error responses when available. "
+                                    + "This can reveal internal field names and echo rejected input, including sensitive values.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can ask Spring Boot to include binding and validation errors in HTTP error responses. "
+                                    + "Those errors can reveal internal field names or echo sensitive input.",
+                            "never"))),
+
+    WEB_INCLUDE_STACKTRACE_ALWAYS(
+            "spring.web.error.include-stacktrace",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Spring Boot includes stack traces in error responses whenever a trace is available. "
+                                    + "These traces reveal internal class and method names and which libraries the application uses.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can ask Spring Boot to include stack traces in error responses. "
+                                    + "Those traces reveal internal class names and library details that help callers map the application.",
+                            "never"))),
+
+    WEB_INCLUDE_MESSAGE_ALWAYS(
+            "spring.web.error.include-message",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Spring Boot includes internal error messages in HTTP error responses when available. "
+                                    + "Those messages can reveal file paths, SQL statements, or database details to callers.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can ask Spring Boot to include internal error messages in HTTP error responses. "
+                                    + "Those messages can reveal file paths, SQL statements, or database details.",
+                            "never"))),
+
+    WEB_INCLUDE_BINDING_ERRORS_ALWAYS(
+            "spring.web.error.include-binding-errors",
+            Set.of(
+                    new DangerousValue(
+                            "always",
+                            "Spring Boot includes binding and validation errors in HTTP error responses when available. "
+                                    + "This can reveal internal field names and echo rejected input, including sensitive values.",
+                            "never"),
+                    new DangerousValue(
+                            "on-param",
+                            "Clients can ask Spring Boot to include binding and validation errors in HTTP error responses. "
+                                    + "Those errors can reveal internal field names or echo sensitive input.",
+                            "never"))),
 
     IMMEDIATE_SHUTDOWN(
             "server.shutdown",
@@ -106,6 +206,26 @@ public enum DangerousPropertyValue {
                     "Immediate shutdown can interrupt in-flight HTTP requests during restarts and deployments. "
                             + "Graceful shutdown gives active requests time to complete.",
                     "graceful"))),
+
+    ENV_SHOW_VALUES_ALWAYS(
+            "management.endpoint.env.show-values",
+            Set.of(new DangerousValue(
+                    "always",
+                    "The Actuator env endpoint can return environment values without masking them. "
+                            + "Anyone with endpoint access could see credentials or API tokens stored in environment properties. "
+                            + "Use the Axelix UI or MCP server to inspect environment properties and keep the standard "
+                            + "Actuator env endpoint unexposed.",
+                    "never"))),
+
+    CONFIGPROPS_SHOW_VALUES_ALWAYS(
+            "management.endpoint.configprops.show-values",
+            Set.of(new DangerousValue(
+                    "always",
+                    "The Actuator configprops endpoint can return configuration values without masking them. "
+                            + "Anyone with endpoint access could see passwords or tokens bound to configuration beans. "
+                            + "Use the Axelix UI or MCP server to inspect configuration properties and keep the standard "
+                            + "Actuator configprops endpoint unexposed.",
+                    "never"))),
 
     EXPOSURE_INCLUDE_ALL(
             "management.endpoints.web.exposure.include",
