@@ -120,6 +120,24 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(27)
+    }
+}
+
+tasks.compileJava {
+    options.release = 27
+}
+
+tasks.compileTestJava {
+    options.release = 27
+}
+
+tasks.compileTestFixturesJava {
+    options.release = 27
+}
+
 configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-api")
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")

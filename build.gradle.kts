@@ -15,7 +15,7 @@ import kotlin.io.path.readText
 plugins {
     id("java")
     id("maven-publish")
-    id("com.diffplug.spotless") version "8.9.0"
+    id("com.diffplug.spotless") version "8.12.0"
     id("pmd")
     id("signing")
     id("net.ltgt.errorprone") version "4.4.0"
@@ -129,7 +129,7 @@ subprojects {
     pmd {
         isIgnoreFailures = false
         isConsoleOutput = true
-        toolVersion = "7.16.0"
+        toolVersion = "7.29.0"
         ruleSetFiles = files("${rootDir}/pmd.ruleset.xml")
     }
 

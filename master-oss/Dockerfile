@@ -1,5 +1,5 @@
 # Dockerfile for the OSS (community) distribution of Axelix Master.
-FROM eclipse-temurin:25-jre-alpine AS training
+FROM eclipse-temurin:27-jre-alpine AS training
 
 WORKDIR /application
 
@@ -26,7 +26,7 @@ RUN java \
     -jar /application/master.jar
 
 # Stage: final runtime image
-FROM eclipse-temurin:25-jre-alpine AS final
+FROM eclipse-temurin:27-jre-alpine AS final
 
 VOLUME /tmp
 
@@ -50,6 +50,7 @@ WORKDIR /application
 
 COPY --from=training /application/master.jar ./
 COPY --from=training /application/app.aot ./
+COPY --from=training --chown=axelix:1001 /application/axelix.db ./
 
 # JVM options
 ENV JAVA_ERROR_FILE_OPTS="-XX:ErrorFile=/tmp/java_error.log"
