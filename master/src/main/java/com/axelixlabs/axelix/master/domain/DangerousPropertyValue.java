@@ -217,6 +217,30 @@ public enum DangerousPropertyValue {
                             + "components and libraries behind a failure.",
                     "false"))),
 
+    MVC_LOG_REQUEST_DETAILS(
+            "spring.mvc.log-request-details",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Spring MVC can log unmasked request parameters and headers when DEBUG or TRACE logging is active. "
+                            + "This can put sensitive form values, session cookies, or authorization tokens in application logs.",
+                    "false"))),
+
+    CODEC_LOG_REQUEST_DETAILS(
+            "spring.codec.log-request-details",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Reactive HTTP codecs can log form values at DEBUG and headers at TRACE. "
+                            + "This can put sensitive form values, session cookies, or authorization tokens in application logs.",
+                    "false"))),
+
+    HTTP_CODECS_LOG_REQUEST_DETAILS(
+            "spring.http.codecs.log-request-details",
+            Set.of(new DangerousValue(
+                    "true",
+                    "Reactive HTTP codecs can log form values at DEBUG and headers at TRACE. "
+                            + "This can put sensitive form values, session cookies, or authorization tokens in application logs.",
+                    "false"))),
+
     IMMEDIATE_SHUTDOWN(
             "server.shutdown",
             Set.of(new DangerousValue(
