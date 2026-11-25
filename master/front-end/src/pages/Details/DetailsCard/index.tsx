@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { IDetailsCardRecord } from "@/models";
@@ -26,7 +26,7 @@ interface IProps {
     /**
      * Details card title
      */
-    title: string;
+    title: ReactNode;
 
     /**
      * Prefix to be used when translating {@link records} via i18n.

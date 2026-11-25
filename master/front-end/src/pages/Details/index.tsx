@@ -19,7 +19,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { BranchIcon, ChipIcon, CommitIcon, LeafIcon, PackageIcon, TerminalIcon } from "@/assets";
+import { BranchIcon, ChipIcon, CommitIcon, LeafIcon, LogoIcon, PackageIcon, TerminalIcon } from "@/assets";
 import { Copy, EmptyHandler, Loader } from "@/components";
 import { fetchData } from "@/helpers";
 import { type IDetailsCardRecord, type IDetailsResponseBody, StatefulRequest } from "@/models";
@@ -70,7 +70,7 @@ const Details = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const { serviceName, git, build, spring, runtime, os } = dataState.response!;
+    const { serviceName, starterVersion, git, build, spring, runtime, os } = dataState.response!;
 
     const gitRecords = records({
         commitShaShort: copyable(git.commitShaShort && code(git.commitShaShort, styles.Chip), git.commitShaShort),
@@ -136,6 +136,11 @@ const Details = () => {
                     <DetailsCard i18nPropertiesPrefix="Details.os" title="os" records={osRecords}>
                         <TerminalIcon />
                     </DetailsCard>
+                    <DetailsCard
+                        i18nPropertiesPrefix="Details.axelix"
+                        title={<LogoIcon className={styles.AxelixLogo} role="img" aria-label="Axelix" />}
+                        records={records({ starterVersion: code(starterVersion, styles.CodeStrong) })}
+                    />
                 </div>
                 <div className={styles.ColumnWrapper}>
                     <DetailsCard i18nPropertiesPrefix="Details.spring" title="spring" records={springRecords}>

@@ -16,7 +16,7 @@
     background-color: var(--axelix-grey-25);
     border-bottom: 1px solid var(--axelix-grey-200);
 
-    svg {
+    > svg {
         width: 14px;
         height: 14px;
         flex-shrink: 0;

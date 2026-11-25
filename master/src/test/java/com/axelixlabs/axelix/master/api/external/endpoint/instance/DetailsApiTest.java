@@ -69,6 +69,7 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
             """
          {
            "serviceName": "test-object-factory-instance",
+           "starterVersion": "1.0.0-SNAPSHOT",
            "git": {
              "commitShaShort": "7a663cb",
              "branch": "local/local-test",
@@ -108,6 +109,7 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
             """
      {
        "serviceName": "test-object-factory-instance",
+       "starterVersion": "1.0.0-SNAPSHOT",
        "git": {
              "commitShaShort": "",
              "branch": "",

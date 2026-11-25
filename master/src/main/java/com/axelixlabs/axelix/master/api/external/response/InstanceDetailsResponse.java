@@ -25,18 +25,20 @@ import com.axelixlabs.axelix.master.api.external.RequiredSince;
 /**
  * The profile of a given details.
  *
- * @param serviceName  The name of the service providing information.
- * @param git          The profile of the git component response.
- * @param runtime      The profile of the runtime component response.
- * @param spring       The profile of the spring component response.
- * @param build        The profile of the build component response.
- * @param os           The profile of the OS component response.
+ * @param serviceName    The name of the service providing information.
+ * @param starterVersion  The version of the Axelix Spring Boot starter registered by the instance.
+ * @param git            The profile of the git component response.
+ * @param runtime        The profile of the runtime component response.
+ * @param spring         The profile of the spring component response.
+ * @param build          The profile of the build component response.
+ * @param os             The profile of the OS component response.
  *
  * @author Nikita Kirilov
  * @author Sergey Cherkasov
  */
 public record InstanceDetailsResponse(
         @Nullable String serviceName,
+        String starterVersion,
         @Nullable GitProfile git,
         RuntimeProfile runtime,
         SpringProfile spring,

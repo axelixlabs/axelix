@@ -37,6 +37,9 @@
         "licenseAlertActionText": "Update key"
     },
     "Details": {
+        "axelix": {
+            "starterVersion": "Spring Boot starter version"
+        },
         "downloadState": "Download state",
         "Components": {
             "HEAP_DUMP": "Heap Dump",

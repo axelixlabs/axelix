@@ -38,6 +38,9 @@
         "licenseExpiringSoonAlertTitle_many": "Votre licence Axelix Enterprise expire dans {{count}} jours ({{date}}). Les fonctionnalités Enterprise cesseront de fonctionner après cette date."
     },
     "Details": {
+        "axelix": {
+            "starterVersion": "Version du starter Spring Boot"
+        },
         "downloadState": "Télécharger l’état",
         "Components": {
             "HEAP_DUMP": "Dump du tas",

@@ -82,7 +82,13 @@ public class InstanceDetailsConverter implements Converter<DetailsConversionRequ
         OSProfile osProfile = osDetailsConverter(source.getOs());
 
         return new InstanceDetailsResponse(
-                serviceName, gitProfile, runtimeProfile, springProfile, buildProfile, osProfile);
+                serviceName,
+                instance.starterVersion(),
+                gitProfile,
+                runtimeProfile,
+                springProfile,
+                buildProfile,
+                osProfile);
     }
 
     private GitProfile gitDetailsConverter(GitDetails gitDetails) {

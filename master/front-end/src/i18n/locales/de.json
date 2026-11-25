@@ -37,6 +37,9 @@
         "licenseAlertActionText": "Schlüssel aktualisieren"
     },
     "Details": {
+        "axelix": {
+            "starterVersion": "Version des Starters für Spring Boot"
+        },
         "downloadState": "Zustand herunterladen",
         "Components": {
             "HEAP_DUMP": "Heap-Dump",

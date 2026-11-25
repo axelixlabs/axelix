@@ -1,3 +1,9 @@
+.AxelixLogo {
+    display: block;
+    width: auto;
+    height: 18px;
+}
+
 .InnerWrapper {
     display: grid;
     grid-template-columns: 1.22fr 1fr;

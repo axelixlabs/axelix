@@ -57,6 +57,7 @@ export interface IDetailsOS {
 
 export interface IDetailsResponseBody {
     serviceName: string;
+    starterVersion: string;
     git: IDetailsGit;
     runtime: IDetailsRuntime;
     spring: IDetailsSpring;

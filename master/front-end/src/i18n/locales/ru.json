@@ -39,6 +39,9 @@
     },
     "notEnoughAuthorities": "У вас недостаточно полномочий",
     "Details": {
+        "axelix": {
+            "starterVersion": "Версия стартера Spring Boot"
+        },
         "downloadState": "Выгрузить состояние",
         "Components": {
             "HEAP_DUMP": "Дамп Кучи",
