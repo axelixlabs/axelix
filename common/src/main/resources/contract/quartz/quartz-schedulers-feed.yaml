@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: quartz-schedulers-feed
+  version: ""
+  description: |
+    Schemas for the runtime metadata of the Quartz schedulers of a Spring Boot app.
+components:
+  schemas:
+    ServiceQuartzSchedulers:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: The overview of available Quartz schedulers of the service, with their runtime metadata.
+      required:
+        - schedulers
+      properties:
+        schedulers:
+          type: array
+          description: The runtime metadata of the Quartz schedulers in the application.
+          x-axelix-introduced-in: 1.4.0
+          items:
+            $ref: '#/components/schemas/QuartzSchedulerMetadata'
+    QuartzSchedulerMetadata:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: The runtime settings and counters of a single Quartz scheduler instance.
+      required:
+        - schedulerName
+        - schedulerInstanceId
+        - version
+        - schedulerClassName
+        - schedulerRemote
+        - started
+        - inStandbyMode
+        - shutdown
+        - numberOfJobsExecuted
+        - jobStoreClassName
+        - jobStoreSupportsPersistence
+        - jobStoreClustered
+        - threadPoolClassName
+        - threadPoolSize
+      properties:
+        schedulerName:
+          type: string
+          description: The name of the scheduler.
+          x-axelix-introduced-in: 1.4.0
+        schedulerInstanceId:
+          type: string
+          description: The id of the scheduler instance.
+          x-axelix-introduced-in: 1.4.0
+        version:
+          type: string
+          description: The version of Quartz used by the scheduler.
+          x-axelix-introduced-in: 1.4.0
+        schedulerClassName:
+          type: string
+          description: The fully qualified name of the scheduler implementation class.
+          x-axelix-introduced-in: 1.4.0
+        schedulerRemote:
+          type: boolean
+          description: Whether the scheduler is accessed remotely through RMI.
+          x-axelix-introduced-in: 1.4.0
+        started:
+          type: boolean
+          description: Whether the scheduler has been started; it may still be in standby or shut down.
+          x-axelix-introduced-in: 1.4.0
+        inStandbyMode:
+          type: boolean
+          description: Whether the scheduler is in standby mode.
+          x-axelix-introduced-in: 1.4.0
+        shutdown:
+          type: boolean
+          description: Whether the scheduler has been shut down.
+          x-axelix-introduced-in: 1.4.0
+        startedAt:
+          type: string
+          description: The timestamp the scheduler first started at, in ISO-8601 format, or absent when it has never started.
+          x-axelix-introduced-in: 1.4.0
+        numberOfJobsExecuted:
+          type: integer
+          format: int32
+          description: The number of job executions on this scheduler instance since it started.
+          x-axelix-introduced-in: 1.4.0
+        jobStoreClassName:
+          type: string
+          description: The fully qualified name of the JobStore implementation class.
+          x-axelix-introduced-in: 1.4.0
+        jobStoreSupportsPersistence:
+          type: boolean
+          description: Whether the JobStore supports persistence.
+          x-axelix-introduced-in: 1.4.0
+        jobStoreClustered:
+          type: boolean
+          description: Whether the JobStore is configured for clustering; this does not indicate cluster health.
+          x-axelix-introduced-in: 1.4.0
+        threadPoolClassName:
+          type: string
+          description: The fully qualified name of the thread pool implementation class.
+          x-axelix-introduced-in: 1.4.0
+        threadPoolSize:
+          type: integer
+          format: int32
+          description: The size of the worker thread pool on this node.
+          x-axelix-introduced-in: 1.4.0

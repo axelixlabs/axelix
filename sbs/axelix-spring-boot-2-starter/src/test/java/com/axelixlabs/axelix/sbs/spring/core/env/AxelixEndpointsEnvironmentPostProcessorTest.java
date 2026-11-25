@@ -55,6 +55,7 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
             "axelix-metadata",
             "axelix-metrics",
             "axelix-ping",
+            "axelix-quartz",
             "axelix-scheduled-tasks",
             "axelix-thread-dump");
 

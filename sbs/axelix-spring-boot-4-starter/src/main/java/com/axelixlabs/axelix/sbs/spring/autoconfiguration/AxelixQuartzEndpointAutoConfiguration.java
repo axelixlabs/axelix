@@ -1,0 +1,60 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+
+import java.util.List;
+
+import org.quartz.Scheduler;
+
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Bean;
+
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzService;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.DefaultAxelixQuartzService;
+
+/**
+ * Auto-configuration for the {@link AxelixQuartzEndpoint}.
+ *
+ * @author Nikita Kirillov
+ */
+@AxelixAutoConfiguration(afterName = "org.springframework.boot.quartz.autoconfigure.QuartzAutoConfiguration")
+@ConditionalOnClass(name = "org.quartz.Scheduler")
+@ConditionalOnBean(type = "org.quartz.Scheduler")
+@ConditionalOnAvailableEndpoint(endpoint = AxelixQuartzEndpoint.class)
+public class AxelixQuartzEndpointAutoConfiguration {
+
+    @Bean
+    public AxelixQuartzAssembler axelixQuartzAssembler() {
+        return new AxelixQuartzAssembler();
+    }
+
+    @Bean
+    public AxelixQuartzService axelixQuartzService(List<Scheduler> schedulers, AxelixQuartzAssembler quartzAssembler) {
+        return new DefaultAxelixQuartzService(schedulers, quartzAssembler);
+    }
+
+    @Bean
+    public AxelixQuartzEndpoint axelixQuartzEndpoint(AxelixQuartzService quartzService) {
+        return new AxelixQuartzEndpoint(quartzService);
+    }
+}

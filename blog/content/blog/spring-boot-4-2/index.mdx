@@ -1,0 +1,153 @@
+---
+title: "Spring Boot 4.2 Is Out. What Will Change If You Just Bump the Version?"
+date: 2026-11-24
+authors: ["Mikhail Polivakha"]
+tags: ["Spring Boot"]
+heroImagePath: /posts/spring-boot-4-2/preview.png
+description: "AMQP 1.0 has appeared in it, executable JARs now start faster, and RestTemplate has officially begun its path to removal."
+---
+
+Hi everyone! My name is Mikhail Polivakha, and I am the technical lead of the [Axelix project](https://github.com/axelixlabs/axelix), an AI Native platform for Java development.
+
+On November 19, [Spring Boot 4.2.0](https://spring.io/blog/2026/11/19/spring-boot-4-2-0-available-now/) came out. AMQP 1.0 has appeared in it, executable JARs now start faster, and `RestTemplate` has officially begun its path to removal.
+
+Imagine that you have a service on Boot 4.1 that works with RabbitMQ. You upgrade the Boot version, open your `pom.xml`, and there is still the same `spring-boot-starter-amqp`. It would seem, what is there to check? Well, in 4.2 this starter brings in support for **a different protocol, and this way you can break production**.
+
+Let's figure out where this came from, what else may change during an ordinary upgrade, and which features in 4.2 I would try separately. We will take the [official release notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes) as the basis.
+
+P.S: As part of Axelix, [support for the Spring Boot 4.2 release line](https://axelix.io/docs/ui-guide/dashboard/spring-portfolio) will be added in the 1.4 minor release and will be backported to the 1.3.x release line, [according to the support policy](https://axelix.io/docs/more/support-policy) (a curious fact - ours is more similar to the Quarkus support policy than to that of Spring Boot, although we don't support Quarkus yet).
+
+### RestTemplate. Now it's really deprecated
+
+There has long been a funny situation with `RestTemplate`. If you were writing a new synchronous HTTP client, you were already advised to use `RestClient`. At the same time, an existing project could have ten integrations on `RestTemplate`, and the team had no particular reason to rewrite them en masse.
+
+In Spring Framework 7.1, `RestTemplate` was marked as deprecated with the intention of removing it. Following it, Boot 4.2 deprecated its own infrastructure, including `RestTemplateBuilder`, `RestTemplateCustomizer` and the corresponding auto-configurations. If you have a client for some hypothetical catalog, the basic migration looks roughly like this.
+
+```java
+@Bean
+RestClient catalogClient(
+        RestClient.Builder builder,
+        @Value("${catalog.base-url}") String baseUrl) {
+    return builder.baseUrl(baseUrl).build();
+}
+```
+
+Then, in place of a hypothetical `getForObject`, you will have something like `catalogClient.get().uri("/products/{id}", id).retrieve().body(Product.class)`. But during the migration I would first open the configuration of the old builder. Where are the timeouts set there? Who adds the headers? Is there a custom error handler?
+
+If the common settings used to arrive through a `RestTemplateCustomizer` bean, they need to be moved to `RestClientCustomizer`. Rewriting a single call is easier than later finding out why the new client behaves differently on a 404.
+
+Separately, `TestRestTemplate` was deprecated. For tests of the application itself, there are `RestTestClient` and `@AutoConfigureRestTestClient`. Depending on the type of test, the client works with a mock transport or goes to an actually running server. And if you already have `@RestClientTest` with `MockRestServiceServer` for outgoing requests, use `RestClient.Builder` when migrating. [HTTP client migration notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#deprecation-of-testresttemplate-support).
+
+### Why the same JAR starts faster
+
+Here we need to take a step back and say how an ordinary executable JAR from Boot is structured, since not everyone knows.
+
+By default, your classes are in `BOOT-INF/classes`, and the dependencies are in separate JARs in `BOOT-INF/lib`. The Launcher must be able to search for classes and resources inside these nested archives (essentially, a custom ClassLoader of its own is used there).
+
+So, previously, during such a search, a URL connection was opened for each nested JAR being checked. In 4.2, the search goes directly through the nested archives. Plus, reading of compressed entries and resolution of cached resources were optimized. Less work and fewer allocations at startup.
+
+Separately, sorting of auto-configurations and DevTools restarts were sped up (this won't affect production, but local development will be a bit snappier). [Startup performance changes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#startup-performance-improvements).
+
+If you want to understand the effect in your own case, compare two built JARs via `java -jar` on the same JVM and with the same profile. Running from an IDE usually puts the dependencies directly on the classpath, so the path through nested JARs that we are interested in may simply be bypassed there.
+
+### RabbitMQ. How one starter became three
+
+In general, the first thing you should remember when upgrading Boot (and Spring Framework modules too) is that **a minor release can and often will carry breaking changes**. I wrote about this in detail [in this article](https://axelix.io/blog/spring-release-cycle-2026). There are specific reasons for such behavior, and a number of large projects that you know do this, from [Axelix](https://axelix.io/docs/more/compatibility-and-versioning#the-pain-index) to K8S - all of them can break you in a minor release.
+
+With AMQP, everything was simple for a long time. You added `spring-boot-starter-amqp` and got RabbitMQ support via AMQP 0-9-1. Now Boot can also do AMQP 1.0. And here the numbers are a bit confusing. 1.0 looks like the next version of the same protocol, to which the client will move by itself. In practice, these variants have different messaging models and different clients. RabbitMQ, meanwhile, has support for both variants.
+
+Here is what this turned into in Boot 4.2.
+
+| What you want to use | Which starter to add |
+| :--- | :--- |
+| The familiar RabbitMQ with AMQP 0-9-1 | `spring-boot-starter-rabbitmq` |
+| AMQP 1.0 with RabbitMQ-specific capabilities | `spring-boot-starter-amqp-rabbitmq` |
+| AMQP 1.0 for a broker that supports this protocol, via Qpid ProtonJ2 | `spring-boot-starter-amqp` |
+
+If the task sounds like "upgrade Boot, leave our work with RabbitMQ as is", you need the first row. The `spring.rabbitmq.*` configuration remains the same. But if you imported Boot auto-configuration classes, for example in your own starter, check the imports. The `spring-boot-amqp` module for the old RabbitMQ integration moved to `spring-boot-rabbitmq`, and its classes moved from `org.springframework.boot.amqp` to `org.springframework.boot.rabbitmq`. Check the test dependencies too, because `spring-boot-starter-amqp-test` now also relates to AMQP 1.0. [AMQP migration details](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#amqp-09-support-moved).
+
+And if you are deliberately going for RabbitMQ with AMQP 1.0, there it already has its own namespace `spring.amqp.rabbitmq.*` and its own health indicator `amqprabbit`. And one more little thing that is easy to get caught by locally. Without an explicitly set login and password, the client tries to connect anonymously. [AMQP 1.0 settings](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#amqp-10-support).
+
+### OpenTelemetry. Where we send and under what names
+
+Boot 4.2 introduced two settings that are easy to mentally merge into one. Let's start with transport. If metrics, logs and traces already go via OTLP to a single Collector, the common address can now be set once.
+
+```yaml
+management:
+  opentelemetry:
+    otlp:
+      endpoint: http://otel-collector:4318
+```
+
+For HTTP, Boot itself will add the path of the corresponding signal, for example `/v1/traces`. An endpoint set directly for a signal takes priority. With headers, it's a bit more interesting. Common and signal-specific headers are merged, and if a key matches, the signal's setting wins. The common setting itself is used as a fallback for configured exporters. [Common OTLP configuration](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#common-otlp-configuration-fallback).
+
+Now imagine that the Collector receives data both from Java services on Spring and from services on other stacks. You want the same HTTP request to be described in telemetry by the same rules. For this, Boot introduced the opt-in `management.observations.conventions=open-telemetry`. Stable OpenTelemetry semantic conventions are supported.
+
+In practice, I would first open the queries that dashboards and alerts live on. If they refer to old metric or attribute names, they may have to be rewritten. For example, when OpenTelemetry conventions are selected, the `management.observations.http.server.requests.name` setting stops affecting the metric name. So I would enable the common endpoint in one PR, and the change of conventions, together with the changes to monitoring queries, in another. [Semantic conventions in Boot 4.2](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#semantic-conventions).
+
+### Forwarded headers. Locally, everything works
+
+Let's say a service is available externally at `https://example.org/billing`. The proxy strips `/billing` before sending the request to the application, and passes this prefix in `X-Forwarded-Prefix`. The application itself handles a hypothetical `/orders`, but when it builds an absolute link to an order, an address with `/billing/orders` is needed on the outside.
+
+And this very `X-Forwarded-Prefix` is ignored by default in Boot 4.2. Your test goes directly to the application, gets its 200s, and everything is wonderful. **And the user behind a real proxy gets a link without `/billing`**.
+
+If the application really depends on the prefix, for Tomcat this can be configured like this.
+
+```yaml
+server:
+  request:
+    header:
+      forwarded:
+        strategy: framework
+        use-prefix: true
+```
+
+At the same time, the new namespace is visible here. The `server.forward-headers-strategy` property was deprecated in favor of `server.request.header.forwarded.strategy`. The `native` value is called `web-server` in the new setting. If you leave both properties in the configuration, the application will crash at startup. In `web-server` mode, Tomcat and Jetty cannot apply `use-prefix`, which is why `framework` is chosen in the example.
+
+One more point. Spring Framework 7.1 requires choosing a family of headers. By default, Boot uses `X-Forwarded-*`. If your proxy sets the standard `Forwarded`, choose `server.request.header.forwarded.naming=rfc-7239`. I would go and check this directly through the ingress, on some redirect and on a link that the application itself generates. [Documentation on running behind a proxy](https://docs.spring.io/spring-boot/4.2/how-to/webserver.html#howto.webserver.use-behind-a-proxy-server).
+
+### Buildpacks. The cache now survives the CI runner
+
+I am almost 100% sure that there will be few users of any buildpacks among the readers, but I will still say a couple of words about them too.
+
+Often in CI, a new runner is brought up for each build (this is not about the slave node for execution). Local Docker volumes work perfectly as long as the next build finds the same volume. If the runner is disposable, the next run starts with a cold cache.
+
+In Boot 4.2, `buildCache` can be stored in a container registry as an image. One runner publishes the cache layers, the next one picks them up from there. There is support in both Maven and Gradle. `buildWorkspace` and `launchCache` still have only local options. [Buildpacks cache in a registry](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#image-based-build-cache-support).
+
+And here are two changes that will also affect those who were not going to configure any new cache.
+
+- By default, the builder is now `paketobuildpacks/ubuntu-resolute-builder`. The base Ubuntu in the images moves from 24.04 to 26.04. If reproducibility is important to you, pin the versions of `builder` and `runImage` separately.
+
+- Paketo has an integration with Spring Cloud Bindings, which the buildpack adds automatically. At the time of the release, it can break the startup of an already built image with Boot 4.2. The reason is quite specific. Bindings looks for `EnvironmentPostProcessor` in the old package. The release notes suggest setting `BP_SPRING_CLOUD_BINDINGS_DISABLED=true` **at the image build stage** until compatibility is fixed. If the application relies on bindings, simply disabling them and considering the migration complete will not work. [Buildpacks changes when upgrading](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#buildpacks).
+
+### What can really break when moving from 4.1 to 4.2
+
+If I were reviewing a PR in which the Boot version was simply bumped, I would first look at these three places.
+
+- **RabbitMQ.** If `spring-boot-starter-amqp` remains in the project, Boot will no longer pull in the previous RabbitMQ auto-configuration through it. In a typical application, where it creates `RabbitTemplate`, you can get an error at startup because of the missing bean. If the project directly uses classes that previously came transitively, compilation itself may already fail. For AMQP 0-9-1, replace the starter with `spring-boot-starter-rabbitmq`. [AMQP migration](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#amqp-09-support-moved).
+
+- **An application behind a proxy.** If the ingress passes the external prefix via `X-Forwarded-Prefix`, after the upgrade the service may start without any trouble but generate links and redirects without this prefix. Check the real `Location` through the ingress. If the application needs the prefix, enable `use-prefix`. For Tomcat and Jetty, use the `framework` strategy. Separately, check the settings from environment variables. If both the old and the new strategy keys remain, the service will crash at startup. [Forwarded headers changes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#forwarded-headers).
+
+- **An image built by Paketo.** Maven or Gradle can successfully build an image that will then crash at startup because of incompatible Spring Cloud Bindings. Therefore, in CI I would run the built image itself and wait for a response from the health endpoint. If the release incompatibility reproduces and the application does not use bindings, set `BP_SPRING_CLOUD_BINDINGS_DISABLED=true` during the build. [Compatibility with Spring Cloud Bindings](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#incompatibility-with-spring-cloud-bindings).
+
+There are several more changes where everything depends on which settings you already have.
+
+- **WebFlux and file uploads.** A request with 51 parts is now rejected by default. The same will happen if a single part requires more than 1 MB on disk. Previously, both limits were unlimited. If you have file uploads on WebFlux, run a typical large request and, if necessary, raise `spring.webflux.multipart.max-parts` and `spring.webflux.multipart.max-disk-usage-per-part`. [Multipart limits](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#webflux-multipart-limits).
+
+- **Redis master/replica.** With `spring.data.redis.masterreplica.nodes` set, database 0 was previously always used, even if a different database was specified in the settings or the URL. Now the application will actually start reading from and writing to the specified database. If the usual keys suddenly "disappeared" after the rollout, check the database number. To keep the previous behavior, specify 0 or remove the number from the connection settings. [Redis changes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#redis-database-applied-to-masterreplica-connections).
+
+- **Tomcat and redirects.** `server.tomcat.servlet.use-relative-redirects` is now `true` by default. If a client or a test expects an absolute URL in `Location`, check the response after the upgrade. The previous behavior can be restored with the value `false`. [Tomcat settings](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#use-relative-redirects).
+
+- **Micrometer.** If a dashboard shows the duration of operations that are still running, check it after the upgrade. Boot stopped creating `LongTaskTimer` for active observations by default. The previous behavior is restored via `management.metrics.observations.include-active-long-task-timer=true`. [Micrometer changes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#micrometer).
+
+- **Old deprecations.** APIs and properties deprecated back in Boot 4.0 have been removed in 4.2. This is already a reason to check compilation and environment settings. If you use `spring-boot-properties-migrator`, it can now be configured so that the application crashes when errors or warnings are detected. [List of changes when moving from 4.1](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#upgrading-from-spring-boot-41).
+
+By the way, two more items from the release notes. For embedded LDAP, enabling SSL without a bundle now leads to a startup error. And the Apache Pulsar starter is deprecated for now, as is `RestTemplate` support. For Pulsar, there is a [guide on moving to the new project's starter](https://pulsar.apache.org/pulsar-spring/reference/migration.html).
+
+Boot itself moved, among other things, to Spring Framework 7.1.0, Spring Security 7.2.0, Spring Data 2026.1.0 and Micrometer 1.18.0. If your build pins its own versions of these libraries, compare them with what is now managed by the Boot BOM. [Updated dependencies](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.2-Release-Notes#dependency-upgrades).
+
+### So what's the result?
+
+As for me, 4.2 has a fairly characteristic set of changes. Of the new things, you can take the common OTLP endpoint, get the startup speedup together with the upgrade, and calmly do the migration to `RestClient` one client at a time. But in the version upgrade PR itself, I would first of all check what already works in production: which auto-configuration the AMQP starter brings, where the redirect behind the proxy leads, and whether the image that CI built starts. For each of these three scenarios, a green local test may say nothing at all.
+
+Good luck to everyone!
