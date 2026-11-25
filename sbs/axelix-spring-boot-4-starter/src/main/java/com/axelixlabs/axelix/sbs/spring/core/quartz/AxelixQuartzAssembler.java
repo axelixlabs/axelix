@@ -112,6 +112,7 @@ public class AxelixQuartzAssembler {
                 .threadPoolSize(metadata.getThreadPoolSize());
     }
 
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     private QuartzMisfirePolicy assembleMisfirePolicy(Trigger trigger) {
         int instruction = trigger.getMisfireInstruction();
         if (instruction == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) {

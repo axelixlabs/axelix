@@ -145,6 +145,7 @@ public class AxelixQuartzAssembler {
         return timestamp != null ? timestamp.toInstant().toString() : null;
     }
 
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     private QuartzMisfirePolicy assembleMisfirePolicy(Trigger trigger) {
         int instruction = trigger.getMisfireInstruction();
         if (instruction == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) {
