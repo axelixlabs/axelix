@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.testdata;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -13,11 +14,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import lombok.ToString;
 
 @Entity
+@ToString(onlyExplicitlyIncluded = true)
 @Table(name = "employees")
 public class Employee {
 
@@ -25,6 +30,7 @@ public class Employee {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@ToString.Include
 	private String name;
 
 	// @Enumerated defaults to ORDINAL.
@@ -42,10 +48,11 @@ public class Employee {
 	@OneToMany(mappedBy = "employee")
 	private Set<Document> documents = new HashSet<>();
 
-	@ManyToMany
+	@ToString.Include
+	@ManyToMany(cascade = CascadeType.REMOVE)
 	@JoinTable(name = "employee_projects", joinColumns = @JoinColumn(name = "employee_id"),
 			inverseJoinColumns = @JoinColumn(name = "project_id"))
-	private Set<Project> projects = new HashSet<>();
+	private List<Project> projects = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -67,7 +74,7 @@ public class Employee {
 		return documents;
 	}
 
-	public Set<Project> getProjects() {
+	public List<Project> getProjects() {
 		return projects;
 	}
 

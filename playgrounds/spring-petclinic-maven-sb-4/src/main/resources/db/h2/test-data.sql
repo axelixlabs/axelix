@@ -10,6 +10,9 @@ INSERT INTO employees (id, name, department_id) VALUES
 (5, 'Eve', 3), (6, 'Frank', 3), (7, 'Grace', 4), (8, 'Heidi', 4),
 (9, 'Ivan', 5), (10, 'Judy', 5), (11, 'Karl', 6), (12, 'Mallory', 6);
 
+-- Demo employee without dependent rows, with projects shared by other employees.
+INSERT INTO employees (id, name, department_id, employment_type) VALUES (13, 'Taylor', 1, 1);
+
 INSERT INTO contracts (id, contract_number, employee_id) VALUES 
 (1, 'CNT-001', 1), (2, 'CNT-002', 2), (3, 'CNT-003', 3), (4, 'CNT-004', 4),
 (5, 'CNT-005', 5), (6, 'CNT-006', 6), (7, 'CNT-007', 7), (8, 'CNT-008', 8),
@@ -27,7 +30,7 @@ INSERT INTO projects (id, title) VALUES (1, 'Project Alpha'), (2, 'Project Beta'
 
 INSERT INTO employee_projects (employee_id, project_id) VALUES 
 (1, 1), (1, 2), (2, 2), (3, 1), (3, 3), (4, 3),
-(5, 1), (6, 2), (7, 3), (8, 1), (9, 2), (10, 3), (11, 1), (12, 2);
+(5, 1), (6, 2), (7, 3), (8, 1), (9, 2), (10, 3), (11, 1), (12, 2), (13, 1), (13, 2), (13, 3);
 
 INSERT INTO payments (id, payee, amount, currency, status) VALUES 
 (1, 'Acme Veterinary Supplies', 157.17, 'EUR', 'PENDING'), (2, 'Northwind Pharma', 194.34, 'EUR', 'PENDING'),
