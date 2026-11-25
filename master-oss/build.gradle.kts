@@ -18,20 +18,6 @@ springBoot {
     mainClass = "com.axelixlabs.axelix.master.app.MasterApplication"
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(27)
-    }
-}
-
-tasks.compileJava {
-    options.release = 27
-}
-
-tasks.compileTestJava {
-    options.release = 27
-}
-
 tasks.bootJar {
     archiveFileName = "master.jar"
 }

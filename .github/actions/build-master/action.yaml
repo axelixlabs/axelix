@@ -12,6 +12,12 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Set up JDK 27 for Master
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '27'
+
     # That is the important step. Note, that:
     #   - The gradle JVM process itself run on java 25
     #   - Then on each individual gradle module (master/sbs3/sbs2) the necessary

@@ -44,13 +44,14 @@ RUN apk add --no-cache --upgrade \
 
 # Configure non-root user
 RUN adduser -S axelix
-USER axelix
 
 WORKDIR /application
+# The default SQLite database is created in the working directory at startup.
+RUN chown axelix /application
+USER axelix
 
 COPY --from=training /application/master.jar ./
 COPY --from=training /application/app.aot ./
-COPY --from=training --chown=axelix:1001 /application/axelix.db ./
 
 # JVM options
 ENV JAVA_ERROR_FILE_OPTS="-XX:ErrorFile=/tmp/java_error.log"

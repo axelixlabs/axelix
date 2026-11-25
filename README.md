@@ -252,7 +252,7 @@ The releases above are the easiest way to run Master, but you can also assemble 
 Spring Boot fat jar and a Docker image.
 
 Builds are driven through Make (a thin layer over Gradle; see the [`Makefile`](Makefile)). You need a
-JDK 25 and the bundled Gradle wrapper (`./gradlew`) — nothing else.
+JDK 27 and the bundled Gradle wrapper (`./gradlew`).
 
 **Build the runnable jar:**
 
