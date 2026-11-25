@@ -26,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.contract.env.DeprecationLevel;
 import com.axelixlabs.axelix.common.contract.env.InjectionType;
 import com.axelixlabs.axelix.master.api.external.RequiredSince;
+import com.axelixlabs.axelix.master.api.external.response.PropertyFindingResponse;
 
 /**
  * The environment properties of a service.
@@ -60,7 +61,7 @@ public record EnvironmentFeedResponse(
      * @param description The property description, if any.
      * @param deprecation The deprecation details, if any.
      * @param injectionPoints The injection points, if available.
-     * @param dangerousValue The dangerous value details, if any.
+     * @param findings The findings that matched this property.
      *
      * @author Sergey Cherkasov
      */
@@ -76,8 +77,15 @@ public record EnvironmentFeedResponse(
 
             @Nullable List<InjectionPoint> injectionPoints,
 
-            @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable
-            DangerousValue dangerousValue) {}
+            List<PropertyFindingResponse> findings) {
+
+        // Compatibility field for console versions that consume a single dangerous value.
+        @JsonProperty("dangerousValue")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        public @Nullable PropertyFindingResponse dangerousValue() {
+            return findings.isEmpty() ? null : findings.getFirst();
+        }
+    }
 
     /**
      * The deprecation details of a property.
@@ -105,14 +113,4 @@ public record EnvironmentFeedResponse(
      */
     public record InjectionPoint(
             String beanName, InjectionType injectionType, String targetName, String propertyExpression) {}
-
-    /**
-     * Details of a dangerous property value.
-     *
-     * @param rationale The reason the value is dangerous.
-     * @param alternativeExample A safer example, if available.
-     *
-     * @author Sergey Cherkasov
-     */
-    public record DangerousValue(String rationale, @Nullable String alternativeExample) {}
 }

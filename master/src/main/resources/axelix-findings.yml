@@ -1,0 +1,330 @@
+# Allocate new IDs sequentially. Keep published IDs stable and never reuse retired IDs.
+
+# OPEN_IN_VIEW
+AXLX-1000:
+  technology: CONFIGURATION
+  concern: PERFORMANCE
+  property-checks:
+    - property: spring.jpa.open-in-view
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        Open Session In View keeps the persistence context open for the whole duration of the request, which
+        hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a
+        consequence, leads to the N+1 problem and to the database connections being held much longer than
+        necessary.
+    - property: spring.jpa.open-in-view
+      alternative: "false"
+      rationale: >-
+        Open Session In View keeps the persistence context open for the whole duration of the request, which
+        hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a
+        consequence, leads to the N+1 problem and to the database connections being held much longer than
+        necessary.
+
+# DDL_AUTO_CREATE
+AXLX-1001:
+  technology: CONFIGURATION
+  concern: RELIABILITY
+  property-checks:
+    - property: spring.jpa.hibernate.ddl-auto
+      value: "create"
+      alternative: "validate"
+      rationale: >-
+        Hibernate recreates the whole schema on every startup, which means a guaranteed data loss. This is
+        acceptable for a throwaway local setup, but never for an environment whose data matters.
+    - property: spring.jpa.hibernate.ddl-auto
+      value: "create-drop"
+      alternative: "validate"
+      rationale: >-
+        Hibernate creates the schema on startup and drops it on shutdown, which means a guaranteed data
+        loss. This is acceptable for a throwaway local setup, but never for an environment whose data
+        matters.
+    - property: spring.jpa.hibernate.ddl-auto
+      value: "update"
+      alternative: "validate"
+      rationale: >-
+        Hibernate alters the schema implicitly at runtime, based on whatever the entity mapping happens to
+        be. The resulting migration is neither reviewed nor reproducible, and Hibernate never drops or
+        renames anything, so the schema silently drifts away from the mapping. A dedicated migration tool,
+        such as Liquibase or Flyway, is the way to evolve a schema you care about.
+
+# LIQUIBASE_DROP_FIRST
+AXLX-1002:
+  technology: CONFIGURATION
+  concern: RELIABILITY
+  property-checks:
+    - property: spring.liquibase.drop-first
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        Liquibase drops existing database objects before running migrations at startup. If the application
+        points to a production database, a restart can erase tables and their data.
+
+# FLYWAY_CLEAN_ENABLED
+AXLX-1003:
+  technology: CONFIGURATION
+  concern: RELIABILITY
+  property-checks:
+    - property: spring.flyway.clean-disabled
+      value: "false"
+      alternative: "true"
+      rationale: >-
+        This permits Flyway's clean operation to run against the configured schemas. An accidental clean
+        against production can delete tables and their data.
+
+# SHOW_SQL
+AXLX-1004:
+  technology: CONFIGURATION
+  concern: PERFORMANCE
+  property-checks:
+    - property: spring.jpa.show-sql
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        The generated SQL is printed straight to the standard output, bypassing the logging subsystem
+        entirely, so it can be neither formatted, nor filtered, nor correlated with anything else. Raising
+        the 'org.hibernate.SQL' logger to DEBUG achieves the same goal without any of that.
+
+# HIBERNATE_JDBC_BIND_TRACE
+AXLX-1005:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: logging.level.org.hibernate.orm.jdbc.bind
+      value: "TRACE"
+      alternative: "INFO"
+      rationale: >-
+        Hibernate logs the values it binds to SQL parameters, including personal data or tokens. These
+        values can reach application logs even if the statement fails or the transaction rolls back. To
+        inspect SQL statements, use the org.hibernate.SQL logger at DEBUG.
+
+# HIBERNATE_JDBC_EXTRACT_TRACE
+AXLX-1006:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: logging.level.org.hibernate.orm.jdbc.extract
+      value: "TRACE"
+      alternative: "INFO"
+      rationale: >-
+        Hibernate logs values it reads from JDBC results, which can include sensitive stored data. Those
+        values can reach application logs even if they are never returned to the caller. To inspect SQL
+        statements, use the org.hibernate.SQL logger at DEBUG.
+
+# ENABLE_LAZY_LOAD_NO_TRANS
+AXLX-1007:
+  technology: CONFIGURATION
+  concern: PERFORMANCE
+  property-checks:
+    - property: spring.jpa.properties.hibernate.enable_lazy_load_no_trans
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        Every lazy association accessed outside of a transaction is loaded in a separate short-lived session
+        of its own. This masks the missing transaction boundaries instead of exposing them, and turns a
+        LazyInitializationException into a swarm of unnoticed queries.
+
+# INCLUDE_STACKTRACE_ALWAYS
+AXLX-1008:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: server.error.include-stacktrace
+      value: "always"
+      alternative: "never"
+      rationale: >-
+        The stack trace is included into every error response, which exposes the internals of the
+        application, the libraries it is built upon and their versions to whoever is on the other side of
+        the wire.
+    - property: server.error.include-stacktrace
+      value: "on-param"
+      alternative: "never"
+      rationale: >-
+        Clients can ask Spring Boot to include stack traces in error responses. Those traces reveal internal
+        class names and library details that help callers map the application.
+    - property: spring.web.error.include-stacktrace
+      value: "always"
+      alternative: "never"
+      rationale: >-
+        Spring Boot includes stack traces in error responses whenever a trace is available. These traces
+        reveal internal class and method names and which libraries the application uses.
+    - property: spring.web.error.include-stacktrace
+      value: "on-param"
+      alternative: "never"
+      rationale: >-
+        Clients can ask Spring Boot to include stack traces in error responses. Those traces reveal internal
+        class names and library details that help callers map the application.
+
+# INCLUDE_MESSAGE_ALWAYS
+AXLX-1009:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: server.error.include-message
+      value: "always"
+      alternative: "never"
+      rationale: >-
+        Spring Boot includes internal error messages in HTTP error responses when available. Those messages
+        can reveal file paths, SQL statements, or database details to callers.
+    - property: server.error.include-message
+      value: "on-param"
+      alternative: "never"
+      rationale: >-
+        Clients can ask Spring Boot to include internal error messages in HTTP error responses. Those
+        messages can reveal file paths, SQL statements, or database details.
+    - property: spring.web.error.include-message
+      value: "always"
+      alternative: "never"
+      rationale: >-
+        Spring Boot includes internal error messages in HTTP error responses when available. Those messages
+        can reveal file paths, SQL statements, or database details to callers.
+    - property: spring.web.error.include-message
+      value: "on-param"
+      alternative: "never"
+      rationale: >-
+        Clients can ask Spring Boot to include internal error messages in HTTP error responses. Those
+        messages can reveal file paths, SQL statements, or database details.
+
+# INCLUDE_BINDING_ERRORS_ALWAYS
+AXLX-1010:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: server.error.include-binding-errors
+      value: "always"
+      alternative: "never"
+      rationale: >-
+        Spring Boot includes binding and validation errors in HTTP error responses when available. This can
+        reveal internal field names and echo rejected input, including sensitive values.
+    - property: server.error.include-binding-errors
+      value: "on-param"
+      alternative: "never"
+      rationale: >-
+        Clients can ask Spring Boot to include binding and validation errors in HTTP error responses. Those
+        errors can reveal internal field names or echo sensitive input.
+    - property: spring.web.error.include-binding-errors
+      value: "always"
+      alternative: "never"
+      rationale: >-
+        Spring Boot includes binding and validation errors in HTTP error responses when available. This can
+        reveal internal field names and echo rejected input, including sensitive values.
+    - property: spring.web.error.include-binding-errors
+      value: "on-param"
+      alternative: "never"
+      rationale: >-
+        Clients can ask Spring Boot to include binding and validation errors in HTTP error responses. Those
+        errors can reveal internal field names or echo sensitive input.
+
+# INCLUDE_EXCEPTION
+AXLX-1011:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: server.error.include-exception
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        Spring Boot can include the fully qualified exception class name in HTTP error responses. This
+        reveals internal class and package names that can help callers identify the application components
+        and libraries behind a failure.
+    - property: spring.web.error.include-exception
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        Spring Boot can include the fully qualified exception class name in HTTP error responses. This
+        reveals internal class and package names that can help callers identify the application components
+        and libraries behind a failure.
+
+# MVC_LOG_REQUEST_DETAILS
+AXLX-1012:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: spring.mvc.log-request-details
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        Spring MVC can log unmasked request parameters and headers when DEBUG or TRACE logging is active.
+        This can put sensitive form values, session cookies, or authorization tokens in application logs.
+
+# CODEC_LOG_REQUEST_DETAILS
+AXLX-1013:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: spring.codec.log-request-details
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        Reactive HTTP codecs can log form values at DEBUG and headers at TRACE. This can put sensitive form
+        values, session cookies, or authorization tokens in application logs.
+    - property: spring.http.codecs.log-request-details
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        Reactive HTTP codecs can log form values at DEBUG and headers at TRACE. This can put sensitive form
+        values, session cookies, or authorization tokens in application logs.
+
+# IMMEDIATE_SHUTDOWN
+AXLX-1014:
+  technology: CONFIGURATION
+  concern: RELIABILITY
+  property-checks:
+    - property: server.shutdown
+      value: "immediate"
+      alternative: "graceful"
+      rationale: >-
+        Immediate shutdown can interrupt in-flight HTTP requests during restarts and deployments. Graceful
+        shutdown gives active requests time to complete.
+
+# ENV_SHOW_VALUES_ALWAYS
+AXLX-1015:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: management.endpoint.env.show-values
+      value: "always"
+      alternative: "never"
+      rationale: >-
+        The Actuator env endpoint can return environment values without masking them. Anyone with endpoint
+        access could see credentials or API tokens stored in environment properties. Use the Axelix UI or
+        MCP server to inspect environment properties and keep the standard Actuator env endpoint unexposed.
+
+# CONFIGPROPS_SHOW_VALUES_ALWAYS
+AXLX-1016:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: management.endpoint.configprops.show-values
+      value: "always"
+      alternative: "never"
+      rationale: >-
+        The Actuator configprops endpoint can return configuration values without masking them. Anyone with
+        endpoint access could see passwords or tokens bound to configuration beans. Use the Axelix UI or MCP
+        server to inspect configuration properties and keep the standard Actuator configprops endpoint
+        unexposed.
+
+# EXPOSURE_INCLUDE_ALL
+AXLX-1017:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: management.endpoints.web.exposure.include
+      value: "*"
+      alternative: "health,info"
+      rationale: >-
+        Every actuator endpoint present on the classpath is exposed over HTTP, including the ones that dump
+        the heap, the thread stacks, the environment and the configuration properties. The endpoints that
+        are actually needed are better listed explicitly.
+
+# H2_CONSOLE_ENABLED
+AXLX-1018:
+  technology: CONFIGURATION
+  concern: SECURITY
+  property-checks:
+    - property: spring.h2.console.enabled
+      value: "true"
+      alternative: "false"
+      rationale: >-
+        This enables the H2 development console over HTTP. Anyone who can reach the console and sign in can
+        run SQL to read, change, or delete database data.

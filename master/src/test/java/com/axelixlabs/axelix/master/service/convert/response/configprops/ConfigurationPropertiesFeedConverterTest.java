@@ -75,8 +75,8 @@ class ConfigurationPropertiesFeedConverterTest {
                         "client",
                         "app",
                         List.of(
-                                new ConfigurationPropertiesFeedResponse.Entry("secret", "sanitized", null),
-                                new ConfigurationPropertiesFeedResponse.Entry("empty", null, null))));
+                                new ConfigurationPropertiesFeedResponse.Entry("secret", "sanitized", List.of()),
+                                new ConfigurationPropertiesFeedResponse.Entry("empty", null, List.of()))));
         verify(sanitizer).sanitize(same(feed));
         verifyNoMoreInteractions(sanitizer);
     }
@@ -99,16 +99,18 @@ class ConfigurationPropertiesFeedConverterTest {
 
     private static Stream<Arguments> dangerousBoundValues() {
         return Stream.of(
-                Arguments.of("spring.jpa", "openInView", "true", true),
-                Arguments.of("spring.jpa", "openInView", null, true),
-                Arguments.of("spring.jpa", "open-in-view", "false", false),
-                Arguments.of("", "spring.jpa.showSql", "TRUE", true),
-                Arguments.of("management.endpoints.web", "exposure.include[2]", "*", true));
+                Arguments.of("spring.jpa", "openInView", "true", "AXLX-1000"),
+                Arguments.of("spring.jpa", "openInView", null, "AXLX-1000"),
+                Arguments.of("spring.jpa", "open-in-view", "false", null),
+                Arguments.of("", "spring.jpa.showSql", "TRUE", "AXLX-1004"),
+                Arguments.of("management.endpoints.web", "exposure.include[2]", "*", "AXLX-1017"),
+                Arguments.of("server.error", "include-message", "always", "AXLX-1009"),
+                Arguments.of("spring.web.error", "include-message", "on-param", "AXLX-1009"));
     }
 
     @ParameterizedTest
     @MethodSource("dangerousBoundValues")
-    void detectsDangerousBoundValues(String prefix, String key, String value, boolean dangerous) {
+    void detectsDangerousBoundValues(String prefix, String key, String value, String expectedFindingId) {
         // given.
         ConfigurationPropertiesFeed feed = new ConfigurationPropertiesFeed()
                 .beans(List.of(new ConfigurationPropertiesFeedBean()
@@ -124,12 +126,15 @@ class ConfigurationPropertiesFeedConverterTest {
 
         // then.
         ConfigurationPropertiesFeedResponse.Bean bean = response.beans().get(0);
-        if (dangerous) {
-            assertThat(bean.properties().get(0).dangerousValue().rationale()).isNotBlank();
-            assertThat(bean.properties().get(0).dangerousValue().alternativeExample())
-                    .isNotBlank();
+        var findings = bean.properties().get(0).findings();
+        if (expectedFindingId == null) {
+            assertThat(findings).isEmpty();
         } else {
-            assertThat(bean.properties().get(0).dangerousValue()).isNull();
+            assertThat(findings).singleElement().satisfies(finding -> {
+                assertThat(finding.findingId()).isEqualTo(expectedFindingId);
+                assertThat(finding.rationale()).isNotBlank();
+                assertThat(finding.alternativeExample()).isNotBlank();
+            });
         }
     }
 }

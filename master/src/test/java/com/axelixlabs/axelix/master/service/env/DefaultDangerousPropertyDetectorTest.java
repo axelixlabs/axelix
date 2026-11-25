@@ -26,8 +26,7 @@ import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.contract.env.Property;
 import com.axelixlabs.axelix.common.contract.env.PropertySource;
 import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
-import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
+import com.axelixlabs.axelix.master.domain.findings.PropertyFinding;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-class DefaultDangerousPropertyValueDetectorTest {
+class DefaultDangerousPropertyDetectorTest {
 
     private final DefaultDangerousPropertyDetector subject =
             new DefaultDangerousPropertyDetector(new DefaultPropertyNameNormalizer());
@@ -48,14 +47,14 @@ class DefaultDangerousPropertyValueDetectorTest {
         EnvironmentFeed feed = feed(propertySource(property));
 
         // when.
-        Map<Property, DangerousValue> result = subject.detect(feed);
+        Map<Property, List<PropertyFinding>> result = subject.detect(feed);
 
         // then.
-        DangerousValue openInView = DangerousPropertyValue.OPEN_IN_VIEW.getDangerousValues().stream()
-                .filter(value -> "true".equals(value.value()))
-                .findFirst()
-                .orElseThrow();
-        assertThat(result).containsExactly(Map.entry(property, openInView));
+        assertThat(result).containsOnlyKeys(property);
+        assertThat(result.get(property))
+                .singleElement()
+                .satisfies(finding ->
+                        assertThat(finding.finding().findingId().id()).isEqualTo("AXLX-1000"));
     }
 
     @Test
@@ -66,7 +65,7 @@ class DefaultDangerousPropertyValueDetectorTest {
         EnvironmentFeed feed = feed(propertySource(effective), propertySource(overridden));
 
         // when.
-        Map<Property, DangerousValue> result = subject.detect(feed);
+        Map<Property, List<PropertyFinding>> result = subject.detect(feed);
 
         // then.
         assertThat(result).hasSize(1);
@@ -81,7 +80,7 @@ class DefaultDangerousPropertyValueDetectorTest {
                 propertySource(property("spring.jpa.open-in-view", "true", false)));
 
         // when.
-        Map<Property, DangerousValue> result = subject.detect(feed);
+        Map<Property, List<PropertyFinding>> result = subject.detect(feed);
 
         // then.
         assertThat(result).isEmpty();
@@ -95,7 +94,7 @@ class DefaultDangerousPropertyValueDetectorTest {
                 propertySource(property("spring.jpa.open-in-view", "true", false)));
 
         // when.
-        Map<Property, DangerousValue> result = subject.detect(feed);
+        Map<Property, List<PropertyFinding>> result = subject.detect(feed);
 
         // then.
         assertThat(result).isEmpty();
@@ -107,7 +106,7 @@ class DefaultDangerousPropertyValueDetectorTest {
         EnvironmentFeed feed = feed(propertySource(property("spring.jpa.open-in-view", "false", true)));
 
         // when.
-        Map<Property, DangerousValue> result = subject.detect(feed);
+        Map<Property, List<PropertyFinding>> result = subject.detect(feed);
 
         // then.
         assertThat(result).isEmpty();

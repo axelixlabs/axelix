@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.env;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -27,8 +28,10 @@ import com.axelixlabs.axelix.common.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.contract.env.Property;
 import com.axelixlabs.axelix.common.contract.env.PropertySource;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
-import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
+import com.axelixlabs.axelix.master.domain.findings.FindingRegistry;
+import com.axelixlabs.axelix.master.domain.findings.FindingTechnology;
+import com.axelixlabs.axelix.master.domain.findings.PropertyFinding;
+import com.axelixlabs.axelix.master.domain.findings.PropertyFindingDiscoveryFunction;
 
 /**
  * Default {@link DangerousPropertyDetector}.
@@ -45,7 +48,7 @@ public class DefaultDangerousPropertyDetector implements DangerousPropertyDetect
     }
 
     @Override
-    public Map<Property, DangerousValue> detect(EnvironmentFeed feed) {
+    public Map<Property, List<PropertyFinding>> detect(EnvironmentFeed feed) {
         Map<String, Property> effectiveProperties = new HashMap<>();
 
         for (PropertySource propertySource : feed.getPropertySources()) {
@@ -54,13 +57,15 @@ public class DefaultDangerousPropertyDetector implements DangerousPropertyDetect
             }
         }
 
-        Map<Property, DangerousValue> dangerousProperties = new IdentityHashMap<>();
+        List<PropertyFindingDiscoveryFunction> checks =
+                FindingRegistry.getPropertyChecks(FindingTechnology.CONFIGURATION);
+        Map<Property, List<PropertyFinding>> dangerousProperties = new IdentityHashMap<>();
 
         effectiveProperties.forEach((normalizedName, property) -> {
-            DangerousValue dangerousProperty = DangerousPropertyValue.resolve(normalizedName, property.getValue());
+            List<PropertyFinding> findings = FindingRegistry.checkProperty(checks, normalizedName, property.getValue());
 
-            if (dangerousProperty != null) {
-                dangerousProperties.put(property, dangerousProperty);
+            if (!findings.isEmpty()) {
+                dangerousProperties.put(property, findings);
             }
         });
 
