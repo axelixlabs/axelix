@@ -1,7 +1,8 @@
 .TopSection {
     display: flex;
     align-items: flex-start;
-    gap: 20px;
+    gap: var(--axelix-space-4);
+    margin-bottom: var(--axelix-space-4);
     flex-wrap: wrap;
 }
 
@@ -11,4 +12,64 @@
     gap: 10px;
     margin-left: auto;
     flex-wrap: wrap;
+}
+
+.Layout {
+    display: grid;
+    grid-template-columns: minmax(200px, 276px) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--axelix-space-4);
+}
+
+.Detail {
+    min-width: 0;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+}
+
+.List {
+    position: sticky;
+    top: calc(var(--axelix-header-height) + 24px);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-height: calc(100vh - var(--axelix-header-height) - 48px);
+    overflow: hidden;
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+}
+
+.ListHeader {
+    padding: var(--axelix-space-4);
+}
+
+.ListTitle {
+    font-size: inherit;
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Search {
+    margin-top: var(--axelix-space-2);
+}
+
+.Groups {
+    min-height: 0;
+    overflow-y: auto;
+}
+
+@media (width <= 900px) {
+    .Layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .List {
+        position: static;
+        max-height: none;
+    }
+
+    .Groups {
+        overflow-y: visible;
+    }
 }

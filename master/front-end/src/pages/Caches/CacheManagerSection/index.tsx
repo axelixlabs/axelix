@@ -15,73 +15,36 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
-
-import { Accordion } from "@/components";
-import { splitCaches } from "@/helpers";
-import type { ICachesManager } from "@/models";
-
-import { CacheAccordionBody } from "../CacheAccordionBody";
-import { SingleCacheHeader } from "../SingleCacheHeader";
+import type { ICacheData, ICachesManager } from "@/models";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    /**
-     * Single cache manager data
-     */
     cacheManager: ICachesManager;
-
-    /**
-     * The instances the cache actions apply to
-     */
-    instanceIds: string[];
+    selectedCacheName?: string;
+    onSelect: (cache: ICacheData) => void;
 }
 
-export const CacheManagerSection = ({ cacheManager, instanceIds }: IProps) => {
-    const { t } = useTranslation();
-
-    const [withDropDown, withoutDropDown] = splitCaches(cacheManager.caches);
-
-    return (
-        <>
-            <div className={styles.Table}>
-                <div className={`TextMedium ${styles.TableHeader}`}>
-                    <div className={styles.CacheManagerName}>
-                        {t("Caches.name")}: {cacheManager.name}
-                    </div>
-                    <div>{t("Caches.clear")}</div>
-                    <div>{t("status")}</div>
-                </div>
-
-                {[
-                    ...withDropDown.map((cache) => (
-                        <Accordion
-                            header={
-                                <SingleCacheHeader
-                                    cacheManagerName={cacheManager.name}
-                                    cache={cache}
-                                    instanceIds={instanceIds}
-                                />
-                            }
-                            children={<CacheAccordionBody cache={cache} cacheManagerName={cacheManager.name} />}
-                            key={cache.name}
-                            wrapperStyles={styles.WrapperStyles}
-                            headerStyles={styles.HeaderStyles}
-                            contentWrapperStyles={styles.ContentWrapperStyles}
-                        />
-                    )),
-                    ...withoutDropDown.map((cache) => (
-                        <div className={styles.SingleCacheSimpleDataWrapper} key={cache.name}>
-                            <SingleCacheHeader
-                                cacheManagerName={cacheManager.name}
-                                cache={cache}
-                                instanceIds={instanceIds}
-                            />
-                        </div>
-                    )),
-                ]}
-            </div>
-        </>
-    );
-};
+export const CacheManagerSection = ({ cacheManager, selectedCacheName, onSelect }: IProps) => (
+    <details open>
+        <summary className={styles.GroupTitle}>
+            {cacheManager.name} · {cacheManager.caches.length}
+        </summary>
+        <ul>
+            {cacheManager.caches.map((cache) => (
+                <li key={cache.name}>
+                    <button
+                        type="button"
+                        className={styles.Row}
+                        title={`${cache.name} · ${cache.target}`}
+                        aria-pressed={cache.name === selectedCacheName}
+                        onClick={() => onSelect(cache)}
+                    >
+                        <strong className={styles.Name}>{cache.name}</strong>
+                        <code className={styles.Target}>{cache.target}</code>
+                    </button>
+                </li>
+            ))}
+        </ul>
+    </details>
+);

@@ -83,31 +83,28 @@ export const SingleCacheHeader = ({ cacheManagerName, cache, instanceIds }: IPro
     };
 
     return (
-        <>
-            <div className={styles.MainWrapper}>
-                <div className={styles.ContentRowChunkWrapper}>
-                    <div className={styles.ContentWrapper}>
-                        <span>{t("Caches.name")}: </span>
-                        <span className={styles.CacheName}>{cache.name}</span>
-                        <div className={styles.TargetWrapper}>
-                            <div>{t("Caches.target")}:</div>
-                            <TooltipWithCopy text={cache.target} />
-                        </div>
-                    </div>
+        <div className={styles.MainWrapper}>
+            <div className={styles.ContentWrapper}>
+                <h2 className={styles.CacheName}>{cache.name}</h2>
+                <div className={styles.ManagerName}>{cacheManagerName}</div>
+                <div className={styles.TargetWrapper}>
+                    <span>{t("Caches.target")}</span>
+                    <TooltipWithCopy text={cache.target} />
                 </div>
+            </div>
+            <div className={styles.Actions}>
+                <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} instanceIds={instanceIds} />
                 <NoRequiredAuthorityTooltip disabled={!cachesClearAccess}>
                     <Button
                         icon={<ReloadOutlined />}
-                        type="primary"
-                        loading={clearSingleCache.loading}
                         onClick={clearCacheClickHandler}
+                        loading={clearSingleCache.loading}
                         disabled={!cachesClearAccess}
-                    />
+                    >
+                        {t("Caches.clear")}
+                    </Button>
                 </NoRequiredAuthorityTooltip>
-                <div>
-                    <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} instanceIds={instanceIds} />
-                </div>
             </div>
-        </>
+        </div>
     );
 };

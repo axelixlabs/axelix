@@ -15,17 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App, Button } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+
+import { App, Button, Input } from "antd";
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { ActionInstancesSelector, EmptyHandler, Loader, NoRequiredAuthorityTooltip, PageSearch } from "@/components";
+import { ActionInstancesSelector, EmptyHandler, Loader, NoRequiredAuthorityTooltip } from "@/components";
 import { extractErrorCode, fetchData, filterCacheManagers } from "@/helpers";
 import { useActionInstanceSelection, useAuthority, useConfirmableAction } from "@/hooks";
 import {
     EAuthorities,
+    type ICacheData,
     type ICachesResponseBody,
     type IErrorResponse,
     StatefulRequest,
@@ -33,7 +36,9 @@ import {
 } from "@/models";
 import { clearAllCachesData, getCachesData } from "@/services";
 
+import { CacheAccordionBody } from "./CacheAccordionBody";
 import { CacheManagerSection } from "./CacheManagerSection";
+import { SingleCacheHeader } from "./SingleCacheHeader";
 import styles from "./styles.module.css";
 
 const Caches = () => {
@@ -45,7 +50,8 @@ const Caches = () => {
     const { message } = App.useApp();
     const confirmAction = useConfirmableAction();
 
-    const [search, setSearch] = useState<string>("");
+    const [search, setSearch] = useState("");
+    const [selection, setSelection] = useState<ICacheData>();
 
     const [clearAllCaches, setClearAllCaches] = useState(StatelessRequest.inactive());
 
@@ -83,13 +89,15 @@ const Caches = () => {
         });
     };
 
-    const requiredCacheManagers = cacheData.response!.cacheManagers;
-    const effectiveCacheManagers = search ? filterCacheManagers(requiredCacheManagers, search) : requiredCacheManagers;
+    const query = search.trim().toLowerCase();
+    const managers = filterCacheManagers(cacheData.response!.cacheManagers, query);
+    const matchingManager = managers.find((manager) => manager.caches.some((cache) => cache === selection));
+    const selectedManager = matchingManager ?? managers[0];
+    const selectedCache = matchingManager ? selection : selectedManager?.caches[0];
 
     return (
         <>
             <div className={styles.TopSection}>
-                <PageSearch setSearch={setSearch} />
                 <ActionInstancesSelector key={instanceId} {...instanceSelection} />
                 <div className={styles.Actions}>
                     <NoRequiredAuthorityTooltip disabled={!cachesClearAccess}>
@@ -105,15 +113,52 @@ const Caches = () => {
                 </div>
             </div>
 
-            <EmptyHandler isEmpty={effectiveCacheManagers.length === 0}>
-                {effectiveCacheManagers.map((cacheManager) => (
-                    <CacheManagerSection
-                        key={cacheManager.name}
-                        cacheManager={cacheManager}
-                        instanceIds={instanceSelection.selectedInstanceIds}
-                    />
-                ))}
-            </EmptyHandler>
+            <div className={styles.Layout}>
+                <section className={styles.List} aria-labelledby="caches-list-title">
+                    <div className={styles.ListHeader}>
+                        <h2 id="caches-list-title" className={styles.ListTitle}>
+                            {t("Sider.caches")}
+                        </h2>
+                        <Input
+                            className={styles.Search}
+                            prefix={<SearchOutlined />}
+                            allowClear
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            aria-label={t("search")}
+                            placeholder={t("search")}
+                        />
+                    </div>
+                    <div className={`ThinScrollbar ${styles.Groups}`} key={query ? "search" : "browse"}>
+                        <EmptyHandler isEmpty={managers.length === 0}>
+                            {managers.map((manager) => (
+                                <CacheManagerSection
+                                    key={manager.name}
+                                    cacheManager={manager}
+                                    selectedCacheName={manager === selectedManager ? selectedCache?.name : undefined}
+                                    onSelect={setSelection}
+                                />
+                            ))}
+                        </EmptyHandler>
+                    </div>
+                </section>
+
+                {selectedManager && selectedCache && (
+                    <section
+                        className={styles.Detail}
+                        key={JSON.stringify([instanceId, selectedManager.name, selectedCache.name])}
+                    >
+                        <SingleCacheHeader
+                            cacheManagerName={selectedManager.name}
+                            cache={selectedCache}
+                            instanceIds={instanceSelection.selectedInstanceIds}
+                        />
+                        {selectedCache.containsStats && (
+                            <CacheAccordionBody cache={selectedCache} cacheManagerName={selectedManager.name} />
+                        )}
+                    </section>
+                )}
+            </div>
         </>
     );
 };

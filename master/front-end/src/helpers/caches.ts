@@ -18,7 +18,6 @@
 import {
     ELookupOutcome,
     type ICacheChartDataPoint,
-    type ICacheData,
     type ICacheLookup,
     type ICachesManager,
     type ITimelineData,
@@ -38,14 +37,16 @@ import {
 export const filterCacheManagers = (cacheManager: ICachesManager[], search: string): ICachesManager[] => {
     const formattedSearch = search.toLowerCase().trim();
 
-    return cacheManager.filter(({ name, caches }) => {
-        const lowerName = name.toLowerCase();
-        if (lowerName.includes(formattedSearch)) {
-            return true;
-        }
+    return cacheManager
+        .map((manager) => {
+            if (manager.name.toLowerCase().includes(formattedSearch)) {
+                return manager;
+            }
 
-        return caches.some(({ name: cacheName }) => cacheName.toLowerCase().includes(formattedSearch));
-    });
+            const caches = manager.caches.filter(({ name }) => name.toLowerCase().includes(formattedSearch));
+            return { ...manager, caches };
+        })
+        .filter(({ caches }) => caches.length > 0);
 };
 
 export const getTimelineInterval = (data: ICacheLookup[]): ITimelineData => {
@@ -130,24 +131,6 @@ export const cacheHitsMissesChartToFormattedTime = (value: number, interval: num
         month: "2-digit",
         year: "2-digit",
     });
-};
-
-/**
- * Split passed caches into two parts - caches that are supposed to have the drop-down and those that do not.
- */
-export const splitCaches = (caches: ICacheData[]): [ICacheData[], ICacheData[]] => {
-    const withDropDown: ICacheData[] = [];
-    const withoutDropDown: ICacheData[] = [];
-
-    caches.forEach((cache) => {
-        if (cache.containsStats) {
-            withDropDown.push(cache);
-        } else {
-            withoutDropDown.push(cache);
-        }
-    });
-
-    return [withDropDown, withoutDropDown];
 };
 
 /**

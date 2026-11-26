@@ -1,60 +1,77 @@
-.Table {
-    display: grid;
-    grid-template-columns: 1fr repeat(2, min-content);
-    border-radius: var(--axelix-border-radius-large);
-    border: 1px solid var(--axelix-grey-100);
-    overflow: hidden;
-    margin-bottom: 40px;
-}
-
-.Table:last-child {
-    margin-bottom: 0;
-}
-
-.SingleCacheSimpleDataWrapper,
-.TableHeader,
-.WrapperStyles,
-.HeaderStyles {
-    display: grid;
-    grid-template-columns: subgrid;
-    grid-column: 1 / -1;
-}
-
-.SingleCacheSimpleDataWrapper,
-.TableHeader,
-.HeaderStyles {
-    column-gap: 30px;
-}
-
-.TableHeader {
-    display: grid;
-    grid-template-columns: subgrid;
-    grid-column: 1 / -1;
+.GroupTitle {
+    display: flex;
     align-items: center;
-    background-color: var(--axelix-green-50);
+    justify-content: space-between;
+    gap: var(--axelix-space-2);
+    padding: var(--axelix-space-2) var(--axelix-space-3);
+    border-block: 1px solid var(--axelix-grey-200);
+    background: var(--axelix-grey-50);
+    color: var(--axelix-grey-700);
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    cursor: pointer;
+    list-style: none;
+    overflow-wrap: anywhere;
+}
+
+.GroupTitle::-webkit-details-marker {
+    display: none;
+}
+
+.GroupTitle::after {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    margin-inline-end: var(--axelix-space-1);
+    border: solid var(--axelix-grey-600);
+    border-width: 0 1px 1px 0;
+    transform: rotate(45deg);
+    content: "";
+}
+
+details[open] > .GroupTitle::after {
+    transform: rotate(225deg);
+}
+
+.Row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--axelix-space-1);
+    width: 100%;
+    padding: var(--axelix-space-3);
+    border: 0;
     border-bottom: 1px solid var(--axelix-grey-100);
-    border-top-left-radius: var(--axelix-border-radius-large);
-    border-top-right-radius: var(--axelix-border-radius-large);
-    padding: 16px;
-    text-align: center;
+    background: var(--axelix-white);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
 }
 
-.CacheManagerName {
-    word-break: break-all;
-    text-align: left;
+.Row:hover,
+.Row[aria-pressed="true"] {
+    background: var(--axelix-green-50);
 }
 
-.ContentWrapperStyles {
-    grid-column: 1 / -1;
+.Row[aria-pressed="true"] {
+    box-shadow: inset 3px 0 var(--axelix-green-600);
 }
 
-.SingleCacheSimpleDataWrapper {
-    padding: 12px 16px 12px 45px;
-    background-color: var(--axelix-grey-50);
-    border-bottom: 1px solid var(--axelix-grey-300);
-
+.GroupTitle:focus-visible,
+.Row:focus-visible {
+    outline: 2px solid var(--axelix-green-600);
+    outline-offset: -2px;
 }
 
-.SingleCacheSimpleDataWrapper:last-child {
-    border-bottom: none;
+.Name,
+.Target {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.Target {
+    color: var(--axelix-grey-600);
+    font-family: var(--axelix-font-family-code);
+    font-size: var(--axelix-font-size-caption);
 }
