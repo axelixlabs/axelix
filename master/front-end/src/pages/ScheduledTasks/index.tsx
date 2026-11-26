@@ -61,7 +61,8 @@ const ScheduledTasks = () => {
                 scheduledTasks={effectiveScheduledTasks}
                 selectedTaskId={selectedItem?.task.taskId}
                 onSelect={setSelectedTaskId}
-                setSearch={setSearch}
+                search={search}
+                onSearchChange={setSearch}
             />
 
             {selectedItem && (

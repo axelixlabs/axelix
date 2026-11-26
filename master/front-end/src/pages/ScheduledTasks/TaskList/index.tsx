@@ -15,10 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { Dispatch, SetStateAction } from "react";
+import { SearchOutlined } from "@ant-design/icons";
+
+import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { EmptyHandler, PageSearch } from "@/components";
+import { EmptyHandler } from "@/components";
 import { SCHEDULED_TASK_TYPE_LABEL_KEYS, isEmpty } from "@/helpers";
 import type { IScheduledTask, IScheduledTasksResponseBody, TScheduledTaskType } from "@/models";
 
@@ -31,7 +33,8 @@ interface IProps {
     scheduledTasks: IScheduledTasksResponseBody;
     selectedTaskId?: string;
     onSelect: (taskId: string) => void;
-    setSearch: Dispatch<SetStateAction<string>>;
+    search: string;
+    onSearchChange: (search: string) => void;
 }
 
 const TASK_TYPES = Object.keys(SCHEDULED_TASK_TYPE_LABEL_KEYS) as TScheduledTaskType[];
@@ -53,7 +56,7 @@ const getDotClass = (task: IScheduledTask): string => {
     return successRate >= HEALTHY_SUCCESS_RATE ? styles.DotOk : styles.DotBad;
 };
 
-export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, setSearch }: IProps) => {
+export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, search, onSearchChange }: IProps) => {
     const { t } = useTranslation();
 
     const getRateLabel = (task: IScheduledTask): string => {
@@ -68,15 +71,26 @@ export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, setSearch }
 
     return (
         <div className={styles.MainWrapper}>
-            <PageSearch setSearch={setSearch} placeholder={t("ScheduledTasks.searchTasks")} removeBottomGutter />
+            <div className={styles.Header}>
+                <h2 className={styles.Title}>{t("Sider.scheduledTasks")}</h2>
+                <Input
+                    className={styles.Search}
+                    prefix={<SearchOutlined />}
+                    allowClear
+                    value={search}
+                    onChange={(event) => onSearchChange(event.target.value)}
+                    aria-label={t("ScheduledTasks.searchTasks")}
+                    placeholder={t("ScheduledTasks.searchTasks")}
+                />
+            </div>
 
             <EmptyHandler isEmpty={isEmpty(scheduledTasks)}>
-                <div className={`ThinScrollbar ${styles.Groups}`}>
-                    {TASK_TYPES.filter((type) => scheduledTasks[type].length > 0).map((type) => (
-                        <div className={styles.Group} key={type}>
-                            <span className={styles.GroupTitle}>
+                <div className={`ThinScrollbar ${styles.Groups}`} key={search.trim() ? "search" : "browse"}>
+                    {TASK_TYPES.map((type) => (
+                        <details key={type} hidden={scheduledTasks[type].length === 0} open>
+                            <summary className={styles.GroupTitle}>
                                 {t(SCHEDULED_TASK_TYPE_LABEL_KEYS[type])} · {scheduledTasks[type].length}
-                            </span>
+                            </summary>
 
                             {scheduledTasks[type].map((task) => {
                                 return (
@@ -85,11 +99,12 @@ export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, setSearch }
                                         key={task.taskId}
                                         title={`${task.className}.${task.methodName}`}
                                         onClick={() => onSelect(task.taskId)}
-                                        className={`${styles.Row} ${task.taskId === selectedTaskId ? styles.Selected : ""}`}
+                                        className={styles.Row}
+                                        aria-pressed={task.taskId === selectedTaskId}
                                     >
                                         <span className={`${styles.Dot} ${getDotClass(task)}`} />
                                         <span className={styles.Labels}>
-                                            <span className={`${shared.Mono} ${styles.Method}`}>{task.methodName}</span>
+                                            <span className={styles.Method}>{task.methodName}</span>
                                             <span className={`${shared.Mono} ${styles.ClassName}`}>
                                                 {task.className.slice(task.className.lastIndexOf(".") + 1)}
                                             </span>
@@ -102,7 +117,7 @@ export const TaskList = ({ scheduledTasks, selectedTaskId, onSelect, setSearch }
                                     </button>
                                 );
                             })}
-                        </div>
+                        </details>
                     ))}
                 </div>
             </EmptyHandler>
