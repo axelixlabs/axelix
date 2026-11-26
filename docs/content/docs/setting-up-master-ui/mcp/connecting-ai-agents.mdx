@@ -1,0 +1,276 @@
+---
+title: Connecting an AI Agent
+description: "How to connect Claude Code, Cursor, or Codex to the MCP server in Axelix Master, with a password, your identity provider, or an access token."
+---
+
+Master has a built-in MCP server, so a coding agent can work with your running services: read bean conditions, find
+N+1 queries, or raise a log level for ten minutes. This page shows how to connect Claude Code, Cursor, and Codex to it.
+
+The agent signs in with an Axelix account, the same way a person signs in to the UI. The account's role decides which
+tools the agent can call, see [Role gating](./mcp-tools.mdx#role-gating).
+
+## Before you start
+
+You need a running Master and its address. The MCP server listens on `/api/mcp` on the same port as the UI:
+
+- `http://localhost:2935/api/mcp` when Master runs on your machine;
+- `https://axelix.example.com/api/mcp` for a shared Master. Replace the host with the address of yours.
+
+The server is on by default. If the agent can't connect at all, check that `axelix.master.mcp-server.enabled` isn't set
+to `false`, see [MCP server](../configuring-master/configuring-master.mdx#mcp-server).
+
+:::note
+Agents change how they set up MCP servers from version to version. If a command or a config field below doesn't work
+in your version, check the agent's own guide: [Claude Code](https://code.claude.com/docs/en/mcp),
+[Cursor](https://cursor.com/docs/context/mcp), or [Codex](https://developers.openai.com/codex/mcp).
+:::
+
+## Choose a sign-in method
+
+Master accepts three kinds of credentials from an agent. Pick the one that matches how people sign in to your Master:
+
+- **Password (Basic).** The username and password of an Axelix account. Works on any Master, including a fresh local one
+  with the default `admin / admin`. Start here if you're trying Axelix.
+- **Identity provider (OAuth).** The agent opens your provider's sign-in page in the browser, the same way the UI does.
+  Use it when your Master has OIDC sign-in enabled.
+- **Access token (Bearer).** An OIDC access token you already have. Use it in scripts and CI, where nobody can sign in
+  through a browser.
+
+## Sign in with a password
+
+The agent sends `Authorization: Basic <base64(username:password)>` with every request. Any account that can sign in to
+the UI with a password works: the super-admin or a local user.
+
+The examples use `YWRtaW46YWRtaW4=`, which is `admin:admin` in base64. To encode your own username and password, run
+this on macOS, Linux, or in Git Bash:
+
+```bash
+printf 'user:password' | base64 | tr -d '\n'
+```
+
+In PowerShell, run this instead:
+
+```powershell
+[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes('user:password'))
+```
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+```bash
+claude mcp add --transport http axelix http://localhost:2935/api/mcp --header "Authorization: Basic YWRtaW46YWRtaW4="
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Add the server to `~/.cursor/mcp.json`, or to `.cursor/mcp.json` to use it in one project only.
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "http://localhost:2935/api/mcp",
+      "headers": { "Authorization": "Basic YWRtaW46YWRtaW4=" }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+`codex mcp add` can't set custom headers, so add the server to the Codex config file:
+
+```toml title="~/.codex/config.toml"
+[mcp_servers.axelix]
+url = "http://localhost:2935/api/mcp"
+http_headers = { "Authorization" = "Basic YWRtaW46YWRtaW4=" }
+```
+
+  </Tab>
+</Tabs>
+
+:::warning
+The default `admin / admin` is fine on your own machine. On a shared Master, change the super-admin password and give
+the agent a local user with the lowest role it needs.
+:::
+
+## Sign in with your identity provider
+
+With OAuth, you add only the server address. When the agent first calls Master without credentials, Master answers
+`401` and points it to your identity provider (RFC 9728). The agent then opens the provider's sign-in page in the
+browser and gets an access token on its own.
+
+Master checks that token with the provider's userinfo endpoint and matches it to an existing Axelix account. That's why
+OAuth needs a few things on the Master side:
+
+- OIDC sign-in is enabled with `axelix.master.auth.options.oauth2.enabled=true`, see
+  [OAuth2 / OIDC](../authentication/authentication.mdx#oauth2--oidc).
+- `axelix.master.auth.options.oauth2.base-url` is the public address the agent connects to. Master tells the agent that
+  the protected resource is `<base-url>/api/mcp`.
+- Each user has signed in to the Axelix UI with OIDC at least once. The first browser sign-in creates the Axelix
+  account, and the agent's token is matched to it.
+- When `role-attribute-path` is set, the role claim it reads is present in the userinfo response for the agent's
+  token, not only for the UI. If the provider adds the role only for the UI client, the agent gets `401`. When
+  `role-attribute-path` isn't set, Master reads no role claim and gives every OIDC user, the agent included, the
+  `VIEWER` role. See [Roles and authorities](../authentication/authentication.mdx#roles-and-authorities) for what
+  that role can do.
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+Add the server, then sign in with `/mcp` inside Claude Code or with `claude mcp login axelix`:
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Cursor finds your provider through Master and runs the sign-in in the browser itself:
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": { "url": "https://axelix.example.com/api/mcp" }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp
+codex mcp login axelix
+```
+
+  </Tab>
+</Tabs>
+
+With these commands, the agent registers itself with your provider as a new OAuth client, usually through dynamic
+client registration. Claude Code and Codex also support Client ID Metadata Documents. If your provider allows neither,
+register a client for the agent yourself, as described below.
+
+### Providers without dynamic client registration
+
+If your provider doesn't support dynamic client registration, or has it turned off, create an OAuth client for the
+agent in your provider, the same way you created one for Master, and pass its client ID to the agent. Add the client
+secret only when the provider registered the client as confidential.
+
+The provider also has to allow the redirect URI the agent uses after sign-in, so add it to the client's settings. The
+agents change these URIs from time to time, so compare them with the OAuth sections of the
+[Claude Code](https://code.claude.com/docs/en/mcp), [Cursor](https://cursor.com/docs/context/mcp#static-oauth-for-remote-servers),
+and [Codex](https://developers.openai.com/codex/mcp) guides:
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+Pick a free port and register `http://localhost:8080/callback` as the redirect URI, with the same port you pass in
+`--callback-port`. `--client-secret` asks for the secret with a masked prompt, or reads it from `MCP_CLIENT_SECRET`.
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp \
+  --client-id axelix-agent --client-secret --callback-port 8080
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Register `http://localhost:8787/callback` as the redirect URI, which is the fixed one the Cursor desktop app uses.
+Read the client ID and secret from environment variables so they stay out of the file:
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "https://axelix.example.com/api/mcp",
+      "auth": {
+        "CLIENT_ID": "${env:AXELIX_CLIENT_ID}",
+        "CLIENT_SECRET": "${env:AXELIX_CLIENT_SECRET}"
+      }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+Pass the client ID when you add the server. For a confidential client, also pass `--oauth-client-secret`. Codex
+saves the secret in `~/.codex/config.toml`, so keep that file private.
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp --oauth-client-id axelix-agent
+codex mcp login axelix
+```
+
+Register exactly the callback URL that `codex mcp add` displays. It's `http://127.0.0.1/callback` when your provider
+advertises issuer identification. Otherwise, Codex appends a server-specific ID, such as
+`http://127.0.0.1/callback/XuuuHAzzHOni`. At sign-in, Codex inserts its listener port into this URL, so the provider
+must accept any loopback port.
+
+  </Tab>
+</Tabs>
+
+## Sign in with an access token
+
+When you already have an OIDC access token from the same provider as Master, pass it as a bearer token. Master checks it
+the same way as an OAuth token, so the requirements from the previous section apply too. Access tokens expire, so this
+fits scripts and CI that fetch a fresh token before each run.
+
+The examples read the token from the `AXELIX_TOKEN` environment variable:
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp \
+  --header "Authorization: Bearer $AXELIX_TOKEN"
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "https://axelix.example.com/api/mcp",
+      "headers": { "Authorization": "Bearer ${env:AXELIX_TOKEN}" }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp --bearer-token-env-var AXELIX_TOKEN
+```
+
+  </Tab>
+</Tabs>
+
+## When the agent can't connect
+
+Two statuses from Master point to a sign-in problem:
+
+- **`401 Unauthorized`** means Master didn't accept the credentials. Check the username and password, or whether the
+  token has expired. With OAuth or a token, the user may also not have signed in to the UI yet. If
+  `role-attribute-path` is set, the userinfo response may also lack the role it reads.
+- **`403 Forbidden`** means the agent signed in, but its role can't call the tool. Give the account a higher role, see
+  [Roles and authorities](../authentication/authentication.mdx#roles-and-authorities).
+
+## Related
+
+- [MCP Tools](./mcp-tools.mdx): every tool, what it does, and which roles can call it.
+- [MCP server authentication](../authentication/authentication.mdx#mcp-server-authentication): how Master checks the
+  credentials an agent sends.
+- [MCP server](../configuring-master/configuring-master.mdx#mcp-server): how to turn the server off or change its
+  settings.
+- MCP guides of the agents: [Claude Code](https://code.claude.com/docs/en/mcp),
+  [Cursor](https://cursor.com/docs/context/mcp), [Codex](https://developers.openai.com/codex/mcp).

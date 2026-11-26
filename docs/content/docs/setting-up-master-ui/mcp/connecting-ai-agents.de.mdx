@@ -1,0 +1,290 @@
+---
+title: KI-Agenten verbinden
+description: "So verbinden Sie Claude Code, Cursor oder Codex mit dem MCP-Server in Axelix Master: per Passwort, über Ihren Identitätsanbieter oder mit einem Zugriffstoken."
+---
+
+Master enthält einen integrierten MCP-Server. Ein Coding-Agent kann damit direkt mit Ihren laufenden Diensten arbeiten:
+Bean-Bedingungen lesen, N+1-Abfragen finden oder ein Log-Level für zehn Minuten anheben. Diese Seite zeigt, wie Sie
+Claude Code, Cursor und Codex damit verbinden.
+
+Der Agent meldet sich mit einem Axelix-Konto an, genauso wie eine Person sich in der UI anmeldet. Die Rolle des Kontos
+bestimmt, welche Werkzeuge der Agent aufrufen darf, siehe [Zugriff nach Rollen](./mcp-tools.mdx#zugriff-nach-rollen).
+
+## Bevor Sie beginnen
+
+Sie benötigen einen laufenden Master und seine Adresse. Der MCP-Server lauscht unter `/api/mcp` auf demselben Port wie
+die UI:
+
+- `http://localhost:2935/api/mcp`, wenn Master auf Ihrem Rechner läuft;
+- `https://axelix.example.com/api/mcp` für einen gemeinsam genutzten Master. Ersetzen Sie den Host durch Ihre Adresse.
+
+Der Server ist standardmäßig aktiviert. Wenn der Agent überhaupt keine Verbindung herstellen kann, prüfen Sie, ob
+`axelix.master.mcp-server.enabled` nicht auf `false` gesetzt ist, siehe
+[MCP-Server](../configuring-master/configuring-master.mdx#mcp-server).
+
+:::note
+Agenten ändern die Einrichtung von MCP-Servern von Version zu Version. Wenn ein Befehl oder ein Konfigurationsfeld unten
+in Ihrer Version nicht funktioniert, sehen Sie in der Anleitung des Agenten nach:
+[Claude Code](https://code.claude.com/docs/en/mcp), [Cursor](https://cursor.com/docs/context/mcp) oder
+[Codex](https://developers.openai.com/codex/mcp).
+:::
+
+## Anmeldeverfahren wählen
+
+Master akzeptiert drei Arten von Zugangsdaten von einem Agenten. Wählen Sie das Verfahren, das dazu passt, wie sich
+Personen an Ihrem Master anmelden:
+
+- **Passwort (Basic).** Benutzername und Passwort eines Axelix-Kontos. Funktioniert mit jedem Master, auch mit einem
+  frisch gestarteten lokalen Master mit den Standardzugangsdaten `admin / admin`. Beginnen Sie hier, wenn Sie Axelix
+  ausprobieren.
+- **Identitätsanbieter (OAuth).** Der Agent öffnet die Anmeldeseite Ihres Anbieters im Browser, genauso wie die UI.
+  Verwenden Sie dieses Verfahren, wenn in Ihrem Master die OIDC-Anmeldung aktiviert ist.
+- **Zugriffstoken (Bearer).** Ein OIDC-Zugriffstoken, das Sie bereits haben. Verwenden Sie es in Skripten und in CI,
+  wo sich niemand über einen Browser anmelden kann.
+
+## Anmeldung per Passwort
+
+Der Agent sendet bei jeder Anfrage `Authorization: Basic <base64(username:password)>`. Jedes Konto, das sich mit einem
+Passwort in der UI anmelden kann, funktioniert: der Super-Admin oder ein lokaler Benutzer.
+
+Die Beispiele verwenden `YWRtaW46YWRtaW4=`, also `admin:admin` in Base64. Um Ihren eigenen Benutzernamen und Ihr
+Passwort zu kodieren, führen Sie unter macOS, Linux oder in Git Bash Folgendes aus:
+
+```bash
+printf 'user:password' | base64 | tr -d '\n'
+```
+
+In PowerShell führen Sie stattdessen Folgendes aus:
+
+```powershell
+[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes('user:password'))
+```
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+```bash
+claude mcp add --transport http axelix http://localhost:2935/api/mcp --header "Authorization: Basic YWRtaW46YWRtaW4="
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Fügen Sie den Server zu `~/.cursor/mcp.json` hinzu, oder zu `.cursor/mcp.json`, um ihn nur in einem Projekt zu
+verwenden.
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "http://localhost:2935/api/mcp",
+      "headers": { "Authorization": "Basic YWRtaW46YWRtaW4=" }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+`codex mcp add` kann keine eigenen Header setzen. Fügen Sie den Server deshalb zur Codex-Konfigurationsdatei hinzu:
+
+```toml title="~/.codex/config.toml"
+[mcp_servers.axelix]
+url = "http://localhost:2935/api/mcp"
+http_headers = { "Authorization" = "Basic YWRtaW46YWRtaW4=" }
+```
+
+  </Tab>
+</Tabs>
+
+:::warning
+Die Standardzugangsdaten `admin / admin` sind auf Ihrem eigenen Rechner in Ordnung. Ändern Sie auf einem gemeinsam
+genutzten Master das Passwort des Super-Admins und geben Sie dem Agenten einen lokalen Benutzer mit der niedrigsten
+Rolle, die er benötigt.
+:::
+
+## Anmeldung über Ihren Identitätsanbieter
+
+Bei OAuth fügen Sie nur die Serveradresse hinzu. Wenn der Agent Master zum ersten Mal ohne Zugangsdaten aufruft,
+antwortet Master mit `401` und verweist ihn auf Ihren Identitätsanbieter (RFC 9728). Der Agent öffnet dann die
+Anmeldeseite des Anbieters im Browser und erhält selbstständig ein Zugriffstoken.
+
+Master prüft dieses Token über den Userinfo-Endpunkt des Anbieters und ordnet es einem bestehenden Axelix-Konto zu.
+Deshalb braucht OAuth auf der Master-Seite einige Voraussetzungen:
+
+- Die OIDC-Anmeldung ist mit `axelix.master.auth.options.oauth2.enabled=true` aktiviert, siehe
+  [OAuth2 / OIDC](../authentication/authentication.mdx#oauth2--oidc).
+- `axelix.master.auth.options.oauth2.base-url` ist die öffentliche Adresse, mit der sich der Agent verbindet. Master
+  teilt dem Agenten mit, dass die geschützte Ressource `<base-url>/api/mcp` ist.
+- Jeder Benutzer hat sich mindestens einmal per OIDC in der Axelix-UI angemeldet. Die erste Anmeldung im Browser legt
+  das Axelix-Konto an, und das Token des Agenten wird diesem Konto zugeordnet.
+- Wenn `role-attribute-path` gesetzt ist, ist der daraus gelesene Rollen-Claim in der Userinfo-Antwort für das Token
+  des Agenten vorhanden, nicht nur für die UI. Fügt der Anbieter die Rolle nur für den UI-Client hinzu, erhält der Agent
+  `401`. Wenn `role-attribute-path` nicht gesetzt ist, liest Master keinen Rollen-Claim und gibt jedem OIDC-Benutzer,
+  auch dem Agenten, die Rolle `VIEWER`. Was diese Rolle darf, steht unter
+  [Rollen und Berechtigungen](../authentication/authentication.mdx#rollen-und-berechtigungen).
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+Fügen Sie den Server hinzu und melden Sie sich dann mit `/mcp` in Claude Code oder mit `claude mcp login axelix` an:
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Cursor findet Ihren Anbieter über Master und führt die Anmeldung im Browser selbst durch:
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": { "url": "https://axelix.example.com/api/mcp" }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp
+codex mcp login axelix
+```
+
+  </Tab>
+</Tabs>
+
+Mit diesen Befehlen registriert sich der Agent bei Ihrem Anbieter als neuer OAuth-Client, in der Regel über die
+dynamische Client-Registrierung. Claude Code und Codex unterstützen außerdem Client ID Metadata Documents. Wenn Ihr
+Anbieter keins von beidem erlaubt, registrieren Sie selbst einen Client für den Agenten, wie unten beschrieben.
+
+### Anbieter ohne dynamische Client-Registrierung
+
+Wenn Ihr Anbieter die dynamische Client-Registrierung nicht unterstützt oder sie deaktiviert hat, legen Sie bei Ihrem
+Anbieter einen OAuth-Client für den Agenten an, genauso wie Sie einen für Master angelegt haben, und übergeben Sie dem
+Agenten dessen Client-ID. Das Client-Secret fügen Sie nur hinzu, wenn der Anbieter den Client als vertraulich
+(confidential) registriert hat.
+
+Der Anbieter muss außerdem die Redirect-URI erlauben, die der Agent nach der Anmeldung verwendet. Tragen Sie sie daher
+in den Einstellungen des Clients ein. Die Agenten ändern diese URIs von Zeit zu Zeit, gleichen Sie sie also mit den
+OAuth-Abschnitten der Anleitungen von [Claude Code](https://code.claude.com/docs/en/mcp),
+[Cursor](https://cursor.com/docs/context/mcp#static-oauth-for-remote-servers) und
+[Codex](https://developers.openai.com/codex/mcp) ab:
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+Wählen Sie einen freien Port und registrieren Sie `http://localhost:8080/callback` als Redirect-URI, mit demselben
+Port, den Sie in `--callback-port` übergeben. `--client-secret` fragt das Secret über eine verdeckte Eingabe ab oder
+liest es aus `MCP_CLIENT_SECRET`.
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp \
+  --client-id axelix-agent --client-secret --callback-port 8080
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Registrieren Sie `http://localhost:8787/callback` als Redirect-URI. Diese feste URI verwendet die Cursor-Desktop-App.
+Lesen Sie Client-ID und Secret aus Umgebungsvariablen, damit sie nicht in der Datei stehen:
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "https://axelix.example.com/api/mcp",
+      "auth": {
+        "CLIENT_ID": "${env:AXELIX_CLIENT_ID}",
+        "CLIENT_SECRET": "${env:AXELIX_CLIENT_SECRET}"
+      }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+Übergeben Sie die Client-ID, wenn Sie den Server hinzufügen. Für einen vertraulichen Client übergeben Sie zusätzlich
+`--oauth-client-secret`. Codex speichert das Secret in `~/.codex/config.toml`, halten Sie diese Datei also privat.
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp --oauth-client-id axelix-agent
+codex mcp login axelix
+```
+
+Registrieren Sie genau die Callback-URL, die `codex mcp add` anzeigt. Sie lautet `http://127.0.0.1/callback`, wenn Ihr
+Anbieter Issuer Identification ankündigt. Andernfalls hängt Codex eine serverspezifische ID an, zum Beispiel
+`http://127.0.0.1/callback/XuuuHAzzHOni`. Bei der Anmeldung fügt Codex den Port seines Listeners in diese URL ein, der
+Anbieter muss also jeden Loopback-Port akzeptieren.
+
+  </Tab>
+</Tabs>
+
+## Anmeldung mit einem Zugriffstoken
+
+Wenn Sie bereits ein OIDC-Zugriffstoken vom selben Anbieter wie Master haben, übergeben Sie es als Bearer-Token. Master
+prüft es genauso wie ein OAuth-Token, die Voraussetzungen aus dem vorherigen Abschnitt gelten also auch hier.
+Zugriffstoken laufen ab. Dieses Verfahren eignet sich daher für Skripte und CI, die vor jedem Lauf ein frisches Token
+abrufen.
+
+Die Beispiele lesen das Token aus der Umgebungsvariable `AXELIX_TOKEN`:
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp \
+  --header "Authorization: Bearer $AXELIX_TOKEN"
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "https://axelix.example.com/api/mcp",
+      "headers": { "Authorization": "Bearer ${env:AXELIX_TOKEN}" }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp --bearer-token-env-var AXELIX_TOKEN
+```
+
+  </Tab>
+</Tabs>
+
+## Wenn der Agent keine Verbindung herstellt
+
+Zwei Statuscodes von Master deuten auf ein Anmeldeproblem hin:
+
+- **`401 Unauthorized`** bedeutet, dass Master die Zugangsdaten nicht akzeptiert hat. Prüfen Sie Benutzername und
+  Passwort oder ob das Token abgelaufen ist. Bei OAuth oder einem Token hat sich der Benutzer möglicherweise auch noch
+  nicht in der UI angemeldet. Wenn `role-attribute-path` gesetzt ist, fehlt in der Userinfo-Antwort eventuell auch die
+  Rolle, die daraus gelesen wird.
+- **`403 Forbidden`** bedeutet, dass sich der Agent angemeldet hat, seine Rolle das Werkzeug aber nicht aufrufen darf.
+  Geben Sie dem Konto eine höhere Rolle, siehe
+  [Rollen und Berechtigungen](../authentication/authentication.mdx#rollen-und-berechtigungen).
+
+## Weiterführende Informationen
+
+- [MCP-Werkzeuge](./mcp-tools.mdx): alle Werkzeuge, was sie tun und welche Rollen sie aufrufen dürfen.
+- [Authentifizierung am MCP-Server](../authentication/authentication.mdx#authentifizierung-am-mcp-server): wie Master
+  die Zugangsdaten prüft, die ein Agent sendet.
+- [MCP-Server](../configuring-master/configuring-master.mdx#mcp-server): wie Sie den Server abschalten oder seine
+  Einstellungen ändern.
+- MCP-Anleitungen der Agenten: [Claude Code](https://code.claude.com/docs/en/mcp),
+  [Cursor](https://cursor.com/docs/context/mcp), [Codex](https://developers.openai.com/codex/mcp).

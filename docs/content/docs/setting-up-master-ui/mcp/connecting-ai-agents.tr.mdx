@@ -1,0 +1,281 @@
+---
+title: Yapay Zekâ Ajanı Bağlama
+description: "Claude Code, Cursor veya Codex'i Axelix Master'daki MCP sunucusuna parola, kimlik sağlayıcınız veya erişim belirteciyle nasıl bağlayacağınız."
+---
+
+Master'da yerleşik bir MCP sunucusu bulunur. Böylece bir kodlama ajanı çalışan servislerinizle doğrudan çalışabilir:
+bean koşullarını okuyabilir, N+1 sorgularını bulabilir veya bir log düzeyini on dakikalığına yükseltebilir. Bu sayfa
+Claude Code, Cursor ve Codex'i bu sunucuya nasıl bağlayacağınızı gösterir.
+
+Ajan, bir kişinin arayüzde oturum açtığı gibi bir Axelix hesabıyla oturum açar. Ajanın hangi araçları
+çağırabileceğini hesabın rolü belirler, bkz. [Rol tabanlı erişim](./mcp-tools.mdx#role-gating).
+
+## Başlamadan önce [#before-you-start]
+
+Çalışan bir Master'a ve adresine ihtiyacınız var. MCP sunucusu, arayüzle aynı portta `/api/mcp` yolunu dinler:
+
+- Master kendi makinenizde çalışıyorsa `http://localhost:2935/api/mcp`;
+- Paylaşılan bir Master için `https://axelix.example.com/api/mcp`. Host'u kendi Master'ınızın adresiyle değiştirin.
+
+Sunucu varsayılan olarak açıktır. Ajan hiç bağlanamıyorsa `axelix.master.mcp-server.enabled` değerinin `false`
+olmadığını kontrol edin, bkz. [MCP sunucusu](../configuring-master/configuring-master.mdx#mcp-server).
+
+:::note
+Ajanlar MCP sunucularının kurulum şeklini sürümden sürüme değiştirir. Aşağıdaki bir komut veya yapılandırma alanı
+sizin sürümünüzde çalışmıyorsa ajanın kendi kılavuzuna bakın: [Claude Code](https://code.claude.com/docs/en/mcp),
+[Cursor](https://cursor.com/docs/context/mcp) veya [Codex](https://developers.openai.com/codex/mcp).
+:::
+
+## Oturum açma yöntemini seçin [#choose-a-sign-in-method]
+
+Master bir ajandan üç tür kimlik bilgisi kabul eder. Kullanıcıların Master'ınızda nasıl oturum açtığına uyan yöntemi
+seçin:
+
+- **Parola (Basic).** Bir Axelix hesabının kullanıcı adı ve parolası. Varsayılan `admin / admin` bilgileriyle yeni
+  kurulmuş yerel bir Master dahil her Master'da çalışır. Axelix'i deniyorsanız buradan başlayın.
+- **Kimlik sağlayıcı (OAuth).** Ajan, arayüzün yaptığı gibi sağlayıcınızın oturum açma sayfasını tarayıcıda açar.
+  Master'ınızda OIDC ile oturum açma etkinse bu yöntemi kullanın.
+- **Erişim belirteci (Bearer).** Elinizde zaten bulunan bir OIDC erişim belirteci. Kimsenin tarayıcı üzerinden oturum
+  açamadığı betiklerde ve CI'da kullanın.
+
+## Parolayla oturum açma [#sign-in-with-a-password]
+
+Ajan her istekte `Authorization: Basic <base64(username:password)>` gönderir. Arayüzde parolayla oturum açabilen her
+hesap uygundur: super-admin veya yerel bir kullanıcı.
+
+Örneklerde `YWRtaW46YWRtaW4=` kullanılır; bu, base64 ile kodlanmış `admin:admin` değeridir. Kendi kullanıcı adınızı ve
+parolanızı kodlamak için macOS, Linux veya Git Bash'te şunu çalıştırın:
+
+```bash
+printf 'user:password' | base64 | tr -d '\n'
+```
+
+PowerShell'de bunun yerine şunu çalıştırın:
+
+```powershell
+[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes('user:password'))
+```
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+```bash
+claude mcp add --transport http axelix http://localhost:2935/api/mcp --header "Authorization: Basic YWRtaW46YWRtaW4="
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Sunucuyu `~/.cursor/mcp.json` dosyasına ekleyin; yalnızca tek bir projede kullanmak için `.cursor/mcp.json` dosyasına
+ekleyin.
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "http://localhost:2935/api/mcp",
+      "headers": { "Authorization": "Basic YWRtaW46YWRtaW4=" }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+`codex mcp add` özel başlık ayarlayamaz, bu yüzden sunucuyu Codex yapılandırma dosyasına ekleyin:
+
+```toml title="~/.codex/config.toml"
+[mcp_servers.axelix]
+url = "http://localhost:2935/api/mcp"
+http_headers = { "Authorization" = "Basic YWRtaW46YWRtaW4=" }
+```
+
+  </Tab>
+</Tabs>
+
+:::warning
+Varsayılan `admin / admin` bilgileri kendi makinenizde sorun değildir. Paylaşılan bir Master'da super-admin parolasını
+değiştirin ve ajana, ihtiyaç duyduğu en düşük role sahip yerel bir kullanıcı verin.
+:::
+
+## Kimlik sağlayıcınızla oturum açma [#sign-in-with-your-identity-provider]
+
+OAuth ile yalnızca sunucu adresini eklersiniz. Ajan Master'ı ilk kez kimlik bilgisi olmadan çağırdığında Master `401`
+ile yanıt verir ve ajanı kimlik sağlayıcınıza yönlendirir (RFC 9728). Ajan daha sonra sağlayıcının oturum açma
+sayfasını tarayıcıda açar ve erişim belirtecini kendisi alır.
+
+Master bu belirteci sağlayıcının userinfo uç noktasıyla doğrular ve mevcut bir Axelix hesabıyla eşleştirir. Bu nedenle
+OAuth, Master tarafında birkaç koşul gerektirir:
+
+- OIDC ile oturum açma `axelix.master.auth.options.oauth2.enabled=true` ile etkinleştirilmiştir, bkz.
+  [OAuth2 / OIDC](../authentication/authentication.mdx#oauth2--oidc).
+- `axelix.master.auth.options.oauth2.base-url`, ajanın bağlandığı genel adrestir. Master ajana korunan kaynağın
+  `<base-url>/api/mcp` olduğunu bildirir.
+- Her kullanıcı Axelix arayüzünde en az bir kez OIDC ile oturum açmıştır. Tarayıcıdaki ilk oturum açma Axelix hesabını
+  oluşturur ve ajanın belirteci bu hesapla eşleştirilir.
+- `role-attribute-path` ayarlandığında, okuduğu rol claim'i yalnızca arayüz için değil, ajanın belirteci için de
+  userinfo yanıtında bulunur. Sağlayıcı rolü yalnızca arayüz istemcisi için ekliyorsa ajan `401` alır.
+  `role-attribute-path` ayarlanmadığında Master hiçbir rol claim'i okumaz ve ajan dahil her OIDC kullanıcısına
+  `VIEWER` rolünü verir. Bu rolün neler yapabildiği için
+  [Roller ve yetkiler](../authentication/authentication.mdx#roles-and-authorities) bölümüne bakın.
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+Sunucuyu ekleyin, ardından Claude Code içinde `/mcp` ile veya `claude mcp login axelix` ile oturum açın:
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Cursor sağlayıcınızı Master üzerinden bulur ve tarayıcıda oturum açma işlemini kendisi yürütür:
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": { "url": "https://axelix.example.com/api/mcp" }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp
+codex mcp login axelix
+```
+
+  </Tab>
+</Tabs>
+
+Bu komutlarla ajan, sağlayıcınıza genellikle dinamik istemci kaydı (dynamic client registration) yoluyla yeni bir OAuth
+istemcisi olarak kaydolur. Claude Code ve Codex ayrıca Client ID Metadata Documents'ı da destekler. Sağlayıcınız
+ikisine de izin vermiyorsa, aşağıda anlatıldığı gibi ajan için bir istemciyi kendiniz kaydedin.
+
+### Dinamik istemci kaydı olmayan sağlayıcılar [#providers-without-dynamic-client-registration]
+
+Sağlayıcınız dinamik istemci kaydını desteklemiyorsa veya bu özellik kapalıysa, Master için yaptığınız gibi
+sağlayıcınızda ajan için bir OAuth istemcisi oluşturun ve istemci kimliğini (client ID) ajana verin. İstemci sırrını
+(client secret) yalnızca sağlayıcı istemciyi gizli (confidential) olarak kaydettiyse ekleyin.
+
+Sağlayıcının, ajanın oturum açtıktan sonra kullandığı yönlendirme URI'sine de izin vermesi gerekir; bu yüzden bu
+URI'yi istemcinin ayarlarına ekleyin. Ajanlar bu URI'leri zaman zaman değiştirir, bu nedenle bunları
+[Claude Code](https://code.claude.com/docs/en/mcp),
+[Cursor](https://cursor.com/docs/context/mcp#static-oauth-for-remote-servers) ve
+[Codex](https://developers.openai.com/codex/mcp) kılavuzlarının OAuth bölümleriyle karşılaştırın:
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+Boş bir port seçin ve `--callback-port` ile verdiğiniz portla aynı portu kullanarak
+`http://localhost:8080/callback` adresini yönlendirme URI'si olarak kaydedin. `--client-secret`, sırrı maskelenmiş bir
+istemle sorar veya `MCP_CLIENT_SECRET` değişkeninden okur.
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp \
+  --client-id axelix-agent --client-secret --callback-port 8080
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+Yönlendirme URI'si olarak `http://localhost:8787/callback` adresini kaydedin; Cursor masaüstü uygulaması bu sabit
+URI'yi kullanır. İstemci kimliğini ve sırrı dosyada tutmamak için ortam değişkenlerinden okuyun:
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "https://axelix.example.com/api/mcp",
+      "auth": {
+        "CLIENT_ID": "${env:AXELIX_CLIENT_ID}",
+        "CLIENT_SECRET": "${env:AXELIX_CLIENT_SECRET}"
+      }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+Sunucuyu eklerken istemci kimliğini verin. Gizli bir istemci için ayrıca `--oauth-client-secret` verin. Codex sırrı
+`~/.codex/config.toml` dosyasına kaydeder, bu yüzden bu dosyayı gizli tutun.
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp --oauth-client-id axelix-agent
+codex mcp login axelix
+```
+
+`codex mcp add` komutunun gösterdiği callback URL'sini birebir kaydedin. Sağlayıcınız issuer identification bilgisini
+duyuruyorsa bu URL `http://127.0.0.1/callback` olur. Aksi halde Codex sunucuya özgü bir kimlik ekler, örneğin
+`http://127.0.0.1/callback/XuuuHAzzHOni`. Oturum açma sırasında Codex bu URL'ye kendi dinleyicisinin portunu ekler, bu
+nedenle sağlayıcının herhangi bir loopback portunu kabul etmesi gerekir.
+
+  </Tab>
+</Tabs>
+
+## Erişim belirteciyle oturum açma [#sign-in-with-an-access-token]
+
+Master ile aynı sağlayıcıdan alınmış bir OIDC erişim belirteciniz varsa, onu bearer belirteci olarak verin. Master bunu
+bir OAuth belirteciyle aynı şekilde doğrular, bu nedenle önceki bölümdeki koşullar burada da geçerlidir. Erişim
+belirteçlerinin süresi dolar; bu yöntem, her çalıştırmadan önce yeni bir belirteç alan betikler ve CI için uygundur.
+
+Örnekler belirteci `AXELIX_TOKEN` ortam değişkeninden okur:
+
+<Tabs groupId="mcp-client" items={['Claude Code', 'Cursor', 'Codex']}>
+  <Tab value="Claude Code">
+
+```bash
+claude mcp add --transport http axelix https://axelix.example.com/api/mcp \
+  --header "Authorization: Bearer $AXELIX_TOKEN"
+```
+
+  </Tab>
+  <Tab value="Cursor">
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "https://axelix.example.com/api/mcp",
+      "headers": { "Authorization": "Bearer ${env:AXELIX_TOKEN}" }
+    }
+  }
+}
+```
+
+  </Tab>
+  <Tab value="Codex">
+
+```bash
+codex mcp add axelix --url https://axelix.example.com/api/mcp --bearer-token-env-var AXELIX_TOKEN
+```
+
+  </Tab>
+</Tabs>
+
+## Ajan bağlanamadığında [#when-the-agent-cant-connect]
+
+Master'dan gelen iki durum kodu bir oturum açma sorununa işaret eder:
+
+- **`401 Unauthorized`**, Master'ın kimlik bilgilerini kabul etmediği anlamına gelir. Kullanıcı adını ve parolayı veya
+  belirtecin süresinin dolup dolmadığını kontrol edin. OAuth veya belirteç kullanılıyorsa kullanıcı henüz arayüzde
+  oturum açmamış da olabilir. `role-attribute-path` ayarlıysa userinfo yanıtında okunan rol eksik olabilir.
+- **`403 Forbidden`**, ajanın oturum açtığı ancak rolünün aracı çağıramadığı anlamına gelir. Hesaba daha yüksek bir rol
+  verin, bkz. [Roller ve yetkiler](../authentication/authentication.mdx#roles-and-authorities).
+
+## İlgili konular [#related]
+
+- [MCP Araçları](./mcp-tools.mdx): tüm araçlar, ne yaptıkları ve hangi rollerin onları çağırabileceği.
+- [MCP sunucusu kimlik doğrulaması](../authentication/authentication.mdx#mcp-server-authentication): Master'ın bir
+  ajanın gönderdiği kimlik bilgilerini nasıl doğruladığı.
+- [MCP sunucusu](../configuring-master/configuring-master.mdx#mcp-server): sunucuyu nasıl kapatacağınız veya
+  ayarlarını nasıl değiştireceğiniz.
+- Ajanların MCP kılavuzları: [Claude Code](https://code.claude.com/docs/en/mcp),
+  [Cursor](https://cursor.com/docs/context/mcp), [Codex](https://developers.openai.com/codex/mcp).
