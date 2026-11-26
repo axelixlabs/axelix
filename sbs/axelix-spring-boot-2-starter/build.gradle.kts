@@ -78,9 +78,14 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<JavaCompile>().configureEach {
+tasks.compileJava {
     options.compilerArgs.add("-parameters")
     options.release = 11
+}
+
+tasks.compileTestJava {
+    options.compilerArgs.add("-parameters")
+    options.release = 17
 }
 
 axelix {
