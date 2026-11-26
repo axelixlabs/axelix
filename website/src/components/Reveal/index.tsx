@@ -24,10 +24,11 @@ import styles from "./styles.module.css";
 
 interface IProps {
     children: ReactNode;
+    early?: boolean;
 }
 
-export const Reveal = ({ children }: IProps) => {
-    const [ref, visible] = useScrollReveal<HTMLDivElement>();
+export const Reveal = ({ children, early }: IProps) => {
+    const [ref, visible] = useScrollReveal<HTMLDivElement>(early);
 
     return (
         <div ref={ref} className={`${styles.Reveal} ${visible ? styles.Visible : ""}`}>

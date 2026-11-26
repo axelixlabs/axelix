@@ -29,22 +29,22 @@ export const CommunityPage = () => {
     return (
         <>
             <CommunityHero />
-            <Reveal>
+            <Reveal early>
                 <FollowAlong />
             </Reveal>
-            <Reveal>
+            <Reveal early>
                 <Partners />
             </Reveal>
-            <Reveal>
+            <Reveal early>
                 <LatestPosts />
             </Reveal>
-            <Reveal>
+            <Reveal early>
                 <Contribute />
             </Reveal>
-            <Reveal>
+            <Reveal early>
                 <Talks />
             </Reveal>
-            <Reveal>
+            <Reveal early>
                 <Rules />
             </Reveal>
         </>

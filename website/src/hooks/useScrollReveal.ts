@@ -21,7 +21,7 @@ import { RefObject, useEffect, useRef, useState } from "react";
  * Reveals an element the first time it scrolls into view. Returns a ref to
  * attach to the target and a flag that flips to `true` once it becomes visible.
  */
-export const useScrollReveal = <T extends HTMLElement>(): [RefObject<T | null>, boolean] => {
+export const useScrollReveal = <T extends HTMLElement>(early = false): [RefObject<T | null>, boolean] => {
     const ref = useRef<T>(null);
     const [visible, setVisible] = useState(false);
 
@@ -38,12 +38,12 @@ export const useScrollReveal = <T extends HTMLElement>(): [RefObject<T | null>, 
                     observer.disconnect();
                 }
             },
-            { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+            early ? { rootMargin: "0px 0px 96px 0px" } : { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
         );
 
         observer.observe(node);
         return () => observer.disconnect();
-    }, []);
+    }, [early]);
 
     return [ref, visible];
 };

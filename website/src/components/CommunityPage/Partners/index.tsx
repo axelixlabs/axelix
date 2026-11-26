@@ -36,11 +36,18 @@ const PARTNERS = [
         cta: "Visit foojay.io",
         href: "https://foojay.io",
     },
+    {
+        name: "jChampions Conference",
+        logo: "/community/partners/jchampions-supporter.png",
+        description: "A free online conference with talks by Java Champions, open to everyone.",
+        cta: "Visit jchampionsconf.com",
+        href: "https://jchampionsconf.com",
+    },
 ];
 
 export const Partners = () => {
     return (
-        <section className={shared.Section} id="partners">
+        <section className={styles.Section} id="partners">
             <div className={`MainContainer ${shared.TwoColumns} ${styles.Inner}`}>
                 <div className={shared.Heading}>
                     <SectionLabel index="02" label="Partners" />

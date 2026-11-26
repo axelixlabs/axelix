@@ -1,3 +1,7 @@
+.Section {
+  padding-block: clamp(56px, 6vw, 88px);
+}
+
 .Inner {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
   align-items: center;
