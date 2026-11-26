@@ -491,7 +491,8 @@ class UserApiTest extends AbstractProtectedEndpointTest {
             assertThat(response.getBody().authorities().effectiveAuthorities())
                     .extracting(UserAuthoritiesResponse.AuthorityProfileResponse::codename)
                     .isSorted()
-                    .containsExactly("caches:clear", "caches:toggle", "gc:manage", "scheduled-tasks:write");
+                    .containsExactly(
+                            "caches:clear", "caches:toggle", "gc:manage", "quartz:write", "scheduled-tasks:write");
             assertThat(response.getBody().authorities().ungrantedAuthorities())
                     .extracting(UserAuthoritiesResponse.AuthorityProfileResponse::codename)
                     .isSorted()
