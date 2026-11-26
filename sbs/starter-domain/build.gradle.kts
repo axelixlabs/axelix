@@ -74,7 +74,11 @@ testing {
 
 tasks {
     withType(KotlinJvmCompile::class).configureEach {
-        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+        if (name == "compileKotlin") {
+            compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+        } else {
+            compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 }
 
