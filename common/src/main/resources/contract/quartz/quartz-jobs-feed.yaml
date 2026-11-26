@@ -3,14 +3,14 @@ info:
   title: quartz-jobs-feed
   version: ""
   description: |
-    Schemas for the jobs and triggers of a Quartz scheduler.
+    Schemas for the jobs, triggers, and currently running executions reported by a Quartz scheduler.
 components:
   schemas:
     ServiceQuartzJobs:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.4.0
       type: object
-      description: The jobs registered in a Quartz scheduler.
+      description: The jobs and currently running executions reported by a Quartz scheduler instance.
       required:
         - jobs
         - executions

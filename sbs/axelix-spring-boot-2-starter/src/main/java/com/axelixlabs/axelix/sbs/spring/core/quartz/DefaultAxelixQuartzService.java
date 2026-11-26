@@ -104,8 +104,18 @@ public class DefaultAxelixQuartzService implements AxelixQuartzService {
     }
 
     @Override
+    public boolean pauseQuartzJob(String schedulerName, String jobName, String jobGroup) {
+        return setQuartzJobPaused(schedulerName, jobName, jobGroup, true);
+    }
+
+    @Override
     public boolean resumeQuartzTrigger(String schedulerName, String triggerName, String triggerGroup) {
         return setQuartzTriggerPaused(schedulerName, triggerName, triggerGroup, false);
+    }
+
+    @Override
+    public boolean resumeQuartzJob(String schedulerName, String jobName, String jobGroup) {
+        return setQuartzJobPaused(schedulerName, jobName, jobGroup, false);
     }
 
     private boolean setQuartzTriggerPaused(
@@ -168,5 +178,27 @@ public class DefaultAxelixQuartzService implements AxelixQuartzService {
             }
         }
         return triggers;
+    }
+
+    private boolean setQuartzJobPaused(String schedulerName, String jobName, String jobGroup, boolean paused) {
+        for (Scheduler scheduler : schedulers) {
+            if (schedulerName.equals(getSchedulerName(scheduler))) {
+                try {
+                    JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
+                    if (!scheduler.checkExists(jobKey)) {
+                        return false;
+                    }
+                    if (paused) {
+                        scheduler.pauseJob(jobKey);
+                    } else {
+                        scheduler.resumeJob(jobKey);
+                    }
+                    return true;
+                } catch (SchedulerException e) {
+                    throw new QuartzAccessException("Could not update Quartz job pause state", e);
+                }
+            }
+        }
+        return false;
     }
 }

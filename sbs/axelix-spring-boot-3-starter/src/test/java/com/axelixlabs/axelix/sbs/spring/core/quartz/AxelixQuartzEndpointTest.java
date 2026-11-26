@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.quartz;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Nested;
@@ -43,6 +44,8 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobPauseRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobResumeRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobsRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzMisfirePolicy;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzSchedulerMetadata;
@@ -346,8 +349,9 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
                     .triggerGroup("endpoint-test");
             try {
                 // when.
-                ResponseEntity<Void> response =
-                        restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pause", request, Void.class);
+                ResponseEntity<Void> response = restTemplate
+                        .asMaster()
+                        .postForEntity("/actuator/axelix-quartz/pauseTrigger", request, Void.class);
 
                 // then.
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -372,7 +376,7 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
 
             // when.
             ResponseEntity<Void> response =
-                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pause", request, Void.class);
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pauseTrigger", request, Void.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -385,7 +389,7 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
 
             // when.
             ResponseEntity<Void> response =
-                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pause", request, Void.class);
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pauseTrigger", request, Void.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -393,10 +397,87 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
 
         @ProtectedEndpointTests(
                 method = HttpMethod.POST,
-                path = "/actuator/axelix-quartz/pause",
+                path = "/actuator/axelix-quartz/pauseTrigger",
                 jsonBody =
                         "{\"schedulerName\":\"standbyScheduler\",\"triggerName\":\"cron\",\"triggerGroup\":\"triggers\"}")
         void negativeTriggerPauseAuthTests() {}
+    }
+
+    @Nested
+    class PauseQuartzJob {
+
+        @Test
+        void shouldPauseAllJobTriggersWithoutAffectingOtherJobs() throws SchedulerException {
+            // given.
+            JobDetail job = JobBuilder.newJob(TestJob.class)
+                    .withIdentity("pause-job", "endpoint-test")
+                    .build();
+            Trigger firstTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity("pause-job-first", "endpoint-test")
+                    .forJob(job)
+                    .build();
+            Trigger secondTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity("pause-job-second", "endpoint-test")
+                    .forJob(job)
+                    .build();
+            standbyScheduler.scheduleJob(job, Set.of(firstTrigger, secondTrigger), false);
+            QuartzJobPauseRequest request = new QuartzJobPauseRequest()
+                    .schedulerName("standbyScheduler")
+                    .jobName("pause-job")
+                    .jobGroup("endpoint-test");
+            try {
+                // when.
+                ResponseEntity<Void> response =
+                        restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pauseJob", request, Void.class);
+
+                // then.
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+                assertThat(standbyScheduler.getTriggerState(firstTrigger.getKey()))
+                        .isEqualTo(Trigger.TriggerState.PAUSED);
+                assertThat(standbyScheduler.getTriggerState(secondTrigger.getKey()))
+                        .isEqualTo(Trigger.TriggerState.PAUSED);
+                assertThat(standbyScheduler.getTriggerState(TriggerKey.triggerKey("cron", "triggers")))
+                        .isEqualTo(Trigger.TriggerState.NORMAL);
+            } finally {
+                standbyScheduler.deleteJob(job.getKey());
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpointTest#missingJobs")
+        void shouldReturnNotFoundForJob(String schedulerName, String jobName, String jobGroup) {
+            // given.
+            QuartzJobPauseRequest request = new QuartzJobPauseRequest()
+                    .schedulerName(schedulerName)
+                    .jobName(jobName)
+                    .jobGroup(jobGroup);
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pauseJob", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+
+        @Test
+        void shouldRejectIncompleteRequest() {
+            // given.
+            Map<String, String> request = Map.of("schedulerName", "standbyScheduler", "jobName", "job");
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/pauseJob", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @ProtectedEndpointTests(
+                method = HttpMethod.POST,
+                path = "/actuator/axelix-quartz/pauseJob",
+                jsonBody = "{\"schedulerName\":\"standbyScheduler\",\"jobName\":\"job\",\"jobGroup\":\"jobs\"}")
+        void negativeQuartzJobPauseAuthTests() {}
     }
 
     @Nested
@@ -420,8 +501,9 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
                     .triggerGroup("endpoint-test");
             try {
                 // when.
-                ResponseEntity<Void> response =
-                        restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resume", request, Void.class);
+                ResponseEntity<Void> response = restTemplate
+                        .asMaster()
+                        .postForEntity("/actuator/axelix-quartz/resumeTrigger", request, Void.class);
 
                 // then.
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -446,7 +528,7 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
 
             // when.
             ResponseEntity<Void> response =
-                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resume", request, Void.class);
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resumeTrigger", request, Void.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -459,7 +541,7 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
 
             // when.
             ResponseEntity<Void> response =
-                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resume", request, Void.class);
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resumeTrigger", request, Void.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -467,10 +549,99 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
 
         @ProtectedEndpointTests(
                 method = HttpMethod.POST,
-                path = "/actuator/axelix-quartz/resume",
+                path = "/actuator/axelix-quartz/resumeTrigger",
                 jsonBody =
                         "{\"schedulerName\":\"standbyScheduler\",\"triggerName\":\"cron\",\"triggerGroup\":\"triggers\"}")
         void negativeTriggerResumeAuthTests() {}
+    }
+
+    @Nested
+    class ResumeQuartzJob {
+
+        @Test
+        void shouldResumeAllJobTriggersWithoutAffectingOtherJobs() throws SchedulerException {
+            // given.
+            JobDetail job = JobBuilder.newJob(TestJob.class)
+                    .withIdentity("resume-job", "endpoint-test")
+                    .build();
+            Trigger firstTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity("resume-job-first", "endpoint-test")
+                    .forJob(job)
+                    .build();
+            Trigger secondTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity("resume-job-second", "endpoint-test")
+                    .forJob(job)
+                    .build();
+            JobDetail unrelatedJob = JobBuilder.newJob(TestJob.class)
+                    .withIdentity("unrelated-resume-job", "endpoint-test")
+                    .build();
+            Trigger unrelatedTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity("unrelated-resume-job-trigger", "endpoint-test")
+                    .forJob(unrelatedJob)
+                    .build();
+            QuartzJobResumeRequest request = new QuartzJobResumeRequest()
+                    .schedulerName("standbyScheduler")
+                    .jobName("resume-job")
+                    .jobGroup("endpoint-test");
+            try {
+                standbyScheduler.scheduleJob(job, Set.of(firstTrigger, secondTrigger), false);
+                standbyScheduler.scheduleJob(unrelatedJob, unrelatedTrigger);
+                standbyScheduler.pauseJob(job.getKey());
+                standbyScheduler.pauseJob(unrelatedJob.getKey());
+
+                // when.
+                ResponseEntity<Void> response =
+                        restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resumeJob", request, Void.class);
+
+                // then.
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+                assertThat(standbyScheduler.getTriggerState(firstTrigger.getKey()))
+                        .isEqualTo(Trigger.TriggerState.NORMAL);
+                assertThat(standbyScheduler.getTriggerState(secondTrigger.getKey()))
+                        .isEqualTo(Trigger.TriggerState.NORMAL);
+                assertThat(standbyScheduler.getTriggerState(unrelatedTrigger.getKey()))
+                        .isEqualTo(Trigger.TriggerState.PAUSED);
+            } finally {
+                standbyScheduler.deleteJob(job.getKey());
+                standbyScheduler.deleteJob(unrelatedJob.getKey());
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpointTest#missingJobs")
+        void shouldReturnNotFoundForJob(String schedulerName, String jobName, String jobGroup) {
+            // given.
+            QuartzJobResumeRequest request = new QuartzJobResumeRequest()
+                    .schedulerName(schedulerName)
+                    .jobName(jobName)
+                    .jobGroup(jobGroup);
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resumeJob", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+
+        @Test
+        void shouldRejectIncompleteRequest() {
+            // given.
+            Map<String, String> request = Map.of("schedulerName", "standbyScheduler", "jobName", "job");
+
+            // when.
+            ResponseEntity<Void> response =
+                    restTemplate.asMaster().postForEntity("/actuator/axelix-quartz/resumeJob", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @ProtectedEndpointTests(
+                method = HttpMethod.POST,
+                path = "/actuator/axelix-quartz/resumeJob",
+                jsonBody = "{\"schedulerName\":\"standbyScheduler\",\"jobName\":\"job\",\"jobGroup\":\"jobs\"}")
+        void negativeQuartzJobResumeAuthTests() {}
     }
 
     @Test

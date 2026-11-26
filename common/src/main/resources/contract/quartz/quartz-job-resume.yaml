@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: quartz-job-resume
+  version: ""
+  description: |
+    Schema for resuming a Quartz job in a selected scheduler.
+components:
+  schemas:
+    QuartzJobResumeRequest:
+      x-axelix-produced-by: master
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A request to resume all triggers associated with a Quartz job.
+      required:
+        - schedulerName
+        - jobName
+        - jobGroup
+      properties:
+        schedulerName:
+          type: string
+          description: The name of the scheduler that owns the job.
+          x-axelix-introduced-in: 1.4.0
+        jobName:
+          type: string
+          description: The name of the job to resume.
+          x-axelix-introduced-in: 1.4.0
+        jobGroup:
+          type: string
+          description: The group of the job to resume.
+          x-axelix-introduced-in: 1.4.0
