@@ -48,7 +48,7 @@ public final class JvmType {
         return stringBuilder.toString();
     }
 
-    @SuppressWarnings("PMD.CyclomaticComplexity")
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
     private static void appendDescriptor(final Class<?> clazz, final StringBuilder stringBuilder) {
         Class<?> currentClass;
         for (currentClass = clazz; currentClass.isArray(); currentClass = currentClass.getComponentType()) {

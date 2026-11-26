@@ -108,28 +108,28 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @NonNull Callable<T> valueLoader) {
-        T value = null;
+        if (!isEnabled()) {
+            return null;
+        }
 
-        if (isEnabled()) {
-            AtomicBoolean miss = new AtomicBoolean();
+        AtomicBoolean miss = new AtomicBoolean();
 
-            value = delegate.get(key, () -> {
-                miss.set(true);
-                return valueLoader.call();
-            });
+        T value = delegate.get(key, () -> {
+            miss.set(true);
+            return valueLoader.call();
+        });
 
-            if (miss.get()) {
-                cacheManager.getLookupHistory(getName()).put(CacheLookup.miss());
+        if (miss.get()) {
+            cacheManager.getLookupHistory(getName()).put(CacheLookup.miss());
 
-                if (metricsPublisher != null) {
-                    metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
-                }
-            } else {
-                cacheManager.getLookupHistory(getName()).put(CacheLookup.hit());
+            if (metricsPublisher != null) {
+                metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
+            }
+        } else {
+            cacheManager.getLookupHistory(getName()).put(CacheLookup.hit());
 
-                if (metricsPublisher != null) {
-                    metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
-                }
+            if (metricsPublisher != null) {
+                metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
             }
         }
 
