@@ -394,12 +394,10 @@ public class InstanceSelfRegistrationInternalApiTest {
 
     @Test
     void shouldStoreTheFeaturesDetectedByTheInstance() {
-        // given. only the starters since 1.3 detect their features.
-        String requestWithDetectedFeatures = JSON_REQUEST
-                .replace("\"version\" : \"1.4.0-SNAPSHOT\"", "\"version\" : \"1.3.0\"")
-                .replace(
-                        "\"insights\" : {",
-                        "\"detectedFeatures\" : [ \"caches\", \"entities-map\" ],\n\"insights\" : {");
+        // given.
+        String requestWithDetectedFeatures = JSON_REQUEST.replace(
+                "\"insights\" : {",
+                "\"detectedFeatures\" : [ \"caches\", \"entities-map\", \"quartz\" ],\n\"insights\" : {");
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -412,7 +410,8 @@ public class InstanceSelfRegistrationInternalApiTest {
         assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID)))
                 .get()
                 .extracting(Instance::detectedFeatures)
-                .isEqualTo(new DetectedFeatures(EnumSet.of(InstanceFeature.CACHES, InstanceFeature.ENTITIES_MAP)));
+                .isEqualTo(new DetectedFeatures(
+                        EnumSet.of(InstanceFeature.CACHES, InstanceFeature.ENTITIES_MAP, InstanceFeature.QUARTZ)));
     }
 
     @Test

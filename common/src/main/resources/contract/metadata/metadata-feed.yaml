@@ -177,6 +177,7 @@ components:
         - entities-map
         - transactions
         - dependency-analysis
+        - quartz
     GarbageCollector:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0

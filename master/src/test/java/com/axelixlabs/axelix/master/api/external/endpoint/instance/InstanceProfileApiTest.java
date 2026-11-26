@@ -25,6 +25,8 @@ import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -71,12 +73,13 @@ class InstanceProfileApiTest extends AbstractProtectedEndpointTest {
         registered.forEach(registry::deRegister);
     }
 
-    @Test
-    void shouldReturnTheInstanceSiblingsCountAndDetectedFeatures() {
+    @ParameterizedTest
+    @EnumSource(InstanceFeature.class)
+    void shouldReturnTheInstanceSiblingsCountAndDetectedFeatures(InstanceFeature feature) {
         // given.
-        String instanceId = register("1.3.0", new DetectedFeatures(EnumSet.of(InstanceFeature.CACHES)));
-        register("1.3.0", new DetectedFeatures(EnumSet.of(InstanceFeature.CACHES)));
-        register("1.3.0", new DetectedFeatures(EnumSet.of(InstanceFeature.CACHES)));
+        String instanceId = register("1.4.0", new DetectedFeatures(EnumSet.of(feature)));
+        register("1.4.0", new DetectedFeatures(EnumSet.of(feature)));
+        register("1.4.0", new DetectedFeatures(EnumSet.of(feature)));
 
         // when.
         IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
@@ -89,7 +92,7 @@ class InstanceProfileApiTest extends AbstractProtectedEndpointTest {
         assertThatJson(response.getBody()).node("instance.commitShaShort").isEqualTo("df027cf");
         assertThatJson(response.getBody()).node("instance.status").isEqualTo("UP");
         assertThatJson(response.getBody()).node("siblingsCount").isEqualTo(2);
-        assertThatJson(response.getBody()).node("features").isArray().containsExactly("caches");
+        assertThatJson(response.getBody()).node("features").isArray().containsExactly(feature.getValue());
         assertSuccessfulCallback(MasterWebEndpoints.INSTANCE_PROFILE_READ, viewer.getActor());
     }
 
