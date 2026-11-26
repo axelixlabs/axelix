@@ -55,8 +55,7 @@ export const ActionInstancesSelector = ({
     const { t } = useTranslation();
     const [open, setOpen] = useState<boolean>(false);
 
-    // There is nothing to choose from in an application with a single instance
-    if (!currentInstance || totalInstances <= 1) {
+    if (!currentInstance) {
         return null;
     }
 
