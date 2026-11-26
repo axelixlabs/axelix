@@ -24,6 +24,9 @@ import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
+import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultInstanceFeaturesDetector;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.NoOpJpaEntitiesProfileProvider;
 import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +53,10 @@ class AxelixQuartzEndpointAutoConfigurationTest {
                 .run(context -> {
                     // then.
                     assertThat(context).hasSingleBean(AxelixQuartzEndpoint.class);
+                    assertThat(new DefaultInstanceFeaturesDetector(
+                                            context.getBeanFactory(), new NoOpJpaEntitiesProfileProvider())
+                                    .detect())
+                            .contains(InstanceFeature.QUARTZ);
                 });
     }
 
@@ -59,6 +66,10 @@ class AxelixQuartzEndpointAutoConfigurationTest {
         contextRunner.run(context -> {
             // then.
             assertThat(context).doesNotHaveBean(AxelixQuartzEndpoint.class);
+            assertThat(new DefaultInstanceFeaturesDetector(
+                                    context.getBeanFactory(), new NoOpJpaEntitiesProfileProvider())
+                            .detect())
+                    .doesNotContain(InstanceFeature.QUARTZ);
         });
     }
 
@@ -68,6 +79,10 @@ class AxelixQuartzEndpointAutoConfigurationTest {
         contextRunner.withClassLoader(new FilteredClassLoader("org.quartz")).run(context -> {
             // then.
             assertThat(context).hasNotFailed().doesNotHaveBean(AxelixQuartzEndpoint.class);
+            assertThat(new DefaultInstanceFeaturesDetector(
+                                    context.getBeanFactory(), new NoOpJpaEntitiesProfileProvider())
+                            .detect())
+                    .doesNotContain(InstanceFeature.QUARTZ);
         });
     }
 
@@ -80,6 +95,10 @@ class AxelixQuartzEndpointAutoConfigurationTest {
                 .run(context -> {
                     // then.
                     assertThat(context).doesNotHaveBean(AxelixQuartzEndpoint.class);
+                    assertThat(new DefaultInstanceFeaturesDetector(
+                                            context.getBeanFactory(), new NoOpJpaEntitiesProfileProvider())
+                                    .detect())
+                            .doesNotContain(InstanceFeature.QUARTZ);
                 });
     }
 
@@ -92,6 +111,10 @@ class AxelixQuartzEndpointAutoConfigurationTest {
                 .run(context -> {
                     // then.
                     assertThat(context).doesNotHaveBean(AxelixQuartzEndpoint.class);
+                    assertThat(new DefaultInstanceFeaturesDetector(
+                                            context.getBeanFactory(), new NoOpJpaEntitiesProfileProvider())
+                                    .detect())
+                            .doesNotContain(InstanceFeature.QUARTZ);
                 });
     }
 }

@@ -29,11 +29,13 @@ import org.springframework.util.ClassUtils;
 import com.axelixlabs.axelix.common.contract.metadata.InstanceFeature;
 import com.axelixlabs.axelix.common.contract.metadata.MappedEntity;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.JpaEntitiesProfileProvider;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpoint;
 
 /**
  * Default {@link InstanceFeaturesDetector} based on the infrastructure beans of the application context.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public class DefaultInstanceFeaturesDetector implements InstanceFeaturesDetector {
 
@@ -68,6 +70,9 @@ public class DefaultInstanceFeaturesDetector implements InstanceFeaturesDetector
         }
         if (hasTransactionManager()) {
             features.add(InstanceFeature.TRANSACTIONS);
+        }
+        if (hasBeanOfType(AxelixQuartzEndpoint.class)) {
+            features.add(InstanceFeature.QUARTZ);
         }
 
         return features;
