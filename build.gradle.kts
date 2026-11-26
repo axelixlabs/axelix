@@ -77,7 +77,9 @@ subprojects {
 
     spotless {
         java {
-            palantirJavaFormat("2.90.0")
+            // TODO: Replace with official palantir-java-format when Java 27 compatibility is added.
+            palantirJavaFormat("21.0.2")
+                .groupArtifact("dev.openjavaformat:open-java-format")
             target("src/**/*.java")
             importOrder(
                 "java",
