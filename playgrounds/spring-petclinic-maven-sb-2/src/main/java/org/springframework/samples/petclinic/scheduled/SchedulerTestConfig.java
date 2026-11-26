@@ -9,8 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
@@ -20,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.samples.petclinic.vet.VetRepository;
 
 @Configuration
 @EnableScheduling
@@ -28,6 +31,27 @@ public class SchedulerTestConfig implements SchedulingConfigurer {
 	private static final Logger log = LoggerFactory.getLogger(SchedulerTestConfig.class);
 
 	private final ReentrantLock reentrantLock = new ReentrantLock(true);
+
+	private final CacheManager cacheManager;
+
+	private final VetRepository vets;
+
+	private int vetLookups;
+
+	public SchedulerTestConfig(CacheManager cacheManager, VetRepository vets) {
+		this.cacheManager = cacheManager;
+		this.vets = vets;
+	}
+
+	@Scheduled(fixedDelay = 5_000, initialDelay = 5_000)
+	public void exerciseVetsCache() {
+		PageRequest page = PageRequest.of(vetLookups % 3, 2);
+		if (vetLookups % 4 == 0) {
+			cacheManager.getCache("vets").evict(page);
+		}
+		vetLookups = (vetLookups + 1) % 12;
+		vets.findAll(page);
+	}
 
 	// IMPORTANT!
 	// Fix for Spring Boot 2. this class `implement SchedulingConfigurer`.

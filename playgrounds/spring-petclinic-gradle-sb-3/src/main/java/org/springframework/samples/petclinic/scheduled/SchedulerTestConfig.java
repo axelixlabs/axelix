@@ -3,8 +3,11 @@ package org.springframework.samples.petclinic.scheduled;
 import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
+import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -18,6 +21,27 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 public class SchedulerTestConfig implements SchedulingConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(SchedulerTestConfig.class);
+
+    private final CacheManager cacheManager;
+
+    private final VetRepository vets;
+
+    private int vetLookups;
+
+    public SchedulerTestConfig(CacheManager cacheManager, VetRepository vets) {
+        this.cacheManager = cacheManager;
+        this.vets = vets;
+    }
+
+    @Scheduled(fixedDelay = 5_000, initialDelay = 5_000)
+    public void exerciseVetsCache() {
+        PageRequest page = PageRequest.of(vetLookups % 3, 2);
+        if (vetLookups % 4 == 0) {
+            cacheManager.getCache("vets").evict(page);
+        }
+        vetLookups = (vetLookups + 1) % 12;
+        vets.findAll(page);
+    }
 
     /**
      * CRON
