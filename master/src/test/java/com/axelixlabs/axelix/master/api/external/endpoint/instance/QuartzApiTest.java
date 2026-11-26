@@ -262,7 +262,7 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
             RecordedRequest request = server.takeRequest(5, TimeUnit.SECONDS);
             assertThat(request.getMethod()).isEqualTo("POST");
-            assertThat(request.getPath()).isEqualTo("/actuator/axelix-quartz/pause");
+            assertThat(request.getPath()).isEqualTo("/actuator/axelix-quartz/pauseTrigger");
             assertThat(request.getHeader("Content-Type")).startsWith(MediaType.APPLICATION_JSON_VALUE);
             assertThatJson(request.getBody().readUtf8()).isEqualTo("""
                     {"schedulerName":"quartzScheduler","triggerName":"sample name","triggerGroup":"sample group"}
@@ -292,7 +292,7 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
             RecordedRequest request = server.takeRequest(5, TimeUnit.SECONDS);
             assertThat(request.getMethod()).isEqualTo("POST");
-            assertThat(request.getPath()).isEqualTo("/actuator/axelix-quartz/resume");
+            assertThat(request.getPath()).isEqualTo("/actuator/axelix-quartz/resumeTrigger");
             assertThat(request.getHeader("Content-Type")).startsWith(MediaType.APPLICATION_JSON_VALUE);
             assertThatJson(request.getBody().readUtf8()).isEqualTo("""
                     {"schedulerName":"quartzScheduler","triggerName":"sample name","triggerGroup":"sample group"}

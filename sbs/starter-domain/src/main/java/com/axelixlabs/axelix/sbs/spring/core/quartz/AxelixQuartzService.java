@@ -65,6 +65,17 @@ public interface AxelixQuartzService {
     boolean pauseQuartzTrigger(String schedulerName, String triggerName, String triggerGroup);
 
     /**
+     * Pauses all triggers associated with a job.
+     *
+     * @param schedulerName the scheduler name.
+     * @param jobName the job name.
+     * @param jobGroup the job group.
+     * @return {@code true} if the job was found and paused; {@code false} if the scheduler or job was not found.
+     * @throws QuartzAccessException if the job cannot be paused.
+     */
+    boolean pauseQuartzJob(String schedulerName, String jobName, String jobGroup);
+
+    /**
      * Resumes a paused trigger.
      *
      * @param schedulerName the scheduler name.
@@ -74,4 +85,15 @@ public interface AxelixQuartzService {
      * @throws QuartzAccessException if the trigger cannot be resumed.
      */
     boolean resumeQuartzTrigger(String schedulerName, String triggerName, String triggerGroup);
+
+    /**
+     * Resumes all triggers associated with a job.
+     *
+     * @param schedulerName the scheduler name.
+     * @param jobName the job name.
+     * @param jobGroup the job group.
+     * @return {@code true} if the job was found and resumed; {@code false} if the scheduler or job was not found.
+     * @throws QuartzAccessException if the job cannot be resumed.
+     */
+    boolean resumeQuartzJob(String schedulerName, String jobName, String jobGroup);
 }

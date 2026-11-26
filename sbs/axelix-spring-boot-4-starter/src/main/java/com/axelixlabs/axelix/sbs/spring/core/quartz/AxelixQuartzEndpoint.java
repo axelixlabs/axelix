@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobPauseRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobResumeRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobsRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerPauseRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerResumeRequest;
@@ -70,7 +72,7 @@ public class AxelixQuartzEndpoint {
                 : ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/pause")
+    @PostMapping("/pauseTrigger")
     public ResponseEntity<Void> pauseQuartzTrigger(@RequestBody QuartzTriggerPauseRequest request) {
         if (request.getSchedulerName() == null
                 || request.getTriggerName() == null
@@ -84,7 +86,19 @@ public class AxelixQuartzEndpoint {
                 : ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/resume")
+    @PostMapping("/pauseJob")
+    public ResponseEntity<Void> pauseQuartzJob(@RequestBody QuartzJobPauseRequest request) {
+        if (request.getSchedulerName() == null || request.getJobName() == null || request.getJobGroup() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        boolean updated =
+                quartzService.pauseQuartzJob(request.getSchedulerName(), request.getJobName(), request.getJobGroup());
+        return updated
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/resumeTrigger")
     public ResponseEntity<Void> resumeQuartzTrigger(@RequestBody QuartzTriggerResumeRequest request) {
         if (request.getSchedulerName() == null
                 || request.getTriggerName() == null
@@ -93,6 +107,18 @@ public class AxelixQuartzEndpoint {
         }
         boolean updated = quartzService.resumeQuartzTrigger(
                 request.getSchedulerName(), request.getTriggerName(), request.getTriggerGroup());
+        return updated
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/resumeJob")
+    public ResponseEntity<Void> resumeQuartzJob(@RequestBody QuartzJobResumeRequest request) {
+        if (request.getSchedulerName() == null || request.getJobName() == null || request.getJobGroup() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        boolean updated =
+                quartzService.resumeQuartzJob(request.getSchedulerName(), request.getJobName(), request.getJobGroup());
         return updated
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
