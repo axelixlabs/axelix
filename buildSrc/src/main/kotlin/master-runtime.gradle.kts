@@ -27,13 +27,15 @@ plugins {
     id("shared")
 }
 
+val masterJavaVersion = 27
+
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(masterJavaVersion)
     }
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-parameters")
-    options.release = 25
+    options.release = masterJavaVersion
 }

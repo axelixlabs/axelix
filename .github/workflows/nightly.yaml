@@ -16,11 +16,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Set up JDK 25
+      - name: Set up JDK 27
         uses: actions/setup-java@v5.6.0
         with:
-          distribution: 'liberica'
-          java-version: '25'
+          distribution: 'temurin'
+          java-version: '27'
 
       - name: Run Concurrency Tests
         run: >

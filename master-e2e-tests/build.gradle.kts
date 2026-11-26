@@ -1,7 +1,5 @@
-import org.gradle.jvm.toolchain.JavaLanguageVersion
-
 plugins {
-    id("shared")
+    id("master-runtime")
 }
 
 val restAssuredVersion = "5.5.7"
@@ -24,12 +22,6 @@ dependencies {
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
 }
 
 tasks.test {

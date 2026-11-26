@@ -1,5 +1,5 @@
 # Dockerfile for the OSS (community) distribution of Axelix Master.
-FROM eclipse-temurin:25-jre-alpine AS training
+FROM eclipse-temurin:27-jre-alpine AS training
 
 WORKDIR /application
 
@@ -26,7 +26,7 @@ RUN java \
     -jar /application/master.jar
 
 # Stage: final runtime image
-FROM eclipse-temurin:25-jre-alpine AS final
+FROM eclipse-temurin:27-jre-alpine AS final
 
 VOLUME /tmp
 
@@ -44,9 +44,11 @@ RUN apk add --no-cache --upgrade \
 
 # Configure non-root user
 RUN adduser -S axelix
-USER axelix
 
 WORKDIR /application
+# The default SQLite database is created in the working directory at startup.
+RUN chown axelix /application
+USER axelix
 
 COPY --from=training /application/master.jar ./
 COPY --from=training /application/app.aot ./

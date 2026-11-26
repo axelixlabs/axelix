@@ -61,9 +61,7 @@ jobs:
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
-      # Java 25 will be installed at this step.
       - name: Build Backend
-        id: build-backend
         uses: ./.github/actions/build-master
         with:
           gradle-cache-encryption-key: ${{ env.SANDBOX_GRADLE_CACHE_ENCRYPTION_KEY }}
@@ -121,6 +119,13 @@ jobs:
             -f values.yaml
 
       # Set up Extra JDKs for Playgrounds
+      - name: Set up JDK 25 for the Feature Service playground
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-25
+        with:
+          java-version: '25'
+          distribution: 'liberica'
+
       - name: Set up JDK 17 for Playgrounds
         uses: actions/setup-java@v5.6.0
         id: setup-java-17
@@ -139,7 +144,7 @@ jobs:
         env:
           JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
           JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
-          JAVA_25_HOME: ${{ steps.build-backend.outputs.java-25-home }}
+          JAVA_25_HOME: ${{ steps.setup-java-25.outputs.path }}
         run: |
           make build-playground BUILD_SB2="true" BUILD_SB3="true" BUILD_SB4="true"
 
