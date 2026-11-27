@@ -69,7 +69,12 @@ public record Platform(PlatformName name, List<PlatformReleaseLine> lines) {
                     IBM_SEMERU,
                     MICROSOFT_OPENJDK,
                     ORACLE_OPENJDK,
-                    RED_HAT_OPENJDK -> lineOfOpenJDKDistro(version);
+                    RED_HAT_OPENJDK,
+                    SAP_MACHINE,
+                    GRAALVM,
+                    ALIBABA_DRAGONWELL,
+                    TENCENT_KONA,
+                    JETBRAINS -> lineOfOpenJDKDistro(version);
         };
     }
 

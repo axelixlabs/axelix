@@ -1,0 +1,10 @@
+platform: jetbrains-runtime
+lines:
+  - line: "11"
+    releasedAt: 2019-07-26
+  - line: "17"
+    releasedAt: 2021-09-24
+  - line: "21"
+    releasedAt: 2023-08-29
+  - line: "25"
+    releasedAt: 2025-10-23

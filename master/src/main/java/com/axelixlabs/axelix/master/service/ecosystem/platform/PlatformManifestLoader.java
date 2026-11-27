@@ -127,13 +127,13 @@ public class PlatformManifestLoader {
         /**
          * @param line                    the release line, e.g. {@code 21} for Corretto or {@code 3.2.x} for Spring Boot
          * @param releasedAt              the date the line was first released
-         * @param ossSupportEndsAt        the date OSS maintenance of the line ended, or ends
+         * @param ossSupportEndsAt        the date OSS maintenance of the line ends, omitted when unknown
          * @param commercialSupportEndsAt the date commercial support ends, omitted when the upstream offers none
          */
         record LineEntry(
                 String line,
                 LocalDate releasedAt,
-                LocalDate ossSupportEndsAt,
+                @Nullable LocalDate ossSupportEndsAt,
                 @Nullable LocalDate commercialSupportEndsAt) {
 
             PlatformReleaseLine toLine() {

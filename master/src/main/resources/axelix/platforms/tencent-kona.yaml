@@ -1,0 +1,10 @@
+platform: tencent-kona
+lines:
+  - line: "11"
+    releasedAt: 2021-03-08
+  - line: "17"
+    releasedAt: 2021-11-04
+  - line: "21"
+    releasedAt: 2024-09-05
+  - line: "25"
+    releasedAt: 2025-12-11

@@ -1,0 +1,14 @@
+platform: alibaba-dragonwell
+lines:
+  - line: "11"
+    releasedAt: 2020-07-20
+    ossSupportEndsAt: 2027-09-30
+  - line: "17"
+    releasedAt: 2021-10-18
+    ossSupportEndsAt: 2027-09-30
+  - line: "21"
+    releasedAt: 2023-11-24
+    ossSupportEndsAt: 2029-11-30
+  - line: "25"
+    releasedAt: 2025-09-24
+    ossSupportEndsAt: 2029-09-30

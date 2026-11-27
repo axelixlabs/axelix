@@ -65,6 +65,31 @@ public enum PlatformName {
     RED_HAT_OPENJDK("red-hat-openjdk"),
 
     /**
+     * SapMachine JDK distribution.
+     */
+    SAP_MACHINE("sapmachine"),
+
+    /**
+     * GraalVM Community Edition JDK distribution.
+     */
+    GRAALVM("graalvm-ce"),
+
+    /**
+     * Alibaba Dragonwell JDK distribution.
+     */
+    ALIBABA_DRAGONWELL("alibaba-dragonwell"),
+
+    /**
+     * Tencent Kona JDK distribution.
+     */
+    TENCENT_KONA("tencent-kona"),
+
+    /**
+     * JetBrains Runtime JDK distribution.
+     */
+    JETBRAINS("jetbrains-runtime"),
+
+    /**
      * Spring Boot as the Platform.
      */
     SPRING_BOOT("spring-boot"),

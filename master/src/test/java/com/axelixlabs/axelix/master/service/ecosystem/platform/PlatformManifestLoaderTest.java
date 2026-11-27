@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -118,7 +119,32 @@ class PlatformManifestLoaderTest {
                         PlatformName.IBM_SEMERU,
                         PlatformName.MICROSOFT_OPENJDK,
                         PlatformName.ORACLE_OPENJDK,
-                        PlatformName.RED_HAT_OPENJDK);
+                        PlatformName.RED_HAT_OPENJDK,
+                        PlatformName.SAP_MACHINE,
+                        PlatformName.GRAALVM,
+                        PlatformName.ALIBABA_DRAGONWELL,
+                        PlatformName.TENCENT_KONA,
+                        PlatformName.JETBRAINS);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "sapmachine, 2028-09-30",
+        "graalvm-ce, 2024-03-19",
+        "alibaba-dragonwell, 2029-11-30",
+        "tencent-kona,",
+        "jetbrains-runtime,"
+    })
+    void resolvesJava21ToVendorMaintenanceWindow(String platform, LocalDate deadline) {
+        Platform vendor = loaderOf("classpath:axelix/platforms/" + platform + ".yaml")
+                .load()
+                .getFirst();
+
+        PlatformReleaseLine line = vendor.lineOf("21.0.2+13").orElseThrow();
+
+        assertThat(line.line()).isEqualTo("21");
+        assertThat(line.ossSupportEndsAt()).isEqualTo(deadline);
+        assertThat(line.ossSupportedAt(LocalDate.of(2024, 3, 1))).isEqualTo(deadline != null);
     }
 
     @Test

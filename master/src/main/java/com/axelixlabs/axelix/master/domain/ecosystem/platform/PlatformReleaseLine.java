@@ -36,7 +36,7 @@ import org.jspecify.annotations.Nullable;
  * @param line                    the release line that is subject to OSS or enterprise support. Maybe written in an
  *                                arbitrary ways.
  * @param releasedAt              the date the line was first released.
- * @param ossSupportEndsAt        the date OSS maintenance (CVE patches etc.) of the line ended or will end if not already.
+ * @param ossSupportEndsAt        the date OSS maintenance (CVE patches etc.) of the line ends, or null when the date is unknown.
  * @param commercialSupportEndsAt the date commercial support of the line ends, or null when the upstream offers no
  *                                commercial support at all.
  *
@@ -45,15 +45,15 @@ import org.jspecify.annotations.Nullable;
 public record PlatformReleaseLine(
         String line,
         LocalDate releasedAt,
-        LocalDate ossSupportEndsAt,
+        @Nullable LocalDate ossSupportEndsAt,
         @Nullable LocalDate commercialSupportEndsAt) {
 
     /**
      * @param today the date to judge against
      *
-     * @return whether the line still receives OSS maintenance as of the given date
+     * @return whether a known OSS maintenance deadline covers the given date
      */
     public boolean ossSupportedAt(LocalDate today) {
-        return !today.isAfter(ossSupportEndsAt);
+        return ossSupportEndsAt != null && !today.isAfter(ossSupportEndsAt);
     }
 }
