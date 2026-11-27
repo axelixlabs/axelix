@@ -113,7 +113,18 @@ class PlatformManifestLoaderTest {
                         PlatformName.SPRING_BOOT,
                         PlatformName.AMAZON_CORRETTO,
                         PlatformName.BELLSOFT_LIBERICA,
-                        PlatformName.ECLIPSE_TEMURIN);
+                        PlatformName.ECLIPSE_TEMURIN,
+                        PlatformName.ORACLE_OPENJDK);
+    }
+
+    @Test
+    void resolvesOracleOpenJdkRuntimeToOssSupportWindow() {
+        Platform oracle = loaderOf("classpath:axelix/platforms/oracle-openjdk.yaml")
+                .load()
+                .getFirst();
+
+        assertThat(oracle.lineOf("21.0.2+13"))
+                .contains(new PlatformReleaseLine("21", LocalDate.of(2023, 9, 19), LocalDate.of(2024, 3, 19), null));
     }
 
     @Test

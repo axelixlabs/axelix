@@ -40,6 +40,11 @@ public enum PlatformName {
     ECLIPSE_TEMURIN("eclipse-temurin"),
 
     /**
+     * Oracle's GPL-licensed OpenJDK distribution.
+     */
+    ORACLE_OPENJDK("oracle-openjdk"),
+
+    /**
      * Spring Boot as the Platform.
      */
     SPRING_BOOT("spring-boot"),
