@@ -30,6 +30,11 @@ public enum PlatformName {
     AMAZON_CORRETTO("amazon-corretto"),
 
     /**
+     * Azul Zulu JDK distribution.
+     */
+    AZUL_ZULU("azul-zulu"),
+
+    /**
      * BellSoft Liberica JDK distribution.
      */
     BELLSOFT_LIBERICA("bellsoft-liberica"),

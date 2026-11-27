@@ -112,9 +112,18 @@ class PlatformManifestLoaderTest {
                 .contains(
                         PlatformName.SPRING_BOOT,
                         PlatformName.AMAZON_CORRETTO,
+                        PlatformName.AZUL_ZULU,
                         PlatformName.BELLSOFT_LIBERICA,
                         PlatformName.ECLIPSE_TEMURIN,
                         PlatformName.ORACLE_OPENJDK);
+    }
+
+    @Test
+    void resolvesZuluRuntimeToPublicSupportWindow() {
+        Platform zulu = loaderOf("classpath:axelix/platforms/azul-zulu.yaml").load().getFirst();
+
+        assertThat(zulu.lineOf("21.0.4+7-LTS"))
+                .contains(new PlatformReleaseLine("21", LocalDate.of(2023, 9, 19), LocalDate.of(2031, 9, 30), null));
     }
 
     @Test
