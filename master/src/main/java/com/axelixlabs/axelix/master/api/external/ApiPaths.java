@@ -255,6 +255,9 @@ public final class ApiPaths {
         /**
          * Endpoint to clear a specific cache across instances.
          */
+        public static final String CACHE_ENTRIES = "/caches/cache/entries";
+
+        public static final String CACHE_ENTRIES_PREVIEW = CACHE_ENTRIES + "/preview";
         public static final String CACHE_BULK_CLEAR_CACHE = "/caches/cache/clear";
 
         /**

@@ -48,6 +48,8 @@ public class DefaultMcpEndpointResolver implements McpEndpointResolver {
             Map.entry(McpEndpoints.WALLBOARD_TOOL_NAME, McpEndpoints.WALLBOARD),
             Map.entry(McpEndpoints.CACHES_FEED_TOOL_NAME, McpEndpoints.ALL_CACHES),
             Map.entry(McpEndpoints.CLEAR_ALL_CACHES_TOOL_NAME, McpEndpoints.CLEAR_ALL_CACHES),
+            Map.entry(McpEndpoints.PREVIEW_CACHE_ENTRY_EVICTION_TOOL_NAME, McpEndpoints.PREVIEW_CACHE_ENTRY_EVICTION),
+            Map.entry(McpEndpoints.EVICT_CACHE_ENTRIES_TOOL_NAME, McpEndpoints.EVICT_CACHE_ENTRIES),
             Map.entry(McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME, McpEndpoints.CLEAR_SPECIFIC_CACHE),
             Map.entry(McpEndpoints.TRANSACTIONS_PROFILE_TOOL_NAME, McpEndpoints.TRANSACTIONS_PROFILE),
             Map.entry(McpEndpoints.ENTITIES_PROFILE_TOOL_NAME, McpEndpoints.ENTITIES_PROFILE),

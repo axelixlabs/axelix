@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import com.axelixlabs.axelix.master.service.BulkInstancesValidator;
+import com.axelixlabs.axelix.master.service.CacheEntryManagement;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -46,9 +47,15 @@ public class CacheMcpServerTools {
     private final EndpointInvoker endpointInvoker;
     private final BulkInstancesValidator bulkInstancesValidator;
 
-    public CacheMcpServerTools(EndpointInvoker endpointInvoker, BulkInstancesValidator bulkInstancesValidator) {
+    private final CacheEntryManagement cacheEntries;
+
+    public CacheMcpServerTools(
+            EndpointInvoker endpointInvoker,
+            BulkInstancesValidator bulkInstancesValidator,
+            CacheEntryManagement cacheEntries) {
         this.endpointInvoker = endpointInvoker;
         this.bulkInstancesValidator = bulkInstancesValidator;
+        this.cacheEntries = cacheEntries;
     }
 
     @McpTool(
@@ -123,15 +130,56 @@ public class CacheMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.PREVIEW_CACHE_ENTRY_EVICTION_TOOL_NAME,
+            title = "Preview Cache Entry Eviction",
+            description = """
+            Estimate how many string keys match a wildcard in the named cache on each selected instance.
+            Use * for any number of characters and ? for one character. The pattern matches the entire key.
+            Available for local Caffeine and concurrent-map caches. Failed instances have no estimate.
+            """,
+            annotations =
+                    @McpTool.McpAnnotations(
+                            readOnlyHint = true,
+                            destructiveHint = false,
+                            idempotentHint = true,
+                            openWorldHint = false))
+    public CacheEntryManagement.Preview previewCacheEntryEviction(
+            @McpToolParam(description = "IDs of the instances to preview") List<String> instanceIds,
+            @McpToolParam(description = "Name of the cache manager") String cacheManager,
+            @McpToolParam(description = "Name of the cache") String cacheName,
+            @McpToolParam(description = "Wildcard pattern to preview") String pattern) {
+        return cacheEntries.preview(instanceIds, cacheManager, cacheName, pattern);
+    }
+
+    @McpTool(
+            name = McpEndpoints.EVICT_CACHE_ENTRIES_TOOL_NAME,
+            title = "Evict Cache Entries",
+            description = """
+            Evict a literal string key or matching string keys in the named local Caffeine or concurrent-map cache.
+            For wildcard eviction, call previewCacheEntryEviction with the same cache, instances and pattern first.
+            Show the estimated counts and failures to the user and obtain confirmation before evicting.
+            """,
+            annotations =
+                    @McpTool.McpAnnotations(
+                            readOnlyHint = false,
+                            destructiveHint = true,
+                            idempotentHint = false,
+                            openWorldHint = false))
+    public void evictCacheEntries(
+            @McpToolParam(description = "IDs of the instances to update") List<String> instanceIds,
+            @McpToolParam(description = "Name of the cache manager") String cacheManager,
+            @McpToolParam(description = "Name of the cache") String cacheName,
+            @McpToolParam(description = "Literal key or wildcard pattern") String selector,
+            @McpToolParam(description = "True for wildcard matching, false for a literal key") boolean wildcard) {
+        cacheEntries.evict(instanceIds, cacheManager, cacheName, selector, wildcard);
+    }
+
+    @McpTool(
             name = McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME,
             title = "Clear Specific Cache",
             description = """
-            Clears a specific cache entry identified by cache name (key) within a specific cache manager
-            for the given instances. Only the entry matching the given cache name is evicted, all other
-            entries remain intact.
-
-            Use this when the user asks to clear a specific cache by name, or to evict a specific entry by key
-            the cache name IS the key).
+            Clears every entry in the named cache within the specified cache manager on the given instances.
+            Use evictCacheEntries for requests that specify an entry key or a wildcard.
 
             PREREQUISITE: If the cache manager name is unknown, call "Caches Feed" first.
             IF THE REQUESTED CACHE NAME IS PRESENT IN MULTIPLE CACHE MANAGERS, YOU MUST ASK THE USER
@@ -156,7 +204,7 @@ public class CacheMcpServerTools {
     public void clearSpecificCacheEntity(
             @McpToolParam(description = "The IDs of the instances to apply the operation to") List<String> instanceIds,
             @McpToolParam(description = "The Cache Manager Name") String cacheManager,
-            @McpToolParam(description = "The Cache Name (also serves as the entry key)") String cacheName) {
+            @McpToolParam(description = "The Cache Name") String cacheName) {
 
         HttpPayload payload = new DefaultHttpPayload(Map.of("cacheName", cacheName, "cacheManagerName", cacheManager));
         bulkInstancesValidator.validate(instanceIds);

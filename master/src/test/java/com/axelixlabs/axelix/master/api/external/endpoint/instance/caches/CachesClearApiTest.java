@@ -103,6 +103,15 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
                 assert path != null;
                 invokedPaths.add(path);
 
+                if (path.equals(
+                        "/" + activeInstanceId + "/actuator/axelix-caches/manager/orders/entries?pattern=owner*")) {
+                    return new MockResponse().setBody("7");
+                }
+                if (path.equals("/" + activeInstanceId
+                        + "/actuator/axelix-caches/manager/orders/entries?selector=owner*&wildcard=true")) {
+                    return new MockResponse();
+                }
+
                 if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/clear")
                         || path.equals("/" + activeInstanceId + "/actuator/axelix-caches/manager/orders/clear")) {
                     return new MockResponse();
@@ -135,6 +144,73 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
         registry.deRegister(InstanceId.of(anotherApplicationInstanceId));
         invokedPaths.clear();
         failingCacheOperationStatusCode.set(500);
+    }
+
+    @Nested
+    class EvictCacheEntries {
+
+        @Test
+        void shouldAllowViewerToPreviewAndReportMissingEstimates() {
+            // given.
+            CacheEntriesApi.PreviewRequest request = new CacheEntriesApi.PreviewRequest(
+                    List.of(activeInstanceId, failingInstanceId), "manager", "orders", "owner*");
+
+            // when.
+            ResponseEntity<String> response = restTemplate
+                    .asViewer()
+                    .exchange(
+                            "/api/external/caches/cache/entries/preview",
+                            HttpMethod.POST,
+                            new HttpEntity<>(request),
+                            String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody())
+                    .contains("estimatedMatches", activeInstanceId, "7", "failedInstanceIds", failingInstanceId);
+        }
+
+        @Test
+        void shouldAllowEditorToEvictMatchingEntries() {
+            // given.
+            CacheEntriesApi.EvictionRequest request =
+                    new CacheEntriesApi.EvictionRequest(List.of(activeInstanceId), "manager", "orders", "owner*", true);
+
+            // when.
+            ResponseEntity<Void> response = restTemplate
+                    .asEditor()
+                    .exchange(
+                            "/api/external/caches/cache/entries",
+                            HttpMethod.DELETE,
+                            new HttpEntity<>(request),
+                            Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            assertThat(invokedPaths)
+                    .containsExactly("/" + activeInstanceId
+                            + "/actuator/axelix-caches/manager/orders/entries?selector=owner*&wildcard=true");
+        }
+
+        @Test
+        void shouldRejectEntryEvictionWithoutClearAuthority() {
+            // given.
+            CacheEntriesApi.EvictionRequest request =
+                    new CacheEntriesApi.EvictionRequest(List.of(activeInstanceId), "manager", "orders", "owner*", true);
+
+            // when.
+            ResponseEntity<Void> response = restTemplate
+                    .asViewer()
+                    .exchange(
+                            "/api/external/caches/cache/entries",
+                            HttpMethod.DELETE,
+                            new HttpEntity<>(request),
+                            Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+            assertThat(invokedPaths).isEmpty();
+        }
     }
 
     @Nested

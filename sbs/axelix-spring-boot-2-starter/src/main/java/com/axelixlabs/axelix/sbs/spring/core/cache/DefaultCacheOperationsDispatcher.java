@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.cache.CacheManager;
+import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.common.contract.caches.CacheDto;
 import com.axelixlabs.axelix.common.contract.caches.CacheManagerDto;
@@ -47,6 +49,9 @@ import com.axelixlabs.axelix.common.contract.caches.SingleCache;
 //  reports the nullability issue with type-use annotations on generics
 @SuppressWarnings("NullAway")
 public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatcher {
+
+    private static final boolean CAFFEINE_PRESENT = ClassUtils.isPresent(
+            "com.github.benmanes.caffeine.cache.Cache", DefaultCacheOperationsDispatcher.class.getClassLoader());
 
     private final Map<String, EnhancedCacheManager> cacheManagers;
     private final CacheSizeProvider cacheSizeProvider;
@@ -116,6 +121,34 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
     @Override
     public void clear(String cacheManagerName, String cacheName, Object key) {
         execute(cacheManagerName, cacheManager -> cacheManager.clear(cacheName, key));
+    }
+
+    @Override
+    public long previewEntryEviction(String cacheManagerName, String cacheName, String pattern) {
+        return CacheEntryOperations.countMatches(localEntries(cacheManagerName, cacheName), pattern);
+    }
+
+    @Override
+    public void evictEntries(String cacheManagerName, String cacheName, String selector, boolean wildcard) {
+        CacheEntryOperations.evict(localEntries(cacheManagerName, cacheName), selector, wildcard);
+    }
+
+    private Map<?, ?> localEntries(String cacheManagerName, String cacheName) {
+        EnhancedCacheManager manager = findCacheManager(cacheManagerName);
+        // Some providers create a cache on getCache. Entry management only targets existing caches.
+        EnhancedCache cache = manager.getCacheNames().contains(cacheName) ? manager.getCache(cacheName) : null;
+        if (cache == null) {
+            throw new CacheNotFoundException(cacheName, cacheManagerName);
+        }
+
+        Object nativeCache = cache.getNativeCache();
+        if (nativeCache instanceof ConcurrentHashMap<?, ?>) {
+            return (ConcurrentHashMap<?, ?>) nativeCache;
+        }
+        if (CAFFEINE_PRESENT && nativeCache instanceof com.github.benmanes.caffeine.cache.Cache<?, ?>) {
+            return ((com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache).asMap();
+        }
+        throw new UnsupportedOperationException("Entry eviction is unavailable for this cache provider");
     }
 
     @Override

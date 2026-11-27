@@ -63,6 +63,9 @@ class DefaultMcpEndpointAuthorityResolverTest {
     }
 
     public static Stream<Arguments> cachesClearEndpoints() {
-        return Stream.of(Arguments.of(McpEndpoints.CLEAR_ALL_CACHES), Arguments.of(McpEndpoints.CLEAR_SPECIFIC_CACHE));
+        return Stream.of(
+                Arguments.of(McpEndpoints.CLEAR_ALL_CACHES),
+                Arguments.of(McpEndpoints.CLEAR_SPECIFIC_CACHE),
+                Arguments.of(McpEndpoints.EVICT_CACHE_ENTRIES));
     }
 }

@@ -72,6 +72,12 @@ public interface CacheOperationsDispatcher {
      */
     void clear(String cacheManagerName, String cacheName, Object key) throws CacheManagerNotFoundException;
 
+    /** Estimates the number of string keys matching the wildcard in an existing local cache. */
+    long previewEntryEviction(String cacheManagerName, String cacheName, String pattern);
+
+    /** Evicts a literal string key or the string keys matching a wildcard in an existing local cache. */
+    void evictEntries(String cacheManagerName, String cacheName, String selector, boolean wildcard);
+
     /**
      * Clears all cache managers in the application {@code CacheManager}.
      */

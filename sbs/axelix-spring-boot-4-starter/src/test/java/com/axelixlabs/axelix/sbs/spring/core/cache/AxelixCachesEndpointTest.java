@@ -232,6 +232,80 @@ class AxelixCachesEndpointTest {
     }
 
     @Test
+    void preview_shouldCountMatchingStringKeysWithoutEvictingThem() {
+        // given.
+        Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
+        cache.put("tenant:1", "value");
+        cache.put("tenant:2", "value");
+        cache.put("another:1", "value");
+        cache.put(123, "value");
+
+        // when.
+        ResponseEntity<Long> response = testRestTemplate
+                .asMaster()
+                .getForEntity(path(CLEAR_CACHE_MANAGER, TEST_CACHE_1 + "/entries?pattern=tenant:*"), Long.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(2L);
+        assertThat(cache.get("tenant:1")).isNotNull();
+        assertThat(cache.get("tenant:2")).isNotNull();
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryEvictionSelectors")
+    void evict_shouldApplyOnlyTheRequestedMatchingMode(String selector, boolean wildcard, boolean removesOtherMatch) {
+        // given.
+        Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
+        cache.put("tenant:*", "value");
+        cache.put("tenant:1", "value");
+        cache.put("another:1", "value");
+        cache.put(123, "value");
+
+        // when.
+        ResponseEntity<Void> response = testRestTemplate
+                .asMaster()
+                .exchange(
+                        path(
+                                CLEAR_CACHE_MANAGER,
+                                TEST_CACHE_1 + "/entries?selector=" + selector + "&wildcard=" + wildcard),
+                        HttpMethod.DELETE,
+                        null,
+                        Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(cache.get("tenant:*")).isNull();
+        assertThat(cache.get("tenant:1") == null).isEqualTo(removesOtherMatch);
+        assertThat(cache.get("another:1")).isNotNull();
+        assertThat(cache.get(123)).isNotNull();
+    }
+
+    static Stream<Arguments> entryEvictionSelectors() {
+        return Stream.of(Arguments.of("tenant:*", false, false), Arguments.of("tenant:*", true, true));
+    }
+
+    @Test
+    void evict_shouldRejectMissingSelectorWithoutClearingCache() {
+        // given.
+        Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
+        cache.put("tenant:1", "value");
+
+        // when.
+        ResponseEntity<Void> response = testRestTemplate
+                .asMaster()
+                .exchange(
+                        path(CLEAR_CACHE_MANAGER, TEST_CACHE_1 + "/entries?wildcard=true"),
+                        HttpMethod.DELETE,
+                        null,
+                        Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(cache.get("tenant:1")).isNotNull();
+    }
+
+    @Test
     void clear_shouldClearEntireCache() {
         String key1 = "key1", key2 = "key2";
         Cache cache = clearCacheManager.getCache(TEST_CACHE_1);

@@ -36,6 +36,47 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CacheMcpServerToolsTest extends AbstractInstanceMcpServerToolsTest {
 
     @Test
+    void shouldPreviewMatchesAndReportAnUnavailableInstance() throws InterruptedException {
+        // given.
+        String path = "/axelix-caches/cacheManager/owners/entries?pattern=owner%3A*";
+        instance.respondWith(path, "3");
+        anotherInstance.respondWithBadRequest(path);
+
+        // when.
+        String result = callTool(
+                McpEndpoints.PREVIEW_CACHE_ENTRY_EVICTION_TOOL_NAME,
+                Map.of(
+                        "instanceIds", List.of(INSTANCE_ID, ANOTHER_INSTANCE_ID),
+                        "cacheManager", "cacheManager",
+                        "cacheName", "owners",
+                        "pattern", "owner:*"));
+
+        // then.
+        assertThat(result).contains("estimatedMatches", INSTANCE_ID, "3", "failedInstanceIds", ANOTHER_INSTANCE_ID);
+        assertThat(instance.takeRequest().getMethod()).isEqualTo("GET");
+        assertThat(anotherInstance.takeRequest().getMethod()).isEqualTo("GET");
+    }
+
+    @Test
+    void shouldSendLiteralEntryEvictionToEachInstance() throws InterruptedException {
+        // when.
+        String result = callTool(
+                McpEndpoints.EVICT_CACHE_ENTRIES_TOOL_NAME,
+                Map.of(
+                        "instanceIds", List.of(INSTANCE_ID, ANOTHER_INSTANCE_ID),
+                        "cacheManager", "cacheManager",
+                        "cacheName", "owners",
+                        "selector", "owner:*",
+                        "wildcard", false));
+
+        // then.
+        assertThat(result).isEqualTo(DONE_RESPONSE);
+        String path = "/axelix-caches/cacheManager/owners/entries?selector=owner%3A*&wildcard=false";
+        assertCacheClearing(instance.takeRequest(), path);
+        assertCacheClearing(anotherInstance.takeRequest(), path);
+    }
+
+    @Test
     void shouldFanTheSpecificCacheClearingOutToEveryListedInstance() throws InterruptedException {
         // when.
         String result = callTool(
