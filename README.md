@@ -244,6 +244,74 @@ With self-registration (your spring boot apps register themselves in Axelix Mast
 sides, every such request is rejected with `401` — managed instances never appear in the UI and
 self-registration never succeeds.
 
+### 3. Use Axelix from an AI agent (MCP)
+
+Many Spring Boot problems are invisible in the source and show up only once the service runs: a bean never gets
+created, a different property source wins, a `@Transactional` method fires N+1 queries. Your coding agent reads
+the code, so it can't see any of that. Master's built-in MCP server shows the agent the running service and
+points out the problems Axelix has already found in it, such as N+1 queries, in-memory pagination, and risky
+entity mappings. Ask "why is the `DataSource` bean missing on staging?", and the agent checks the live
+conditions on that instance instead of guessing from the code. It can also act: raise a log level for ten
+minutes or clear a cache, within the role of the account it signs in with.
+
+The server is on by default at `/api/mcp` on Master's port (`http://localhost:2935/api/mcp` locally) and uses the
+Streamable HTTP transport.
+
+See the full [MCP tool catalog](docs/content/docs/setting-up-master-ui/mcp/mcp-tools.mdx) for every tool, what it
+does, and which roles can call it. The same list is on the **MCP** page of the Axelix UI.
+
+The agent signs in with an Axelix account, and the account's role decides which tools it can call. The examples
+below use the default `admin / admin` account of a local Master: `YWRtaW46YWRtaW4=` is `admin:admin` in base64.
+
+**Claude Code:**
+
+```bash
+claude mcp add --transport http axelix http://localhost:2935/api/mcp --header "Authorization: Basic YWRtaW46YWRtaW4="
+```
+
+**Cursor** (`~/.cursor/mcp.json`, or `.cursor/mcp.json` for one project):
+
+```json
+{
+  "mcpServers": {
+    "axelix": {
+      "url": "http://localhost:2935/api/mcp",
+      "headers": { "Authorization": "Basic YWRtaW46YWRtaW4=" }
+    }
+  }
+}
+```
+
+**Codex** (`~/.codex/config.toml`, because `codex mcp add` can't set custom headers):
+
+```toml
+[mcp_servers.axelix]
+url = "http://localhost:2935/api/mcp"
+http_headers = { "Authorization" = "Basic YWRtaW46YWRtaW4=" }
+```
+
+If a command or field doesn't work in your agent's version, check its own MCP guide:
+[Claude Code](https://code.claude.com/docs/en/mcp), [Cursor](https://cursor.com/docs/context/mcp),
+[Codex](https://developers.openai.com/codex/mcp).
+
+For a shared Master, replace the host and use your own account. To sign in through your identity provider
+(OAuth/OIDC) or with an access token, see
+[Connecting an AI agent](docs/content/docs/setting-up-master-ui/mcp/connecting-ai-agents.mdx).
+
+Then ask the agent in plain language:
+
+- *"List the instances registered in Axelix and their Spring Boot versions."*
+- *"Why is the `DataSource` bean not created on `orders-service`?"*
+- *"Set `com.example.payments` to `DEBUG` on `payments-service` for 10 minutes, then revert it."*
+- *"Find N+1 queries and in-memory pagination in the transactions of `orders-service`."*
+- *"Check the JPA entities of `orders-service` for eager fetching and risky cascades."*
+- *"Which scheduled tasks run on `billing-service`, and what are their cron expressions?"*
+
+> In production, restrict `/api/mcp` to trusted clients or turn the server off with
+> `axelix.master.mcp-server.enabled=false`. Details:
+> [MCP authentication](docs/content/docs/setting-up-master-ui/authentication/authentication.mdx#mcp-server-authentication),
+> [MCP configuration](docs/content/docs/setting-up-master-ui/configuring-master/configuring-master.mdx#mcp-server).
+
 ## Building the community distribution from source
 
 The releases above are the easiest way to run Master, but you can also assemble the **community
