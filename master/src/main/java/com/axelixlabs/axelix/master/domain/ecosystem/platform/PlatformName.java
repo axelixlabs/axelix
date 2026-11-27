@@ -50,6 +50,11 @@ public enum PlatformName {
     ORACLE_OPENJDK("oracle-openjdk"),
 
     /**
+     * Red Hat build of OpenJDK.
+     */
+    RED_HAT_OPENJDK("red-hat-openjdk"),
+
+    /**
      * Spring Boot as the Platform.
      */
     SPRING_BOOT("spring-boot"),

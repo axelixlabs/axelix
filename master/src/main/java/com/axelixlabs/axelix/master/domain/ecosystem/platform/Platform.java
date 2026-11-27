@@ -62,7 +62,7 @@ public record Platform(PlatformName name, List<PlatformReleaseLine> lines) {
     public Optional<PlatformReleaseLine> lineOf(String version) {
         return switch (name) {
             case SPRING_BOOT, SPRING_FRAMEWORK -> lineOfSpring(version);
-            case AMAZON_CORRETTO, AZUL_ZULU, BELLSOFT_LIBERICA, ECLIPSE_TEMURIN, ORACLE_OPENJDK ->
+            case AMAZON_CORRETTO, AZUL_ZULU, BELLSOFT_LIBERICA, ECLIPSE_TEMURIN, ORACLE_OPENJDK, RED_HAT_OPENJDK ->
                 lineOfOpenJDKDistro(version);
         };
     }

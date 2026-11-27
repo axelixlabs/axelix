@@ -115,7 +115,18 @@ class PlatformManifestLoaderTest {
                         PlatformName.AZUL_ZULU,
                         PlatformName.BELLSOFT_LIBERICA,
                         PlatformName.ECLIPSE_TEMURIN,
-                        PlatformName.ORACLE_OPENJDK);
+                        PlatformName.ORACLE_OPENJDK,
+                        PlatformName.RED_HAT_OPENJDK);
+    }
+
+    @Test
+    void resolvesRedHatRuntimeToStandardMaintenanceWindow() {
+        Platform redHat = loaderOf("classpath:axelix/platforms/red-hat-openjdk.yaml")
+                .load()
+                .getFirst();
+
+        assertThat(redHat.lineOf("11.0.25+9"))
+                .contains(new PlatformReleaseLine("11", LocalDate.of(2018, 10, 1), LocalDate.of(2024, 10, 31), null));
     }
 
     @Test

@@ -1,0 +1,14 @@
+platform: red-hat-openjdk
+lines:
+  - line: "11"
+    releasedAt: 2018-10-01
+    ossSupportEndsAt: 2024-10-31
+  - line: "17"
+    releasedAt: 2021-11-11
+    ossSupportEndsAt: 2027-12-31
+  - line: "21"
+    releasedAt: 2023-11-14
+    ossSupportEndsAt: 2029-12-31
+  - line: "25"
+    releasedAt: 2025-11-13
+    ossSupportEndsAt: 2030-12-31
