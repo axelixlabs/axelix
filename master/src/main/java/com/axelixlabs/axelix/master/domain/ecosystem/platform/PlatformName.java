@@ -19,33 +19,15 @@ package com.axelixlabs.axelix.master.domain.ecosystem.platform;
 
 /**
  * The {@link Platform Platforms} that are supported and known to Axelix Master.
- * <p>
- * <strong>Important Note!</strong> It is vital to distinguish the platform from the vendor of the given Platform. The
- * Platform itself is independent of the vendor.
- * <p>
- * For example, OpenJDK is the platform on which de-facto every java deployment is running, but there may be multiple
- * potential vendors of the OpenJDK.
- * <p>
- * Same about Spring Boot. Spring Boot is fundamental particle, the fundamental platform for all microservices. Yet,
- * we must realize that the <strong>BUILD</strong> of the Spring Boot is provided by the vendor. Sure, the build may be the OSS
- * build, where we may colloquially call "OSS" as the vendor, but there are other potential builds of the Spring Boot platform
- * provided by:
- *
- * <ol>
- *     <li>1. Broadcom</li>
- *     <li>2. Herodevs</li>
- *     <li>3. Tuxcare</li>
- * </ol>
- *
- * And so on. These are vendors of the Spring Boot.
+ * JDK distributions have distinct platform names because vendors publish their own support schedules.
  *
  * @author Mikhail Polivakha
  */
 public enum PlatformName {
     /**
-     * OpenJDK as the Platform.
+     * Amazon Corretto JDK distribution.
      */
-    OPEN_JDK("openjdk"),
+    AMAZON_CORRETTO("amazon-corretto"),
 
     /**
      * Spring Boot as the Platform.

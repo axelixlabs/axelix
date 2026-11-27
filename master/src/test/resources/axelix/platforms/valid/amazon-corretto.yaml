@@ -1,0 +1,5 @@
+platform: amazon-corretto
+lines:
+  - line: "21"
+    releasedAt: 2023-09-21
+    ossSupportEndsAt: 2030-10-31

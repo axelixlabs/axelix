@@ -21,6 +21,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
@@ -49,11 +51,11 @@ class PlatformManifestLoaderTest {
         // then
         assertThat(platforms).hasSize(2);
 
-        Platform openJdk = platforms.get(0);
-        assertThat(openJdk.name()).isEqualTo(PlatformName.OPEN_JDK);
-        assertThat(openJdk.lines())
+        Platform corretto = platforms.get(0);
+        assertThat(corretto.name()).isEqualTo(PlatformName.AMAZON_CORRETTO);
+        assertThat(corretto.lines())
                 .containsExactly(
-                        new PlatformReleaseLine("21.0.x", LocalDate.of(2023, 9, 19), LocalDate.of(2028, 9, 30), null));
+                        new PlatformReleaseLine("21", LocalDate.of(2023, 9, 21), LocalDate.of(2030, 10, 31), null));
 
         Platform springBoot = platforms.get(1);
         assertThat(springBoot.name()).isEqualTo(PlatformName.SPRING_BOOT);
@@ -107,8 +109,31 @@ class PlatformManifestLoaderTest {
         // then
         assertThat(platforms)
                 .map(Platform::name)
-                .contains(PlatformName.SPRING_BOOT)
-                .doesNotContain(PlatformName.OPEN_JDK);
+                .contains(PlatformName.SPRING_BOOT, PlatformName.AMAZON_CORRETTO);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"21", "21.0.8", "21.0.8+9-LTS"})
+    void resolvesCorrettoVersionsToTheirFeatureRelease(String version) {
+        // given.
+        Platform corretto = loaderOf("classpath:axelix/platforms/amazon-corretto.yaml")
+                .load()
+                .getFirst();
+
+        // when / then.
+        assertThat(corretto.lineOf(version)).map(PlatformReleaseLine::line).contains("21");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"14", "21.invalid", "unknown"})
+    void returnsEmptyForUnavailableOrInvalidCorrettoVersions(String version) {
+        // given.
+        Platform corretto = loaderOf("classpath:axelix/platforms/amazon-corretto.yaml")
+                .load()
+                .getFirst();
+
+        // when / then.
+        assertThat(corretto.lineOf(version)).isEmpty();
     }
 
     private static PlatformManifestLoader loaderOf(String locationPattern) {

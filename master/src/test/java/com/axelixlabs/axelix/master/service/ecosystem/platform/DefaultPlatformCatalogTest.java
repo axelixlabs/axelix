@@ -48,15 +48,15 @@ class DefaultPlatformCatalogTest {
     void findsLoadedPlatformByItsName() {
         // given
         Platform springBoot = platform(PlatformName.SPRING_BOOT);
-        Platform openJdk = platform(PlatformName.OPEN_JDK);
-        when(platformManifestLoader.load()).thenReturn(List.of(springBoot, openJdk));
+        Platform corretto = platform(PlatformName.AMAZON_CORRETTO);
+        when(platformManifestLoader.load()).thenReturn(List.of(springBoot, corretto));
 
         // when
         DefaultPlatformCatalog subject = new DefaultPlatformCatalog(platformManifestLoader);
 
         // then
         assertThat(subject.find(PlatformName.SPRING_BOOT)).isEqualTo(springBoot);
-        assertThat(subject.find(PlatformName.OPEN_JDK)).isEqualTo(openJdk);
+        assertThat(subject.find(PlatformName.AMAZON_CORRETTO)).isEqualTo(corretto);
     }
 
     @Test

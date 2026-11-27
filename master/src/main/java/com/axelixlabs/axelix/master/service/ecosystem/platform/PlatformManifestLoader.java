@@ -125,7 +125,7 @@ public class PlatformManifestLoader {
         }
 
         /**
-         * @param line                    the release line in the {@code major.minor.x} notation
+         * @param line                    the release line, e.g. {@code 21} for Corretto or {@code 3.2.x} for Spring Boot
          * @param releasedAt              the date the line was first released
          * @param ossSupportEndsAt        the date OSS maintenance of the line ended, or ends
          * @param commercialSupportEndsAt the date commercial support ends, omitted when the upstream offers none

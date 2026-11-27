@@ -50,26 +50,39 @@ public record Platform(PlatformName name, List<PlatformReleaseLine> lines) {
         lines = List.copyOf(lines);
     }
 
-    // TODO:
-    //  right now, this method is capable to simply resolve the SemVer versions, which is fine for now,
-    //  but later we're probably going to introduce the OpenJDK support, so it will no longer work.
     /**
-     * The release line a concrete version belongs to, matched by the {@code major.minor} prefix: version
-     * {@code 3.2.4} belongs to line {@code 3.2.x}.
+     * Extracts the release line from the given version. By "release line" we call the certain bundle of versions that
+     * are considered to belong to same "line". In case of OpenJDK release like is java feature version, in case of
+     * spring boot/framework it is the generation version e.g. Spring Boot 2.7.x or Spring Framework 6.1.x.
      *
      * @param version the exact version an instance runs
      *
      * @return the line of the version, or empty when the version does not parse or the line is not curated
      */
     public Optional<PlatformReleaseLine> lineOf(String version) {
-        String[] segments = version.split("\\.");
+        return switch (name) {
+            case SPRING_BOOT, SPRING_FRAMEWORK -> lineOfSpring(version);
+            case AMAZON_CORRETTO -> lineOfOpenJDKDistro(version);
+        };
+    }
 
+    private Optional<PlatformReleaseLine> lineOfSpring(String version) {
+        String[] segments = version.split("\\.");
         if (segments.length < 2) {
             return Optional.empty();
         }
+        return findLine(segments[0] + "." + segments[1] + ".x");
+    }
 
-        String line = segments[0] + "." + segments[1] + ".x";
+    private Optional<PlatformReleaseLine> lineOfOpenJDKDistro(String version) {
+        try {
+            return findLine(Integer.toString(Runtime.Version.parse(version).feature()));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
 
+    private Optional<PlatformReleaseLine> findLine(String line) {
         return lines.stream().filter(candidate -> candidate.line().equals(line)).findFirst();
     }
 
