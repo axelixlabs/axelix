@@ -46,6 +46,7 @@ public class DefaultMcpEndpointAuthorityResolver implements McpEndpointAuthority
     static {
         MAPPING = new HashMap<>(2);
         MAPPING.put(McpEndpoints.CLEAR_ALL_CACHES, () -> "caches:clear");
+        MAPPING.put(McpEndpoints.EVICT_CACHE_ENTRY, () -> "caches:clear");
         MAPPING.put(McpEndpoints.CLEAR_SPECIFIC_CACHE, () -> "caches:clear");
     }
 

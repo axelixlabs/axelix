@@ -18,11 +18,13 @@
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.axelixlabs.axelix.common.contract.caches.CachesFeed;
 import com.axelixlabs.axelix.common.contract.caches.SingleCache;
@@ -69,6 +71,30 @@ public class AxelixCachesEndpoint {
             dispatcher.clear(cacheManagerName, cacheName);
         } else {
             dispatcher.clear(cacheManagerName, cacheName, key);
+        }
+    }
+
+    @GetMapping("/{cacheManagerName}/{cacheName}/entries")
+    public boolean containsKey(
+            @PathVariable String cacheManagerName, @PathVariable String cacheName, @RequestParam String key) {
+        try {
+            return dispatcher.containsKey(cacheManagerName, cacheName, key);
+        } catch (CacheManagerNotFoundException | CacheNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
+    }
+
+    @DeleteMapping("/{cacheManagerName}/{cacheName}/entries")
+    public void evictEntry(
+            @PathVariable String cacheManagerName, @PathVariable String cacheName, @RequestParam String key) {
+        try {
+            dispatcher.evictEntry(cacheManagerName, cacheName, key);
+        } catch (CacheManagerNotFoundException | CacheNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
 

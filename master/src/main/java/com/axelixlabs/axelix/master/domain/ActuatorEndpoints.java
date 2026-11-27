@@ -51,6 +51,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_BEANS = endpoint("/axelix-beans", HttpMethod.GET);
 
     // Caches
+    public static final ActuatorEndpoint CACHE_KEY_EXISTS =
+            endpoint("/axelix-caches/{cacheManagerName}/{cacheName}/entries", HttpMethod.GET);
+    public static final ActuatorEndpoint EVICT_CACHE_ENTRY =
+            endpoint("/axelix-caches/{cacheManagerName}/{cacheName}/entries", HttpMethod.DELETE);
     public static final ActuatorEndpoint CLEAR_SINGLE_CACHE =
             endpoint("/axelix-caches/{cacheManagerName}/{cacheName}/clear", HttpMethod.DELETE);
     public static final ActuatorEndpoint CLEAR_ALL_CACHES = endpoint("/axelix-caches/clear", HttpMethod.DELETE);

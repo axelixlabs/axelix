@@ -114,6 +114,22 @@ public class EndpointProbersAutoConfiguration {
 
     // Caches
     @Bean
+    public DefaultEndpointProber<Boolean> cacheKeyExistsEndpointProber(ObjectMapper objectMapper) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry,
+                new DefaultJacksonMessageDeserializationStrategy<>(objectMapper, Boolean.class),
+                tokenProvider,
+                ActuatorEndpoints.CACHE_KEY_EXISTS,
+                httpClient);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber evictCacheEntryEndpointProber() {
+        return new DiscardingAbstractEndpointProber(
+                instanceRegistry, ActuatorEndpoints.EVICT_CACHE_ENTRY, tokenProvider, httpClient);
+    }
+
+    @Bean
     public DiscardingAbstractEndpointProber clearAllCachesEndpointProber() {
         return new DiscardingAbstractEndpointProber(
                 instanceRegistry, ActuatorEndpoints.CLEAR_ALL_CACHES, tokenProvider, httpClient);

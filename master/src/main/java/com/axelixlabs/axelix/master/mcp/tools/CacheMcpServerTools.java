@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.master.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import com.axelixlabs.axelix.master.service.BulkInstancesValidator;
+import com.axelixlabs.axelix.master.service.CacheEntryManagement;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -46,9 +47,15 @@ public class CacheMcpServerTools {
     private final EndpointInvoker endpointInvoker;
     private final BulkInstancesValidator bulkInstancesValidator;
 
-    public CacheMcpServerTools(EndpointInvoker endpointInvoker, BulkInstancesValidator bulkInstancesValidator) {
+    private final CacheEntryManagement cacheEntries;
+
+    public CacheMcpServerTools(
+            EndpointInvoker endpointInvoker,
+            BulkInstancesValidator bulkInstancesValidator,
+            CacheEntryManagement cacheEntries) {
         this.endpointInvoker = endpointInvoker;
         this.bulkInstancesValidator = bulkInstancesValidator;
+        this.cacheEntries = cacheEntries;
     }
 
     @McpTool(
@@ -123,15 +130,51 @@ public class CacheMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.CACHE_KEY_EXISTS_TOOL_NAME,
+            title = "Check Cache Key",
+            description = """
+            Check whether the exact string key exists in the named local Caffeine or concurrent-map cache on each selected instance.
+            """,
+            annotations =
+                    @McpTool.McpAnnotations(
+                            readOnlyHint = true,
+                            destructiveHint = false,
+                            idempotentHint = true,
+                            openWorldHint = false))
+    public CacheEntryManagement.KeyPresence cacheKeyExists(
+            @McpToolParam(description = "IDs of the instances to check") List<String> instanceIds,
+            @McpToolParam(description = "Name of the cache manager") String cacheManager,
+            @McpToolParam(description = "Name of the cache") String cacheName,
+            @McpToolParam(description = "Exact string key") String key) {
+        return cacheEntries.exists(instanceIds, cacheManager, cacheName, key);
+    }
+
+    @McpTool(
+            name = McpEndpoints.EVICT_CACHE_ENTRY_TOOL_NAME,
+            title = "Evict Cache Entry",
+            description = """
+            Evict the exact string key from the named local Caffeine or concurrent-map cache on each selected instance.
+            """,
+            annotations =
+                    @McpTool.McpAnnotations(
+                            readOnlyHint = false,
+                            destructiveHint = true,
+                            idempotentHint = false,
+                            openWorldHint = false))
+    public void evictCacheEntry(
+            @McpToolParam(description = "IDs of the instances to update") List<String> instanceIds,
+            @McpToolParam(description = "Name of the cache manager") String cacheManager,
+            @McpToolParam(description = "Name of the cache") String cacheName,
+            @McpToolParam(description = "Exact string key") String key) {
+        cacheEntries.evict(instanceIds, cacheManager, cacheName, key);
+    }
+
+    @McpTool(
             name = McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME,
             title = "Clear Specific Cache",
             description = """
-            Clears a specific cache entry identified by cache name (key) within a specific cache manager
-            for the given instances. Only the entry matching the given cache name is evicted, all other
-            entries remain intact.
-
-            Use this when the user asks to clear a specific cache by name, or to evict a specific entry by key
-            the cache name IS the key).
+            Clears every entry in the named cache within the specified cache manager on the given instances.
+            Use evictCacheEntry for requests that specify an entry key.
 
             PREREQUISITE: If the cache manager name is unknown, call "Caches Feed" first.
             IF THE REQUESTED CACHE NAME IS PRESENT IN MULTIPLE CACHE MANAGERS, YOU MUST ASK THE USER
@@ -156,7 +199,7 @@ public class CacheMcpServerTools {
     public void clearSpecificCacheEntity(
             @McpToolParam(description = "The IDs of the instances to apply the operation to") List<String> instanceIds,
             @McpToolParam(description = "The Cache Manager Name") String cacheManager,
-            @McpToolParam(description = "The Cache Name (also serves as the entry key)") String cacheName) {
+            @McpToolParam(description = "The Cache Name") String cacheName) {
 
         HttpPayload payload = new DefaultHttpPayload(Map.of("cacheName", cacheName, "cacheManagerName", cacheManager));
         bulkInstancesValidator.validate(instanceIds);

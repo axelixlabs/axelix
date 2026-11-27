@@ -231,6 +231,66 @@ class AxelixCachesEndpointTest {
         assertThat(cache.get(key1)).isNotNull();
     }
 
+    @ParameterizedTest
+    @MethodSource("cacheKeyPresence")
+    void checksExactKey(String key, boolean expected) {
+        // given.
+        Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
+        cache.put("tenant:1", "value");
+
+        // when.
+        ResponseEntity<Boolean> response = testRestTemplate
+                .asMaster()
+                .getForEntity(path(CLEAR_CACHE_MANAGER, TEST_CACHE_1 + "/entries?key=" + key), Boolean.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(expected);
+        assertThat(cache.get("tenant:1")).isNotNull();
+    }
+
+    static Stream<Arguments> cacheKeyPresence() {
+        return Stream.of(Arguments.of("tenant:1", true), Arguments.of("tenant:*", false));
+    }
+
+    @Test
+    void evictsOnlyTheExactKey() {
+        // given.
+        Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
+        cache.put("tenant:*", "value");
+        cache.put("tenant:1", "value");
+
+        // when.
+        ResponseEntity<Void> response = testRestTemplate
+                .asMaster()
+                .exchange(
+                        path(CLEAR_CACHE_MANAGER, TEST_CACHE_1 + "/entries?key=tenant:*"),
+                        HttpMethod.DELETE,
+                        null,
+                        Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(cache.get("tenant:*")).isNull();
+        assertThat(cache.get("tenant:1")).isNotNull();
+    }
+
+    @Test
+    void evict_shouldRejectMissingKeyWithoutClearingCache() {
+        // given.
+        Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
+        cache.put("tenant:1", "value");
+
+        // when.
+        ResponseEntity<Void> response = testRestTemplate
+                .asMaster()
+                .exchange(path(CLEAR_CACHE_MANAGER, TEST_CACHE_1 + "/entries"), HttpMethod.DELETE, null, Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(cache.get("tenant:1")).isNotNull();
+    }
+
     @Test
     void clear_shouldClearEntireCache() {
         String key1 = "key1", key2 = "key2";

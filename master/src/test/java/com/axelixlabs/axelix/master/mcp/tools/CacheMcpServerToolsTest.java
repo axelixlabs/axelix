@@ -36,6 +36,46 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CacheMcpServerToolsTest extends AbstractInstanceMcpServerToolsTest {
 
     @Test
+    void shouldCheckKeyPresenceAndReportAnUnavailableInstance() throws InterruptedException {
+        // given.
+        String path = "/axelix-caches/cacheManager/owners/entries?key=owner%3A*";
+        instance.respondWith(path, "true");
+        anotherInstance.respondWithBadRequest(path);
+
+        // when.
+        String result = callTool(
+                McpEndpoints.CACHE_KEY_EXISTS_TOOL_NAME,
+                Map.of(
+                        "instanceIds", List.of(INSTANCE_ID, ANOTHER_INSTANCE_ID),
+                        "cacheManager", "cacheManager",
+                        "cacheName", "owners",
+                        "key", "owner:*"));
+
+        // then.
+        assertThat(result).contains("existsByInstance", INSTANCE_ID, "true", "failedInstanceIds", ANOTHER_INSTANCE_ID);
+        assertThat(instance.takeRequest().getMethod()).isEqualTo("GET");
+        assertThat(anotherInstance.takeRequest().getMethod()).isEqualTo("GET");
+    }
+
+    @Test
+    void shouldSendLiteralEntryEvictionToEachInstance() throws InterruptedException {
+        // when.
+        String result = callTool(
+                McpEndpoints.EVICT_CACHE_ENTRY_TOOL_NAME,
+                Map.of(
+                        "instanceIds", List.of(INSTANCE_ID, ANOTHER_INSTANCE_ID),
+                        "cacheManager", "cacheManager",
+                        "cacheName", "owners",
+                        "key", "owner:*"));
+
+        // then.
+        assertThat(result).isEqualTo(DONE_RESPONSE);
+        String path = "/axelix-caches/cacheManager/owners/entries?key=owner%3A*";
+        assertCacheClearing(instance.takeRequest(), path);
+        assertCacheClearing(anotherInstance.takeRequest(), path);
+    }
+
+    @Test
     void shouldFanTheSpecificCacheClearingOutToEveryListedInstance() throws InterruptedException {
         // when.
         String result = callTool(

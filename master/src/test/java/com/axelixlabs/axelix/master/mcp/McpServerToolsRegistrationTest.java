@@ -57,6 +57,8 @@ class McpServerToolsRegistrationTest {
                         "getAllCaches",
                         "clearAllCaches",
                         "clearSpecificCacheEntity",
+                        "cacheKeyExists",
+                        "evictCacheEntry",
                         "getAvailableLoggingLevels",
                         "getLoggerGroupsFeed",
                         "getLoggersFeed",
