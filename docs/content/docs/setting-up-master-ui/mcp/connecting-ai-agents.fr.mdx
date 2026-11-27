@@ -158,11 +158,17 @@ codex mcp login axelix
 </Tabs>
 
 Avec ces commandes, l’agent s’enregistre auprès de votre fournisseur comme nouveau client OAuth, généralement via
-l’enregistrement dynamique de clients. Claude Code et Codex prennent aussi en charge les Client ID Metadata Documents.
-Si votre fournisseur n’autorise ni l’un ni l’autre, enregistrez vous-même un client pour l’agent, comme décrit
-ci-dessous.
+l’enregistrement dynamique de clients. Un enregistrement statique est également possible. Claude Code et Codex
+prennent aussi en charge les Client ID Metadata Documents. Si votre fournisseur n’autorise ni l’enregistrement
+dynamique ni les Client ID Metadata Documents, enregistrez vous-même un client pour l’agent, comme décrit ci-dessous.
 
 ### Fournisseurs sans enregistrement dynamique de clients
+
+:::note
+Cette section vise principalement à vous aider à configurer votre agent IA comme client MCP pour le connecter au
+serveur MCP d’Axelix Master. En règle générale, le mode d’enregistrement du client OIDC (à l’avance ou de façon
+dynamique) importe peu au serveur.
+:::
 
 Si votre fournisseur ne prend pas en charge l’enregistrement dynamique de clients, ou l’a désactivé, créez chez lui un
 client OAuth pour l’agent, de la même façon que vous en avez créé un pour Master, et transmettez son client ID à

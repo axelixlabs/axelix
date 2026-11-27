@@ -159,10 +159,17 @@ codex mcp login axelix
 </Tabs>
 
 Mit diesen Befehlen registriert sich der Agent bei Ihrem Anbieter als neuer OAuth-Client, in der Regel über die
-dynamische Client-Registrierung. Claude Code und Codex unterstützen außerdem Client ID Metadata Documents. Wenn Ihr
-Anbieter keins von beidem erlaubt, registrieren Sie selbst einen Client für den Agenten, wie unten beschrieben.
+dynamische Client-Registrierung. Auch eine statische Registrierung ist möglich. Claude Code und Codex unterstützen
+außerdem Client ID Metadata Documents. Wenn Ihr Anbieter weder die dynamische Registrierung noch Client ID Metadata
+Documents zulässt, registrieren Sie selbst einen Client für den Agenten, wie unten beschrieben.
 
 ### Anbieter ohne dynamische Client-Registrierung
+
+:::note
+Dieser Abschnitt soll Ihnen vor allem dabei helfen, Ihren KI-Agenten als MCP-Client für die Verbindung mit dem
+MCP-Server von Axelix Master einzurichten. Für den Server spielt es in der Regel keine Rolle, ob der OIDC-Client vorab
+oder dynamisch registriert wird.
+:::
 
 Wenn Ihr Anbieter die dynamische Client-Registrierung nicht unterstützt oder sie deaktiviert hat, legen Sie bei Ihrem
 Anbieter einen OAuth-Client für den Agenten an, genauso wie Sie einen für Master angelegt haben, und übergeben Sie dem

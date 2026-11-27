@@ -153,11 +153,18 @@ codex mcp login axelix
   </Tab>
 </Tabs>
 
-Bu komutlarla ajan, sağlayıcınıza genellikle dinamik istemci kaydı (dynamic client registration) yoluyla yeni bir OAuth
-istemcisi olarak kaydolur. Claude Code ve Codex ayrıca Client ID Metadata Documents'ı da destekler. Sağlayıcınız
-ikisine de izin vermiyorsa, aşağıda anlatıldığı gibi ajan için bir istemciyi kendiniz kaydedin.
+Bu komutlarla ajan, sağlayıcınıza genellikle dinamik istemci kaydı (dynamic client registration) yoluyla yeni bir
+OAuth istemcisi olarak kaydolur. Statik kayıt da mümkündür. Claude Code ve Codex Client ID Metadata Documents'ı da
+destekler. Sağlayıcınız ne dinamik kayda ne de Client ID Metadata Documents kullanımına izin veriyorsa, aşağıda
+anlatıldığı gibi ajan için bir istemciyi kendiniz kaydedin.
 
 ### Dinamik istemci kaydı olmayan sağlayıcılar [#providers-without-dynamic-client-registration]
+
+:::note
+Bu bölümün temel amacı, yapay zekâ ajanınızı Axelix Master'ın MCP sunucusuna bağlanacak bir MCP istemcisi olarak
+yapılandırmanıza yardımcı olmaktır. OIDC istemcisinin önceden mi yoksa dinamik olarak mı kaydedildiği sunucu açısından
+genellikle önemli değildir.
+:::
 
 Sağlayıcınız dinamik istemci kaydını desteklemiyorsa veya bu özellik kapalıysa, Master için yaptığınız gibi
 sağlayıcınızda ajan için bir OAuth istemcisi oluşturun ve istemci kimliğini (client ID) ajana verin. İstemci sırrını
