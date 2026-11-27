@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 import java.util.List;
 
 import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.QuartzJobExecutionHistory;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 
@@ -46,4 +47,9 @@ public interface InsightsInfoProvider {
      * @return the latest scheduled task executions, at most the configured number per task.
      */
     List<ScheduledTaskExecution> getScheduledTaskExecutions();
+
+    /**
+     * @return the latest completed Quartz job executions observed by this starter instance.
+     */
+    List<QuartzJobExecutionHistory> getQuartzExecutionHistory();
 }

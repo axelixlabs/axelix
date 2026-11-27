@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import com.axelixlabs.axelix.common.contract.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.contract.metadata.InsightFeature;
 import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.QuartzJobExecutionHistory;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
@@ -43,6 +44,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.QuartzExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 
 import static com.axelixlabs.axelix.common.domain.insights.FeatureId.AOT_CACHE;
@@ -74,13 +76,56 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                historyWith(first, second));
+                historyWith(first, second),
+                null);
 
         // when.
         List<ScheduledTaskExecution> executions = subject.getScheduledTaskExecutions();
 
         // then.
         assertThat(executions).containsExactlyInAnyOrder(first, second);
+    }
+
+    @Test
+    void reportsQuartzExecutionHistory_whenHistoryIsNotEmpty() {
+        // given.
+        QuartzJobExecutionHistory execution = quartzExecutionHistory("scheduler", "execution-1");
+        DefaultInsightsInfoProvider subject = new DefaultInsightsInfoProvider(
+                osivDisabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry(),
+                noOpJpaEntitiesProfileProvider(),
+                null,
+                quartzHistoryWith("scheduler", execution));
+
+        // when.
+        List<QuartzJobExecutionHistory> executions = subject.getQuartzExecutionHistory();
+
+        // then.
+        assertThat(executions).containsExactly(execution);
+    }
+
+    @Test
+    void reportsQuartzExecutionHistoryInInsights_whenHistoryIsNotEmpty() {
+        // given.
+        QuartzJobExecutionHistory execution = quartzExecutionHistory("scheduler", "execution-1");
+        DefaultInsightsInfoProvider subject = new DefaultInsightsInfoProvider(
+                osivDisabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry(),
+                noOpJpaEntitiesProfileProvider(),
+                null,
+                quartzHistoryWith("scheduler", execution));
+
+        // when.
+        Insights insights = subject.getInsight();
+
+        // then.
+        assertThat(insights.getQuartzExecutionHistory()).containsExactly(execution);
     }
 
     @Test
@@ -94,7 +139,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                historyWith(execution));
+                historyWith(execution),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -113,13 +159,35 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         List<ScheduledTaskExecution> executions = subject.getScheduledTaskExecutions();
 
         // then.
         assertThat(executions).isEmpty();
+    }
+
+    @Test
+    void reportsNoQuartzExecutionHistory_whenHistoryIsAbsent() {
+        // given.
+        DefaultInsightsInfoProvider subject = new DefaultInsightsInfoProvider(
+                osivDisabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry(),
+                noOpJpaEntitiesProfileProvider(),
+                null,
+                null);
+
+        // when.
+        Insights insights = subject.getInsight();
+
+        // then.
+        assertThat(subject.getQuartzExecutionHistory()).isEmpty();
+        assertThat(insights.getQuartzExecutionHistory()).isEmpty();
     }
 
     @Test
@@ -132,7 +200,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -156,7 +225,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -176,7 +246,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -195,7 +266,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -215,7 +287,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -235,7 +308,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -255,7 +329,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -275,7 +350,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -294,7 +370,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -313,7 +390,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -340,7 +418,8 @@ class DefaultInsightsInfoProviderTest {
                 collector,
                 emptyTransactionAttributesRegistry(),
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -377,7 +456,8 @@ class DefaultInsightsInfoProviderTest {
                 collector,
                 registry,
                 noOpJpaEntitiesProfileProvider(),
-                emptyScheduledTaskExecutionHistory());
+                emptyScheduledTaskExecutionHistory(),
+                null);
 
         // when.
         Insights insights = subject.getInsight();
@@ -428,6 +508,28 @@ class DefaultInsightsInfoProviderTest {
             history.record(execution);
         }
         return history;
+    }
+
+    private static QuartzExecutionHistory quartzHistoryWith(
+            String schedulerName, QuartzJobExecutionHistory... executions) {
+        QuartzExecutionHistory history = new QuartzExecutionHistory();
+        for (QuartzJobExecutionHistory execution : executions) {
+            history.record(schedulerName, execution);
+        }
+        return history;
+    }
+
+    private static QuartzJobExecutionHistory quartzExecutionHistory(String schedulerName, String executionId) {
+        return new QuartzJobExecutionHistory()
+                .executionId(executionId)
+                .schedulerName(schedulerName)
+                .jobName("job")
+                .jobGroup("jobs")
+                .triggerName("trigger")
+                .triggerGroup("triggers")
+                .startedAt("2026-01-01T00:00:00Z")
+                .durationMillis(100L)
+                .success(true);
     }
 
     private static ScheduledTaskExecution scheduledTaskExecution(String taskId) {

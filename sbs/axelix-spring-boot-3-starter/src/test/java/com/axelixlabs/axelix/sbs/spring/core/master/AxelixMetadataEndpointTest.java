@@ -94,7 +94,20 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
                   "transactions" : [ ],
                   "entitiesMap" : null
                 },
-                "scheduledTaskExecutions" : [ ]
+                "scheduledTaskExecutions" : [ ],
+                "quartzExecutionHistory" : [ {
+                  "executionId" : "quartz-execution-1",
+                  "schedulerName" : "quartzScheduler",
+                  "jobName" : "testJob",
+                  "jobGroup" : "jobs",
+                  "triggerName" : "testTrigger",
+                  "triggerGroup" : "triggers",
+                  "startedAt" : "2026-01-01T00:00:00Z",
+                  "durationMillis" : 100,
+                  "success" : true,
+                  "errorType" : null,
+                  "errorMessage" : null
+                } ]
               },
               "sbom" : "#{json-unit.any-string}"
             }

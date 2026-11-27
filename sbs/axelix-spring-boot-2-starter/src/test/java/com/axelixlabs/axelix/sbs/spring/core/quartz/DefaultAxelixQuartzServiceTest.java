@@ -20,9 +20,11 @@ package com.axelixlabs.axelix.sbs.spring.core.quartz;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -64,6 +66,7 @@ import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzJobs;
 import com.axelixlabs.axelix.common.contract.quartz.ServiceQuartzSchedulers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 /**
  * Integration tests for {@link DefaultAxelixQuartzService}.
@@ -74,6 +77,54 @@ class DefaultAxelixQuartzServiceTest extends AbstractQuartzSharedContextTest {
 
     @Autowired
     private AxelixQuartzService quartzService;
+
+    @Autowired
+    private QuartzExecutionHistory executionHistory;
+
+    @Nested
+    class ExecutionHistory {
+
+        @ParameterizedTest
+        @MethodSource("com.axelixlabs.axelix.sbs.spring.core.quartz.DefaultAxelixQuartzServiceTest#executionScenarios")
+        void shouldRecordCompletedQuartzJobExecution(
+                Class<? extends Job> jobClass, boolean success, String errorType, String errorMessage)
+                throws Exception {
+            // given.
+            String jobName = "execution-history-" + UUID.randomUUID();
+            JobDetail job = JobBuilder.newJob(jobClass)
+                    .withIdentity(jobName, "execution-history")
+                    .build();
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity(jobName, "execution-history")
+                    .startNow()
+                    .forJob(job)
+                    .build();
+            scheduler.scheduleJob(job, trigger);
+
+            try {
+                // when.
+                await().atMost(Duration.ofSeconds(5))
+                        .untilAsserted(() -> assertThat(executionHistory.getExecutions(scheduler.getSchedulerName()))
+                                .filteredOn(execution -> jobName.equals(execution.getJobName()))
+                                .singleElement()
+                                .satisfies(execution -> {
+                                    assertThat(execution.getExecutionId()).isNotBlank();
+                                    assertThat(execution.getSchedulerName()).isEqualTo(scheduler.getSchedulerName());
+                                    assertThat(execution.getJobGroup()).isEqualTo("execution-history");
+                                    assertThat(execution.getTriggerName()).isEqualTo(jobName);
+                                    assertThat(execution.getTriggerGroup()).isEqualTo("execution-history");
+                                    assertThat(Instant.parse(execution.getStartedAt()))
+                                            .isBeforeOrEqualTo(Instant.now());
+                                    assertThat(execution.getDurationMillis()).isNotNegative();
+                                    assertThat(execution.getSuccess()).isEqualTo(success);
+                                    assertThat(execution.getErrorType()).isEqualTo(errorType);
+                                    assertThat(execution.getErrorMessage()).isEqualTo(errorMessage);
+                                }));
+            } finally {
+                scheduler.deleteJob(job.getKey());
+            }
+        }
+    }
 
     @Nested
     class GetQuartzSchedulers {
@@ -322,6 +373,19 @@ class DefaultAxelixQuartzServiceTest extends AbstractQuartzSharedContextTest {
                         DailyTimeIntervalScheduleBuilder.dailyTimeIntervalSchedule()
                                 .withMisfireHandlingInstructionDoNothing(),
                         QuartzMisfirePolicy.DO_NOTHING));
+    }
+
+    static Stream<Arguments> executionScenarios() {
+        return Stream.of(
+                Arguments.of(TestJob.class, true, null, null),
+                Arguments.of(FailingJob.class, false, JobExecutionException.class.getName(), "job failed"));
+    }
+
+    public static class FailingJob implements Job {
+        @Override
+        public void execute(JobExecutionContext context) throws JobExecutionException {
+            throw new JobExecutionException("job failed");
+        }
     }
 
     static Stream<Arguments> jobBehaviorFlags() {

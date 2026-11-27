@@ -29,8 +29,10 @@ import org.springframework.context.annotation.Bean;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.annotations.AxelixAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzJobExecutionListener;
 import com.axelixlabs.axelix.sbs.spring.core.quartz.AxelixQuartzService;
 import com.axelixlabs.axelix.sbs.spring.core.quartz.DefaultAxelixQuartzService;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.QuartzExecutionHistory;
 
 /**
  * Auto-configuration for the {@link AxelixQuartzEndpoint}.
@@ -46,6 +48,17 @@ public class AxelixQuartzEndpointAutoConfiguration {
     @Bean
     public AxelixQuartzAssembler axelixQuartzAssembler() {
         return new AxelixQuartzAssembler();
+    }
+
+    @Bean
+    public QuartzExecutionHistory quartzExecutionHistory() {
+        return new QuartzExecutionHistory();
+    }
+
+    @Bean
+    public AxelixQuartzJobExecutionListener axelixQuartzJobExecutionListener(
+            List<Scheduler> schedulers, QuartzExecutionHistory quartzExecutionHistory) {
+        return new AxelixQuartzJobExecutionListener(schedulers, quartzExecutionHistory);
     }
 
     @Bean

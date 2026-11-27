@@ -48,6 +48,7 @@ public class MasterPingAssembler {
                 .memoryDetails(new MemoryDetails()
                         .heap(memoryMXBean.getHeapMemoryUsage().getUsed()))
                 .transactions(insightsInfoProvider.getTransactions())
-                .scheduledTaskExecutions(insightsInfoProvider.getScheduledTaskExecutions());
+                .scheduledTaskExecutions(insightsInfoProvider.getScheduledTaskExecutions())
+                .quartzExecutionHistory(insightsInfoProvider.getQuartzExecutionHistory());
     }
 }

@@ -82,7 +82,20 @@ class AxelixPingEndpointTest {
                         + "    \"heap\" : \"#{json-unit.ignore}\"\n"
                         + "  },\n"
                         + "  \"transactions\" : [ ],\n"
-                        + "  \"scheduledTaskExecutions\" : [ ]\n"
+                        + "  \"scheduledTaskExecutions\" : [ ],\n"
+                        + "  \"quartzExecutionHistory\" : [ {\n"
+                        + "    \"executionId\" : \"quartz-execution-1\",\n"
+                        + "    \"schedulerName\" : \"quartzScheduler\",\n"
+                        + "    \"jobName\" : \"testJob\",\n"
+                        + "    \"jobGroup\" : \"jobs\",\n"
+                        + "    \"triggerName\" : \"testTrigger\",\n"
+                        + "    \"triggerGroup\" : \"triggers\",\n"
+                        + "    \"startedAt\" : \"2026-01-01T00:00:00Z\",\n"
+                        + "    \"durationMillis\" : 100,\n"
+                        + "    \"success\" : true,\n"
+                        + "    \"errorType\" : null,\n"
+                        + "    \"errorMessage\" : null\n"
+                        + "  } ]\n"
                         + "}");
     }
 

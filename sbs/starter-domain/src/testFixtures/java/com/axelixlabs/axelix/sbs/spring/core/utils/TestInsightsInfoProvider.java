@@ -23,6 +23,7 @@ import com.axelixlabs.axelix.common.contract.metadata.HotSpotInsights;
 import com.axelixlabs.axelix.common.contract.metadata.InsightFeature;
 import com.axelixlabs.axelix.common.contract.metadata.Insights;
 import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.QuartzJobExecutionHistory;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
@@ -48,7 +49,17 @@ public final class TestInsightsInfoProvider implements InsightsInfoProvider {
                             .enabled(true))))
             .springFramework(List.of(new InsightFeature().featureId("OSIV").enabled(false)))
             .persistenceInsights(new PersistenceInsights().transactions(List.of()))
-            .scheduledTaskExecutions(List.of());
+            .scheduledTaskExecutions(List.of())
+            .quartzExecutionHistory(List.of(new QuartzJobExecutionHistory()
+                    .executionId("quartz-execution-1")
+                    .schedulerName("quartzScheduler")
+                    .jobName("testJob")
+                    .jobGroup("jobs")
+                    .triggerName("testTrigger")
+                    .triggerGroup("triggers")
+                    .startedAt("2026-01-01T00:00:00Z")
+                    .durationMillis(100L)
+                    .success(true)));
 
     @Override
     public Insights getInsight() {
@@ -63,5 +74,10 @@ public final class TestInsightsInfoProvider implements InsightsInfoProvider {
     @Override
     public List<ScheduledTaskExecution> getScheduledTaskExecutions() {
         return TEST_INSIGHTS.getScheduledTaskExecutions();
+    }
+
+    @Override
+    public List<QuartzJobExecutionHistory> getQuartzExecutionHistory() {
+        return TEST_INSIGHTS.getQuartzExecutionHistory();
     }
 }

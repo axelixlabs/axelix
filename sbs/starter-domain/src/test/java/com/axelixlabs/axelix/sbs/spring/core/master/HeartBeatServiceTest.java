@@ -53,12 +53,14 @@ import com.axelixlabs.axelix.common.contract.heartbeatv2.HeartBeatMetadataV2;
 import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.common.contract.metadata.Insights;
+import com.axelixlabs.axelix.common.contract.metadata.QuartzJobExecutionHistory;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.QuartzExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
@@ -108,6 +110,9 @@ class HeartBeatServiceTest {
     @Autowired
     private ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
 
+    @Autowired
+    private QuartzExecutionHistory quartzExecutionHistory;
+
     @TestConfiguration
     static class HeartBeatServiceTestConfiguration {
 
@@ -143,6 +148,11 @@ class HeartBeatServiceTest {
         }
 
         @Bean
+        public QuartzExecutionHistory quartzExecutionHistory() {
+            return new QuartzExecutionHistory();
+        }
+
+        @Bean
         public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
                 BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
                 HealthDetectionFunction healthDetectionFunction,
@@ -172,7 +182,9 @@ class HeartBeatServiceTest {
         }
 
         @Bean
-        InsightsInfoProvider insightsInfoProvider(ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
+        InsightsInfoProvider insightsInfoProvider(
+                ScheduledTaskExecutionHistory scheduledTaskExecutionHistory,
+                QuartzExecutionHistory quartzExecutionHistory) {
             TestInsightsInfoProvider delegate = new TestInsightsInfoProvider();
 
             return new InsightsInfoProvider() {
@@ -189,6 +201,11 @@ class HeartBeatServiceTest {
                 @Override
                 public List<ScheduledTaskExecution> getScheduledTaskExecutions() {
                     return scheduledTaskExecutionHistory.getExecutions();
+                }
+
+                @Override
+                public List<QuartzJobExecutionHistory> getQuartzExecutionHistory() {
+                    return quartzExecutionHistory.getExecutions();
                 }
             };
         }
@@ -273,6 +290,7 @@ class HeartBeatServiceTest {
     @Test
     void shouldDeliverTheWholeHistoryOnEveryHeartbeat() throws Exception {
         scheduledTaskExecutionHistory.record(scheduledTaskExecution("com.example.Delivered#run()"));
+        quartzExecutionHistory.record("quartzScheduler", quartzJobExecution("quartz-execution-1"));
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
@@ -283,11 +301,13 @@ class HeartBeatServiceTest {
 
         RecordedRequest firstHeartbeat = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
         assertThat(firstHeartbeat.getPath()).isEqualTo("/service/heartbeat/v2");
-        assertThat(firstHeartbeat.getBody().readUtf8()).contains("com.example.Delivered#run()");
+        String firstHeartbeatBody = firstHeartbeat.getBody().readUtf8();
+        assertThat(firstHeartbeatBody).contains("com.example.Delivered#run()").contains("quartz-execution-1");
 
         RecordedRequest secondHeartbeat = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
         assertThat(secondHeartbeat.getPath()).isEqualTo("/service/heartbeat/v2");
-        assertThat(secondHeartbeat.getBody().readUtf8()).contains("com.example.Delivered#run()");
+        String secondHeartbeatBody = secondHeartbeat.getBody().readUtf8();
+        assertThat(secondHeartbeatBody).contains("com.example.Delivered#run()").contains("quartz-execution-1");
     }
 
     @Test
@@ -314,6 +334,19 @@ class HeartBeatServiceTest {
     private static ScheduledTaskExecution scheduledTaskExecution(String taskId) {
         return new ScheduledTaskExecution()
                 .taskId(taskId)
+                .startedAt("2026-01-01T00:00:00Z")
+                .durationMillis(100L)
+                .success(true);
+    }
+
+    private static QuartzJobExecutionHistory quartzJobExecution(String executionId) {
+        return new QuartzJobExecutionHistory()
+                .executionId(executionId)
+                .schedulerName("quartzScheduler")
+                .jobName("testJob")
+                .jobGroup("jobs")
+                .triggerName("testTrigger")
+                .triggerGroup("triggers")
                 .startedAt("2026-01-01T00:00:00Z")
                 .durationMillis(100L)
                 .success(true);
@@ -425,8 +458,13 @@ class HeartBeatServiceTest {
                     : heartBeat.getScheduledTaskExecutions().stream()
                             .map(execution -> "\"" + execution.getTaskId() + "\"")
                             .collect(Collectors.joining(","));
+            String quartzExecutionIds = heartBeat.getQuartzExecutionHistory() == null
+                    ? ""
+                    : heartBeat.getQuartzExecutionHistory().stream()
+                            .map(execution -> "\"" + execution.getExecutionId() + "\"")
+                            .collect(Collectors.joining(","));
             return "{\"instanceId\":\"" + heartBeat.getInstanceId() + "\",\"scheduledTaskExecutions\":[" + taskIds
-                    + "]}";
+                    + "],\"quartzExecutionHistory\":[" + quartzExecutionIds + "]}";
         }
 
         InitialSelfRegistrationRequest metadata = (InitialSelfRegistrationRequest) payload;

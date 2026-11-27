@@ -223,6 +223,12 @@ components:
           x-axelix-introduced-in: 1.2.0
           items:
             $ref: '#/components/schemas/ScheduledTaskExecution'
+        quartzExecutionHistory:
+          type: array
+          description: The latest completed Quartz job executions observed by this starter instance.
+          x-axelix-introduced-in: 1.4.0
+          items:
+            $ref: '#/components/schemas/QuartzJobExecutionHistory'
     HotSpotInsights:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0
@@ -268,6 +274,67 @@ components:
           type: boolean
           description: The enabled state of the insight feature.
           x-axelix-introduced-in: 1.2.0
+    QuartzJobExecutionHistory:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A completed Quartz job execution observed by this starter instance.
+      required:
+        - executionId
+        - schedulerName
+        - jobName
+        - jobGroup
+        - triggerName
+        - triggerGroup
+        - startedAt
+        - durationMillis
+        - success
+      properties:
+        executionId:
+          type: string
+          description: The Quartz fire instance id of the execution.
+          x-axelix-introduced-in: 1.4.0
+        schedulerName:
+          type: string
+          description: The name of the Quartz scheduler that observed the execution.
+          x-axelix-introduced-in: 1.4.0
+        jobName:
+          type: string
+          description: The name of the executed job.
+          x-axelix-introduced-in: 1.4.0
+        jobGroup:
+          type: string
+          description: The group of the executed job.
+          x-axelix-introduced-in: 1.4.0
+        triggerName:
+          type: string
+          description: The name of the trigger that fired the job.
+          x-axelix-introduced-in: 1.4.0
+        triggerGroup:
+          type: string
+          description: The group of the trigger that fired the job.
+          x-axelix-introduced-in: 1.4.0
+        startedAt:
+          type: string
+          description: The actual fire time reported by Quartz in ISO-8601 format.
+          x-axelix-introduced-in: 1.4.0
+        durationMillis:
+          type: integer
+          format: int64
+          description: The job execution duration in milliseconds.
+          x-axelix-introduced-in: 1.4.0
+        success:
+          type: boolean
+          description: Whether the job execution completed without a Quartz job exception.
+          x-axelix-introduced-in: 1.4.0
+        errorType:
+          type: string
+          description: The fully qualified exception class name, or absent when the execution succeeded.
+          x-axelix-introduced-in: 1.4.0
+        errorMessage:
+          type: string
+          description: The exception message, or absent when the execution succeeded.
+          x-axelix-introduced-in: 1.4.0
     ScheduledTaskExecution:
       x-axelix-produced-by: starter
       x-axelix-introduced-in: 1.2.0

@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.common.contract.metadata.Insights;
 import com.axelixlabs.axelix.common.contract.metadata.JpaEntities;
 import com.axelixlabs.axelix.common.contract.metadata.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.common.contract.metadata.QuartzJobExecutionHistory;
 import com.axelixlabs.axelix.common.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.contract.metadata.TransactionOrigin;
@@ -50,6 +51,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStats;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.QuartzExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmOptions.AOT_CACHE_OPTION;
@@ -81,13 +83,11 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
     @Nullable
     private final ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
 
+    @Nullable
+    private final QuartzExecutionHistory quartzExecutionHistory;
+
     /**
      * Creates a new DefaultInsightsInfoProvider.
-     *
-     * @param openSessionInViewStateProvider provider of the Spring Open Session in View state.
-     * @param gcLogService                   GC log service, or {@code null} when the HotSpot DiagnosticCommandMBean
-     *                                        is unavailable and GC log insights cannot be reported.
-     * @param entitiesMapProvider            provider of the scanned JPA entities map.
      */
     public DefaultInsightsInfoProvider(
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
@@ -96,7 +96,8 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
             TransactionStatsCollector transactionStatsCollector,
             TransactionAttributesRegistry transactionAttributesRegistry,
             JpaEntitiesProfileProvider entitiesMapProvider,
-            @Nullable ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
+            @Nullable ScheduledTaskExecutionHistory scheduledTaskExecutionHistory,
+            @Nullable QuartzExecutionHistory quartzExecutionHistory) {
         this.openSessionInViewStateProvider = openSessionInViewStateProvider;
         this.gcLogService = gcLogService;
         this.vmOptionsAccessor = vmOptionsAccessor;
@@ -104,6 +105,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
         this.transactionAttributesRegistry = transactionAttributesRegistry;
         this.entitiesMapProvider = entitiesMapProvider;
         this.scheduledTaskExecutionHistory = scheduledTaskExecutionHistory;
+        this.quartzExecutionHistory = quartzExecutionHistory;
     }
 
     @Override
@@ -119,12 +121,18 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                         .featureId(FeatureId.OSIV.getId())
                         .enabled(openSessionInViewStateProvider.isOpenSessionInViewEnabled())))
                 .persistenceInsights(assemblePersistenceInsights())
-                .scheduledTaskExecutions(getScheduledTaskExecutions());
+                .scheduledTaskExecutions(getScheduledTaskExecutions())
+                .quartzExecutionHistory(getQuartzExecutionHistory());
     }
 
     @Override
     public List<ScheduledTaskExecution> getScheduledTaskExecutions() {
         return scheduledTaskExecutionHistory != null ? scheduledTaskExecutionHistory.getExecutions() : List.of();
+    }
+
+    @Override
+    public List<QuartzJobExecutionHistory> getQuartzExecutionHistory() {
+        return quartzExecutionHistory != null ? quartzExecutionHistory.getExecutions() : List.of();
     }
 
     @Override
