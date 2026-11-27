@@ -114,9 +114,9 @@ public final class MasterWebEndpoints {
             register("caches:enable", HttpMethod.POST, ApiPaths.CachesApi.BULK_ENABLE_CACHE, () -> "caches:toggle");
     public static final MasterWebEndpoint CACHE_DISABLE =
             register("caches:disable", HttpMethod.POST, ApiPaths.CachesApi.BULK_DISABLE_CACHE, () -> "caches:toggle");
-    public static final MasterWebEndpoint CACHE_ENTRIES_PREVIEW =
-            register("caches:entries:preview", HttpMethod.POST, ApiPaths.CachesApi.CACHE_ENTRIES_PREVIEW, null);
-    public static final MasterWebEndpoint CACHE_ENTRIES_EVICT =
+    public static final MasterWebEndpoint CACHE_KEY_EXISTS =
+            register("caches:entries:exists", HttpMethod.POST, ApiPaths.CachesApi.CACHE_KEY_EXISTS, null);
+    public static final MasterWebEndpoint CACHE_ENTRY_EVICT =
             register("caches:entries:evict", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_ENTRIES, () -> "caches:clear");
     public static final MasterWebEndpoint CACHE_CLEAR_ONE = register(
             "caches:clear-one", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_BULK_CLEAR_CACHE, () -> "caches:clear");

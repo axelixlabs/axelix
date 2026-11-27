@@ -133,13 +133,13 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
     }
 
     @Override
-    public long previewEntryEviction(String cacheManagerName, String cacheName, String pattern) {
-        return CacheEntryOperations.countMatches(localEntries(cacheManagerName, cacheName), pattern);
+    public boolean containsKey(String cacheManagerName, String cacheName, String key) {
+        return localEntries(cacheManagerName, cacheName).containsKey(key);
     }
 
     @Override
-    public void evictEntries(String cacheManagerName, String cacheName, String selector, boolean wildcard) {
-        CacheEntryOperations.evict(localEntries(cacheManagerName, cacheName), selector, wildcard);
+    public void evictEntry(String cacheManagerName, String cacheName, String key) {
+        localEntries(cacheManagerName, cacheName).remove(key);
     }
 
     private Map<?, ?> localEntries(String cacheManagerName, String cacheName) {
@@ -157,7 +157,7 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
         if (CAFFEINE_PRESENT && nativeCache instanceof com.github.benmanes.caffeine.cache.Cache<?, ?>) {
             return ((com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache).asMap();
         }
-        throw new UnsupportedOperationException("Entry eviction is unavailable for this cache provider");
+        throw new UnsupportedOperationException("Entry management is unavailable for this cache provider");
     }
 
     @Override

@@ -27,11 +27,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.service.CacheEntryManagement;
-import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 
 /**
- * API for previewing and evicting entries from a specific cache.
+ * API for checking and evicting entries from a specific cache.
  */
 @ExternalApiRestController
 public class CacheEntriesApi {
@@ -42,34 +41,22 @@ public class CacheEntriesApi {
         this.entries = entries;
     }
 
-    @PostMapping(ApiPaths.CachesApi.CACHE_ENTRIES_PREVIEW)
-    public CacheEntryManagement.Preview preview(@RequestBody PreviewRequest request) {
-        return entries.preview(
-                request.instanceIds(), request.cacheManagerName(), request.cacheName(), request.pattern());
+    @PostMapping(ApiPaths.CachesApi.CACHE_KEY_EXISTS)
+    public CacheEntryManagement.KeyPresence exists(@RequestBody CacheKeyRequest request) {
+        return entries.exists(request.instanceIds(), request.cacheManagerName(), request.cacheName(), request.key());
     }
 
     @DeleteMapping(ApiPaths.CachesApi.CACHE_ENTRIES)
-    public ResponseEntity<?> evict(@RequestBody EvictionRequest request) {
-        if (request.wildcard() == null) {
-            throw new BadRequestException("Specify whether the selector is a wildcard");
-        }
+    public ResponseEntity<?> evict(@RequestBody CacheKeyRequest request) {
         try {
-            entries.evict(
-                    request.instanceIds(),
-                    request.cacheManagerName(),
-                    request.cacheName(),
-                    request.selector(),
-                    request.wildcard());
+            entries.evict(request.instanceIds(), request.cacheManagerName(), request.cacheName(), request.key());
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
             return ResponseEntity.badRequest().body(new EvictionFailure(e.failedInstanceIds()));
         }
     }
 
-    public record PreviewRequest(List<String> instanceIds, String cacheManagerName, String cacheName, String pattern) {}
-
-    public record EvictionRequest(
-            List<String> instanceIds, String cacheManagerName, String cacheName, String selector, Boolean wildcard) {}
+    public record CacheKeyRequest(List<String> instanceIds, String cacheManagerName, String cacheName, String key) {}
 
     public record EvictionFailure(List<String> failedInstanceIds) {}
 }

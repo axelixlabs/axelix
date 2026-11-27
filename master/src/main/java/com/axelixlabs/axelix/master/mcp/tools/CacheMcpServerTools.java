@@ -130,12 +130,10 @@ public class CacheMcpServerTools {
     }
 
     @McpTool(
-            name = McpEndpoints.PREVIEW_CACHE_ENTRY_EVICTION_TOOL_NAME,
-            title = "Preview Cache Entry Eviction",
+            name = McpEndpoints.CACHE_KEY_EXISTS_TOOL_NAME,
+            title = "Check Cache Key",
             description = """
-            Estimate how many string keys match a wildcard in the named cache on each selected instance.
-            Use * for any number of characters and ? for one character. The pattern matches the entire key.
-            Available for local Caffeine and concurrent-map caches. Failed instances have no estimate.
+            Check whether the exact string key exists in the named local Caffeine or concurrent-map cache on each selected instance.
             """,
             annotations =
                     @McpTool.McpAnnotations(
@@ -143,21 +141,19 @@ public class CacheMcpServerTools {
                             destructiveHint = false,
                             idempotentHint = true,
                             openWorldHint = false))
-    public CacheEntryManagement.Preview previewCacheEntryEviction(
-            @McpToolParam(description = "IDs of the instances to preview") List<String> instanceIds,
+    public CacheEntryManagement.KeyPresence cacheKeyExists(
+            @McpToolParam(description = "IDs of the instances to check") List<String> instanceIds,
             @McpToolParam(description = "Name of the cache manager") String cacheManager,
             @McpToolParam(description = "Name of the cache") String cacheName,
-            @McpToolParam(description = "Wildcard pattern to preview") String pattern) {
-        return cacheEntries.preview(instanceIds, cacheManager, cacheName, pattern);
+            @McpToolParam(description = "Exact string key") String key) {
+        return cacheEntries.exists(instanceIds, cacheManager, cacheName, key);
     }
 
     @McpTool(
-            name = McpEndpoints.EVICT_CACHE_ENTRIES_TOOL_NAME,
-            title = "Evict Cache Entries",
+            name = McpEndpoints.EVICT_CACHE_ENTRY_TOOL_NAME,
+            title = "Evict Cache Entry",
             description = """
-            Evict a literal string key or matching string keys in the named local Caffeine or concurrent-map cache.
-            For wildcard eviction, call previewCacheEntryEviction with the same cache, instances and pattern first.
-            Show the estimated counts and failures to the user and obtain confirmation before evicting.
+            Evict the exact string key from the named local Caffeine or concurrent-map cache on each selected instance.
             """,
             annotations =
                     @McpTool.McpAnnotations(
@@ -165,13 +161,12 @@ public class CacheMcpServerTools {
                             destructiveHint = true,
                             idempotentHint = false,
                             openWorldHint = false))
-    public void evictCacheEntries(
+    public void evictCacheEntry(
             @McpToolParam(description = "IDs of the instances to update") List<String> instanceIds,
             @McpToolParam(description = "Name of the cache manager") String cacheManager,
             @McpToolParam(description = "Name of the cache") String cacheName,
-            @McpToolParam(description = "Literal key or wildcard pattern") String selector,
-            @McpToolParam(description = "True for wildcard matching, false for a literal key") boolean wildcard) {
-        cacheEntries.evict(instanceIds, cacheManager, cacheName, selector, wildcard);
+            @McpToolParam(description = "Exact string key") String key) {
+        cacheEntries.evict(instanceIds, cacheManager, cacheName, key);
     }
 
     @McpTool(
@@ -179,7 +174,7 @@ public class CacheMcpServerTools {
             title = "Clear Specific Cache",
             description = """
             Clears every entry in the named cache within the specified cache manager on the given instances.
-            Use evictCacheEntries for requests that specify an entry key or a wildcard.
+            Use evictCacheEntry for requests that specify an entry key.
 
             PREREQUISITE: If the cache manager name is unknown, call "Caches Feed" first.
             IF THE REQUESTED CACHE NAME IS PRESENT IN MULTIPLE CACHE MANAGERS, YOU MUST ASK THE USER

@@ -103,13 +103,8 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
                 assert path != null;
                 invokedPaths.add(path);
 
-                if (path.equals(
-                        "/" + activeInstanceId + "/actuator/axelix-caches/manager/orders/entries?pattern=owner*")) {
-                    return new MockResponse().setBody("7");
-                }
-                if (path.equals("/" + activeInstanceId
-                        + "/actuator/axelix-caches/manager/orders/entries?selector=owner*&wildcard=true")) {
-                    return new MockResponse();
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/manager/orders/entries?key=owner*")) {
+                    return "GET".equals(request.getMethod()) ? new MockResponse().setBody("true") : new MockResponse();
                 }
 
                 if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/clear")
@@ -150,16 +145,16 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
     class EvictCacheEntries {
 
         @Test
-        void shouldAllowViewerToPreviewAndReportMissingEstimates() {
+        void shouldAllowViewerToCheckKeyPresenceAndReportFailures() {
             // given.
-            CacheEntriesApi.PreviewRequest request = new CacheEntriesApi.PreviewRequest(
+            CacheEntriesApi.CacheKeyRequest request = new CacheEntriesApi.CacheKeyRequest(
                     List.of(activeInstanceId, failingInstanceId), "manager", "orders", "owner*");
 
             // when.
             ResponseEntity<String> response = restTemplate
                     .asViewer()
                     .exchange(
-                            "/api/external/caches/cache/entries/preview",
+                            "/api/external/caches/cache/entries/exists",
                             HttpMethod.POST,
                             new HttpEntity<>(request),
                             String.class);
@@ -167,14 +162,14 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody())
-                    .contains("estimatedMatches", activeInstanceId, "7", "failedInstanceIds", failingInstanceId);
+                    .contains("existsByInstance", activeInstanceId, "true", "failedInstanceIds", failingInstanceId);
         }
 
         @Test
-        void shouldAllowEditorToEvictMatchingEntries() {
+        void shouldAllowEditorToEvictExactKey() {
             // given.
-            CacheEntriesApi.EvictionRequest request =
-                    new CacheEntriesApi.EvictionRequest(List.of(activeInstanceId), "manager", "orders", "owner*", true);
+            CacheEntriesApi.CacheKeyRequest request =
+                    new CacheEntriesApi.CacheKeyRequest(List.of(activeInstanceId), "manager", "orders", "owner*");
 
             // when.
             ResponseEntity<Void> response = restTemplate
@@ -188,15 +183,15 @@ class CachesClearApiTest extends AbstractProtectedEndpointTest {
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
             assertThat(invokedPaths)
-                    .containsExactly("/" + activeInstanceId
-                            + "/actuator/axelix-caches/manager/orders/entries?selector=owner*&wildcard=true");
+                    .containsExactly(
+                            "/" + activeInstanceId + "/actuator/axelix-caches/manager/orders/entries?key=owner*");
         }
 
         @Test
         void shouldRejectEntryEvictionWithoutClearAuthority() {
             // given.
-            CacheEntriesApi.EvictionRequest request =
-                    new CacheEntriesApi.EvictionRequest(List.of(activeInstanceId), "manager", "orders", "owner*", true);
+            CacheEntriesApi.CacheKeyRequest request =
+                    new CacheEntriesApi.CacheKeyRequest(List.of(activeInstanceId), "manager", "orders", "owner*");
 
             // when.
             ResponseEntity<Void> response = restTemplate

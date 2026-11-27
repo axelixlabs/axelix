@@ -253,11 +253,15 @@ public final class ApiPaths {
         public static final String CACHE_BULK_CLEAR_ALL = "/caches/clear";
 
         /**
-         * Endpoint to clear a specific cache across instances.
+         * Endpoint for evicting a cache entry by key.
          */
         public static final String CACHE_ENTRIES = "/caches/cache/entries";
 
-        public static final String CACHE_ENTRIES_PREVIEW = CACHE_ENTRIES + "/preview";
+        public static final String CACHE_KEY_EXISTS = CACHE_ENTRIES + "/exists";
+
+        /**
+         * Endpoint to clear a specific cache across instances.
+         */
         public static final String CACHE_BULK_CLEAR_CACHE = "/caches/cache/clear";
 
         /**

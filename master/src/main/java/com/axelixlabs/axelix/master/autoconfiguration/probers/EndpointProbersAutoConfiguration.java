@@ -114,15 +114,19 @@ public class EndpointProbersAutoConfiguration {
 
     // Caches
     @Bean
-    public ProxyingEndpointProber previewCacheEntriesEndpointProber() {
-        return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.PREVIEW_CACHE_ENTRIES, tokenProvider, httpClient);
+    public DefaultEndpointProber<Boolean> cacheKeyExistsEndpointProber(ObjectMapper objectMapper) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry,
+                new DefaultJacksonMessageDeserializationStrategy<>(objectMapper, Boolean.class),
+                tokenProvider,
+                ActuatorEndpoints.CACHE_KEY_EXISTS,
+                httpClient);
     }
 
     @Bean
-    public DiscardingAbstractEndpointProber evictCacheEntriesEndpointProber() {
+    public DiscardingAbstractEndpointProber evictCacheEntryEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.EVICT_CACHE_ENTRIES, tokenProvider, httpClient);
+                instanceRegistry, ActuatorEndpoints.EVICT_CACHE_ENTRY, tokenProvider, httpClient);
     }
 
     @Bean

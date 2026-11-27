@@ -75,10 +75,10 @@ public class AxelixCachesEndpoint {
     }
 
     @GetMapping("/{cacheManagerName}/{cacheName}/entries")
-    public long previewEntryEviction(
-            @PathVariable String cacheManagerName, @PathVariable String cacheName, @RequestParam String pattern) {
+    public boolean containsKey(
+            @PathVariable String cacheManagerName, @PathVariable String cacheName, @RequestParam String key) {
         try {
-            return dispatcher.previewEntryEviction(cacheManagerName, cacheName, pattern);
+            return dispatcher.containsKey(cacheManagerName, cacheName, key);
         } catch (CacheManagerNotFoundException | CacheNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (IllegalArgumentException | UnsupportedOperationException e) {
@@ -87,13 +87,10 @@ public class AxelixCachesEndpoint {
     }
 
     @DeleteMapping("/{cacheManagerName}/{cacheName}/entries")
-    public void evictEntries(
-            @PathVariable String cacheManagerName,
-            @PathVariable String cacheName,
-            @RequestParam String selector,
-            @RequestParam boolean wildcard) {
+    public void evictEntry(
+            @PathVariable String cacheManagerName, @PathVariable String cacheName, @RequestParam String key) {
         try {
-            dispatcher.evictEntries(cacheManagerName, cacheName, selector, wildcard);
+            dispatcher.evictEntry(cacheManagerName, cacheName, key);
         } catch (CacheManagerNotFoundException | CacheNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (IllegalArgumentException | UnsupportedOperationException e) {

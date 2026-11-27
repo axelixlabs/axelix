@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,7 +37,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvocationExceptio
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * Previews and evicts entries in a named cache across the selected application instances.
+ * Checks and evicts entries in a named cache across the selected application instances.
  */
 @Service
 public class CacheEntryManagement {
@@ -51,53 +50,42 @@ public class CacheEntryManagement {
         this.bulkInstancesValidator = bulkInstancesValidator;
     }
 
-    public Preview preview(List<String> instanceIds, String cacheManagerName, String cacheName, String pattern) {
-        validate(instanceIds, cacheManagerName, cacheName, pattern, true);
-        HttpPayload payload = new DefaultHttpPayload(
-                List.of(new SingleValueQueryParameter("pattern", pattern)),
-                Map.of("cacheManagerName", cacheManagerName, "cacheName", cacheName));
-
-        Map<String, Long> estimatedMatches = new LinkedHashMap<>();
+    public KeyPresence exists(List<String> instanceIds, String cacheManagerName, String cacheName, String key) {
+        HttpPayload payload = entryPayload(instanceIds, cacheManagerName, cacheName, key);
+        Map<String, Boolean> existsByInstance = new LinkedHashMap<>();
         List<String> failedInstanceIds = new ArrayList<>();
         for (String instanceId :
                 instanceIds.stream().filter(StringUtils::hasText).distinct().toList()) {
             try {
-                byte[] response = endpointInvoker.invoke(
-                        InstanceId.of(instanceId), ActuatorEndpoints.PREVIEW_CACHE_ENTRIES, payload);
-                estimatedMatches.put(instanceId, Long.parseLong(new String(response, StandardCharsets.UTF_8).strip()));
-            } catch (EndpointInvocationException
-                    | BadRequestException
-                    | InstanceNotFoundException
-                    | NumberFormatException e) {
+                Boolean exists =
+                        endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.CACHE_KEY_EXISTS, payload);
+                existsByInstance.put(instanceId, exists);
+            } catch (EndpointInvocationException | BadRequestException | InstanceNotFoundException e) {
                 failedInstanceIds.add(instanceId);
             }
         }
-        return new Preview(estimatedMatches, failedInstanceIds);
+        return new KeyPresence(existsByInstance, failedInstanceIds);
     }
 
-    public void evict(
-            List<String> instanceIds, String cacheManagerName, String cacheName, String selector, boolean wildcard) {
-        validate(instanceIds, cacheManagerName, cacheName, selector, wildcard);
-        HttpPayload payload = new DefaultHttpPayload(
-                List.of(
-                        new SingleValueQueryParameter("selector", selector),
-                        new SingleValueQueryParameter("wildcard", Boolean.toString(wildcard))),
-                Map.of("cacheManagerName", cacheManagerName, "cacheName", cacheName));
-        endpointInvoker.invokeNoValueForInstances(instanceIds, ActuatorEndpoints.EVICT_CACHE_ENTRIES, payload);
+    public void evict(List<String> instanceIds, String cacheManagerName, String cacheName, String key) {
+        HttpPayload payload = entryPayload(instanceIds, cacheManagerName, cacheName, key);
+        endpointInvoker.invokeNoValueForInstances(instanceIds, ActuatorEndpoints.EVICT_CACHE_ENTRY, payload);
     }
 
-    private void validate(
-            List<String> instanceIds, String cacheManagerName, String cacheName, String selector, boolean wildcard) {
+    private HttpPayload entryPayload(List<String> instanceIds, String cacheManagerName, String cacheName, String key) {
         try {
             BulkRequestValidator.validate(instanceIds, cacheManagerName, cacheName);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(Objects.toString(e.getMessage(), "Invalid cache entry request"));
         }
-        if (selector == null || (wildcard && (selector.isBlank() || selector.length() > 256))) {
-            throw new BadRequestException("Provide a key or a wildcard pattern of 1 to 256 characters");
+        if (key == null) {
+            throw new BadRequestException("Provide a cache key");
         }
         bulkInstancesValidator.validate(instanceIds);
+        return new DefaultHttpPayload(
+                List.of(new SingleValueQueryParameter("key", key)),
+                Map.of("cacheManagerName", cacheManagerName, "cacheName", cacheName));
     }
 
-    public record Preview(Map<String, Long> estimatedMatches, List<String> failedInstanceIds) {}
+    public record KeyPresence(Map<String, Boolean> existsByInstance, List<String> failedInstanceIds) {}
 }

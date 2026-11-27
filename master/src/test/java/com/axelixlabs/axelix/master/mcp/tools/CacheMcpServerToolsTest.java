@@ -36,23 +36,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CacheMcpServerToolsTest extends AbstractInstanceMcpServerToolsTest {
 
     @Test
-    void shouldPreviewMatchesAndReportAnUnavailableInstance() throws InterruptedException {
+    void shouldCheckKeyPresenceAndReportAnUnavailableInstance() throws InterruptedException {
         // given.
-        String path = "/axelix-caches/cacheManager/owners/entries?pattern=owner%3A*";
-        instance.respondWith(path, "3");
+        String path = "/axelix-caches/cacheManager/owners/entries?key=owner%3A*";
+        instance.respondWith(path, "true");
         anotherInstance.respondWithBadRequest(path);
 
         // when.
         String result = callTool(
-                McpEndpoints.PREVIEW_CACHE_ENTRY_EVICTION_TOOL_NAME,
+                McpEndpoints.CACHE_KEY_EXISTS_TOOL_NAME,
                 Map.of(
                         "instanceIds", List.of(INSTANCE_ID, ANOTHER_INSTANCE_ID),
                         "cacheManager", "cacheManager",
                         "cacheName", "owners",
-                        "pattern", "owner:*"));
+                        "key", "owner:*"));
 
         // then.
-        assertThat(result).contains("estimatedMatches", INSTANCE_ID, "3", "failedInstanceIds", ANOTHER_INSTANCE_ID);
+        assertThat(result).contains("existsByInstance", INSTANCE_ID, "true", "failedInstanceIds", ANOTHER_INSTANCE_ID);
         assertThat(instance.takeRequest().getMethod()).isEqualTo("GET");
         assertThat(anotherInstance.takeRequest().getMethod()).isEqualTo("GET");
     }
@@ -61,17 +61,16 @@ class CacheMcpServerToolsTest extends AbstractInstanceMcpServerToolsTest {
     void shouldSendLiteralEntryEvictionToEachInstance() throws InterruptedException {
         // when.
         String result = callTool(
-                McpEndpoints.EVICT_CACHE_ENTRIES_TOOL_NAME,
+                McpEndpoints.EVICT_CACHE_ENTRY_TOOL_NAME,
                 Map.of(
                         "instanceIds", List.of(INSTANCE_ID, ANOTHER_INSTANCE_ID),
                         "cacheManager", "cacheManager",
                         "cacheName", "owners",
-                        "selector", "owner:*",
-                        "wildcard", false));
+                        "key", "owner:*"));
 
         // then.
         assertThat(result).isEqualTo(DONE_RESPONSE);
-        String path = "/axelix-caches/cacheManager/owners/entries?selector=owner%3A*&wildcard=false";
+        String path = "/axelix-caches/cacheManager/owners/entries?key=owner%3A*";
         assertCacheClearing(instance.takeRequest(), path);
         assertCacheClearing(anotherInstance.takeRequest(), path);
     }

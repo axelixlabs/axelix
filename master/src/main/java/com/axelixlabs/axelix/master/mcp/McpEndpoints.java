@@ -35,8 +35,8 @@ public final class McpEndpoints {
     public static final String WALLBOARD_TOOL_NAME = "getInstances";
     public static final String CACHES_FEED_TOOL_NAME = "getAllCaches";
     public static final String CLEAR_ALL_CACHES_TOOL_NAME = "clearAllCaches";
-    public static final String PREVIEW_CACHE_ENTRY_EVICTION_TOOL_NAME = "previewCacheEntryEviction";
-    public static final String EVICT_CACHE_ENTRIES_TOOL_NAME = "evictCacheEntries";
+    public static final String CACHE_KEY_EXISTS_TOOL_NAME = "cacheKeyExists";
+    public static final String EVICT_CACHE_ENTRY_TOOL_NAME = "evictCacheEntry";
     public static final String CLEAR_SPECIFIC_CACHE_TOOL_NAME = "clearSpecificCacheEntity";
     public static final String TRANSACTIONS_PROFILE_TOOL_NAME = "getApplicationTransactionsProfile";
     public static final String ENTITIES_PROFILE_TOOL_NAME = "getApplicationEntitiesProfile";
@@ -51,9 +51,8 @@ public final class McpEndpoints {
     public static final McpEndpoint WALLBOARD = new DefaultMcpEndpoint(WALLBOARD_TOOL_NAME);
     public static final McpEndpoint ALL_CACHES = new DefaultMcpEndpoint(CACHES_FEED_TOOL_NAME);
     public static final McpEndpoint CLEAR_ALL_CACHES = new DefaultMcpEndpoint(CLEAR_ALL_CACHES_TOOL_NAME);
-    public static final McpEndpoint PREVIEW_CACHE_ENTRY_EVICTION =
-            new DefaultMcpEndpoint(PREVIEW_CACHE_ENTRY_EVICTION_TOOL_NAME);
-    public static final McpEndpoint EVICT_CACHE_ENTRIES = new DefaultMcpEndpoint(EVICT_CACHE_ENTRIES_TOOL_NAME);
+    public static final McpEndpoint CACHE_KEY_EXISTS = new DefaultMcpEndpoint(CACHE_KEY_EXISTS_TOOL_NAME);
+    public static final McpEndpoint EVICT_CACHE_ENTRY = new DefaultMcpEndpoint(EVICT_CACHE_ENTRY_TOOL_NAME);
     public static final McpEndpoint CLEAR_SPECIFIC_CACHE = new DefaultMcpEndpoint(CLEAR_SPECIFIC_CACHE_TOOL_NAME);
     public static final McpEndpoint TRANSACTIONS_PROFILE = new DefaultMcpEndpoint(TRANSACTIONS_PROFILE_TOOL_NAME);
     public static final McpEndpoint ENTITIES_PROFILE = new DefaultMcpEndpoint(ENTITIES_PROFILE_TOOL_NAME);
