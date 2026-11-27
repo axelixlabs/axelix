@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.master.domain.auth.Authority;
  * carries a stable {@code operationCode} so that operations never have to be deduced from the raw request.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public final class MasterWebEndpoints {
 
@@ -125,11 +126,22 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint QUARTZ_JOBS_READ =
             register("quartz:jobs:read", HttpMethod.POST, ApiPaths.QuartzApi.JOBS, null);
     public static final MasterWebEndpoint QUARTZ_JOB_EXECUTE =
-            register("quartz:job:execute", HttpMethod.POST, ApiPaths.QuartzApi.EXECUTE, () -> "quartz:write");
+            register("quartz:job:execute", HttpMethod.POST, ApiPaths.QuartzApi.EXECUTE_JOB, () -> "quartz:write");
+    public static final MasterWebEndpoint QUARTZ_JOB_PAUSE =
+            register("quartz:job:pause", HttpMethod.POST, ApiPaths.QuartzApi.PAUSE_JOB, () -> "quartz:write");
+    public static final MasterWebEndpoint QUARTZ_JOB_RESUME =
+            register("quartz:job:resume", HttpMethod.POST, ApiPaths.QuartzApi.RESUME_JOB, () -> "quartz:write");
     public static final MasterWebEndpoint QUARTZ_TRIGGER_PAUSE =
-            register("quartz:trigger:pause", HttpMethod.POST, ApiPaths.QuartzApi.PAUSE, () -> "quartz:write");
+            register("quartz:trigger:pause", HttpMethod.POST, ApiPaths.QuartzApi.PAUSE_TRIGGER, () -> "quartz:write");
     public static final MasterWebEndpoint QUARTZ_TRIGGER_RESUME =
-            register("quartz:trigger:resume", HttpMethod.POST, ApiPaths.QuartzApi.RESUME, () -> "quartz:write");
+            register("quartz:trigger:resume", HttpMethod.POST, ApiPaths.QuartzApi.RESUME_TRIGGER, () -> "quartz:write");
+    public static final MasterWebEndpoint QUARTZ_CRON_EXPRESSION_VALIDATE = register(
+            "quartz:cron-expression:validate", HttpMethod.POST, ApiPaths.QuartzApi.VALIDATE_CRON_EXPRESSION, null);
+    public static final MasterWebEndpoint QUARTZ_SIMPLE_TRIGGER_INTERVAL_VALIDATE = register(
+            "quartz:simple-trigger-interval:validate",
+            HttpMethod.POST,
+            ApiPaths.QuartzApi.VALIDATE_SIMPLE_TRIGGER_INTERVAL,
+            null);
 
     // Scheduled tasks
     public static final MasterWebEndpoint SCHEDULED_TASKS_READ =

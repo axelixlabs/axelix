@@ -1,0 +1,31 @@
+openapi: 3.1.0
+info:
+  title: quartz-cron-expression-validation
+  version: ""
+  description: Schemas for validating a Quartz cron expression.
+components:
+  schemas:
+    QuartzCronExpressionValidationRequest:
+      x-axelix-produced-by: master
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: A request to validate a Quartz cron expression.
+      required:
+        - cronExpression
+      properties:
+        cronExpression:
+          type: string
+          description: The Quartz cron expression to validate.
+          x-axelix-introduced-in: 1.4.0
+    QuartzCronExpressionValidationResponse:
+      x-axelix-produced-by: starter
+      x-axelix-introduced-in: 1.4.0
+      type: object
+      description: The result of validating a Quartz cron expression.
+      required:
+        - valid
+      properties:
+        valid:
+          type: boolean
+          description: Whether Quartz accepts the cron expression.
+          x-axelix-introduced-in: 1.4.0

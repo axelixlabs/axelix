@@ -42,6 +42,8 @@ import org.quartz.simpl.SimpleThreadPool;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.contract.quartz.QuartzCronExpressionValidationRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzCronExpressionValidationResponse;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJob;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobPauseRequest;
@@ -260,6 +262,62 @@ class AxelixQuartzEndpointTest extends AbstractQuartzSharedContextTest {
                 path = "/actuator/axelix-quartz/jobs",
                 jsonBody = "{\"schedulerName\":\"standbyScheduler\"}")
         void negativeJobsAuthTests() {}
+    }
+
+    @Nested
+    class ValidateCronExpression {
+
+        @Test
+        void shouldAcceptQuartzCronExpressionWithYearField() {
+            // given.
+            QuartzCronExpressionValidationRequest request =
+                    new QuartzCronExpressionValidationRequest().cronExpression("0 0 12 * * ? 2027");
+
+            // when.
+            ResponseEntity<QuartzCronExpressionValidationResponse> response = restTemplate
+                    .asMaster()
+                    .postForEntity(
+                            "/actuator/axelix-quartz/validateCronExpression",
+                            request,
+                            QuartzCronExpressionValidationResponse.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getValid()).isTrue();
+        }
+
+        @Test
+        void shouldRejectInvalidQuartzCronExpression() {
+            // given.
+            QuartzCronExpressionValidationRequest request =
+                    new QuartzCronExpressionValidationRequest().cronExpression("not a cron expression");
+
+            // when.
+            ResponseEntity<QuartzCronExpressionValidationResponse> response = restTemplate
+                    .asMaster()
+                    .postForEntity(
+                            "/actuator/axelix-quartz/validateCronExpression",
+                            request,
+                            QuartzCronExpressionValidationResponse.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getValid()).isFalse();
+        }
+
+        @Test
+        void shouldRejectIncompleteRequest() {
+            // given.
+            Map<String, String> request = Map.of();
+
+            // when.
+            ResponseEntity<Void> response = restTemplate
+                    .asMaster()
+                    .postForEntity("/actuator/axelix-quartz/validateCronExpression", request, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Nested

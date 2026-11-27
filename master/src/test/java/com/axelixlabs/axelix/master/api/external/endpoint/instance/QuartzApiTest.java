@@ -42,10 +42,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.contract.quartz.QuartzCronExpressionValidationRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobPauseRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzJobResumeRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobsRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerPauseRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzTriggerResumeRequest;
+import com.axelixlabs.axelix.master.api.external.request.QuartzSimpleTriggerIntervalValidationRequest;
+import com.axelixlabs.axelix.master.api.external.response.QuartzSimpleTriggerIntervalValidationResponse;
 import com.axelixlabs.axelix.master.domain.auth.Authority;
 import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.instance.InstanceId;
@@ -212,6 +217,99 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Nested
+    class ValidateCronExpression {
+
+        @Test
+        void shouldProxyValidationToStarter() throws InterruptedException {
+            // given.
+            String responseBody = "{\"valid\":true}";
+            server.enqueue(
+                    new MockResponse().setBody(responseBody).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+            QuartzCronExpressionValidationRequest payload =
+                    new QuartzCronExpressionValidationRequest().cronExpression("0 0 12 * * ? 2027");
+            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+
+            // when.
+            ResponseEntity<String> response = viewer.postForEntity(
+                    "/api/external/quartz/{instanceId}/validateCronExpression", payload, String.class, instanceId);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+            assertThatJson(response.getBody()).isEqualTo(responseBody);
+            RecordedRequest request = server.takeRequest(5, TimeUnit.SECONDS);
+            assertThat(request.getMethod()).isEqualTo("POST");
+            assertThat(request.getPath()).isEqualTo("/actuator/axelix-quartz/validateCronExpression");
+            assertThatJson(request.getBody().readUtf8()).isEqualTo("""
+                    {"cronExpression":"0 0 12 * * ? 2027"}
+                    """);
+            assertSuccessfulCallback(MasterWebEndpoints.QUARTZ_CRON_EXPRESSION_VALIDATE, viewer.getActor());
+        }
+    }
+
+    @Nested
+    class ValidateSimpleTriggerInterval {
+
+        @ParameterizedTest
+        @ValueSource(longs = {1, 30_000})
+        void shouldAcceptPositiveInterval(long interval) {
+            // given.
+            QuartzSimpleTriggerIntervalValidationRequest payload =
+                    new QuartzSimpleTriggerIntervalValidationRequest(interval);
+            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+
+            // when.
+            ResponseEntity<QuartzSimpleTriggerIntervalValidationResponse> response = viewer.postForEntity(
+                    "/api/external/quartz/validateSimpleTriggerInterval",
+                    payload,
+                    QuartzSimpleTriggerIntervalValidationResponse.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().valid()).isTrue();
+            assertThat(server.getRequestCount()).isZero();
+            assertSuccessfulCallback(MasterWebEndpoints.QUARTZ_SIMPLE_TRIGGER_INTERVAL_VALIDATE, viewer.getActor());
+        }
+
+        @ParameterizedTest
+        @ValueSource(longs = {0, -1})
+        void shouldRejectNonPositiveInterval(long interval) {
+            // given.
+            QuartzSimpleTriggerIntervalValidationRequest payload =
+                    new QuartzSimpleTriggerIntervalValidationRequest(interval);
+
+            // when.
+            ResponseEntity<QuartzSimpleTriggerIntervalValidationResponse> response = restTemplate
+                    .asViewer()
+                    .postForEntity(
+                            "/api/external/quartz/validateSimpleTriggerInterval",
+                            payload,
+                            QuartzSimpleTriggerIntervalValidationResponse.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().valid()).isFalse();
+            assertThat(server.getRequestCount()).isZero();
+        }
+
+        @Test
+        void shouldRejectIncompleteRequest() {
+            // given.
+            QuartzSimpleTriggerIntervalValidationRequest payload =
+                    new QuartzSimpleTriggerIntervalValidationRequest(null);
+
+            // when.
+            ResponseEntity<Void> response = restTemplate
+                    .asViewer()
+                    .postForEntity("/api/external/quartz/validateSimpleTriggerInterval", payload, Void.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(server.getRequestCount()).isZero();
+        }
+    }
+
+    @Nested
     class ExecuteQuartzJob {
 
         @Test
@@ -242,6 +340,66 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Nested
+    class PauseQuartzJob {
+
+        @Test
+        void shouldPauseJob() throws InterruptedException {
+            // given.
+            server.enqueue(new MockResponse().setResponseCode(204));
+            QuartzJobPauseRequest payload = new QuartzJobPauseRequest()
+                    .schedulerName("quartzScheduler")
+                    .jobName("sample name")
+                    .jobGroup("sample group");
+            IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+
+            // when.
+            ResponseEntity<Void> response =
+                    editor.postForEntity("/api/external/quartz/{instanceId}/pauseJob", payload, Void.class, instanceId);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            RecordedRequest request = server.takeRequest(5, TimeUnit.SECONDS);
+            assertThat(request.getMethod()).isEqualTo("POST");
+            assertThat(request.getPath()).isEqualTo("/actuator/axelix-quartz/pauseJob");
+            assertThat(request.getHeader("Content-Type")).startsWith(MediaType.APPLICATION_JSON_VALUE);
+            assertThatJson(request.getBody().readUtf8()).isEqualTo("""
+                    {"schedulerName":"quartzScheduler","jobName":"sample name","jobGroup":"sample group"}
+                    """);
+            assertSuccessfulCallback(MasterWebEndpoints.QUARTZ_JOB_PAUSE, editor.getActor());
+        }
+    }
+
+    @Nested
+    class ResumeQuartzJob {
+
+        @Test
+        void shouldResumeJob() throws InterruptedException {
+            // given.
+            server.enqueue(new MockResponse().setResponseCode(204));
+            QuartzJobResumeRequest payload = new QuartzJobResumeRequest()
+                    .schedulerName("quartzScheduler")
+                    .jobName("sample name")
+                    .jobGroup("sample group");
+            IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
+
+            // when.
+            ResponseEntity<Void> response = editor.postForEntity(
+                    "/api/external/quartz/{instanceId}/resumeJob", payload, Void.class, instanceId);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            RecordedRequest request = server.takeRequest(5, TimeUnit.SECONDS);
+            assertThat(request.getMethod()).isEqualTo("POST");
+            assertThat(request.getPath()).isEqualTo("/actuator/axelix-quartz/resumeJob");
+            assertThat(request.getHeader("Content-Type")).startsWith(MediaType.APPLICATION_JSON_VALUE);
+            assertThatJson(request.getBody().readUtf8()).isEqualTo("""
+                    {"schedulerName":"quartzScheduler","jobName":"sample name","jobGroup":"sample group"}
+                    """);
+            assertSuccessfulCallback(MasterWebEndpoints.QUARTZ_JOB_RESUME, editor.getActor());
+        }
+    }
+
+    @Nested
     class PauseQuartzTrigger {
 
         @Test
@@ -255,8 +413,8 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
             IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
 
             // when.
-            ResponseEntity<Void> response =
-                    editor.postForEntity("/api/external/quartz/{instanceId}/pause", payload, Void.class, instanceId);
+            ResponseEntity<Void> response = editor.postForEntity(
+                    "/api/external/quartz/{instanceId}/pauseTrigger", payload, Void.class, instanceId);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -285,8 +443,8 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
             IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
 
             // when.
-            ResponseEntity<Void> response =
-                    editor.postForEntity("/api/external/quartz/{instanceId}/resume", payload, Void.class, instanceId);
+            ResponseEntity<Void> response = editor.postForEntity(
+                    "/api/external/quartz/{instanceId}/resumeTrigger", payload, Void.class, instanceId);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -399,7 +557,11 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
                         Arguments.of(
                                 "/quartz/{instanceId}/jobs",
                                 HttpMethod.POST,
-                                new QuartzJobsRequest().schedulerName("quartzScheduler"))),
+                                new QuartzJobsRequest().schedulerName("quartzScheduler")),
+                        Arguments.of(
+                                "/quartz/{instanceId}/validateCronExpression",
+                                HttpMethod.POST,
+                                new QuartzCronExpressionValidationRequest().cronExpression("0 0 12 * * ? 2027"))),
                 managementRequests()
                         .map(arguments -> Arguments.of(
                                 arguments.get()[0], HttpMethod.POST, arguments.get()[1])));
@@ -415,14 +577,28 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
                                 .jobGroup("jobs"),
                         MasterWebEndpoints.QUARTZ_JOB_EXECUTE),
                 Arguments.of(
-                        "/quartz/{instanceId}/pause",
+                        "/quartz/{instanceId}/pauseJob",
+                        new QuartzJobPauseRequest()
+                                .schedulerName("quartzScheduler")
+                                .jobName("job")
+                                .jobGroup("jobs"),
+                        MasterWebEndpoints.QUARTZ_JOB_PAUSE),
+                Arguments.of(
+                        "/quartz/{instanceId}/resumeJob",
+                        new QuartzJobResumeRequest()
+                                .schedulerName("quartzScheduler")
+                                .jobName("job")
+                                .jobGroup("jobs"),
+                        MasterWebEndpoints.QUARTZ_JOB_RESUME),
+                Arguments.of(
+                        "/quartz/{instanceId}/pauseTrigger",
                         new QuartzTriggerPauseRequest()
                                 .schedulerName("quartzScheduler")
                                 .triggerName("cron")
                                 .triggerGroup("triggers"),
                         MasterWebEndpoints.QUARTZ_TRIGGER_PAUSE),
                 Arguments.of(
-                        "/quartz/{instanceId}/resume",
+                        "/quartz/{instanceId}/resumeTrigger",
                         new QuartzTriggerResumeRequest()
                                 .schedulerName("quartzScheduler")
                                 .triggerName("cron")
@@ -460,10 +636,22 @@ class QuartzApiTest extends AbstractProtectedEndpointTest {
                         MasterWebEndpoints.QUARTZ_JOB_EXECUTE,
                         "/api/external/quartz/00000000-0000-0000-0000-000000000001/execute"),
                 new TestableMasterWebEndpoint(
+                        MasterWebEndpoints.QUARTZ_JOB_PAUSE,
+                        "/api/external/quartz/00000000-0000-0000-0000-000000000001/pauseJob"),
+                new TestableMasterWebEndpoint(
+                        MasterWebEndpoints.QUARTZ_JOB_RESUME,
+                        "/api/external/quartz/00000000-0000-0000-0000-000000000001/resumeJob"),
+                new TestableMasterWebEndpoint(
                         MasterWebEndpoints.QUARTZ_TRIGGER_PAUSE,
-                        "/api/external/quartz/00000000-0000-0000-0000-000000000001/pause"),
+                        "/api/external/quartz/00000000-0000-0000-0000-000000000001/pauseTrigger"),
                 new TestableMasterWebEndpoint(
                         MasterWebEndpoints.QUARTZ_TRIGGER_RESUME,
-                        "/api/external/quartz/00000000-0000-0000-0000-000000000001/resume"));
+                        "/api/external/quartz/00000000-0000-0000-0000-000000000001/resumeTrigger"),
+                new TestableMasterWebEndpoint(
+                        MasterWebEndpoints.QUARTZ_CRON_EXPRESSION_VALIDATE,
+                        "/api/external/quartz/00000000-0000-0000-0000-000000000001/validateCronExpression"),
+                new TestableMasterWebEndpoint(
+                        MasterWebEndpoints.QUARTZ_SIMPLE_TRIGGER_INTERVAL_VALIDATE,
+                        "/api/external/quartz/validateSimpleTriggerInterval"));
     }
 }
