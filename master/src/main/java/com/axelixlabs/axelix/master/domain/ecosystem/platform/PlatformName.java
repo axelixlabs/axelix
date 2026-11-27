@@ -45,6 +45,11 @@ public enum PlatformName {
     ECLIPSE_TEMURIN("eclipse-temurin"),
 
     /**
+     * Microsoft Build of OpenJDK.
+     */
+    MICROSOFT_OPENJDK("microsoft-openjdk"),
+
+    /**
      * Oracle's GPL-licensed OpenJDK distribution.
      */
     ORACLE_OPENJDK("oracle-openjdk"),

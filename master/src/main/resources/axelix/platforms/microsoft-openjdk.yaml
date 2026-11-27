@@ -1,0 +1,14 @@
+platform: microsoft-openjdk
+lines:
+  - line: "11"
+    releasedAt: 2021-05-25
+    ossSupportEndsAt: 2027-09-30
+  - line: "17"
+    releasedAt: 2021-09-14
+    ossSupportEndsAt: 2027-09-30
+  - line: "21"
+    releasedAt: 2023-09-28
+    ossSupportEndsAt: 2028-09-30
+  - line: "25"
+    releasedAt: 2025-09-29
+    ossSupportEndsAt: 2030-09-30

@@ -115,8 +115,19 @@ class PlatformManifestLoaderTest {
                         PlatformName.AZUL_ZULU,
                         PlatformName.BELLSOFT_LIBERICA,
                         PlatformName.ECLIPSE_TEMURIN,
+                        PlatformName.MICROSOFT_OPENJDK,
                         PlatformName.ORACLE_OPENJDK,
                         PlatformName.RED_HAT_OPENJDK);
+    }
+
+    @Test
+    void resolvesMicrosoftRuntimeToPublicSupportWindow() {
+        Platform microsoft = loaderOf("classpath:axelix/platforms/microsoft-openjdk.yaml")
+                .load()
+                .getFirst();
+
+        assertThat(microsoft.lineOf("11.0.33+10-LTS"))
+                .contains(new PlatformReleaseLine("11", LocalDate.of(2021, 5, 25), LocalDate.of(2027, 9, 30), null));
     }
 
     @Test
@@ -131,7 +142,8 @@ class PlatformManifestLoaderTest {
 
     @Test
     void resolvesZuluRuntimeToPublicSupportWindow() {
-        Platform zulu = loaderOf("classpath:axelix/platforms/azul-zulu.yaml").load().getFirst();
+        Platform zulu =
+                loaderOf("classpath:axelix/platforms/azul-zulu.yaml").load().getFirst();
 
         assertThat(zulu.lineOf("21.0.4+7-LTS"))
                 .contains(new PlatformReleaseLine("21", LocalDate.of(2023, 9, 19), LocalDate.of(2031, 9, 30), null));
