@@ -21,9 +21,6 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         starterConfig:
           - starter: Spring Boot 2 starter
-            javaVersion: 11
-            tasks: :sbs:axelix-spring-boot-2-starter:build
-          - starter: Spring Boot 2 starter
             javaVersion: 17
             tasks: :sbs:axelix-spring-boot-2-starter:build
           - starter: Spring Boot 2 starter
