@@ -66,6 +66,7 @@ public record Platform(PlatformName name, List<PlatformReleaseLine> lines) {
                     AZUL_ZULU,
                     BELLSOFT_LIBERICA,
                     ECLIPSE_TEMURIN,
+                    IBM_SEMERU,
                     MICROSOFT_OPENJDK,
                     ORACLE_OPENJDK,
                     RED_HAT_OPENJDK -> lineOfOpenJDKDistro(version);

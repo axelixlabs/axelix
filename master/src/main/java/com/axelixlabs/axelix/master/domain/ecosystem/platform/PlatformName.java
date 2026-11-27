@@ -45,6 +45,11 @@ public enum PlatformName {
     ECLIPSE_TEMURIN("eclipse-temurin"),
 
     /**
+     * IBM Semeru Runtimes Open Edition.
+     */
+    IBM_SEMERU("ibm-semeru"),
+
+    /**
      * Microsoft Build of OpenJDK.
      */
     MICROSOFT_OPENJDK("microsoft-openjdk"),

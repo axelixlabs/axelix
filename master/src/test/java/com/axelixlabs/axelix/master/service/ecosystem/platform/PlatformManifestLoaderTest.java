@@ -115,9 +115,19 @@ class PlatformManifestLoaderTest {
                         PlatformName.AZUL_ZULU,
                         PlatformName.BELLSOFT_LIBERICA,
                         PlatformName.ECLIPSE_TEMURIN,
+                        PlatformName.IBM_SEMERU,
                         PlatformName.MICROSOFT_OPENJDK,
                         PlatformName.ORACLE_OPENJDK,
                         PlatformName.RED_HAT_OPENJDK);
+    }
+
+    @Test
+    void resolvesSemeruRuntimeToPublicSupportWindow() {
+        Platform semeru =
+                loaderOf("classpath:axelix/platforms/ibm-semeru.yaml").load().getFirst();
+
+        assertThat(semeru.lineOf("21.0.1+12"))
+                .contains(new PlatformReleaseLine("21", LocalDate.of(2024, 1, 11), LocalDate.of(2031, 9, 30), null));
     }
 
     @Test
