@@ -30,6 +30,11 @@ public enum PlatformName {
     AMAZON_CORRETTO("amazon-corretto"),
 
     /**
+     * Eclipse Temurin JDK distribution.
+     */
+    ECLIPSE_TEMURIN("eclipse-temurin"),
+
+    /**
      * Spring Boot as the Platform.
      */
     SPRING_BOOT("spring-boot"),

@@ -109,7 +109,17 @@ class PlatformManifestLoaderTest {
         // then
         assertThat(platforms)
                 .map(Platform::name)
-                .contains(PlatformName.SPRING_BOOT, PlatformName.AMAZON_CORRETTO);
+                .contains(PlatformName.SPRING_BOOT, PlatformName.AMAZON_CORRETTO, PlatformName.ECLIPSE_TEMURIN);
+    }
+
+    @Test
+    void resolvesTemurinRuntimeToCommunitySupportWindow() {
+        Platform temurin = loaderOf("classpath:axelix/platforms/eclipse-temurin.yaml")
+                .load()
+                .getFirst();
+
+        assertThat(temurin.lineOf("21.0.13.1+2"))
+                .contains(new PlatformReleaseLine("21", LocalDate.of(2023, 10, 10), LocalDate.of(2029, 12, 31), null));
     }
 
     @ParameterizedTest

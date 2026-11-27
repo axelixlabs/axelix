@@ -1,0 +1,44 @@
+# Release and community support dates from https://github.com/endoflife-date/endoflife.date/blob/master/products/eclipse-temurin.md
+# Adoptium publishes minimum availability periods for LTS lines. Commercial support is provided by third parties.
+# https://adoptium.net/support/
+platform: eclipse-temurin
+lines:
+  - line: "11"
+    releasedAt: 2021-08-01
+    ossSupportEndsAt: 2027-10-31
+  - line: "16"
+    releasedAt: 2021-07-30
+    ossSupportEndsAt: 2021-09-30
+  - line: "17"
+    releasedAt: 2021-09-22
+    ossSupportEndsAt: 2027-10-31
+  - line: "18"
+    releasedAt: 2022-03-24
+    ossSupportEndsAt: 2022-09-30
+  - line: "19"
+    releasedAt: 2022-09-26
+    ossSupportEndsAt: 2023-03-31
+  - line: "20"
+    releasedAt: 2023-03-23
+    ossSupportEndsAt: 2023-09-19
+  - line: "21"
+    releasedAt: 2023-10-10
+    ossSupportEndsAt: 2029-12-31
+  - line: "22"
+    releasedAt: 2024-03-20
+    ossSupportEndsAt: 2024-09-17
+  - line: "23"
+    releasedAt: 2024-09-17
+    ossSupportEndsAt: 2025-03-18
+  - line: "24"
+    releasedAt: 2025-03-20
+    ossSupportEndsAt: 2025-09-22
+  - line: "25"
+    releasedAt: 2025-09-22
+    ossSupportEndsAt: 2031-09-30
+  - line: "26"
+    releasedAt: 2026-03-23
+    ossSupportEndsAt: 2026-09-22
+  - line: "27"
+    releasedAt: 2026-09-22
+    ossSupportEndsAt: 2027-03-23 # Projected from the expected Java 28 release.
