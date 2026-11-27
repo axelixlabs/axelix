@@ -60,21 +60,9 @@ public record Platform(PlatformName name, List<PlatformReleaseLine> lines) {
      * @return the line of the version, or empty when the version does not parse or the line is not curated
      */
     public Optional<PlatformReleaseLine> lineOf(String version) {
-        return switch (name) {
-            case SPRING_BOOT, SPRING_FRAMEWORK -> lineOfSpring(version);
-            case AMAZON_CORRETTO,
-                    AZUL_ZULU,
-                    BELLSOFT_LIBERICA,
-                    ECLIPSE_TEMURIN,
-                    IBM_SEMERU,
-                    MICROSOFT_OPENJDK,
-                    ORACLE_OPENJDK,
-                    RED_HAT_OPENJDK,
-                    SAP_MACHINE,
-                    GRAALVM,
-                    ALIBABA_DRAGONWELL,
-                    TENCENT_KONA,
-                    JETBRAINS -> lineOfOpenJDKDistro(version);
+        return switch (name.versionFormat()) {
+            case SPRING -> lineOfSpring(version);
+            case OPENJDK -> lineOfOpenJDKDistro(version);
         };
     }
 

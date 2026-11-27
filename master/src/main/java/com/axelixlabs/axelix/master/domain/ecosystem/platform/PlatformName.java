@@ -27,82 +27,89 @@ public enum PlatformName {
     /**
      * Amazon Corretto JDK distribution.
      */
-    AMAZON_CORRETTO("amazon-corretto"),
+    AMAZON_CORRETTO("amazon-corretto", VersionFormat.OPENJDK),
 
     /**
      * Azul Zulu JDK distribution.
      */
-    AZUL_ZULU("azul-zulu"),
+    AZUL_ZULU("azul-zulu", VersionFormat.OPENJDK),
 
     /**
      * BellSoft Liberica JDK distribution.
      */
-    BELLSOFT_LIBERICA("bellsoft-liberica"),
+    BELLSOFT_LIBERICA("bellsoft-liberica", VersionFormat.OPENJDK),
 
     /**
      * Eclipse Temurin JDK distribution.
      */
-    ECLIPSE_TEMURIN("eclipse-temurin"),
+    ECLIPSE_TEMURIN("eclipse-temurin", VersionFormat.OPENJDK),
 
     /**
      * IBM Semeru Runtimes Open Edition.
      */
-    IBM_SEMERU("ibm-semeru"),
+    IBM_SEMERU("ibm-semeru", VersionFormat.OPENJDK),
 
     /**
      * Microsoft Build of OpenJDK.
      */
-    MICROSOFT_OPENJDK("microsoft-openjdk"),
+    MICROSOFT_OPENJDK("microsoft-openjdk", VersionFormat.OPENJDK),
 
     /**
      * Oracle's GPL-licensed OpenJDK distribution.
      */
-    ORACLE_OPENJDK("oracle-openjdk"),
+    ORACLE_OPENJDK("oracle-openjdk", VersionFormat.OPENJDK),
 
     /**
      * Red Hat build of OpenJDK.
      */
-    RED_HAT_OPENJDK("red-hat-openjdk"),
+    RED_HAT_OPENJDK("red-hat-openjdk", VersionFormat.OPENJDK),
 
     /**
      * SapMachine JDK distribution.
      */
-    SAP_MACHINE("sapmachine"),
+    SAP_MACHINE("sapmachine", VersionFormat.OPENJDK),
 
     /**
      * GraalVM Community Edition JDK distribution.
      */
-    GRAALVM("graalvm-ce"),
+    GRAALVM("graalvm-ce", VersionFormat.OPENJDK),
 
     /**
      * Alibaba Dragonwell JDK distribution.
      */
-    ALIBABA_DRAGONWELL("alibaba-dragonwell"),
+    ALIBABA_DRAGONWELL("alibaba-dragonwell", VersionFormat.OPENJDK),
 
     /**
      * Tencent Kona JDK distribution.
      */
-    TENCENT_KONA("tencent-kona"),
+    TENCENT_KONA("tencent-kona", VersionFormat.OPENJDK),
 
     /**
      * JetBrains Runtime JDK distribution.
      */
-    JETBRAINS("jetbrains-runtime"),
+    JETBRAINS("jetbrains-runtime", VersionFormat.OPENJDK),
 
     /**
      * Spring Boot as the Platform.
      */
-    SPRING_BOOT("spring-boot"),
+    SPRING_BOOT("spring-boot", VersionFormat.SPRING),
 
     /**
      * Spring Framework as the Platform.
      */
-    SPRING_FRAMEWORK("spring-framework");
+    SPRING_FRAMEWORK("spring-framework", VersionFormat.SPRING);
+
+    enum VersionFormat {
+        OPENJDK,
+        SPRING
+    }
 
     private final String codeName;
+    private final VersionFormat versionFormat;
 
-    PlatformName(String codeName) {
+    PlatformName(String codeName, VersionFormat versionFormat) {
         this.codeName = codeName;
+        this.versionFormat = versionFormat;
     }
 
     public static PlatformName valueOfElseThrow(String platform) {
@@ -114,6 +121,10 @@ public enum PlatformName {
 
         throw new IllegalArgumentException(
                 "Unrecognized framework provided in the framework manifest file: " + platform);
+    }
+
+    VersionFormat versionFormat() {
+        return versionFormat;
     }
 
     public String codeName() {
