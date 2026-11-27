@@ -109,7 +109,21 @@ class PlatformManifestLoaderTest {
         // then
         assertThat(platforms)
                 .map(Platform::name)
-                .contains(PlatformName.SPRING_BOOT, PlatformName.AMAZON_CORRETTO, PlatformName.ECLIPSE_TEMURIN);
+                .contains(
+                        PlatformName.SPRING_BOOT,
+                        PlatformName.AMAZON_CORRETTO,
+                        PlatformName.BELLSOFT_LIBERICA,
+                        PlatformName.ECLIPSE_TEMURIN);
+    }
+
+    @Test
+    void resolvesLibericaRuntimeToPublicSupportWindow() {
+        Platform liberica = loaderOf("classpath:axelix/platforms/bellsoft-liberica.yaml")
+                .load()
+                .getFirst();
+
+        assertThat(liberica.lineOf("27.0.1.1+5"))
+                .contains(new PlatformReleaseLine("27", LocalDate.of(2026, 9, 16), LocalDate.of(2027, 3, 23), null));
     }
 
     @Test

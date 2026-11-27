@@ -30,6 +30,11 @@ public enum PlatformName {
     AMAZON_CORRETTO("amazon-corretto"),
 
     /**
+     * BellSoft Liberica JDK distribution.
+     */
+    BELLSOFT_LIBERICA("bellsoft-liberica"),
+
+    /**
      * Eclipse Temurin JDK distribution.
      */
     ECLIPSE_TEMURIN("eclipse-temurin"),
