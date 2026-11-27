@@ -306,17 +306,37 @@ public final class ApiPaths {
         /**
          * Endpoint to request an immediate Quartz job execution.
          */
-        public static final String EXECUTE = "/quartz/{instanceId}/execute";
+        public static final String EXECUTE_JOB = "/quartz/{instanceId}/execute";
+
+        /**
+         * Endpoint to pause all triggers associated with a Quartz job.
+         */
+        public static final String PAUSE_JOB = "/quartz/{instanceId}/pauseJob";
+
+        /**
+         * Endpoint to resume all triggers associated with a Quartz job.
+         */
+        public static final String RESUME_JOB = "/quartz/{instanceId}/resumeJob";
 
         /**
          * Endpoint to pause a Quartz trigger.
          */
-        public static final String PAUSE = "/quartz/{instanceId}/pause";
+        public static final String PAUSE_TRIGGER = "/quartz/{instanceId}/pauseTrigger";
 
         /**
          * Endpoint to resume a Quartz trigger.
          */
-        public static final String RESUME = "/quartz/{instanceId}/resume";
+        public static final String RESUME_TRIGGER = "/quartz/{instanceId}/resumeTrigger";
+
+        /**
+         * Endpoint to validate a Quartz cron expression using the target instance's Quartz version.
+         */
+        public static final String VALIDATE_CRON_EXPRESSION = "/quartz/{instanceId}/validateCronExpression";
+
+        /**
+         * Endpoint to validate a Quartz SimpleTrigger repeat interval using the target instance.
+         */
+        public static final String VALIDATE_SIMPLE_TRIGGER_INTERVAL = "/quartz/validateSimpleTriggerInterval";
     }
 
     public static final class ScheduledTasksApi {

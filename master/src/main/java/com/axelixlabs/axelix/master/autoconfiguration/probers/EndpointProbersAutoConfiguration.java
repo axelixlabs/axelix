@@ -303,6 +303,18 @@ public class EndpointProbersAutoConfiguration {
     }
 
     @Bean
+    public DiscardingAbstractEndpointProber pauseQuartzJobEndpointProber() {
+        return new DiscardingAbstractEndpointProber(
+                instanceRegistry, ActuatorEndpoints.PAUSE_QUARTZ_JOB, tokenProvider, httpClient);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber resumeQuartzJobEndpointProber() {
+        return new DiscardingAbstractEndpointProber(
+                instanceRegistry, ActuatorEndpoints.RESUME_QUARTZ_JOB, tokenProvider, httpClient);
+    }
+
+    @Bean
     public DiscardingAbstractEndpointProber pauseQuartzTriggerEndpointProber() {
         return new DiscardingAbstractEndpointProber(
                 instanceRegistry, ActuatorEndpoints.PAUSE_QUARTZ_TRIGGER, tokenProvider, httpClient);
@@ -312,6 +324,12 @@ public class EndpointProbersAutoConfiguration {
     public DiscardingAbstractEndpointProber resumeQuartzTriggerEndpointProber() {
         return new DiscardingAbstractEndpointProber(
                 instanceRegistry, ActuatorEndpoints.RESUME_QUARTZ_TRIGGER, tokenProvider, httpClient);
+    }
+
+    @Bean
+    public ProxyingEndpointProber validateQuartzCronExpressionEndpointProber() {
+        return new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.VALIDATE_QUARTZ_CRON_EXPRESSION, tokenProvider, httpClient);
     }
 
     // Scheduled tasks

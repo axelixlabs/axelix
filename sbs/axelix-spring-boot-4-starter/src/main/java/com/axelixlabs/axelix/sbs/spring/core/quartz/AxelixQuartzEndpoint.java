@@ -17,12 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.quartz;
 
+import org.quartz.CronExpression;
+
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.axelixlabs.axelix.common.contract.quartz.QuartzCronExpressionValidationRequest;
+import com.axelixlabs.axelix.common.contract.quartz.QuartzCronExpressionValidationResponse;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobExecuteRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobPauseRequest;
 import com.axelixlabs.axelix.common.contract.quartz.QuartzJobResumeRequest;
@@ -49,6 +53,16 @@ public class AxelixQuartzEndpoint {
     @GetMapping
     public ServiceQuartzSchedulers getQuartzSchedulers() {
         return quartzService.getQuartzSchedulers();
+    }
+
+    @PostMapping("/validateCronExpression")
+    public ResponseEntity<QuartzCronExpressionValidationResponse> validateCronExpression(
+            @RequestBody QuartzCronExpressionValidationRequest request) {
+        if (request.getCronExpression() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(new QuartzCronExpressionValidationResponse()
+                .valid(CronExpression.isValidExpression(request.getCronExpression())));
     }
 
     @PostMapping("/jobs")
