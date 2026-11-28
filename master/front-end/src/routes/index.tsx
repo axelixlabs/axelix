@@ -40,7 +40,7 @@ export const AppRoutes = () => {
                 () => dispatch(setCurrentUser(null)),
             );
         }
-    }, [dispatch, isAuthenticated]);
+    }, [isAuthenticated]);
 
     useEffect(() => {
         getAxelixSettings()

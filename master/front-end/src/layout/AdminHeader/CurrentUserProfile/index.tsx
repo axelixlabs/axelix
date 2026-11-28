@@ -84,8 +84,8 @@ export const CurrentUserProfile = () => {
                     { key: "logout", label: t("Authentication.logout"), disabled: loggingOut, onClick: logOut },
                 ],
             }}
-            placement="bottomRight"
-            trigger={["hover", "click"]}
+            placement="bottomLeft"
+            trigger={["hover"]}
         >
             {avatar}
         </Dropdown>
