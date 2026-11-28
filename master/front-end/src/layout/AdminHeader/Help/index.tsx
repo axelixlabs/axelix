@@ -55,7 +55,6 @@ export const Help = () => {
         },
         {
             key: "license",
-            // TODO: Change the icon in the future
             icon: <LicenseIcon />,
             label: <HelpLicenseItem />,
         },
