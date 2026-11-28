@@ -45,6 +45,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.service.Jackson2JwtJsonCodec;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
@@ -132,7 +133,8 @@ class HeartBeatServiceTest {
         public TechUserJwtSerializer techUserJwtSerializer(AuthProperties authProperties) {
             return new DefaultTechUserJwtSerializer(
                     authProperties.getJwt().getAlgorithm(),
-                    authProperties.getJwt().getSigningKey());
+                    authProperties.getJwt().getSigningKey(),
+                    new Jackson2JwtJsonCodec());
         }
 
         @Bean

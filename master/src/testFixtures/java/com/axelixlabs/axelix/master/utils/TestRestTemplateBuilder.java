@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.master.domain.auth.DefaultRole;
 import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.Jackson3JwtJsonCodec;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.testfixtures.TestAuthorities;
 import com.axelixlabs.axelix.master.testfixtures.TestRoles;
@@ -81,8 +82,8 @@ public class TestRestTemplateBuilder {
             TechUserJwtSerializer techUserJwtSerializer) {
         this.techUserJwtSerializer = techUserJwtSerializer;
         this.defaultUserJwtEncoderService = defaultUserJwtEncoderService;
-        this.expiredUserJwtEncoderService =
-                new DefaultUserJwtEncoderService(jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO);
+        this.expiredUserJwtEncoderService = new DefaultUserJwtEncoderService(
+                jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO, new Jackson3JwtJsonCodec());
     }
 
     public IdentityAwareTestRestTemplate asViewer() {

@@ -64,6 +64,7 @@ import com.axelixlabs.axelix.master.domain.instance.InstanceId;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.auth.StarterAuthenticationTokenProvider;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.Jackson3JwtJsonCodec;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
@@ -129,8 +130,12 @@ class KubernetesInstanceDiscovererTest {
             return new StarterAuthenticationTokenProvider(
                     securityContextExecutor,
                     new DefaultUserJwtEncoderService(
-                            JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY, Duration.ofMinutes(5)),
-                    new DefaultTechUserJwtSerializer(JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY),
+                            JwtDefaults.DEFAULT_ALGORITHM,
+                            JwtDefaults.DEFAULT_SIGNING_KEY,
+                            Duration.ofMinutes(5),
+                            new Jackson3JwtJsonCodec()),
+                    new DefaultTechUserJwtSerializer(
+                            JwtDefaults.DEFAULT_ALGORITHM, JwtDefaults.DEFAULT_SIGNING_KEY, new Jackson3JwtJsonCodec()),
                     decoder);
         }
 

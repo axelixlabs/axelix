@@ -53,7 +53,7 @@ class DefaultTechUserJwtSerializerTest {
     private static final String SIGNING_KEY = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
 
     private final TechUserJwtSerializer serializer =
-            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC256, SIGNING_KEY);
+            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC256, SIGNING_KEY, new Jackson2JwtJsonCodec());
 
     @ParameterizedTest
     @EnumSource(TechUser.class)
@@ -82,7 +82,8 @@ class DefaultTechUserJwtSerializerTest {
     @Test
     void shouldFailWhenTokenCannotBeSigned() {
         // given.
-        TechUserJwtSerializer invalidSerializer = new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC256, "shortKey");
+        TechUserJwtSerializer invalidSerializer =
+                new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC256, "shortKey", new Jackson2JwtJsonCodec());
 
         // when / then.
         assertThatThrownBy(() -> invalidSerializer.serialize(TechUser.MASTER))

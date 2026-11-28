@@ -167,7 +167,8 @@ class DefaultUserJwtDecoderServiceTest {
     @Test
     void shouldEncodeDecodeTokenWithHS256() {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
-        UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
+        UserJwtEncoderService encoder =
+                new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan, new Jackson3JwtJsonCodec());
         String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR)));
         UserJwtDecoderService decoder256 =
                 new DefaultUserJwtDecoderService(authoritiesService, JwtAlgorithm.HMAC256, key256);
@@ -191,7 +192,8 @@ class DefaultUserJwtDecoderServiceTest {
     void shouldEncodeDecodeTokenWithHS384() {
         String key384 =
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
-        UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
+        UserJwtEncoderService encoder =
+                new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan, new Jackson3JwtJsonCodec());
         String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN)));
         UserJwtDecoderService decoder384 =
                 new DefaultUserJwtDecoderService(authoritiesService, JwtAlgorithm.HMAC384, key384);
@@ -285,8 +287,8 @@ class DefaultUserJwtDecoderServiceTest {
     @Test
     void shouldFailToDecodeTokenWithWrongSecret() {
         String wrongSecret = "MX3TNBx0j8bGCjGWCvq1JffIqqzXLIV-URlKFLX4mfA";
-        UserJwtEncoderService encoderWithWrongSecret =
-                new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, wrongSecret, lifespan);
+        UserJwtEncoderService encoderWithWrongSecret = new DefaultUserJwtEncoderService(
+                JwtAlgorithm.HMAC256, wrongSecret, lifespan, new Jackson3JwtJsonCodec());
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
         String token = encoderWithWrongSecret.generateToken(user);

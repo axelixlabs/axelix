@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.service.Jackson2JwtJsonCodec;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
@@ -132,7 +133,7 @@ class HeartBeatAutoConfigurationTest {
 
         @Bean
         public TechUserJwtSerializer techUserJwtSerializer() {
-            return new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, "secret");
+            return new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, "secret", new Jackson2JwtJsonCodec());
         }
     }
 
