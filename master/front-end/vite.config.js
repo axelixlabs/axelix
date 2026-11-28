@@ -34,7 +34,8 @@ export default defineConfig(() => {
         plugins: [
             react(),
             babel({
-                presets: [reactCompilerPreset()],
+                exclude: [/\/node_modules\/(?!@axelix\/console\/)/],
+                presets: [reactCompilerPreset({ sources: () => true })],
             }),
             svgr(),
         ],

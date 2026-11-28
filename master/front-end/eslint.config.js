@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import path from "node:path";
-
 import js from "@eslint/js";
 import licenseHeader from "@tony.ganchev/eslint-plugin-header";
 
@@ -29,6 +27,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import * as jsoncParser from "jsonc-eslint-parser";
+import path from "node:path";
 import tseslint from "typescript-eslint";
 
 export default [

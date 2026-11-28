@@ -11,7 +11,7 @@
         "lint:css:fix": "stylelint \"src/**/*.css\" --fix",
         "test": "vitest",
         "cy:open": "cypress open",
-        "check": "npm run lint && npm run lint-css && vitest run && tsc -b"
+        "check": "eslint . && stylelint \"src/**/*.css\" && vitest run && tsc -b"
     },
     "dependencies": {
         "@ant-design/icons": "^6.3.4",
