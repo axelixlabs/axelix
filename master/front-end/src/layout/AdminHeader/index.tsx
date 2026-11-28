@@ -19,14 +19,14 @@ import { useNavigate } from "react-router";
 
 import { LogoIcon } from "@/assets";
 import { LanguageSwitcher } from "@/components";
-import type { ICurrentUser } from "@/models";
+import type { ICurrentUserResponseBody } from "@/models";
 
 import { Help } from "./Help";
 import { NavigationBar } from "./NavigationBar";
 import { ProfileMenu } from "./ProfileMenu";
 import styles from "./styles.module.css";
 
-export const AdminHeader = ({ account }: { account: ICurrentUser | null }) => {
+export const AdminHeader = ({ account }: { account: ICurrentUserResponseBody | null }) => {
     const navigate = useNavigate();
 
     return (

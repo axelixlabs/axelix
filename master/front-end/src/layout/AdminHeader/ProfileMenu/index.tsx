@@ -22,12 +22,12 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import { extractErrorCode, getUserInitials } from "@/helpers";
-import { type ICurrentUser, type IErrorResponse, StatelessRequest } from "@/models";
+import { type ICurrentUserResponseBody, type IErrorResponse, StatelessRequest } from "@/models";
 import { logout } from "@/services";
 
 import styles from "./styles.module.css";
 
-export const ProfileMenu = ({ account }: { account: ICurrentUser | null }) => {
+export const ProfileMenu = ({ account }: { account: ICurrentUserResponseBody | null }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 

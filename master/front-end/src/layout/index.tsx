@@ -23,7 +23,7 @@ import { AccessProvider } from "@/components";
 import { InstanceProfileProvider } from "@/components/InstanceProfileProvider";
 import { ConsoleExtensionsContext } from "@/extensions";
 import { fetchData } from "@/helpers";
-import { type ICurrentUser, StatefulRequest } from "@/models";
+import { type ICurrentUserResponseBody, StatefulRequest } from "@/models";
 import { getCurrentUser } from "@/services";
 
 import { AdminHeader } from "./AdminHeader";
@@ -39,7 +39,7 @@ interface IProps {
 }
 
 export const MainLayout = ({ siderContent }: IProps) => {
-    const [account, setAccount] = useState(StatefulRequest.loading<ICurrentUser>());
+    const [account, setAccount] = useState(StatefulRequest.loading<ICurrentUserResponseBody>());
     useEffect(() => {
         void fetchData(setAccount, getCurrentUser);
     }, []);

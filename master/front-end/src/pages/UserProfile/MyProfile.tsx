@@ -21,7 +21,7 @@ import { useOutletContext } from "react-router";
 
 import { Loader } from "@/components";
 import { getUserFullName, getUserInitials } from "@/helpers";
-import type { ICurrentUser, StatefulRequest } from "@/models";
+import type { ICurrentUserResponseBody, StatefulRequest } from "@/models";
 
 import { ProfileCard } from "./ProfileCard";
 import { ProfileField } from "./ProfileField";
@@ -30,7 +30,7 @@ import styles from "./styles.module.css";
 
 const MyProfile = () => {
     const { t } = useTranslation();
-    const { loading, response: user } = useOutletContext<StatefulRequest<ICurrentUser>>();
+    const { loading, response: user } = useOutletContext<StatefulRequest<ICurrentUserResponseBody>>();
     if (loading) return <Loader />;
     if (!user) return <Alert type="error" title={t("unknownError")} />;
 
