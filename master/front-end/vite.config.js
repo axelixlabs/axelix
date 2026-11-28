@@ -30,7 +30,15 @@ export default defineConfig(() => {
 
     return {
         envDir,
-        optimizeDeps: { exclude: ["@axelix/console"] },
+        optimizeDeps: {
+            exclude: ["@axelix/console", "@"],
+            // The console ships as source under node_modules, outside Vite's default dependency scan.
+            entries: [
+                "index.html",
+                "node_modules/@axelix/console/src/**/*.{ts,tsx}",
+                "!node_modules/@axelix/console/src/tests/**",
+            ],
+        },
         plugins: [
             react(),
             babel({
