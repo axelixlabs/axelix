@@ -22,10 +22,9 @@ import * as path from "path";
 import { defineConfig, loadEnv } from "vite";
 import svgr from "vite-plugin-svgr";
 
-export default defineConfig(() => {
-    // we have to load the .env file manually here since vite interprets the .env after the config getting loaded
-    const envDir = path.resolve(process.env.INIT_CWD ?? process.cwd(), "../../master/front-end");
-    const env = loadEnv("", envDir, "");
+export default defineConfig(({ mode }) => {
+    const envDir = path.resolve(process.cwd(), "../../master/front-end");
+    const env = loadEnv(mode, process.cwd(), "VITE_LOCAL_API_URL");
     const apiTarget = env.VITE_LOCAL_API_URL ?? "http://localhost:2935";
 
     return {
