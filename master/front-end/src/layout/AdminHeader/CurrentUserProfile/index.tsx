@@ -17,7 +17,7 @@
  */
 import { UserOutlined } from "@ant-design/icons";
 
-import { Dropdown } from "antd";
+import { Dropdown, Popover } from "antd";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -33,8 +33,7 @@ export const CurrentUserProfile = () => {
     const { t } = useTranslation();
     const [account, setAccount] = useState<ICurrentUserResponseBody | null>(null);
     const accountRequested = useRef(false);
-    const avatarRef = useRef<HTMLButtonElement>(null);
-    const [panel, setPanel] = useState<"menu" | "profile" | null>(null);
+    const [profileOpen, setProfileOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
 
     const loadAccount = () => {
@@ -49,7 +48,6 @@ export const CurrentUserProfile = () => {
     };
 
     const logOut = () => {
-        setPanel(null);
         setLoggingOut(true);
         logout().then(
             () => window.location.assign("/login"),
@@ -57,12 +55,35 @@ export const CurrentUserProfile = () => {
         );
     };
 
-    const closeProfile = () => {
-        setPanel(null);
-        avatarRef.current?.focus();
-    };
+    const avatar = (
+        <button
+            onMouseEnter={loadAccount}
+            onClick={loadAccount}
+            type="button"
+            className={styles.Avatar}
+            aria-haspopup={profileOpen ? "dialog" : "menu"}
+            aria-label={account?.username ?? t("Users.Profile.account")}
+            title={account?.username}
+        >
+            {account ? getUserInitials(account.firstName, account.lastName, account.username) : <UserOutlined />}
+        </button>
+    );
 
-    const profile = panel === "profile" && account ? <AccountProfile account={account} onClose={closeProfile} /> : null;
+    if (profileOpen && account) {
+        return (
+            <Popover
+                open
+                trigger="click"
+                placement="bottomRight"
+                arrow={false}
+                styles={{ container: { padding: 0 } }}
+                onOpenChange={setProfileOpen}
+                content={<AccountProfile account={account} onClose={() => setProfileOpen(false)} />}
+            >
+                {avatar}
+            </Popover>
+        );
+    }
 
     return (
         <Dropdown
@@ -72,32 +93,15 @@ export const CurrentUserProfile = () => {
                         key: "profile",
                         label: t("Authentication.viewProfile"),
                         disabled: !account,
-                        onClick: () => setPanel("profile"),
+                        onClick: () => setProfileOpen(true),
                     },
                     { key: "logout", label: t("Authentication.logout"), disabled: loggingOut, onClick: logOut },
                 ],
             }}
             placement="bottomRight"
-            trigger={profile ? ["click"] : ["hover", "click"]}
-            open={panel !== null}
-            onOpenChange={(open, { source }) => {
-                if (source === "trigger") setPanel(open ? "menu" : null);
-            }}
-            popupRender={(menu) => profile ?? menu}
+            trigger={["hover", "click"]}
         >
-            <button
-                ref={avatarRef}
-                onMouseEnter={loadAccount}
-                onClick={loadAccount}
-                type="button"
-                className={styles.Avatar}
-                aria-haspopup={profile ? "dialog" : "menu"}
-                aria-expanded={panel !== null}
-                aria-label={account?.username ?? t("Users.Profile.account")}
-                title={account?.username}
-            >
-                {account ? getUserInitials(account.firstName, account.lastName, account.username) : <UserOutlined />}
-            </button>
+            {avatar}
         </Dropdown>
     );
 };
