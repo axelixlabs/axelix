@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.axelixlabs.axelix.master.api.external.ApiPaths.UsersApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +118,11 @@ public class UserApi {
         return ResponseEntity.ok(counts);
     }
 
+    /**
+     * This method is required, and we cannot just use {@link UsersApi#USER_PROFILE}, since {@link UsersApi#USER_PROFILE} returns the
+     * profile of any user in hte system, and thus requires special care/authorities to access, whereas the current endpoint just
+     * returns the currently authenticated user, which is okay for all users in the system.
+     */
     @GetMapping(path = ApiPaths.UsersApi.CURRENT_USER)
     public CurrentUserResponse getCurrentUser() {
         User actor = securityContextExecutor.requireSecurityContext().user();

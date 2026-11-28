@@ -25,15 +25,15 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.http.client.HttpCookieHandling;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.boot.resttestclient.TestRestTemplate;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -75,7 +75,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestRestTemplate
 @TestPropertySource(
         properties = {
             "axelix.master.auth.options.local.enabled=true",
@@ -89,7 +88,6 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     private static final String USER_PROFILE_PATH = "/api/external/users/{userId}/profile";
     private static final String ROLE_USER_COUNTS_PATH = "/api/external/users/role-counts";
 
-    @Autowired
     private TestRestTemplate restTemplate;
 
     @Autowired
@@ -120,13 +118,10 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     }
 
     @BeforeEach
-    void statelessRestTemplate() {
-        // The auto-configured TestRestTemplate defaults to ENABLE_WHEN_POSSIBLE cookie handling, so once an
-        // Apache HttpClient is on the classpath (pulled in transitively by spring-cloud-config) it starts
-        // persisting the auth cookie set by login-like requests across subsequent calls. That leaks a valid
-        // cookie into tests that intentionally send none (e.g. logout without a cookie). Disable cookie
-        // handling so every request is stateless and carries only the cookies it explicitly sets.
-        restTemplate = restTemplate.withCookieHandling(HttpCookieHandling.DISABLE);
+    void createRestTemplate(@LocalServerPort int port) {
+        restTemplate = new TestRestTemplate(new RestTemplateBuilder()
+                .baseUri("http://localhost:" + port)
+                .cookieHandling(HttpCookieHandling.ENABLE));
     }
 
     @ParameterizedTest
@@ -375,29 +370,39 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         assertSuccessfulCallback(MasterWebEndpoints.USERS_READ, superAdmin.getActor());
     }
 
-    @ParameterizedTest
-    @CsvSource({"alice,secret,Alice,Smith,VIEWER", "admin,admin,,,SUPER_ADMIN"})
-    void shouldReturnCurrentUser(String username, String password, String firstName, String lastName, String role) {
+    @Test
+    void shouldReturnCurrentLocalUser() {
         // given.
         userService.createLocal("alice", "Alice", "Smith", null, "secret", Set.of("VIEWER"));
-        var login = restTemplate.postForEntity(
-                "/api/external/users/login", defaultEntity(new LoginRequest(username, password)), Void.class);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(
-                HttpHeaders.COOKIE,
-                login.getHeaders().getFirst(HttpHeaders.SET_COOKIE).split(";", 2)[0]);
+        loginAs("alice", "secret");
 
         // when.
-        var response = restTemplate.exchange(
-                CURRENT_USER_PATH, HttpMethod.GET, new HttpEntity<>(headers), CurrentUserResponse.class);
+        var response = restTemplate.getForEntity(CURRENT_USER_PATH, CurrentUserResponse.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         var profile = response.getBody();
-        assertThat(profile.username()).isEqualTo(username);
-        assertThat(profile.firstName()).isEqualTo(firstName);
-        assertThat(profile.lastName()).isEqualTo(lastName);
-        assertThat(profile.roles()).containsExactly(role);
+        assertThat(profile.username()).isEqualTo("alice");
+        assertThat(profile.firstName()).isEqualTo("Alice");
+        assertThat(profile.lastName()).isEqualTo("Smith");
+        assertThat(profile.roles()).containsExactly("VIEWER");
+    }
+
+    @Test
+    void shouldReturnCurrentSuperAdmin() {
+        // given.
+        loginAs("admin", "admin");
+
+        // when.
+        var response = restTemplate.getForEntity(CURRENT_USER_PATH, CurrentUserResponse.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var profile = response.getBody();
+        assertThat(profile.username()).isEqualTo("admin");
+        assertThat(profile.firstName()).isNull();
+        assertThat(profile.lastName()).isNull();
+        assertThat(profile.roles()).containsExactly("SUPER_ADMIN");
     }
 
     @Test
@@ -543,6 +548,11 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ, USERS_FEED_PATH),
                 new TestableMasterWebEndpoint(MasterWebEndpoints.USER_PROFILE, "/api/external/users/missing/profile"),
                 new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ_ROLE_COUNTS, ROLE_USER_COUNTS_PATH));
+    }
+
+    private void loginAs(String username, String password) {
+        restTemplate.postForEntity(
+                "/api/external/users/login", defaultEntity(new LoginRequest(username, password)), Void.class);
     }
 
     private HttpEntity<String> defaultEntity(LoginRequest loginRequest) {
