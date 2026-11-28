@@ -21,6 +21,7 @@ import { Navigate, Route, Routes } from "react-router";
 import Loadable from "@/components";
 import { useAppSelector } from "@/hooks";
 import { MainLayout } from "@/layout";
+import { AdminHeader } from "@/layout/AdminHeader";
 import { AdministrationSiderMenu, DashboardSiderMenu, InstanceSiderMenu } from "@/layout/siders";
 
 const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringPortfolio")));
@@ -53,6 +54,7 @@ export const MainRoutes = () => {
 
     return (
         <>
+            <AdminHeader />
             <Routes>
                 <Route path="/" element={<MainLayout />}>
                     <Route index element={<Navigate to="/wallboard" replace />} />

@@ -23,7 +23,6 @@ import { AccessProvider } from "@/components";
 import { InstanceProfileProvider } from "@/components/InstanceProfileProvider";
 import { ConsoleExtensionsContext } from "@/extensions";
 
-import { AdminHeader } from "./AdminHeader";
 import styles from "./styles.module.css";
 
 const { Content, Sider } = Layout;
@@ -44,8 +43,6 @@ export const MainLayout = ({ siderContent }: IProps) => {
         <>
             <AccessProvider />
             <Layout className={styles.MainWrapper}>
-                <AdminHeader />
-
                 {siderContent && (
                     <Sider width={270} className={styles.Sider}>
                         <div className={styles.SiderScrollContainer}>{siderContent}</div>

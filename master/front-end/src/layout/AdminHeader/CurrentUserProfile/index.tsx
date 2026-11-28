@@ -18,11 +18,11 @@
 import { UserOutlined } from "@ant-design/icons";
 
 import { Dropdown, Popover } from "antd";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { getUserInitials } from "@/helpers";
-import type { ICurrentUserResponseBody } from "@/models";
+import { fetchData, getUserInitials } from "@/helpers";
+import { type ICurrentUserResponseBody, StatefulRequest } from "@/models";
 import { getCurrentUser, logout } from "@/services";
 
 import { AccountProfile } from "../AccountProfile";
@@ -31,21 +31,16 @@ import styles from "./styles.module.css";
 
 export const CurrentUserProfile = () => {
     const { t } = useTranslation();
-    const [account, setAccount] = useState<ICurrentUserResponseBody | null>(null);
+    const [{ response: account }, setAccount] = useState(StatefulRequest.loading<ICurrentUserResponseBody>());
     const accountRequested = useRef(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
 
-    const loadAccount = () => {
+    useEffect(() => {
         if (accountRequested.current) return;
         accountRequested.current = true;
-        getCurrentUser().then(
-            ({ data }) => setAccount(data),
-            () => {
-                accountRequested.current = false;
-            },
-        );
-    };
+        void fetchData(setAccount, getCurrentUser);
+    }, []);
 
     const logOut = () => {
         setLoggingOut(true);
@@ -57,8 +52,6 @@ export const CurrentUserProfile = () => {
 
     const avatar = (
         <button
-            onMouseEnter={loadAccount}
-            onClick={loadAccount}
             type="button"
             className={styles.Avatar}
             aria-haspopup={profileOpen ? "dialog" : "menu"}
