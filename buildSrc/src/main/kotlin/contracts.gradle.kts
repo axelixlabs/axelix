@@ -79,7 +79,7 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
                         "Insights", "HotSpotInsights", "InsightFeature", "ScheduledTaskExecution", "ScheduledTaskLaunchType", "PersistenceInsights",
                         "TransactionAggregatedProfile", "TransactionOrigin", "TransactionalKey", "ExecutionStats",
                         "CountedLazyLoadingTarget", "LazyLoadingTarget", "ExternalCallInsight", "TypeExternalCall",
-                        "JpaEntities", "MappedEntity", "FlaggedAssociation", "Association", "AssociationProblem",
+                        "JpaEntities", "MappedEntity", "FlaggedAssociation", "Association", "AssociationProblem", "QuartzJobExecutionHistory",
                     ).associateWith { schema -> "$basePackage.metadata.$schema" }
                 })
             } else {

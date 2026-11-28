@@ -45,6 +45,7 @@ import com.axelixlabs.axelix.common.contract.heartbeatv2.HeartBeatMetadataV2;
 import com.axelixlabs.axelix.common.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.common.contract.metadata.QuartzJobExecutionHistory;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
@@ -53,6 +54,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.NoOpJpaEntitiesProf
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.QuartzExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
@@ -300,6 +302,44 @@ class DefaultHeartBeatMetadataAssemblerTest {
         assertThat(heartBeat.getScheduledTaskExecutions()).isEmpty();
     }
 
+    @Test
+    void shouldReportQuartzExecutionHistory() {
+        // given.
+        QuartzJobExecutionHistory execution = new QuartzJobExecutionHistory()
+                .executionId("execution-1")
+                .schedulerName("quartzScheduler")
+                .jobName("job")
+                .jobGroup("jobs")
+                .triggerName("trigger")
+                .triggerGroup("triggers")
+                .startedAt("2026-01-01T00:00:00Z")
+                .durationMillis(100L)
+                .success(true);
+        QuartzExecutionHistory history = new QuartzExecutionHistory();
+        history.record("quartzScheduler", execution);
+        DefaultHeartBeatMetadataAssembler assembler = new DefaultHeartBeatMetadataAssembler(
+                service, healthDetectionFunction, insightsInfoProviderWithQuartzHistory(history), properties);
+
+        // when.
+        HeartBeatMetadataV2 heartBeat = assembler.assembleHeartBeatV2();
+
+        // then.
+        assertThat(heartBeat.getQuartzExecutionHistory()).containsExactly(execution);
+    }
+
+    @Test
+    void shouldReportNoQuartzExecutionHistory_whenHistoryIsAbsent() {
+        // given.
+        DefaultHeartBeatMetadataAssembler assembler = new DefaultHeartBeatMetadataAssembler(
+                service, healthDetectionFunction, insightsInfoProviderWithoutHistory(), properties);
+
+        // when.
+        HeartBeatMetadataV2 heartBeat = assembler.assembleHeartBeatV2();
+
+        // then.
+        assertThat(heartBeat.getQuartzExecutionHistory()).isEmpty();
+    }
+
     private static DefaultInsightsInfoProvider insightsInfoProviderWithoutHistory() {
         return new DefaultInsightsInfoProvider(
                 () -> false,
@@ -308,7 +348,20 @@ class DefaultHeartBeatMetadataAssemblerTest {
                 new DefaultTransactionStatsCollector(),
                 new TransactionAttributesRegistry(),
                 new NoOpJpaEntitiesProfileProvider(),
+                null,
                 null);
+    }
+
+    private static DefaultInsightsInfoProvider insightsInfoProviderWithQuartzHistory(QuartzExecutionHistory history) {
+        return new DefaultInsightsInfoProvider(
+                () -> false,
+                null,
+                new VmOptionsAccessor(List.of()),
+                new DefaultTransactionStatsCollector(),
+                new TransactionAttributesRegistry(),
+                new NoOpJpaEntitiesProfileProvider(),
+                null,
+                history);
     }
 
     private DefaultBasicRegistrationMetadataAssembler metadataAssemblerWith(ClasspathDependencySbom sbom) {

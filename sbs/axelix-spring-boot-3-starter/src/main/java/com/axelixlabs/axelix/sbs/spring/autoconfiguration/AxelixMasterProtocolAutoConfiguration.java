@@ -56,6 +56,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.NoOpTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.QuartzExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 
@@ -102,7 +103,8 @@ public class AxelixMasterProtocolAutoConfiguration {
             ObjectProvider<TransactionStatsCollector> transactionStatsCollectorProvider,
             ObjectProvider<TransactionAttributesRegistry> transactionAttributesRegistryProvider,
             ObjectProvider<JpaEntitiesProfileProvider> entitiesMapProvider,
-            ObjectProvider<ScheduledTaskExecutionHistory> scheduledTaskExecutionHistoryProvider) {
+            ObjectProvider<ScheduledTaskExecutionHistory> scheduledTaskExecutionHistoryProvider,
+            ObjectProvider<QuartzExecutionHistory> quartzExecutionHistoryProvider) {
         return new DefaultInsightsInfoProvider(
                 openSessionInViewStateProvider,
                 gcLogServiceProvider.getIfAvailable(),
@@ -110,7 +112,8 @@ public class AxelixMasterProtocolAutoConfiguration {
                 transactionStatsCollectorProvider.getIfAvailable(NoOpTransactionStatsCollector::new),
                 transactionAttributesRegistryProvider.getIfAvailable(TransactionAttributesRegistry::new),
                 entitiesMapProvider.getIfAvailable(NoOpJpaEntitiesProfileProvider::new),
-                scheduledTaskExecutionHistoryProvider.getIfAvailable());
+                scheduledTaskExecutionHistoryProvider.getIfAvailable(),
+                quartzExecutionHistoryProvider.getIfAvailable());
     }
 
     @Bean

@@ -56,7 +56,20 @@ class AxelixPingEndpointTest extends AbstractMasterSharedContextTest {
                 "heap" : "#{json-unit.ignore}"
               },
               "transactions" : [ ],
-              "scheduledTaskExecutions" : [ ]
+              "scheduledTaskExecutions" : [ ],
+              "quartzExecutionHistory" : [ {
+                "executionId" : "quartz-execution-1",
+                "schedulerName" : "quartzScheduler",
+                "jobName" : "testJob",
+                "jobGroup" : "jobs",
+                "triggerName" : "testTrigger",
+                "triggerGroup" : "triggers",
+                "startedAt" : "2026-01-01T00:00:00Z",
+                "durationMillis" : 100,
+                "success" : true,
+                "errorType" : null,
+                "errorMessage" : null
+              } ]
             }
             """);
     }

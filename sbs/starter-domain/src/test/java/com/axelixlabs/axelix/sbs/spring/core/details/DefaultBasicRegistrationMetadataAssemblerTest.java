@@ -27,6 +27,7 @@ import org.springframework.boot.SpringBootVersion;
 
 import com.axelixlabs.axelix.common.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.common.contract.metadata.QuartzJobExecutionHistory;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultBasicRegistrationMetadataAssembler;
@@ -37,6 +38,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.NoOpJpaEntitiesProf
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
+import com.axelixlabs.axelix.sbs.spring.core.quartz.QuartzExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
@@ -103,6 +105,38 @@ class DefaultBasicRegistrationMetadataAssemblerTest extends AbstractDetailsShare
         assertThat(serviceMetadata.getInsights().getScheduledTaskExecutions()).isEmpty();
     }
 
+    @Test
+    void shouldIncludeQuartzExecutionHistoryInInsights() {
+        // given.
+        QuartzJobExecutionHistory execution = new QuartzJobExecutionHistory()
+                .executionId("execution-1")
+                .schedulerName("quartzScheduler")
+                .jobName("job")
+                .jobGroup("jobs")
+                .triggerName("trigger")
+                .triggerGroup("triggers")
+                .startedAt("2026-01-01T00:00:00Z")
+                .durationMillis(100L)
+                .success(true);
+        QuartzExecutionHistory history = new QuartzExecutionHistory();
+        history.record("quartzScheduler", execution);
+        DefaultBasicRegistrationMetadataAssembler assembler = new DefaultBasicRegistrationMetadataAssembler(
+                healthDetectionFunction,
+                axelixVersionDiscoverer,
+                libraryInformationProvider,
+                insightsInfoProviderWithQuartzHistory(history),
+                axelixInfoProperties,
+                () -> Set.of(),
+                new ClasspathDependencySbom(),
+                new NoOpLogger());
+
+        // when.
+        BasicRegistrationMetadata serviceMetadata = assembler.assemble();
+
+        // then.
+        assertThat(serviceMetadata.getInsights().getQuartzExecutionHistory()).containsExactly(execution);
+    }
+
     private static DefaultInsightsInfoProvider insightsInfoProviderWithoutHistory() {
         return new DefaultInsightsInfoProvider(
                 () -> false,
@@ -111,6 +145,19 @@ class DefaultBasicRegistrationMetadataAssemblerTest extends AbstractDetailsShare
                 new DefaultTransactionStatsCollector(),
                 new TransactionAttributesRegistry(),
                 new NoOpJpaEntitiesProfileProvider(),
+                null,
                 null);
+    }
+
+    private static DefaultInsightsInfoProvider insightsInfoProviderWithQuartzHistory(QuartzExecutionHistory history) {
+        return new DefaultInsightsInfoProvider(
+                () -> false,
+                null,
+                new VmOptionsAccessor(List.of()),
+                new DefaultTransactionStatsCollector(),
+                new TransactionAttributesRegistry(),
+                new NoOpJpaEntitiesProfileProvider(),
+                null,
+                history);
     }
 }
