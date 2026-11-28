@@ -42,6 +42,8 @@ public final class ApiPaths {
 
         public static final String LOGIN = "/users/login";
 
+        public static final String CURRENT_USER = "/users/me";
+
         public static final String LOGOUT = "/users/logout";
 
         /**

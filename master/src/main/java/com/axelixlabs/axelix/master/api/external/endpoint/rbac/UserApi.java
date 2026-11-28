@@ -36,13 +36,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
+import com.axelixlabs.axelix.master.api.external.response.CurrentUserResponse;
 import com.axelixlabs.axelix.master.api.external.response.RoleProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.RoleUsersCountResponse;
 import com.axelixlabs.axelix.master.api.external.response.UserAuthoritiesResponse;
 import com.axelixlabs.axelix.master.api.external.response.UserProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.UserResponse;
+import com.axelixlabs.axelix.master.domain.auth.Role;
+import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
+import com.axelixlabs.axelix.master.repository.AuthorityRepository.AuthorityProfile;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.UserAuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
@@ -62,6 +66,7 @@ public class UserApi {
 
     private static final Logger log = LoggerFactory.getLogger(UserApi.class);
 
+    private final SecurityContextExecutor securityContextExecutor;
     private final CookieService cookieService;
     private final UserAuthenticator userAuthenticator;
     private final UserJwtEncoderService userJwtEncoderService;
@@ -72,12 +77,14 @@ public class UserApi {
     private static final InvalidCredentialsException INVALID_CREDENTIALS_EXCEPTION = new InvalidCredentialsException();
 
     public UserApi(
+            SecurityContextExecutor securityContextExecutor,
             CookieService cookieService,
             UserAuthenticator userAuthenticator,
             UserJwtEncoderService userJwtEncoderService,
             UserService userService,
             RoleService roleService,
             UserAuthoritiesService userAuthoritiesService) {
+        this.securityContextExecutor = securityContextExecutor;
         this.cookieService = cookieService;
         this.userAuthenticator = userAuthenticator;
         this.userJwtEncoderService = userJwtEncoderService;
@@ -108,6 +115,22 @@ public class UserApi {
                 .toList();
 
         return ResponseEntity.ok(counts);
+    }
+
+    @GetMapping(path = ApiPaths.UsersApi.CURRENT_USER)
+    public CurrentUserResponse getCurrentUser() {
+        User actor = securityContextExecutor.requireSecurityContext().user();
+        var details = userService.findUserById(actor.getId()).orElse(null);
+        return new CurrentUserResponse(
+                actor.getId(),
+                details == null ? actor.getUsername() : details.username(),
+                details == null ? null : details.firstName(),
+                details == null ? null : details.lastName(),
+                details == null ? null : details.email(),
+                actor.getRoles().stream().map(Role::name).sorted().toList(),
+                userAuthoritiesService.getAuthorities(actor.getRoles()).effectiveAuthorities().stream()
+                        .map(AuthorityProfile::displayName)
+                        .toList());
     }
 
     @GetMapping(path = ApiPaths.UsersApi.USER_PROFILE)

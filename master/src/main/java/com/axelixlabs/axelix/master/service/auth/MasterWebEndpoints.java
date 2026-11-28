@@ -264,6 +264,8 @@ public final class MasterWebEndpoints {
             register("users:read", HttpMethod.GET, ApiPaths.UsersApi.USERS_FEED, () -> "users:read");
     public static final MasterWebEndpoint USERS_READ_ROLE_COUNTS =
             register("users:read-role-counts", HttpMethod.GET, ApiPaths.UsersApi.ROLE_USER_COUNTS, () -> "users:read");
+    public static final MasterWebEndpoint CURRENT_USER =
+            register("users:me", HttpMethod.GET, ApiPaths.UsersApi.CURRENT_USER, null);
     public static final MasterWebEndpoint USER_PROFILE =
             register("users:profile", HttpMethod.GET, ApiPaths.UsersApi.USER_PROFILE, () -> "users:read");
     public static final MasterWebEndpoint LOCAL_LOGIN =

@@ -25,6 +25,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.databind.ObjectMapper;
 
@@ -42,6 +43,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
+import com.axelixlabs.axelix.master.api.external.response.CurrentUserResponse;
 import com.axelixlabs.axelix.master.api.external.response.RoleProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.UserAuthoritiesResponse;
 import com.axelixlabs.axelix.master.api.external.response.UserProfileResponse;
@@ -83,6 +85,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserApiTest extends AbstractProtectedEndpointTest {
 
     private static final String USERS_FEED_PATH = "/api/external/users/feed";
+    private static final String CURRENT_USER_PATH = "/api/external/users/me";
     private static final String USER_PROFILE_PATH = "/api/external/users/{userId}/profile";
     private static final String ROLE_USER_COUNTS_PATH = "/api/external/users/role-counts";
 
@@ -372,6 +375,31 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         assertSuccessfulCallback(MasterWebEndpoints.USERS_READ, superAdmin.getActor());
     }
 
+    @ParameterizedTest
+    @CsvSource({"alice,secret,Alice,Smith,VIEWER", "admin,admin,,,SUPER_ADMIN"})
+    void shouldReturnCurrentUser(String username, String password, String firstName, String lastName, String role) {
+        // given.
+        userService.createLocal("alice", "Alice", "Smith", null, "secret", Set.of("VIEWER"));
+        var login = restTemplate.postForEntity(
+                "/api/external/users/login", defaultEntity(new LoginRequest(username, password)), Void.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(
+                HttpHeaders.COOKIE,
+                login.getHeaders().getFirst(HttpHeaders.SET_COOKIE).split(";", 2)[0]);
+
+        // when.
+        var response = restTemplate.exchange(
+                CURRENT_USER_PATH, HttpMethod.GET, new HttpEntity<>(headers), CurrentUserResponse.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var profile = response.getBody();
+        assertThat(profile.username()).isEqualTo(username);
+        assertThat(profile.firstName()).isEqualTo(firstName);
+        assertThat(profile.lastName()).isEqualTo(lastName);
+        assertThat(profile.roles()).containsExactly(role);
+    }
+
     @Test
     void shouldReturnUserProfile() {
         // given.
@@ -511,6 +539,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
         return Set.of(
+                new TestableMasterWebEndpoint(MasterWebEndpoints.CURRENT_USER, CURRENT_USER_PATH),
                 new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ, USERS_FEED_PATH),
                 new TestableMasterWebEndpoint(MasterWebEndpoints.USER_PROFILE, "/api/external/users/missing/profile"),
                 new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ_ROLE_COUNTS, ROLE_USER_COUNTS_PATH));
