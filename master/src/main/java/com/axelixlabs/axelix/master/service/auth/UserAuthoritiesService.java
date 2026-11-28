@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.master.domain.auth.Authority;
-import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.repository.AuthorityRepository.AuthorityProfile;
 import com.axelixlabs.axelix.master.repository.UserRepository;
@@ -60,11 +59,7 @@ public class UserAuthoritiesService {
             throw new UserNotFoundException(userId);
         }
 
-        return getAuthorities(roleService.findRolesOfUser(userId));
-    }
-
-    public UserAuthorities getAuthorities(Set<Role> roles) {
-        Set<String> granted = roles.stream()
+        Set<String> granted = roleService.findRolesOfUser(userId).stream()
                 .flatMap(role -> role.getEffectiveAuthorities().stream())
                 .map(Authority::getName)
                 .collect(Collectors.toSet());

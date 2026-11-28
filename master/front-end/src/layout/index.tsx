@@ -16,15 +16,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Layout } from "antd";
-import { type JSX, useContext, useEffect, useState } from "react";
+import { type JSX, useContext } from "react";
 import { Outlet, useParams } from "react-router";
 
 import { AccessProvider } from "@/components";
 import { InstanceProfileProvider } from "@/components/InstanceProfileProvider";
 import { ConsoleExtensionsContext } from "@/extensions";
-import { fetchData } from "@/helpers";
-import { type ICurrentUserResponseBody, StatefulRequest } from "@/models";
-import { getCurrentUser } from "@/services";
 
 import { AdminHeader } from "./AdminHeader";
 import styles from "./styles.module.css";
@@ -39,11 +36,6 @@ interface IProps {
 }
 
 export const MainLayout = ({ siderContent }: IProps) => {
-    const [account, setAccount] = useState(StatefulRequest.loading<ICurrentUserResponseBody>());
-    useEffect(() => {
-        void fetchData(setAccount, getCurrentUser);
-    }, []);
-
     const { instanceId } = useParams();
 
     const { LicenseStatusAlert } = useContext(ConsoleExtensionsContext);
@@ -52,7 +44,7 @@ export const MainLayout = ({ siderContent }: IProps) => {
         <>
             <AccessProvider />
             <Layout className={styles.MainWrapper}>
-                <AdminHeader account={account.response} />
+                <AdminHeader />
 
                 {siderContent && (
                     <Sider width={270} className={styles.Sider}>

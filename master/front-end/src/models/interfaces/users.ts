@@ -65,13 +65,10 @@ export interface IUser {
 }
 
 export interface ICurrentUserResponseBody {
-    id: string;
     username: string;
     firstName: string | null;
     lastName: string | null;
-    email: string | null;
     roles: string[];
-    permissions: string[];
 }
 
 export interface ICreateUserFormFields {

@@ -22,13 +22,10 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Identity details and effective access of the signed-in user.
+ * Identity details and roles of the signed-in user.
  */
 public record CurrentUserResponse(
-        String id,
         String username,
         @Nullable String firstName,
         @Nullable String lastName,
-        @Nullable String email,
-        List<String> roles,
-        List<String> permissions) {}
+        List<String> roles) {}

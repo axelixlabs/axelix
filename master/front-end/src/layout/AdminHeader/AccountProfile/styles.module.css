@@ -1,17 +1,3 @@
-.Avatar {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    color: var(--axelix-white);
-    font: inherit;
-    font-weight: var(--axelix-font-weight-semibold);
-    margin-inline: 20px;
-    background-color: var(--axelix-green-600);
-    cursor: pointer;
-}
-
 .Profile {
     position: relative;
     width: min(308px, calc(100vw - 32px));
