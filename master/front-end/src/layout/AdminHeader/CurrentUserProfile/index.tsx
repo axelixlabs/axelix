@@ -18,11 +18,11 @@
 import { UserOutlined } from "@ant-design/icons";
 
 import { Dropdown, Popover } from "antd";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getUserInitials } from "@/helpers";
-import { CurrentUserContext } from "@/routes/CurrentUserContext";
+import { useAppSelector } from "@/hooks";
 import { logout } from "@/services";
 
 import { AccountProfile } from "../AccountProfile";
@@ -31,7 +31,7 @@ import styles from "./styles.module.css";
 
 export const CurrentUserProfile = () => {
     const { t } = useTranslation();
-    const account = useContext(CurrentUserContext);
+    const account = useAppSelector((state) => state.currentUser);
     const [profileOpen, setProfileOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
 

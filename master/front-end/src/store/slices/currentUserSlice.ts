@@ -15,8 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { createContext } from "react";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 import type { ICurrentUserResponseBody } from "@/models";
 
-export const CurrentUserContext = createContext<ICurrentUserResponseBody | null>(null);
+export const CurrentUserSlice = createSlice({
+    name: "currentUser",
+    initialState: null as ICurrentUserResponseBody | null,
+    reducers: {
+        setCurrentUser: (_, action: PayloadAction<ICurrentUserResponseBody | null>) => action.payload,
+    },
+});
+
+export const { setCurrentUser } = CurrentUserSlice.actions;

@@ -18,14 +18,12 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router";
 
-import { fetchData, getCookie } from "@/helpers";
+import { getCookie } from "@/helpers";
 import { useAppDispatch } from "@/hooks";
-import { type ICurrentUserResponseBody, StatefulRequest } from "@/models";
 import { getAxelixSettings, getCurrentUser } from "@/services";
-import { setAxelixSettings } from "@/store/slices";
+import { setAxelixSettings, setCurrentUser } from "@/store/slices";
 
 import { AuthRoutes } from "./AuthRoutes";
-import { CurrentUserContext } from "./CurrentUserContext";
 import { MainRoutes } from "./MainRoutes";
 
 export const AppRoutes = () => {
@@ -35,13 +33,14 @@ export const AppRoutes = () => {
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState<boolean>(true);
 
-    const [currentUser, setCurrentUser] = useState(StatefulRequest.loading<ICurrentUserResponseBody>());
-
     useEffect(() => {
         if (isAuthenticated) {
-            void fetchData(setCurrentUser, getCurrentUser);
+            getCurrentUser().then(
+                ({ data }) => dispatch(setCurrentUser(data)),
+                () => dispatch(setCurrentUser(null)),
+            );
         }
-    }, [isAuthenticated]);
+    }, [dispatch, isAuthenticated]);
 
     useEffect(() => {
         getAxelixSettings()
@@ -59,15 +58,5 @@ export const AppRoutes = () => {
         return null;
     }
 
-    return (
-        <BrowserRouter>
-            {isAuthenticated ? (
-                <CurrentUserContext.Provider value={currentUser.response}>
-                    <MainRoutes />
-                </CurrentUserContext.Provider>
-            ) : (
-                <AuthRoutes />
-            )}
-        </BrowserRouter>
-    );
+    return <BrowserRouter>{isAuthenticated ? <MainRoutes /> : <AuthRoutes />}</BrowserRouter>;
 };
