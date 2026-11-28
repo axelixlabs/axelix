@@ -31,11 +31,6 @@
         "recharts": "^3.10.1",
         "timepicker-ui": "^4.6.0"
     },
-    "exports": {
-        ".": "./src/main.tsx",
-        "./vite": "./vite.config.js",
-        "./license-details": "./src/layout/AdminHeader/Help/HelpLicenseItem/LicenseModal/LicenseDetails.tsx"
-    },
     "files": [
         "src",
         "cypress",
