@@ -31,11 +31,6 @@
     "license": "Lizenz",
     "version": "Version",
     "or": "oder",
-    "LicenseStatusAlert": {
-        "licenseExpiringSoonAlertTitle_one": "Ihre Axelix-Enterprise-Lizenz läuft in {{count}} Tag ab ({{date}}). Danach stehen die Enterprise-Funktionen nicht mehr zur Verfügung.",
-        "licenseExpiringSoonAlertTitle_other": "Ihre Axelix-Enterprise-Lizenz läuft in {{count}} Tagen ab ({{date}}). Danach stehen die Enterprise-Funktionen nicht mehr zur Verfügung.",
-        "licenseAlertActionText": "Schlüssel aktualisieren"
-    },
     "Details": {
         "axelix": {
             "starterVersion": "Version des Starters für Spring Boot"
@@ -518,8 +513,6 @@
         "active": "Aktiv",
         "noExpiry": "Unbefristet",
         "thirdPartyNotices": "Hinweise zu Drittanbietern",
-        "updateKey": "Schlüssel aktualisieren",
-        "enterKey": "Schlüssel eingeben",
         "ossDescription": "Sie verwenden die Distribution <b>Axelix OSS</b> unter der Lizenz <a>{{license}}</a>. Die Enterprise-Funktionen sind auf dieser Instanz nicht aktiviert.",
         "licensedTo": "LIZENZIERT FÜR",
         "licensedId": "LIZENZ-ID",
@@ -533,40 +526,7 @@
             "expired": "abgelaufen",
             "unknown": "Ablaufdatum unbekannt"
         },
-        "Form": {
-            "enterKeyTitle": "Lizenzschlüssel eingeben",
-            "updateKeyTitle": "Lizenzschlüssel aktualisieren",
-            "enterKeyDescription": "Fügen Sie den für Ihre Organisation ausgestellten Schlüssel ein. Die Prüfung erfolgt lokal ohne ausgehende Verbindung.",
-            "activate": "Aktivieren",
-            "replaceLicense": "Lizenz ersetzen",
-            "availableInEnterprise": "In Axelix Enterprise verfügbar",
-            "uploadFile": ".lic-Datei hochladen",
-            "keyActivated": "Lizenzschlüssel aktiviert",
-            "keyUpdated": "Lizenzschlüssel aktualisiert",
-            "fileReadError": "Die Datei konnte nicht gelesen werden. Versuchen Sie es erneut.",
-            "KeyInfo": {
-                "currentlyActive": "Derzeit aktiv",
-                "validUntil": "bis {{date}}"
-            },
-            "Alert": {
-                "Valid": {
-                    "title": "Neuer Schlüssel ist gültig",
-                    "description": "{{issuedTo}} · gültig bis <0>{{validUntil}}</0>. Die aktuelle Lizenz bleibt aktiv, bis Sie die Änderung bestätigen."
-                },
-                "AlreadyActive": {
-                    "title": "Bereits aktiv",
-                    "description": "Dieser Lizenzschlüssel ist bereits in Gebrauch."
-                },
-                "Expired": {
-                    "title": "Dieser Schlüssel ist am {{date}} abgelaufen",
-                    "description": "Ausgestellt für {{issuedTo}}. Bitten Sie Ihre Ansprechperson bei Axelix um einen neuen Schlüssel oder <0>wenden Sie sich an den Support</0>."
-                },
-                "SignatureInvalid": {
-                    "title": "Signatur konnte nicht geprüft werden",
-                    "description": "Der Schlüssel wurde nach seiner Ausstellung verändert oder stammt nicht von Axelix. Fordern Sie bei Ihrer Ansprechperson bei Axelix eine neue Kopie an."
-                }
-            }
-        }
+        "availableInEnterprise": "In Axelix Enterprise verfügbar"
     },
     "ThreadDump": {
         "id": "Thread-ID",

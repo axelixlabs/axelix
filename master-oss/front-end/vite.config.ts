@@ -15,16 +15,4 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { apiFetch } from "@/api";
-
-export const checkLicenseKey = (licenseKey: string) => {
-    return apiFetch.post("license/check", {
-        licenseKey: licenseKey,
-    });
-};
-
-export const enterLicenseKey = (licenseKey: string) => {
-    return apiFetch.post("license", {
-        licenseKey: licenseKey,
-    });
-};
+export { default } from "@axelix/console/vite.config.js";

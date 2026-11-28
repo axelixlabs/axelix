@@ -24,14 +24,18 @@ import svgr from "vite-plugin-svgr";
 
 export default defineConfig(() => {
     // we have to load the .env file manually here since vite interprets the .env after the config getting loaded
-    const env = loadEnv("", process.cwd(), "");
+    const envDir = path.resolve(process.env.INIT_CWD ?? process.cwd(), "../../master/front-end");
+    const env = loadEnv("", envDir, "");
     const apiTarget = env.VITE_LOCAL_API_URL ?? "http://localhost:2935";
 
     return {
+        envDir,
+        optimizeDeps: { exclude: ["@axelix/console"] },
         plugins: [
             react(),
             babel({
-                presets: [reactCompilerPreset()],
+                exclude: [/\/node_modules\/(?!@axelix\/console\/)/],
+                presets: [reactCompilerPreset({ sources: () => true })],
             }),
             svgr(),
         ],
@@ -47,7 +51,7 @@ export default defineConfig(() => {
         },
         resolve: {
             alias: {
-                "@": path.resolve(__dirname, "./src"),
+                "@": path.resolve(import.meta.dirname, "./src"),
             },
         },
     };

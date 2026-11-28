@@ -27,6 +27,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import * as jsoncParser from "jsonc-eslint-parser";
+import path from "node:path";
 import tseslint from "typescript-eslint";
 
 export default [
@@ -95,7 +96,7 @@ export default [
                     format: ["UPPER_CASE"],
                 },
             ],
-            "header/header": ["error", "../../LICENSE_HEADER"],
+            "header/header": ["error", path.resolve(process.env.INIT_CWD ?? process.cwd(), "../../LICENSE_HEADER")],
             complexity: ["error", 10],
             "max-nested-callbacks": ["error", 2],
             "max-depth": ["error", 2],

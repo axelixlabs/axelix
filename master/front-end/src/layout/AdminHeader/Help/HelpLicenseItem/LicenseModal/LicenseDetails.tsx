@@ -15,6 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ILicenseValidationErrorResponseBody, ILicenseValidationResponseBody } from "@/models";
+import type { ReactNode } from "react";
 
-export type TLicenseCheckResponseBody = ILicenseValidationResponseBody | ILicenseValidationErrorResponseBody;
+import { isEnterpriseLicense } from "@/helpers";
+import type { ILicensing } from "@/models";
+
+import { EnterpriseLicenseDetails } from "./EnterpriseLicenseDetails";
+import { OSSLicenseDetails } from "./OSSLicenseDetails";
+
+export const LicenseDetails = ({ licensing, children }: { licensing: ILicensing; children?: ReactNode }) => {
+    const Details = isEnterpriseLicense(licensing) ? EnterpriseLicenseDetails : OSSLicenseDetails;
+    return <Details licensing={licensing}>{children}</Details>;
+};

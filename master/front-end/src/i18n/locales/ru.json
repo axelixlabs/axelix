@@ -30,13 +30,6 @@
     "license": "Лицензия",
     "version": "Версия",
     "or": "или",
-    "LicenseStatusAlert": {
-        "licenseExpiringSoonAlertTitle_one": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} день ({{date}}). После этой даты корпоративные функции перестанут работать.",
-        "licenseExpiringSoonAlertTitle_few": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} дня ({{date}}). После этой даты корпоративные функции перестанут работать.",
-        "licenseExpiringSoonAlertTitle_many": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} дней ({{date}}). После этой даты корпоративные функции перестанут работать.",
-        "licenseExpiringSoonAlertTitle_other": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} дней ({{date}}). После этой даты корпоративные функции перестанут работать.",
-        "licenseAlertActionText": "Обновить ключ"
-    },
     "notEnoughAuthorities": "У вас недостаточно полномочий",
     "Details": {
         "axelix": {
@@ -524,8 +517,6 @@
         "active": "Активна",
         "noExpiry": "бессрочно",
         "thirdPartyNotices": "Сторонние лицензии",
-        "updateKey": "Обновить ключ",
-        "enterKey": "Ввести ключ",
         "ossDescription": "Вы используете <b>Axelix OSS</b> дистрибутив в рамках лицензии <a>{{license}}</a>. Возможности Enterprise на этом экземпляре не активированы.",
         "licensedTo": "ЛИЦЕНЗИАТ",
         "licensedId": "ID ЛИЦЕНЗИИ",
@@ -540,40 +531,7 @@
             "expired": "срок действия истёк",
             "unknown": "срок действия не указан"
         },
-        "Form": {
-            "enterKeyTitle": "Ввести лицензионный ключ",
-            "updateKeyTitle": "Обновить лицензионный ключ",
-            "enterKeyDescription": "Вставьте ключ, выданный вашей организации. Ключи проверяются локально - исходящих соединений не выполняется.",
-            "activate": "Активировать",
-            "replaceLicense": "Заменить лицензию",
-            "availableInEnterprise": "Доступно в Enterprise",
-            "uploadFile": "загрузить файл .lic",
-            "keyActivated": "Ключ лицензии активирован",
-            "keyUpdated": "Ключ лицензии обновлён",
-            "fileReadError": "Не удалось прочитать файл. Попробуйте ещё раз.",
-            "KeyInfo": {
-                "currentlyActive": "Активный ключ",
-                "validUntil": "до {{date}}"
-            },
-            "Alert": {
-                "Valid": {
-                    "title": "Новый ключ подтверждён",
-                    "description": "{{issuedTo}} · действителен до <0>{{validUntil}}</0>. Текущая лицензия остаётся активной до подтверждения."
-                },
-                "AlreadyActive": {
-                    "title": "Уже активен",
-                    "description": "Этот лицензионный ключ уже используется."
-                },
-                "Expired": {
-                    "title": "Срок действия ключа истёк {{date}}",
-                    "description": "Выдан для {{issuedTo}}. Запросите новый ключ у контакта Axelix или <0>свяжитесь с поддержкой</0>."
-                },
-                "SignatureInvalid": {
-                    "title": "Не удалось проверить подпись",
-                    "description": "Ключ был изменён после выдачи или не был выдан Axelix. Запросите новую копию у вашего контакта Axelix."
-                }
-            }
-        }
+        "availableInEnterprise": "Доступно в Enterprise"
     },
     "ThreadDump": {
         "id": "Id потока",

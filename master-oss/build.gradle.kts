@@ -1,5 +1,6 @@
 plugins {
     id("master-runtime")
+    id("com.axelixlabs.axelix-nodejs")
     id("org.springframework.boot") version "4.2.0"
     id("com.axelixlabs.axelix-internal")
 }
@@ -24,4 +25,9 @@ tasks.bootJar {
 
 axelix {
     properties.put("version", version.toString())
+}
+
+nodejs {
+    sourceDir = layout.projectDirectory.dir("front-end").asFile.path
+    steps = listOf("run build")
 }

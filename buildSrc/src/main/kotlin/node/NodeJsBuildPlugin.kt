@@ -22,6 +22,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
@@ -49,12 +50,22 @@ class NodeJsBuildPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val extension = project.extensions.create<NodeJsBuildPluginExtension>(AXELIX_DSL_CONFIG)
+        val installDependencies = project.tasks.register<Exec>("installConsoleDependencies") {
+            workingDir(extension.sourceDir)
+            commandLine("npm", "ci")
+        }
+        val checkConsole = project.tasks.register<Exec>("checkConsole") {
+            dependsOn(installDependencies)
+            workingDir(extension.sourceDir)
+            commandLine("npm", "run", "check")
+        }
 
         val buildNodeJsProjectTask =
             project.tasks.register<NodeJsBuildTask>(BUILD_NODE_JS_PROJECT_TASK_NAME) {
                 group = "build"
                 description = "Builds the Node.js front-end project and copies its dist into generated resources"
 
+                dependsOn(checkConsole)
                 steps.set(extension.steps)
                 sourceDir.set(extension.sourceDir)
                 distDirectory.set(project.layout.buildDirectory.dir(GENERATED_FRONT_END_DIST_DIR))

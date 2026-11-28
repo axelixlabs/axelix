@@ -4,7 +4,6 @@ import org.gradle.kotlin.dsl.axelix
 plugins {
     id("master-runtime")
     id("com.axelixlabs.axelix-internal")
-    id("com.axelixlabs.axelix-nodejs")
     id("java-test-fixtures")
 }
 
@@ -142,16 +141,4 @@ tasks.processResources {
 
 axelix {
     properties.put("version", version.toString())
-}
-
-nodejs {
-    steps = listOf(
-        "ci",
-        "run lint",
-        "run lint-css",
-        "run test",
-        "run build",
-    )
-
-    sourceDir = project.layout.projectDirectory.dir("front-end").asFile.path
 }

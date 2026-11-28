@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'master/front-end/**'
+      - 'master-oss/front-end/**'
     branches: [ master ]
 
 concurrency:
@@ -28,6 +29,9 @@ jobs:
           max-lines: '600'
 
   frontend-build:
+    defaults:
+      run:
+        working-directory: ./master-oss/front-end
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -39,13 +43,10 @@ jobs:
           node-version-file: ./master/front-end/.nvmrc
 
       - run: npm ci
-        working-directory: ./master/front-end
         shell: bash
 
-      - run: npm run lint && npm run lint-css && npm run test
-        working-directory: ./master/front-end
+      - run: npm run check
         shell: bash
 
       - run: npm run build
-        working-directory: ./master/front-end
         shell: bash

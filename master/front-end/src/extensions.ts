@@ -15,7 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export enum ELicenseFormType {
-    CREATE = "CREATE",
-    UPDATE = "UPDATE",
+import { type ComponentType, createContext } from "react";
+
+import type { ILicensing } from "@/models";
+
+export interface IConsoleExtensions {
+    LicenseDetails?: ComponentType<{ licensing: ILicensing }>;
+    LicenseStatusAlert?: ComponentType<{ hideSider: boolean }>;
 }
+
+export const ConsoleExtensionsContext = createContext<IConsoleExtensions>({});

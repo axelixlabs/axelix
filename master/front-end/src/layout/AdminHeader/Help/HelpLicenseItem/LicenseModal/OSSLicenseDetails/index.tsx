@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// License key entry is moving to the Enterprise distro; button temporarily disabled.
-// import { Button } from "antd";
-import type { Dispatch, SetStateAction } from "react";
+import type { ReactNode } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
-import { ELicenseFormType, type ILicensing } from "@/models";
+import type { ILicensing } from "@/models";
 import { LGPL_LINK } from "@/utils";
 
 import { LicenseStatusBadge } from "../../LicenseStatusBadge";
@@ -30,10 +28,10 @@ import styles from "./styles.module.css";
 
 interface IProps {
     licensing: ILicensing;
-    setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
+    children?: ReactNode;
 }
 
-export const OSSLicenseDetails = ({ licensing }: IProps) => {
+export const OSSLicenseDetails = ({ licensing, children }: IProps) => {
     const { t } = useTranslation();
 
     const { license, functions } = licensing;
@@ -74,12 +72,7 @@ export const OSSLicenseDetails = ({ licensing }: IProps) => {
 
                 <LicenseFunctions functions={functions} />
 
-                {/* License key entry is moving to the Enterprise distro; button temporarily disabled. */}
-                {/* <div className={styles.ActionsWrapper}>
-                    <Button type="primary" onClick={() => setLicenseFormType(ELicenseFormType.CREATE)}>
-                        {t("LicenseModal.enterKey")}
-                    </Button>
-                </div> */}
+                {children && <div className={styles.ActionsWrapper}>{children}</div>}
             </div>
         </>
     );
