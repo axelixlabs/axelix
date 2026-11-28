@@ -21,14 +21,19 @@ import { createRoot } from "react-dom/client";
 import { applyDesignTokens } from "@/theme/tokens";
 
 import { App } from "./App";
+import { ConsoleExtensionsContext, type IConsoleExtensions } from "./extensions";
 
 import "./index.css";
 import "./customizedTable.css";
 
-applyDesignTokens(document.documentElement.style);
+export function mountConsole(extensions: IConsoleExtensions = {}) {
+    applyDesignTokens(document.documentElement.style);
 
-createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-        <App />
-    </StrictMode>,
-);
+    createRoot(document.getElementById("root")!).render(
+        <StrictMode>
+            <ConsoleExtensionsContext.Provider value={extensions}>
+                <App />
+            </ConsoleExtensionsContext.Provider>
+        </StrictMode>,
+    );
+}

@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useContext } from "react";
 
-import { LicenseKeyForm, UniversalModal } from "@/components";
-import { isEnterpriseLicense } from "@/helpers";
-import { ELicenseFormType, type ILicensing } from "@/models";
+import { UniversalModal } from "@/components";
+import { ConsoleExtensionsContext } from "@/extensions";
+import type { ILicensing } from "@/models";
 
-import { EnterpriseLicenseDetails } from "./EnterpriseLicenseDetails";
-import { OSSLicenseDetails } from "./OSSLicenseDetails";
+import { LicenseDetails } from "./LicenseDetails";
 
 interface IProps {
     /**
@@ -39,38 +38,12 @@ interface IProps {
 }
 
 export const LicenseModal = ({ isModalOpen, setIsModalOpen, licensing }: IProps) => {
-    const [licenseFormType, setLicenseFormType] = useState<ELicenseFormType | null>(null);
-
-    const onClose = (): void => {
-        setIsModalOpen(false);
-        setLicenseFormType(null);
-    };
-
-    const existingLicenseDetails = isEnterpriseLicense(licensing) ? (
-        <EnterpriseLicenseDetails setLicenseFormType={setLicenseFormType} licensing={licensing} />
-    ) : (
-        <OSSLicenseDetails setLicenseFormType={setLicenseFormType} licensing={licensing} />
-    );
+    const { LicenseDetails: Details = LicenseDetails } = useContext(ConsoleExtensionsContext);
+    const onClose = () => setIsModalOpen(false);
 
     return (
-        <>
-            <UniversalModal
-                open={isModalOpen}
-                onOk={onClose}
-                onClose={onClose}
-                displayCancel={false}
-                displayOkay={false}
-            >
-                {licenseFormType ? (
-                    <LicenseKeyForm
-                        licenseFormType={licenseFormType}
-                        setLicenseFormType={setLicenseFormType}
-                        licensing={licensing}
-                    />
-                ) : (
-                    existingLicenseDetails
-                )}
-            </UniversalModal>
-        </>
+        <UniversalModal open={isModalOpen} onOk={onClose} onClose={onClose} displayCancel={false} displayOkay={false}>
+            {isModalOpen && <Details licensing={licensing} />}
+        </UniversalModal>
     );
 };

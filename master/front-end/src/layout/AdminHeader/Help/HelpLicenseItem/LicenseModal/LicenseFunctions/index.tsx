@@ -45,7 +45,7 @@ export const LicenseFunctions = ({ functions }: IProps) => {
                     {sortedFunctions.map(({ name, enabled }) => {
                         if (!enabled) {
                             return (
-                                <HintTooltip content={t("LicenseModal.Form.availableInEnterprise")} key={name}>
+                                <HintTooltip content={t("LicenseModal.availableInEnterprise")} key={name}>
                                     <span className={styles.FunctionChip}>
                                         {name} <GoldCrownIcon />
                                     </span>

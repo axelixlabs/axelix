@@ -1,69 +1,26 @@
-# React + TypeScript + Vite
+# Axelix Console UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The npm workspace at the repository root contains the shared React application
+in `master/front-end` and its OSS entry point in `master-oss/front-end`.
+With the Enterprise submodule checked out, it also includes the application
+in `axelix-enterprise/front-end`.
 
-Currently, two official plugins are available:
+Run these commands from the repository root.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-    globalIgnores(["dist"]),
-    {
-        files: ["**/*.{ts,tsx}"],
-        extends: [
-            // Other configs...
-
-            // Remove tseslint.configs.recommended and replace with this
-            ...tseslint.configs.recommendedTypeChecked,
-            // Alternatively, use this for stricter rules
-            ...tseslint.configs.strictTypeChecked,
-            // Optionally, add this for stylistic rules
-            ...tseslint.configs.stylisticTypeChecked,
-
-            // Other configs...
-        ],
-        languageOptions: {
-            parserOptions: {
-                project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-                tsconfigRootDir: import.meta.dirname,
-            },
-            // other options...
-        },
-    },
-]);
+```sh
+npm ci
+npm run dev -w axelix-oss
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Use `-w axelix-enterprise` to start the Enterprise console. Both applications
+use the shared Vite configuration and read the development proxy target from
+`master/front-end/.env.local` (`VITE_LOCAL_API_URL`).
 
-```js
-// eslint.config.js
-import reactDom from "eslint-plugin-react-dom";
-import reactX from "eslint-plugin-react-x";
+Run `npm run check -w @axelix/console` to check the shared code and
+`npm run build -w axelix-oss` or `npm run build -w axelix-enterprise` to
+type-check and bundle an edition. Each edition writes its own `dist/`.
+Gradle packages that directory under `spa/` in the corresponding Master JAR.
 
-export default tseslint.config([
-    globalIgnores(["dist"]),
-    {
-        files: ["**/*.{ts,tsx}"],
-        extends: [
-            // Other configs...
-            // Enable lint rules for React
-            reactX.configs["recommended-typescript"],
-            // Enable lint rules for React DOM
-            reactDom.configs.recommended,
-        ],
-        languageOptions: {
-            parserOptions: {
-                project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-                tsconfigRootDir: import.meta.dirname,
-            },
-            // other options...
-        },
-    },
-]);
-```
+The OSS entry point calls `mountConsole()`. Enterprise passes its license
+details component and expiry alert to `mountConsole`. Both render inside
+the common application's Redux, translation and Ant Design providers.

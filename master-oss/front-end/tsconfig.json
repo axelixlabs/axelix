@@ -1,0 +1,7 @@
+{
+    "extends": "../../master/front-end/tsconfig.app.json",
+    "include": [
+        "src/main.tsx",
+        "../../master/front-end/src/*.d.ts"
+    ]
+}

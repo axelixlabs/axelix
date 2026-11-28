@@ -16,15 +16,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Layout } from "antd";
-import type { JSX } from "react";
+import { type JSX, useContext } from "react";
 import { Outlet, useParams } from "react-router";
 
 import { AccessProvider } from "@/components";
 import { InstanceProfileProvider } from "@/components/InstanceProfileProvider";
+import { ConsoleExtensionsContext } from "@/extensions";
 
 import { AdminHeader } from "./AdminHeader";
-// License key entry is moving to the Enterprise distro; banner temporarily disabled.
-// import { LicenseStatusAlert } from "./LicenseStatusAlert";
 import styles from "./styles.module.css";
 
 const { Content, Sider } = Layout;
@@ -38,6 +37,8 @@ interface IProps {
 
 export const MainLayout = ({ siderContent }: IProps) => {
     const { instanceId } = useParams();
+
+    const { LicenseStatusAlert } = useContext(ConsoleExtensionsContext);
 
     const layout = (
         <>
@@ -53,8 +54,7 @@ export const MainLayout = ({ siderContent }: IProps) => {
 
                 <Layout className={styles.ContentLayout}>
                     <Content className={`${styles.Content} ${siderContent ? styles.WithSider : ""}`}>
-                        {/* License key entry is moving to the Enterprise distro; banner temporarily disabled. */}
-                        {/* <LicenseStatusAlert hideSider={hideSider} /> */}
+                        {LicenseStatusAlert && <LicenseStatusAlert hideSider={!siderContent} />}
                         <Outlet />
                     </Content>
                 </Layout>

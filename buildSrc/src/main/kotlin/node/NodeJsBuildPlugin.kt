@@ -55,6 +55,14 @@ class NodeJsBuildPlugin : Plugin<Project> {
                 group = "build"
                 description = "Builds the Node.js front-end project and copies its dist into generated resources"
 
+                dependsOn(":master:checkConsole")
+                val frontendInputs = listOf("src/**", "*.json", "*.ts", "*.html", ".env*")
+                inputs.files(project.fileTree(project.rootProject.file("master/front-end")) { include(frontendInputs) })
+                inputs.files(project.fileTree(extension.sourceDir) { include(frontendInputs) })
+                inputs.files(project.rootProject.file("package.json"), project.rootProject.file("package-lock.json"))
+                inputs.property("version", project.version.toString())
+                inputs.property("viteVersion", project.providers.environmentVariable("VITE_APP_VERSION").orElse(""))
+
                 steps.set(extension.steps)
                 sourceDir.set(extension.sourceDir)
                 distDirectory.set(project.layout.buildDirectory.dir(GENERATED_FRONT_END_DIST_DIR))

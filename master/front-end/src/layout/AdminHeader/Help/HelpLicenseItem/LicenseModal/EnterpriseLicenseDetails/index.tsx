@@ -15,13 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-// License key entry is moving to the Enterprise distro; button temporarily disabled.
-// import { Button } from "antd";
-import type { Dispatch, SetStateAction } from "react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getTimeLeftText } from "@/helpers";
-import { ELicenseFormType, type ILicensing } from "@/models";
+import type { ILicensing } from "@/models";
 
 import { LicenseStatusBadge } from "../../LicenseStatusBadge";
 import { LicenseFunctions } from "../LicenseFunctions";
@@ -31,10 +29,10 @@ import styles from "./styles.module.css";
 
 interface IProps {
     licensing: ILicensing;
-    setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
+    children?: ReactNode;
 }
 
-export const EnterpriseLicenseDetails = ({ licensing }: IProps) => {
+export const EnterpriseLicenseDetails = ({ licensing, children }: IProps) => {
     const { t } = useTranslation();
 
     const { functions, validUntil } = licensing;
@@ -60,12 +58,7 @@ export const EnterpriseLicenseDetails = ({ licensing }: IProps) => {
 
                 <LicenseFunctions functions={functions} />
 
-                {/* License key entry is moving to the Enterprise distro; button temporarily disabled. */}
-                {/* <div className={styles.ActionsWrapper}>
-                    <Button type="primary" onClick={() => setLicenseFormType(ELicenseFormType.UPDATE)}>
-                        {t("LicenseModal.updateKey")}
-                    </Button>
-                </div> */}
+                {children && <div className={styles.ActionsWrapper}>{children}</div>}
             </div>
         </>
     );

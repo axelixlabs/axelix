@@ -59,6 +59,8 @@ bin/
 .DS_Store
 /.idea/inspectionProfiles/Project_Default.xml
 
+/node_modules/
+
 # APM dependencies
 apm_modules/
 apm.lock.yaml

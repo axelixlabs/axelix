@@ -4,7 +4,6 @@ import org.gradle.kotlin.dsl.axelix
 plugins {
     id("master-runtime")
     id("com.axelixlabs.axelix-internal")
-    id("com.axelixlabs.axelix-nodejs")
     id("java-test-fixtures")
 }
 
@@ -144,14 +143,13 @@ axelix {
     properties.put("version", version.toString())
 }
 
-nodejs {
-    steps = listOf(
-        "ci",
-        "run lint",
-        "run lint-css",
-        "run test",
-        "run build",
-    )
+val installConsoleDependencies = tasks.register<Exec>("installConsoleDependencies") {
+    workingDir(rootDir)
+    commandLine("npm", "ci")
+}
 
-    sourceDir = project.layout.projectDirectory.dir("front-end").asFile.path
+tasks.register<Exec>("checkConsole") {
+    dependsOn(installConsoleDependencies)
+    workingDir(layout.projectDirectory.dir("front-end"))
+    commandLine("npm", "run", "check")
 }

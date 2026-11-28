@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - 'master/front-end/**'
+      - 'master-oss/front-end/**'
+      - 'package.json'
+      - 'package-lock.json'
     branches: [ master ]
 
 concurrency:
@@ -39,13 +42,12 @@ jobs:
           node-version-file: ./master/front-end/.nvmrc
 
       - run: npm ci
-        working-directory: ./master/front-end
         shell: bash
 
-      - run: npm run lint && npm run lint-css && npm run test
+      - run: npm run check
         working-directory: ./master/front-end
         shell: bash
 
       - run: npm run build
-        working-directory: ./master/front-end
+        working-directory: ./master-oss/front-end
         shell: bash
