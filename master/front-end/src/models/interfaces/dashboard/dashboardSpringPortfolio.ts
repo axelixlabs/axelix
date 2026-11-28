@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { EPlatformName } from "@/models";
+import { EFrameworkSupportStatus, EPlatformName } from "@/models";
 
 /**
  * A single Spring release line (e.g. {@code 3.5.x}) and how many applications run it.
@@ -71,4 +71,38 @@ export interface IDashboardSpringPortfolioResponseBody {
     springFramework: IPlatformDistribution;
     linesInUse: IMaintenanceWindowEntry[];
     computedAt: string;
+}
+
+/**
+ * An application of the estate together with the Spring release lines it runs on.
+ */
+export interface ISpringPortfolioApplication {
+    /**
+     * Name of the application in the {@code groupId:artifactId} form, e.g. {@code com.example:billing-service}
+     */
+    name: string;
+
+    /**
+     * Spring Boot release line the application runs on, e.g. {@code 3.5.x}
+     */
+    springBootLine: string;
+
+    /**
+     * Spring Framework release line the application runs on, e.g. {@code 6.2.x}
+     */
+    springFrameworkLine: string;
+
+    /**
+     * Whether the application runs on lines that are still inside the OSS maintenance window
+     */
+    ossSupported: boolean;
+}
+
+export type TSpringSliceStatus = EFrameworkSupportStatus | "ALL";
+
+export interface ISpringSlice {
+    platform: EPlatformName;
+    from: string;
+    to: string;
+    status: TSpringSliceStatus;
 }

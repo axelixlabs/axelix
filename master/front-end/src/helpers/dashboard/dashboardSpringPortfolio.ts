@@ -15,7 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IPlatformDistribution } from "@/models";
+import {
+    EFrameworkSupportStatus,
+    EPlatformName,
+    type IPlatformDistribution,
+    type ISpringPortfolioApplication,
+    type ISpringSlice,
+} from "@/models";
+import { PLATFORM_ORDER } from "@/utils";
 
 export const LINE_COLORS = [
     "#2EC4B6",
@@ -55,4 +62,58 @@ export const parseIsoDate = (value: string | number[]): Date => {
 
 export const formatMonthYear = (value: string | number[]): string => {
     return parseIsoDate(value).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+};
+
+// TODO: Revisit once the applications come from the API: the version format, an empty list, and Spring Framework versions overridden by the application
+const compareVersions = (left: string, right: string): number =>
+    left.localeCompare(right, undefined, { numeric: true });
+
+export const springSliceVersionOf = (application: ISpringPortfolioApplication, platform: EPlatformName): string => {
+    const line = platform === EPlatformName.SPRING_BOOT ? application.springBootLine : application.springFrameworkLine;
+
+    return line.replace(/\.x$/, "");
+};
+
+export const getSpringSliceVersions = (
+    applications: ISpringPortfolioApplication[],
+    platform: EPlatformName,
+): string[] => {
+    return [...new Set(applications.map((application) => springSliceVersionOf(application, platform)))].sort(
+        compareVersions,
+    );
+};
+
+export const getSpringSliceVersionsCount = (applications: ISpringPortfolioApplication[]): number => {
+    return Math.max(...PLATFORM_ORDER.map((platform) => getSpringSliceVersions(applications, platform).length));
+};
+
+const isInSpringSliceRange = (application: ISpringPortfolioApplication, slice: ISpringSlice): boolean => {
+    const version = springSliceVersionOf(application, slice.platform);
+
+    return compareVersions(version, slice.from) >= 0 && compareVersions(version, slice.to) <= 0;
+};
+
+export const matchesSpringSlice = (application: ISpringPortfolioApplication, slice: ISpringSlice): boolean => {
+    const status = application.ossSupported
+        ? EFrameworkSupportStatus.OSS_SUPPORTED
+        : EFrameworkSupportStatus.OUT_OF_OSS_MAINTENANCE;
+
+    return isInSpringSliceRange(application, slice) && (slice.status === "ALL" || slice.status === status);
+};
+
+export const isSpringSliceFullRange = (applications: ISpringPortfolioApplication[], slice: ISpringSlice): boolean => {
+    const versions = getSpringSliceVersions(applications, slice.platform);
+
+    return slice.from === versions[0] && slice.to === versions[versions.length - 1];
+};
+
+export const normalizeSpringSlice = (
+    applications: ISpringPortfolioApplication[],
+    slice: ISpringSlice,
+): ISpringSlice | null => {
+    return slice.status === "ALL" && isSpringSliceFullRange(applications, slice) ? null : slice;
+};
+
+export const formatSpringSliceRange = (from: string, to: string): string => {
+    return from === to ? from : `${from} – ${to}`;
 };

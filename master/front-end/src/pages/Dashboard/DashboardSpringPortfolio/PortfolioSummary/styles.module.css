@@ -2,18 +2,19 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    background-color: var(--axelix-white);
-    border: 1px solid var(--axelix-grey-300);
+    color: var(--axelix-white);
+    background-color: var(--axelix-grey-900);
+    border: 1px solid var(--axelix-grey-800);
     border-radius: var(--axelix-border-radius-large);
     padding: 12px 20px;
-    box-shadow: var(--axelix-box-shadow-light);
+    box-shadow: var(--axelix-box-shadow-bold);
     flex-shrink: 0;
 }
 
 .TotalLabel {
     font-weight: 600;
     letter-spacing: 1px;
-    color: var(--axelix-grey-500);
+    color: var(--axelix-grey-300);
     text-transform: uppercase;
 }
 
@@ -22,7 +23,7 @@
     flex-direction: column;
     gap: 8px;
     padding-left: 20px;
-    border-left: 1px solid var(--axelix-grey-300);
+    border-left: 1px solid var(--axelix-grey-700);
 }
 
 .BreakdownRow {
@@ -38,11 +39,11 @@
 }
 
 .SupportedCount {
-    color: var(--axelix-green-600);
+    color: var(--axelix-green-200);
 }
 
 .UnsupportedCount {
-    color: var(--axelix-red-600);
+    color: var(--axelix-red-300);
 }
 
 /* TODO: Improve in the future */
@@ -60,19 +61,19 @@
 
 /* TODO: Improve in the future */
 .ChipOk {
-    color: var(--axelix-green-600);
-    background-color: var(--axelix-green-50);
-    border: 1px solid var(--axelix-green-600);
+    color: var(--axelix-green-200);
+    background-color: color-mix(in srgb, var(--axelix-green-500) 14%, transparent);
+    border: 1px solid var(--axelix-green-500);
 }
 
 /* TODO: Improve in the future */
 .ChipNo {
-    color: var(--axelix-red-600);
-    background-color: var(--axelix-red-50);
-    border: 1px solid var(--axelix-red-600);
+    color: var(--axelix-red-200);
+    background-color: color-mix(in srgb, var(--axelix-red-500) 14%, transparent);
+    border: 1px solid var(--axelix-red-300);
 }
 
 .BreakdownHint {
-    color: var(--axelix-grey-500);
+    color: var(--axelix-grey-300);
     white-space: nowrap;
 }

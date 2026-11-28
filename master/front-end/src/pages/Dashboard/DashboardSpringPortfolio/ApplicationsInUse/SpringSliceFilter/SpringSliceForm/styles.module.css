@@ -1,0 +1,109 @@
+.MainWrapper {
+    --tp-pill-min-width: 30px;
+
+    display: flex;
+    flex-direction: column;
+    width: min-content;
+    min-width: 380px;
+}
+
+.Header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--axelix-grey-100);
+}
+
+.HeaderIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    color: var(--axelix-white);
+    background-color: var(--axelix-green-600);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.HeaderText {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.Title {
+    font-weight: var(--axelix-font-weight-semibold);
+}
+
+.Description {
+    color: var(--axelix-grey-500);
+}
+
+.Body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 16px;
+}
+
+.Field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.StatusChip {
+    line-height: var(--axelix-line-height-normal);
+    vertical-align: middle;
+}
+
+.Caption {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+}
+
+.Divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &::before,
+    &::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: var(--axelix-grey-200);
+    }
+}
+
+.DividerLabel {
+    padding: 3px 8px;
+    font-size: var(--axelix-font-size-caption);
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-white);
+    background-color: var(--axelix-grey-900);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.Footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--axelix-grey-100);
+}
+
+.Clear.Clear {
+    padding-inline: 4px;
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-500);
+    text-decoration: underline;
+}

@@ -1,0 +1,78 @@
+.MainWrapper {
+    --tp-pills-padding: 4px;
+    --tp-pills-border: 1px;
+    --tp-pills-inset: calc(var(--tp-pills-padding) + var(--tp-pills-border));
+    --tp-pill-width: 36px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.Header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.Caption {
+    font-weight: var(--axelix-font-weight-semibold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-grey-500);
+}
+
+.AllVersions.AllVersions {
+    padding: 0;
+    height: auto;
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-grey-500);
+    text-decoration: underline;
+}
+
+.Pills {
+    position: relative;
+    display: flex;
+    min-width: calc(var(--tp-versions-count) * var(--tp-pill-min-width));
+    justify-content: space-between;
+    padding: var(--tp-pills-padding);
+    border: var(--tp-pills-border) solid var(--axelix-grey-200);
+    border-radius: 6px;
+}
+
+.Band {
+    position: absolute;
+    top: var(--tp-pills-padding);
+    bottom: var(--tp-pills-padding);
+    background-color: var(--axelix-green-100);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.Pill {
+    position: relative;
+    flex: 0 1 var(--tp-pill-width);
+    min-width: var(--tp-pill-min-width);
+    height: 32px;
+    padding: 0;
+    font: inherit;
+    font-weight: var(--axelix-font-weight-medium);
+    color: var(--axelix-grey-700);
+    background: transparent;
+    border: none;
+    border-radius: var(--axelix-border-radius-small);
+    cursor: pointer;
+}
+
+.InRange {
+    font-weight: var(--axelix-font-weight-semibold);
+    color: var(--axelix-green-700);
+}
+
+.Edge {
+    color: var(--axelix-white);
+    background-color: var(--axelix-green-600);
+}
+
+.Hint {
+    color: var(--axelix-grey-500);
+}

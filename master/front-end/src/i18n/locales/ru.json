@@ -509,7 +509,30 @@
             "ossEnds": "Конец OSS",
             "apps": "Прил.",
             "legendSupported": "Поддерживается OSS — сообщество выпускает исправления для этой линии",
-            "legendUnsupported": "Не поддерживается OSS — после этой даты выпусков от сообщества нет"
+            "legendUnsupported": "Не поддерживается OSS — после этой даты выпусков от сообщества нет",
+            "applicationsInUseTitle": "Приложения",
+            "applicationsInUseHint": "Версии, обнаруженные во время работы",
+            "columns": {
+                "application": "Приложение",
+                "springBoot": "Spring Boot",
+                "springFramework": "Spring Framework",
+                "status": "Статус"
+            },
+            "applicationsFooter": "{{from}}–{{to}} из {{total}} приложений",
+            "applicationsFooterEmpty": "0 приложений",
+            "noApplicationsMatch": "Нет приложений, подходящих под фильтры.",
+            "springSlice": "Срез Spring",
+            "springSliceDescription": "Фильтр приложений по версии и статусу.",
+            "close": "Закрыть",
+            "versionRange": "Диапазон версий",
+            "allVersions": "Все версии",
+            "versionRangeHint": "Нажмите на версию, чтобы выбрать только её. Перетащите ползунки или нажмите на шкалу, чтобы задать диапазон.",
+            "and": "И",
+            "allStatuses": "Все",
+            "ossSupported": "Поддержка OSS",
+            "windowClosed": "Окно закрыто",
+            "clear": "Сбросить",
+            "show": "Показать"
         }
     },
     "About": {

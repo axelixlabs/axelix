@@ -22,7 +22,9 @@ import { DashboardNoData, EmptyHandler, Loader, PagesFirstSection } from "@/comp
 import { fetchData } from "@/helpers";
 import { type IDashboardSpringPortfolioResponseBody, StatefulRequest } from "@/models";
 import { getDashboardSpringPortfolioData } from "@/services";
+import { SPRING_PORTFOLIO_APPLICATIONS_MOCK } from "@/utils";
 
+import { ApplicationsInUse } from "./ApplicationsInUse";
 import { MaintenanceLadder } from "./MaintenanceLadder";
 import { PlatformDistributionCard } from "./PlatformDistributionCard";
 import { PortfolioSummary } from "./PortfolioSummary";
@@ -82,6 +84,8 @@ const DashboardSpringPortfolio = () => {
             </div>
 
             {portfolio.linesInUse.length > 0 && <MaintenanceLadder entries={portfolio.linesInUse} />}
+
+            <ApplicationsInUse applications={SPRING_PORTFOLIO_APPLICATIONS_MOCK} />
         </>
     );
 };

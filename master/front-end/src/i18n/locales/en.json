@@ -503,7 +503,30 @@
             "ossEnds": "OSS ends",
             "apps": "Apps",
             "legendSupported": "OSS supported — the community publishes fixes for this line",
-            "legendUnsupported": "Not OSS supported — no community releases after this date"
+            "legendUnsupported": "Not OSS supported — no community releases after this date",
+            "applicationsInUseTitle": "Applications in use",
+            "applicationsInUseHint": "Versions detected at runtime",
+            "columns": {
+                "application": "Application",
+                "springBoot": "Spring Boot",
+                "springFramework": "Spring Framework",
+                "status": "Status"
+            },
+            "applicationsFooter": "{{from}}–{{to}} of {{total}} applications",
+            "applicationsFooterEmpty": "0 applications",
+            "noApplicationsMatch": "No applications match these filters.",
+            "springSlice": "Spring slice",
+            "springSliceDescription": "Filter applications by version and status.",
+            "close": "Close",
+            "versionRange": "Version range",
+            "allVersions": "All versions",
+            "versionRangeHint": "Click a version to pick just that one. Drag the handles or click the slider to set a range.",
+            "and": "AND",
+            "allStatuses": "All",
+            "ossSupported": "OSS supported",
+            "windowClosed": "Window closed",
+            "clear": "Clear",
+            "show": "Show"
         }
     },
     "About": {
