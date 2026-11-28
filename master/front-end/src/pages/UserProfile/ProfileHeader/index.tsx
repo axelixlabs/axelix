@@ -66,8 +66,10 @@ export const ProfileHeader = ({ user, displayName, onEdit, onSuspend }: IProps) 
             </div>
 
             <div className={styles.Identity}>
-                <span className={`${styles.Avatar} ${getUserFullName(user) ? "" : styles.AvatarAnonymous}`}>
-                    {getUserInitials(user)}
+                <span
+                    className={`${styles.Avatar} ${getUserFullName(user.firstName, user.lastName) ? "" : styles.AvatarAnonymous}`}
+                >
+                    {getUserInitials(user.firstName, user.lastName, user.username)}
                 </span>
                 <div className={styles.IdentityText}>
                     <div className={styles.NameRow}>

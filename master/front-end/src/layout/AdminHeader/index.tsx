@@ -20,25 +20,23 @@ import { useNavigate } from "react-router";
 import { LogoIcon } from "@/assets";
 import { LanguageSwitcher } from "@/components";
 
+import { CurrentUserProfile } from "./CurrentUserProfile";
 import { Help } from "./Help";
 import { NavigationBar } from "./NavigationBar";
-import { ProfileMenu } from "./ProfileMenu";
 import styles from "./styles.module.css";
 
 export const AdminHeader = () => {
     const navigate = useNavigate();
 
     return (
-        <>
-            <div className={styles.Header}>
-                <LogoIcon onClick={() => navigate("/wallboard")} className={styles.Logo} />
-                <div className={styles.LinksAndAvatarWrapper}>
-                    <NavigationBar />
-                    <Help />
-                    <ProfileMenu />
-                    <LanguageSwitcher />
-                </div>
+        <div className={styles.Header}>
+            <LogoIcon onClick={() => navigate("/wallboard")} className={styles.Logo} />
+            <div className={styles.LinksAndAvatarWrapper}>
+                <NavigationBar />
+                <Help />
+                <CurrentUserProfile />
+                <LanguageSwitcher />
             </div>
-        </>
+        </div>
     );
 };

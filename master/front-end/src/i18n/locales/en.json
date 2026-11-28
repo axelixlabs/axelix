@@ -234,7 +234,10 @@
     },
     "Authentication": {
         "welcome": "Welcome",
-        "logout": "Logout",
+        "signedInAs": "Signed in as",
+        "closeProfile": "Close profile",
+        "viewProfile": "View profile",
+        "logout": "Log out",
         "docs": "Docs",
         "loginPasswordForm" : {
             "enterUsername": "Enter username",

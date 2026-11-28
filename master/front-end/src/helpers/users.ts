@@ -40,20 +40,17 @@ export const getUserDisplayStatus = (user: IUser): EUserDisplayStatus => {
 /**
  * Returns null when neither the first nor the last name is known.
  */
-export const getUserFullName = ({ firstName, lastName }: IUser): string | null => {
+export const getUserFullName = (firstName: string | null, lastName: string | null): string | null => {
     const fullName = [firstName, lastName].filter(Boolean).join(" ");
 
     return fullName || null;
 };
 
-export const getUserInitials = (user: IUser): string => {
-    const { firstName, lastName, username } = user;
-
-    if (firstName || lastName) {
-        return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
-    }
-
-    return username[0].toUpperCase();
+export const getUserInitials = (firstName: string | null, lastName: string | null, username: string): string => {
+    const [first] = firstName?.trim() ?? "";
+    const [last] = lastName?.trim() ?? "";
+    const [fallback] = username.trim();
+    return (first && last ? first + last : (fallback ?? "")).toUpperCase();
 };
 
 const matchesSearch = (user: IUser, search: string): boolean => {
@@ -61,7 +58,7 @@ const matchesSearch = (user: IUser, search: string): boolean => {
         return true;
     }
 
-    const searchable = [user.username, user.email, getUserFullName(user)];
+    const searchable = [user.username, user.email, getUserFullName(user.firstName, user.lastName)];
 
     return searchable.some((value) => value?.toLowerCase().includes(search));
 };

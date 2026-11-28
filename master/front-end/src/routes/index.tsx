@@ -20,8 +20,8 @@ import { BrowserRouter } from "react-router";
 
 import { getCookie } from "@/helpers";
 import { useAppDispatch } from "@/hooks";
-import { getAxelixSettings } from "@/services";
-import { setAxelixSettings } from "@/store/slices";
+import { getAxelixSettings, getCurrentUser } from "@/services";
+import { setAxelixSettings, setCurrentUser } from "@/store/slices";
 
 import { AuthRoutes } from "./AuthRoutes";
 import { MainRoutes } from "./MainRoutes";
@@ -32,6 +32,15 @@ export const AppRoutes = () => {
     const isAuthenticated = Boolean(getCookie("authorities"));
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            getCurrentUser().then(
+                ({ data }) => dispatch(setCurrentUser(data)),
+                () => dispatch(setCurrentUser(null)),
+            );
+        }
+    }, [isAuthenticated]);
 
     useEffect(() => {
         getAxelixSettings()
@@ -49,9 +58,5 @@ export const AppRoutes = () => {
         return null;
     }
 
-    return (
-        <>
-            <BrowserRouter>{isAuthenticated ? <MainRoutes /> : <AuthRoutes />}</BrowserRouter>
-        </>
-    );
+    return <BrowserRouter>{isAuthenticated ? <MainRoutes /> : <AuthRoutes />}</BrowserRouter>;
 };

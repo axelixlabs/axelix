@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.api.external.ApiPaths.UsersApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.api.external.ApiPaths.UsersApi;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.api.external.response.CurrentUserResponse;
@@ -47,7 +47,6 @@ import com.axelixlabs.axelix.master.domain.auth.Role;
 import com.axelixlabs.axelix.master.domain.auth.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.auth.User;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
-import com.axelixlabs.axelix.master.repository.AuthorityRepository.AuthorityProfile;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.UserAuthoritiesService;
 import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
@@ -128,15 +127,10 @@ public class UserApi {
         User actor = securityContextExecutor.requireSecurityContext().user();
         var details = userService.findUserById(actor.getId()).orElse(null);
         return new CurrentUserResponse(
-                actor.getId(),
                 details == null ? actor.getUsername() : details.username(),
                 details == null ? null : details.firstName(),
                 details == null ? null : details.lastName(),
-                details == null ? null : details.email(),
-                actor.getRoles().stream().map(Role::name).sorted().toList(),
-                userAuthoritiesService.getAuthorities(actor.getRoles()).effectiveAuthorities().stream()
-                        .map(AuthorityProfile::displayName)
-                        .toList());
+                actor.getRoles().stream().map(Role::name).sorted().toList());
     }
 
     @GetMapping(path = ApiPaths.UsersApi.USER_PROFILE)

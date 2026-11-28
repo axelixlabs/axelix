@@ -16,4 +16,5 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 export * from "./authoritiesSlice";
+export * from "./currentUserSlice";
 export * from "./settingsSlice";

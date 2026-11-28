@@ -64,6 +64,13 @@ export interface IUser {
     username: string;
 }
 
+export interface ICurrentUserResponseBody {
+    username: string;
+    firstName: string | null;
+    lastName: string | null;
+    roles: string[];
+}
+
 export interface ICreateUserFormFields {
     /**
      * First name of the user

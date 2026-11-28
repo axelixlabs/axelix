@@ -234,6 +234,9 @@
     },
     "Authentication": {
         "welcome": "Bienvenue",
+        "signedInAs": "Session ouverte en tant que",
+        "closeProfile": "Fermer le profil",
+        "viewProfile": "Voir le profil",
         "logout": "Se déconnecter",
         "docs": "Documentation",
         "loginPasswordForm": {
