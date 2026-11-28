@@ -17,18 +17,6 @@
  */
 import styles from "./styles.module.css";
 
-interface IProps {
-    isEnterprise: boolean;
-    enterpriseText: string;
-    ossText: string;
-}
-
-export const LicenseStatusBadge = ({ isEnterprise, enterpriseText, ossText }: IProps) => {
-    return (
-        <>
-            <span className={`TextUltraSmall ${isEnterprise ? styles.EnterpriseBadge : styles.OSSBadge}`}>
-                {isEnterprise ? enterpriseText : ossText}
-            </span>
-        </>
-    );
-};
+export const OSSBadge = ({ children }: { children: string }) => (
+    <span className={`TextUltraSmall ${styles.OSSBadge}`}>{children}</span>
+);

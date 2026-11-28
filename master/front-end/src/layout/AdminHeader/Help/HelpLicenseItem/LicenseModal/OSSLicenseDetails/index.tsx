@@ -21,7 +21,7 @@ import { Trans, useTranslation } from "react-i18next";
 import type { ILicensing } from "@/models";
 import { LGPL_LINK } from "@/utils";
 
-import { LicenseStatusBadge } from "../../LicenseStatusBadge";
+import { OSSBadge } from "../../OSSBadge";
 import { LicenseFunctions } from "../LicenseFunctions";
 
 import styles from "./styles.module.css";
@@ -42,7 +42,7 @@ export const OSSLicenseDetails = ({ licensing, children }: IProps) => {
 
             <div className={styles.ContentWrapper}>
                 <div className={`TextSmall ${styles.Meta}`}>
-                    <LicenseStatusBadge isEnterprise={false} enterpriseText="Enterprise" ossText="Open Source" />
+                    <OSSBadge>Open Source</OSSBadge>
 
                     <div className={`${styles.MetaStatus} ${styles.MetaStatusOSS}`}>
                         <span>{license}</span>

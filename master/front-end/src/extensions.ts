@@ -20,6 +20,7 @@ import { type ComponentType, createContext } from "react";
 import type { ILicensing } from "@/models";
 
 export interface IConsoleExtensions {
+    LicenseMenuBadge?: ComponentType<{ licensing: ILicensing }>;
     LicenseDetails?: ComponentType<{ licensing: ILicensing }>;
     LicenseStatusAlert?: ComponentType<{ hideSider: boolean }>;
 }

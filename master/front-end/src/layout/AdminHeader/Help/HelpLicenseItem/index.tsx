@@ -15,20 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Badge } from "antd";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { isEnterpriseLicense, isLicenseExpiringSoon } from "@/helpers";
+import { ConsoleExtensionsContext } from "@/extensions";
 import { useAppSelector } from "@/hooks";
 
 import { LicenseModal } from "./LicenseModal";
-import { LicenseStatusBadge } from "./LicenseStatusBadge";
+import { OSSBadge } from "./OSSBadge";
 import styles from "./styles.module.css";
 
 export const HelpLicenseItem = () => {
     const { t } = useTranslation();
 
+    const { LicenseMenuBadge } = useContext(ConsoleExtensionsContext);
     const { licensing } = useAppSelector((state) => state.settings);
     const [isLicenseModalOpen, setIsLicenseModalOpen] = useState<boolean>(false);
 
@@ -37,15 +37,7 @@ export const HelpLicenseItem = () => {
             <div className={styles.LicenseItemWrapper} onClick={() => setIsLicenseModalOpen(true)}>
                 {t("license")}
 
-                {isLicenseExpiringSoon(licensing.validUntil) ? (
-                    <Badge status="warning" />
-                ) : (
-                    <LicenseStatusBadge
-                        isEnterprise={isEnterpriseLicense(licensing)}
-                        enterpriseText="ENT"
-                        ossText="OSS"
-                    />
-                )}
+                {LicenseMenuBadge ? <LicenseMenuBadge licensing={licensing} /> : <OSSBadge>OSS</OSSBadge>}
             </div>
 
             <LicenseModal

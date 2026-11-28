@@ -510,22 +510,10 @@
         "githubSource": "Quellcode auf GitHub"
     },
     "LicenseModal": {
-        "active": "Aktiv",
         "noExpiry": "Unbefristet",
         "thirdPartyNotices": "Hinweise zu Drittanbietern",
         "ossDescription": "Sie verwenden die Distribution <b>Axelix OSS</b> unter der Lizenz <a>{{license}}</a>. Die Enterprise-Funktionen sind auf dieser Instanz nicht aktiviert.",
-        "licensedTo": "LIZENZIERT FÜR",
-        "licensedId": "LIZENZ-ID",
-        "validFrom": "GÜLTIG AB",
-        "validTo": "GÜLTIG BIS",
         "included": "ENTHALTEN",
-        "timeLeft": {
-            "days_one": "läuft in {{count}} Tag ab",
-            "days_other": "läuft in {{count}} Tagen ab",
-            "detailed": "läuft in {{days}} T. {{hours}} Std. {{minutes}} Min. ab",
-            "expired": "abgelaufen",
-            "unknown": "Ablaufdatum unbekannt"
-        },
         "availableInEnterprise": "In Axelix Enterprise verfügbar"
     },
     "ThreadDump": {

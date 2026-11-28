@@ -514,23 +514,10 @@
         "githubSource": "Исходный код на GitHub"
     },
     "LicenseModal": {
-        "active": "Активна",
         "noExpiry": "бессрочно",
         "thirdPartyNotices": "Сторонние лицензии",
         "ossDescription": "Вы используете <b>Axelix OSS</b> дистрибутив в рамках лицензии <a>{{license}}</a>. Возможности Enterprise на этом экземпляре не активированы.",
-        "licensedTo": "ЛИЦЕНЗИАТ",
-        "licensedId": "ID ЛИЦЕНЗИИ",
-        "validFrom": "ДЕЙСТВУЕТ С",
-        "validTo": "ДЕЙСТВУЕТ ДО",
         "included": "ВКЛЮЧЕНО",
-        "timeLeft": {
-            "days_one": "истекает через {{count}} день",
-            "days_few": "истекает через {{count}} дня",
-            "days_many": "истекает через {{count}} дней",
-            "detailed": "истекает через {{days}}д {{hours}}ч {{minutes}}м",
-            "expired": "срок действия истёк",
-            "unknown": "срок действия не указан"
-        },
         "availableInEnterprise": "Доступно в Enterprise"
     },
     "ThreadDump": {

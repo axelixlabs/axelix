@@ -1,16 +1,7 @@
-.EnterpriseBadge,
 .OSSBadge {
     padding: 0 3px;
     border-radius: var(--axelix-border-radius-small);
     font-weight: var(--axelix-font-weight-medium);
-}
-
-.EnterpriseBadge {
-    color: var(--axelix-white);
-    background-color: var(--axelix-green-600);
-}
-
-.OSSBadge {
     color: var(--axelix-green-600);
     background-color: var(--axelix-white);
     border: 1px solid var(--axelix-green-600);

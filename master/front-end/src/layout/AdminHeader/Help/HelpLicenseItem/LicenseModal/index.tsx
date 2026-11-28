@@ -21,7 +21,7 @@ import { UniversalModal } from "@/components";
 import { ConsoleExtensionsContext } from "@/extensions";
 import type { ILicensing } from "@/models";
 
-import { LicenseDetails } from "./LicenseDetails";
+import { OSSLicenseDetails } from "./OSSLicenseDetails";
 
 interface IProps {
     /**
@@ -38,7 +38,7 @@ interface IProps {
 }
 
 export const LicenseModal = ({ isModalOpen, setIsModalOpen, licensing }: IProps) => {
-    const { LicenseDetails: Details = LicenseDetails } = useContext(ConsoleExtensionsContext);
+    const { LicenseDetails: Details = OSSLicenseDetails } = useContext(ConsoleExtensionsContext);
     const onClose = () => setIsModalOpen(false);
 
     return (
