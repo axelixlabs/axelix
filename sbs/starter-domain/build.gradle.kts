@@ -30,7 +30,12 @@ dependencies {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release = 11
+    if (name == "compileJava") {
+        options.release = 11
+    } else {
+        options.release = 17
+    }
+
     options.compilerArgs.add("-parameters")
 }
 
@@ -69,7 +74,11 @@ testing {
 
 tasks {
     withType(KotlinJvmCompile::class).configureEach {
-        compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+        if (name == "compileKotlin") {
+            compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+        } else {
+            compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 }
 
