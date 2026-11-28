@@ -15,20 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { UserOutlined } from "@ant-design/icons";
-
-import { Avatar, Dropdown, type MenuProps } from "antd";
+import { Dropdown, type MenuProps } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
-import { extractErrorCode } from "@/helpers";
-import { type IErrorResponse, StatelessRequest } from "@/models";
+import { extractErrorCode, getUserInitials } from "@/helpers";
+import { type ICurrentUser, type IErrorResponse, StatelessRequest } from "@/models";
 import { logout } from "@/services";
 
 import styles from "./styles.module.css";
 
-export const ProfileMenu = () => {
+export const ProfileMenu = ({ account }: { account: ICurrentUser | null }) => {
+    const navigate = useNavigate();
     const { t } = useTranslation();
 
     const [logoutData, setLogoutData] = useState(StatelessRequest.inactive());
@@ -48,18 +48,21 @@ export const ProfileMenu = () => {
     };
 
     const items: MenuProps["items"] = [
-        {
-            key: "logout",
-            disabled: logoutData.loading,
-            label: <div onClick={logoutClickHandler}>{t("Authentication.logout")}</div>,
-        },
+        { key: "profile", label: t("Authentication.viewProfile"), onClick: () => navigate("/profile") },
+        { key: "logout", label: t("Authentication.logout"), disabled: logoutData.loading, onClick: logoutClickHandler },
     ];
 
     return (
-        <>
-            <Dropdown menu={{ items }}>
-                <Avatar icon={<UserOutlined />} className={styles.Avatar} />
-            </Dropdown>
-        </>
+        <Dropdown menu={{ items }} trigger={["click"]}>
+            <button
+                type="button"
+                className={styles.Avatar}
+                aria-haspopup="menu"
+                aria-label={account?.username ?? t("Users.Profile.account")}
+                title={account?.username}
+            >
+                {account ? getUserInitials(account) : "…"}
+            </button>
+        </Dropdown>
     );
 };

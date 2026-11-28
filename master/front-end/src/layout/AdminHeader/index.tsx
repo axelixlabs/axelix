@@ -19,13 +19,14 @@ import { useNavigate } from "react-router";
 
 import { LogoIcon } from "@/assets";
 import { LanguageSwitcher } from "@/components";
+import type { ICurrentUser } from "@/models";
 
 import { Help } from "./Help";
 import { NavigationBar } from "./NavigationBar";
 import { ProfileMenu } from "./ProfileMenu";
 import styles from "./styles.module.css";
 
-export const AdminHeader = () => {
+export const AdminHeader = ({ account }: { account: ICurrentUser | null }) => {
     const navigate = useNavigate();
 
     return (
@@ -35,7 +36,7 @@ export const AdminHeader = () => {
                 <div className={styles.LinksAndAvatarWrapper}>
                     <NavigationBar />
                     <Help />
-                    <ProfileMenu />
+                    <ProfileMenu account={account} />
                     <LanguageSwitcher />
                 </div>
             </div>

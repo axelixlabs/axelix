@@ -234,7 +234,8 @@
     },
     "Authentication": {
         "welcome": "Welcome",
-        "logout": "Logout",
+        "viewProfile": "View profile",
+        "logout": "Log out",
         "docs": "Docs",
         "loginPasswordForm" : {
             "enterUsername": "Enter username",

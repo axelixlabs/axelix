@@ -64,6 +64,11 @@ export interface IUser {
     username: string;
 }
 
+export interface ICurrentUser extends Pick<IUser, "id" | "username" | "firstName" | "lastName" | "email"> {
+    roles: string[];
+    permissions: string[];
+}
+
 export interface ICreateUserFormFields {
     /**
      * First name of the user

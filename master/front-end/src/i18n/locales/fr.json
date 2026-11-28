@@ -234,6 +234,7 @@
     },
     "Authentication": {
         "welcome": "Bienvenue",
+        "viewProfile": "Voir le profil",
         "logout": "Se déconnecter",
         "docs": "Documentation",
         "loginPasswordForm": {

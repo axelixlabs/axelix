@@ -234,6 +234,7 @@
     },
     "Authentication": {
         "welcome": "Добро пожаловать",
+        "viewProfile": "Посмотреть профиль",
         "logout": "Выйти",
         "loginPasswordForm" : {
             "enterUsername": "Введите имя пользователя",
