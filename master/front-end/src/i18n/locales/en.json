@@ -234,6 +234,8 @@
     },
     "Authentication": {
         "welcome": "Welcome",
+        "signedInAs": "Signed in as",
+        "closeProfile": "Close profile",
         "viewProfile": "View profile",
         "logout": "Log out",
         "docs": "Docs",

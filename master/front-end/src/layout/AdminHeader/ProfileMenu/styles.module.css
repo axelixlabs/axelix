@@ -11,3 +11,46 @@
     background-color: var(--axelix-green-600);
     cursor: pointer;
 }
+
+.Profile {
+    position: relative;
+    width: min(308px, calc(100vw - 32px));
+    padding: var(--axelix-space-4);
+    border: 1px solid var(--axelix-grey-200);
+    border-radius: var(--axelix-border-radius-large);
+    background: var(--axelix-white);
+    box-shadow: var(--axelix-box-shadow-light);
+    overflow-wrap: anywhere;
+}
+
+.Close {
+    position: absolute;
+    top: var(--axelix-space-3);
+    right: var(--axelix-space-3);
+}
+
+.Label {
+    margin-bottom: var(--axelix-space-1);
+    color: var(--axelix-grey-600);
+    font-size: var(--axelix-font-size-caption);
+}
+
+.Name {
+    display: block;
+    padding-right: var(--axelix-space-6);
+    font-size: var(--axelix-font-size-subtitle);
+}
+
+.Username {
+    color: var(--axelix-grey-600);
+    font-family: var(--axelix-font-family-code);
+}
+
+.Roles {
+    margin-top: var(--axelix-space-4);
+}
+
+.Roles :global(.ant-tag) {
+    max-width: 100%;
+    white-space: normal;
+}

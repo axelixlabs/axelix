@@ -34,7 +34,6 @@ const Transactional = Loadable(lazy(() => import("@/pages/Transactional")));
 const EntitiesMap = Loadable(lazy(() => import("@/pages/EntitiesMap")));
 const Environment = Loadable(lazy(() => import("@/pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("@/pages/ConfigProps")));
-const MyProfile = Loadable(lazy(() => import("@/pages/UserProfile/MyProfile")));
 const UserProfile = Loadable(lazy(() => import("@/pages/UserProfile")));
 const Conditions = Loadable(lazy(() => import("@/pages/Conditions")));
 const ThreadDump = Loadable(lazy(() => import("@/pages/ThreadDump")));
@@ -57,7 +56,6 @@ export const MainRoutes = () => {
             <Routes>
                 <Route path="/" element={<MainLayout />}>
                     <Route index element={<Navigate to="/wallboard" replace />} />
-                    <Route path="/profile" element={<MyProfile />} />
                     <Route path="/wallboard" element={<Wallboard />} />
                     {settings.isMcpServerEnabled && <Route path="/mcp-server" element={<MCP />} />}
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />

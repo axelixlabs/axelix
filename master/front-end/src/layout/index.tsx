@@ -63,7 +63,7 @@ export const MainLayout = ({ siderContent }: IProps) => {
                 <Layout className={styles.ContentLayout}>
                     <Content className={`${styles.Content} ${siderContent ? styles.WithSider : ""}`}>
                         {LicenseStatusAlert && <LicenseStatusAlert hideSider={!siderContent} />}
-                        <Outlet context={account} />
+                        <Outlet />
                     </Content>
                 </Layout>
             </Layout>

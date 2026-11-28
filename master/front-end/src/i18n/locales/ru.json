@@ -234,6 +234,8 @@
     },
     "Authentication": {
         "welcome": "Добро пожаловать",
+        "signedInAs": "Вы вошли как",
+        "closeProfile": "Закрыть профиль",
         "viewProfile": "Посмотреть профиль",
         "logout": "Выйти",
         "loginPasswordForm" : {

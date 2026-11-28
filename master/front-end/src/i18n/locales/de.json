@@ -234,6 +234,8 @@
     },
     "Authentication": {
         "welcome": "Willkommen",
+        "signedInAs": "Angemeldet als",
+        "closeProfile": "Profil schließen",
         "viewProfile": "Profil anzeigen",
         "logout": "Abmelden",
         "docs": "Dokumentation",
