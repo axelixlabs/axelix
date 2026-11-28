@@ -18,12 +18,12 @@
 import { UserOutlined } from "@ant-design/icons";
 
 import { Dropdown, Popover } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { fetchData, getUserInitials } from "@/helpers";
-import { type ICurrentUserResponseBody, StatefulRequest } from "@/models";
-import { getCurrentUser, logout } from "@/services";
+import { getUserInitials } from "@/helpers";
+import { CurrentUserContext } from "@/routes/CurrentUserContext";
+import { logout } from "@/services";
 
 import { AccountProfile } from "../AccountProfile";
 
@@ -31,16 +31,9 @@ import styles from "./styles.module.css";
 
 export const CurrentUserProfile = () => {
     const { t } = useTranslation();
-    const [{ response: account }, setAccount] = useState(StatefulRequest.loading<ICurrentUserResponseBody>());
-    const accountRequested = useRef(false);
+    const account = useContext(CurrentUserContext);
     const [profileOpen, setProfileOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
-
-    useEffect(() => {
-        if (accountRequested.current) return;
-        accountRequested.current = true;
-        void fetchData(setAccount, getCurrentUser);
-    }, []);
 
     const logOut = () => {
         setLoggingOut(true);
