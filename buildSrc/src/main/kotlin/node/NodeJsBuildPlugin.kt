@@ -22,6 +22,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.SourceSet
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
@@ -48,6 +49,10 @@ class NodeJsBuildPlugin : Plugin<Project> {
     }
 
     override fun apply(project: Project) {
+        val workspace = project.rootProject
+        workspace.pluginManager.apply(ConsoleWorkspacePlugin::class.java)
+        val checkConsole = workspace.tasks.named("checkConsole")
+
         val extension = project.extensions.create<NodeJsBuildPluginExtension>(AXELIX_DSL_CONFIG)
 
         val buildNodeJsProjectTask =
@@ -55,7 +60,7 @@ class NodeJsBuildPlugin : Plugin<Project> {
                 group = "build"
                 description = "Builds the Node.js front-end project and copies its dist into generated resources"
 
-                dependsOn(":master:checkConsole")
+                dependsOn(checkConsole)
                 val frontendInputs = listOf("src/**", "*.json", "*.ts", "*.html", ".env*")
                 inputs.files(project.fileTree(project.rootProject.file("master/front-end")) { include(frontendInputs) })
                 inputs.files(project.fileTree(extension.sourceDir) { include(frontendInputs) })
@@ -90,5 +95,21 @@ class NodeJsBuildPlugin : Plugin<Project> {
         val steps: ListProperty<String>
 
         val sourceDir: Property<String>
+    }
+}
+
+// Both editions use the same npm workspace. Gradle applies this plugin once on the root project.
+internal class ConsoleWorkspacePlugin : Plugin<Project> {
+    override fun apply(project: Project) {
+        val installDependencies = project.tasks.register<Exec>("installConsoleDependencies") {
+            workingDir(project.projectDir)
+            commandLine("npm", "ci")
+        }
+
+        project.tasks.register<Exec>("checkConsole") {
+            dependsOn(installDependencies)
+            workingDir(project.projectDir)
+            commandLine("npm", "run", "check", "--workspace", "@axelix/console")
+        }
     }
 }

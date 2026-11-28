@@ -142,14 +142,3 @@ tasks.processResources {
 axelix {
     properties.put("version", version.toString())
 }
-
-val installConsoleDependencies = tasks.register<Exec>("installConsoleDependencies") {
-    workingDir(rootDir)
-    commandLine("npm", "ci")
-}
-
-tasks.register<Exec>("checkConsole") {
-    dependsOn(installConsoleDependencies)
-    workingDir(layout.projectDirectory.dir("front-end"))
-    commandLine("npm", "run", "check")
-}
