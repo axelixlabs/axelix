@@ -35,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.service.Jackson2JwtJsonCodec;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
@@ -91,7 +92,8 @@ class ReactiveJwtAuthorizationFilterSeparateManagementPortTest {
     void shouldAllowAccess_TokenIsValid() {
         String token = new DefaultTechUserJwtSerializer(
                         authProperties.getJwt().getAlgorithm(),
-                        authProperties.getJwt().getSigningKey())
+                        authProperties.getJwt().getSigningKey(),
+                        new Jackson2JwtJsonCodec())
                 .serialize(TechUser.MASTER);
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token);

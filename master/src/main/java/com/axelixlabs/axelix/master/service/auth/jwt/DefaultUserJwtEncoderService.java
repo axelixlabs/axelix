@@ -22,13 +22,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonCodec;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.contract.jwt.AxelixJwtToken;
@@ -48,19 +48,23 @@ import com.axelixlabs.axelix.master.domain.auth.User;
 @NullMarked
 public class DefaultUserJwtEncoderService implements UserJwtEncoderService {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     private final JwtSigningStrategy signingStrategy;
 
     private final String signingKey;
 
     private final Duration lifespan;
 
+    private final JwtJsonCodec jsonCodec;
+
     public DefaultUserJwtEncoderService(
-            final JwtAlgorithm algorithm, final String signingKey, final Duration lifespan) {
+            final JwtAlgorithm algorithm,
+            final String signingKey,
+            final Duration lifespan,
+            final JwtJsonCodec jsonCodec) {
         this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
         this.signingKey = signingKey;
         this.lifespan = lifespan;
+        this.jsonCodec = jsonCodec;
     }
 
     @Override
@@ -87,7 +91,7 @@ public class DefaultUserJwtEncoderService implements UserJwtEncoderService {
         try {
             Instant now = Instant.now();
             token.iat(now.getEpochSecond()).exp(now.plus(lifespan).getEpochSecond());
-            JwtBuilder builder = Jwts.builder().content(OBJECT_MAPPER.writeValueAsBytes(token));
+            JwtBuilder builder = Jwts.builder().content(jsonCodec.write(token));
 
             return signingStrategy.signToken(builder, signingKey).compact();
         } catch (JwtTokenGenerationException e) {

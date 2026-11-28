@@ -21,6 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.common.auth.service.Jackson2JwtJsonCodec;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
@@ -44,7 +45,9 @@ public class JwtAuthTestConfiguration {
     @Bean
     public TechUserJwtSerializer techUserJwtSerializer(AuthProperties authProperties) {
         return new DefaultTechUserJwtSerializer(
-                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
+                authProperties.getJwt().getAlgorithm(),
+                authProperties.getJwt().getSigningKey(),
+                new Jackson2JwtJsonCodec());
     }
 
     @Bean

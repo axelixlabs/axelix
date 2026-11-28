@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.TechUser;
+import com.axelixlabs.axelix.common.auth.service.Jackson2JwtJsonCodec;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
@@ -67,7 +68,8 @@ public class TestRestTemplateBuilder {
     public TestRestTemplateBuilder(
             final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
             final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-        this.techUserJwtSerializer = new DefaultTechUserJwtSerializer(algorithm, signingKey);
+        this.techUserJwtSerializer =
+                new DefaultTechUserJwtSerializer(algorithm, signingKey, new Jackson2JwtJsonCodec());
         this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
         this.signingKey = signingKey;
     }

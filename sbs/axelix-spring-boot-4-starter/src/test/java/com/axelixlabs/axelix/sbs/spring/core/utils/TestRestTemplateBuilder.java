@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategy;
 import com.axelixlabs.axelix.common.auth.service.JwtSigningStrategyFactory;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtSerializer;
+import com.axelixlabs.axelix.sbs.spring.core.auth.Jackson3JwtJsonCodec;
 
 /**
  * Configuration for the tests that cover the HTTP API side.
@@ -67,7 +68,8 @@ public class TestRestTemplateBuilder {
     public TestRestTemplateBuilder(
             final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
             final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-        this.techUserJwtSerializer = new DefaultTechUserJwtSerializer(algorithm, signingKey);
+        this.techUserJwtSerializer =
+                new DefaultTechUserJwtSerializer(algorithm, signingKey, new Jackson3JwtJsonCodec());
         this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
         this.signingKey = signingKey;
     }

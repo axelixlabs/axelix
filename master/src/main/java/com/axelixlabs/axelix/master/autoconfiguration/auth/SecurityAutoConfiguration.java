@@ -38,6 +38,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonCodec;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
@@ -79,6 +80,7 @@ import com.axelixlabs.axelix.master.service.auth.basic.UserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.Jackson3JwtJsonCodec;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.UserJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
@@ -173,8 +175,14 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        public TechUserJwtSerializer techUserJwtSerializer(JwtProperties jwtProperties) {
-            return new DefaultTechUserJwtSerializer(jwtProperties.algorithm(), jwtProperties.signingKey());
+        public JwtJsonCodec jwtJsonCodec() {
+            return new Jackson3JwtJsonCodec();
+        }
+
+        @Bean
+        public TechUserJwtSerializer techUserJwtSerializer(JwtProperties jwtProperties, JwtJsonCodec jwtJsonCodec) {
+            return new DefaultTechUserJwtSerializer(
+                    jwtProperties.algorithm(), jwtProperties.signingKey(), jwtJsonCodec);
         }
 
         @Bean
@@ -190,12 +198,12 @@ public class SecurityAutoConfiguration {
         private static final Logger log = LoggerFactory.getLogger(JwtAutoConfiguration.class);
 
         @Bean
-        public UserJwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
+        public UserJwtEncoderService jwtEncoderService(JwtProperties jwtProperties, JwtJsonCodec jwtJsonCodec) {
             if (JwtDefaults.isDefaultSigningKey(jwtProperties.signingKey())) {
                 log.warn(JwtDefaults.MASTER_DEFAULT_SIGNING_KEY_IN_USE_WARNING_MESSAGE);
             }
             return new DefaultUserJwtEncoderService(
-                    jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan());
+                    jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan(), jwtJsonCodec);
         }
 
         @Bean

@@ -317,7 +317,8 @@ class DefaultUserJwtEncoderServiceTest {
     @Test
     void shouldGenerateValidJwtToken_WithHs256() {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
-        UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
+        UserJwtEncoderService encoder =
+                new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan, new Jackson3JwtJsonCodec());
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
@@ -363,7 +364,8 @@ class DefaultUserJwtEncoderServiceTest {
     void shouldGenerateValidJwtToken_WithHs384() {
         String key384 =
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
-        UserJwtEncoderService encoder = new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
+        UserJwtEncoderService encoder =
+                new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan, new Jackson3JwtJsonCodec());
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
 
@@ -401,7 +403,7 @@ class DefaultUserJwtEncoderServiceTest {
         String shortSecretKey = "shortKey";
         JwtAlgorithm jwtAlgorithm = JwtAlgorithm.HMAC256;
         DefaultUserJwtEncoderService invalidService =
-                new DefaultUserJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
+                new DefaultUserJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan, new Jackson3JwtJsonCodec());
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
@@ -435,7 +437,7 @@ class DefaultUserJwtEncoderServiceTest {
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan,
                 final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultUserJwtEncoderService(algorithm, signingKey, lifespan);
+            return new DefaultUserJwtEncoderService(algorithm, signingKey, lifespan, new Jackson3JwtJsonCodec());
         }
     }
 }

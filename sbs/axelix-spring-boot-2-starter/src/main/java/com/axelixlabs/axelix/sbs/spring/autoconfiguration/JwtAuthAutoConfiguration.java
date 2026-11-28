@@ -27,6 +27,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
+import com.axelixlabs.axelix.common.auth.service.Jackson2JwtJsonCodec;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtDeserializer;
 import com.axelixlabs.axelix.common.auth.service.tech.DefaultTechUserJwtSerializer;
 import com.axelixlabs.axelix.common.auth.service.tech.TechUserJwtDeserializer;
@@ -68,7 +69,9 @@ public class JwtAuthAutoConfiguration {
             log.warn(JwtDefaults.STARTER_DEFAULT_SIGNING_KEY_IN_USE_WARNING_MESSAGE);
         }
         return new DefaultTechUserJwtSerializer(
-                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
+                authProperties.getJwt().getAlgorithm(),
+                authProperties.getJwt().getSigningKey(),
+                new Jackson2JwtJsonCodec());
     }
 
     @Bean

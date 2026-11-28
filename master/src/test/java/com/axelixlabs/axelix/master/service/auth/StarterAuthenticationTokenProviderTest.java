@@ -42,6 +42,7 @@ import com.axelixlabs.axelix.master.domain.auth.OssAuthority;
 import com.axelixlabs.axelix.master.domain.auth.PasswordlessUser;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtDecoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultUserJwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.jwt.Jackson3JwtJsonCodec;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,12 +59,12 @@ class StarterAuthenticationTokenProviderTest {
     private static final String SIGNING_KEY =
             "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff";
     private final ScopedValueSecurityContextExecutor securityContextExecutor = new ScopedValueSecurityContextExecutor();
-    private final DefaultUserJwtEncoderService encoder =
-            new DefaultUserJwtEncoderService(JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5));
+    private final DefaultUserJwtEncoderService encoder = new DefaultUserJwtEncoderService(
+            JwtAlgorithm.HMAC512, SIGNING_KEY, Duration.ofMinutes(5), new Jackson3JwtJsonCodec());
     private final StarterAuthenticationTokenProvider tokenProvider = new StarterAuthenticationTokenProvider(
             securityContextExecutor,
             encoder,
-            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY),
+            new DefaultTechUserJwtSerializer(JwtAlgorithm.HMAC512, SIGNING_KEY, new Jackson3JwtJsonCodec()),
             new DefaultUserJwtDecoderService(modernAuthoritiesService(), JwtAlgorithm.HMAC512, SIGNING_KEY));
 
     @ParameterizedTest
