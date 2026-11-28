@@ -29,7 +29,7 @@ import styles from "./styles.module.css";
 export const AccountProfile = ({ account, onClose }: { account: ICurrentUserResponseBody; onClose: () => void }) => {
     const { t } = useTranslation();
     const closeRef = useRef<HTMLButtonElement>(null);
-    const fullName = getUserFullName(account);
+    const fullName = getUserFullName(account.firstName, account.lastName);
 
     useEffect(() => {
         closeRef.current?.focus();

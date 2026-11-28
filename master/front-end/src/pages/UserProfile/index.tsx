@@ -57,7 +57,7 @@ const UserProfile = () => {
     }
 
     const { user, roles, authorities } = userResponse.response;
-    const displayName = getUserFullName(user) ?? user.username;
+    const displayName = getUserFullName(user.firstName, user.lastName) ?? user.username;
     const givenName = user.firstName?.trim() || displayName;
 
     return (

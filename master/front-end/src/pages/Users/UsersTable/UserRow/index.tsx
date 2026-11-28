@@ -59,7 +59,7 @@ export const UserRow = ({ user, selected, onToggle }: IProps) => {
 
     const { id, username, email, roles, lastLoginAt } = user;
     const profilePath = `/administration/users/${id}`;
-    const fullName = getUserFullName(user);
+    const fullName = getUserFullName(user.firstName, user.lastName);
     const status = getUserDisplayStatus(user);
     const isLocal = user.userOrigin === EUserOrigin.LOCAL;
 
@@ -79,7 +79,7 @@ export const UserRow = ({ user, selected, onToggle }: IProps) => {
 
                 <div className={styles.Person}>
                     <span className={`${styles.Avatar} ${fullName ? "" : styles.AvatarAnonymous}`}>
-                        {getUserInitials(user)}
+                        {getUserInitials(user.firstName, user.lastName, user.username)}
                     </span>
                     <div className={styles.PersonText}>
                         <Link

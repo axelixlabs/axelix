@@ -40,17 +40,13 @@ export const getUserDisplayStatus = (user: IUser): EUserDisplayStatus => {
 /**
  * Returns null when neither the first nor the last name is known.
  */
-export const getUserFullName = ({ firstName, lastName }: Pick<IUser, "firstName" | "lastName">): string | null => {
+export const getUserFullName = (firstName: string | null, lastName: string | null): string | null => {
     const fullName = [firstName, lastName].filter(Boolean).join(" ");
 
     return fullName || null;
 };
 
-export const getUserInitials = ({
-    firstName,
-    lastName,
-    username,
-}: Pick<IUser, "firstName" | "lastName" | "username">): string => {
+export const getUserInitials = (firstName: string | null, lastName: string | null, username: string): string => {
     const [first] = firstName?.trim() ?? "";
     const [last] = lastName?.trim() ?? "";
     const [fallback] = username.trim();
@@ -62,7 +58,7 @@ const matchesSearch = (user: IUser, search: string): boolean => {
         return true;
     }
 
-    const searchable = [user.username, user.email, getUserFullName(user)];
+    const searchable = [user.username, user.email, getUserFullName(user.firstName, user.lastName)];
 
     return searchable.some((value) => value?.toLowerCase().includes(search));
 };

@@ -106,7 +106,11 @@ export const AdminHeader = () => {
                         aria-label={account?.username ?? t("Users.Profile.account")}
                         title={account?.username}
                     >
-                        {account ? getUserInitials(account) : <UserOutlined />}
+                        {account ? (
+                            getUserInitials(account.firstName, account.lastName, account.username)
+                        ) : (
+                            <UserOutlined />
+                        )}
                     </button>
                 </Dropdown>
                 <LanguageSwitcher />
