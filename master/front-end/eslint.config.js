@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import path from "node:path";
+
 import js from "@eslint/js";
 import licenseHeader from "@tony.ganchev/eslint-plugin-header";
 
@@ -95,7 +97,7 @@ export default [
                     format: ["UPPER_CASE"],
                 },
             ],
-            "header/header": ["error", "../../LICENSE_HEADER"],
+            "header/header": ["error", path.resolve(process.env.INIT_CWD ?? process.cwd(), "../../LICENSE_HEADER")],
             complexity: ["error", 10],
             "max-nested-callbacks": ["error", 2],
             "max-depth": ["error", 2],

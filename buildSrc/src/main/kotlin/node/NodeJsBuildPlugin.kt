@@ -49,11 +49,16 @@ class NodeJsBuildPlugin : Plugin<Project> {
     }
 
     override fun apply(project: Project) {
-        val workspace = project.rootProject
-        workspace.pluginManager.apply(ConsoleWorkspacePlugin::class.java)
-        val checkConsole = workspace.tasks.named("checkConsole")
-
         val extension = project.extensions.create<NodeJsBuildPluginExtension>(AXELIX_DSL_CONFIG)
+        val installDependencies = project.tasks.register<Exec>("installConsoleDependencies") {
+            workingDir(extension.sourceDir)
+            commandLine("npm", "ci")
+        }
+        val checkConsole = project.tasks.register<Exec>("checkConsole") {
+            dependsOn(installDependencies)
+            workingDir(extension.sourceDir)
+            commandLine("npm", "run", "check")
+        }
 
         val buildNodeJsProjectTask =
             project.tasks.register<NodeJsBuildTask>(BUILD_NODE_JS_PROJECT_TASK_NAME) {
@@ -61,10 +66,9 @@ class NodeJsBuildPlugin : Plugin<Project> {
                 description = "Builds the Node.js front-end project and copies its dist into generated resources"
 
                 dependsOn(checkConsole)
-                val frontendInputs = listOf("src/**", "*.json", "*.ts", "*.html", ".env*")
+                val frontendInputs = listOf("src/**", "*.json", "*.ts", "*.js", ".npmrc", "*.html", ".env*")
                 inputs.files(project.fileTree(project.rootProject.file("master/front-end")) { include(frontendInputs) })
                 inputs.files(project.fileTree(extension.sourceDir) { include(frontendInputs) })
-                inputs.files(project.rootProject.file("package.json"), project.rootProject.file("package-lock.json"))
                 inputs.property("version", project.version.toString())
                 inputs.property("viteVersion", project.providers.environmentVariable("VITE_APP_VERSION").orElse(""))
 
@@ -95,21 +99,5 @@ class NodeJsBuildPlugin : Plugin<Project> {
         val steps: ListProperty<String>
 
         val sourceDir: Property<String>
-    }
-}
-
-// Both editions use the same npm workspace. Gradle applies this plugin once on the root project.
-internal class ConsoleWorkspacePlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        val installDependencies = project.tasks.register<Exec>("installConsoleDependencies") {
-            workingDir(project.projectDir)
-            commandLine("npm", "ci")
-        }
-
-        project.tasks.register<Exec>("checkConsole") {
-            dependsOn(installDependencies)
-            workingDir(project.projectDir)
-            commandLine("npm", "run", "check", "--workspace", "@axelix/console")
-        }
     }
 }

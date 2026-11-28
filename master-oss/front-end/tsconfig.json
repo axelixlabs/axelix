@@ -1,7 +1,7 @@
 {
-    "extends": "../../master/front-end/tsconfig.app.json",
+    "extends": "./node_modules/@axelix/console/tsconfig.app.json",
     "include": [
         "src/main.tsx",
-        "../../master/front-end/src/*.d.ts"
+        "node_modules/@axelix/console/src/*.d.ts"
     ]
 }

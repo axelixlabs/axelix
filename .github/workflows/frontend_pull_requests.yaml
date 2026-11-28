@@ -5,8 +5,6 @@ on:
     paths:
       - 'master/front-end/**'
       - 'master-oss/front-end/**'
-      - 'package.json'
-      - 'package-lock.json'
     branches: [ master ]
 
 concurrency:
@@ -31,6 +29,9 @@ jobs:
           max-lines: '600'
 
   frontend-build:
+    defaults:
+      run:
+        working-directory: ./master-oss/front-end
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -45,9 +46,7 @@ jobs:
         shell: bash
 
       - run: npm run check
-        working-directory: ./master/front-end
         shell: bash
 
       - run: npm run build
-        working-directory: ./master-oss/front-end
         shell: bash

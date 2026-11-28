@@ -24,11 +24,13 @@ import svgr from "vite-plugin-svgr";
 
 export default defineConfig(() => {
     // we have to load the .env file manually here since vite interprets the .env after the config getting loaded
-    const env = loadEnv("", import.meta.dirname, "");
+    const envDir = path.resolve(process.env.INIT_CWD ?? process.cwd(), "../../master/front-end");
+    const env = loadEnv("", envDir, "");
     const apiTarget = env.VITE_LOCAL_API_URL ?? "http://localhost:2935";
 
     return {
-        envDir: import.meta.dirname,
+        envDir,
+        optimizeDeps: { exclude: ["@axelix/console"] },
         plugins: [
             react(),
             babel({
