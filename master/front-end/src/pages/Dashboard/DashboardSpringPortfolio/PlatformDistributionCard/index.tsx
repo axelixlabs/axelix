@@ -20,6 +20,8 @@ import { useTranslation } from "react-i18next";
 import { buildLineColorMap, platformFullName, platformShortName } from "@/helpers";
 import type { IPlatformDistribution } from "@/models";
 
+import { OssChip } from "../OssChip";
+
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -136,13 +138,7 @@ export const PlatformDistributionCard = ({ distribution }: IProps) => {
                                             <span className={styles.LineLabel}>{line.line}</span>
                                         </span>
                                         <span className={styles.LineShare}>{line.applicationPercentage}%</span>
-                                        <span
-                                            className={`${styles.OssChip} ${line.ossSupported ? styles.OssChipOk : styles.OssChipNo}`}
-                                        >
-                                            {line.ossSupported
-                                                ? t("Dashboard.SpringPortfolio.ossOk")
-                                                : t("Dashboard.SpringPortfolio.ossNo")}
-                                        </span>
+                                        <OssChip ossSupported={line.ossSupported} className={styles.OssChip} />
                                     </div>
                                 ))}
                             </div>

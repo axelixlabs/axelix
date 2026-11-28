@@ -506,7 +506,30 @@
             "ossEnds": "Fin OSS",
             "apps": "Applis",
             "legendSupported": "Prise en charge OSS — la communauté publie des correctifs pour cette branche",
-            "legendUnsupported": "Sans prise en charge OSS — aucune version communautaire après cette date"
+            "legendUnsupported": "Sans prise en charge OSS — aucune version communautaire après cette date",
+            "applicationsInUseTitle": "Applications utilisées",
+            "applicationsInUseHint": "Versions détectées à l’exécution",
+            "columns": {
+                "application": "Application",
+                "springBoot": "Spring Boot",
+                "springFramework": "Spring Framework",
+                "status": "Statut"
+            },
+            "applicationsFooter": "{{from}}–{{to}} sur {{total}} applications",
+            "applicationsFooterEmpty": "0 application",
+            "noApplicationsMatch": "Aucune application ne correspond à ces filtres.",
+            "springSlice": "Tranche Spring",
+            "springSliceDescription": "Filtrer les applications par version et statut.",
+            "close": "Fermer",
+            "versionRange": "Plage de versions",
+            "allVersions": "Toutes les versions",
+            "versionRangeHint": "Cliquez sur une version pour ne sélectionner qu’elle. Faites glisser les poignées ou cliquez sur le curseur pour définir une plage.",
+            "and": "ET",
+            "allStatuses": "Tous",
+            "ossSupported": "Support OSS",
+            "windowClosed": "Fenêtre fermée",
+            "clear": "Effacer",
+            "show": "Afficher"
         }
     },
     "About": {

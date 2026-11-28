@@ -1,0 +1,37 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: var(--tp-columns);
+    gap: 14px;
+    align-items: center;
+    min-width: 640px;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--axelix-grey-100);
+}
+
+.Name {
+    font-family: var(--axelix-font-family-code);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.Line {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.Dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.DotOk {
+    background-color: var(--axelix-green-600);
+}
+
+.DotNo {
+    background-color: var(--axelix-orange-500);
+}
